@@ -35,34 +35,25 @@ class KnowledgeSettingsController extends SettingsController {
     /** @var KnowledgeBaseKludgedVars */
     private $kludgedVars;
 
-    /** @var LocalesApiController */
-    private $localApiController;
-
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
     /**
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $apiController
-     * @param MediaApiController $mediaApiController
      * @param Gdn_Request $request
      * @param KnowledgeBaseKludgedVars $kludgedVars
-     * @param LocalesApiController $localApiController
      * @param  KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
-        MediaApiController $mediaApiController,
         Gdn_Request $request,
         KnowledgeBaseKludgedVars $kludgedVars,
-        LocalesApiController $localApiController,
         KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->apiController = $apiController;
-        $this->mediaApiController = $mediaApiController;
         $this->request = $request;
         $this->kludgedVars = $kludgedVars;
-        $this->localApiController = $localApiController;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
@@ -130,35 +121,14 @@ class KnowledgeSettingsController extends SettingsController {
     }
 
     /**
-     * Main entry function for all /knowledge-settings/knowledge-bases routes.
+     * Render the /knowledge-settings/knowledge-categories page.
      *
      * @param int|null $knowledgeBaseID
      * @param string|null $action
      * @return void
      */
-    public function knowledgeBases($knowledgeBaseID = null, $action = null) {
-        $action = strtolower($action ?? "");
-
-        if ($knowledgeBaseID !== null) {
-            $knowledgeBaseID = filter_var($knowledgeBaseID, FILTER_VALIDATE_INT);
-            switch ($action) {
-                case "delete":
-                    $this->knowledgeBasesDelete($knowledgeBaseID, $this->request->get("purge") === "purge");
-                    break;
-                default:
-                    throw new NotFoundException("Page");
-            }
-        } else {
-            $this->knowledgeBasesIndex($this->request->get("status", KnowledgeBaseModel::STATUS_PUBLISHED));
-        }
-    }
-
-    /**
-     * Render the /knowledge-settings/knowledge-categories page.
-     *
-     * @param string $status
-     */
-    private function knowledgeBasesIndex(string $status) {
+    public function knowledgeBases() {
+        $status = $this->request->get("status", KnowledgeBaseModel::STATUS_PUBLISHED);
         if ($status === KnowledgeBaseModel::STATUS_DELETED) {
             $this->title(t('Deleted Knowledge Bases'));
         } else {
@@ -179,29 +149,5 @@ class KnowledgeSettingsController extends SettingsController {
         $this->addIndexNavigation($status);
 
         $this->render('index');
-    }
-
-    /**
-     * Handle a request to "soft" delete a knoweldge base.
-     *
-     * @param integer $knowledgeBaseID
-     * @param bool $purge Perform a true delete of this knowledge base?
-     */
-    private function knowledgeBasesDelete(int $knowledgeBaseID, bool $purge = false) {
-        $this->deliveryMethod(DELIVERY_METHOD_JSON);
-
-        if ($this->Form->authenticatedPostBack()) {
-            if ($purge) {
-                $this->apiController->delete($knowledgeBaseID);
-                $this->informMessage(sprintf(self::t("%s purged."), self::t("Knowledge Base")));
-            } else {
-                $this->apiController->patch($knowledgeBaseID, [
-                    "status" => KnowledgeBaseModel::STATUS_DELETED,
-                ]);
-                $this->informMessage(sprintf(self::t("%s deleted."), self::t("Knowledge Base")));
-            }
-            $this->setRedirectTo("/knowledge-settings/knowledge-bases");
-            $this->render("blank", "utility", "dashboard");
-        }
     }
 }

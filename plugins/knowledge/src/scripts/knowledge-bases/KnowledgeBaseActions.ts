@@ -59,6 +59,12 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
     public static clearErrorAC = actionCreator("CLEAR_ERROR");
     public clearError = this.bindDispatch(KnowledgeBaseActions.clearErrorAC);
 
+    public static clearPatchStatusAC = actionCreator<{ kbID: number }>("CLEAR_PATCH_STATUS");
+    public clearPatchStatus = this.bindDispatch(KnowledgeBaseActions.clearPatchStatusAC);
+
+    public static clearDeleteStatus = actionCreator<{ kbID: number }>("CLEAR_DELETE_STATUS");
+    public clearDeleteStatus = this.bindDispatch(KnowledgeBaseActions.clearDeleteStatus);
+
     public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
         "GET",
     );
@@ -128,9 +134,14 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
 
         return this.dispatch(thunk);
     }
+
+    public patchKBStatus = (knowledgeBaseID: number, newStatus: KnowledgeBaseStatus) => {
+        return this.patchKB({ knowledgeBaseID, status: newStatus });
+    };
+
     public deleteKB = (options: IDeleteKnowledgeBaseRequest) => {
         const apiThunk = bindThunkAction(KnowledgeBaseActions.deleteKB_ACs, async () => {
-            const response = await this.api.delete(`/products/${options.kbID}`);
+            const response = await this.api.delete(`/knowledge-bases/${options.kbID}`);
             return response.data;
         })(options);
         return this.dispatch(apiThunk);
