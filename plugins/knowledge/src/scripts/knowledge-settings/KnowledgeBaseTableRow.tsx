@@ -12,14 +12,16 @@ import { AlertIcon, DeleteIcon, EditIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
-import { t } from "@vanilla/i18n";
+import { t, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import Button from "@library/forms/Button";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
     forStatus: KnowledgeBaseStatus;
-    onEditClick: () => void;
+    onEditClick?: () => void;
+    onStatusChangeClick: () => void;
+    onPurgeClick?: () => void;
 }
 export function KnowledgeBaseTableRow(props: IProps) {
     const kb = props.knowledgeBase;
@@ -56,34 +58,41 @@ export function KnowledgeBaseTableRow(props: IProps) {
                         </ToolTipIcon>
                     </ToolTip>
                 ) : (
-                    kb.sourceLocale
+                    <LocaleDisplayer localeContent={kb.sourceLocale} displayLocale={kb.sourceLocale} />
                 )}
             </td>
             <td>
                 <DashboardTableOptions>
-                    <Button className="btn-icon" onClick={props.onEditClick} baseClass={ButtonTypes.ICON_COMPACT}>
-                        <EditIcon />
-                    </Button>
-                    {props.forStatus === KnowledgeBaseStatus.DELETED ? (
-                        <LinkAsButton
-                            to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/publish`}
-                            className="js-modal-confirm btn-icon"
-                            data-body={t("Are you sure you want to restore this knowledge base?")}
+                    {props.onEditClick && (
+                        <Button className="btn-icon" onClick={props.onEditClick} baseClass={ButtonTypes.ICON_COMPACT}>
+                            <EditIcon />
+                        </Button>
+                    )}
+                    {props.onPurgeClick && (
+                        <Button
+                            className="btn-icon"
+                            onClick={props.onPurgeClick}
                             baseClass={ButtonTypes.DASHBOARD_LINK}
                         >
+                            {t("Purge")}
+                        </Button>
+                    )}
+                    {props.forStatus === KnowledgeBaseStatus.DELETED ? (
+                        <Button
+                            className="btn-icon"
+                            onClick={props.onStatusChangeClick}
+                            baseClass={ButtonTypes.TEXT_PRIMARY}
+                        >
                             {t("Restore")}
-                        </LinkAsButton>
+                        </Button>
                     ) : (
-                        <LinkAsButton
-                            to={`/knowledge-settings/knowledge-bases/${kb.knowledgeBaseID}/delete`}
-                            className="js-modal-confirm btn-icon"
-                            data-body={t(
-                                "Are you sure you want to delete this knowledge base? It can restored later from the Deleted Knowledge Bases page.",
-                            )}
+                        <Button
+                            className="btn-icon"
+                            onClick={props.onStatusChangeClick}
                             baseClass={ButtonTypes.ICON_COMPACT}
                         >
                             <DeleteIcon />
-                        </LinkAsButton>
+                        </Button>
                     )}
                 </DashboardTableOptions>
             </td>

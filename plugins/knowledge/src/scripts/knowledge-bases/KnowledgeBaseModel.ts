@@ -38,8 +38,13 @@ export interface IKnowledgeBasesState {
         [id: number]: IKnowledgeBase;
     }>;
     form: IKbFormState;
+    patchStatusesByID: {
+        [kbID: number]: ILoadable<{}>;
+    };
     formSubmit: ILoadable<{}>;
-    deleteSubmit: ILoadable<{}>;
+    deletesByID: {
+        [kbID: number]: ILoadable<{}>;
+    };
 }
 
 export enum KbViewType {
@@ -80,13 +85,14 @@ export enum KnowledgeBaseStatus {
 
 export interface IPatchKnowledgeBaseRequest {
     knowledgeBaseID: number;
-    description: string;
+    description?: string;
     icon?: string;
-    name: string;
+    name?: string;
+    status?: KnowledgeBaseStatus;
     sortArticles?: KnowledgeBaseSortMode;
     sourceLocale?: string;
-    urlCode: string;
-    viewType: KbViewType;
+    urlCode?: string;
+    viewType?: KbViewType;
 }
 export interface IPostKnowledgeBaseRequest {
     description: string;
@@ -173,9 +179,8 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         formSubmit: {
             status: LoadStatus.PENDING,
         },
-        deleteSubmit: {
-            status: LoadStatus.PENDING,
-        },
+        patchStatusesByID: {},
+        deletesByID: {},
     };
 
     public initialState = KnowledgeBaseModel.INITIAL_STATE;
@@ -254,30 +259,54 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         })
         .case(KnowledgeBaseActions.patchKB_ACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
+            state.patchStatusesByID[payload.knowledgeBaseID] = {
+                status: LoadStatus.LOADING,
+            };
             return state;
         })
         .case(KnowledgeBaseActions.patchKB_ACs.failed, (state, payload) => {
             state.formSubmit.status = LoadStatus.ERROR;
             state.formSubmit.error = payload.error;
+            state.patchStatusesByID[payload.params.knowledgeBaseID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return state;
         })
         .case(KnowledgeBaseActions.patchKB_ACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
             state.knowledgeBasesByID.data![payload.result.knowledgeBaseID] = payload.result;
+            state.patchStatusesByID[payload.params.knowledgeBaseID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.clearPatchStatusAC, (state, { kbID }) => {
+            delete state.patchStatusesByID[kbID];
+            return state;
+        })
+        .case(KnowledgeBaseActions.clearDeleteStatus, (state, { kbID }) => {
+            delete state.deletesByID[kbID];
             return state;
         })
         .case(KnowledgeBaseActions.deleteKB_ACs.started, (state, payload) => {
-            state.deleteSubmit.status = LoadStatus.LOADING;
+            state.deletesByID[payload.kbID] = {
+                status: LoadStatus.LOADING,
+            };
             return state;
         })
         .case(KnowledgeBaseActions.deleteKB_ACs.done, (state, payload) => {
-            delete state.knowledgeBasesByID[payload.params.kbID];
+            delete state.knowledgeBasesByID.data![payload.params.kbID];
+            state.deletesByID[payload.params.kbID] = {
+                status: LoadStatus.SUCCESS,
+            };
             return state;
         })
         .case(KnowledgeBaseActions.deleteKB_ACs.failed, (state, payload) => {
-            const existingKB = state.knowledgeBasesByID[payload.params.kbID];
-            existingKB.deleteKB.status = LoadStatus.ERROR;
-            existingKB.deleteKB.error = payload.error.response.data;
+            state.deletesByID[payload.params.kbID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return state;
         });
 }
