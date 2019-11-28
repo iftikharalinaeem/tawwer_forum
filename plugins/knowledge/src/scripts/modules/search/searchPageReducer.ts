@@ -30,11 +30,6 @@ export enum SearchPeriod {
     ONE_YEAR = "1 year",
 }
 
-export const dateWithin = Object.values(SearchPeriod).map(period => ({
-    label: t(period),
-    value: period,
-}));
-
 export interface ISearchFormState {
     query: string;
     title: string;
