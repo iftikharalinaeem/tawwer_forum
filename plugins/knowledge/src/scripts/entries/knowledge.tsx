@@ -25,11 +25,15 @@ import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { AppContext } from "@library/AppContext";
 import { mountReact } from "@vanilla/react-utils";
 import ErrorPage from "@knowledge/pages/ErrorPage";
+import { serverReducer } from "@knowledge/server/serverReducer";
+import { registerReducer } from "@library/redux/reducerRegistry";
 
 debug(getMeta("context.debug"));
 
 apiv2.interceptors.response.use(deploymentKeyMiddleware);
 Router.addRoutes(getPageRoutes());
+
+registerReducer("server", serverReducer);
 
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
