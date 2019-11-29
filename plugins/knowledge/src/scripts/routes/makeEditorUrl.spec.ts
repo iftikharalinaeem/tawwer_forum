@@ -5,7 +5,7 @@
 
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getMockKbStore } from "@knowledge/__tests__/kbMockStore";
-import { makeEditorUrl, IEditorURLData } from "@knowledge/routes/pageRoutes";
+import { makeEditorUrl, IEditorURLData } from "@knowledge/routes/makeEditorUrl";
 import { DeepPartial } from "redux";
 import { LoadStatus } from "@library/@types/api/core";
 import { dummyKnowledgeBase, dummySiteSection } from "@knowledge/__tests__/kbMockTestData";
