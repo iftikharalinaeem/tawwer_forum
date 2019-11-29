@@ -54,6 +54,8 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         const classesNavigationManager = navigationManagerClasses();
+        const isDisable = !canEdit && this.props.item.children.length === 0 ? false : true;
+
         return (
             <div
                 id={this.id}
@@ -140,24 +142,23 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                             >
                                 {t("Rename")}
                             </Button>
-                            {this.props.item.children.length === 0 && (
-                                <Button
-                                    onClick={this.handleDeleteClick}
-                                    className={classNames(
-                                        "navigationManager-delete",
-                                        "navigationManager-action",
-                                        classesNavigationManager.action,
-                                        classesNavigationManager.deleteItem,
-                                        this.props.className,
-                                    )}
-                                    baseClass={ButtonTypes.CUSTOM}
-                                    buttonRef={this.deleteButtonRef}
-                                    tabIndex={0}
-                                    disabled={canEdit}
-                                >
-                                    {t("Delete")}
-                                </Button>
-                            )}
+
+                            <Button
+                                onClick={this.handleDeleteClick}
+                                className={classNames(
+                                    "navigationManager-delete",
+                                    "navigationManager-action",
+                                    classesNavigationManager.action,
+                                    classesNavigationManager.deleteItem,
+                                    this.props.className,
+                                )}
+                                baseClass={ButtonTypes.CUSTOM}
+                                buttonRef={this.deleteButtonRef}
+                                tabIndex={0}
+                                disabled={isDisable}
+                            >
+                                {t("Delete")}
+                            </Button>
                         </>
                     )}
                 </div>
