@@ -20,7 +20,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();

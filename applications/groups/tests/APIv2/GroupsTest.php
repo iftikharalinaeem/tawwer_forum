@@ -39,7 +39,7 @@ class GroupsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
         \PermissionModel::resetAllRoles();
@@ -48,7 +48,7 @@ class GroupsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->incrementRecordCounterOnCall = false;
         static::$recordCounter++;

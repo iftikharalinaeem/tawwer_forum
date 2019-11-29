@@ -21,7 +21,7 @@ class PollsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'polls'];
 
         parent::setupBeforeClass();
@@ -58,7 +58,7 @@ class PollsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         self::$recordCounter++;

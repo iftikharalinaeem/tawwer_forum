@@ -31,7 +31,7 @@ class SearchTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         self::container()->rule(BreadcrumbModel::class)

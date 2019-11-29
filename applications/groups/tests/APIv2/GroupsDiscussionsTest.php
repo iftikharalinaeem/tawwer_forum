@@ -38,7 +38,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
         \PermissionModel::resetAllRoles();
