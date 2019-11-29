@@ -749,9 +749,6 @@ class SalesforcePlugin extends Gdn_Plugin {
                         writeGenericAttachment([
                             'Icon' => 'ticket',
                             'Body' => wrap(t('A ticket has been generated from this post.'), 'p'),
-                            'Fields' => [
-                                'one' => 'two'
-                            ]
                         ]);
                     } else {
                         writeGenericAttachment([
