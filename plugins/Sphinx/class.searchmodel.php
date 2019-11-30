@@ -441,8 +441,8 @@ class SphinxSearchModel extends \SearchModel {
         $this->fireEvent('BeforeSphinxSearch');
         $search = $sphinx->query($query, implode(' ', $indexes));
         if ($search === false) {
-           $error = $sphinx->getLastError();
-           throw new \Exception($error, 500);
+            $error = $sphinx->getLastError();
+            throw new \Exception($error, 500);
         }
 
         $results = $this->getDocuments($search);
