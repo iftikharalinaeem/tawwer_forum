@@ -427,10 +427,21 @@ class SphinxSearchModel extends \SearchModel {
         return $results;
     }
 
+   /**
+    * @param SphinxClient $sphinx
+    * @param $query
+    * @param $indexes
+    * @return array
+    * @throws Exception
+    */
     protected function doSearch($sphinx, $query, $indexes) {
         $this->EventArguments['SphinxClient'] = $sphinx;
         $this->fireEvent('BeforeSphinxSearch');
         $search = $sphinx->query($query, implode(' ', $indexes));
+        if ($search === false) {
+           $error = $sphinx->getLastError();
+           throw new \Exception($error, 500);
+        }
 
         $results = $this->getDocuments($search);
         $total = $search['total'] ?? 0;

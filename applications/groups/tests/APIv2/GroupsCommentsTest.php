@@ -61,7 +61,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
         self::createUsers(8);
         $session->end();
     }
-    
+
     /**
      * Create Users for test.
      *
@@ -177,11 +177,11 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
 
     /**
      * Test /comments/:discussionID endpoint with a secret group and a guest user.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
      */
     public function testFailSecretGroupCommentID() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
+
         $secretGroupID = self::$secretGroups[1]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
         $this->createComment($secretDiscussionID);
@@ -211,11 +211,11 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
 
     /**
      * Test /comments/:discussionID endpoint with a private group and a guest.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
      */
     public function testFailPrivateGroupCommentID() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
+
         $privateGroupID = self::$privateGroups[1]['groupID'];
         $privateDiscussionID = $this->createDiscussion($privateGroupID);
         $privateCommentID = $this->createComment($privateDiscussionID);

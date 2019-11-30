@@ -135,7 +135,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 
@@ -159,7 +159,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 
@@ -182,7 +182,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(8, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 

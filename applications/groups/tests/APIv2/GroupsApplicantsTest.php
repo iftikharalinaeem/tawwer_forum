@@ -34,7 +34,7 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
         $invite = $result->getBody();
 
-        $this->assertInternalType('array', $invite);
+        $this->assertIsArray($invite);
         $this->assertArrayHasKey('userID', $invite);
         $this->assertArrayHasKey('reason', $invite);
         $this->assertEquals(self::$userIDs[0], $invite['userID']);
@@ -43,11 +43,11 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
     /**
      * Test POST :groupID/applicants.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Cannot apply to a group that is not private.
      */
     public function testApplyToPublicGroup() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Cannot apply to a group that is not private.');
+
         $originalGroup = $this->createGroup(__FUNCTION__, true);
 
         $reason = uniqid('Because ');
@@ -88,7 +88,7 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
         $applicants = $result->getBody();
 
-        $this->assertInternalType('array', $applicants);
+        $this->assertIsArray($applicants);
         $this->assertEquals(count(self::$userIDs), count($applicants));
 
         $this->pagingTest($url);
@@ -128,7 +128,7 @@ class GroupsApplicantsTest extends AbstractGroupsSubResource {
 
         $applicant = $result->getBody();
 
-        $this->assertInternalType('array', $applicant);
+        $this->assertIsArray($applicant);
         $this->assertArrayHasKey('userID', $applicant);
         $this->assertArrayHasKey('status', $applicant);
         $this->assertEquals(self::$userIDs[0], $applicant['userID']);

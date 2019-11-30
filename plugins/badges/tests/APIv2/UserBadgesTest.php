@@ -30,7 +30,7 @@ class UserBadgesTest extends AbstractBadgesSubResource {
 
         $userBadge = $result->getBody();
 
-        $this->assertInternalType('array', $userBadge);
+        $this->assertIsArray($userBadge);
         $this->assertArrayHasKey('userID', $userBadge);
         $this->assertArrayHasKey('badgeID', $userBadge);
         $this->assertArrayHasKey('reasonBody', $userBadge);
@@ -69,7 +69,7 @@ class UserBadgesTest extends AbstractBadgesSubResource {
 
         $requests = $result->getBody();
 
-        $this->assertInternalType('array', $requests);
+        $this->assertIsArray($requests);
         $this->assertEquals(count(self::$userIDs), count($requests));
     }
 
@@ -104,7 +104,7 @@ class UserBadgesTest extends AbstractBadgesSubResource {
 
         $requests = $result->getBody();
 
-        $this->assertInternalType('array', $requests);
+        $this->assertIsArray($requests);
         $this->assertEquals(count(self::$userIDs) - 1, count($requests));
     }
 

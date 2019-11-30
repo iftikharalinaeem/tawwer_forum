@@ -131,7 +131,7 @@ class ReactionsIdeaTest extends AbstractAPIv2Test {
         foreach ($reactions as $reaction) {
             if ($reaction['userID'] === $this->api()->getUserID()) {
                 $found = true;
-                $this->assertEquals($vote, $reaction['reactionType']['urlcode'], '', 0.0, 10, false, true);
+                $this->assertEqualsIgnoringCase($vote, $reaction['reactionType']['urlcode']);
             }
         }
         $this->assertTrue($found);

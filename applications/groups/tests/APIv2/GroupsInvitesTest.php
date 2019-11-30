@@ -30,7 +30,7 @@ class GroupsInvitesTest extends AbstractGroupsSubResource {
 
         $invite = $result->getBody();
 
-        $this->assertInternalType('array', $invite);
+        $this->assertIsArray($invite);
         $this->assertArrayHasKey('userID', $invite);
         $this->assertArrayHasKey('insertUserID', $invite);
         $this->assertEquals(self::$userIDs[0], $invite['userID']);
@@ -61,7 +61,7 @@ class GroupsInvitesTest extends AbstractGroupsSubResource {
 
         $invites = $result->getBody();
 
-        $this->assertInternalType('array', $invites);
+        $this->assertIsArray($invites);
         $this->assertEquals(count(self::$userIDs), count($invites));
 
         $this->pagingTest($url);
@@ -93,7 +93,7 @@ class GroupsInvitesTest extends AbstractGroupsSubResource {
 
         $invites = $result->getBody();
 
-        $this->assertInternalType('array', $invites);
+        $this->assertIsArray($invites);
         $this->assertEquals(0, count($invites));
     }
 }
