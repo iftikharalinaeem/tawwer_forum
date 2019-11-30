@@ -427,13 +427,15 @@ class SphinxSearchModel extends \SearchModel {
         return $results;
     }
 
-   /**
-    * @param SphinxClient $sphinx
-    * @param $query
-    * @param $indexes
-    * @return array
-    * @throws Exception
-    */
+    /**
+     * Perform a search.
+     *
+     * @param SphinxClient $sphinx
+     * @param string $query
+     * @param array $indexes
+     * @return array
+     * @throws Exception If there is an error while performing the search.
+     */
     protected function doSearch($sphinx, $query, $indexes) {
         $this->EventArguments['SphinxClient'] = $sphinx;
         $this->fireEvent('BeforeSphinxSearch');
