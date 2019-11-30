@@ -54,7 +54,7 @@ class ArticlesTest extends AbstractResourceTest {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ["vanilla", "sphinx", "knowledge"];
         parent::setupBeforeClass();
 
@@ -523,7 +523,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         // Baseline. We should only have one revision and it should be the current one.
         $this->assertEquals(200, $originalResponse->getStatusCode());
-        $this->assertInternalType("array", $originalResponseBody);
+        $this->assertIsArray($originalResponseBody);
         $this->assertCount(1, $originalResponseBody);
         $this->assertEquals(ArticleModel::STATUS_PUBLISHED, $originalResponseBody[0]["status"]);
         $this->assertEquals($article["name"], $originalResponseBody[0]["name"]);
@@ -538,7 +538,7 @@ class ArticlesTest extends AbstractResourceTest {
         $response = $this->api()->get("{$this->baseUrl}/{$articleID}/revisions");
         $responseBody = $response->getBody();
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertInternalType("array", $responseBody);
+        $this->assertIsArray($responseBody);
         $this->assertCount(6, $responseBody);
 
         // Verify there is one, and only one, published revision and that it is the latest revision.
@@ -607,12 +607,11 @@ class ArticlesTest extends AbstractResourceTest {
 
     /**
      * Test posting article in a locale that isn't supported.
-     *
-     * @expectedException Garden\Web\Exception\ClientException
-     * @expectedExceptionMessage Articles must be created in en locale.
-     *
      */
     public function testPostArticleInNotSupportedLocale() {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage('Articles must be created in en locale.');
+
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
         $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
         $kb = $knowledgeBaseModel->get(["knowledgeBaseID" => self::$knowledgeBaseID]);
