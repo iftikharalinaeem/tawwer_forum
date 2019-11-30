@@ -81,7 +81,7 @@ class ReactionsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function setup() {
+    public function setup(): void {
         ReactionModel::$ReactionTypes = null;
         parent::setUp();
     }
@@ -89,7 +89,7 @@ class ReactionsTest extends AbstractResourceTest {
     /**
      * Setup routine, run before the test class is instantiated.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['reactions', 'vanilla'];
         parent::setUpBeforeClass();
     }

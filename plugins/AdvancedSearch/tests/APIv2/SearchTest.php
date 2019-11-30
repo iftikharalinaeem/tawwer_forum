@@ -31,7 +31,7 @@ class SearchTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
 
         self::container()->rule(BreadcrumbModel::class)
@@ -120,7 +120,7 @@ class SearchTest extends AbstractAPIv2Test {
         $item = $this->api()->get('/search?'.http_build_query($params))->getBody()[0];
         $this->assertNotNull($item['body']);
         $this->assertNotNull($item['insertUser']);
-        $this->assertInternalType('array', $item['breadcrumbs']);
+        $this->assertIsArray($item['breadcrumbs']);
         $this->assertInstanceOf(Breadcrumb::class, $item['breadcrumbs'][0]);
     }
 

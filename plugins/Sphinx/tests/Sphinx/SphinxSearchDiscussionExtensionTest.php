@@ -40,7 +40,7 @@ class SphinxSearchDiscussionExtensionTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         saveToConfig('Plugins.Sphinx.UseDeltas', true);
         saveToConfig('Vanilla.EnableCategoryFollowing', '1');

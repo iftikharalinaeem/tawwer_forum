@@ -16,7 +16,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     /**
      * Setup routine, run before each test case.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         ReactionModel::$ReactionTypes = null;
     }
@@ -24,7 +24,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     /**
      * Setup routine, run before the test class is instantiated.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['reactions', 'stubcontent', 'vanilla'];
         parent::setUpBeforeClass();
     }
@@ -82,7 +82,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         $this->assertEquals(201, $response->getStatusCode());
 
         $body = $response->getBody();
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertSummaryHasReactionType($type, $body);
     }
 
@@ -99,7 +99,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
 
         $response = $this->api()->get('/comments/1/reactions');
         $body = $response->getBody();
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertNotEmpty($body);
         $this->asserttrue($this->hasUserReaction($this->api()->getUserID(), $type, $body));
     }
@@ -162,7 +162,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
         $this->assertEquals(201, $response->getStatusCode());
 
         $body = $response->getBody();
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertSummaryHasReactionType($type, $body);
     }
 
@@ -179,7 +179,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
 
         $response = $this->api()->get('/discussions/1/reactions');
         $body = $response->getBody();
-        $this->assertInternalType('array', $body);
+        $this->assertIsArray($body);
         $this->assertNotEmpty($body);
         $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), $type, $body));
     }

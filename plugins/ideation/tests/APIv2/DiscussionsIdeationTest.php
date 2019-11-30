@@ -27,7 +27,7 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
      * @param array $discussion
      */
     private function assertIsIdea($discussion) {
-        $this->assertInternalType('array', $discussion);
+        $this->assertIsArray($discussion);
 
         $this->assertArrayHasKey('type', $discussion);
         $this->assertEquals('idea', $discussion['type']);
@@ -40,7 +40,7 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
         $this->assertArrayHasKey('statusNotes', $discussion['attributes']['idea']);
         $this->assertArrayHasKey('type', $discussion['attributes']['idea']);
 
-        $this->assertInternalType('array', $discussion['attributes']['idea']['status']);
+        $this->assertIsArray($discussion['attributes']['idea']['status']);
         $this->assertArrayHasKey('name', $discussion['attributes']['idea']['status']);
         $this->assertArrayHasKey('state', $discussion['attributes']['idea']['status']);
     }
@@ -74,7 +74,7 @@ class DiscussionsIdeationTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'ideation'];
         parent::setupBeforeClass();
 
