@@ -160,7 +160,7 @@ class RanksTest extends AbstractResourceTest {
             case 'abilities':
                 $expected = $updatedRow['abilities'][$field];
                 $actual = $rank['Abilities'][$expectedName];
-                $actual = $actual === 'yes' ? true : $actual === 'no' ? false : $actual;
+                $actual = $actual === 'yes' ? true : ($actual === 'no' ? false : $actual);
                 break;
             case 'criteria':
                 $expected = $updatedRow['criteria'][$field];
