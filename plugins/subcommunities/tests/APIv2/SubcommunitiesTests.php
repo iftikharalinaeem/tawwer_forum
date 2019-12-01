@@ -17,7 +17,7 @@ class SubcommunitiesTests extends AbstractAPIv2Test {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'subcommunities'];
         parent::setupBeforeClass();
         self::createSubcommunity();
