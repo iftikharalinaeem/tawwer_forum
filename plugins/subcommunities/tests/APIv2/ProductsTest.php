@@ -19,7 +19,7 @@ class ProductsTest extends AbstractAPIv2Test {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'subcommunities'];
         parent::setupBeforeClass();
         /** @var \Gdn_Configuration $config */
@@ -109,11 +109,11 @@ class ProductsTest extends AbstractAPIv2Test {
 
     /**
      * Test Delete /products
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage Product not found.
      */
     public function testDeleteProduct() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Product not found.');
+   
         $record = $this->getRecord();
         $result = $this->api()->post(
             'products',
@@ -130,12 +130,12 @@ class ProductsTest extends AbstractAPIv2Test {
 
     /**
      * Test Delete /products with associated subcommunity.
-     *
-     * @expectedException \Garden\Web\Exception\ClientException
-     * @expectedExceptionCode 409
-     * @expectedExceptionMessageRegExp  /Product \d is associated with \d subcommunities./
      */
     public function testDeleteProductWithSubcommunity() {
+        $this->expectException(\Garden\Web\Exception\ClientException::class);
+        $this->expectExceptionCode(409);
+        $this->expectExceptionMessageMatches('/Product \\d is associated with \\d subcommunities./');
+   
         $record = $this->getRecord();
         $result = $this->api()->post(
             'products',
