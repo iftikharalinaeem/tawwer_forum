@@ -134,7 +134,7 @@ class ProductsTest extends AbstractAPIv2Test {
     public function testDeleteProductWithSubcommunity() {
         $this->expectException(\Garden\Web\Exception\ClientException::class);
         $this->expectExceptionCode(409);
-        $this->expectExceptionMessageRegExp('/Product \\d is associated with \\d subcommunities./');
+        $this->expectExceptionMessageMatches('/Product \\d is associated with \\d subcommunities./');
    
         $record = $this->getRecord();
         $result = $this->api()->post(
