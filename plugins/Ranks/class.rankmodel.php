@@ -13,6 +13,12 @@ class RankModel extends Gdn_Model {
     protected static $_Ranks = null;
 
     /**
+     * @var array
+     */
+    private $allowedLinkHosts = [
+    ];
+
+    /**
      * RankModel constructor.
      */
     public function __construct() {
@@ -628,5 +634,69 @@ class RankModel extends Gdn_Model {
         }
 
         return true;
+    }
+
+    /**
+     * Determine whether or not some HTML has external links.
+     *
+     * @param string $html
+     * @return bool
+     */
+    public function hasExternalLinks(string $html): bool {
+        // Do not allow any anchors. This could include links to attachments in some formats, like rich.
+        $dom = new DOMDocument();
+        $dom->loadHTML($html);
+        $anchors = $dom->getElementsByTagName("a");
+        $currentDomain = parse_url(Gdn::request()->domain(), PHP_URL_HOST);
+
+        // Allow links to the current domain or uploads.
+        if ($anchors instanceof Traversable) {
+            /** @var DOMElement $anchor */
+            foreach ($anchors as $anchor) {
+                $linkUrl = $anchor->getAttribute("href");
+                $urlParts = parse_url($linkUrl);
+                $linkHost = $urlParts['host'] ?? '';
+                $linkPath = $urlParts['path'] ?? '';
+                if (!empty($linkHost) &&
+                    $linkHost !== $currentDomain &&
+                    !in_array($linkHost, $this->allowedLinkHosts, true) &&
+                    !preg_match('`\.v-cdn\.net$`', $linkHost) &&
+                    !Gdn_Upload::isUploadUri($linkUrl)) {
+
+                    return true;
+                } elseif (strpos($linkPath, '/home/leaving') !== false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all of the allowed link hosts.
+     *
+     * @return string[]
+     */
+    public function getAllowedLinkHosts(): array {
+        return $this->allowedLinkHosts;
+    }
+
+    /**
+     * Set the allowed link hosts.
+     *
+     * @param string[] $allowedLinkHosts
+     */
+    public function setAllowedLinkHosts(array $allowedLinkHosts): void {
+        $this->allowedLinkHosts = $allowedLinkHosts;
+    }
+
+    /**
+     * Add an allowed link host.
+     *
+     * @param string $host
+     */
+    public function addAllowedLinkHost(string $host): void {
+        $this->allowedLinkHosts[] = $host;
     }
 }
