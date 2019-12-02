@@ -9,6 +9,7 @@
 use Vanilla\ApiUtils;
 use Garden\Web\Exception\ServerException;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
 
 /**
  * Class RuleApiController
@@ -113,6 +114,7 @@ class RulesApiController extends AbstractApiController {
      * @param int $id The ID of the rule to update.
      * @param array $body The request body.
      * @return array
+     * @throws ServerException
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -125,9 +127,13 @@ class RulesApiController extends AbstractApiController {
 
         $body = $this->normalizeInput($in->validate($body, true));
 
-        $this->ruleModel->update($body, ['RuleID' => $id]);
-        $this->validateModel($this->ruleModel);
+        try {
+            $this->ruleModel->update($body, ['RuleID' => $id]);
+        } catch (Exception $exception) {
+            throw new ServerException('Unable to update rule.', 500);
+        }
 
+        $this->validateModel($this->ruleModel);
         $rule = $this->ruleModel->getID($id);
 
         return $out->validate($this->normalizeOutput($rule));
@@ -149,13 +155,13 @@ class RulesApiController extends AbstractApiController {
         $body = $in->validate($body);
         $rule = $this->normalizeInput($body);
 
-        $id = $this->ruleModel->insert($rule);
-        $this->validateModel($this->ruleModel);
-
-        if (!$id) {
+        try {
+            $id = $this->ruleModel->insert($rule);
+        } catch (Exception $exception) {
             throw new ServerException('Unable to create rule.', 500);
         }
 
+        $this->validateModel($this->ruleModel);
         $rule = $this->ruleModel->getID($id);
 
         return $out->validate($this->normalizeOutput($rule));
@@ -196,7 +202,7 @@ class RulesApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     private function fullSchema() {
-        $schema = Schema::parse([
+        return Schema::parse([
             'ruleID:i' => 'The ID of the rule.',
             'name:s' => 'The name of the rule.',
             'description:s|n' => [
@@ -210,18 +216,21 @@ class RulesApiController extends AbstractApiController {
             'updateUserID:i|n' => 'The user that last edited the rule.',
             'updateUser?' => $this->getUserFragmentSchema()
         ]);
-
-        return $schema;
     }
 
     /**
-     * Get a rule by ID, throws an exception if the rule is not found.
+     * Get a rule by ID.
      *
      * @param int $id
      * @return array
+     * @throws NotFoundException
      */
     private function getRuleByID(int $id): array {
-        return $this->ruleModel->getID($id);
+        try {
+            return $this->ruleModel->getID($id);
+        } catch (Exception $exception) {
+            throw new NotFoundException('Rule');
+        }
     }
 
     /**

@@ -100,7 +100,7 @@ function writeUserNoteWarning($row) {
         }
 
         if (isset($row['Rule']['Name'])) {
-            echo '<b>'.t('Infringed rule').'</b>: ' . $row['Rule']['Name'];
+            echo '<b>' . Gdn::translate('Infringed rule') . '</b>: ' . $row['Rule']['Name'];
 
             if (isset($row['Rule']['Description'])) {
                 echo '<div class="Meta">' . $row['Rule']['Description'] . '</div>';

@@ -40,12 +40,12 @@ Gdn::structure()->table('WarningType')
 
 Gdn::structure()->table('Rule')
     ->primaryKey('RuleID')
+    ->column('Name', 'varchar(255)', false)
+    ->column('Description', 'varchar(500)', false)
     ->column('InsertUserID', 'int', false, 'key')
     ->column('DateInserted', 'datetime', false)
     ->column('UpdateUserID', 'int', true)
-    ->column('DateUpdated', 'int', true)
-    ->column('Name', 'varchar(255)', false)
-    ->column('Description', 'varchar(500)', false)
+    ->column('DateUpdated', 'datetime', true)
     ->set();
 
 
