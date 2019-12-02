@@ -48,7 +48,6 @@ Gdn::structure()->table('Rule')
     ->column('DateUpdated', 'datetime', true)
     ->set();
 
-
 if (!$WarningTypeExists) {
     Gdn::sql()->replace(
         'WarningType',
