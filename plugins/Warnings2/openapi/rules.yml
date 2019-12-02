@@ -4,19 +4,19 @@ paths:
   /rules:
     get:
       parameters:
-        - description: |
-            Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
-          in: query
-          name: expand
-          schema:
-            items:
-              enum:
-              - insertUser
-              - updateUser
-              - all
-              type: string
+      - description: |
+          Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - updateUser
+            - all
+            type: string
           type: array
-          style: form
+        style: form
       responses:
         '200':
           content:

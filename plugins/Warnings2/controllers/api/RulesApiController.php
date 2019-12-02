@@ -25,6 +25,12 @@ class RulesApiController extends AbstractApiController {
     /** @var Schema */
     private $ruleSchema;
 
+    /**
+     * RulesApiController constructor.
+     *
+     * @param RuleModel $ruleModel
+     * @param UserModel $userModel
+     */
     public function __construct(RuleModel $ruleModel, UserModel $userModel) {
         $this->ruleModel = $ruleModel;
         $this->userModel = $userModel;
@@ -74,7 +80,7 @@ class RulesApiController extends AbstractApiController {
     /**
      * Get a list of Rules.
      *
-     * @param $query
+     * @param array $query
      * @return mixed
      */
     public function index(array $query) {
@@ -114,7 +120,7 @@ class RulesApiController extends AbstractApiController {
      * @param int $id The ID of the rule to update.
      * @param array $body The request body.
      * @return array
-     * @throws ServerException
+     * @throws ServerException If the rule could not be updated.
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -144,7 +150,7 @@ class RulesApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @return array
-     * @throws ServerException If the badge could not be created.
+     * @throws ServerException If the rule could not be created.
      */
     public function post(array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -223,7 +229,7 @@ class RulesApiController extends AbstractApiController {
      *
      * @param int $id
      * @return array
-     * @throws NotFoundException
+     * @throws NotFoundException If the rule was not found.
      */
     private function getRuleByID(int $id): array {
         try {
