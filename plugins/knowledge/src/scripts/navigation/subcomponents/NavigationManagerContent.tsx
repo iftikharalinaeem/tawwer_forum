@@ -33,7 +33,7 @@ interface IProps {
     firstID: string | null;
     getItemID: (id: string) => string;
     isInRoot: boolean;
-    canEdit?: boolean;
+    isDisable?: boolean; // for enable/disable Delete category button
 }
 
 interface IState {
@@ -50,11 +50,10 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot, isInRoot, canEdit } = this.props;
+        const { item, provided, snapshot, isInRoot, isDisable } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         const classesNavigationManager = navigationManagerClasses();
-        const isDisable = !canEdit && this.props.item.children.length === 0 ? false : true;
 
         return (
             <div
@@ -137,7 +136,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
-                                disabled={canEdit}
+                                disabled={isDisable}
                                 tabIndex={0}
                             >
                                 {t("Rename")}
