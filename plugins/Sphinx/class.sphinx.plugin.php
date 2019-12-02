@@ -6,7 +6,7 @@
 
 use Garden\Container\Container;
 use Garden\Schema\Schema;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Sphinx\Models\SearchRecordTypeProvider;
 use Vanilla\Sphinx\Models\SearchRecordTypeDiscussion;

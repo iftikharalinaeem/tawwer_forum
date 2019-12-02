@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion;
@@ -374,7 +374,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
 
             $Row['ImageUrls'] = $this->formatService->parseImageUrls($Row['Summary'], $Row['Format']);
             $Row['Summary'] = searchExcerpt($this->formatService->renderPlainText($Row['Summary'], $Row['Format']), $SearchTerms, $Length);
-            
+
             // Left behind for compatibility with existing view overrides.
             // They won't see the media previews unless they are updated, but at least they won't break.
             $Row['Media'] = [];
