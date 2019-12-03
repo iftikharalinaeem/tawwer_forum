@@ -57,7 +57,7 @@ class StatusesTest extends AbstractResourceTest {
     /**
      * Setup routine, run before the test class is instantiated.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'ideation'];
         parent::setUpBeforeClass();
     }

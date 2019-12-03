@@ -20,7 +20,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
@@ -130,7 +130,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
 
         $participant = $result->getBody();
 
-        $this->assertInternalType('array', $participant);
+        $this->assertIsArray($participant);
         $this->assertArrayHasKey('userID', $participant);
         $this->assertArrayHasKey('attending', $participant);
         $this->assertEquals(self::$userIDs[0], $participant['userID']);
@@ -159,7 +159,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
 
         $participant = $result->getBody();
 
-        $this->assertInternalType('array', $participant);
+        $this->assertIsArray($participant);
         $this->assertArrayHasKey('userID', $participant);
         $this->assertArrayHasKey('attending', $participant);
         $this->assertEquals(self::$userIDs[0], $participant['userID']);
@@ -186,7 +186,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
 
             $participant = $result->getBody();
 
-            $this->assertInternalType('array', $participant);
+            $this->assertIsArray($participant);
             $this->assertArrayHasKey('userID', $participant);
             $this->assertArrayHasKey('attending', $participant);
             $this->assertEquals(self::$userIDs[0], $participant['userID']);
@@ -228,7 +228,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
 
         $participants = $result->getBody();
 
-        $this->assertInternalType('array', $participants);
+        $this->assertIsArray($participants);
         $this->assertEquals(count(self::$userIDs), count($participants));
     }
 
@@ -256,7 +256,7 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
 
             $participant = $result->getBody();
 
-            $this->assertInternalType('array', $participant);
+            $this->assertIsArray($participant);
             $this->assertArrayHasKey('userID', $participant);
             $this->assertArrayHasKey('attending', $participant);
             $this->assertEquals($userID, $participant['userID']);

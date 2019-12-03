@@ -38,7 +38,7 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
         \PermissionModel::resetAllRoles();
@@ -189,11 +189,11 @@ class GroupsDiscussionsTest extends DiscussionsTest {
 
     /**
      * Test /discussion/:id endpoint with a secret group and non member.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You need the Vanilla.Discussions.View permission to do that.
      */
     public function testFailSecretGroupDiscussionID() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
+
         $secretGroupID = self::$secretGroups[0]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
 

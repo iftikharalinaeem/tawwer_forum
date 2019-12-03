@@ -13,7 +13,7 @@ class UserRankTest extends AbstractAPIv2Test {
     /**
      * Setup routine, run before the test class is instantiated.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['ranks', 'vanilla'];
         parent::setUpBeforeClass();
     }

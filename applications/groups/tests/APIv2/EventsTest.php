@@ -37,7 +37,7 @@ class EventsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$groups = [];
         self::$addons = ['vanilla', 'groups'];
         parent::setupBeforeClass();
@@ -71,7 +71,7 @@ class EventsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         static::$testCount++;
     }

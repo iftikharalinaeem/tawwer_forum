@@ -28,7 +28,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
         $member = $result->getBody();
 
-        $this->assertInternalType('array', $member);
+        $this->assertIsArray($member);
         $this->assertArrayHasKey('userID', $member);
         $this->assertArrayHasKey('role', $member);
         $this->assertEquals(self::$userIDs[0], $member['userID']);
@@ -44,11 +44,11 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
     /**
      * Test POST :groupID/join where the group is private.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage A group must be public or you have to be invited to join it.
      */
     public function testJoinPrivate() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A group must be public or you have to be invited to join it.');
+
         $originalGroup = $this->createGroup(__FUNCTION__, false);
 
         // Join as one or our test user.
@@ -84,7 +84,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
         $member = $result->getBody();
 
-        $this->assertInternalType('array', $member);
+        $this->assertIsArray($member);
         $this->assertArrayHasKey('userID', $member);
         $this->assertArrayHasKey('role', $member);
         $this->assertEquals(self::$userIDs[0], $member['userID']);
@@ -111,7 +111,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
         $member = $result->getBody();
 
-        $this->assertInternalType('array', $member);
+        $this->assertIsArray($member);
         $this->assertArrayHasKey('role', $member);
         $this->assertEquals('member', $member['role']);
 
@@ -139,7 +139,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
         $member = $result->getBody();
 
-        $this->assertInternalType('array', $member);
+        $this->assertIsArray($member);
         $this->assertArrayHasKey('role', $member);
         $this->assertEquals('leader', $member['role']);
 
@@ -151,11 +151,11 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
     /**
      * Test POST :groupID/leave as the owner of the group.
-     *
-     * @expectedException \Exception
-     * @expectedExceptionMessage You can't leave the group you started.
      */
     public function testOwnerLeaveGroup() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You can\'t leave the group you started.');
+
         $originalGroup = $this->createGroup(__FUNCTION__, true);
 
         $this->api()->post(
@@ -265,7 +265,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
 
         $groupMembers = $result->getBody();
 
-        $this->assertInternalType('array', $groupMembers);
+        $this->assertIsArray($groupMembers);
         $this->assertEquals(1 + count(self::$userIDs), count($groupMembers));
     }
 }

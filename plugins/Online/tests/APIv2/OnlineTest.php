@@ -27,7 +27,7 @@ class OnlineTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         echo null;
     }
@@ -35,7 +35,7 @@ class OnlineTest extends AbstractAPIv2Test {
     /**
      * @inheritdoc
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'online'];
         parent::setUpBeforeClass();
 

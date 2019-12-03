@@ -17,7 +17,7 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$userIDs = [];
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();

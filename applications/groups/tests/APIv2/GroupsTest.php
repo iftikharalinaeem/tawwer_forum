@@ -39,7 +39,7 @@ class GroupsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['vanilla', 'conversations', 'groups'];
         parent::setupBeforeClass();
         \PermissionModel::resetAllRoles();
@@ -48,7 +48,7 @@ class GroupsTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->incrementRecordCounterOnCall = false;
         static::$recordCounter++;
@@ -135,7 +135,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 
@@ -159,7 +159,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(5, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 
@@ -182,7 +182,7 @@ class GroupsTest extends AbstractResourceTest {
         $this->assertEquals(8, count($searchResults));
 
         foreach ($searchResults as $result) {
-            $this->assertContains($query['query'], $result['name'], '', true);
+            $this->assertStringContainsStringIgnoringCase($query['query'], $result['name']);
         }
     }
 
