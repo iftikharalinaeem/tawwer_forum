@@ -27,6 +27,7 @@ import { mountReact } from "@vanilla/react-utils";
 import ErrorPage from "@knowledge/pages/ErrorPage";
 import { serverReducer } from "@knowledge/server/serverReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
+import kbReducer from "@knowledge/state/reducer";
 
 debug(getMeta("context.debug"));
 
@@ -34,6 +35,7 @@ apiv2.interceptors.response.use(deploymentKeyMiddleware);
 Router.addRoutes(getPageRoutes());
 
 registerReducer("server", serverReducer);
+registerReducer("knowledge", kbReducer);
 
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
