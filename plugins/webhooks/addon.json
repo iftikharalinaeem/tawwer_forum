@@ -1,0 +1,19 @@
+{
+    "name": "Webhooks",
+    "description": "Vanilla webhooks",
+    "version": "1.0",
+    "license": "Proprietary",
+    "icon": "webhooks.png",
+    "key": "webhooks",
+    "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/webhooks/",
+    "authors": [
+        {
+            "name": "Ryan Perry",
+            "email": "ryan.p@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4.200"
+    }
+}
