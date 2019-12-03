@@ -21,6 +21,9 @@ class RankModelTest extends TestCase {
      */
     private $rankModel;
 
+    /**
+     * {@inheritDoc}
+     */
     public static function getAddons(): array {
         return ['vanilla', 'ranks'];
     }
@@ -112,7 +115,9 @@ class RankModelTest extends TestCase {
             'basic' => ['Hello <b>world</b>'],
             'quote' => [<<<EOT
 <blockquote class="Quote UserQuote blockquote">
-<div class="blockquote-content"><a rel="nofollow" href="/profile/Frank">Frank</a> wrote: <a rel="nofollow" href="/discussion/comment/370536#Comment_370536" class="QuoteLink">»</a></div>
+<div class="blockquote-content">
+    <a rel="nofollow" href="/profile/Frank">Frank</a>
+    wrote: <a rel="nofollow" href="/discussion/comment/370536#Comment_370536" class="QuoteLink">»</a></div>
 <div class="blockquote-content">Okay wut!?</div>
 </blockquote>
 EOT
