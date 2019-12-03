@@ -16,6 +16,7 @@ class RankModel extends Gdn_Model {
      * @var array
      */
     private $allowedLinkHosts = [
+        '*.v-cdn.net',
     ];
 
     /**
@@ -654,17 +655,10 @@ class RankModel extends Gdn_Model {
             /** @var DOMElement $anchor */
             foreach ($anchors as $anchor) {
                 $linkUrl = $anchor->getAttribute("href");
-                $urlParts = parse_url($linkUrl);
-                $linkHost = $urlParts['host'] ?? '';
-                $linkPath = $urlParts['path'] ?? '';
-                if (!empty($linkHost) &&
-                    $linkHost !== $currentDomain &&
-                    !in_array($linkHost, $this->allowedLinkHosts, true) &&
-                    !preg_match('`\.v-cdn\.net$`', $linkHost) &&
-                    !Gdn_Upload::isUploadUri($linkUrl)) {
-
+                if ($this->isExternalHost($linkUrl, $currentDomain)) {
                     return true;
-                } elseif (strpos($linkPath, '/home/leaving') !== false) {
+                }
+                if ($this->isLeavingURL($linkUrl)) {
                     return true;
                 }
             }
@@ -698,5 +692,40 @@ class RankModel extends Gdn_Model {
      */
     public function addAllowedLinkHost(string $host): void {
         $this->allowedLinkHosts[] = $host;
+    }
+
+    /**
+     * Determine whether or not URL is from an external host.
+     *
+     * @param string $url The URL to check.
+     * @param string $currentHost The current host.
+     *
+     * @return bool
+     */
+    public function isExternalHost(string $url, string $currentHost): bool {
+        $linkHost = parse_url($url, PHP_URL_HOST);
+
+        if (empty($linkHost) || $linkHost === $currentHost) {
+            goto THE_ONLY_GOTO_IN_PROD;
+        }
+        foreach ($this->allowedLinkHosts as $host) {
+            if (fnmatch($host, $linkHost, FNM_CASEFOLD)) {
+                goto THE_ONLY_GOTO_IN_PROD;
+            }
+        }
+        return true;
+
+        THE_ONLY_GOTO_IN_PROD:
+            return false;
+    }
+
+    /**
+     * Determine whether or not a URL is the leaving URL.
+     *
+     * @param string $linkUrl
+     * @return bool
+     */
+    private function isLeavingURL(string $linkUrl): bool {
+        return strpos(parse_url($linkUrl, PHP_URL_PATH), '/home/leaving') !== false;
     }
 }

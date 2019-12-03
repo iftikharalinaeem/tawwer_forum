@@ -56,6 +56,38 @@ class RankModelTest extends TestCase {
     }
 
     /**
+     * Test URLs that should be internal.
+     *
+     * @param string $url
+     * @dataProvider provideInternalUrls
+     */
+    public function testNotExternalHost(string $url): void {
+        $actual = $this->rankModel->isExternalHost($url, 'vanilla.test');
+        $this->assertFalse($actual);
+    }
+
+    /**
+     * A different host is different.
+     */
+    public function testExternalHost(): void {
+        $this->assertTrue($this->rankModel->isExternalHost('http://example.com', 'vanilla.test'));
+    }
+
+    /**
+     * @return array
+     */
+    public function provideInternalUrls(): array {
+        $r = [
+            'empty' => [''],
+            'slash' => ['/'],
+            'path' => ['/path'],
+            'current' => ['http://vanilla.test/'],
+            'cdn' => ['http://foo.v-cdn.net/bar'],
+        ];
+        return $r;
+    }
+
+    /**
      * Provide sample HTML with external links.
      *
      * @return array
@@ -63,6 +95,7 @@ class RankModelTest extends TestCase {
     public function provideHtmlWithExternalLinks(): array {
         $r = [
             'basic' => ['<a href="https://example.com">e</a>'],
+            'mixed' => ['<a href="/foo">a</a><a href="http://example.com">b</a>'],
             'entry/leaving' => ['<a href="/home/leaving?target=http%3A%2F%2Fgoogle.com" class="Popup" rel="nofollow">google.com</a>'],
         ];
 
