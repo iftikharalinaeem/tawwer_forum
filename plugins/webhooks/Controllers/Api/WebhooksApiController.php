@@ -56,9 +56,9 @@ class WebhooksApiController extends AbstractApiController {
         $out = $this->webhookSchema('out');
 
         $body = $in->validate($body);
-        $webhookData = ApiUtils::convertInputKeys($body);
+        //$webhookData = ApiUtils::convertInputKeys($body);
 
-        $id = $this->webhookModel->save($webhookData);
+        $id = $this->webhookModel->save($body);
         $this->validateModel($this->webhookModel);
         if (!$id) {
             throw new ServerException('Unable to insert webhook.', 500);
@@ -94,14 +94,12 @@ class WebhooksApiController extends AbstractApiController {
         $in = $this->webhookPostSchema('in')->setDescription('Update a webhook.');
         $out = $this->webhookSchema('out');
 
-        $body = $in->validate($body, true);
-        $webhookData = ApiUtils::convertInputKeys($body);
+        $webhookData = $in->validate($body, true);
+        $webhookData['webhookID'] = $id;
         $row = $this->webhookByID($id);
-        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+        if ($row['insertUserID'] !== $this->getSession()->UserID) {
             $this->permission('Garden.Moderation.Manage');
         }
-
-        $webhookData['WebhookID'] = $row['WebhookID'];
         $this->webhookModel->save($webhookData);
         $this->validateModel($this->webhookModel);
         $row = $this->webhookByID($id);
@@ -173,11 +171,11 @@ class WebhooksApiController extends AbstractApiController {
                 'description' => 'Events to be forwarded to this webhook.',
                 'minLength' => 0
             ],
-            'url:s?' => 'The target URL of the webhook.',
-            'secret:s?' => 'The secret used to sign events associated with this webhook.',
-            'dateInserted:dt' => 'The date/time that the webhook was created.',
+            'url:s' => 'The target URL of the webhook.',
+            'secret:s' => 'The secret used to sign events associated with this webhook.',
+            'dateInserted:dt?' => 'The date/time that the webhook was created.',
             'insertUserID:i?' => 'The user that created the webhook.',
-            'dateUpdated:dt|n' => 'The date/time that the webhook was created.',
+            'dateUpdated:dt|n?' => 'The date/time that the webhook was created.',
             'updateUserID:i?' => 'The user that created the webhook.'
         ]);
     }

@@ -3,7 +3,7 @@
 class WebhookModel extends GDN_Model {
 
     public function __construct() {
-        parent::__construct('Webhook');
+        parent::__construct('webhook');
     }
 
     /**
@@ -21,8 +21,8 @@ class WebhookModel extends GDN_Model {
         $this->options($options);
         $webhook = $this->SQL
             ->select('w.*')
-            ->select('w.Active, w.Name, w.Events, w.Url, w.Secret, w.DateInserted, w.InsertUserID, w.DateUpdated, w.UpdateUserID')
-            ->from('Webhook w')
+            ->select('w.active, w.name, w.events, w.url, w.secret, w.dateInserted, w.insertUserID, w.dateUpdated, w.updateUserID')
+            ->from('webhook w')
             ->where('w.webhookID', $webhookID)
             ->get()
             ->firstRow();
@@ -42,7 +42,7 @@ class WebhookModel extends GDN_Model {
      */
     public function save($formPostValues, $settings = []) {
         $formPostValues = $this->filterForm($formPostValues);
-        $webhookID = $formPostValues['WebhookID'] ?? false;
+        $webhookID = $formPostValues['webhookID'] ?? false;
         $insert = !$webhookID;
 
         if ($insert) {
@@ -59,18 +59,16 @@ class WebhookModel extends GDN_Model {
             if ($insert) {
                 // Save the webhook record.
                 $webhook = [
-                    'Active' => $formPostValues['Active'],
-                    'Events' => $formPostValues['Events'],
-                    'Name' => $formPostValues['Name'],
-                    'Url' =>  $formPostValues['Url'],
-                    'Secret' => $formPostValues['Secret']
+                    'active' => $formPostValues['active'],
+                    'events' => $formPostValues['events'],
+                    'name' => $formPostValues['name'],
+                    'url' =>  $formPostValues['url'],
+                    'secret' => $formPostValues['secret']
                 ];
-                $webhook = $this->coerceData($webhook);
                 $webhookID = $this->insert($webhook);
 
             } else {
-                $newWebhookData = $this->coerceData($formPostValues);
-                $this->update($newWebhookData, ['WebhookID' => $webhookID]);
+                $this->update($formPostValues, ['webhookID' => $webhookID]);
             }
         }
         return $webhookID;
@@ -95,10 +93,10 @@ class WebhookModel extends GDN_Model {
         }
         // Log the deletion.
         $log = isset($options['log']) ? $options['log'] : 'Delete';
-        LogModel::insert($log, 'Webhook', $webhook, isset($options['log']) ? $options['log'] : []);
+        LogModel::insert($log, 'webhook', $webhook, isset($options['log']) ? $options['log'] : []);
 
         // Delete the webhook.
-        $this->SQL->delete('Webhook', ['WebhookID' => $webhookID]);
+        $this->SQL->delete('webhook', ['webhookID' => $webhookID]);
         return true;
     }
 }

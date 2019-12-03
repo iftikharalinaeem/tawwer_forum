@@ -4,15 +4,16 @@ Gdn::structure()->table('Webhook');
 $webhooksExists = Gdn::structure()->tableExists();
 
 Gdn::structure()
-    ->table('Webhook')
-    ->primaryKey('WebhookID')
-    ->column('Active', 'tinyint')
-    ->column('Name', 'varchar(100)', false, ['unique'])
-    ->column('Events', ['*', 'Comment', 'Discussion', 'User'])
-    ->column('Url', 'varchar(255)', false)
-    ->column('Secret', 'varchar(100)', false)
-    ->column('DateInserted', 'datetime', false)
-    ->column('InsertUserID', 'int', false)
-    ->column('DateUpdated', 'datetime', true)
-    ->column('UpdateUserID', 'int', true)
+    ->table('webhook')
+    ->primaryKey('webhookID')
+    ->column('active', 'tinyint')
+    ->column('name', 'varchar(100)', false, ['unique'])
+    ->column('events', ['*', 'comment', 'discussion', 'user'])
+    ->column('url', 'varchar(255)', false)
+    ->column('secret', 'varchar(100)', false)
+    ->column('dateInserted', 'datetime', true)
+    ->column('insertUserID', 'int', true)
+    ->column('dateUpdated', 'datetime', true)
+    ->column('updateUserID', 'int', true)
     ->set();
+
