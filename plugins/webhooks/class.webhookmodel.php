@@ -51,6 +51,7 @@ class WebhookModel extends GDN_Model {
     public static function webhooks() {
         return $webhooks = Gdn::sql()->get('webhook')->resultArray();
     }
+
     /**
      * Save a webhook returns the webhook id.
      *
@@ -103,10 +104,6 @@ class WebhookModel extends GDN_Model {
         if (!$webhook) {
             return false;
         }
-        // Log the deletion.
-//        $log = isset($options['log']) ? $options['log'] : 'Delete';
-//        LogModel::insert($log, 'webhook', $webhook, isset($options['log']) ? $options['log'] : []);
-
         // Delete the webhook.
         $this->SQL->delete('webhook', ['webhookID' => $webhookID]);
         return true;
