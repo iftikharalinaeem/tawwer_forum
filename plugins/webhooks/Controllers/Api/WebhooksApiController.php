@@ -56,7 +56,7 @@ class WebhooksApiController extends AbstractApiController {
      * @return array
      */
     public function get($id, array $query) {
-        $this->permission();
+        $this->permission('Garden.Settings.Manage');
 
         $this->idParamSchema();
         $in = $this->schema([], ['WebhookGet', 'in'])->setDescription('Get a webhook.');
@@ -76,7 +76,7 @@ class WebhooksApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission('Garden.Settings.Manage');
         $in = $this->webhookPostSchema('in')->setDescription('Add a webhook.');
         $out = $this->webhookSchema('out');
 
@@ -97,7 +97,7 @@ class WebhooksApiController extends AbstractApiController {
      * @param int $id The ID of the webhook.
      */
     public function delete($id) {
-        $this->permission('Garden.Moderation.Manage');
+        $this->permission('Garden.Settings.Manage');
         $in = $this->idParamSchema()->setDescription('Delete a webhook.');
         $out = $this->schema([], 'out');
         $this->webhookModel->deleteID($id);
@@ -111,7 +111,7 @@ class WebhooksApiController extends AbstractApiController {
      * @return array
      */
     public function patch($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission('Garden.Settings.Manage');
 
         $this->idParamSchema('in');
         $in = $this->webhookPostSchema('in')->setDescription('Update a webhook.');
@@ -138,6 +138,7 @@ class WebhooksApiController extends AbstractApiController {
      * @return array
      */
     public function webhookByID($id) {
+        $this->permission('Garden.Settings.Manage');
         $row = $this->webhookModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
             throw new NotFoundException('Webhook');
