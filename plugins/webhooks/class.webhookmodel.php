@@ -44,7 +44,7 @@ class WebhookModel extends GDN_Model {
     }
 
     /**
-     * Get all ranks data.
+     * Get all webhooks data.
      *
      * @return mixed|null
      */
