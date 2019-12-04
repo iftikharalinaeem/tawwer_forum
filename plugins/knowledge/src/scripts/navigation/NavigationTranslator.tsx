@@ -11,12 +11,17 @@ import NavigationModel, {
     INormalizedNavigationItem,
     KbRecordType,
     IKbNavigationItem,
+    NavigationActionType,
 } from "@knowledge/navigation/state/NavigationModel";
+import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
-import Loader from "@library/loaders/Loader";
-
-interface IProps {
+import apiv2 from "@library/apiv2";
+import { connect } from "react-redux";
+interface IActions {
+    navigationActions: NavigationActions;
+}
+interface IProps extends IActions {
     kbID: number;
     sourceLocale: string;
     activeLocale: string;
@@ -34,6 +39,9 @@ export function OrganizeCategoriesTranslator(props: IProps) {
     const isLoading = status === LoadStatus.LOADING;
     return (
         <Translator
+            afterSave={() => {
+                props.navigationActions.getNavigationFlat(props.kbID, true); //getNavigationFlat(props.kbID, true);
+            }}
             properties={items.map(navItemToTranslationProperty)}
             isLoading={isLoading}
             isFullScreen
@@ -89,3 +97,13 @@ function useNavigationCategoriesForKB(kbID: number): IKbNavigationItem[] {
 
     return itemsForKb;
 }
+
+function mapStateToProps(state: IKnowledgeAppStoreState) {
+    return state.knowledge.navigation;
+}
+function mapDispatchToProps(dispatch): IActions {
+    return {
+        navigationActions: new NavigationActions(dispatch, apiv2),
+    };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(OrganizeCategoriesTranslator);
