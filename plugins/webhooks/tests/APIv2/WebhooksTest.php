@@ -29,9 +29,7 @@ class WebhooksTest extends AbstractResourceTest {
     public function testPatchFull() {
         $postedRecord = $this->testpost();
         $patchFields = ['active' => 0, 'name' => 'testpatch', 'url' => 'http://webhook.patch'];
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$postedRecord[$this->pk]}", $patchFields);
-
+        $r = $this->api()->patch("{$this->baseUrl}/{$postedRecord[$this->pk]}", $patchFields);
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual($patchFields, $r->getBody());
         return $r->getBody();
@@ -89,5 +87,4 @@ class WebhooksTest extends AbstractResourceTest {
         ];
         return $record;
     }
-
 }

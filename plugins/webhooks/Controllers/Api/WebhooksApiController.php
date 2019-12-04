@@ -1,10 +1,17 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 
+/**
+ * WebhooksApiController for the `/webhooks` resource.
+ */
 class WebhooksApiController extends AbstractApiController {
 
     /** @var WebhookModel */
@@ -19,7 +26,12 @@ class WebhooksApiController extends AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
-    public function __construct( WebhookModel $webhookModel) {
+    /**
+     * WebhooksApiController constructor.
+     *
+     * @param WebhookModel $webhookModel
+     */
+    public function __construct(WebhookModel $webhookModel) {
         $this->webhookModel = $webhookModel;
     }
 
@@ -61,7 +73,7 @@ class WebhooksApiController extends AbstractApiController {
      * Add a webhook.
      *
      * @param array $body The request body.
-     * @throws ServerException if the webhook could not be created.
+     * @throws ServerException If the webhook could not be created.
      * @return array
      */
     public function post(array $body) {
@@ -123,7 +135,7 @@ class WebhooksApiController extends AbstractApiController {
      * Get a webhook by its numeric ID.
      *
      * @param int $id The webhook ID.
-     * @throws NotFoundException if the webhook could not be found.
+     * @throws NotFoundException If the webhook could not be found.
      * @return array
      */
     public function webhookByID($id) {

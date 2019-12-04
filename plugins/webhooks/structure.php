@@ -16,4 +16,3 @@ Gdn::structure()
     ->column('dateUpdated', 'datetime', true)
     ->column('updateUserID', 'int', true)
     ->set();
-

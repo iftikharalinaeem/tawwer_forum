@@ -1,7 +1,17 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
+/**
+ * Class WebhookModel
+ */
 class WebhookModel extends GDN_Model {
 
+    /**
+     * WebhookModel constructor.
+     */
     public function __construct() {
         parent::__construct('webhook');
     }
@@ -17,7 +27,7 @@ class WebhookModel extends GDN_Model {
      * @param array $options options to pass to the database.
      * @return mixed SQL result in format specified by $dataSetType.
      */
-    public function getID($webhookID,  $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
+    public function getID($webhookID, $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
         $this->options($options);
         $webhook = $this->SQL
             ->select('w.*')
@@ -40,7 +50,6 @@ class WebhookModel extends GDN_Model {
      */
     public static function webhooks() {
         return $webhooks = Gdn::sql()->get('webhook')->resultArray();
-
     }
     /**
      * Save a webhook returns the webhook id.
@@ -75,7 +84,6 @@ class WebhookModel extends GDN_Model {
                     'secret' => $formPostValues['secret']
                 ];
                 $webhookID = $this->insert($webhook);
-
             } else {
                 $this->update($formPostValues, ['webhookID' => $webhookID]);
             }
@@ -88,7 +96,7 @@ class WebhookModel extends GDN_Model {
      *
      * @param int $webhookID Unique ID of the webhook to be deleted.
      * @param array $options Additional options for the delete.
-     * @param bool Always returns TRUE.
+     * @return bool Always returns TRUE.
      */
     public function deleteID($webhookID, $options = []) {
         $webhook = $this->getID($webhookID, DATASET_TYPE_ARRAY);
