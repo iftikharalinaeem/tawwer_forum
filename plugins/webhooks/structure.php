@@ -1,7 +1,8 @@
 <?php if (!defined('APPLICATION')) exit;
-
-Gdn::structure()->table('Webhook');
-$webhooksExists = Gdn::structure()->tableExists();
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 Gdn::structure()
     ->table('webhook')

@@ -2,7 +2,7 @@
 /**
  * @author Dani M <dani.m@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 namespace VanillaTests\APIv2;
