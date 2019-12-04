@@ -40,7 +40,7 @@ class WebhooksApiController extends AbstractApiController {
      * @return  array
      */
     public function index() {
-        $this->permission();
+        $this->permission('Garden.Settings.Manage');
         $in = $this->schema([], 'in')->setDescription('Get a list of all the webhooks.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
         $rows = WebhookModel::webhooks();
