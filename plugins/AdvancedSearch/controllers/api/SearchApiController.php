@@ -264,8 +264,7 @@ class SearchApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $data,
-            $this->resolveExpandFields($query, ['insertUser' => 'UserID']),
-            ['expand' => $query['expand']]
+            $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
 

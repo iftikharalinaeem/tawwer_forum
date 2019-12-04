@@ -52,7 +52,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      *
      */
     public function base_render_before($sender, $args) {
-        $sender->Head->addCss('/plugins/termsmanager/design/termsmanager.css');
+        $sender->addCssFile('/plugins/termsmanager/design/termsmanager.css');
     }
 
 
