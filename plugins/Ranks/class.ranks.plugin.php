@@ -198,22 +198,8 @@ class RanksPlugin extends Gdn_Plugin {
         $format = $formValues["Format"] ?? "";
         $body = $this->formatService->renderHTML($content, $format);
 
-        // Do not allow any anchors. This could include links to attachments in some formats, like rich.
-        $dom = new DOMDocument();
-        $dom->loadHTML($body);
-        $anchors = $dom->getElementsByTagName("a");
-        $currentDomain = parse_url(Gdn::request()->domain(), PHP_URL_HOST);
-
-        // Allow links to the current domain or uploads.
-        if ($anchors instanceof Traversable) {
-            /** @var DOMElement $anchor */
-            foreach ($anchors as $anchor) {
-                $linkUrl = $anchor->getAttribute("href");
-                $linkDomain = parse_url($linkUrl, PHP_URL_HOST);
-                if ($linkDomain !== $currentDomain && !Gdn_Upload::isUploadUri($linkUrl)) {
-                    $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
-                }
-            }
+        if ($this->rankModel->hasExternalLinks($body)) {
+            $sender->Validation->addValidationResult($fieldName, t($this->LinksNotAllowedMessage));
         }
     }
 

@@ -182,8 +182,8 @@ echo $this->Form->open(['enctype' => 'multipart/form-data']), $this->Form->error
         </li>
         <li class="form-group">
             <div class="label-wrap">
-                <?php echo $this->Form->label('Post Links', ''),
-                    '<div class="info">'."You can take away the ability to post links to help prevent link spammers.".'</div>'; ?>
+                <?php echo $this->Form->label('Post External Links', ''),
+                    '<div class="info">'."You can take away the ability to post external links to help prevent link spammers.".'</div>'; ?>
             </div>
             <div class="input-wrap">
                 <div class="form-group">
