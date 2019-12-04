@@ -152,7 +152,7 @@ class WebhooksApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function webhookPostSchema($type = '') {
+    private function webhookPostSchema($type = '') {
         if ($this->webhookPostSchema === null) {
             $this->webhookPostSchema = $this->schema(
                 Schema::parse([
@@ -174,7 +174,7 @@ class WebhooksApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function webhookSchema($type = '') {
+    private function webhookSchema($type = '') {
         if ($this->webhookSchema === null) {
             $this->webhookSchema = $this->schema($this->fullSchema(), 'Webhook');
         }
@@ -186,15 +186,12 @@ class WebhooksApiController extends AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    protected function fullSchema() {
+    private function fullSchema() {
         return Schema::parse([
             'webhookID:i' => 'The webhook identifier.',
             'active:i' => 'Whether or not this webhook will send events.',
             'name:s' => 'User-friendly name.',
-            'events:s|n' => [
-                'description' => 'Events to be forwarded to this webhook.',
-                'minLength' => 0
-            ],
+            'events:s|n' => ['*', 'comment', 'discussion', 'user'],
             'url:s' => 'The target URL of the webhook.',
             'secret:s' => 'The secret used to sign events associated with this webhook.',
             'dateInserted:dt?' => 'The date/time that the webhook was created.',
@@ -210,7 +207,7 @@ class WebhooksApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema($type = 'in') {
+    private function idParamSchema($type = 'in') {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
                 Schema::parse(['id:i' => 'The webhook ID.']),

@@ -19,19 +19,15 @@ class WebhookModel extends GDN_Model {
     /**
      * Get a single webhook by ID.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $webhookID Unique ID of the webhook.
      * @param string $dataSetType Format to return webhook in.
      * @param array $options options to pass to the database.
-     * @return mixed SQL result in format specified by $dataSetType.
+     * @return array SQL result in format specified by $dataSetType.
      */
     public function getID($webhookID, $dataSetType = DATASET_TYPE_OBJECT, $options = []) {
         $this->options($options);
         $webhook = $this->SQL
             ->select('w.*')
-            ->select('w.active, w.name, w.events, w.url, w.secret, w.dateInserted, w.insertUserID, w.dateUpdated, w.updateUserID')
             ->from('webhook w')
             ->where('w.webhookID', $webhookID)
             ->get()
@@ -48,7 +44,7 @@ class WebhookModel extends GDN_Model {
      *
      * @return mixed|null
      */
-    public static function webhooks() {
+    public function webhooks() {
         return $webhooks = Gdn::sql()->get('webhook')->resultArray();
     }
 

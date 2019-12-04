@@ -19,7 +19,7 @@ class WebhooksTest extends AbstractResourceTest {
      * Run before the test class is instantiated.
      */
     public static function setupBeforeClass(): void {
-        self::$addons = ['vanilla', 'webhooks'];
+        self::$addons = ['webhooks'];
         parent::setUpBeforeClass();
     }
 
@@ -56,12 +56,24 @@ class WebhooksTest extends AbstractResourceTest {
     }
 
     /**
-     * This method is not implemented.
+     * Test PATCH /resource/<id> with a a single field update.
      *
-     * @param null $record
+     * @param string $field The name of the field to patch.
      */
-    public function testPatchSparse($record = null) {
-        $this->assertTrue(true);
+    public function testPatchSparse($field = null) {
+        $this->patchFields = ['name', 'active', 'url', 'events'];
+        $row = $this->testpost();
+        $field = 'name';
+        $patchRow = $this->modifyRow($row);
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            [$field => $patchRow[$field]]
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+
+        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
+        $this->assertSame($patchRow[$field], $newRow[$field]);
     }
 
     /**

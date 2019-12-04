@@ -6,14 +6,10 @@
     "icon": "webhooks.png",
     "key": "webhooks",
     "type": "addon",
-    "documentationUrl": "http://docs.vanillaforums.com/help/webhooks/",
     "authors": [
         {
-            "name": "Ryan Perry",
-            "email": "ryan.p@vanillaforums.com"
+            "name": "Dani M",
+            "email": "dani.m@vanillaforums.com"
         }
-    ],
-    "require": {
-        "vanilla": ">=2.4.200"
-    }
+    ]
 }
