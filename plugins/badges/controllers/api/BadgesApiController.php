@@ -724,8 +724,7 @@ class BadgesApiController extends AbstractApiController {
         }
 
         $row = $this->badgeByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
-
+        $this->userModel->expandUsers($row, ['InsertUserID']);
         $result = $this->normalizeBadgeOutput($row);
         return $out->validate($result);
     }
@@ -762,7 +761,7 @@ class BadgesApiController extends AbstractApiController {
 
         // Get the fresh badge with updated count.
         $row['Badge'] = $this->badgeByID($id);
-        $this->userModel->expandUsers($row['Badge'], ['InsertUserID', 'UpdateUser']);
+        $this->userModel->expandUsers($row['Badge'], ['InsertUserID']);
 
         $result = $this->normalizeUserBadgeOutput($row);
         return $out->validate($result);
