@@ -7,7 +7,6 @@
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\ApiUtils;
 
 /**
  * WebhooksApiController for the `/webhooks` resource.
