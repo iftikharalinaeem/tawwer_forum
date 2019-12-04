@@ -30,7 +30,7 @@ class WebhooksPlugin extends \Gdn_Plugin {
     }
 
     /**
-     * Runs structure.php on /utility/update and on enabling the plugin.
+     * Database configuration.
      */
     public function structure() {
         $this->database->structure()
