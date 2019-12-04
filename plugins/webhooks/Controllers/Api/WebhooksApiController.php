@@ -24,6 +24,20 @@ class WebhooksApiController extends AbstractApiController {
     }
 
     /**
+     * Get a list of all webhooks.
+     *
+     * @return  array
+     */
+    public function index() {
+        $this->permission();
+        $in = $this->schema([], 'in')->setDescription('Get a list of all the webhooks.');
+        $out = $this->schema([':a' => $this->fullSchema()], 'out');
+        $rows = WebhookModel::webhooks();
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
      * Get a webhook.
      *
      * @param int $id The ID of the webhook.
@@ -56,8 +70,6 @@ class WebhooksApiController extends AbstractApiController {
         $out = $this->webhookSchema('out');
 
         $body = $in->validate($body);
-        //$webhookData = ApiUtils::convertInputKeys($body);
-
         $id = $this->webhookModel->save($body);
         $this->validateModel($this->webhookModel);
         if (!$id) {
@@ -74,7 +86,7 @@ class WebhooksApiController extends AbstractApiController {
      * @param int $id The ID of the webhook.
      */
     public function delete($id) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission('Garden.Moderation.Manage');
         $in = $this->idParamSchema()->setDescription('Delete a webhook.');
         $out = $this->schema([], 'out');
         $this->webhookModel->deleteID($id);

@@ -34,6 +34,15 @@ class WebhookModel extends GDN_Model {
     }
 
     /**
+     * Get all ranks data.
+     *
+     * @return mixed|null
+     */
+    public static function webhooks() {
+        return $webhooks = Gdn::sql()->get('webhook')->resultArray();
+
+    }
+    /**
      * Save a webhook returns the webhook id.
      *
      * @param array $formPostValues The data to save.
@@ -77,11 +86,6 @@ class WebhookModel extends GDN_Model {
     /**
      * Delete a webhook.
      *
-     * This is a hard delete that completely removes it from the database.
-     *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $webhookID Unique ID of the webhook to be deleted.
      * @param array $options Additional options for the delete.
      * @param bool Always returns TRUE.
@@ -92,8 +96,8 @@ class WebhookModel extends GDN_Model {
             return false;
         }
         // Log the deletion.
-        $log = isset($options['log']) ? $options['log'] : 'Delete';
-        LogModel::insert($log, 'webhook', $webhook, isset($options['log']) ? $options['log'] : []);
+//        $log = isset($options['log']) ? $options['log'] : 'Delete';
+//        LogModel::insert($log, 'webhook', $webhook, isset($options['log']) ? $options['log'] : []);
 
         // Delete the webhook.
         $this->SQL->delete('webhook', ['webhookID' => $webhookID]);
