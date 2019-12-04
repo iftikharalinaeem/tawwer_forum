@@ -9,11 +9,17 @@
  */
 class WebhooksPlugin extends \Gdn_Plugin {
 
+    /** @var \Gdn_Database */
+    private $database;
+
     /**
      * WebhooksPlugin constructor.
+     *
+     * @param \Gdn_Database $database
      */
-    public function __construct() {
+    public function __construct(\Gdn_Database $database) {
         parent::__construct();
+        $this->database = $database;
     }
 
     /**
@@ -27,6 +33,18 @@ class WebhooksPlugin extends \Gdn_Plugin {
      * Runs structure.php on /utility/update and on enabling the plugin.
      */
     public function structure() {
-        require dirname(__FILE__).'/structure.php';
+        $this->database->structure()
+            ->table('webhook')
+            ->primaryKey('webhookID')
+            ->column('active', 'tinyint')
+            ->column('name', 'varchar(100)', false)
+            ->column('events', ['*', 'comment', 'discussion', 'user'])
+            ->column('url', 'varchar(255)', false)
+            ->column('secret', 'varchar(100)', false)
+            ->column('dateInserted', 'datetime', true)
+            ->column('insertUserID', 'int', true)
+            ->column('dateUpdated', 'datetime', true)
+            ->column('updateUserID', 'int', true)
+            ->set();
     }
 }
