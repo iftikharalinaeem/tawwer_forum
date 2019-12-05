@@ -18,6 +18,7 @@ import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
+
 interface IActions {
     navigationActions: NavigationActions;
 }
@@ -37,10 +38,11 @@ export function OrganizeCategoriesTranslator(props: IProps) {
         return null;
     }
     const isLoading = status === LoadStatus.LOADING;
+
     return (
         <Translator
-            afterSave={() => {
-                props.navigationActions.getNavigationFlat(props.kbID, true); //getNavigationFlat(props.kbID, true);
+            renderNavigationData={() => {
+                props.navigationActions.getNavigationFlat(props.kbID, true);
             }}
             properties={items.map(navItemToTranslationProperty)}
             isLoading={isLoading}
