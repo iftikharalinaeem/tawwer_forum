@@ -169,6 +169,9 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
                                 return;
                             }
                             publishForm(props.properties);
+                            if (props.renderNavigationData) {
+                                props.renderNavigationData();
+                            }
                         }}
                     >
                         {content}
