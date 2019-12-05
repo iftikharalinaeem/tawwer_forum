@@ -34,6 +34,7 @@ interface IProps extends IDeviceProps {
     results: IResult[];
     query?: string;
     pages: ILinkPages;
+    useBackButton?: boolean;
 }
 
 interface IState {
@@ -108,6 +109,11 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     >
                                         <ComposeIcon />
                                     </LinkAsButton>
+                                }
+                                includeBackLink={
+                                    this.props.device !== Devices.MOBILE &&
+                                    this.props.device !== Devices.XS &&
+                                    this.props.useBackButton
                                 }
                             >
                                 <label className={classNames("searchBar-label", classesSearchBar.label)}>
