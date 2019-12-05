@@ -94,7 +94,17 @@ abstract class KbPage extends ThemedPage {
         SiteSectionModel $siteSectionModel = null, // Default needed for method extensions
         KnowledgeBaseModel $kbModel = null // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider, $eventManager);
+        parent::setDependencies(
+            $siteMeta,
+            $request,
+            $session,
+            $assetProvider,
+            $breadcrumbModel,
+            $cspModel,
+            $preloadModel,
+            $eventManager,
+            $themePreloadProvider
+        );
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
