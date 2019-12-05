@@ -20,7 +20,7 @@ import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 
 interface IActions {
-    navigationActions: NavigationActions;
+    navigationActions?: NavigationActions;
 }
 interface IProps extends IActions {
     kbID: number;
@@ -41,8 +41,10 @@ export function OrganizeCategoriesTranslator(props: IProps) {
 
     return (
         <Translator
-            renderNavigationData={() => {
-                props.navigationActions.getNavigationFlat(props.kbID, true);
+            afterSave={() => {
+                if (props.navigationActions) {
+                    props.navigationActions.getNavigationFlat(props.kbID, true);
+                }
             }}
             properties={items.map(navItemToTranslationProperty)}
             isLoading={isLoading}
