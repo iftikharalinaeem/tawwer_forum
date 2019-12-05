@@ -23,6 +23,7 @@ use Vanilla\Knowledge\Models\KnowledgeVariablesProvider;
 use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
+use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -103,6 +104,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('setType', [new SearchRecordTypeArticle()])
             ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
             ->addCall('add', [new Reference(\Vanilla\Site\Application::class, ['knowledge-base', ['kb']])])
+
+            ->rule(\Vanilla\Menu\CounterModel::class)
+                ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
+            ;
         ;
     }
 
