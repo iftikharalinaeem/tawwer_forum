@@ -72,10 +72,11 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
      */
     public function userModel_afterSave_handler(UserModel $model, array $args) {
         $isInsert = !isset($args['FormPostValues']['UserID']);
-
+        $isAdmin = Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
         // Give roles when a user is updated and Confirmed was part of the update.
         // Inserts are managed in afterInsertUser.
-        if (!$isInsert && !empty($args['FormPostValues']['ConfirmEmail'])) {
+        
+        if (!$isInsert && !empty($args['FormPostValues']['ConfirmEmail']) && !$isAdmin) {
             $user = $model->getID($args['UserID'], DATASET_TYPE_ARRAY);
             if (!empty($user['Confirmed'])) {
                 $this->giveRolesByEmail($model, $user);
