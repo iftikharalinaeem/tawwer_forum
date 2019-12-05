@@ -33,7 +33,7 @@ interface IProps {
     firstID: string | null;
     getItemID: (id: string) => string;
     isInRoot: boolean;
-    canEdit?: boolean;
+    isDisable?: boolean; // for enable/disable Delete category button
 }
 
 interface IState {
@@ -50,10 +50,11 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot, isInRoot, canEdit } = this.props;
+        const { item, provided, snapshot, isInRoot, isDisable } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         const classesNavigationManager = navigationManagerClasses();
+
         return (
             <div
                 id={this.id}
@@ -135,29 +136,28 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
-                                disabled={canEdit}
+                                disabled={isDisable}
                                 tabIndex={0}
                             >
                                 {t("Rename")}
                             </Button>
-                            {this.props.item.children.length === 0 && (
-                                <Button
-                                    onClick={this.handleDeleteClick}
-                                    className={classNames(
-                                        "navigationManager-delete",
-                                        "navigationManager-action",
-                                        classesNavigationManager.action,
-                                        classesNavigationManager.deleteItem,
-                                        this.props.className,
-                                    )}
-                                    baseClass={ButtonTypes.CUSTOM}
-                                    buttonRef={this.deleteButtonRef}
-                                    tabIndex={0}
-                                    disabled={canEdit}
-                                >
-                                    {t("Delete")}
-                                </Button>
-                            )}
+
+                            <Button
+                                onClick={this.handleDeleteClick}
+                                className={classNames(
+                                    "navigationManager-delete",
+                                    "navigationManager-action",
+                                    classesNavigationManager.action,
+                                    classesNavigationManager.deleteItem,
+                                    this.props.className,
+                                )}
+                                baseClass={ButtonTypes.CUSTOM}
+                                buttonRef={this.deleteButtonRef}
+                                tabIndex={0}
+                                disabled={isDisable}
+                            >
+                                {t("Delete")}
+                            </Button>
                         </>
                     )}
                 </div>

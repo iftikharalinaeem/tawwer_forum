@@ -7,7 +7,7 @@ import React from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
-import { EditorRoute } from "@knowledge/routes/pageRoutes";
+import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
 
 interface IProps {
     discussionID: number;
@@ -15,7 +15,7 @@ interface IProps {
 
 export function ConvertDiscussionModal(props: IProps) {
     const navigateToDraft = () => {
-        const url = EditorRoute.url({ discussionID: props.discussionID });
+        const url = makeEditorUrl({ discussionID: props.discussionID });
         window.location.href = url;
     };
 

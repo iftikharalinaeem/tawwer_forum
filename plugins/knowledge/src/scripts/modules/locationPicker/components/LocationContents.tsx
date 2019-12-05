@@ -28,9 +28,8 @@ import { loaderClasses } from "@library/loaders/loaderStyles";
 import Paragraph from "@library/layout/Paragraph";
 import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
-import { article } from "@knowledge/navigation/navigationManagerIcons";
+
 import LocationPickerSelectedArticle from "./LocationPickerSelectedArticle";
-import { select } from "@storybook/addon-knobs";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
