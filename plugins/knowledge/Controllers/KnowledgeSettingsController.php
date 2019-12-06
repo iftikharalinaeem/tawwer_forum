@@ -113,6 +113,13 @@ class KnowledgeSettingsController extends SettingsController {
             ],
         ];
         $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getHeaderVars());
+        $configValues += [
+            "SizingVarsTitle" => [
+                "Control" => "title",
+                "Title" => "Sizing Options",
+            ],
+        ];
+        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getSizingVariables());
 
         $configurationModule->initialize($configValues);
 
