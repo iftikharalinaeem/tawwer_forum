@@ -15,9 +15,13 @@ class WebhooksTest extends AbstractResourceTest {
     /** @var string The resource route. */
     protected $baseUrl = "/webhooks";
 
-    /**
-     * Run before the test class is instantiated.
-     */
+    /** @var array The patch fields. */
+    protected $patchFields = ['active', 'name', 'url', 'secret'];
+
+    /** @var bool Whether to check if paging works or not in the index. */
+    protected $testPagingOnIndex = false;
+
+    /** Run before the test class is instantiated. */
     public static function setupBeforeClass(): void {
         self::$addons = ['webhooks'];
         parent::setUpBeforeClass();
@@ -27,29 +31,27 @@ class WebhooksTest extends AbstractResourceTest {
      * Test PATCH /resource/<id> with a full record overwrite.
      */
     public function testPatchFull() {
-        $postedRecord = $this->testpost();
-        $patchFields = ['active' => 0, 'name' => 'testpatch', 'url' => 'http://webhook.patch'];
-        $r = $this->api()->patch("{$this->baseUrl}/{$postedRecord[$this->pk]}", $patchFields);
+        $row = $this->testpost();
+        $newRow = $this->modifyRow($row);
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            $newRow
+        );
+
         $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual($patchFields, $r->getBody());
+        $this->assertRowsEqual($newRow, $r->getBody());
         return $r->getBody();
     }
 
     /**
-     * This method is not implemented.
-     *
-     * @param null $record
-     * @return array|void
+     * {@inheritdoc}
      */
     public function testGetEdit($record = null) {
         $this->assertTrue(true);
     }
 
     /**
-     * This method is not implemented.
-     *
-     * @param null $record
-     * @return array|void
+     * {@inheritdoc}
      */
     public function testGetEditFields($record = null) {
         $this->assertTrue(true);
@@ -58,13 +60,15 @@ class WebhooksTest extends AbstractResourceTest {
     /**
      * Test PATCH /resource/<id> with a a single field update.
      *
+     * Patch endpoints should be able to update every field on its own.
+     *
      * @param string $field The name of the field to patch.
+     * @dataProvider providePatchFields
      */
-    public function testPatchSparse($field = null) {
-        $this->patchFields = ['name', 'active', 'url', 'events'];
-        $row = $this->testpost();
-        $field = 'name';
+    public function testPatchSparse($field) {
+        $row = $this->testPost();
         $patchRow = $this->modifyRow($row);
+
         $r = $this->api()->patch(
             "{$this->baseUrl}/{$row[$this->pk]}",
             [$field => $patchRow[$field]]
@@ -77,13 +81,24 @@ class WebhooksTest extends AbstractResourceTest {
     }
 
     /**
-     * This method is not implemented.
-     *
-     * @param null $record
-     * @return array|void
+     * {@inheritdoc}
      */
-    public function testIndex($record = null) {
-        $this->assertTrue(true);
+    protected function modifyRow(array $row) {
+        $newRow = [];
+
+        $dt = new \DateTimeImmutable();
+        foreach ($this->patchFields as $key) {
+            $value = $row[$key];
+            switch ($key) {
+                case 'active':
+                    $value = !$value;
+                    break;
+                default:
+                    $value = $value.$dt->format(\DateTime::RSS);
+            }
+            $newRow[$key] = $value;
+        }
+        return $newRow;
     }
 
     /**

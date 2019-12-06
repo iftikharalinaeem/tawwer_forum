@@ -43,7 +43,7 @@ class WebhooksApiController extends AbstractApiController {
         $this->permission('Garden.Settings.Manage');
         $in = $this->schema([], 'in')->setDescription('Get a list of all the webhooks.');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
-        $rows = WebhookModel::webhooks();
+        $rows = $this->webhookModel->webhooks();
         $result = $out->validate($rows);
         return $result;
     }
@@ -57,7 +57,6 @@ class WebhooksApiController extends AbstractApiController {
      */
     public function get($id, array $query) {
         $this->permission('Garden.Settings.Manage');
-
         $this->idParamSchema();
         $in = $this->schema([], ['WebhookGet', 'in'])->setDescription('Get a webhook.');
         $out = $this->schema($this->webhookSchema(), 'out');
@@ -119,10 +118,6 @@ class WebhooksApiController extends AbstractApiController {
 
         $webhookData = $in->validate($body, true);
         $webhookData['webhookID'] = $id;
-        $row = $this->webhookByID($id);
-        if ($row['insertUserID'] !== $this->getSession()->UserID) {
-            $this->permission('Garden.Moderation.Manage');
-        }
         $this->webhookModel->save($webhookData);
         $this->validateModel($this->webhookModel);
         $row = $this->webhookByID($id);
@@ -189,7 +184,7 @@ class WebhooksApiController extends AbstractApiController {
     private function fullSchema() {
         return Schema::parse([
             'webhookID:i' => 'The webhook identifier.',
-            'active:i' => 'Whether or not this webhook will send events.',
+            'active:b' => 'Whether or not this webhook will send events.',
             'name:s' => 'User-friendly name.',
             'events:s|n' => ['*', 'comment', 'discussion', 'user'],
             'url:s' => 'The target URL of the webhook.',

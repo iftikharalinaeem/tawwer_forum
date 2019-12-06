@@ -57,6 +57,9 @@ class WebhookModel extends GDN_Model {
      */
     public function save($formPostValues, $settings = []) {
         $formPostValues = $this->filterForm($formPostValues);
+        if (isset($formPostValues['active'])) {
+            $formPostValues['active'] = $formPostValues['active'] ? 1 : 0;
+        }
         $webhookID = $formPostValues['webhookID'] ?? false;
         $insert = !$webhookID;
 
