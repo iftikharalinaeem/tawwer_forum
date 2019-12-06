@@ -25,13 +25,25 @@ class SearchRecordTypeProvider implements SearchRecordTypeProviderInterface {
     /** @var $providerGroups string[] */
     private $providerGroups = [];
 
+    /** @var \Gdn_Session $session */
+    private $session;
+
+    /**
+     * SearchRecordTypeProvider constructor.
+     * @param \Gdn_Session $session
+     */
+    public function __construct(\Gdn_Session $session) {
+        $this->session = $session;
+    }
+
     /**
      * @inheritdoc
      */
     public function getAll(): array {
         $res = [];
         foreach ($this->types as $recordType) {
-            if (in_array($recordType->getProviderGroup(), $this->providerGroups)) {
+            if (in_array($recordType->getProviderGroup(), $this->providerGroups)
+             && $recordType->isEnabled($this->session)) {
                 $res[] = $recordType;
             }
         }
