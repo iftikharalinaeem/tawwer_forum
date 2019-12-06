@@ -319,7 +319,7 @@ export function useKnowledgeBases(status: KnowledgeBaseStatus) {
 
     useEffect(() => {
         if (knowledgeBasesByID.status === LoadStatus.PENDING) {
-            getAll(status);
+            getAll({ status });
         }
     }, [knowledgeBasesByID, getAll, status]);
 
