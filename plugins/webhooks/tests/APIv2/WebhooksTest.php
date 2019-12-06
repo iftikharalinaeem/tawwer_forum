@@ -21,7 +21,9 @@ class WebhooksTest extends AbstractResourceTest {
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = false;
 
-    /** Run before the test class is instantiated. */
+    /**
+     * Run before the test class is instantiated.
+     */
     public static function setupBeforeClass(): void {
         self::$addons = ['webhooks'];
         parent::setUpBeforeClass();
