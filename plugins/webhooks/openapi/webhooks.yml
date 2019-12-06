@@ -1,7 +1,5 @@
 openapi: 3.0.2
 info:
-  title: Webhooks
-  version: 1.0.0
 paths:
   /webhooks:
     post:
@@ -189,34 +187,6 @@ components:
           nullable: true
           format: date-time
           type: string
-    WebhookDelivery:
-      properties:
-        deliveryID:
-          description: Unique ID of the delivery.
-          type: string
-          format: uuid
-        webhookID:
-          description: Unique ID of the associated webhook.
-          type: integer
-        request:
-          properties:
-            headers:
-              description: Headers sent as part of the delivery.
-              type: string
-            payload:
-              description: Full body of the delivery payload.
-              type: string
-          type: object
-        response:
-          properties:
-            headers:
-              description: Headers received during the delivery.
-              type: string
-            body:
-              description: Full body of the response to the delivery.
-              type: string
-          type: object
-      type: object
     WebhookEvent:
       type: string
       enum:
