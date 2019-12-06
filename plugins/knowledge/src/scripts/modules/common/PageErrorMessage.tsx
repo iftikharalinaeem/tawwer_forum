@@ -16,10 +16,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { debugHelper, flexHelper } from "@library/styles/styleHelpers";
 import { formatUrl, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { percent, px, viewHeight } from "csx";
 import React, { ReactNode } from "react";
 import { connect } from "react-redux";
-import { style } from "typestyle";
 import { pageErrorMessageClasses } from "@knowledge/modules/common/pageErrorMessageStyles";
 
 class PageErrorMessage extends React.Component<IProps> {

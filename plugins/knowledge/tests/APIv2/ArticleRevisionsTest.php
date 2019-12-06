@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
@@ -28,7 +29,7 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
 
@@ -192,12 +193,12 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
     /**
      * Tests that an exception is thrown if the limit parameter is higher than the maximum
      * on the article-revisions/reRender endpoint.
-     *
-     * @expectedException Garden\Web\Exception\ClientException
-     * @expectedExceptionCode 422
-     * @expectedExceptionMessage limit is greater than 1000.
      */
     public function testReRenderLimitFail() {
+        $this->expectException(ClientException::class);
+        $this->expectExceptionCode(422);
+        $this->expectExceptionMessage('limit is greater than 1000');
+
         $options = ['limit' => 1001];
         $this->api()->patch(
             "article-revisions/re-render",

@@ -223,7 +223,7 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
      * @throws \Garden\Container\ContainerException If there was an error while retrieving an item from the container.
      * @throws \Garden\Container\NotFoundException If no entry was found for the specified item in the container.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
         $this->articleModel = $this->container()->get(ArticleModel::class);
         $this->knowledgeCategoryModel = $this->container()->get(KnowledgeCategoryModel::class);

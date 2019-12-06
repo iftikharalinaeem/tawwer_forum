@@ -30,7 +30,9 @@ export const pageErrorMessageClasses = () => {
     });
 
     const cta = style("cta", {
-        display: "block",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         ...margins({
             top: unit(21),
             horizontal: "auto",

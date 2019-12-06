@@ -53,7 +53,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
     /**
      * This method is called before the first test of this test class is run.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
     }
 
