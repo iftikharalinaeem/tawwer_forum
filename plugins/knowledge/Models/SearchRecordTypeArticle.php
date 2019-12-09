@@ -55,6 +55,6 @@ class SearchRecordTypeArticle implements SearchRecordTypeInterface {
      * @inheritdoc
      */
     public function isEnabled(\Gdn_Session $session): bool {
-        return $session->getPermissions()->hasAny(['"knowledge.kb.view"']);
+        return $session->getPermissions()->hasAny(["knowledge.kb.view"]);
     }
 }
