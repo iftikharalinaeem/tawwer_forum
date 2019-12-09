@@ -9,6 +9,7 @@ namespace Vanilla\TranslationsApi\Models;
 
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
+use Vanilla\Contracts\Site\TranslationResourceInterface;
 
 /**
  * Class TranslationProvider
@@ -18,12 +19,36 @@ class TranslationProvider implements TranslationProviderInterface {
     /** @var TranslationsApiController $translationApi */
     private $translationModel;
 
+    /** @var ResourceModel $resourceModel */
+    private $resourceModel;
+
+    /** @var TranslationResourceInterface[] $validResources */
+    private $validResources;
+
     /**
      * TranslationProvider constructor.
      * @param TranslationPropertyModel $translationModel
      */
-    public function __construct(TranslationPropertyModel $translationModel) {
+    public function __construct(TranslationPropertyModel $translationModel, ResourceModel $resourceModel) {
         $this->translationModel = $translationModel;
+        $this->resourceModel = $resourceModel;
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initializeResource(TranslationResourceInterface $resource) {
+        $this->validResources[] = $resource;
+        $resourceExists = $this->resourceModel->get(
+            [
+                "urlCode" => $resource->resourceKey(),
+            ]
+        );
+
+        if (!$resourceExists) {
+            $this->resourceModel->insert($resource->resourceRecord());
+        }
     }
 
     /**
