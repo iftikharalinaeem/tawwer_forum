@@ -148,7 +148,7 @@ export function EditorForm(props: IProps) {
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
             className={classNames(classesEditorForm.containerWidth)}
-            icon={<WarningIcon className={classNames(classesMessages.messageIcon)} />}
+            icon={<WarningIcon />}
             contents={<Translate source="You have been redirected to the source locale to insert the article." />}
             onConfirm={() => props.actions.notifyRedirection({ shouldNotify: false })}
             stringContents={t("You have been redirected to the source locale to insert the article.")}
