@@ -91,6 +91,10 @@ export const navigationManagerVariables = useThemeCache(() => {
         },
     });
 
+    const spacing = makeThemeVars("spacing", {
+        top: 52,
+    });
+
     return {
         colors,
         dragging,
@@ -103,6 +107,7 @@ export const navigationManagerVariables = useThemeCache(() => {
         chevron,
         input,
         states,
+        spacing,
     };
 });
 
@@ -131,7 +136,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
-        paddingTop: globalVars.gutter.size + 36,
+        paddingTop: unit(vars.spacing.top),
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),

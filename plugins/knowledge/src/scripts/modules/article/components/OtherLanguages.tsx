@@ -5,10 +5,7 @@
  */
 
 import { IArticleLocale } from "@knowledge/@types/api/article";
-import DateTime from "@library/content/DateTime";
-import Translate from "@library/content/Translate";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { AlertIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
@@ -17,8 +14,8 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import classNames from "classnames";
 import * as React from "react";
+import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
-import { translate } from "@vanilla/i18n/src";
 
 export interface IOtherLangaugesProps {
     articleLocaleData: IArticleLocale[];
@@ -43,7 +40,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
             icon: data.translationStatus === "not-translated" && (
                 <ToolTip label={t("This article is not translated yet or it is out of date.")}>
                     <ToolTipIcon>
-                        <AlertIcon className={classNames("selectBox-selectedIcon")} />
+                        <WarningIcon className={classNames(iconClasses().errorFgColor)} />
                     </ToolTipIcon>
                 </ToolTip>
             ),

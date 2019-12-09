@@ -8,13 +8,14 @@ import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
 import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ButtonTypes } from "@library/forms/buttonStyles";
-import { AlertIcon, DeleteIcon, EditIcon } from "@library/icons/common";
+import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { getMeta } from "@library/utility/appUtils";
 import { t, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import Button from "@library/forms/Button";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
@@ -54,7 +55,7 @@ export function KnowledgeBaseTableRow(props: IProps) {
                         }
                     >
                         <ToolTipIcon>
-                            <AlertIcon compact />
+                            <WarningIcon className={iconClasses().errorFgColor} />
                         </ToolTipIcon>
                     </ToolTip>
                 ) : (
