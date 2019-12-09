@@ -32,7 +32,6 @@ class TranslationProvider implements TranslationProviderInterface {
     public function __construct(TranslationPropertyModel $translationModel, ResourceModel $resourceModel) {
         $this->translationModel = $translationModel;
         $this->resourceModel = $resourceModel;
-
     }
 
     /**
