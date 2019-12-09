@@ -23,6 +23,7 @@ interface IProps {
 }
 
 export function OrganizeCategoriesTranslator(props: IProps) {
+    const { getNavigationFlat } = useNavigationActions();
     const { Translator, shouldDisplay } = useContentTranslator();
     const status = useStatus(props.kbID);
 
@@ -32,7 +33,7 @@ export function OrganizeCategoriesTranslator(props: IProps) {
         return null;
     }
     const isLoading = status === LoadStatus.LOADING;
-    const { getNavigationFlat } = useNavigationActions();
+
     return (
         <Translator
             afterSave={() => {
