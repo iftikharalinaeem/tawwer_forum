@@ -50,9 +50,7 @@ function OrganizeCategoriesPage(props: IProps) {
             isFixed={true}
             contents={
                 <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
+                    <AttachmentErrorIcon className={classNames(classesMessages.icon, classesMessages.errorIcon)} />
                     <div>
                         <Translate
                             source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"

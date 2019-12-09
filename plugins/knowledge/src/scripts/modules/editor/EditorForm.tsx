@@ -137,7 +137,7 @@ export function EditorForm(props: IProps) {
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
             contents={
                 <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.messageIcon} />
+                    <WarningIcon className={classesMessages.icon} />
                     <div>
                         {t(
                             "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
@@ -157,7 +157,7 @@ export function EditorForm(props: IProps) {
             className={classNames(classesEditorForm.containerWidth)}
             contents={
                 <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.messageIcon} />
+                    <WarningIcon className={classesMessages.icon} />
                     <Translate source="You have been redirected to the source locale to insert the article." />
                 </div>
             }

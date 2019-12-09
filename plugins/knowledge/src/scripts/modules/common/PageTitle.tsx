@@ -7,8 +7,8 @@
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";
-import { pageTitleClasses } from "@library/layout/pageHeadingStyles";
 import { PageHeading } from "@library/layout/PageHeading";
+import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 
 export interface IPageTitle {
     title: string;
