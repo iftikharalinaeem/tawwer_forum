@@ -135,16 +135,10 @@ export function EditorForm(props: IProps) {
     const translationNotice = props.fallbackLocale.notify && props.fallbackLocale.locale && (
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.messageIcon} />
-                    <div>
-                        {t(
-                            "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
-                        )}
-                    </div>
-                </div>
-            }
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon, classesMessages.icon)} />}
+            contents={t(
+                "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+            )}
             onConfirm={() => props.actions.clearFallbackLocaleNotice()}
             stringContents={t(
                 "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
@@ -155,12 +149,8 @@ export function EditorForm(props: IProps) {
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
             className={classNames(classesEditorForm.containerWidth)}
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.messageIcon} />
-                    <Translate source="You have been redirected to the source locale to insert the article." />
-                </div>
-            }
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon)} />}
+            contents={<Translate source="You have been redirected to the source locale to insert the article." />}
             onConfirm={() => props.actions.notifyRedirection({ shouldNotify: false })}
             stringContents={t("You have been redirected to the source locale to insert the article.")}
         />

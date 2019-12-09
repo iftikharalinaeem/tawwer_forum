@@ -37,12 +37,8 @@ export function ArticleUntranslatedMessage(props: IProps) {
     return (
         <Message
             stringContents={textNoDate}
-            contents={
-                <div className={classes.content}>
-                    <WarningIcon className={classNames(classes.messageIcon)} />
-                    <div>{textDate}</div>
-                </div>
-            }
+            icon={<WarningIcon className={classNames(classes.messageIcon, classes.icon)} />}
+            contents={textDate}
         />
     );
 }
