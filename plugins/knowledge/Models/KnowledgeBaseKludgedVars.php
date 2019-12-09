@@ -69,7 +69,7 @@ class KnowledgeBaseKludgedVars {
         }
 
         $inputType = $varInfo['Options']['type'] ?? null;
-        if ($inputType === 'number') { // Number inputs should be kept as numbers!
+        if ($inputType === 'number' && $value !== null) { // Number inputs should be kept as numbers!
             $value = (int) $value;
         }
 
