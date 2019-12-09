@@ -317,7 +317,7 @@ describe("EditorPageActions", () => {
         it("can post new article", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/add?draftID=1"); // draft ID only used for testing location query string.
-
+            console.log(history.location.pathname);
             const initialForm: IEditorPageForm = {
                 name: "Test form name",
                 body: [{ insert: "Test form body" }],
@@ -344,7 +344,7 @@ describe("EditorPageActions", () => {
                 .replyOnce(200, []);
             applyAnyFallbackError(mockApi);
 
-            void (await editorPageActions.publish(history));
+            void (await editorPageActions.publish(history, () => {}));
 
             expect(mockStore.isActionTypeDispatched(ArticleActions.POST_ARTICLE_REQUEST)).toEqual(true);
             expect(mockStore.isActionTypeDispatched(ArticleActions.POST_ARTICLE_RESPONSE)).toEqual(true);
@@ -394,7 +394,7 @@ describe("EditorPageActions", () => {
                 .replyOnce(200, article)
                 .onGet("/knowledge-bases/1/navigation-flat?locale=en")
                 .replyOnce(200, []);
-            void (await editorPageActions.publish(history));
+            void (await editorPageActions.publish(history, () => {}));
 
             expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).toEqual(true);
             expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_RESPONSE)).toEqual(true);
@@ -440,7 +440,7 @@ describe("EditorPageActions", () => {
                 .replyOnce(200, article);
             applyAnyFallbackError(mockApi);
 
-            void (await editorPageActions.publish(history));
+            void (await editorPageActions.publish(history, () => {}));
 
             expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).toEqual(false);
             expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_RESPONSE)).toEqual(false);

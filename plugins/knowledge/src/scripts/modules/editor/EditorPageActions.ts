@@ -383,7 +383,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      *
      * @param history History object for redirecting.
      */
-    public publish = async (history: History) => {
+    public publish = async (history: History, pushSmartLocation: (location: string) => void) => {
         const editorState = this.getState().knowledge.editorPage;
         const currentLocale = getCurrentLocale();
 
@@ -419,9 +419,9 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
                 format: shouldSubmitBody ? Format.RICH : undefined, // forced to always be rich on insert
                 name: shouldSubmitName ? name : undefined,
                 knowledgeCategoryID: shouldSubmitCategory ? knowledgeCategoryID : undefined,
+                draftID: draft.data ? draft.data.draftID : undefined,
                 sort,
             };
-
             return this.updateArticle(patchRequest, history);
         }
 
@@ -446,10 +446,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
 
         history.replace(editLocation);
 
-        const pathname = getRelativeUrl(article.url);
-        history.push({
-            pathname,
-        });
+        pushSmartLocation(article.url);
     };
 
     /**
