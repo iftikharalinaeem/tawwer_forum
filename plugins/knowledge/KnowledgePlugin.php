@@ -9,11 +9,13 @@ namespace Vanilla\Knowledge;
 
 use Gdn_Router as Router;
 use Garden\Container\Reference;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Web\Robots;
@@ -107,6 +109,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
             ->rule(\Vanilla\Menu\CounterModel::class)
                 ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
+
+            ->rule(TranslationProviderInterface::class)
+            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
             ;
         ;
     }

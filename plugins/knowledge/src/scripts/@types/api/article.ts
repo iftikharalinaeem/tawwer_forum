@@ -56,6 +56,8 @@ export interface IArticleReaction {
     userReaction: "yes" | "no" | null;
 }
 
+type ArticleTranslationStatus = "out-of-date" | "up-to-date" | "untranslated";
+
 interface IArticleServerManagedData extends IExpandedInsertUpdate {
     articleID: number;
     knowledgeBaseID: number;
@@ -65,6 +67,7 @@ interface IArticleServerManagedData extends IExpandedInsertUpdate {
     url: string; // Full URL to the resource
     outline: IOutlineItem[];
     reactions: IArticleReaction[];
+    translationStatus: ArticleTranslationStatus;
 }
 
 // The record
@@ -197,5 +200,5 @@ export interface IArticleTranslation {
     url: string;
     locale: string;
     sourceLocale: string;
-    translationStatus: "out-of-date" | "up-to-date" | "untranslated";
+    translationStatus: ArticleTranslationStatus;
 }

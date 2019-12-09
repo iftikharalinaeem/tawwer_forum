@@ -42,7 +42,6 @@ import { useMeasure } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/userContentStyles";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
-import getStore from "@library/redux/getStore";
 import { WarningIcon } from "@library/icons/common";
 import { messagesClasses } from "@library/messages/messageStyles";
 
@@ -135,16 +134,10 @@ export function EditorForm(props: IProps) {
     const translationNotice = props.fallbackLocale.notify && props.fallbackLocale.locale && (
         <Message
             className={classNames(classesEditorForm.containerWidth, classesEditorForm.conversionNotice)}
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.icon} />
-                    <div>
-                        {t(
-                            "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
-                        )}
-                    </div>
-                </div>
-            }
+            icon={<WarningIcon />}
+            contents={t(
+                "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
+            )}
             onConfirm={() => props.actions.clearFallbackLocaleNotice()}
             stringContents={t(
                 "This article hasn't been translated yet. The original article text has been loaded to aid translation.",
@@ -155,12 +148,8 @@ export function EditorForm(props: IProps) {
     const articleRedirectionNotice = props.notifyArticleRedirection && (
         <Message
             className={classNames(classesEditorForm.containerWidth)}
-            contents={
-                <div className={classesMessages.content}>
-                    <WarningIcon className={classesMessages.icon} />
-                    <Translate source="You have been redirected to the source locale to insert the article." />
-                </div>
-            }
+            icon={<WarningIcon className={classNames(classesMessages.messageIcon)} />}
+            contents={<Translate source="You have been redirected to the source locale to insert the article." />}
             onConfirm={() => props.actions.notifyRedirection({ shouldNotify: false })}
             stringContents={t("You have been redirected to the source locale to insert the article.")}
         />

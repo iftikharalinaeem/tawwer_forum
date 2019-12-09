@@ -48,16 +48,12 @@ function OrganizeCategoriesPage(props: IProps) {
     const categoriesWarning = warningFlag && (
         <Message
             isFixed={true}
+            icon={<ErrorIcon />}
             contents={
-                <div className={classesMessages.content}>
-                    <ErrorIcon className={classNames(classesMessages.icon, classesMessages.errorIcon)} />
-                    <div>
-                        <Translate
-                            source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
-                            c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
-                        />
-                    </div>
-                </div>
+                <Translate
+                    source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
+                    c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
+                />
             }
             onConfirm={() => {
                 setWarning(false);
