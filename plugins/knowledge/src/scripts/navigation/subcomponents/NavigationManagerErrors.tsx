@@ -14,6 +14,7 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@library/utility/appUtils";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Container from "@library/layout/components/Container";
+import { ErrorIcon } from "@library/icons/common";
 
 type RetryHandler = (() => void) | null;
 
@@ -31,6 +32,7 @@ class NavigationManagerErrors extends React.Component<IProps> {
         return (
             <Container>
                 <Message
+                    icon={<ErrorIcon />}
                     className={classes.formError}
                     onConfirm={retryHandler ? this.handleRetry : undefined}
                     confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
