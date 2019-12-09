@@ -105,4 +105,31 @@ class KbPageTest extends AbstractAPIv2Test {
         $siteSectionModel->addProvider($newSiteSectionProvider);
         $page->validateSiteSection($kbID);
     }
+
+    /**
+     * Test page number parsing.
+     *
+     * @param string $path
+     * @param int $expectedNumber
+     *
+     * @dataProvider providePageNumbers
+     */
+    public function testPageNumber(string $path, int $expectedNumber) {
+        /** @var KbPageFixture $page */
+        $page = self::container()->get(KbPageFixture::class);
+
+        $this->assertEquals($expectedNumber, $page->parsePageNumberFromPath($path, $expectedNumber));
+    }
+
+    /**
+     * @return array
+     */
+    public function providePageNumbers(): array {
+        return [
+            ['/test/test/path/p642/p12', 12],
+            ['/test/p6', 6],
+            ['asdf', 1],
+            ['asdf$#%$^%&*&^%$#!/', 1]
+        ];
+    }
 }

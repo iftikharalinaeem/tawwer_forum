@@ -40,6 +40,8 @@ abstract class KbPage extends ThemedPage {
     /** Regex pattern for retrieving the record ID from a URL path. */
     protected const ID_PATH_PATTERN = "/^\/(?<recordID>\d+)(-[^\/]*)?/";
 
+    protected const PAGE_PATH_PATTERN = "/.*\/p(?<pageNumber>\d+)$/";
+
     const TWIG_VIEWS_PATH = 'plugins/knowledge/views/';
 
     /** @var AnalyticsClient */
@@ -283,8 +285,9 @@ abstract class KbPage extends ThemedPage {
      * @param string|null $path The path to parse.
      *
      * @return int|null The parsed ID or null.
+     * @internal Marked public for testing.
      */
-    protected function parseIDFromPath(?string $path): ?int {
+    public function parseIDFromPath(?string $path): ?int {
         if (!$path) {
             return null;
         }
@@ -301,5 +304,37 @@ abstract class KbPage extends ThemedPage {
         }
 
         return $id;
+    }
+
+    /**
+     * Get the page number out of some path.
+     *
+     * Works in the following format:
+     * "/path/some/path" -> 1
+     * "/path/some/path/p2" -> 2
+     * "/path/some/path/p142" -> 142
+     *
+     * @param string|null $path
+     *
+     * @return int
+     * @internal Marked public for testing.
+     */
+    public function parsePageNumberFromPath(?string $path): int {
+        if (!$path) {
+            return 1;
+        }
+
+        $matches = [];
+        if (preg_match(static::PAGE_PATH_PATTERN, $path, $matches) === 0) {
+            return 1;
+        }
+
+        $pageNumber = filter_var($matches["pageNumber"], FILTER_VALIDATE_INT);
+
+        if ($pageNumber === false) {
+            return 1;
+        }
+
+        return $pageNumber;
     }
 }
