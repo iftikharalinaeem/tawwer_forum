@@ -38,14 +38,14 @@ paths:
                 items:
                   $ref: '#/components/schemas/Webhook'
   '/webhooks/{id}':
-    parameters:
-      - name: id
-        in: path
-        description: The webhook ID.
-        required: true
-        schema:
-          type: integer
     get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
       summary: Get information about a webhook.
       tags:
         - Webhooks
@@ -78,6 +78,101 @@ paths:
         - Webhooks
       responses:
         '204':
+          description: Success
+  '/webhooks/{id}/deliveries':
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookDelivery'
+      summary: List deliveries attempted for a specific webhook.
+      tags:
+        - Webhooks
+  '/webhooks/{id}/deliveries/{deliveryID}':
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+        - name: deliveryID
+          in: path
+          description: Unique delivery ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDelivery'
+      summary: Get a specific webhook delivery record.
+      tags:
+        - Webhooks
+  '/webhooks/{id}/deliveries/{deliveryID}/redeliver':
+    post:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+        - name: deliveryID
+          in: path
+          description: Unique delivery ID.
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        201:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDelivery'
+      summary: Re-send a specific delivery attempt.
+      tags:
+        - Webhooks
+  '/webhooks/{id}/ping':
+    post:
+      summary: Ping a webhook for testing.
+      tags:
+        - Webhooks
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Unique ID sent as part of the ping payload.
+                    type: string
           description: Success
 components:
   callbacks:
@@ -187,6 +282,34 @@ components:
           nullable: true
           format: date-time
           type: string
+    WebhookDelivery:
+      properties:
+        deliveryID:
+          description: Unique ID of the delivery.
+          type: string
+          format: uuid
+        webhookID:
+          description: Unique ID of the associated webhook.
+          type: integer
+        request:
+          properties:
+            headers:
+              description: Headers sent as part of the delivery.
+              type: string
+            payload:
+              description: Full body of the delivery payload.
+              type: string
+          type: object
+        response:
+          properties:
+            headers:
+              description: Headers received during the delivery.
+              type: string
+            body:
+              description: Full body of the response to the delivery.
+              type: string
+          type: object
+      type: object
     WebhookEvent:
       type: string
       enum:
