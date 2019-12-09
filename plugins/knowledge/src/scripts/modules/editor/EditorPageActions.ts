@@ -382,6 +382,7 @@ export default class EditorPageActions extends ReduxActions<IKnowledgeAppStoreSt
      * - Redirects to the url of the new article.
      *
      * @param history History object for redirecting.
+     * @param pushSmartLocation
      */
     public publish = async (history: History, pushSmartLocation: (location: string) => void) => {
         const editorState = this.getState().knowledge.editorPage;

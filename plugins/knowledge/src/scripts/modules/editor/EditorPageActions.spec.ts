@@ -317,7 +317,6 @@ describe("EditorPageActions", () => {
         it("can post new article", async () => {
             const history = createMemoryHistory();
             history.push("/kb/articles/add?draftID=1"); // draft ID only used for testing location query string.
-            console.log(history.location.pathname);
             const initialForm: IEditorPageForm = {
                 name: "Test form name",
                 body: [{ insert: "Test form body" }],
@@ -343,17 +342,16 @@ describe("EditorPageActions", () => {
                 .onGet("/knowledge-bases/1/navigation-flat?locale=en")
                 .replyOnce(200, []);
             applyAnyFallbackError(mockApi);
-
-            void (await editorPageActions.publish(history, () => {}));
-
+            const pushLocationSpy = jest.fn();
+            void (await editorPageActions.publish(history, pushLocationSpy));
             expect(mockStore.isActionTypeDispatched(ArticleActions.POST_ARTICLE_REQUEST)).toEqual(true);
             expect(mockStore.isActionTypeDispatched(ArticleActions.POST_ARTICLE_RESPONSE)).toEqual(true);
             expect(mockStore.isActionTypeDispatched(ArticleActions.PATCH_ARTICLE_REQUEST)).toEqual(false);
 
-            expect(history.location.pathname).toEqual(article.url);
+            expect(pushLocationSpy.mock.calls[0][0]).toEqual(article.url);
 
             // Verify query string was removed from previous edit page. Don't want an outdated draft loading.
-            const lastPage = history.entries[history.entries.length - 2];
+            const lastPage = history.entries[history.entries.length - 1];
             expect(lastPage.search).toEqual("");
             expect(lastPage.pathname).toEqual(`/kb/articles/${article.articleID}/editor`);
         });
