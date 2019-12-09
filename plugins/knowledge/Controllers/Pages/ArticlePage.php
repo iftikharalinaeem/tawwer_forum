@@ -81,7 +81,7 @@ class ArticlePage extends KbPage {
 
         // Add translation meta tags for alternative language versions.
         foreach ($translationData->getData() as $translation) {
-            $this->addMetaTag([
+            $this->addLinkTag([
                 'rel' => 'alternate',
                 'hreflang' => $translation['locale'],
                 'href' => $translation['url'],
