@@ -9,6 +9,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/vanillaHeaderStyles";
 import { margins, paddings, unit } from "@library/styles/styleHelpers";
+import { modalVariables } from "@library/modal/modalStyles";
 
 export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
@@ -17,7 +18,7 @@ export const contentTranslatorClasses = useThemeCache(() => {
     const globalVars = globalVariables();
 
     const content = style("content", {
-        paddingTop: unit(globalVars.fullScreenModalTitle.gap),
+        paddingTop: unit(modalVariables().fullScreenTitleSpacing.gap),
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
