@@ -68,7 +68,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                 describedBy={titleID}
                 value={activeOption}
                 renderLeft={false}
-                offsetPaddingTop={true}
+                offsetPadding={true}
             />
         </div>
     );
