@@ -22,8 +22,10 @@ export const subcommunityChooserVariables = useThemeCache(() => {
     });
 
     const toggle = vars("toggle", {
-        lineHeight: titleBarVars.button.size,
-        color: titleBarVars.colors.fg,
+        lineHeight: unit(titleBarVars.button.size),
+        color: colorOut(titleBarVars.colors.fg),
+        minHeight: unit(titleBarVars.button.size),
+        height: 0, // IE11 compat.
     });
 
     return { arrow, toggle };
