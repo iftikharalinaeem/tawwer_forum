@@ -26,14 +26,12 @@ import Permission from "@library/features/users/Permission";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
 import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
-import { OrganizeCategoriesTranslator } from "@knowledge/navigation/NavigationTranslator";
+import OrganizeCategoriesTranslator from "@knowledge/navigation/NavigationTranslator";
 import Message from "@library/messages/Message";
 import { AttachmentErrorIcon } from "@library/icons/fileTypes";
 import { messagesClasses } from "@library/messages/messageStyles";
 import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
-import { string } from "prop-types";
-import Container from "@library/layout/components/Container";
 
 function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
@@ -50,18 +48,14 @@ function OrganizeCategoriesPage(props: IProps) {
     const categoriesWarning = warningFlag && (
         <Message
             isFixed={true}
+            icon={
+                <AttachmentErrorIcon className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)} />
+            }
             contents={
-                <div className={classesMessages.content}>
-                    <AttachmentErrorIcon
-                        className={classNames(classesMessages.messageIcon, classesMessages.errorIcon)}
-                    />
-                    <div>
-                        <Translate
-                            source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
-                            c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
-                        />
-                    </div>
-                </div>
+                <Translate
+                    source="Certain actions are disabled because they are only avalaible in the source locale: <0/>"
+                    c0={<LocaleDisplayer localeContent={sourceLocale || " "} />}
+                />
             }
             onConfirm={() => {
                 setWarning(false);

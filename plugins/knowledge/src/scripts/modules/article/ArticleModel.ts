@@ -194,6 +194,15 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                         id => id !== articleID,
                     );
                 }
+
+                /// Update our translation status.
+                const articleLocales = nextState.articleLocalesByID[articleID]?.data ?? [];
+                articleLocales.forEach(locale => {
+                    if (locale.locale === payload.result.locale) {
+                        locale.translationStatus = payload.result.translationStatus;
+                        locale.url = payload.result.url;
+                    }
+                });
                 return nextState;
             })
             .case(ArticleActions.getArticleLocalesACs.started, (nextState, payload) => {

@@ -12,7 +12,7 @@ import React from "react";
 
 // Our own libraries
 import apiv2 from "@library/apiv2";
-import { onReady } from "@library/utility/appUtils";
+import { onReady, t } from "@library/utility/appUtils";
 import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
 import { initAllUserContent } from "@library/content";
@@ -28,6 +28,10 @@ import ErrorPage from "@knowledge/pages/ErrorPage";
 import { serverReducer } from "@knowledge/server/serverReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import kbReducer from "@knowledge/state/reducer";
+import Permission from "@library/features/users/Permission";
+import DropDownSection from "@library/flyouts/items/DropDownSection";
+import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
+import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 
 debug(getMeta("context.debug"));
 
@@ -46,6 +50,20 @@ const render = () => {
         app,
     );
 };
+
+UserDropDownContents.registerBeforeUserDropDown(props => {
+    return (
+        <Permission permission="articles.add">
+            <DropDownSection title={t("Articles")}>
+                <DropDownItemLinkWithCount
+                    to="/kb/drafts"
+                    name={t("Drafts")}
+                    count={props.getCountByName("ArticleDrafts")}
+                />
+            </DropDownSection>
+        </Permission>
+    );
+});
 
 onReady(() => {
     initAllUserContent();

@@ -17,6 +17,8 @@ import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
+import { getSiteSection } from "@library/utility/appUtils";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
 interface IKknowledgeBaseParams {
@@ -29,6 +31,12 @@ type IGetKnowledgeBaseRequest = {
 type IDeleteKnowledgeBaseRequest = {
     kbID: number;
 };
+interface IGetKnowledgeBasesRequest {
+    status: KnowledgeBaseStatus;
+    siteSectionGroup?: string;
+    locale?: string;
+    sourceLocale?: string;
+}
 type IGetKnowledgeBaseResponse = IKnowledgeBase[];
 type IPostKnowledgeBaseResponse = IKnowledgeBase;
 type IPatchKnowledgeBaseResponse = IKnowledgeBase;
@@ -38,15 +46,26 @@ type IDeleteKnowledgeBaseResponse = undefined;
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
 export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStoreState> {
-    public static readonly GET_ACS = actionCreator.async<{ status: KnowledgeBaseStatus }, IKnowledgeBase[], IApiError>(
+    public static readonly GET_ACS = actionCreator.async<IGetKnowledgeBasesRequest, IKnowledgeBase[], IApiError>(
         "GET_ALL",
     );
 
-    public getAll = (status: KnowledgeBaseStatus = KnowledgeBaseStatus.PUBLISHED) => {
+    public getAll = (options: IGetKnowledgeBasesRequest = { status: KnowledgeBaseStatus.PUBLISHED }) => {
+        options = {
+            locale: getCurrentLocale(),
+            siteSectionGroup: getSiteSection().sectionGroup,
+            ...options,
+        };
+
         const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
-            const response = await this.api.get(`/knowledge-bases?expand=all&status=${status}`);
+            const response = await this.api.get(`/knowledge-bases`, {
+                params: {
+                    ...options,
+                    expand: "all",
+                },
+            });
             return response.data;
-        })({ status });
+        })(options);
         return this.dispatch(thunk);
     };
 

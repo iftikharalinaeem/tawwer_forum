@@ -27,7 +27,7 @@ export default class ArticleDeletedMessage extends React.Component<IProps> {
                 onConfirm={onRestoreClick}
                 isActionLoading={isLoading}
                 confirmText={t("Restore")}
-                noIcon={true}
+                icon={false}
             />
         );
     }

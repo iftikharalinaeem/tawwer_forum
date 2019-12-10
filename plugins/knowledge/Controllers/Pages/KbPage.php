@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers\Pages;
 
+use Garden\EventManager;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -82,6 +83,7 @@ abstract class KbPage extends ThemedPage {
         BreadcrumbModel $breadcrumbModel,
         ContentSecurityPolicyModel $cspModel,
         AssetPreloadModel $preloadModel,
+        EventManager $eventManager,
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
@@ -92,7 +94,17 @@ abstract class KbPage extends ThemedPage {
         SiteSectionModel $siteSectionModel = null, // Default needed for method extensions
         KnowledgeBaseModel $kbModel = null // Default needed for method extensions
     ) {
-        parent::setDependencies($siteMeta, $request, $session, $assetProvider, $breadcrumbModel, $cspModel, $preloadModel, $themePreloadProvider);
+        parent::setDependencies(
+            $siteMeta,
+            $request,
+            $session,
+            $assetProvider,
+            $breadcrumbModel,
+            $cspModel,
+            $preloadModel,
+            $eventManager,
+            $themePreloadProvider
+        );
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;

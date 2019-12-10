@@ -58,14 +58,19 @@ class KnowledgeBaseKludgedVars {
      * Given some variable info, fetch it's value from the config and return it.
      *
      * @param array $varInfo
-     * @return string|null
+     * @return mixed|null
      */
-    public function readKludgedConfigValue(array $varInfo): ?string {
+    public function readKludgedConfigValue(array $varInfo) {
         $configName = $this->makeConfigName($varInfo);
         $value = $this->config->get($configName, null);
         if ($value === '') {
             // The ConfigModule often saves empty strings from empty inputs.
             return null;
+        }
+
+        $inputType = $varInfo['Options']['type'] ?? null;
+        if ($inputType === 'number' && $value !== null) { // Number inputs should be kept as numbers!
+            $value = (int) $value;
         }
 
         if ($value !== null && $varInfo['Control'] === "imageupload") {
@@ -94,24 +99,33 @@ class KnowledgeBaseKludgedVars {
         return [
             [
                 "VariableName" => "global.mainColors.primary",
-                "LabelCode" => "Primary Color",
-                "Description" => "The primary color is used for buttons, inputs, and various indicators.",
+                "LabelCode" => self::t("Primary Color"),
+                "Description" => self::t("The primary color is used for buttons, inputs, and various indicators."),
                 "Control" => "color",
-                'Options' => ['AllowEmpty' => true]
+                'Options' => [
+                    'AllowEmpty' => true,
+                    'placeholder' => "#0291db",
+                ],
             ],
             [
                 "VariableName" => "global.mainColors.bg",
-                "LabelCode" => "Default Background Color",
-                "Description" => self::BG_MESSAGE,
+                "LabelCode" => self::t("Default Background Color"),
+                "Description" => self::t(self::BG_MESSAGE),
                 "Control" => "color",
-                'Options' => ['AllowEmpty' => true]
+                'Options' => [
+                    'AllowEmpty' => true,
+                    'placeholder' => "#ffffff"
+                ],
             ],
             [
                 "VariableName" => "global.mainColors.fg",
-                "LabelCode" => "Default Foreground Color",
-                "Description" => self::FG_MESSAGE,
+                "LabelCode" => self::t("Default Foreground Color"),
+                "Description" => self::t(self::FG_MESSAGE),
                 "Control" => "color",
-                'Options' => ['AllowEmpty' => true]
+                'Options' => [
+                    'AllowEmpty' => true,
+                    'placeholder' => '#555a62',
+                ],
             ],
         ];
     }
@@ -125,17 +139,23 @@ class KnowledgeBaseKludgedVars {
         return [
             [
                 "VariableName" => "titleBar.colors.bg",
-                "LabelCode" => "Title Bar Background Color",
-                "Description" => self::BG_MESSAGE,
+                "LabelCode" => self::t("Title Bar Background Color"),
+                "Description" => self::t(self::BG_MESSAGE),
                 "Control" => "color",
-                'Options' => ['AllowEmpty' => true]
+                'Options' => [
+                    'AllowEmpty' => true,
+                    'placeholder' => "#0291db",
+                ]
             ],
             [
                 "VariableName" => "titleBar.colors.fg",
-                "LabelCode" => "Title Bar Foreground Color",
-                "Description" => self::FG_MESSAGE,
+                "LabelCode" => self::t("Title Bar Foreground Color"),
+                "Description" => self::t(self::FG_MESSAGE),
                 "Control" => "color",
-                'Options' => ['AllowEmpty' => true]
+                'Options' => [
+                    'AllowEmpty' => true,
+                    'placeholder' => "#ffffff"
+                ]
             ],
             [
                 "VariableName" => "titleBar.border.type",
@@ -160,10 +180,11 @@ class KnowledgeBaseKludgedVars {
             [
                 "VariableName" => "splash.title.text",
                 "ConfigName" => "Knowledge.ChooserTitle",
-                "LabelCode" => "Knowledge Base Chooser Title",
-                "Description" => "This title will appear on the Knowledge homepage. It should be 20 characters or less.",
+                "LabelCode" => self::t("Knowledge Base Chooser Title"),
+                "Description" => self::t("This title will appear on the Knowledge homepage. It should be 20 characters or less."),
                 "Control" => "textbox",
                 "Options" => [
+                    "placeholder" => \Gdn::locale()->translate('How can we help you?'),
                     "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
                 ]
             ],
@@ -171,9 +192,9 @@ class KnowledgeBaseKludgedVars {
                 "VariableName" => "splash.outerBackground.image",
                 "ConfigName" => "Knowledge.DefaultBannerImage",
                 "Description" =>
-                    "The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
-                    . " Recommended dimensions are about 1000px by 400px or a similar ratio.",
-                "LabelCode" => "Banner Image",
+                    self::t("The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
+                    . " Recommended dimensions are about 1000px by 400px or a similar ratio."),
+                "LabelCode" => self::t("Banner Image"),
                 "Control" => "imageupload",
                 "Options" => [
                     "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
@@ -181,10 +202,33 @@ class KnowledgeBaseKludgedVars {
             ],
             [
                 "VariableName" => "splash.backgrounds.useOverlay",
-                "LabelCode" => "Use Banner Image Overlay",
-                "Description" => "It can be hard to read text on top of certain banner images. "
-                    . "Enable this setting to add an overlay over banner images which makes text easier to read.",
+                "LabelCode" => self::t("Use Banner Image Overlay"),
+                "Description" => self::t("It can be hard to read text on top of certain banner images. "
+                    . "Enable this setting to add an overlay over banner images which makes text easier to read."),
                 "Control" => "toggle",
+            ],
+        ];
+    }
+
+    /**
+     * Get variables related to content sizing.
+     *
+     * @return array[]
+     */
+    public function getSizingVariables(): array {
+        return [
+            [
+                "VariableName" => "global.middleColumn.width",
+                "ConfigName" => "Knowledge.MiddleColumn.Width",
+                "LabelCode" => "Layout Center Column Width",
+                "Description" => \Gdn::locale()->translate("The width of the center column of the primary layout in pixels."),
+                "Control" => "textbox",
+                "Options" => [
+                    "placeholder" => "672",
+                    "type" => "number",
+                    "max" => 2000,
+                    "min" => 500,
+                ],
             ],
         ];
     }

@@ -33,7 +33,8 @@ class KnowledgeVariablesProvider implements VariablesProviderInterface {
         $kludgedVars = array_merge(
             $this->kludgedVars->getBannerVariables(),
             $this->kludgedVars->getHeaderVars(),
-            $this->kludgedVars->getGlobalColors()
+            $this->kludgedVars->getGlobalColors(),
+            $this->kludgedVars->getSizingVariables()
         );
         $result = [];
 
