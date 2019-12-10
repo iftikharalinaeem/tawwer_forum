@@ -44,6 +44,7 @@ import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import Translate from "@library/content/Translate";
 import { WarningIcon } from "@library/icons/common";
 import { messagesClasses } from "@library/messages/messageStyles";
+import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 
 export function EditorForm(props: IProps) {
     const domID = useMemo(() => uniqueId("editorForm-"), []);
@@ -105,6 +106,7 @@ export function EditorForm(props: IProps) {
     const sourceLocale = useLocaleInfo();
     const classesMessages = messagesClasses();
 
+    const { pushSmartLocation } = useLinkContext();
     /**
      * Form submit handler. Fetch the values out of the form and pass them to the callback prop.
      */
@@ -112,9 +114,9 @@ export function EditorForm(props: IProps) {
         (event: React.FormEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            void props.actions.publish(props.history);
+            void props.actions.publish(props.history, pushSmartLocation);
         },
-        [props.actions.publish, props.history],
+        [props.actions.publish, props.history, pushSmartLocation],
     );
 
     const { clearConversionNotice } = props.actions;
