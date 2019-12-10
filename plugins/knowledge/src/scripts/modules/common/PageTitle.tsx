@@ -1,4 +1,4 @@
-/***
+/**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
@@ -7,8 +7,8 @@
 import classNames from "classnames";
 import * as React from "react";
 import { metasClasses } from "@library/styles/metasStyles";
-import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import { PageHeading } from "@library/layout/PageHeading";
+import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 
 export interface IPageTitle {
     title: string;
