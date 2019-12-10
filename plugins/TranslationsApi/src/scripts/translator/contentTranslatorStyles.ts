@@ -9,7 +9,7 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/vanillaHeaderStyles";
 import { margins, paddings, unit } from "@library/styles/styleHelpers";
-import { navigationManagerVariables } from "@knowledge/navigation/navigationManagerStyles";
+import { navigationManagerVariables } from "@library/navigation/navigationManagerStyles";
 
 export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
