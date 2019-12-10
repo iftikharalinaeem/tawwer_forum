@@ -43,10 +43,36 @@ class CategoryPage extends KbPage {
      */
     public function initialize(string $path = null) {
         $category = $this->getCategoryForPath($path);
+        $pageNumber = $this->parsePageNumberFromPath($path);
+        
         $articles = $this->articlesApi->index([
             "expand" => "excerpt",
             "knowledgeCategoryID" => $category['knowledgeCategoryID'],
+            "limit" => 10,
+            "page" => $pageNumber,
         ]);
+
+        // Apply paging headers.
+        $categoryUrl = $category['url'];
+        $pagingInfo = $articles->getMeta('paging');
+        $pageCount = $pagingInfo['pageCount'] ?? 1;
+        if ($pageNumber === 1) {
+            $this->setCanonicalUrl($categoryUrl);
+        } else {
+            $this->setCanonicalUrl($categoryUrl . '/p' . $pageNumber);
+        }
+
+        if ($pageNumber < $pageCount) {
+            $nextUrl = $categoryUrl . '/p' . ($pageNumber + 1);
+            $this->addLinkTag(['rel' => 'next', 'href' => $nextUrl]);
+        }
+
+        if ($pageNumber > 1) {
+            $prevNumber = $pageNumber - 1;
+            $prevUrl = $prevNumber === 1 ? $categoryUrl :$categoryUrl . '/p' . ($pageNumber - 1);
+            $this->addLinkTag(['rel' => 'prev', 'href' => $prevUrl]);
+        }
+
         $currentLocale = $this->siteSectionModel
             ->getCurrentSiteSection()
             ->getContentLocale();
@@ -59,12 +85,14 @@ class CategoryPage extends KbPage {
                 'category' => $category,
                 'articles' => $articles
             ]))
-            ->setCanonicalUrl($category['url'])
             ->validateSiteSection($category['knowledgeBaseID'])
         ;
 
-        // Preload redux actions for faster page loads.
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_CATEGORY_RESPONSE, Data::box($category)));
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_CATEGORY_RESPONSE,
+            Data::box($category),
+            ['id' => $category['knowledgeCategoryID']]
+        ));
         $this->preloadNavigation($category['knowledgeBaseID']);
     }
 
