@@ -5,6 +5,13 @@
  * @license Proprietary
  */
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
+use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Models\UserFragmentSchema;
+
 /**
  * Plugin that allows moderators to warn users and help police the community.
  *
@@ -15,7 +22,16 @@
  * - Moderation.UserNotes.Add
  * - Moderation.Warnings.Add
  */
-class Warnings2Plugin extends Gdn_Plugin {
+class Warnings2Plugin extends Gdn_Plugin
+{
+
+    /**
+     * @var EmbedService $embedService
+     */
+    private $embedService;
+
+    /** @var FormatService */
+    private $formatService;
 
     /// Properties ///
 
@@ -31,7 +47,18 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
      */
-    public function __construct() {
+    public function __construct(
+        \DiscussionModel $discussionModel,
+        \CommentModel $commentModel,
+        \UserModel $userModel,
+        EmbedService $embedService,
+        FormatService $formatService
+    ) {
+        $this->userModel = $userModel;
+        $this->commentModel = $commentModel;
+        $this->discussionModel = $discussionModel;
+        $this->embedService = $embedService;
+        $this->formatService = $formatService;
         parent::__construct();
         $this->fireEvent('Init');
     }
@@ -39,15 +66,17 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * {@inheritdoc}
      */
-    public function setup() {
+    public function setup()
+    {
         $this->structure();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function structure() {
-        require __DIR__.'/structure.php';
+    public function structure()
+    {
+        require __DIR__ . '/structure.php';
 
         if (Gdn::addonManager()->isEnabled('Warnings', \Vanilla\Addon::TYPE_ADDON)) {
             Gdn::pluginManager()->disablePlugin('Warnings');
@@ -59,7 +88,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender Sending controller instance.
      */
-    public function settingsController_warnings_create($sender) {
+    public function settingsController_warnings_create($sender)
+    {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
@@ -73,6 +103,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->render($sender->fetchViewLocation('settings', '', 'plugins/Warnings2'));
     }
+
     /**
      * Return the HTML for a warning reaction button.
      *
@@ -82,7 +113,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @return string Returns a string of HTML that represents the warning button.
      */
-    public function warnButton($row, $recordType, $recordID) {
+    public function warnButton($row, $recordType, $recordID)
+    {
         $args = [
             'userid' => val('InsertUserID', $row),
             'recordtype' => $recordType,
@@ -90,8 +122,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         ];
 
         $result = anchor(
-            '<span class="ReactSprite ReactWarn"></span> '.t('Warn'),
-            '/profile/warn?'.http_build_query($args),
+            '<span class="ReactSprite ReactWarn"></span> ' . t('Warn'),
+            '/profile/warn?' . http_build_query($args),
             'ReactButton ReactButton-Warn Popup',
             ['title' => t('Warn')]
         );
@@ -103,7 +135,8 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Process expired warning on sign in.
      */
-    public function base_afterSignIn_handler() {
+    public function base_afterSignIn_handler()
+    {
         if (Gdn::session()->UserID) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings(Gdn::session()->UserID);
@@ -113,7 +146,8 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Process warnings when a user visits.
      */
-    public function userModel_visit_handler() {
+    public function userModel_visit_handler()
+    {
         if (Gdn::session()->UserID) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings(Gdn::session()->UserID);
@@ -126,7 +160,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ActivityModel $sender The activity model sending the ban notification.
      * @param array $args Event arguments.
      */
-    public function activityModel_beforeSave_handler($sender, $args) {
+    public function activityModel_beforeSave_handler($sender, $args)
+    {
         if (!isset($args['Activity'])) {
             return;
         }
@@ -179,7 +214,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param object $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function base_beforeCommentBody_handler($sender, $args) {
+    public function base_beforeCommentBody_handler($sender, $args)
+    {
         if (isset($args['Comment'])) {
             $row = $args['Comment'];
         } else {
@@ -208,10 +244,10 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $wordWarn = 'warned';
                 if (!empty($row->Attributes['WarningID'])) {
                     $warningID = $row->Attributes['WarningID'];
-                    $wordWarn = '<a href="'.url("profile/viewnote/$warningID").'" class="Popup">'.$wordWarn.'</a>';
+                    $wordWarn = '<a href="' . url("profile/viewnote/$warningID") . '" class="Popup">' . $wordWarn . '</a>';
                 }
-                echo '<div class="DismissMessage Warning">'.
-                    sprintf(t('%s was %s for this.'), htmlspecialchars(val('InsertName', $row)), $wordWarn).
+                echo '<div class="DismissMessage Warning">' .
+                    sprintf(t('%s was %s for this.'), htmlspecialchars(val('InsertName', $row)), $wordWarn) .
                     '</div>';
             }
         }
@@ -222,7 +258,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param MessagesController $sender The event sender.
      */
-    public function messagesController_conversationWarning_handler($sender) {
+    public function messagesController_conversationWarning_handler($sender)
+    {
         $foreignID = $sender->data('Conversation.ForeignID');
         if (!stristr($foreignID, '-')) {
             return;
@@ -237,9 +274,9 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
 
-        $content = wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
+        $content = wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
         $content .= "<br>";
-        $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
+        $content .= wrap(t('Points'), 'strong') . ' ' . $warning['Points'];
 
         echo $content;
     }
@@ -250,7 +287,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ActivityModel $sender The event sender.
      * @param array $args Event arguments.
      */
-    public function activityModel_beforeSendNotification_handler($sender, $args) {
+    public function activityModel_beforeSendNotification_handler($sender, $args)
+    {
         if (!isset($args['Email'])) {
             return;
         }
@@ -268,7 +306,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $recordType = strtolower($recordType);
         if (in_array($recordType, ['comment', 'discussion'])) {
-            $modelName = $recordType.'Model';
+            $modelName = $recordType . 'Model';
             $model = new $modelName();
             $record = $model->getID($recordID);
 
@@ -287,7 +325,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $i = 0;
                 // Replace all blockquotes with no other blockquote as a child, one at the time (starting by the last one)!
                 while (preg_match('/\n?<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
-                    $indented = "\n> ".implode("\n> ", explode("\n", trim($matches[1])));
+                    $indented = "\n> " . implode("\n> ", explode("\n", trim($matches[1])));
                     $quotedRecord = str_replace($matches[0], $indented, $quotedRecord);
                     if ($i++ > 1000) {
                         break; // The parsing went wrong :)
@@ -295,7 +333,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 }
                 $quotedRecord = trim($quotedRecord);
 
-                $message .= '<br>'.t('Post that triggered the warning:').$quotedRecord;
+                $message .= '<br>' . t('Post that triggered the warning:') . $quotedRecord;
                 $emailTemplate->setMessage($message);
             }
         }
@@ -307,7 +345,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function base_flags_handler($sender, $args) {
+    public function base_flags_handler($sender, $args)
+    {
         if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             $args['Flags']['warn'] = [$this, 'WarnButton'];
         }
@@ -319,13 +358,14 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_beforeProfileOptions_handler($sender, $args) {
+    public function profileController_beforeProfileOptions_handler($sender, $args)
+    {
         if (!val('EditMode', Gdn::controller())) {
 
             if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
                 $sender->EventArguments['ProfileOptions'][] = [
                     'Text' => t('Add Note'),
-                    'Url' => '/profile/note?userid='.$args['UserID'],
+                    'Url' => '/profile/note?userid=' . $args['UserID'],
                     'CssClass' => 'Popup UserNoteButton'
                 ];
             }
@@ -333,8 +373,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
             if ($checkPermission && Gdn::session()->UserID != $sender->EventArguments['UserID']) {
                 $sender->EventArguments['ProfileOptions'][] = [
-                    'Text' => sprite('SpWarn').' '.t('Warn'),
-                    'Url' => '/profile/warn?userid='.$args['UserID'],
+                    'Text' => sprite('SpWarn') . ' ' . t('Warn'),
+                    'Url' => '/profile/warn?userid=' . $args['UserID'],
                     'CssClass' => 'Popup WarnButton'
                 ];
             }
@@ -347,14 +387,15 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_card_render($sender, $args) {
+    public function profileController_card_render($sender, $args)
+    {
         $userID = $sender->data('Profile.UserID');
 
         if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             $sender->setData('Actions.Warn', [
                 'Text' => sprite('SpWarn'),
                 'Title' => t('Warn'),
-                'Url' => '/profile/warn?userid='.$userID,
+                'Url' => '/profile/warn?userid=' . $userID,
                 'CssClass' => 'Popup'
             ]);
         }
@@ -363,7 +404,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $sender->setData('Actions.Note', [
                 'Text' => sprite('SpNote'),
                 'Title' => t('Add Note'),
-                'Url' => '/profile/note?userid='.$userID,
+                'Url' => '/profile/note?userid=' . $userID,
                 'CssClass' => 'Popup'
             ]);
         }
@@ -390,7 +431,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      * @param int $noteID The ID of the note to delete.
      */
-    public function profileController_deleteNote_create($sender, $noteID) {
+    public function profileController_deleteNote_create($sender, $noteID)
+    {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $form = new Gdn_Form();
@@ -414,7 +456,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param UserModel $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function userModel_setCalculatedFields_handler($sender, $args) {
+    public function userModel_setCalculatedFields_handler($sender, $args)
+    {
         if (val('Banned', $args['User'])) {
             setValue('Punished', $args['User'], 0);
         }
@@ -432,7 +475,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_beforeUserInfo_handler($sender, $args) {
+    public function profileController_beforeUserInfo_handler($sender, $args)
+    {
         echo Gdn_Theme::module('UserWarningModule');
         return;
 
@@ -451,9 +495,9 @@ class Warnings2Plugin extends Gdn_Plugin {
         echo '</b>';
 
         echo "<ul>";
-        echo wrap(t("Can't post discussions.")."\n", 'li');
-        echo wrap(t("Can't post as often.")."\n", 'li');
-        echo wrap(t("Signature hidden.")."\n", 'li');
+        echo wrap(t("Can't post discussions.") . "\n", 'li');
+        echo wrap(t("Can't post as often.") . "\n", 'li');
+        echo wrap(t("Signature hidden.") . "\n", 'li');
         echo "</ul>";
 
         echo '</div>';
@@ -466,7 +510,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param int ? $userID The ID of the user to create the note for.
      * @param int ? $noteID The ID of the note to edit.
      */
-    public function profileController_note_create($sender, $userID = null, $noteID = null) {
+    public function profileController_note_create($sender, $userID = null, $noteID = null)
+    {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $model = new UserNoteModel();
@@ -526,7 +571,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender The controller the endpoint is attached to.
      * @param int $id The ID of the warning to reverse.
      */
-    public function profileController_reverseWarning_create($sender, $id) {
+    public function profileController_reverseWarning_create($sender, $id)
+    {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $form = new Gdn_Form();
@@ -549,14 +595,16 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param AssetModel $sender The event sender.
      */
-    public function assetModel_styleCss_handler($sender) {
+    public function assetModel_styleCss_handler($sender)
+    {
         $sender->addCssFile('warnings.css', 'plugins/Warnings2');
     }
 
     /**
      * Process a user's jailed status on startup.
      */
-    public function gdn_dispatcher_appStartup_handler() {
+    public function gdn_dispatcher_appStartup_handler()
+    {
         if (!Gdn::session()->UserID || !val('Punished', Gdn::session()->User)) {
             return;
         }
@@ -577,7 +625,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param ProfileController $sender The event sender.
      */
-    public function profileController_addProfileTabs_handler($sender) {
+    public function profileController_addProfileTabs_handler($sender)
+    {
         $isPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         // We can choose to allow regular users to see warnings or not. Default not.
@@ -597,7 +646,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      *
      * @param SiteNavModule $sender The event sender.
      */
-    public function siteNavModule_init_handler($sender) {
+    public function siteNavModule_init_handler($sender)
+    {
         $isPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
         // We can choose to allow regular users to see warnings or not. Default not.
         if (!$isPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
@@ -614,7 +664,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $username
      * @param string $page
      */
-    public function profileController_notes_create($sender, $userReference, $username = '', $page = '') {
+    public function profileController_notes_create($sender, $userReference, $username = '', $page = '')
+    {
         $sender->editMode(false);
         $sender->getUserInfo($userReference, $username);
 
@@ -669,7 +720,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param ProfileController $sender
      * @param $noteID
      */
-    public function profileController_viewNote_create($sender, $noteID) {
+    public function profileController_viewNote_create($sender, $noteID)
+    {
         $userNoteModel = new UserNoteModel();
         $note = $userNoteModel->getID($noteID);
 
@@ -686,7 +738,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->getUserInfo($userID, '', $userID);
 
         $isPrivileged = Gdn::session()->checkPermission(
-            [ 'Garden.Moderation.Manage', 'Moderation.UserNotes.View'],
+            ['Garden.Moderation.Manage', 'Moderation.UserNotes.View'],
             false
         );
 
@@ -737,7 +789,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         ?string $userIDs,
         ?string $recordType = null,
         ?string $recordIDs = null
-    ) {
+    )
+    {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         if (empty($userIDs) || empty($recordType) || empty($recordIDs)) {
@@ -765,7 +818,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         ?string $userID,
         ?string $recordType = null,
         ?string $recordID = null
-    ) {
+    )
+    {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -774,7 +828,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
         $sender->User = $user;
 
-        $sender->_setBreadcrumbs(t('Warn'), '/profile/warn?userid='.$user['UserID']);
+        $sender->_setBreadcrumbs(t('Warn'), '/profile/warn?userid=' . $user['UserID']);
 
 //      $Meta = Gdn::userMetaModel()->getUserMeta($UserID, 'Warnings.%');
 //      $CurrentLevel = val('Warnings.Level', $Meta, 0);
@@ -844,7 +898,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string|null $recordIDs
      * @return string
      */
-    private function getErrorMsg(?string $userIDs, ?string $recordType, ?string $recordIDs) {
+    private function getErrorMsg(?string $userIDs, ?string $recordType, ?string $recordIDs)
+    {
         $params = [];
         if (empty($userIDs)) {
             $params[] = 'User ID';
@@ -858,7 +913,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $params[] = 'Record ID';
         }
 
-        return implode($params, ', ').plural(count($params), t(' parameter is invalid.'), t(' parameters are invalid.'));
+        return implode($params, ', ') . plural(count($params), t(' parameter is invalid.'), t(' parameters are invalid.'));
     }
 
     /**
@@ -869,7 +924,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $recordType
      * @return bool
      */
-    private function checkAlreadyWarned(\ProfileController $sender, array $recordIDs, string $recordType): bool {
+    private function checkAlreadyWarned(\ProfileController $sender, array $recordIDs, string $recordType): bool
+    {
         $warningModule = new WarningModel();
         $warnedPostIDs = [];
         $model = $warningModule->getModel(strtolower($recordType));
@@ -900,7 +956,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string|array $recordIDs
      * @return array
      */
-    private function normalizeRecordIDs($recordIDs): array {
+    private function normalizeRecordIDs($recordIDs): array
+    {
         return gettype($recordIDs) === 'string' ? explode(',', $recordIDs) : $recordIDs;
     }
 
@@ -917,16 +974,16 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         switch (strtolower($format)) {
             case 'rich':
-                $body = $this->getRichWarningBody($recordUrls);
+                $body = $this->getRichWarningBody($recordIDs, $recordType);
                 break;
             default:
                 $body = plural(
                     count($recordUrls),
                     t('You are being warned for the following post:'),
                     t('You are being warned for the following posts:')
-                ).PHP_EOL;
+                ) . PHP_EOL;
                 foreach ($recordUrls as $recordUrl) {
-                    $body .= $recordUrl.PHP_EOL;
+                    $body .= $recordUrl . PHP_EOL;
                 }
                 break;
         }
@@ -941,7 +998,8 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param string $recordType
      * @return array
      */
-    private function getRecordUrls(array $recordIDs, string $recordType): array {
+    private function getRecordUrls(array $recordIDs, string $recordType): array
+    {
         $recordUrls = [];
 
         if (strtolower($recordType) == 'comment') {
@@ -965,33 +1023,133 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Return warn body message in rich format
      *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return string
+     */
+    private function getRichWarningBody(array $recordIDs, string $recordType): string {
+        $data = [
+            ["insert" => plural(
+                count($recordIDs),
+                t('You are being warned for the following post:'),
+                t('You are being warned for the following posts:')
+            )],
+            ["insert" => "\n"],
+        ];
+
+        $records = $this->getSelectedRecords($recordIDs, $recordType);
+
+        foreach ($records as $record) {
+            $bodyRaw = $record["Body"];
+            $userID = $record['InsertUserID'] ?? $record['ActivityUserID'];
+            $userRecord = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+            $userRecord = UserFragmentSchema::normalizeUserFragment($userRecord);
+            $name = $record['Name'] ?? null;
+            $recordID = $recordType === 'Comment' ? $record['CommentID'] : $record['DiscussionID'];
+            $recordUrl = $this->getRecordUrls([$recordID], $recordType)[0];
+            $discussionLink = $this->getRecordUrls([$record['DiscussionID']], 'Discussion')[0];
+            $category = $this->getRecordCategory($record);
+
+            $embed = new QuoteEmbed([
+                "name" => $name,
+                "embedType" => QuoteEmbed::TYPE,
+                "recordType" => strtolower($recordType),
+                "recordID" => $recordID,
+                "body" => $this->formatService->renderHTML($bodyRaw, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY),
+                "format" => $record['Format'],
+                "dateInserted" =>  $record["DateInserted"],
+                "bodyRaw" => $bodyRaw,
+                "userID" => $userID,
+                "insertUser" => $userRecord,
+                "displayOptions" => QuoteEmbedDisplayOptions::minimal(false),
+                "url" => $recordUrl,
+            ]);
+
+            $embedData = [
+                "insert" => [
+                    "embed-external" => [
+                        "data" => $embed,
+                        "loaderData" => [
+                            "type" => "link",
+                            "link" => $recordUrl
+                        ]
+                    ],
+                ]
+            ];
+
+            $filteredEmbededData = $this->embedService->filterEmbedData($embedData);
+
+            $data[] = $filteredEmbededData;
+        }
+
+        return json_encode($data);
+    }
+
+    /**
+     * Return record category
+     *
+     * @param array $record
+     * @return array|null
+     */
+    private function getRecordCategory(array $record): ?array {
+        $categoryID = $record['CategoryID'] ?? $record['Discussion']['CategoryID'] ?? null;
+        $category = $categoryID !== null ? CategoryModel::categories($categoryID) : null;
+        $category = $category !== null ? [
+            'categoryID' => $categoryID,
+            'name' => (array) $category['Name'],
+            'url' => CategoryModel::categoryUrl($category),
+        ] : null;
+
+        return $category;
+    }
+
+    /**
+     * Returns either comments or discussions array selected on provided IDs
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return array
+     */
+    private function getSelectedRecords(array $recordIDs, string $recordType): array {
+        if ($recordType === 'Comment') {
+            $records = $this->commentModel->lookup(['CommentID' => implode(',', $recordIDs)])->resultArray();
+        } else {
+            $records = $this->discussionModel->getIn($recordIDs)->resultArray();
+        }
+
+        return $records;
+    }
+
+    /**
+     * Return warn body message in rich format
+     *
      * @param array $recordUrls
      * @return string
      */
-    private function getRichWarningBody(array $recordUrls): string {
-        $richBody = '[{"insert": "'.plural(
-            count($recordUrls),
-            t('You are being warned for the following post:'),
-            t('You are being warned for the following posts:')
-        ).'"},';
-        $richBody .= '{"insert": "\n"},';
-        $length = count($recordUrls);
-        foreach ($recordUrls as $key => $recordUrl) {
-            $richBody .= <<<EOT
-{
-  "attributes": {
-    "link": "$recordUrl"
-  },
-  "insert": "$recordUrl"
-},
-EOT;
-
-            $richBody .= ($key === $length - 1) ? '{"insert": "\n"}' : '{"insert": "\n"},';
-        }
-        $richBody .= ']';
-
-        return $richBody;
-    }
+//    private function getRichWarningBody(array $recordUrls): string {
+//        $richBody = '[{"insert": "'.plural(
+//            count($recordUrls),
+//            t('You are being warned for the following post:'),
+//            t('You are being warned for the following posts:')
+//        ).'"},';
+//        $richBody .= '{"insert": "\n"},';
+//        $length = count($recordUrls);
+//        foreach ($recordUrls as $key => $recordUrl) {
+//            $richBody .= <<<EOT
+//{
+//  "attributes": {
+//    "link": "$recordUrl"
+//  },
+//  "insert": "$recordUrl"
+//},
+//EOT;
+//
+//            $richBody .= ($key === $length - 1) ? '{"insert": "\n"}' : '{"insert": "\n"},';
+//        }
+//        $richBody .= ']';
+//
+//        return $richBody;
+//    }
 
     /**
      * Hide signatures for people in the pokey.
