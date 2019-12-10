@@ -9,19 +9,17 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
 import { titleBarVariables } from "@library/headers/vanillaHeaderStyles";
 import { margins, paddings, unit } from "@library/styles/styleHelpers";
-
-export const contentTranslatorVariables = useThemeCache(() => {
-    return {};
-});
+import { navigationManagerVariables } from "@knowledge/navigation/navigationManagerStyles";
 
 export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
     const layoutVars = layoutVariables();
     const titleBarVars = titleBarVariables();
     const globalVars = globalVariables();
+    const navigationManagerVars = navigationManagerVariables();
 
     const content = style("content", {
-        paddingTop: globalVars.gutter.size,
+        paddingTop: unit(navigationManagerVars.spacing.top),
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
