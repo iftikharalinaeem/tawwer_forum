@@ -14,6 +14,7 @@ import { userSelect } from "@library/styles/styleHelpers";
 import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { modalVariables } from "@library/modal/modalStyles";
 
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -131,7 +132,7 @@ export const navigationManagerClasses = useThemeCache(() => {
     });
 
     const container = style("container", {
-        paddingTop: unit(globalVars.fullScreenModalTitle.gap),
+        paddingTop: unit(modalVariables().fullScreenTitleSpacing.gap),
         position: "relative",
         maxWidth: unit(800),
         width: percent(100),
