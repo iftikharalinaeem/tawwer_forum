@@ -60,6 +60,28 @@ class WebhooksTest extends AbstractResourceTest {
     }
 
     /**
+     * Test DELETE /resource/<id>.
+     *
+     * Overriding test since webhookModel uses the pipelineModel::selectsingle method, that throws a 500, instead of 404.
+     */
+    public function testDelete() {
+        $row = $this->testPost();
+        // GardenHTTP does not allow a call to its delete method with a body. This long form is required for delete requests with a body.
+        $r = $this->api()->request(\Garden\Http\HttpRequest::METHOD_DELETE, "{$this->baseUrl}/{$row[$this->pk]}", []);
+
+        $this->assertEquals(204, $r->getStatusCode());
+
+        try {
+            $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
+            $this->fail("The {$this->singular} did not get deleted.");
+        } catch (\Exception $ex) {
+            $this->assertEquals(500, $ex->getCode());
+            return;
+        }
+        $this->fail("Something odd happened while deleting a {$this->singular}.");
+    }
+
+    /**
      * Test PATCH /resource/<id> with a a single field update.
      *
      * Patch endpoints should be able to update every field on its own.

@@ -35,10 +35,11 @@ class WebhookModel extends PipelineModel {
     /**
      * Get all webhooks data.
      *
+     * @param array $where Where condition.
      * @return mixed|null
      */
     public function webhooks(array $where = []) {
-       return $this->get($where);
+        return $this->get($where);
     }
 
     /**
