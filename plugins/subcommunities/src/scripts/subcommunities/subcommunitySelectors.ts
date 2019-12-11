@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { useEffect, useMemo, useDebugValue } from "react";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { ISubcommunity } from "@subcommunities/subcommunities/subcommunityTypes";
-import { formatUrl, assetUrl } from "@library/utility/appUtils";
+import { formatUrl, siteUrl } from "@library/utility/appUtils";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { useLocaleInfo, ILocale } from "@vanilla/i18n";
 
@@ -71,7 +71,7 @@ export function useSubcommunities() {
 
 export function useCurrentSubcommunity() {
     const webPath = formatUrl("");
-    const realRoot = assetUrl("");
+    const realRoot = siteUrl("");
     const currentFolder = webPath.replace(realRoot, "").replace("/", "");
     const { subcommunitiesByID } = useSubcommunities();
 

@@ -7,7 +7,7 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { CheckIcon, LeftChevronCompactIcon } from "@library/icons/common";
 import Loader from "@library/loaders/Loader";
-import { assetUrl } from "@library/utility/appUtils";
+import { siteUrl } from "@library/utility/appUtils";
 import { useProductsForLocale } from "@subcommunities/products/productSelectors";
 import React, { useRef, useLayoutEffect } from "react";
 import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
@@ -62,7 +62,7 @@ export function ProductChooser(props: IProps) {
                 return (
                     <DropDownItemLink
                         key={`product${product ? product.productID : ""}-sub${community.subcommunityID}`}
-                        to={window.location.origin + assetUrl("/" + community.folder) + options.linkSuffix}
+                        to={siteUrl("/" + community.folder + options.linkSuffix)}
                     >
                         <span className={classes.rowIndented}>
                             {community.name}
