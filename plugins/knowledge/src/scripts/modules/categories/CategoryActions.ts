@@ -3,8 +3,7 @@
  * @license Proprietary
  */
 
-import { ActionsUnion } from "@library/redux/utility";
-import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import {
     IDeleteKbCategoryRequest,
     IGetKbCategoryRequestBody,
