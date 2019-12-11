@@ -8,11 +8,12 @@ import { ITranslationProperty, TranslationPropertyType, t } from "@vanilla/i18n"
 import { translationGridClasses } from "./TranslationGridStyles";
 import { TranslationGridRow } from "./TranslationGridRow";
 import { TranslationGridText } from "./TranslationGridText";
-import { EditIcon, AlertIcon } from "@library/icons/common";
+import { EditIcon, WarningIcon } from "@library/icons/common";
 import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { makeTranslationKey } from "../translator/TranslationActions";
+import { iconClasses } from "@library/icons/iconClasses";
 
 interface IProps {
     /** The translation property to represent */
@@ -71,7 +72,7 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
                 <>
                     {isEditing && (
                         <EditIcon
-                            className={classNames(classes.icon, { [classes.isFirst]: isFirst })}
+                            className={classNames(classes.icon, classes.editIcon, { [classes.isFirst]: isFirst })}
                             title={t("You have unsaved changes")}
                             small={true}
                         />
@@ -79,7 +80,11 @@ export const TranslationProperty = React.memo(function TranslationProperty(props
                     {!isEditing && !existingTranslation && (
                         <ToolTip label={t("Not translated")} ariaLabel={t("Not Translated")}>
                             <ToolTipIcon>
-                                <AlertIcon className={classNames(classes.icon, { [classes.isFirst]: isFirst })} />
+                                <WarningIcon
+                                    className={classNames(classes.icon, iconClasses().errorFgColor, {
+                                        [classes.isFirst]: isFirst,
+                                    })}
+                                />
                             </ToolTipIcon>
                         </ToolTip>
                     )}
