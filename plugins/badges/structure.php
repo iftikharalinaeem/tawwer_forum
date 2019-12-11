@@ -52,7 +52,7 @@ $Construct->table('UserBadge')
     ->column('RequestReason', 'varchar(255)', true)
     ->column('Declined', 'tinyint', 0)
     ->column('Count', 'int', 0)
-    ->column('Status', $userBadgeStatuses, false)
+    ->column('Status', $userBadgeStatuses, false, 'index.status')
     ->column('DateCompleted', 'datetime', true)
     ->column('DateInserted', 'datetime')
     ->column('InsertUserID', 'int')
@@ -62,8 +62,8 @@ $Construct
     ->table('UserBadge')
     ->column('BadgeID', 'int', false, 'index.earned')
     ->column('DateCompleted', 'datetime', true, 'index.earned')
-    ->column('Status', $userBadgeStatuses, false, 'index.status')
     ->set();
+
 
 // Add badge count to Users
 $Construct->table('User')
