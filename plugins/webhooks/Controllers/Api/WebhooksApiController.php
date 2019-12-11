@@ -134,9 +134,10 @@ class WebhooksApiController extends AbstractApiController {
      */
     public function webhookByID($id) {
         $this->permission('Garden.Settings.Manage');
-        $row = $this->webhookModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row) {
-            throw new NotFoundException('Webhook');
+        try {
+            $row = $this->webhookModel->getID($id);
+        } catch (Exception $e) {
+            throw new NotFoundException("Webhook not found.");
         }
         return $row;
     }
