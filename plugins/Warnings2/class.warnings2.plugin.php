@@ -1088,7 +1088,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @return array
      */
     private function getSelectedRecords(array $recordIDs, string $recordType): array {
-        if ($recordType === 'Comment') {
+        if (strtolower($recordType) === 'comment') {
             $records = $this->commentModel->lookup(['CommentID' => $recordIDs])->resultArray();
         } else {
             $records = $this->discussionModel->getIn($recordIDs)->resultArray();
