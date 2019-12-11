@@ -1044,7 +1044,7 @@ class Warnings2Plugin extends Gdn_Plugin
             $recordID = $recordType === 'Comment' ? $record['CommentID'] : $record['DiscussionID'];
             $recordUrl = $this->getRecordUrls([$recordID], $recordType)[0];
 
-            $embed = new QuoteEmbed([
+            $quoteEmbed = new QuoteEmbed([
                 "name" => $name,
                 "embedType" => QuoteEmbed::TYPE,
                 "recordType" => strtolower($recordType),
@@ -1059,12 +1059,12 @@ class Warnings2Plugin extends Gdn_Plugin
                 "url" => $recordUrl,
             ]);
 
-            $embed = $this->embedService->filterEmbedData($embed->getData());
+            $filteredEmbed = $this->embedService->filterEmbedData($quoteEmbed->getData());
 
             $embedData = [
                 "insert" => [
                     "embed-external" => [
-                        "data" => $embed,
+                        "data" => $filteredEmbed,
                         "loaderData" => [
                             "type" => "link",
                             "link" => $recordUrl
@@ -1077,9 +1077,6 @@ class Warnings2Plugin extends Gdn_Plugin
         }
 
         $body = json_encode($data, JSON_UNESCAPED_UNICODE);
-
-        // Run through the format service filter to ensure safe data.
-//        $body = $this->formatService->filter($body, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
         return $body;
     }
 
@@ -1092,44 +1089,13 @@ class Warnings2Plugin extends Gdn_Plugin
      */
     private function getSelectedRecords(array $recordIDs, string $recordType): array {
         if ($recordType === 'Comment') {
-            $records = $this->commentModel->lookup(['CommentID' => implode(',', $recordIDs)])->resultArray();
+            $records = $this->commentModel->lookup(['CommentID' => $recordIDs])->resultArray();
         } else {
             $records = $this->discussionModel->getIn($recordIDs)->resultArray();
         }
 
         return $records;
     }
-
-    /**
-     * Return warn body message in rich format
-     *
-     * @param array $recordUrls
-     * @return string
-     */
-//    private function getRichWarningBody(array $recordUrls): string {
-//        $richBody = '[{"insert": "'.plural(
-//            count($recordUrls),
-//            t('You are being warned for the following post:'),
-//            t('You are being warned for the following posts:')
-//        ).'"},';
-//        $richBody .= '{"insert": "\n"},';
-//        $length = count($recordUrls);
-//        foreach ($recordUrls as $key => $recordUrl) {
-//            $richBody .= <<<EOT
-//{
-//  "attributes": {
-//    "link": "$recordUrl"
-//  },
-//  "insert": "$recordUrl"
-//},
-//EOT;
-//
-//            $richBody .= ($key === $length - 1) ? '{"insert": "\n"}' : '{"insert": "\n"},';
-//        }
-//        $richBody .= ']';
-//
-//        return $richBody;
-//    }
 
     /**
      * Hide signatures for people in the pokey.
