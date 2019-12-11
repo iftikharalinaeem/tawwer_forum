@@ -7,8 +7,6 @@
 
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
-use Vanilla\EmbeddedContent\EmbedService;
-use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Models\UserFragmentSchema;
 
@@ -25,13 +23,11 @@ use Vanilla\Models\UserFragmentSchema;
 class Warnings2Plugin extends Gdn_Plugin
 {
 
-    /**
-     * @var EmbedService $embedService
-     */
-    private $embedService;
-
     /** @var FormatService */
     private $formatService;
+
+    /** @var \Vanilla\EmbeddedContent\EmbedService */
+    private $embedService;
 
     /// Properties ///
 
@@ -51,14 +47,14 @@ class Warnings2Plugin extends Gdn_Plugin
         \DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \UserModel $userModel,
-        EmbedService $embedService,
-        FormatService $formatService
+        FormatService $formatService,
+        \Vanilla\EmbeddedContent\EmbedService $embedService
     ) {
         $this->userModel = $userModel;
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
-        $this->embedService = $embedService;
         $this->formatService = $formatService;
+        $this->embedService = $embedService;
         parent::__construct();
         $this->fireEvent('Init');
     }
@@ -1047,15 +1043,13 @@ class Warnings2Plugin extends Gdn_Plugin
             $name = $record['Name'] ?? null;
             $recordID = $recordType === 'Comment' ? $record['CommentID'] : $record['DiscussionID'];
             $recordUrl = $this->getRecordUrls([$recordID], $recordType)[0];
-            $discussionLink = $this->getRecordUrls([$record['DiscussionID']], 'Discussion')[0];
-            $category = $this->getRecordCategory($record);
 
             $embed = new QuoteEmbed([
                 "name" => $name,
                 "embedType" => QuoteEmbed::TYPE,
                 "recordType" => strtolower($recordType),
                 "recordID" => $recordID,
-                "body" => $this->formatService->renderHTML($bodyRaw, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY),
+                "body" => $this->formatService->renderHTML($bodyRaw, $record['Format']),
                 "format" => $record['Format'],
                 "dateInserted" =>  $record["DateInserted"],
                 "bodyRaw" => $bodyRaw,
@@ -1064,6 +1058,8 @@ class Warnings2Plugin extends Gdn_Plugin
                 "displayOptions" => QuoteEmbedDisplayOptions::minimal(false),
                 "url" => $recordUrl,
             ]);
+
+            $embed = $this->embedService->filterEmbedData($embed->getData());
 
             $embedData = [
                 "insert" => [
@@ -1077,30 +1073,14 @@ class Warnings2Plugin extends Gdn_Plugin
                 ]
             ];
 
-            $filteredEmbededData = $this->embedService->filterEmbedData($embedData);
-
-            $data[] = $filteredEmbededData;
+            array_push($data, $embedData);
         }
 
-        return json_encode($data);
-    }
+        $body = json_encode($data, JSON_UNESCAPED_UNICODE);
 
-    /**
-     * Return record category
-     *
-     * @param array $record
-     * @return array|null
-     */
-    private function getRecordCategory(array $record): ?array {
-        $categoryID = $record['CategoryID'] ?? $record['Discussion']['CategoryID'] ?? null;
-        $category = $categoryID !== null ? CategoryModel::categories($categoryID) : null;
-        $category = $category !== null ? [
-            'categoryID' => $categoryID,
-            'name' => (array) $category['Name'],
-            'url' => CategoryModel::categoryUrl($category),
-        ] : null;
-
-        return $category;
+        // Run through the format service filter to ensure safe data.
+//        $body = $this->formatService->filter($body, \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY);
+        return $body;
     }
 
     /**
