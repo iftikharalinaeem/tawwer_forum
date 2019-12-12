@@ -203,7 +203,7 @@ class RulesApiController extends AbstractApiController {
     }
 
     /**
-     * Get a schema instance comprised of all available category fields.
+     * Get a schema instance comprised of all available rule fields.
      *
      * @return Schema Returns a schema object.
      */
