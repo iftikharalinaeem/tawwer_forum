@@ -1,9 +1,10 @@
 <?php
-
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+use Vanilla\Web\TwigFormWrapper;
 
 /**
  * Plugin that allows moderators to warn users and help police the community.
@@ -21,6 +22,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public $pageSize = 20;
 
+    /** @var RuleModel $ruleModel */
     private $ruleModel;
 
     /**
@@ -32,13 +34,13 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
+     *
      * @param RuleModel $ruleModel
      */
     public function __construct(RuleModel $ruleModel) {
         parent::__construct();
         $this->ruleModel = $ruleModel;
 
-        $test = $this->ruleModel->get();
         $this->fireEvent('Init');
     }
 
@@ -735,38 +737,92 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Rules option to dashboard.
+     *
+     * @param dashboardNavModule $sender
+     */
+    public function dashboardNavModule_init_handler($sender) {
+        $sender->addLinkToSectionIf(
+            'Garden.Settings.Manage',
+            'Settings',
+            Gdn::translate('Rules'),
+            '/settings/rules',
+            'forum.rules'
+        );
+    }
+
+    /**
+     * Endpoint for rule creation and modification.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_addEditRule_create(SettingsController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $formValues = $sender->Form->formValues();
+
+            if (isset($formValues['RuleID']) && ctype_digit($formValues['RuleID'])) {
+                $ruleID = $formValues['RuleID'] ?? null;
+                unset($formValues['RuleID']);
+                $this->ruleModel->update($formValues, ['RuleID' => $ruleID]);
+            } else {
+                $this->ruleModel->insert($formValues);
+            }
+
+            redirectTo('dashboard/settings/rules');
+        }
+
+        $ruleID = $sender->RequestArgs[0] ?? null;
+
+        $modalTitle = Gdn::translate('Add rule');
+        if (isset($ruleID) && ctype_digit($ruleID)) {
+            $rule = $this->ruleModel->getID($ruleID);
+            $sender->Form->setData($rule);
+            $modalTitle = Gdn::translate('Edit rule');
+        }
+
+        $sender->title($modalTitle);
+        $sender->setData('Form', $sender->Form);
+
+        $sender->render('rules/addeditrule', '', 'plugins/Warnings2');
+    }
+
+    /**
+     * Endpoint for rule deletion.
+     *
+     * @param SettingsController $sender
+     * @param int $ruleID
+     */
+    public function settingsController_deleteRule_create(SettingsController $sender, $ruleID) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            if ($this->ruleModel->delete(['RuleID' => $ruleID])) {
+                $sender->jsonTarget("#Rule_$ruleID", null, 'SlideUp');
+            }
+        }
+
+        $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Rules endpoint creation.
+     *
      * @param SettingsController $sender
      */
     public function settingsController_rules_create(SettingsController $sender) {
         $sender->permission('Garden.Settings.Manage');
 
-        $rules = $this->ruleModel->get()->result(DATASET_TYPE_ARRAY);
+        $rules = $this->ruleModel->get();
 
-        $form = [];
-        if (!empty($rules)) {
-            foreach ($rules as $rule) {
-                $form['Buttons']['Edit'][$rule['RuleID']] = anchor(
-                    dashboardSymbol('edit'),
-                    '/edit/rule/'.$rule['RuleID'],
-                    'btn btn-icon',
-                    ['aria-label' => t('Edit'), 'title' => t('Edit')]
-                );
-                $form['Buttons']['Delete'][$rule['RuleID']] = anchor(
-                    dashboardSymbol('delete'),
-                    '/settings/deleterule?ruleid='.$rule['RuleID'],
-                    'js-modal-confirm btn btn-icon',
-                    ['aria-label' => t('Delete'), 'title' => t('Delete')]
-                );
-            }
-        }
+        $sender->setData('Title', Gdn::translate('Rules'));
+        $sender->setData('Form', new TwigFormWrapper($sender->Form));
+        $sender->setData('Rules', $rules);
 
-        $sender->setData('Heading', heading('Rules', sprintf(t('Add %s'), t('Rules'))));
-        $sender->setData('Templates', $rules);
-        $sender->setData('Form', $form);
+        $sender->setHighlightRoute('dashboard/settings/rules');
 
-        $sender->addSideMenu();
-
-        $sender->render('settings', '', 'plugins/Warnings2/views');
+        $sender->render('rules/settings', '', 'plugins/Warnings2');
     }
 
     /**
