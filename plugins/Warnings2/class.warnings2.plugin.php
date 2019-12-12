@@ -20,8 +20,7 @@ use Vanilla\Models\UserFragmentSchema;
  * - Moderation.UserNotes.Add
  * - Moderation.Warnings.Add
  */
-class Warnings2Plugin extends Gdn_Plugin
-{
+class Warnings2Plugin extends Gdn_Plugin {
 
     /** @var FormatService */
     private $formatService;
@@ -42,19 +41,22 @@ class Warnings2Plugin extends Gdn_Plugin
 
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
+     *
+     * @param DiscussionModel $discussionModel
+     * @param CommentModel $commentModel
+     * @param UserModel $userModel
+     * @param FormatService $formatService
      */
     public function __construct(
         \DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \UserModel $userModel,
-        FormatService $formatService,
-        \Vanilla\EmbeddedContent\EmbedService $embedService
+        FormatService $formatService
     ) {
         $this->userModel = $userModel;
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->formatService = $formatService;
-        $this->embedService = $embedService;
         parent::__construct();
         $this->fireEvent('Init');
     }
@@ -62,16 +64,14 @@ class Warnings2Plugin extends Gdn_Plugin
     /**
      * {@inheritdoc}
      */
-    public function setup()
-    {
+    public function setup() {
         $this->structure();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function structure()
-    {
+    public function structure() {
         require __DIR__ . '/structure.php';
 
         if (Gdn::addonManager()->isEnabled('Warnings', \Vanilla\Addon::TYPE_ADDON)) {
@@ -84,8 +84,7 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @param SettingsController $sender Sending controller instance.
      */
-    public function settingsController_warnings_create($sender)
-    {
+    public function settingsController_warnings_create($sender) {
         // Prevent non-admins from accessing this page
         $sender->permission('Garden.Settings.Manage');
 
@@ -109,8 +108,7 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @return string Returns a string of HTML that represents the warning button.
      */
-    public function warnButton($row, $recordType, $recordID)
-    {
+    public function warnButton($row, $recordType, $recordID) {
         $args = [
             'userid' => val('InsertUserID', $row),
             'recordtype' => $recordType,
@@ -131,8 +129,7 @@ class Warnings2Plugin extends Gdn_Plugin
     /**
      * Process expired warning on sign in.
      */
-    public function base_afterSignIn_handler()
-    {
+    public function base_afterSignIn_handler() {
         if (Gdn::session()->UserID) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings(Gdn::session()->UserID);
@@ -142,8 +139,7 @@ class Warnings2Plugin extends Gdn_Plugin
     /**
      * Process warnings when a user visits.
      */
-    public function userModel_visit_handler()
-    {
+    public function userModel_visit_handler() {
         if (Gdn::session()->UserID) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings(Gdn::session()->UserID);
@@ -156,8 +152,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ActivityModel $sender The activity model sending the ban notification.
      * @param array $args Event arguments.
      */
-    public function activityModel_beforeSave_handler($sender, $args)
-    {
+    public function activityModel_beforeSave_handler($sender, $args) {
         if (!isset($args['Activity'])) {
             return;
         }
@@ -210,8 +205,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param object $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function base_beforeCommentBody_handler($sender, $args)
-    {
+    public function base_beforeCommentBody_handler($sender, $args) {
         if (isset($args['Comment'])) {
             $row = $args['Comment'];
         } else {
@@ -228,13 +222,11 @@ class Warnings2Plugin extends Gdn_Plugin
 
         $row->Attributes = dbdecode($row->Attributes);
         if (isset($row->Attributes['WarningID']) && $row->Attributes['WarningID']) {
-
             //Check if warning has been reversed.
             $noteModel = new UserNoteModel();
             $warning = $noteModel->getID($row->Attributes['WarningID']);
 
             if (!isset($warning['Reversed']) || !$warning['Reversed']) {
-
                 // Make inline warning message link to specific warning text.
                 // It will only be readable by the warned user or moderators.
                 $wordWarn = 'warned';
@@ -254,8 +246,7 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @param MessagesController $sender The event sender.
      */
-    public function messagesController_conversationWarning_handler($sender)
-    {
+    public function messagesController_conversationWarning_handler($sender) {
         $foreignID = $sender->data('Conversation.ForeignID');
         if (!stristr($foreignID, '-')) {
             return;
@@ -283,8 +274,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ActivityModel $sender The event sender.
      * @param array $args Event arguments.
      */
-    public function activityModel_beforeSendNotification_handler($sender, $args)
-    {
+    public function activityModel_beforeSendNotification_handler($sender, $args) {
         if (!isset($args['Email'])) {
             return;
         }
@@ -341,8 +331,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param Gdn_Controller $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function base_flags_handler($sender, $args)
-    {
+    public function base_flags_handler($sender, $args) {
         if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
             $args['Flags']['warn'] = [$this, 'WarnButton'];
         }
@@ -354,10 +343,8 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_beforeProfileOptions_handler($sender, $args)
-    {
+    public function profileController_beforeProfileOptions_handler($sender, $args) {
         if (!val('EditMode', Gdn::controller())) {
-
             if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
                 $sender->EventArguments['ProfileOptions'][] = [
                     'Text' => t('Add Note'),
@@ -383,8 +370,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_card_render($sender, $args)
-    {
+    public function profileController_card_render($sender, $args) {
         $userID = $sender->data('Profile.UserID');
 
         if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false)) {
@@ -427,14 +413,12 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender The event sender.
      * @param int $noteID The ID of the note to delete.
      */
-    public function profileController_deleteNote_create($sender, $noteID)
-    {
+    public function profileController_deleteNote_create($sender, $noteID) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $form = new Gdn_Form();
 
         if ($form->authenticatedPostBack()) {
-
             // Delete the note.
             $noteModel = new UserNoteModel();
             $noteModel->delete(['UserNoteID' => $noteID]);
@@ -452,8 +436,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param UserModel $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function userModel_setCalculatedFields_handler($sender, $args)
-    {
+    public function userModel_setCalculatedFields_handler($sender, $args) {
         if (val('Banned', $args['User'])) {
             setValue('Punished', $args['User'], 0);
         }
@@ -471,8 +454,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender The event sender.
      * @param array $args The event arguments.
      */
-    public function profileController_beforeUserInfo_handler($sender, $args)
-    {
+    public function profileController_beforeUserInfo_handler($sender, $args) {
         echo Gdn_Theme::module('UserWarningModule');
         return;
 
@@ -506,8 +488,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param int ? $userID The ID of the user to create the note for.
      * @param int ? $noteID The ID of the note to edit.
      */
-    public function profileController_note_create($sender, $userID = null, $noteID = null)
-    {
+    public function profileController_note_create($sender, $userID = null, $noteID = null) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false);
 
         $model = new UserNoteModel();
@@ -567,8 +548,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender The controller the endpoint is attached to.
      * @param int $id The ID of the warning to reverse.
      */
-    public function profileController_reverseWarning_create($sender, $id)
-    {
+    public function profileController_reverseWarning_create($sender, $id) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $form = new Gdn_Form();
@@ -591,16 +571,14 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @param AssetModel $sender The event sender.
      */
-    public function assetModel_styleCss_handler($sender)
-    {
+    public function assetModel_styleCss_handler($sender) {
         $sender->addCssFile('warnings.css', 'plugins/Warnings2');
     }
 
     /**
      * Process a user's jailed status on startup.
      */
-    public function gdn_dispatcher_appStartup_handler()
-    {
+    public function gdn_dispatcher_appStartup_handler() {
         if (!Gdn::session()->UserID || !val('Punished', Gdn::session()->User)) {
             return;
         }
@@ -621,8 +599,7 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @param ProfileController $sender The event sender.
      */
-    public function profileController_addProfileTabs_handler($sender)
-    {
+    public function profileController_addProfileTabs_handler($sender) {
         $isPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         // We can choose to allow regular users to see warnings or not. Default not.
@@ -642,8 +619,7 @@ class Warnings2Plugin extends Gdn_Plugin
      *
      * @param SiteNavModule $sender The event sender.
      */
-    public function siteNavModule_init_handler($sender)
-    {
+    public function siteNavModule_init_handler($sender) {
         $isPrivileged = Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
         // We can choose to allow regular users to see warnings or not. Default not.
         if (!$isPrivileged && Gdn::session()->UserID != valr('User.UserID', $sender)) {
@@ -660,8 +636,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param string $username
      * @param string $page
      */
-    public function profileController_notes_create($sender, $userReference, $username = '', $page = '')
-    {
+    public function profileController_notes_create($sender, $userReference, $username = '', $page = '') {
         $sender->editMode(false);
         $sender->getUserInfo($userReference, $username);
 
@@ -716,8 +691,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param ProfileController $sender
      * @param $noteID
      */
-    public function profileController_viewNote_create($sender, $noteID)
-    {
+    public function profileController_viewNote_create($sender, $noteID) {
         $userNoteModel = new UserNoteModel();
         $note = $userNoteModel->getID($noteID);
 
@@ -785,8 +759,7 @@ class Warnings2Plugin extends Gdn_Plugin
         ?string $userIDs,
         ?string $recordType = null,
         ?string $recordIDs = null
-    )
-    {
+    ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         if (empty($userIDs) || empty($recordType) || empty($recordIDs)) {
@@ -814,8 +787,7 @@ class Warnings2Plugin extends Gdn_Plugin
         ?string $userID,
         ?string $recordType = null,
         ?string $recordID = null
-    )
-    {
+    ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
         $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
@@ -894,8 +866,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param string|null $recordIDs
      * @return string
      */
-    private function getErrorMsg(?string $userIDs, ?string $recordType, ?string $recordIDs)
-    {
+    private function getErrorMsg(?string $userIDs, ?string $recordType, ?string $recordIDs) {
         $params = [];
         if (empty($userIDs)) {
             $params[] = 'User ID';
@@ -920,8 +891,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param string $recordType
      * @return bool
      */
-    private function checkAlreadyWarned(\ProfileController $sender, array $recordIDs, string $recordType): bool
-    {
+    private function checkAlreadyWarned(\ProfileController $sender, array $recordIDs, string $recordType): bool {
         $warningModule = new WarningModel();
         $warnedPostIDs = [];
         $model = $warningModule->getModel(strtolower($recordType));
@@ -952,8 +922,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param string|array $recordIDs
      * @return array
      */
-    private function normalizeRecordIDs($recordIDs): array
-    {
+    private function normalizeRecordIDs($recordIDs): array {
         return gettype($recordIDs) === 'string' ? explode(',', $recordIDs) : $recordIDs;
     }
 
@@ -994,8 +963,7 @@ class Warnings2Plugin extends Gdn_Plugin
      * @param string $recordType
      * @return array
      */
-    private function getRecordUrls(array $recordIDs, string $recordType): array
-    {
+    private function getRecordUrls(array $recordIDs, string $recordType): array {
         $recordUrls = [];
 
         if (strtolower($recordType) == 'comment') {
