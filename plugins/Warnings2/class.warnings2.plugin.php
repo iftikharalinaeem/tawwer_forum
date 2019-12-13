@@ -991,16 +991,22 @@ class Warnings2Plugin extends Gdn_Plugin {
         ) . PHP_EOL;
 
         foreach ($records as $record) {
-            $quote = wrap(
-                wrap(
-                    Gdn::formatService()->renderQuote($record["Body"], $record['Format']),
-                    'blockquote',
-                    ["class" => "Quote"]
-                ),
-                "div",
-                ["class" => "QuoteText"]
-            );
-            $body .= $quote . PHP_EOL;
+            $quotedRecord = formatQuote($record, false);
+            // Transform the HTML to Markdown
+            $quotedRecord = strip_tags($quotedRecord, '<blockquote>');
+
+            $i = 0;
+            // Replace all blockquotes with no other blockquote as a child, one at the time (starting by the last one)!
+            while (preg_match('/\n?<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
+                $indented = "\n> " . implode("\n> ", explode("\n", trim($matches[1])));
+                $quotedRecord = str_replace($matches[0], $indented, $quotedRecord);
+                if ($i++ > 1000) {
+                    break; // The parsing went wrong :)
+                }
+            }
+            $quotedRecord = trim($quotedRecord);
+            $body .= $quotedRecord . PHP_EOL;
+            $body .= "\n";
         }
 
         return $body;
