@@ -13,21 +13,10 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 
 const story = storiesOf("Knowledge Base", module);
 
-// Add Knobs
-
-interface IArticleReactionProps extends IArticleReaction {
-    signedIn: boolean;
-    isYesSubmitting: boolean;
-    isNoSubmitting: boolean;
-}
-
-// interface IArticleReactionOption
-
 story.add("Was this Helpful?", () => {
     const noop = () => {
         return;
     };
-    const positiveIntOptions = { min: 0 };
 
     const yesVotes = 10;
     const noVotes = 2;
