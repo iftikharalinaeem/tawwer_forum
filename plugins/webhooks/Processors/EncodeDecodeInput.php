@@ -10,7 +10,7 @@ use Vanilla\Database\Operation\Processor;
 use Vanilla\Database\Operation;
 
 /**
- * Database operation processor for including current date fields.
+ * Database operation processor for encoding/decoding fields.
  */
 class EncodeDecode implements Processor {
 

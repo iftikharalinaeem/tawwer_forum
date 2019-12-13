@@ -15,7 +15,7 @@ use Vanilla\Database\Operation;
 class NormalizeInput implements Processor {
 
     /**
-     * Add current date to write operations.
+     * Add field to write operations.
      *
      * @param Operation $databaseOperation
      * @param callable $stack
