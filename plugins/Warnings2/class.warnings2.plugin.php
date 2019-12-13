@@ -935,21 +935,12 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @return string
      */
     private function getWarningBody(array $recordIDs, string $recordType, string $format): string {
-        $recordUrls = $this->getRecordUrls($recordIDs, $recordType);
-
         switch (strtolower($format)) {
             case 'rich':
                 $body = $this->getRichWarningBody($recordIDs, $recordType);
                 break;
             default:
-                $body = plural(
-                    count($recordUrls),
-                    t('You are being warned for the following post:'),
-                    t('You are being warned for the following posts:')
-                ) . PHP_EOL;
-                foreach ($recordUrls as $recordUrl) {
-                    $body .= $recordUrl . PHP_EOL;
-                }
+                $body = $this->getLegacyWarningBody($recordIDs, $recordType);
                 break;
         }
 
@@ -982,6 +973,37 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         return $recordUrls;
+    }
+
+    /**
+     * Return warn body message in rich format
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return string
+     */
+    private function getLegacyWarningBody(array $recordIDs, string $recordType): string {
+        $records = $this->getSelectedRecords($recordIDs, $recordType);
+        $body = plural(
+            count($records),
+            t("You are being warned for the following post:"),
+            t("You are being warned for the following posts:")
+        ) . PHP_EOL;
+
+        foreach ($records as $record) {
+            $quote = wrap(
+                wrap(
+                    Gdn::formatService()->renderQuote($record["Body"], $record['Format']),
+                    'blockquote',
+                    ["class" => "Quote"]
+                ),
+                "div",
+                ["class" => "QuoteText"]
+            );
+            $body .= $quote . PHP_EOL;
+        }
+
+        return $body;
     }
 
     /**
@@ -1027,12 +1049,14 @@ class Warnings2Plugin extends Gdn_Plugin {
                 "url" => $recordUrl,
             ]);
 
-            $filteredEmbed = $this->embedService->filterEmbedData($quoteEmbed->getData());
+            if ($this->embedService) {
+                $quoteEmbed = $this->embedService->filterEmbedData($quoteEmbed->getData());
+            }
 
             $embedData = [
                 "insert" => [
                     "embed-external" => [
-                        "data" => $filteredEmbed,
+                        "data" => $quoteEmbed,
                         "loaderData" => [
                             "type" => "link",
                             "link" => $recordUrl
