@@ -38,7 +38,7 @@ class WebhooksPlugin extends \Gdn_Plugin {
             ->primaryKey('webhookID')
             ->column('active', 'tinyint', 1)
             ->column('name', 'varchar(100)', false)
-            ->column('events', ['*', 'comment', 'discussion', 'user'])
+            ->column('events', 'varchar(255)')
             ->column('url', 'varchar(255)', false)
             ->column('secret', 'varchar(100)', false)
             ->column('dateInserted', 'datetime', true)

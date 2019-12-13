@@ -7,17 +7,37 @@
 use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
+use Vanilla\Database\Operation;
+use Webhooks\Processors\EncodeDecode;
+use Webhooks\Processors\NormalizeInput;
+
 
 /**
  * Class WebhookModel
  */
 class WebhookModel extends PipelineModel {
 
+    /** @var Gdn_Session */
+    private $session;
+
     /**
      * WebhookModel constructor.
      */
-    public function __construct() {
+    public function __construct(Gdn_Session $session) {
         parent::__construct('webhook');
+        $this->session = $session;
+        $dateProcessor = new Operation\CurrentDateFieldProcessor();
+        $normalizeProcessor = new NormalizeInput();
+        $encodeDecodeProcessor = new EncodeDecode();
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
+            ->setUpdateFields(["dateUpdated"]);
+        $this->addPipelineProcessor($dateProcessor);
+        $this->addPipelineProcessor($normalizeProcessor);
+        $this->addPipelineProcessor($encodeDecodeProcessor);
+        $userProcessor = new Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
+            ->setUpdateFields(["updateUserID"]);
+        $this->addPipelineProcessor($userProcessor);
     }
 
     /**
@@ -30,62 +50,5 @@ class WebhookModel extends PipelineModel {
      */
     public function getID(int $webhookID): array {
         return $this->selectSingle(["webhookID" => $webhookID]);
-    }
-
-    /**
-     * Get all webhooks data.
-     *
-     * @param array $where Where condition.
-     * @return mixed|null
-     */
-    public function webhooks(array $where = []) {
-        return $this->get($where);
-    }
-
-    /**
-     * Save a webhook returns the webhook id.
-     *
-     * @param array $formPostValues The data to save.
-     * @return int|bool ID of the inserted row, or true on update.
-     * @throws Exception If an error is encountered while performing the query.
-     */
-    public function save($formPostValues) {
-        if (isset($formPostValues['active'])) {
-            $formPostValues['active'] = $formPostValues['active'] ? 1 : 0;
-        }
-        $webhookID = $formPostValues['webhookID'] ?? false;
-        $insert = !$webhookID;
-
-        if ($insert) {
-            // Save the webhook record.
-            $webhook = [
-                'active' => $formPostValues['active'],
-                'events' => $formPostValues['events'],
-                'name' => $formPostValues['name'],
-                'url' =>  $formPostValues['url'],
-                'secret' => $formPostValues['secret']
-            ];
-            $webhookID = $this->insert($webhook);
-        } else {
-            $webhookID = $this->update($formPostValues, ['webhookID' => $webhookID]);
-        }
-        return $webhookID;
-    }
-
-    /**
-     * Delete a webhook.
-     *
-     * @param int $webhookID Unique ID of the webhook to be deleted.
-     * @param array $options Additional options for the delete.
-     * @return bool Always returns TRUE.
-     */
-    public function deleteID($webhookID, $options = []) {
-        $webhook = $this->getID($webhookID);
-        if (!$webhook) {
-            return false;
-        }
-        // Delete the webhook.
-        $this->delete(['webhookID' => $webhookID], $options);
-        return true;
     }
 }

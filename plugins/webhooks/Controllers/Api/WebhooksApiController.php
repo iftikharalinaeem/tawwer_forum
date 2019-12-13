@@ -41,9 +41,9 @@ class WebhooksApiController extends AbstractApiController {
      */
     public function index() {
         $this->permission('Garden.Settings.Manage');
-        $in = $this->schema([], 'in')->setDescription('Get a list of all the webhooks.');
+        $in = $this->schema([], 'in');
         $out = $this->schema([':a' => $this->fullSchema()], 'out');
-        $rows = $this->webhookModel->webhooks();
+        $rows = $this->webhookModel->get([], ['limit' => 100]);
         $result = $out->validate($rows);
         return $result;
     }
@@ -52,15 +52,14 @@ class WebhooksApiController extends AbstractApiController {
      * Get a webhook.
      *
      * @param int $id The ID of the webhook.
-     * @param array $query The request query.
+     * @throws NotFoundException If the webhook could not be found.
      * @return array
      */
-    public function get($id, array $query) {
+    public function get($id) {
         $this->permission('Garden.Settings.Manage');
         $this->idParamSchema();
-        $in = $this->schema([], ['WebhookGet', 'in'])->setDescription('Get a webhook.');
+        $in = $this->schema([], ['WebhookGet', 'in']);
         $out = $this->schema($this->webhookSchema(), 'out');
-        $query = $in->validate($query);
         $webhook = $this->webhookByID($id);
         $result = $out->validate($webhook);
 
@@ -72,16 +71,16 @@ class WebhooksApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException If the webhook could not be created.
-     * @return array
+     * @return array|Exception If an error is encountered while performing the query.
      */
     public function post(array $body) {
         $this->permission('Garden.Settings.Manage');
-        $in = $this->webhookPostSchema('in')->setDescription('Add a webhook.');
+        $in = $this->webhookPostSchema('in');
         $out = $this->webhookSchema('out');
 
         $body = $in->validate($body);
-        $id = $this->webhookModel->save($body);
-        $this->validateModel($this->webhookModel);
+
+        $id = $this->webhookModel->insert($body);
         if (!$id) {
             throw new ServerException('Unable to insert webhook.', 500);
         }
@@ -94,12 +93,13 @@ class WebhooksApiController extends AbstractApiController {
      * Delete a webhook.
      *
      * @param int $id The ID of the webhook.
+     * @throws Exception If an error is encountered while performing the query.
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
-        $in = $this->idParamSchema()->setDescription('Delete a webhook.');
+        $in = $this->idParamSchema();
         $out = $this->schema([], 'out');
-        $this->webhookModel->deleteID($id);
+        $this->webhookModel->delete(['webhookID' => $id], ['limit' => 1]);
     }
 
     /**
@@ -107,19 +107,17 @@ class WebhooksApiController extends AbstractApiController {
      *
      * @param int $id The ID of the webhook.
      * @param array $body The request body.
+     * @throws Exception If an error is encountered while performing the query.
      * @return array
      */
     public function patch($id, array $body) {
         $this->permission('Garden.Settings.Manage');
 
         $this->idParamSchema('in');
-        $in = $this->webhookPostSchema('in')->setDescription('Update a webhook.');
+        $in = $this->webhookPostSchema('in');
         $out = $this->webhookSchema('out');
-
         $webhookData = $in->validate($body, true);
-        $webhookData['webhookID'] = $id;
-        $this->webhookModel->save($webhookData);
-        $this->validateModel($this->webhookModel);
+        $this->webhookModel->update($webhookData, ['webhookID' => $id]);
         $row = $this->webhookByID($id);
         $result = $out->validate($row);
         return $result;
@@ -132,8 +130,7 @@ class WebhooksApiController extends AbstractApiController {
      * @throws NotFoundException If the webhook could not be found.
      * @return array
      */
-    public function webhookByID($id) {
-        $this->permission('Garden.Settings.Manage');
+    private function webhookByID($id) {
         try {
             $row = $this->webhookModel->getID($id);
         } catch (Exception $e) {
@@ -187,7 +184,13 @@ class WebhooksApiController extends AbstractApiController {
             'webhookID:i' => 'The webhook identifier.',
             'active:b' => 'Whether or not this webhook will send events.',
             'name:s' => 'User-friendly name.',
-            'events:s|n' => ['*', 'comment', 'discussion', 'user'],
+            'events' => [
+                'type' => 'array',
+                'items' => [
+                    'type' => 'string',
+                    'enum' => ['*', 'comment', 'discussion', 'user'],
+                ]
+            ],
             'url:s' => 'The target URL of the webhook.',
             'secret:s' => 'The secret used to sign events associated with this webhook.',
             'dateInserted:dt?' => 'The date/time that the webhook was created.',
