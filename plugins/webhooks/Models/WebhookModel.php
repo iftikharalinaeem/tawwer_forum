@@ -11,7 +11,6 @@ use Vanilla\Database\Operation;
 use Webhooks\Processors\EncodeDecode;
 use Webhooks\Processors\NormalizeInput;
 
-
 /**
  * Class WebhookModel
  */
@@ -22,6 +21,8 @@ class WebhookModel extends PipelineModel {
 
     /**
      * WebhookModel constructor.
+     *
+     * @param Gdn_Session $session
      */
     public function __construct(Gdn_Session $session) {
         parent::__construct('webhook');

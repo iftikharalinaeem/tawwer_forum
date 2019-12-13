@@ -32,7 +32,7 @@ class EncodeDecode implements Processor {
         }
         $dbStack = $stack($databaseOperation);
         if ($getOperationType === Operation::TYPE_SELECT) {
-            foreach($dbStack as $key => $value) {
+            foreach ($dbStack as $key => $value) {
                 $dbStack[$key]['events'] = dbdecode($value['events']);
             }
         }
