@@ -43,6 +43,9 @@ $IsPrivileged = $this->data('IsPrivileged');
                if (!isset($Row['HideWarnerIdentity']) || !$Row['HideWarnerIdentity']) {
                   echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
                }
+               if (!isset($Row['Rule']) || !$Row['Rule']) {
+                   echo '<div>'.userAnchor($Row, '', ['Px' => 'Insert']).'</div> ';
+               }
                echo '<div class="Meta">'.Gdn_Format::date($Row['DateInserted'], 'html').'</div>';
                ?>
             </div>

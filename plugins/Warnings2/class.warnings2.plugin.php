@@ -1,9 +1,10 @@
 <?php
-
 /**
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license Proprietary
  */
+
+use Vanilla\Web\TwigFormWrapper;
 
 /**
  * Plugin that allows moderators to warn users and help police the community.
@@ -21,6 +22,9 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     public $pageSize = 20;
 
+    /** @var RuleModel $ruleModel */
+    private $ruleModel;
+
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
      */
@@ -30,9 +34,13 @@ class Warnings2Plugin extends Gdn_Plugin {
 
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
+     *
+     * @param RuleModel $ruleModel
      */
-    public function __construct() {
+    public function __construct(RuleModel $ruleModel) {
         parent::__construct();
+        $this->ruleModel = $ruleModel;
+
         $this->fireEvent('Init');
     }
 
@@ -715,6 +723,10 @@ class Warnings2Plugin extends Gdn_Plugin {
         $warningModel = new WarningModel();
         $note['HideWarnerIdentity'] = $warningModel->HideWarnerIdentity;
 
+        if (!empty($note['RuleID'])) {
+            $note['Rule'] = $this->ruleModel->getID($note['RuleID']);
+        }
+
         // Join record in question with note.
         $notes = [];
         $notes[] = $note;
@@ -722,6 +734,95 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->setData('Notes', $notes);
         $sender->render('viewnote', '', 'plugins/Warnings2');
+    }
+
+    /**
+     * Add Rules option to dashboard.
+     *
+     * @param dashboardNavModule $sender
+     */
+    public function dashboardNavModule_init_handler($sender) {
+        $sender->addLinkToSectionIf(
+            'Garden.Settings.Manage',
+            'Settings',
+            Gdn::translate('Rules'),
+            '/settings/rules',
+            'forum.rules'
+        );
+    }
+
+    /**
+     * Endpoint for rule creation and modification.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_addEditRule_create(SettingsController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $formValues = $sender->Form->formValues();
+
+            if (isset($formValues['RuleID']) && ctype_digit($formValues['RuleID'])) {
+                $ruleID = $formValues['RuleID'] ?? null;
+                unset($formValues['RuleID']);
+                $this->ruleModel->update($formValues, ['RuleID' => $ruleID]);
+            } else {
+                $this->ruleModel->insert($formValues);
+            }
+
+            redirectTo('dashboard/settings/rules');
+        }
+
+        $ruleID = $sender->RequestArgs[0] ?? null;
+
+        $modalTitle = Gdn::translate('Add rule');
+        if (isset($ruleID) && ctype_digit($ruleID)) {
+            $rule = $this->ruleModel->getID($ruleID);
+            $sender->Form->setData($rule);
+            $modalTitle = Gdn::translate('Edit rule');
+        }
+
+        $sender->title($modalTitle);
+        $sender->setData('Form', $sender->Form);
+
+        $sender->render('rules/addeditrule', '', 'plugins/Warnings2');
+    }
+
+    /**
+     * Endpoint for rule deletion.
+     *
+     * @param SettingsController $sender
+     * @param int $ruleID
+     */
+    public function settingsController_deleteRule_create(SettingsController $sender, $ruleID) {
+        $sender->permission('Garden.Settings.Manage');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            if ($this->ruleModel->delete(['RuleID' => $ruleID])) {
+                $sender->jsonTarget("#Rule_$ruleID", null, 'SlideUp');
+            }
+        }
+
+        $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Rules endpoint creation.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_rules_create(SettingsController $sender) {
+        $sender->permission('Garden.Settings.Manage');
+
+        $rules = $this->ruleModel->get();
+
+        $sender->setData('Title', Gdn::translate('Rules'));
+        $sender->setData('Form', new TwigFormWrapper($sender->Form));
+        $sender->setData('Rules', $rules);
+
+        $sender->setHighlightRoute('dashboard/settings/rules');
+
+        $sender->render('rules/settings', '', 'plugins/Warnings2');
     }
 
     /**
@@ -828,8 +929,17 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->setValue('AttachRecord', true);
         }
 
+        $ruleOptions = [];
+        $rules = $this->ruleModel->get();
+        foreach ($rules as $rule) {
+            $ruleOptions[$rule['RuleID']] = [
+                'Text' => $rule['Name'] ?? null,
+            ];
+        }
+
         $sender->setData('Profile', $user);
         $sender->setData('Title', sprintf(t('Warn %s'), htmlspecialchars(val('Name', $user))));
+        $sender->setData('RuleOptions', $ruleOptions);
 
         $sender->View = 'Warn';
         $sender->ApplicationFolder = 'plugins/Warnings2';
