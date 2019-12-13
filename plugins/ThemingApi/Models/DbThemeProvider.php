@@ -88,6 +88,13 @@ class DbThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getAllThemes(): array {
+        return $this->themeModel->get([]);
+    }
+
+    /**
      * @inheritdoc
      */
     public function postTheme(array $body): array {
