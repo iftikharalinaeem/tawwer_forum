@@ -289,7 +289,7 @@ class GroupsApiController extends AbstractApiController {
                 'groupID',
                 'name',
                 'description',
-                'format:s' => 'The input format of the group.',
+                'format' => new \Vanilla\Models\FormatSchema(),
                 'iconUrl',
                 'bannerUrl',
                 'privacy'
@@ -1144,7 +1144,7 @@ class GroupsApiController extends AbstractApiController {
                 Schema::parse([
                     'name',
                     'description',
-                    'format:s' => 'The input format of the group.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'iconUrl?',
                     'bannerUrl?',
                     'privacy',
@@ -1189,7 +1189,7 @@ class GroupsApiController extends AbstractApiController {
 
         return [$sortField, $sortOrder];
     }
-  
+
     /**
      * Verify the current user has "Access" permission for a group.
      *
