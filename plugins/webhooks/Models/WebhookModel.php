@@ -52,4 +52,36 @@ class WebhookModel extends PipelineModel {
     public function getID(int $webhookID): array {
         return $this->selectSingle(["webhookID" => $webhookID]);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function insert(array $set) {
+        $set = $this->prepareWrite($set);
+        return parent::insert($set);
+    }
+
+    /**
+     * Prepare data to be saved.
+     *
+     * @param array $set
+     * @return array
+     */
+    private function prepareWrite(array $set): array {
+        foreach ($set as $field => $value) {
+            $compareField = strtolower($field);
+            if ($compareField === "events" && is_array($value) && in_array("*", $value)) {
+                $set[$field] = ["*"];
+            }
+        }
+        return $set;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function update(array $set, array $where): bool {
+        $set = $this->prepareWrite($set);
+        return parent::update($set, $where);
+    }
 }
