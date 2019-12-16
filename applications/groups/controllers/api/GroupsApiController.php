@@ -289,7 +289,7 @@ class GroupsApiController extends AbstractApiController {
                 'groupID',
                 'name',
                 'description',
-                'format' => new \Vanilla\Models\FormatSchema(),
+                'format' => new \Vanilla\Models\FormatSchema(true),
                 'iconUrl',
                 'bannerUrl',
                 'privacy'
