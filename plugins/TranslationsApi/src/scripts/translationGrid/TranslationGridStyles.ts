@@ -5,9 +5,17 @@
 
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { absolutePosition, colorOut, paddings, singleBorder, unit } from "@library/styles/styleHelpers";
+import {
+    absolutePosition,
+    colorOut,
+    margins,
+    negative,
+    paddings,
+    singleBorder,
+    unit,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent, translate } from "csx";
+import { calc, percent, px, translate, translateY } from "csx";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
 
 export const translationGridVariables = useThemeCache(() => {
@@ -68,6 +76,13 @@ export const translationGridClasses = useThemeCache(() => {
                 paddingTop: unit(vars.cell.paddings.inner - vars.paddings.vertical),
             },
         },
+    });
+
+    const editIcon = style("editIcon", {
+        ...margins({
+            top: -4,
+            left: -2,
+        }),
     });
 
     const isLast = style("isLast", {});
@@ -207,7 +222,7 @@ export const translationGridClasses = useThemeCache(() => {
         },
     });
 
-    const iconOffset = globalVars.icon.sizes.default / -2;
+    const iconOffset = -8;
 
     const icon = style("icon", {
         position: "absolute",
@@ -216,10 +231,10 @@ export const translationGridClasses = useThemeCache(() => {
             vars.cell.paddings.inner + Math.floor(globalVars.lineHeights.condensed * globalVars.fonts.size.medium) / 2,
         ),
         left: unit((vars.cell.paddings.outer + vars.cell.paddings.inner) / 2),
-        transform: translate(unit(iconOffset) as string, unit(iconOffset)),
+        transform: translate(unit(iconOffset + 2) as string, unit(iconOffset) as string),
         $nest: {
             [`&.${isFirst}`]: {
-                transform: translate(unit(iconOffset) as string, unit(iconOffset - vars.paddings.vertical / 2)),
+                transform: translate(unit(iconOffset) as string, unit(iconOffset - 4) as string),
             },
         },
     });
@@ -245,5 +260,6 @@ export const translationGridClasses = useThemeCache(() => {
         icon,
         languageDropdown,
         languageDropdownToggle,
+        editIcon,
     };
 });

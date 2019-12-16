@@ -232,7 +232,7 @@ class BadgesApiController extends AbstractApiController {
         $out = $this->schema($this->fullBadgeSchema(), 'out');
 
         $row = $this->badgeByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUser']);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $row = $this->normalizeBadgeOutput($row);
         return $out->validate($row);
@@ -694,7 +694,7 @@ class BadgesApiController extends AbstractApiController {
         $this->validateModel($this->badgeModel);
 
         $result = $this->badgeByID($id);
-        $this->userModel->expandUsers($result, ['InsertUserID', 'UpdateUser']);
+        $this->userModel->expandUsers($result, ['InsertUserID']);
 
         $result = $this->normalizeBadgeOutput($result);
         return $out->validate($result);
@@ -724,8 +724,7 @@ class BadgesApiController extends AbstractApiController {
         }
 
         $row = $this->badgeByID($id);
-        $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
-
+        $this->userModel->expandUsers($row, ['InsertUserID']);
         $result = $this->normalizeBadgeOutput($row);
         return $out->validate($result);
     }
@@ -762,7 +761,7 @@ class BadgesApiController extends AbstractApiController {
 
         // Get the fresh badge with updated count.
         $row['Badge'] = $this->badgeByID($id);
-        $this->userModel->expandUsers($row['Badge'], ['InsertUserID', 'UpdateUser']);
+        $this->userModel->expandUsers($row['Badge'], ['InsertUserID']);
 
         $result = $this->normalizeUserBadgeOutput($row);
         return $out->validate($result);
@@ -798,7 +797,7 @@ class BadgesApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['UserID', 'InsertUserID']);
 
         $row['Badge'] = $badge;
-        $this->userModel->expandUsers($row['Badge'], ['InsertUserID', 'UpdateUser']);
+        $this->userModel->expandUsers($row['Badge'], ['InsertUserID']);
 
         $result = $this->normalizeBadgeRequestOutput($row);
         return $out->validate($result);
