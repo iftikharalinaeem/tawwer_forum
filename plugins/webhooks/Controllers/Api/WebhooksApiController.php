@@ -95,7 +95,7 @@ class WebhooksApiController extends \AbstractApiController {
      * Delete a webhook.
      *
      * @param int $id The ID of the webhook.
-     * @throws Exception If an error is encountered while performing the query.
+     * @throws \Exception If an error is encountered while performing the query.
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
@@ -109,7 +109,7 @@ class WebhooksApiController extends \AbstractApiController {
      *
      * @param int $id The ID of the webhook.
      * @param array $body The request body.
-     * @throws Exception If an error is encountered while performing the query.
+     * @throws \Exception If an error is encountered while performing the query.
      * @return array
      */
     public function patch($id, array $body) {
@@ -135,7 +135,7 @@ class WebhooksApiController extends \AbstractApiController {
     private function webhookByID($id) {
         try {
             $row = $this->webhookModel->getID($id);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new NotFoundException("Webhook not found.");
         }
         return $row;

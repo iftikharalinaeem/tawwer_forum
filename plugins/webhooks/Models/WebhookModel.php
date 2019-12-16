@@ -10,8 +10,8 @@ use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Database\Operation;
-use Webhooks\Processors\EncodeDecode;
-use Webhooks\Processors\NormalizeInput;
+use Vanilla\Webhooks\Processors\EncodeDecode;
+use Vanilla\Webhooks\Processors\NormalizeInput;
 
 /**
  * Class WebhookModel
@@ -21,9 +21,9 @@ class WebhookModel extends PipelineModel {
     /**
      * WebhookModel constructor.
      *
-     * @param Gdn_Session $session
+     * @param \Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(\Gdn_Session $session) {
         parent::__construct('webhook');
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $normalizeProcessor = new NormalizeInput();
