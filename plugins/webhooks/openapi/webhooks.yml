@@ -265,23 +265,6 @@ components:
       properties:
         siteID:
           type: integer
-    UserFragment:
-      description: Vanilla user information.
-      type: object
-      properties:
-        userID:
-          description: Unique user ID.
-          type: integer
-        name:
-          description: Username.
-          type: string
-        photoUrl:
-          description: Full URL to the user photo.
-          type: string
-        dateLastActive:
-          nullable: true
-          format: date-time
-          type: string
     WebhookDelivery:
       properties:
         deliveryID:
