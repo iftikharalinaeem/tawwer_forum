@@ -13,7 +13,7 @@ use Garden\Web\Exception\ServerException;
 /**
  * WebhooksApiController for the `/webhooks` resource.
  */
-class WebhooksApiController extends AbstractApiController {
+class WebhooksApiController extends \AbstractApiController {
 
     /** @var WebhookModel */
     private $webhookModel;
