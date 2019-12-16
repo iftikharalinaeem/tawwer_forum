@@ -10,7 +10,10 @@ import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import uniqueId from "lodash/uniqueId";
 import { actionCreatorFactory } from "typescript-fsa";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { useDispatch } from "react-redux";
 const createAction = actionCreatorFactory("@@navigation");
+import { useMemo, useCallback } from "react";
+import apiv2 from "@library/apiv2";
 
 /**
  * Redux actions for knowledge base navigation data.
@@ -101,4 +104,9 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
         })(params);
         return this.dispatch(apiThunk);
     };
+}
+export function useNavigationActions() {
+    const dispatch = useDispatch();
+    const actions = useMemo(() => new NavigationActions(dispatch, apiv2), [dispatch]);
+    return actions;
 }
