@@ -1,9 +1,8 @@
 {
     "name": "Webhooks",
-    "description": "Vanilla webhooks",
+    "description": "Adds support for webhooks.",
     "version": "1.0",
     "license": "Proprietary",
-    "icon": "webhooks.png",
     "key": "webhooks",
     "type": "addon",
     "authors": [

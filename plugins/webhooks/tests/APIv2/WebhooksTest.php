@@ -112,7 +112,7 @@ class WebhooksTest extends AbstractResourceTest {
             'name' => 'webhooktest',
             'url' => 'http://webhook.test',
             'secret' => '123',
-            'events' => ['*']
+            'events' => ['comment', 'discussion'],
         ];
         return $record;
     }
