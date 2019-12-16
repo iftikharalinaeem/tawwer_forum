@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-namespace Webhooks\Processors;
+namespace Vanilla\Webhooks\Processors;
 
 use Vanilla\Database\Operation\Processor;
 use Vanilla\Database\Operation;

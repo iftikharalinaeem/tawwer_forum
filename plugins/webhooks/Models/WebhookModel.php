@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+namespace Vanilla\Webhooks;
+
 use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;

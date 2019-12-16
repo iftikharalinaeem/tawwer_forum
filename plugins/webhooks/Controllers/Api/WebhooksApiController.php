@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+namespace Vanilla\Webhooks;
+
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
