@@ -32,7 +32,6 @@ class WebhookModel extends PipelineModel {
 
         $normalizeProcessor = new NormalizeDataProcessor();
         $normalizeProcessor
-            ->addBooleanField('active')
             ->addSerializedField('events');
         $this->addPipelineProcessor($normalizeProcessor);
 

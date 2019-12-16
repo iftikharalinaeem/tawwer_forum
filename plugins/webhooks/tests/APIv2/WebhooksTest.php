@@ -16,7 +16,7 @@ class WebhooksTest extends AbstractResourceTest {
     protected $baseUrl = "/webhooks";
 
     /** @var array The patch fields. */
-    protected $patchFields = ['active', 'name', 'url', 'secret'];
+    protected $patchFields = ['status', 'name', 'url', 'secret'];
 
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = false;
@@ -92,8 +92,8 @@ class WebhooksTest extends AbstractResourceTest {
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {
-                case 'active':
-                    $value = !$value;
+                case 'status':
+                    $value = $value === "active" ? "disabled" : "active";
                     break;
                 default:
                     $value = $value.$dt->format(\DateTime::RSS);
@@ -108,7 +108,6 @@ class WebhooksTest extends AbstractResourceTest {
      */
     public function record() {
         $record = [
-            'active' => 1,
             'name' => 'webhooktest',
             'url' => 'http://webhook.test',
             'secret' => '123',

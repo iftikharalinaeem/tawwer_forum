@@ -38,7 +38,7 @@ class WebhooksPlugin extends \Gdn_Plugin {
         $this->database->structure()
             ->table('webhook')
             ->primaryKey('webhookID')
-            ->column('active', 'tinyint', 1)
+            ->column('status', ['active', 'disabled'], 'active')
             ->column('name', 'varchar(100)', false)
             ->column('events', 'varchar(255)')
             ->column('url', 'varchar(255)', false)

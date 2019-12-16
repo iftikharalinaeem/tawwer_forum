@@ -315,10 +315,13 @@ components:
     WebhookPost:
       type: object
       properties:
-        active:
-          default: true
-          description: Whether or not this webhook should be sent events.
-          type: boolean
+        status:
+          type: string
+          default: active
+          description: The operational status of the webhook.
+          enum:
+            - active
+            - disabled
         events:
           type: array
           description: Events to be forwarded to this webhook.
@@ -346,9 +349,13 @@ components:
           type: integer
           description: The webhook's identifier.
           readOnly: true
-        active:
-          description: Whether or not this webhook will be sent events.
-          type: boolean
+        status:
+          description: Operational status of this webhook.
+          type: string
+          default: active
+          enum:
+            - active
+            - disabled
         name:
           description: User-friendly name.
           type: string

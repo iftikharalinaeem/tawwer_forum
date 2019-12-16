@@ -151,7 +151,7 @@ class WebhooksApiController extends \AbstractApiController {
         if ($this->webhookPostSchema === null) {
             $this->webhookPostSchema = $this->schema(
                 Schema::parse([
-                    'active?',
+                    'status?',
                     'events',
                     'name',
                     'url',
@@ -184,7 +184,10 @@ class WebhooksApiController extends \AbstractApiController {
     private function fullSchema() {
         return Schema::parse([
             'webhookID:i' => 'The webhook identifier.',
-            'active:b' => 'Whether or not this webhook will send events.',
+            'status' => [
+                'type' => 'string',
+                'enum' => ['active', 'disabled'],
+            ],
             'name:s' => 'User-friendly name.',
             'events' => [
                 'type' => 'array',
