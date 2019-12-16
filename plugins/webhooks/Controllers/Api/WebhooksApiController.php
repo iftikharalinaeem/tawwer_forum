@@ -151,11 +151,11 @@ class WebhooksApiController extends \AbstractApiController {
         if ($this->webhookPostSchema === null) {
             $this->webhookPostSchema = $this->schema(
                 Schema::parse([
-                    'active',
+                    'active?',
                     'events',
-                    'name:s' => 'The name of the webhook',
-                    'url:s' => 'The target URL of the webhook.',
-                    'secret:s' => 'The secret used to sign events associated with this webhook.',
+                    'name',
+                    'url',
+                    'secret',
                 ])->add($this->fullSchema()),
                 'WebhookPost'
             );

@@ -10,8 +10,7 @@ use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Database\Operation;
-use Vanilla\Webhooks\Processors\EncodeDecode;
-use Vanilla\Webhooks\Processors\NormalizeInput;
+use Vanilla\Webhooks\Processors\NormalizeDataProcessor;
 
 /**
  * Class WebhookModel
@@ -25,14 +24,18 @@ class WebhookModel extends PipelineModel {
      */
     public function __construct(\Gdn_Session $session) {
         parent::__construct('webhook');
+
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
-        $normalizeProcessor = new NormalizeInput();
-        $encodeDecodeProcessor = new EncodeDecode();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
             ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
+
+        $normalizeProcessor = new NormalizeDataProcessor();
+        $normalizeProcessor
+            ->addBooleanField('active')
+            ->addSerializedField('events');
         $this->addPipelineProcessor($normalizeProcessor);
-        $this->addPipelineProcessor($encodeDecodeProcessor);
+
         $userProcessor = new Operation\CurrentUserFieldProcessor($session);
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
