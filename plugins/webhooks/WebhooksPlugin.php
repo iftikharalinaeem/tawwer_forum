@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+namespace Vanilla\Webhooks;
+
 /**
  * Class WebhooksPlugin
  */

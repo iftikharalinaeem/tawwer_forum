@@ -16,9 +16,6 @@ use Webhooks\Processors\NormalizeInput;
  */
 class WebhookModel extends PipelineModel {
 
-    /** @var Gdn_Session */
-    private $session;
-
     /**
      * WebhookModel constructor.
      *
@@ -26,7 +23,6 @@ class WebhookModel extends PipelineModel {
      */
     public function __construct(Gdn_Session $session) {
         parent::__construct('webhook');
-        $this->session = $session;
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $normalizeProcessor = new NormalizeInput();
         $encodeDecodeProcessor = new EncodeDecode();
@@ -35,7 +31,7 @@ class WebhookModel extends PipelineModel {
         $this->addPipelineProcessor($dateProcessor);
         $this->addPipelineProcessor($normalizeProcessor);
         $this->addPipelineProcessor($encodeDecodeProcessor);
-        $userProcessor = new Operation\CurrentUserFieldProcessor($this->session);
+        $userProcessor = new Operation\CurrentUserFieldProcessor($session);
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
