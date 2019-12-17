@@ -12,7 +12,7 @@ import React from "react";
 
 // Our own libraries
 import apiv2 from "@library/apiv2";
-import { onReady, t, formatUrl } from "@library/utility/appUtils";
+import { onReady, t } from "@library/utility/appUtils";
 import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
 import { initAllUserContent } from "@library/content";
