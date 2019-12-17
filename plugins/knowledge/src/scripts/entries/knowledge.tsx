@@ -32,6 +32,7 @@ import Permission from "@library/features/users/Permission";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
+import { registerDefaultNavItem } from "@library/headers/navigationVariables";
 
 debug(getMeta("context.debug"));
 
@@ -40,7 +41,6 @@ Router.addRoutes(getPageRoutes());
 
 registerReducer("server", serverReducer);
 registerReducer("knowledge", kbReducer);
-
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
     mountReact(
@@ -63,6 +63,14 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
             </DropDownSection>
         </Permission>
     );
+});
+
+registerDefaultNavItem(() => {
+    return {
+        children: t("Help Menu", "Help"),
+        permission: "kb.view",
+        to: "/kb",
+    };
 });
 
 onReady(() => {

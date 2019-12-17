@@ -8,6 +8,8 @@ import { UnlinkDiscussionModal } from "@knowledge/articleDiscussion/UnlinkDiscus
 import { delegateEvent } from "@vanilla/dom-utils";
 import { mountModal } from "@library/modal/Modal";
 import React from "react";
+import { registerDefaultNavItem } from "@library/headers/navigationVariables";
+import { t } from "@vanilla/i18n";
 
 delegateEvent("click", ".js-convertDiscussionToArticle", (event, triggeringElement) => {
     event.preventDefault();
@@ -29,4 +31,12 @@ delegateEvent("click", ".js-unlinkDiscussion", (event, triggeringElement) => {
 
     const id = parseInt(discussionID, 10);
     mountModal(<UnlinkDiscussionModal discussionID={id} />);
+});
+
+registerDefaultNavItem(() => {
+    return {
+        children: t("Help Menu", "Help"),
+        permission: "kb.view",
+        to: "/kb",
+    };
 });
