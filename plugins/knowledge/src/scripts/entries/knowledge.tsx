@@ -12,7 +12,7 @@ import React from "react";
 
 // Our own libraries
 import apiv2 from "@library/apiv2";
-import { onReady, t } from "@library/utility/appUtils";
+import { onReady, t, formatUrl } from "@library/utility/appUtils";
 import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
 import { initAllUserContent } from "@library/content";
@@ -32,6 +32,10 @@ import Permission from "@library/features/users/Permission";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
+import { navigationVariables, registerDefaultNavItem } from "@library/headers/navigationVariables";
+import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 
 debug(getMeta("context.debug"));
 
@@ -40,7 +44,7 @@ Router.addRoutes(getPageRoutes());
 
 registerReducer("server", serverReducer);
 registerReducer("knowledge", kbReducer);
-
+const classes = titleBarNavClasses();
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
     mountReact(
@@ -63,6 +67,14 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
             </DropDownSection>
         </Permission>
     );
+});
+
+registerDefaultNavItem(() => {
+    return {
+        children: t("Help Menu", "Help"),
+        permission: "kb.view",
+        to: "/kb",
+    };
 });
 
 onReady(() => {
