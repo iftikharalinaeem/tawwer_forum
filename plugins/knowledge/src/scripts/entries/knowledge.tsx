@@ -32,9 +32,8 @@ import Permission from "@library/features/users/Permission";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
-import { navigationVariables, registerDefaultNavItem } from "@library/headers/navigationVariables";
-import TitleBarMobileNav from "@library/headers/TitleBarMobileNav";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import { registerDefaultNavItem } from "@library/headers/navigationVariables";
+
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 
 debug(getMeta("context.debug"));
