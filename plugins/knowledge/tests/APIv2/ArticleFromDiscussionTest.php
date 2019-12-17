@@ -26,7 +26,7 @@ class ArticleFromDiscussionTest extends AbstractAPIv2Test {
         $post = [
             "body" => "Hello world.",
             "categoryID" => 1,
-            "format" => "Markdown",
+            "format" => "markdown",
             "name" => __FUNCTION__,
         ];
         $discussion = $this->api()->post("discussions", $post)->getBody();
@@ -47,7 +47,7 @@ class ArticleFromDiscussionTest extends AbstractAPIv2Test {
         $post = [
             "body" => '[{"insert":"Hello world.\n"}]',
             "categoryID" => 1,
-            "format" => "Rich",
+            "format" => "rich",
             "name" => __FUNCTION__,
         ];
         $discussion = $this->api()->post("discussions", $post)->getBody();
