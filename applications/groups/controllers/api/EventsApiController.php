@@ -510,11 +510,11 @@ class EventsApiController extends AbstractApiController {
         $in = $this->postEventSchema()->setDescription('Create an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
-        if (!$this->eventModel->checkPermission('Create', null)) {
-            throw new ClientException('You do not have the rights to create an event.');
-        }
-
         $body = $in->validate($body);
+
+        if (!$this->eventModel->canCreateEvents($body['groupID'])) {
+            throw new ClientException('You do not have permission to create an event in this group.');
+        }
 
         $this->groupByID($body['groupID']);
 

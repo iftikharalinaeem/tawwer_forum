@@ -1,0 +1,145 @@
+openapi: 3.0.2
+info:
+paths:
+  /rules:
+    get:
+      parameters:
+      - description: |
+          Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - updateUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Rule'
+                type: array
+          description: Success
+      tags:
+        - Rules
+      summary: List rules.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: Success
+      tags:
+        - Rules
+      requestBody:
+        $ref: '#/components/requestBodies/RulePost'
+      summary: Create a rule.
+  /rules/{id}:
+    delete:
+      parameters:
+        - description: |
+            The rule ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Rules
+      summary: Delete a rule.
+    get:
+      parameters:
+        - description: |
+            The rule ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: Success
+      tags:
+        - Rules
+      summary: Get a rule.
+    patch:
+      parameters:
+        - description: The rule ID.
+          in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+          description: Success
+      tags:
+        - Rules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RulePost'
+        required: true
+      summary: Update a rule.
+components:
+  requestBodies:
+    RulePost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RulePost'
+      required: true
+  schemas:
+    Rule:
+      properties:
+        name:
+          description: Name of the rule.
+          minLength: 1
+          type: string
+        description:
+          description: Description of the rule.
+          nullable: true
+          type: string
+        ruleID:
+          description: ID of the rule.
+          type: integer
+      required:
+        - ruleID
+        - name
+        - description
+      type: object
+    RulePost:
+      properties:
+        name:
+          description: The name of the rule.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the rule.
+          minLength: 1
+          nullable: true
+          type: string
+      required:
+        - name
+        - description
+      type: object

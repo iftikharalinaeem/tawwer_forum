@@ -202,6 +202,7 @@ class UserBadgeModel extends Gdn_Model {
     public function declineRequest($userID, $badgeID) {
         $userBadge = $this->getID($userID, $badgeID);
         setValue('Declined', $userBadge, 1);
+        setValue('Status', $userBadge, 'declined');
         $this->save($userBadge);
     }
 
@@ -316,9 +317,7 @@ class UserBadgeModel extends Gdn_Model {
             ->select('ub.DateRequested')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
-            ->where('ub.Declined', 0)
-            ->where('ub.DateCompleted is null')
-            ->where('ub.DateRequested is not null')
+            ->where('ub.Status', 'pending')
             ->orderBy('ub.DateRequested', 'asc')
             ->get();
     }
@@ -330,9 +329,7 @@ class UserBadgeModel extends Gdn_Model {
      */
     public function getBadgeRequestCount() {
         return $this->getCount([
-            'Declined' => 0,
-            'DateCompleted is null' => null,
-            'DateRequested is not null' => null
+            'Status' => 'pending'
         ]);
     }
 
@@ -408,6 +405,7 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         $userBadge['Reason'] = $reason;
+        $userBadge['Status'] = 'given';
         $userBadge['DateCompleted'] = Gdn_Format::toDateTime();
 
         $pointsText = '';
@@ -561,6 +559,7 @@ class UserBadgeModel extends Gdn_Model {
             setValue('DateRequested', $userBadge, Gdn_Format::toDateTime());
             setValue('RequestReason', $userBadge, $reason);
             setValue('Declined', $userBadge, 0);
+            setValue('Status', $userBadge, 'pending');
             $this->save($userBadge);
 
             // Prep activity

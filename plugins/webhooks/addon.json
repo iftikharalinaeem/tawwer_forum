@@ -1,0 +1,14 @@
+{
+    "name": "Webhooks",
+    "description": "Adds support for webhooks.",
+    "version": "1.0",
+    "license": "Proprietary",
+    "key": "webhooks",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dani M",
+            "email": "dani.m@vanillaforums.com"
+        }
+    ]
+}

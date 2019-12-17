@@ -76,11 +76,11 @@ class ReactionsPlugin extends Gdn_Plugin {
     private function addAttributes(array $row, $attributes) {
         if (is_array($attributes) || (is_object($attributes) && $attributes instanceof ArrayObject)) {
             // Normalize the casing of attributes and reaction URL codes.
-            if (array_key_exists('react', $attributes)) {
+            if (isset($attributes['react'])) {
                 $attributes['React'] = $attributes['react'];
                 unset($attributes['react']);
             }
-            if (array_key_exists('React', $attributes) && is_array($attributes['React'])) {
+            if (isset($attributes['React']) && is_array($attributes['React'])) {
                 foreach ($attributes['React'] as $urlCode => $total) {
                     $type = ReactionModel::reactionTypes($urlCode);
                     if ($type) {
