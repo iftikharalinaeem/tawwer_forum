@@ -29,6 +29,8 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\MasterViewRenderer;
+use Vanilla\Web\PageHead;
 use Vanilla\Web\ThemedPage;
 use Vanilla\Contracts\Analytics\ClientInterface as AnalyticsClient;
 
@@ -77,15 +79,19 @@ abstract class KbPage extends ThemedPage {
     /**
      * @inheritdoc
      */
+    public function getAssetSection(): string {
+        return 'knowledge';
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function setDependencies(
         SiteMeta $siteMeta,
         \Gdn_Request $request,
         \Gdn_Session $session,
-        WebpackAssetProvider $assetProvider,
-        BreadcrumbModel $breadcrumbModel,
-        ContentSecurityPolicyModel $cspModel,
-        AssetPreloadModel $preloadModel,
-        EventManager $eventManager,
+        PageHead $pageHead,
+        MasterViewRenderer $masterViewRenderer,
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
@@ -100,11 +106,8 @@ abstract class KbPage extends ThemedPage {
             $siteMeta,
             $request,
             $session,
-            $assetProvider,
-            $breadcrumbModel,
-            $cspModel,
-            $preloadModel,
-            $eventManager,
+            $pageHead,
+            $masterViewRenderer,
             $themePreloadProvider
         );
         $this->usersApi = $usersApi;
@@ -124,9 +127,6 @@ abstract class KbPage extends ThemedPage {
      * Initialize assets from the asset provide.
      */
     protected function initAssets() {
-        $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
-        $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts('knowledge'));
-        $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets('knowledge'));
         $this->addJsonLDItem(new SearchJsonLD($this->request));
         parent::initAssets();
     }
