@@ -34,8 +34,6 @@ import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWi
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { registerDefaultNavItem } from "@library/headers/navigationVariables";
 
-import titleBarNavClasses from "@library/headers/titleBarNavStyles";
-
 debug(getMeta("context.debug"));
 
 apiv2.interceptors.response.use(deploymentKeyMiddleware);
@@ -43,7 +41,6 @@ Router.addRoutes(getPageRoutes());
 
 registerReducer("server", serverReducer);
 registerReducer("knowledge", kbReducer);
-const classes = titleBarNavClasses();
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
     mountReact(
