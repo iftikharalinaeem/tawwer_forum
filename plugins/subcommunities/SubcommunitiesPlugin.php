@@ -195,6 +195,18 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $args['Attributes']['IncludeNull'] = t('All');
     }
 
+    /**
+     * @param Gdn_Controller $sender
+     */
+    public function discussionsController_render_before(Gdn_Controller $sender) {
+        $site = SubcommunityModel::getCurrent();
+        if (!$site) {
+            return;
+        }
+        $categoryID = $site['CategoryID'];
+        $sender->setData('ContextualCategoryID', $categoryID);
+    }
+
     public function base_getAppSettingsMenuItems_handler($sender) {
         /* @var SideMenuModule */
         $menu = $sender->EventArguments['SideMenu'];
