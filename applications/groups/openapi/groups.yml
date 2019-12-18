@@ -651,9 +651,7 @@ components:
           minLength: 1
           type: string
         format:
-          description: The input format of the group.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         groupID:
           description: The ID of the group.
           type: integer
@@ -778,9 +776,7 @@ components:
           minLength: 1
           type: string
         format:
-          description: The input format of the group.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         iconUrl:
           description: The URL of the icon of the group.
           nullable: true
@@ -814,9 +810,7 @@ components:
           minLength: 1
           type: string
         format:
-          description: The input format of the group.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         iconUrl:
           description: The URL of the icon of the group.
           nullable: true

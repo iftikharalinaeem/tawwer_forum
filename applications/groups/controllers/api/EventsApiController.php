@@ -268,7 +268,7 @@ class EventsApiController extends AbstractApiController {
                 'groupID',
                 'name',
                 'body',
-                'format:s' => 'The input format of the event.',
+                'format' => new \Vanilla\Models\FormatSchema(true),
                 'location',
                 'dateStarts',
                 'dateEnds'
@@ -607,7 +607,7 @@ class EventsApiController extends AbstractApiController {
                     'groupID',
                     'name',
                     'body',
-                    'format:s' => 'The input format of the event.',
+                    'format' => new \Vanilla\Models\FormatSchema(),
                     'location',
                     'dateStarts',
                     'dateEnds?',

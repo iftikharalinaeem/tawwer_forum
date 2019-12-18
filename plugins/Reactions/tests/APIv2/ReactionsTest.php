@@ -161,4 +161,12 @@ class ReactionsTest extends AbstractResourceTest {
     public function testPost($record = null, array $extra = []) {
         $this->fail(__METHOD__.' needs to be implemented.');
     }
+
+    /**
+     * {@inheritdoc}
+     * @requires function ReactionsApiController::post
+     */
+    public function testPostBadFormat(): void {
+        parent::testPostBadFormat();
+    }
 }
