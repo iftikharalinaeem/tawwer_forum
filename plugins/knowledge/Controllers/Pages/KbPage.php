@@ -73,6 +73,8 @@ abstract class KbPage extends ThemedPage {
     /** @var KnowledgeBaseModel $kbModel */
     protected $kbModel;
 
+    protected $breadcrumbModel;
+
     /** @var bool */
     private $siteSectionValidated = false;
 
@@ -92,6 +94,7 @@ abstract class KbPage extends ThemedPage {
         \Gdn_Session $session,
         PageHead $pageHead,
         MasterViewRenderer $masterViewRenderer,
+        BreadcrumbModel $breadcrumbModel,
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
@@ -110,6 +113,7 @@ abstract class KbPage extends ThemedPage {
             $masterViewRenderer,
             $themePreloadProvider
         );
+        $this->breadcrumbModel = $breadcrumbModel;
         $this->usersApi = $usersApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
