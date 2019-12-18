@@ -10,7 +10,7 @@ use Garden\Http\HttpClient;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
 use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\Exception\UnsatisfiedDependencyException as DependancyException;
+use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
 
 /**
  * Execute the webhook event queue.
@@ -129,13 +129,13 @@ class WebhookEvent implements \Vanilla\Scheduler\Job\LocalJobInterface {
      * Generate a Uuid.
      *
      * @return \Ramsey\Uuid\UuidInterface|string The uuid string.
-     * @return DependancyException Dependency not met.
+     * @return UnsatisfiedDependencyException Dependency not met.
      */
     private function generateUuid() {
         try {
         $uuid = Uuid::uuid1();
         $uuid = $uuid->toString();
-        } catch (DependancyException $e) {
+        } catch (UnsatisfiedDependencyException $e) {
             echo 'Missing dependancy exception ' . $e->getMessage();
         }
         return $uuid;
