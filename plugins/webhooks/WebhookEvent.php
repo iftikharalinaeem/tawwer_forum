@@ -38,10 +38,10 @@ class WebhookEvent implements \Vanilla\Scheduler\Job\LocalJobInterface {
     /**
      * Initial job setup.
      *
-     * @param WebhookModel $webhookModel
+     * @param HttpClient $httpClient
      */
     public function __construct(HttpClient $httpClient) {
-       $this->httpClient = $httpClient;
+        $this->httpClient = $httpClient;
     }
 
     /**
@@ -128,13 +128,13 @@ class WebhookEvent implements \Vanilla\Scheduler\Job\LocalJobInterface {
     /**
      * Generate a Uuid.
      *
-     * @return \Ramsey\Uuid\UuidInterface|string The uuid string.
      * @throws UnsatisfiedDependencyException Dependency not met.
+     * @return \Ramsey\Uuid\UuidInterface|string The uuid string.
      */
     private function generateUuid() {
         try {
-        $uuid = Uuid::uuid1();
-        $uuid = $uuid->toString();
+            $uuid = Uuid::uuid1();
+            $uuid = $uuid->toString();
         } catch (UnsatisfiedDependencyException $e) {
             echo 'Missing dependancy exception ' . $e->getMessage();
         }
