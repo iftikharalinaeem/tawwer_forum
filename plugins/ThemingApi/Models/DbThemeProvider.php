@@ -6,6 +6,7 @@
 
 namespace Vanilla\ThemingApi;
 
+use Gdn_Upload;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\ThemingApi\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
@@ -91,7 +92,14 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritDoc
      */
     public function getAllThemes(): array {
-        return $this->themeModel->get([]);
+        $dbThemes = $this->themeModel->get();
+
+        $allDbThemes = [];
+        foreach ($dbThemes as $dbTheme) {
+
+            $allDbThemes[] = $this->getThemeWithAssets($dbTheme["themeID"]);
+        }
+        return $allDbThemes;
     }
 
     /**
