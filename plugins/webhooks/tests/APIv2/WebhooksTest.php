@@ -15,8 +15,11 @@ class WebhooksTest extends AbstractResourceTest {
     /** @var string The resource route. */
     protected $baseUrl = "/webhooks";
 
+    /** @var array Fields to be checked with get/<id>/edit */
+    protected $editFields = ["events", "name", "secret", "status", "url"];
+
     /** @var array The patch fields. */
-    protected $patchFields = ['status', 'name', 'url', 'secret'];
+    protected $patchFields = ['status', 'name', 'url', 'secret', 'events'];
 
     /** @var bool Whether to check if paging works or not in the index. */
     protected $testPagingOnIndex = false;
@@ -43,20 +46,6 @@ class WebhooksTest extends AbstractResourceTest {
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual($newRow, $r->getBody());
         return $r->getBody();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function testGetEdit($record = null) {
-        $this->assertTrue(true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function testGetEditFields($record = null) {
-        $this->assertTrue(true);
     }
 
     /**
@@ -92,6 +81,13 @@ class WebhooksTest extends AbstractResourceTest {
         foreach ($this->patchFields as $key) {
             $value = $row[$key];
             switch ($key) {
+                case 'events':
+                    if (in_array("discussion", $value)) {
+                        $value = ["comment"];
+                    } else {
+                        $value = ["discussion"];
+                    }
+                    break;
                 case 'status':
                     $value = $value === "active" ? "disabled" : "active";
                     break;
@@ -111,6 +107,7 @@ class WebhooksTest extends AbstractResourceTest {
             'name' => 'webhooktest',
             'url' => 'http://webhook.test',
             'secret' => '123',
+            'status' => 'active',
             'events' => ['comment', 'discussion'],
         ];
         return $record;
