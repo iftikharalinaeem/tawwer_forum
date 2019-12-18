@@ -96,7 +96,6 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $allDbThemes = [];
         foreach ($dbThemes as $dbTheme) {
-
             $allDbThemes[] = $this->getThemeWithAssets($dbTheme["themeID"]);
         }
         return $allDbThemes;
