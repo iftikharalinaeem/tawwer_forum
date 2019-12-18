@@ -82,9 +82,9 @@ class WebhooksTest extends AbstractResourceTest {
             $value = $row[$key];
             switch ($key) {
                 case 'events':
-                    if (array_search("discussion", $value)) {
+                    if (in_array("discussion", $value)) {
                         $value = ["comment"];
-                    } {
+                    } else {
                         $value = ["discussion"];
                     }
                     break;
