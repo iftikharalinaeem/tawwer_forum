@@ -9,6 +9,7 @@ namespace Vanilla\Webhooks;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * WebhooksApiController for the `/webhooks` resource.
@@ -27,13 +28,17 @@ class WebhooksApiController extends \AbstractApiController {
     /** @var Schema */
     private $idParamSchema;
 
+    /** @var SchedulerInterface */
+    private $scheduler;
+
     /**
      * WebhooksApiController constructor.
      *
      * @param WebhookModel $webhookModel
      */
-    public function __construct(WebhookModel $webhookModel) {
+    public function __construct(WebhookModel $webhookModel, SchedulerInterface $scheduler) {
         $this->webhookModel = $webhookModel;
+        $this->scheduler = $scheduler;
     }
 
     /**
@@ -73,7 +78,7 @@ class WebhooksApiController extends \AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException If the webhook could not be created.
-     * @return array|Exception If an error is encountered while performing the query.
+     * @return array|\Exception If an error is encountered while performing the query.
      */
     public function post(array $body) {
         $this->permission('Garden.Settings.Manage');
@@ -139,6 +144,33 @@ class WebhooksApiController extends \AbstractApiController {
             throw new NotFoundException("Webhook not found.");
         }
         return $row;
+    }
+
+
+    /**
+     * Post a webhook for testing.
+     *
+     * @param int $id The webhook ID.
+     * @throws NotFoundException If the webhook could not be found.
+     * @return array
+     */
+    public function post_ping(int $id) {
+        $row = $this->webhookModel->getID($id);
+        $userModel = new \UserModel();
+        $userID = \Gdn::session()->UserID;
+        $user = $userModel->getID($userID);
+        $webhookUrl = $row['url'];
+        $webhookName = $row['name'];
+        $webhookSecret = $row['secret'];
+        $pingMessage = [
+            'action' => 'ping',
+            'url' => $webhookUrl,
+            'name' => $webhookName,
+            'user' => $user,
+            'secret' => $webhookSecret
+        ];
+        $this->scheduler->addJob(WebhookEvent::class, $pingMessage);
+        return $row['webhookID'];
     }
 
     /**
