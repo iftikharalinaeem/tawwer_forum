@@ -129,7 +129,7 @@ class WebhookEvent implements \Vanilla\Scheduler\Job\LocalJobInterface {
      * Generate a Uuid.
      *
      * @return \Ramsey\Uuid\UuidInterface|string The uuid string.
-     * @return UnsatisfiedDependencyException Dependency not met.
+     * @throws UnsatisfiedDependencyException Dependency not met.
      */
     private function generateUuid() {
         try {
