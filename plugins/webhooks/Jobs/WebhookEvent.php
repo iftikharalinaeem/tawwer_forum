@@ -94,8 +94,9 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
     /**
      * Initial job setup.
      *
-     * @param HttpClient $httpClient
+     * @param Client $client
      * @param SessionInterface $session
+     * @param UserModel $userModel
      */
     public function setDependencies(Client $client, SessionInterface $session, UserModel $userModel) {
         $this->client = $client;
