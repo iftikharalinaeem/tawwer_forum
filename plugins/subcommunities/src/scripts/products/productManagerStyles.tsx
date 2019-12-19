@@ -47,7 +47,6 @@ export const productManagerClasses = useThemeCache(() => {
     const emptyMessage = style("emptyMessage", {});
 
     const itemName = style("itemName", {
-        display: "flex",
         alignItems: "center",
         fontSize: globalVars.fonts.size.large,
         width: percent(100),
@@ -68,5 +67,9 @@ export const productManagerClasses = useThemeCache(() => {
         flex: 1,
     });
 
-    return { row, emptyMessage, loader, input, item, itemActions, itemName };
+    const error = style("error", {
+        width: percent(100),
+    });
+
+    return { row, emptyMessage, loader, input, item, itemActions, itemName, error };
 });
