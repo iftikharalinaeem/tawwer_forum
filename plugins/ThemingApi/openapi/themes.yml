@@ -188,7 +188,66 @@ components:
                     name:
                       description: Theme name.
                       type: string
-                  example: {"name":"custom client theme"}
+                    parentTheme:
+                      type: string
+                      description: Parent theme template
+                    parentVersion:
+                      type: string
+                      description: Parent theme template version
+                    assets:
+                      type: object
+                      properties:
+                        header:
+                          type: string
+                          description: Header asset should be valid html
+                          example: <div><!-- HEADER --></div>
+                        footer:
+                          type: string
+                          description: Footer asset should be valid html
+                          example: <div><!-- FOOTER --></div>
+                        variables:
+                          type: string
+                          description: Variables asset should be valid json encoded object
+                          example: '{"global": {"mainColors": {"primary": "#279b37"}}}'
+                        fonts:
+                          type: string
+                          description: Fonts asset should be valid json encoded array
+                          example: >
+                            [
+                                {
+                                    "type": "url",
+                                    "name": "Roboto",
+                                    "fallbacks": "",
+                                    "url": "https://fonts.googleapis.com/css?family=Roboto"
+                                }
+                            ]
+                        scripts:
+                          type: string
+                          description: Scripts asset should be valid json encoded array
+                          example: >
+                            [
+                                {
+                                    "url": "https://www.google-analytics.com/analytics.js"
+                                }
+                            ]
+                        styles:
+                          type: string
+                          description: Styles asset should be valid css
+                          example: '.is-hidden {display: none;}'
+                        javascript:
+                          type: string
+                          description: Javascipt asset should be valid javascipt code
+                          example: console.log("JavaScript asset loaded.");
+                  example: >
+                    {
+                        "name": "custom client theme",
+                        "parentTheme": "keystone",
+                        "parentVersion": "1.0.2",
+                        "assets": {
+                            "header": "<div><!-- HEADER --></div>",
+                            "footer": "<div><!-- FOOTER --></div>"
+                        }
+                    }
                   required:
                     - name
       required: true
