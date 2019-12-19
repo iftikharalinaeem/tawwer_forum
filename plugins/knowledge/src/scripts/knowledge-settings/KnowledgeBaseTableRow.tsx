@@ -36,16 +36,24 @@ export function KnowledgeBaseTableRow(props: IProps) {
                 <DashboardMediaItem title={kb.name} info={kb.description} imgSrc={kb.icon} />
             </td>
             <td>
-                {kb.siteSections.map(section => {
-                    const sectionBase = section.basePath.replace("/", "");
-                    const fullUrlCode = `${sectionBase ? "/" + sectionBase : ""}/kb/${kb.urlCode.replace("/", "")}`;
-                    return (
-                        <React.Fragment key={section.sectionID}>
-                            <a href={getMeta("context.host") + fullUrlCode}>{fullUrlCode}</a>
-                            <br />
-                        </React.Fragment>
-                    );
-                })}
+                {kb.siteSections.length > 0 ? (
+                    kb.siteSections.map(section => {
+                        const sectionBase = section.basePath.replace("/", "");
+                        const fullUrlCode = `${sectionBase ? "/" + sectionBase : ""}/kb/${kb.urlCode.replace("/", "")}`;
+                        return (
+                            <React.Fragment key={section.sectionID}>
+                                <a href={getMeta("context.host") + fullUrlCode}>{fullUrlCode}</a>
+                                <br />
+                            </React.Fragment>
+                        );
+                    })
+                ) : (
+                    <ToolTip label={"This knowledge base is not accesssible due to a multisite configuration issue."}>
+                        <ToolTipIcon>
+                            <WarningIcon className={iconClasses().errorFgColor} />
+                        </ToolTipIcon>
+                    </ToolTip>
+                )}
             </td>
             <td>
                 {hasConflictingSourceLocale ? (
