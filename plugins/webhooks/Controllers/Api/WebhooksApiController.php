@@ -74,6 +74,33 @@ class WebhooksApiController extends \AbstractApiController {
     }
 
     /**
+     * Get a webhook for editing.
+     *
+     * @param int $id The ID of the webhook.
+     * @throws NotFoundException If the webhook could not be found.
+     * @return array
+     */
+    public function get_edit($id) {
+        $this->permission('Garden.Settings.Manage');
+
+        $this->idParamSchema();
+        $in = $this->schema([], ['WebhookGetEdit', 'in']);
+        $out = $this->schema(Schema::parse([
+            "webhookID",
+            "status",
+            "name",
+            "events",
+            "url",
+            "secret",
+        ])->add($this->webhookSchema()), "out");
+
+        $webhook = $this->webhookByID($id);
+        $result = $out->validate($webhook);
+
+        return $result;
+    }
+
+    /**
      * Add a webhook.
      *
      * @param array $body The request body.

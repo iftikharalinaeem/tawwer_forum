@@ -300,9 +300,7 @@ components:
             format: date-time
             type: string
           format:
-            description: The input format of the event.
-            minLength: 1
-            type: string
+            $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
           groupID:
             description: The group the event is in.
             type: integer
@@ -340,9 +338,7 @@ components:
           format: date-time
           type: string
         format:
-          description: The input format of the event.
-          minLength: 1
-          type: string
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
         groupID:
           description: The group the event is in.
           type: integer

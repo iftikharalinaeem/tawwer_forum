@@ -4,6 +4,11 @@
  * @license Proprietary
  */
 
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
+use Vanilla\EmbeddedContent\EmbedService;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Web\TwigFormWrapper;
 
 /**
@@ -17,6 +22,12 @@ use Vanilla\Web\TwigFormWrapper;
  * - Moderation.Warnings.Add
  */
 class Warnings2Plugin extends Gdn_Plugin {
+
+    /** @var FormatService */
+    private $formatService;
+
+    /** @var \Vanilla\EmbeddedContent\EmbedService */
+    private $embedService;
 
     /// Properties ///
 
@@ -35,11 +46,28 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
      *
-     * @param RuleModel $ruleModel
+     * @param DiscussionModel $discussionModel
+     * @param CommentModel $commentModel
+     * @param UserModel $userModel
+     * @param FormatService $formatService
+     * @param EmbedService $embedService
+     * @param \RuleModel $ruleModel
      */
-    public function __construct(RuleModel $ruleModel) {
-        parent::__construct();
+    public function __construct(
+        \DiscussionModel $discussionModel,
+        \CommentModel $commentModel,
+        \UserModel $userModel,
+        FormatService $formatService,
+        EmbedService $embedService,
+        RuleModel $ruleModel
+    ) {
+        $this->userModel = $userModel;
+        $this->commentModel = $commentModel;
+        $this->discussionModel = $discussionModel;
+        $this->formatService = $formatService;
+        $this->embedService = $embedService;
         $this->ruleModel = $ruleModel;
+        parent::__construct();
 
         $this->fireEvent('Init');
     }
@@ -55,7 +83,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * {@inheritdoc}
      */
     public function structure() {
-        require __DIR__.'/structure.php';
+        require __DIR__ . '/structure.php';
 
         if (Gdn::addonManager()->isEnabled('Warnings', \Vanilla\Addon::TYPE_ADDON)) {
             Gdn::pluginManager()->disablePlugin('Warnings');
@@ -81,6 +109,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $sender->render($sender->fetchViewLocation('settings', '', 'plugins/Warnings2'));
     }
+
     /**
      * Return the HTML for a warning reaction button.
      *
@@ -98,8 +127,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         ];
 
         $result = anchor(
-            '<span class="ReactSprite ReactWarn"></span> '.t('Warn'),
-            '/profile/warn?'.http_build_query($args),
+            '<span class="ReactSprite ReactWarn"></span> ' . t('Warn'),
+            '/profile/warn?' . http_build_query($args),
             'ReactButton ReactButton-Warn Popup',
             ['title' => t('Warn')]
         );
@@ -204,22 +233,20 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $row->Attributes = dbdecode($row->Attributes);
         if (isset($row->Attributes['WarningID']) && $row->Attributes['WarningID']) {
-
             //Check if warning has been reversed.
             $noteModel = new UserNoteModel();
             $warning = $noteModel->getID($row->Attributes['WarningID']);
 
             if (!isset($warning['Reversed']) || !$warning['Reversed']) {
-
                 // Make inline warning message link to specific warning text.
                 // It will only be readable by the warned user or moderators.
                 $wordWarn = 'warned';
                 if (!empty($row->Attributes['WarningID'])) {
                     $warningID = $row->Attributes['WarningID'];
-                    $wordWarn = '<a href="'.url("profile/viewnote/$warningID").'" class="Popup">'.$wordWarn.'</a>';
+                    $wordWarn = '<a href="' . url("profile/viewnote/$warningID") . '" class="Popup">' . $wordWarn . '</a>';
                 }
-                echo '<div class="DismissMessage Warning">'.
-                    sprintf(t('%s was %s for this.'), htmlspecialchars(val('InsertName', $row)), $wordWarn).
+                echo '<div class="DismissMessage Warning">' .
+                    sprintf(t('%s was %s for this.'), htmlspecialchars(val('InsertName', $row)), $wordWarn) .
                     '</div>';
             }
         }
@@ -245,9 +272,9 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
 
-        $content = wrap(t('Moderator'), 'strong').' '.userAnchor($issuer);
+        $content = wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
         $content .= "<br>";
-        $content .= wrap(t('Points'), 'strong').' '.$warning['Points'];
+        $content .= wrap(t('Points'), 'strong') . ' ' . $warning['Points'];
 
         echo $content;
     }
@@ -276,7 +303,7 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $recordType = strtolower($recordType);
         if (in_array($recordType, ['comment', 'discussion'])) {
-            $modelName = $recordType.'Model';
+            $modelName = $recordType . 'Model';
             $model = new $modelName();
             $record = $model->getID($recordID);
 
@@ -295,7 +322,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $i = 0;
                 // Replace all blockquotes with no other blockquote as a child, one at the time (starting by the last one)!
                 while (preg_match('/\n?<blockquote[^>]*>(?!.*<blockquote[^>]*>)(.+?)<\/blockquote>/is', $quotedRecord, $matches)) {
-                    $indented = "\n> ".implode("\n> ", explode("\n", trim($matches[1])));
+                    $indented = "\n> " . implode("\n> ", explode("\n", trim($matches[1])));
                     $quotedRecord = str_replace($matches[0], $indented, $quotedRecord);
                     if ($i++ > 1000) {
                         break; // The parsing went wrong :)
@@ -303,7 +330,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 }
                 $quotedRecord = trim($quotedRecord);
 
-                $message .= '<br>'.t('Post that triggered the warning:').$quotedRecord;
+                $message .= '<br>' . t('Post that triggered the warning:') . $quotedRecord;
                 $emailTemplate->setMessage($message);
             }
         }
@@ -329,11 +356,10 @@ class Warnings2Plugin extends Gdn_Plugin {
      */
     public function profileController_beforeProfileOptions_handler($sender, $args) {
         if (!val('EditMode', Gdn::controller())) {
-
             if (Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.UserNotes.Add'], false)) {
                 $sender->EventArguments['ProfileOptions'][] = [
                     'Text' => t('Add Note'),
-                    'Url' => '/profile/note?userid='.$args['UserID'],
+                    'Url' => '/profile/note?userid=' . $args['UserID'],
                     'CssClass' => 'Popup UserNoteButton'
                 ];
             }
@@ -341,8 +367,8 @@ class Warnings2Plugin extends Gdn_Plugin {
 
             if ($checkPermission && Gdn::session()->UserID != $sender->EventArguments['UserID']) {
                 $sender->EventArguments['ProfileOptions'][] = [
-                    'Text' => sprite('SpWarn').' '.t('Warn'),
-                    'Url' => '/profile/warn?userid='.$args['UserID'],
+                    'Text' => sprite('SpWarn') . ' ' . t('Warn'),
+                    'Url' => '/profile/warn?userid=' . $args['UserID'],
                     'CssClass' => 'Popup WarnButton'
                 ];
             }
@@ -362,7 +388,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $sender->setData('Actions.Warn', [
                 'Text' => sprite('SpWarn'),
                 'Title' => t('Warn'),
-                'Url' => '/profile/warn?userid='.$userID,
+                'Url' => '/profile/warn?userid=' . $userID,
                 'CssClass' => 'Popup'
             ]);
         }
@@ -371,7 +397,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $sender->setData('Actions.Note', [
                 'Text' => sprite('SpNote'),
                 'Title' => t('Add Note'),
-                'Url' => '/profile/note?userid='.$userID,
+                'Url' => '/profile/note?userid=' . $userID,
                 'CssClass' => 'Popup'
             ]);
         }
@@ -404,7 +430,6 @@ class Warnings2Plugin extends Gdn_Plugin {
         $form = new Gdn_Form();
 
         if ($form->authenticatedPostBack()) {
-
             // Delete the note.
             $noteModel = new UserNoteModel();
             $noteModel->delete(['UserNoteID' => $noteID]);
@@ -459,9 +484,9 @@ class Warnings2Plugin extends Gdn_Plugin {
         echo '</b>';
 
         echo "<ul>";
-        echo wrap(t("Can't post discussions.")."\n", 'li');
-        echo wrap(t("Can't post as often.")."\n", 'li');
-        echo wrap(t("Signature hidden.")."\n", 'li');
+        echo wrap(t("Can't post discussions.") . "\n", 'li');
+        echo wrap(t("Can't post as often.") . "\n", 'li');
+        echo wrap(t("Signature hidden.") . "\n", 'li');
         echo "</ul>";
 
         echo '</div>';
@@ -694,7 +719,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->getUserInfo($userID, '', $userID);
 
         $isPrivileged = Gdn::session()->checkPermission(
-            [ 'Garden.Moderation.Manage', 'Moderation.UserNotes.View'],
+            ['Garden.Moderation.Manage', 'Moderation.UserNotes.View'],
             false
         );
 
@@ -875,7 +900,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
         $sender->User = $user;
 
-        $sender->_setBreadcrumbs(t('Warn'), '/profile/warn?userid='.$user['UserID']);
+        $sender->_setBreadcrumbs(t('Warn'), '/profile/warn?userid=' . $user['UserID']);
 
 //      $Meta = Gdn::userMetaModel()->getUserMeta($UserID, 'Warnings.%');
 //      $CurrentLevel = val('Warnings.Level', $Meta, 0);
@@ -905,8 +930,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $form->addHidden('RecordFormat', $row['Format']);
             $form->addHidden('RecordInsertTime', $row['DateInserted']);
 
-            $warningBody = $this->getWarningBody($recordID, $recordType, c('Garden.InputFormatter'));
-            $form->setValue('Body', $warningBody);
+            $this->applyWarningBodyAndFormat($form, $recordID, $recordType);
         }
 
         if ($form->authenticatedPostBack()) {
@@ -968,7 +992,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             $params[] = 'Record ID';
         }
 
-        return implode($params, ', ').plural(count($params), t(' parameter is invalid.'), t(' parameters are invalid.'));
+        return implode($params, ', ') . plural(count($params), t(' parameter is invalid.'), t(' parameters are invalid.'));
     }
 
     /**
@@ -994,8 +1018,11 @@ class Warnings2Plugin extends Gdn_Plugin {
         }
 
         if (count($warnedPostIDs) > 0) {
-            $warnedPostUrls = $this->getRecordUrls($warnedPostIDs, $recordType);
-            $sender->setData('WarnedPostUrls', $warnedPostUrls);
+            $records = $this->getRecords($warnedPostIDs, $recordType);
+            $recordUrls = array_map(function ($record) {
+                return $record['Url'];
+            }, $records);
+            $sender->setData('WarnedPostUrls', $recordUrls);
             $sender->title(t('Already Warned'));
             $sender->render('alreadywarned', '', 'plugins/Warnings2');
             return true;
@@ -1015,92 +1042,130 @@ class Warnings2Plugin extends Gdn_Plugin {
     }
 
     /**
-     * Return warn body message
-     *
-     * @param array $recordIDs
-     * @param string $recordType
-     * @param string $format
-     * @return string
-     */
-    private function getWarningBody(array $recordIDs, string $recordType, string $format): string {
-        $recordUrls = $this->getRecordUrls($recordIDs, $recordType);
-
-        switch (strtolower($format)) {
-            case 'rich':
-                $body = $this->getRichWarningBody($recordUrls);
-                break;
-            default:
-                $body = plural(
-                    count($recordUrls),
-                    t('You are being warned for the following post:'),
-                    t('You are being warned for the following posts:')
-                ).PHP_EOL;
-                foreach ($recordUrls as $recordUrl) {
-                    $body .= $recordUrl.PHP_EOL;
-                }
-                break;
-        }
-
-        return $body;
-    }
-
-    /**
      * Return records urls
      *
      * @param array $recordIDs
      * @param string $recordType
      * @return array
      */
-    private function getRecordUrls(array $recordIDs, string $recordType): array {
-        $recordUrls = [];
+    private function getRecords(array $recordIDs, string $recordType): array {
+        $records = [];
 
-        if (strtolower($recordType) == 'comment') {
-            foreach ($recordIDs as $recordID) {
-                $url = url("/discussion/comment/{$recordID}#Comment_{$recordID}", true);
-                $recordUrls[] = $url;
-            }
-        } else {    // discussion
-            foreach ($recordIDs as $recordID) {
-                $discussionModel = new DiscussionModel();
-                $discussion = $discussionModel->getID($recordID, DATASET_TYPE_ARRAY);
-                $discussionSlug = Gdn_Format::url($discussion['Name']);
-                $url = url("/discussion/{$recordID}/{$discussionSlug}", true);
-                $recordUrls[] = $url;
-            }
+        foreach ($recordIDs as $recordID) {
+            $records[] = getRecord($recordType, $recordID);
         }
-
-        return $recordUrls;
+        return $records;
     }
 
     /**
-     * Return warn body message in rich format
+     * Apply a warning body and format to the form.
      *
-     * @param array $recordUrls
-     * @return string
+     * - Forces to rich to allow embeds where possible.
+     * - Otherwise only displays links (not ideal).
+     *
+     * @param Gdn_Form $form
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return void
      */
-    private function getRichWarningBody(array $recordUrls): string {
-        $richBody = '[{"insert": "'.plural(
-            count($recordUrls),
+    private function applyWarningBodyAndFormat(Gdn_Form $form, array $recordIDs, string $recordType) {
+        $postTitle = plural(
+            count($recordIDs),
             t('You are being warned for the following post:'),
             t('You are being warned for the following posts:')
-        ).'"},';
-        $richBody .= '{"insert": "\n"},';
-        $length = count($recordUrls);
-        foreach ($recordUrls as $key => $recordUrl) {
-            $richBody .= <<<EOT
-{
-  "attributes": {
-    "link": "$recordUrl"
-  },
-  "insert": "$recordUrl"
-},
-EOT;
+        );
 
-            $richBody .= ($key === $length - 1) ? '{"insert": "\n"}' : '{"insert": "\n"},';
+        $records = $this->getRecords($recordIDs, $recordType);
+
+        // we want to apply Rich, even if it's not the default format, but it might have been disabled.
+        if (!class_exists(RichEditorPlugin::class)) {
+            $body = $postTitle . "\n";
+            foreach ($records as $record) {
+                $body .=  $record['Url'] . "\n";
+            }
+            $form->setValue('Body', $body);
+            $form->setValue('Format', 'Markdown');
+            return;
         }
-        $richBody .= ']';
 
-        return $richBody;
+        $data = [
+            ["insert" => plural(
+                count($recordIDs),
+                t('You are being warned for the following post:'),
+                t('You are being warned for the following posts:')
+            )],
+            ["insert" => "\n"],
+        ];
+
+        foreach ($records as $record) {
+            $bodyRaw = $record["Body"];
+            $userID = $record['InsertUserID'] ?? $record['ActivityUserID'];
+            $userRecord = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+            $userRecord = UserFragmentSchema::normalizeUserFragment($userRecord);
+            $name = $record['Name'] ?? null;
+            $recordID = $recordType === 'Comment' ? $record['CommentID'] : $record['DiscussionID'];
+            $recordUrl = $record['Url'];
+
+            $quoteEmbed = new QuoteEmbed([
+                "name" => $name,
+                "embedType" => QuoteEmbed::TYPE,
+                "recordType" => strtolower($recordType),
+                "recordID" => $recordID,
+                "body" => $this->formatService->renderHTML($bodyRaw, $record['Format']),
+                "format" => $record['Format'],
+                "dateInserted" =>  $record["DateInserted"],
+                "bodyRaw" => $bodyRaw,
+                "userID" => $userID,
+                "insertUser" => $userRecord,
+                "displayOptions" => new QuoteEmbedDisplayOptions(
+                    true,
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                ),
+                "url" => $recordUrl,
+            ]);
+
+            $quoteEmbed = $this->embedService->filterEmbedData($quoteEmbed->getData());
+
+            $embedData = [
+                "insert" => [
+                    "embed-external" => [
+                        "data" => $quoteEmbed,
+                        "loaderData" => [
+                            "type" => "link",
+                            "link" => $recordUrl
+                        ]
+                    ],
+                ]
+            ];
+
+            array_push($data, $embedData);
+        }
+
+        $body = json_encode($data, JSON_UNESCAPED_UNICODE);
+        $form->setValue('Body', $body);
+        $form->setValue('Format', 'Rich');
+    }
+
+    /**
+     * Returns either comments or discussions array selected on provided IDs
+     *
+     * @param array $recordIDs
+     * @param string $recordType
+     * @return array
+     */
+    private function getSelectedRecords(array $recordIDs, string $recordType): array {
+        if (strtolower($recordType) === 'comment') {
+            $records = $this->commentModel->lookup(['CommentID' => $recordIDs])->resultArray();
+        } else {
+            $records = $this->discussionModel->getIn($recordIDs)->resultArray();
+        }
+
+        return $records;
     }
 
     /**
