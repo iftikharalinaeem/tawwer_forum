@@ -22,17 +22,14 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
     /** @var string */
     protected $action;
 
+    /** @var Client */
+    protected $client;
+
     /** @var int */
     protected $delay;
 
-    /** @var string Url of the event. */
-    protected $webhookUrl;
-
     /** @var string Event action. */
     protected $eventAction;
-
-    /** @var Client */
-    protected $client;
 
     /** @var JobPriority */
     protected $priority;
@@ -43,8 +40,14 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
     /** @var UserModel */
     protected $userModel;
 
+    /** @var int */
+    protected $webhookID;
+
     /** @var  string Event Secret. */
     protected $webhookSecret;
+
+    /** @var string Url of the event. */
+    protected $webhookUrl;
 
     /**
      * Get default webhook event data.
@@ -82,13 +85,15 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
         $defaultData = $this->defaultData();
         $data = $this->getData();
 
-        $this->client->sendEvent(
+        $result = $this->client->sendEvent(
+            $this->webhookID,
             $this->webhookUrl,
             $defaultData + $data,
             $this->getEventType(),
             $this->webhookSecret
         );
-        return JobExecutionStatus::complete();
+
+        return $result ? JobExecutionStatus::complete() : JobExecutionStatus::error();
     }
 
     /**
@@ -111,8 +116,20 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
      */
     public function setMessage(array $message) {
         $this->setAction($message["action"]);
+        $this->setWebhookID($message["webhookID"]);
         $this->setWebhookUrl($message["url"]);
         $this->setWebhookSecret($message["secret"]);
+    }
+
+    /**
+     * Set the event action identifier.
+     *
+     * @param string $action
+     * @return self
+     */
+    protected function setAction(string $action): self {
+        $this->action = $action;
+        return $this;
     }
 
     /**
@@ -130,13 +147,13 @@ abstract class WebhookEvent implements LocalJobInterface, InjectableInterface {
     }
 
     /**
-     * Set the event action identifier.
+     * Set the unique ID of the webhook to receive this event.
      *
-     * @param string $action
+     * @param int $webhookID
      * @return self
      */
-    protected function setAction(string $action): self {
-        $this->action = $action;
+    protected function setWebhookID(int $webhookID): self {
+        $this->webhookID = $webhookID;
         return $this;
     }
 

@@ -48,5 +48,14 @@ class WebhooksPlugin extends \Gdn_Plugin {
             ->column('dateUpdated', 'datetime', true)
             ->column('updateUserID', 'int', true)
             ->set();
+
+        $this->database->structure()
+            ->table("webhookDelivery")
+            ->column("deliveryID", "varchar(36)", false, ["index"])
+            ->column("webhookID", "int")
+            ->column("request", "text")
+            ->column("response", "text")
+            ->column('dateInserted', 'datetime')
+            ->set();
     }
 }
