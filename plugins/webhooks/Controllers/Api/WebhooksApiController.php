@@ -10,6 +10,8 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Scheduler\SchedulerInterface;
+use Vanilla\Webhooks\Jobs\PingWebhook;
+use Vanilla\Webhooks\Models\WebhookModel;
 
 /**
  * WebhooksApiController for the `/webhooks` resource.
@@ -173,31 +175,25 @@ class WebhooksApiController extends \AbstractApiController {
         return $row;
     }
 
-
     /**
-     * Post a webhook for testing.
+     * Ping a webhook.
      *
      * @param int $id The webhook ID.
      * @throws NotFoundException If the webhook could not be found.
      * @return array
      */
-    public function post_ping(int $id) {
-        $row = $this->webhookModel->getID($id);
-        $userModel = new \UserModel();
-        $userID = \Gdn::session()->UserID;
-        $user = $userModel->getID($userID);
-        $webhookUrl = $row['url'];
-        $webhookName = $row['name'];
-        $webhookSecret = $row['secret'];
-        $pingMessage = [
-            'action' => 'ping',
-            'url' => $webhookUrl,
-            'name' => $webhookName,
-            'user' => $user,
-            'secret' => $webhookSecret
-        ];
-        $this->scheduler->addJob(WebhookEvent::class, $pingMessage);
-        return $row['webhookID'];
+    public function post_pings(int $id): array {
+        $this->permission("Garden.Settings.Manage");
+
+        $in = $this->schema([]);
+        $out = $this->schema(['webhookID'])->add($this->webhookSchema());
+
+        $webhook = $this->webhookModel->getID($id);
+        $message = $webhook + ["action" => "ping"];
+        $this->scheduler->addJob(PingWebhook::class, $message);
+
+        $result = $out->validate($webhook);
+        return $result;
     }
 
     /**

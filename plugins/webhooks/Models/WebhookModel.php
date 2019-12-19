@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Webhooks;
+namespace Vanilla\Webhooks\Models;
 
 use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
