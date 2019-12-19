@@ -15,6 +15,7 @@ Gdn::structure()->table('UserNote')
     ->column('DateUpdated', 'datetime', true)
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->column('Attributes', 'text', true)
+    ->column('RuleID', 'int', true)
     ->set();
 
 Gdn::structure()->table('UserAlert')
@@ -35,6 +36,16 @@ Gdn::structure()->table('WarningType')
     ->column('Points', 'smallint', '0')
     ->column('ExpireNumber', 'smallint', '0')
     ->column('ExpireType', ['hours', 'days', 'weeks', 'months'], true)
+    ->set();
+
+Gdn::structure()->table('Rule')
+    ->primaryKey('RuleID')
+    ->column('Name', 'varchar(255)', false)
+    ->column('Description', 'varchar(500)', false)
+    ->column('InsertUserID', 'int', false, 'key')
+    ->column('DateInserted', 'datetime', false)
+    ->column('UpdateUserID', 'int', true)
+    ->column('DateUpdated', 'datetime', true)
     ->set();
 
 if (!$WarningTypeExists) {

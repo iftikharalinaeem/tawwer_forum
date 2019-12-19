@@ -231,6 +231,22 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Checks to see whether or not a user can create events for a group.
+     *
+     * @param int $groupID
+     * @return bool
+     */
+    public function canCreateEvents(int $groupID): bool {
+        if (groupPermission('Leader', $groupID)) {
+            return true;
+        } elseif (c('Groups.Members.CanAddEvents', true) && groupPermission('Member', $groupID)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Parse the ID out of a slug.
      *
      * @param type $iD

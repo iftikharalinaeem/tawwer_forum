@@ -426,7 +426,8 @@ class PollsPlugin extends Gdn_Plugin {
                     redirectTo(discussionUrl($discussion));
                 }
             } else {
-                $sender->Form->setValidationResults($pollModel->validationResults());
+                $validationResults = $discussionModel->validationResults() + $pollModel->validationResults();
+                $sender->Form->setValidationResults($validationResults);
             }
         }
 
@@ -443,8 +444,15 @@ class PollsPlugin extends Gdn_Plugin {
         $sender->setData('Breadcrumbs', $crumb);
         $sender->setData('_AnonymousPolls', c('Plugins.Polls.AnonymousPolls'));
         $sender->addJsFile('jquery.duplicate.js');
+        $sender->addJsFile('post.js');
         $sender->addJsFile('polls.js', 'plugins/Polls');
         $this->_addCss($sender);
+
+        if ($sender->Form->errorCount() > 0) {
+            // Return the form errors
+            $sender->errorMessage($sender->Form->errors());
+        }
+
         $sender->render('add', '', 'plugins/Polls');
     }
 
