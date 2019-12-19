@@ -17,6 +17,9 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { PlusCircleIcon, EditIcon, DeleteIcon } from "@library/icons/common";
 import { ProductDeleteErrorModal } from "@subcommunities/products/ProductDeleteErrorModal";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import { useSubcommunities } from "@subcommunities/subcommunities/subcommunitySelectors";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { noSubcommunitiesFieldError } from "@subcommunities/subcommunities/subcommunityErrors";
 
 interface IProps {
     productLoadable?: ILoadedProduct | ILoadable<TempProduct>;
@@ -45,6 +48,12 @@ export function ProductManagerItem(props: IProps) {
             ? props.productLoadable.data
             : null;
     const initialProductName = actualProduct ? actualProduct.name : "";
+
+    const { subcommunitiesByProductID } = useSubcommunities();
+    const relatedSubcommunities = actualProduct?.productID
+        ? subcommunitiesByProductID.data?.[actualProduct.productID]
+        : null;
+    const hasNoSubcommunities = (relatedSubcommunities?.length ?? 0) === 0 ?? true;
 
     /// Locale State
     const { postProduct, patchProduct, deleteProduct, clearDeleteError } = useProductActions();
@@ -140,6 +149,14 @@ export function ProductManagerItem(props: IProps) {
                     ) : (
                         <span className={classes.itemName}>
                             {actualProduct ? actualProduct.name : tempProduct ? tempProduct.name : null}
+                            {hasNoSubcommunities && (
+                                <ErrorMessages
+                                    className={classes.error}
+                                    errors={[
+                                        noSubcommunitiesFieldError(),
+                                    ]}
+                                />
+                            )}
                         </span>
                     )}
                     <div className={classes.itemActions}>

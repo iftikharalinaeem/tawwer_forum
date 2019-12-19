@@ -5,7 +5,7 @@
 
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
-import { LoadStatus } from "@library/@types/api/core";
+import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -15,6 +15,9 @@ import { useProducts } from "@subcommunities/products/productSelectors";
 import React, { useMemo, useState } from "react";
 import { makeSiteSectionGroup } from "@subcommunities/products/productTypes";
 import { ILoadedProduct } from "@subcommunities/products/productReducer";
+import { useSubcommunities } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { noSubcommunitiesFieldError } from "@subcommunities/subcommunities/subcommunityErrors";
 
 interface IProps {
     // Gdn_Form version (uncontrolled).
@@ -28,6 +31,7 @@ interface IProps {
     // Genenal props
     valueType: "sectionGroup" | "productID";
     disabled?: boolean;
+    errors?: IFieldError[];
 }
 
 /**
@@ -36,15 +40,29 @@ interface IProps {
  */
 export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     const { allProductLoadable, productsById } = useProducts();
+    const { valueType } = props;
+    const { subcommunitiesByProductID } = useSubcommunities();
     const options = useMemo(() => {
-        return Object.values(productsById).map(productLoadable => {
-            const { productID } = productLoadable.product;
-            return {
-                label: productLoadable.product.name,
-                value: props.valueType === "sectionGroup" ? makeSiteSectionGroup({ productID }) : productID,
-            };
-        });
-    }, [productsById]);
+        return Object.values(productsById)
+            .filter(productLoadable => {
+                const { productID } = productLoadable.product;
+                const subcommunities = subcommunitiesByProductID.data?.[productID];
+
+                if (!subcommunities) {
+                    // Hide products with no subcommunities.
+                    return false;
+                }
+
+                return true;
+            })
+            .map(productLoadable => {
+                const { productID } = productLoadable.product;
+                return {
+                    label: productLoadable.product.name,
+                    value: valueType === "sectionGroup" ? makeSiteSectionGroup({ productID }) : productID,
+                };
+            });
+    }, [productsById, subcommunitiesByProductID, valueType]);
     const [modalOpen, setModalOpen] = useState(false);
 
     const [ownValue, setOwnValue] = useState<number | string | null>(
@@ -53,31 +71,41 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
 
     const setValue = props.onChange ?? setOwnValue;
     const value = props.value ?? ownValue;
-
-    const currentComboBoxValue = useMemo(() => {
+    const selectedProduct = useMemo(() => {
         if (value == null) {
             return null;
         }
 
         let selectedProduct: ILoadedProduct | undefined;
         for (const [productID, product] of Object.entries(productsById)) {
-            if (props.valueType === "sectionGroup" && value === makeSiteSectionGroup({ productID })) {
+            if (valueType === "sectionGroup" && value === makeSiteSectionGroup({ productID })) {
                 selectedProduct = product;
                 break;
-            } else if (props.valueType === "productID" && value.toString() === productID.toString()) {
+            } else if (valueType === "productID" && value.toString() === productID.toString()) {
                 selectedProduct = product;
                 break;
             }
         }
+        return selectedProduct;
+    }, [productsById, value, valueType]);
+
+    const currentComboBoxValue = useMemo(() => {
         if (!selectedProduct) {
             return null;
         }
 
         return {
             label: selectedProduct.product.name,
-            value,
+            value: value!,
         };
-    }, [value, productsById]);
+    }, [selectedProduct, value]);
+
+    const ownSubcommunities = selectedProduct
+        ? subcommunitiesByProductID.data?.[selectedProduct.product.productID] ?? []
+        : null;
+    const ownError = ownSubcommunities && ownSubcommunities.length === 0 ? [noSubcommunitiesFieldError()] : undefined;
+
+    const errors = props.errors ?? ownError;
 
     return (
         <DashboardFormGroup
@@ -100,6 +128,7 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
             {modalOpen && <ProductManager onClose={() => setModalOpen(false)} asModal />}
             <input name={props.formFieldName} type="hidden" value={value != null ? value : ""} />
             <DashboardSelect
+                errors={errors}
                 disabled={allProductLoadable.status !== LoadStatus.SUCCESS || props.disabled}
                 options={options}
                 value={currentComboBoxValue!}
