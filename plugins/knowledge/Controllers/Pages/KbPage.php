@@ -94,8 +94,8 @@ abstract class KbPage extends ThemedPage {
         \Gdn_Session $session,
         PageHead $pageHead,
         MasterViewRenderer $masterViewRenderer,
-        BreadcrumbModel $breadcrumbModel,
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
+        BreadcrumbModel $breadcrumbModel = null,
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
