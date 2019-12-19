@@ -185,6 +185,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
 
                                 {ProductSelectorFormGroup && (
                                     <ProductSelectorFormGroup.Component
+                                        errors={errors?.["siteSectionGroup"]}
                                         value={form.siteSectionGroup}
                                         onChange={siteSectionGroup => {
                                             updateForm({ siteSectionGroup });
@@ -201,6 +202,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                     )}
                                 >
                                     <DashboardInput
+                                        errors={errors?.["description"]}
                                         inputProps={{
                                             disabled: isLoading,
                                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
