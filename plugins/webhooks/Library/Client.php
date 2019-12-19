@@ -99,8 +99,7 @@ class Client extends HttpClient {
      *
      * @param string $deliveryID
      * @param integer $webhookID
-     * @param array $request
-     * @param array $response
+     * @param HttpResponse $response
      * @return void
      */
     private function writeDeliveryRecord(string $deliveryID, int $webhookID, HttpResponse $response): void {
