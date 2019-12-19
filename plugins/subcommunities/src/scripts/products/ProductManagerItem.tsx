@@ -150,12 +150,7 @@ export function ProductManagerItem(props: IProps) {
                         <span className={classes.itemName}>
                             {actualProduct ? actualProduct.name : tempProduct ? tempProduct.name : null}
                             {hasNoSubcommunities && (
-                                <ErrorMessages
-                                    className={classes.error}
-                                    errors={[
-                                        noSubcommunitiesFieldError(),
-                                    ]}
-                                />
+                                <ErrorMessages className={classes.error} errors={[noSubcommunitiesFieldError()]} />
                             )}
                         </span>
                     )}
