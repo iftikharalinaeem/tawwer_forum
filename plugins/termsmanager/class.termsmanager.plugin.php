@@ -341,16 +341,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
         }
 
         $validationMessage = (val('Terms', $user) && val('ForceRenew', $terms)) ? t('<h2>We have recently updated our Terms of Use. You must agree to the code of conduct.</h2>') : '';
-        if (!$terms->ShowInPopup && $terms->Body) {
-            $termsBody = t('Terms of service body text.', val('Body', $terms));
-            $body = Gdn_Format::text($termsBody);
-            echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag, ['class' => 'managed-terms-row']);
-        } else {
-            $link = ($terms->Link && !$terms->Body) ? $terms->Link : '/vanilla/terms';
+        if ($terms->ShowInPopup || $terms->Link) {
+            $link = $terms->Link ? $terms->Link : '/vanilla/terms';
             $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
             $anchor = $terms->ShowInPopup || $link ? anchor('Click here to read.', $link, $linkAttribute) : '';
             $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
             echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag, ['class' => 'managed-terms-message']);
+        } else {
+            $termsBody = t('Terms of service body text.', val('Body', $terms));
+            $body = Gdn_Format::text($termsBody);
+            echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag, ['class' => 'managed-terms-row']);
         }
         echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag, ['class' => 'managed-terms-checkbox-row']);
     }
