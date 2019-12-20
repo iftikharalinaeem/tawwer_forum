@@ -371,8 +371,8 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $comment = $sender->commentByID($id);
         $discussion = $sender->discussionByID($comment['DiscussionID']);
-        $userID = $sender->getSession()->UserID;
-        $this->canViewDiscussion($discussion, $userID);
+        $session = $sender->getSession();
+        $this->canViewDiscussion($discussion, $session);
         $body = $in->validate($body);
 
         $this->reactionModel->react('Comment', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
@@ -581,11 +581,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      * Checks if the user can view discussion.
      *
      * @param array $discussion
+     * @param Gdn_Session $session
      * @throws Exception If the user cannot view the discussion.
      */
-    private function canViewDiscussion(array $discussion, int $userID): void {
+    private function canViewDiscussion(array $discussion, Gdn_Session $session): void {
+        $userID = $session->UserID;
         $canView = $this->discussionModel->canView($discussion, $userID);
-        $isAdmin = Gdn::session()->checkRankedPermission('Garden.Moderation.Manage');
+        $isAdmin = $session->checkRankedPermission('Garden.Moderation.Manage');
         if (!$canView && !$isAdmin) {
             throw permissionException('Vanilla.Discussions.View');
         }
@@ -607,8 +609,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         ], 'in')->setDescription('React to a discussion.');
         $out = $sender->schema($this->getReactionSummaryFragment(), 'out');
         $discussion = $sender->discussionByID($id);
-        $userID = $sender->getSession()->UserID;
-        $this->canViewDiscussion($discussion, $userID);
+        $session = $sender->getSession();
+        $this->canViewDiscussion($discussion, $session);
         $body = $in->validate($body);
 
         $this->reactionModel->react('Discussion', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
