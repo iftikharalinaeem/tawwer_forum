@@ -360,7 +360,6 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int $id The comment ID.
      * @param array $body The request query.
      * @return array
-     * @throws Exception If user cannot view the discussion.
      */
     public function commentsApiController_post_reactions(CommentsApiController $sender, $id, array $body) {
         $sender->permission('Garden.SignIn.Allow');
