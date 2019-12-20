@@ -579,7 +579,7 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Checks if the user can view discussion.
      *
-     * @param $discussion
+     * @param array $discussion
      * @throws Exception If the user cannot view the discussion.
      */
     private function canViewDiscussion(array $discussion): void {
