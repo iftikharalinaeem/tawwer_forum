@@ -13,5 +13,11 @@
     ],
     "require": {
         "vanilla": ">=2.8.3"
+    },
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/theming-ui-settings"
+        }
     }
 }

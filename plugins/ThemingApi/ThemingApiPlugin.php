@@ -19,6 +19,7 @@ use Vanilla\Models\ThemeModel;
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
  */
 class ThemingApiPlugin extends Gdn_Plugin {
+    const NAV_SECTION = "appearance";
 
     /** @var Gdn_Database */
     private $database;
@@ -73,6 +74,33 @@ class ThemingApiPlugin extends Gdn_Plugin {
     public function setup() {
         parent::setup();
         $this->structure();
+    }
+
+    /**
+     * Event handler for adding navigation items into the dashboard.
+     *
+     * @param \Gdn_Pluggable $sender
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var \NestedCollectionAdapter */
+        $menu = $sender->EventArguments['SideMenu'];
+        $this->createDashboardMenus($menu);
+    }
+
+    /**
+     * Construct the Theming UI dashboard menu items.
+     *
+     * @param \NestedCollectionAdapter $navCollection
+     */
+    private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
+        $navCollection->addLink(
+            self::NAV_SECTION,
+            t('Theming UI'),
+            '/theming-ui-settings/themes',
+            'Garden.Settings.Manage'
+        );
     }
 
     /**
