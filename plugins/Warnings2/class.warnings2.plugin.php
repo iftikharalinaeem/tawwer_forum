@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
 use Vanilla\EmbeddedContent\EmbedService;
@@ -46,6 +47,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
      *
+     * @param Container $container
      * @param DiscussionModel $discussionModel
      * @param CommentModel $commentModel
      * @param UserModel $userModel
@@ -54,6 +56,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param \RuleModel $ruleModel
      */
     public function __construct(
+        Container $container,
         \DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \UserModel $userModel,
@@ -67,6 +70,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $this->formatService = $formatService;
         $this->embedService = $embedService;
         $this->ruleModel = $ruleModel;
+        $this->userNoteModel = $container->has('UserNoteModel') ? $container->get('UserNoteModel') : null;
         parent::__construct();
 
         $this->fireEvent('Init');
@@ -1223,6 +1227,22 @@ class Warnings2Plugin extends Gdn_Plugin {
         $authorIDs = $this->getAuthorIDs($discussionIDs, 'discussion');
 
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userids='.join($authorIDs, ',').'&recordtype=Discussion&recordids='.join($discussionIDs, ','), 'Warn Popup');
+    }
+
+    /**
+     * Remove data when deleting a user.
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_beforeDeleteUser_handler(\UserModel $sender, array $args) {
+        if ($this->userNoteModel) {
+            try {
+                $this->userNoteModel->delete(["UserID" => $args["UserID"]]);
+            } catch (\Exception $e) {
+                Logger::log(Logger::ERROR, "Failed to delete user notes.");
+            }
+        }
     }
 
     /**
