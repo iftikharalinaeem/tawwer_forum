@@ -35,26 +35,55 @@ interface IProps {
 
 interface IState {}
 
-export default class ManageThemingPage extends React.Component<IProps, IState> {
-    constructor(props) {
-        super(props);
-    }
-    public render() {
-        const { currentTheme, templateThemes, customThemes } = this.props;
-        const globalVars = globalVariables();
-        return (
-            <BrowserRouter>
-                <DashboardHeaderBlock
-                    title={t("Themes")}
-                />
-                <CurrentThemeInfo name={currentTheme.name} authors={currentTheme.author} description={currentTheme.description}
+export default function ManageThemingPage(props) {
+    const themePreviewDefault = {
+        globalBg: "#fff",
+        globalPrimary: "#985E6D",
+        globalFg: "#555a62",
+        titleBarBg: "#0291db",
+        titleBarFg: "#fff",
+        isActiveTheme: true
+    };
+    const {
+                currentTheme = {
+                    name: 'Theme',
+                    author: 'Author',
+                    description: 'Description',
+                    preview: themePreviewDefault
+                }
+            } = props;
+    const { templateThemes = [
+            { preview: themePreviewDefault},
+            { preview: themePreviewDefault},
+            { preview: themePreviewDefault}
+        ]
+        } = props;
+    const { customThemes = [] } = props;
+    const globalVars = globalVariables();
+    return (
+        <BrowserRouter>
+            <DashboardHeaderBlock
+                title={t("Themes")}
+            />
+            <div>
+            <ThemePreviewCard
+                globalBg={currentTheme.preview.globalBg}
+                globalFg={currentTheme.preview.globalFg}
+                globalPrimary={currentTheme.preview.globalPrimary}
+                titleBarBg={currentTheme.preview.titleBarBg}
+                titleBarFg={currentTheme.preview.titleBarFg}
+                isActiveTheme={currentTheme.preview.isActiveTheme}
+            />
+            <CurrentThemeInfo name={currentTheme.name} authors={currentTheme.author} description={currentTheme.description}
 
-                />
+            />
+            </div>
 
-                <DashboardHeaderBlock
-                    title={t("Templates")}
-                />
-                { templateThemes.map((templateTheme, key) => (
+            <DashboardHeaderBlock
+                title={t("Templates")}
+            />
+            <div style={{display: "flex"}}>
+            { templateThemes.map((templateTheme, key) => (
                         <ThemePreviewCard
                         globalBg={templateTheme.preview.globalBg}
                         globalFg={templateTheme.preview.globalFg}
@@ -62,26 +91,27 @@ export default class ManageThemingPage extends React.Component<IProps, IState> {
                         titleBarBg={templateTheme.preview.titleBarBg}
                         titleBarFg={templateTheme.preview.titleBarFg}
                         isActiveTheme={templateTheme.isActive}
-                        />)
+                        />
+
                     )
-                }
-
-                <DashboardHeaderBlock
-                    title={t("Custom themes")}
-                />
-                { customThemes.map((templateTheme, key) => (
-                    <ThemePreviewCard
-                        globalBg={templateTheme.preview.globalBg}
-                        globalFg={templateTheme.preview.globalFg}
-                        globalPrimary={templateTheme.preview.globalPrimary}
-                        titleBarBg={templateTheme.preview.titleBarBg}
-                        titleBarFg={templateTheme.preview.titleBarFg}
-                        isActiveTheme={templateTheme.isActive}
-                    />)
                 )
-                }
+            }
+            </div>
+            <DashboardHeaderBlock
+                title={t("Custom themes")}
+            />
+            { customThemes.map((templateTheme, key) => (
+                <ThemePreviewCard
+                    globalBg={templateTheme.preview.globalBg}
+                    globalFg={templateTheme.preview.globalFg}
+                    globalPrimary={templateTheme.preview.globalPrimary}
+                    titleBarBg={templateTheme.preview.titleBarBg}
+                    titleBarFg={templateTheme.preview.titleBarFg}
+                    isActiveTheme={templateTheme.isActive}
+                />)
+            )
+            }
 
-            </BrowserRouter>
-        );
-    }
+        </BrowserRouter>
+    );
 }
