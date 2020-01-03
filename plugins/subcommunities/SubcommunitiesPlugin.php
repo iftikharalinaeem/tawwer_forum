@@ -883,37 +883,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function discussionModel_beforeGetCount_handler($sender, $args) {
         $this->dicussionQueryFiltering($args);
     }
-
-    /**
-     * Restricting searches to the immediate subcommunity.
-     *
-     * @param  array $args
-     * @return mixed
-     */
-
-    public function advancedSearchPlugin_beforeSearch_handler($args) {
-
-        $searchCategory = $args['search']['cat'] ?? '';
-        $inSubCommunity = true;
-
-        if ($searchCategory !== 'all') {
-            $subCommunityCategory = SubcommunityModel::getCurrent() ?? null;
-
-            // If the search category id isn't the subcommunity category id, check if it's in
-            // the subcommunity and use that id for the search.
-            if ($searchCategory !== $subCommunityCategory['CategoryID']) {
-                $subCommunityChildCategories = CategoryModel::getChildren($subCommunityCategory['CategoryID']);
-                $subCommunityChildCategoriesIDs = array_column($subCommunityChildCategories, 'CategoryID', 'CategoryID');
-                $inSubCommunity = array_key_exists($searchCategory, $subCommunityChildCategoriesIDs);
-            }
-
-            $args['categoryID'] = ($inSubCommunity) ? $searchCategory : $subCommunityCategory['CategoryID'];
-            $args['search']['subcats'] = ( $args['categoryID']) ? 1 : $args['subcats'];
-
-            return $args;
-        }
-    }
-
+    
     /**
      * Add filter to discussion queries based on certain conditions.
      *
