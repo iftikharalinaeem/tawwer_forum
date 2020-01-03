@@ -507,9 +507,9 @@ class OnlinePlugin extends Gdn_Plugin {
     public static function whereAmI($resolvedPath = null, $resolvedArgs = null) {
         $location = 'limbo';
         $wildLocations = [
-            'categories/index' => 'category',
-            'discussion/index' => 'discussion',
-            'discussion/comment' => 'comment'
+            'vanilla/categories/index' => 'category',
+            'vanilla/discussion/index' => 'discussion',
+            'vanilla/discussion/comment' => 'comment'
         ];
 
         if (is_null($resolvedPath)) {
@@ -526,12 +526,14 @@ class OnlinePlugin extends Gdn_Plugin {
         if (!$resolvedPath) {
             return $location;
         }
-        $location = val($resolvedPath, $wildLocations, 'limbo');
+
+        if (isset($wildLocations[$resolvedPath])) {
+            $location = $wildLocations[$resolvedPath];
+        }
 
         // Check if we're on the categories list, or inside one, and adjust location
         if ($location == 'category') {
-            $categoryIdentifier = val('categoryidentifier', array_change_key_case($resolvedArgs));
-            if (empty($categoryIdentifier)) {
+            if (empty($resolvedArgs['categoryIdentifier'])) {
                 $location = 'limbo';
             }
         }
