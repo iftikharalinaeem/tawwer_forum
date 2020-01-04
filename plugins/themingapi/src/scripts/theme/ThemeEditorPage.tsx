@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import React, { useState } from "react";
 import { t } from "@vanilla/i18n";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
