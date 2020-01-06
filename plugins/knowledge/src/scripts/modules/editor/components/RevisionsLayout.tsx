@@ -69,7 +69,6 @@ export class RevisionsLayout extends React.Component<IProps> {
                 />
                 <Container className="richEditorRevisionsForm-body">
                     <PanelLayout
-                        device={this.props.device}
                         topPadding={this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS}
                         breadcrumbs={
                             this.props.device !== Devices.MOBILE &&

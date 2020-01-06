@@ -34,7 +34,6 @@ class DraftsLayout extends React.Component<IProps> {
                 <DraftHeader mobileDropDownTitle={isMobile ? t("Drafts") : undefined} />
                 <Container>
                     <PanelLayout
-                        device={this.props.device}
                         className="hasLargePadding"
                         leftTop={isFullWidth && <PanelEmptyColumn />}
                         middleTop={!isMobile && <PageTitle includeBackLink={false} title={t("Drafts")} />}
