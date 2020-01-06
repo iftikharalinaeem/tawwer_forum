@@ -6,7 +6,7 @@
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IPostThemeRequest, IPatchThemeRequest, ITheme, IThemeAssets } from "./ThemeReducers";
+import { IPostThemeRequest, IPatchThemeRequest, ITheme } from "./ThemeReducers";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -25,6 +25,7 @@ interface IGetAllThemesReauest {}
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
 export default class ThemeActions extends ReduxActions<IKnowledgeAppStoreState> {
+    [x: string]: any;
     public static readonly getAllThemes_ACS = actionCreator.async<{}, ITheme, IApiError>("GET_ALL_Themes");
     public static getThemeAssets_ACs = actionCreator.async<IGetThemeRequest, IGetThemeResponse, IApiError>("GET");
     public static postTheme_ACs = actionCreator.async<IPostThemeRequest, IPostThemeResponse, IApiError>("POST"); //Copy

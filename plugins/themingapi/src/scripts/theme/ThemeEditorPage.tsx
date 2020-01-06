@@ -13,10 +13,11 @@ import { DataTabs } from "@library/sectioning/Tabs";
 import TextEditor from "@library/textEditor/TextEditor";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
+import ThemeActions from "./ThemeActions";
 
 interface IProps {}
 
-export default function ThemeEditorPage(props: IProps) {
+export function ThemeEditorPage(props: IProps) {
     /*const onSubmit = useCallback(
         (event: React.FormEvent) => {
             event.preventDefault();
@@ -48,12 +49,13 @@ export default function ThemeEditorPage(props: IProps) {
             </React.Fragment>
         </BrowserRouter>
     );
-} /*
+}
 function mapDispatchToProps(dispatch) {
-    const actions = new ThemeEditorPageActions(dispatch, apiv2);
+    const actions = new ThemeActions(dispatch, apiv2);
     return { actions };
 }
-
+export default connect(mapDispatchToProps)(ThemeEditorPage);
+/*
 const withRedux = connect(mapDispatchToProps);
 
 export default withRedux(withRouter(ThemeEditorPage));
