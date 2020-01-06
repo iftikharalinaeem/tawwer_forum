@@ -26,10 +26,10 @@ export default function ThemeEditorPage(props: IProps) {
         [props.actions.publish, props.history, pushSmartLocation],
     );*/
     const tabData = [
-        { label: "Header", panelData: "header" },
-        { label: "Footer", panelData: "footer" },
-        { label: "CSS", panelData: "css" },
-        { label: "JS", panelData: "js" },
+        { label: "Header", panelData: "header", contents: <TextEditor language={"html"} /> },
+        { label: "Footer", panelData: "footer", contents: <TextEditor language={"html"} /> },
+        { label: "CSS", panelData: "css", contents: <TextEditor language={"css"} /> },
+        { label: "JS", panelData: "js", contents: <TextEditor language={"javascript"} /> },
     ];
     return (
         <BrowserRouter>
@@ -43,15 +43,7 @@ export default function ThemeEditorPage(props: IProps) {
                             </DropDown>
                         }
                     />
-                    <DataTabs data={tabData}>
-                        <TextEditor
-                            height={"90vh"} // By default, it fully fits with its parent
-                            theme={"dark"}
-                            language={"html"}
-                            // editorDidMount={handleEditorDidMount}
-                            options={{ lineNumbers: "on" }}
-                        />
-                    </DataTabs>
+                    <DataTabs data={tabData} />
                 </form>
             </React.Fragment>
         </BrowserRouter>
