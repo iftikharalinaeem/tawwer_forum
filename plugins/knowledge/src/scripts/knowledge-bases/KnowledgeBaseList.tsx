@@ -27,7 +27,7 @@ import { subcommunityTileClasses } from "@library/features/subcommunities/subcom
  */
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
-        const { knowledgeBases, loadStatus, className } = this.props;
+        const { knowledgeBases, loadStatus, className, columns } = this.props;
         const classesSubCommunityTile = subcommunityTileClasses();
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
@@ -45,6 +45,8 @@ class KnowledgeBaseList extends React.Component<IProps> {
                 items={knowledgeBases}
                 emptyMessage={t("No knowledge bases found.")}
                 fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
+                className={className}
+                columns={columns}
             />
         );
     }
@@ -61,6 +63,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
 
 interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
     className?: string;
+    columns?: number;
 }
 
 function mapStateToProps(state: IKnowledgeAppStoreState) {
