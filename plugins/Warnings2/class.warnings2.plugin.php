@@ -37,6 +37,9 @@ class Warnings2Plugin extends Gdn_Plugin {
     /** @var RuleModel $ruleModel */
     private $ruleModel;
 
+    /** @var UserModel $userNoteModel */
+    private $userNoteModel;
+
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
      */
@@ -47,7 +50,6 @@ class Warnings2Plugin extends Gdn_Plugin {
     /**
      * Initialize a new instance of the {@link Warnings2Plugin}.
      *
-     * @param Container $container
      * @param DiscussionModel $discussionModel
      * @param CommentModel $commentModel
      * @param UserModel $userModel
@@ -56,21 +58,21 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param \RuleModel $ruleModel
      */
     public function __construct(
-        Container $container,
         \DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \UserModel $userModel,
         FormatService $formatService,
         EmbedService $embedService,
-        RuleModel $ruleModel
+        RuleModel $ruleModel,
+        UserNoteModel $userNoteModel
     ) {
-        $this->userModel = $userModel;
-        $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
+        $this->userModel = $userModel;
         $this->formatService = $formatService;
         $this->embedService = $embedService;
         $this->ruleModel = $ruleModel;
-        $this->userNoteModel = $container->has('UserNoteModel') ? $container->get('UserNoteModel') : null;
+        $this->userNoteModel = $userModel;
         parent::__construct();
 
         $this->fireEvent('Init');
@@ -1237,11 +1239,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      */
     public function userModel_beforeDeleteUser_handler(\UserModel $sender, array $args) {
         if ($this->userNoteModel) {
-            try {
-                $this->userNoteModel->delete(["UserID" => $args["UserID"]]);
-            } catch (\Exception $e) {
-                Logger::log(Logger::ERROR, "Failed to delete user notes.");
-            }
+            Gdn::userModel()->getDelete('UserNote', ['UserID' => $args['UserID']], $args['Content']);
         }
     }
 
