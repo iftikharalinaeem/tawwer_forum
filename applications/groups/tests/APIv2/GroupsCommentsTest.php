@@ -37,7 +37,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
         /** @var \GroupsApiController $groupsAPIController */
         $groupsAPIController = static::container()->get('GroupsApiController');
         // Create test groups
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 2; $i++) {
             self::$groups[] = $groupsAPIController->post([
                 'name' => uniqid(__CLASS__),
                 'description' => uniqid(__CLASS__),
@@ -186,8 +186,6 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[3], false, false);
         $this->createComment($secretDiscussionID);
-
-        $this->api()->get($this->baseUrl, ['discussionID' => $secretDiscussionID]);
     }
 
     /**
@@ -215,7 +213,7 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
     public function testFailPrivateGroupCommentID() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
-        $privateGroupID = self::$privateGroups[2]['groupID'];
+        $privateGroupID = self::$privateGroups[1]['groupID'];
         $privateDiscussionID = $this->createDiscussion($privateGroupID);
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[5], false, false);
