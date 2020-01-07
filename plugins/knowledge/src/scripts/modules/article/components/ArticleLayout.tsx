@@ -24,6 +24,7 @@ import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import { PanelBackground } from "./PanelBackground";
 
 /**
  * Implements the article's layout
@@ -53,90 +54,97 @@ export class ArticleLayout extends React.Component<IProps> {
             title = currentNavCategory.name;
         }
         return (
-            <Container>
-                <TitleBar
-                    useMobileBackButton={this.props.useBackButton}
-                    isFixed={true}
-                    title={title}
-                    mobileDropDownContent={
-                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                    }
-                />
-                <PanelLayout
-                    breadcrumbs={
-                        this.props.device !== Devices.MOBILE &&
-                        this.props.device !== Devices.XS &&
-                        article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
-                    }
-                    leftBottom={
-                        <PanelWidget>
+            <>
+                {this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS && <PanelBackground />}
+                <Container>
+                    <TitleBar
+                        useMobileBackButton={this.props.useBackButton}
+                        isFixed={true}
+                        title={title}
+                        mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                        </PanelWidget>
-                    }
-                    middleTop={
-                        <PanelWidget>
-                            <PageTitle
-                                title={article.name}
-                                headingClassName={typographyClasses().largeTitle}
-                                actions={
-                                    <ArticleMenu
-                                        article={article}
-                                        buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
-                                        device={this.props.device}
-                                    />
-                                }
-                                meta={
-                                    <ArticleMeta
-                                        updateUser={article.updateUser!}
-                                        dateUpdated={article.dateUpdated}
-                                        permaLink={article.url}
-                                    />
-                                }
-                                includeBackLink={
-                                    this.props.device !== Devices.MOBILE &&
-                                    this.props.device !== Devices.XS &&
-                                    this.props.useBackButton
-                                }
-                            />
-                            {messages && <div className="messages">{messages}</div>}
-                        </PanelWidget>
-                    }
-                    middleBottom={
-                        <>
+                        }
+                    />
+                    <PanelLayout
+                        breadcrumbs={
+                            this.props.device !== Devices.MOBILE &&
+                            this.props.device !== Devices.XS &&
+                            article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
+                        }
+                        leftBottom={
                             <PanelWidget>
-                                <UserContent content={article.body} />
+                                <Navigation
+                                    collapsible={true}
+                                    activeRecord={activeRecord}
+                                    kbID={article.knowledgeBaseID}
+                                />
                             </PanelWidget>
+                        }
+                        middleTop={
                             <PanelWidget>
-                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                                <PageTitle
+                                    title={article.name}
+                                    headingClassName={typographyClasses().largeTitle}
+                                    actions={
+                                        <ArticleMenu
+                                            article={article}
+                                            buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
+                                            device={this.props.device}
+                                        />
+                                    }
+                                    meta={
+                                        <ArticleMeta
+                                            updateUser={article.updateUser!}
+                                            dateUpdated={article.dateUpdated}
+                                            permaLink={article.url}
+                                        />
+                                    }
+                                    includeBackLink={
+                                        this.props.device !== Devices.MOBILE &&
+                                        this.props.device !== Devices.XS &&
+                                        this.props.useBackButton
+                                    }
+                                />
+                                {messages && <div className="messages">{messages}</div>}
                             </PanelWidget>
-                            {(!!prevNavArticle || !!nextNavArticle) && (
+                        }
+                        middleBottom={
+                            <>
                                 <PanelWidget>
-                                    <NextPrevious
-                                        accessibleTitle={t("More Articles")}
-                                        prevItem={prevNavArticle}
-                                        nextItem={nextNavArticle}
-                                    />
+                                    <UserContent content={article.body} />
                                 </PanelWidget>
-                            )}
-                        </>
-                    }
-                    rightTop={
-                        <>
-                            {device !== Devices.MOBILE &&
-                                device !== Devices.TABLET &&
-                                article.outline &&
-                                article.outline.length > 0 && (
+                                <PanelWidget>
+                                    <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                                </PanelWidget>
+                                {(!!prevNavArticle || !!nextNavArticle) && (
                                     <PanelWidget>
-                                        <ArticleTOC items={article.outline} />
+                                        <NextPrevious
+                                            accessibleTitle={t("More Articles")}
+                                            prevItem={prevNavArticle}
+                                            nextItem={nextNavArticle}
+                                        />
                                     </PanelWidget>
                                 )}
-                            <PanelWidget>
-                                <OtherLanguages articleLocaleData={articlelocales} />
-                            </PanelWidget>
-                        </>
-                    }
-                />
-            </Container>
+                            </>
+                        }
+                        rightTop={
+                            <>
+                                {device !== Devices.MOBILE &&
+                                    device !== Devices.TABLET &&
+                                    article.outline &&
+                                    article.outline.length > 0 && (
+                                        <PanelWidget>
+                                            <ArticleTOC items={article.outline} />
+                                        </PanelWidget>
+                                    )}
+                                <PanelWidget>
+                                    <OtherLanguages articleLocaleData={articlelocales} />
+                                </PanelWidget>
+                            </>
+                        }
+                    />
+                </Container>
+            </>
         );
     }
 }
