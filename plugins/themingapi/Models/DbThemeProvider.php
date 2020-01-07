@@ -7,8 +7,10 @@
 namespace Vanilla\ThemingApi;
 
 use Gdn_Upload;
+use Vanilla\AddonManager;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\ThemingApi\Models\ThemeModel;
+use Vanilla\Models\ThemeModel;
+use Vanilla\ThemingApi\Models\ThemeModel as ThemingModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\Models\ThemeVariablesTrait;
 use Vanilla\Exception\Database\NoResultsException;
@@ -35,7 +37,7 @@ class DbThemeProvider implements ThemeProviderInterface {
     private $themeAssetModel;
 
     /**
-     * @var ThemeModel
+     * @var ThemingModel
      */
     private $themeModel;
 
@@ -45,24 +47,30 @@ class DbThemeProvider implements ThemeProviderInterface {
     /** @var Gdn_Request */
     private $request;
 
+    /** @var AddonManager */
+    private $addonManager;
+
     /**
      * DbThemeProvider constructor.
      *
      * @param ThemeAssetModel $themeAssetModel
-     * @param ThemeModel $themeModel
+     * @param ThemingModel $themeModel
      * @param ConfigurationInterface $config
      * @param Gdn_Request $request
+     * @param AddonManager $addonManager
      */
     public function __construct(
         ThemeAssetModel $themeAssetModel,
-        ThemeModel $themeModel,
+        ThemingModel $themeModel,
         ConfigurationInterface $config,
-        Gdn_Request $request
+        Gdn_Request $request,
+        AddonManager $addonManager
     ) {
         $this->themeAssetModel = $themeAssetModel;
         $this->themeModel = $themeModel;
         $this->config = $config;
         $this->request = $request;
+        $this->addonManager = $addonManager;
     }
 
     /**
@@ -109,7 +117,13 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
 
-        return $this->normalizeTheme($theme, []);
+        $assets = $body['assets'] ?? [];
+        foreach ($assets as $assetKey => $assetData) {
+            $this->setAsset($themeID, $assetKey, $assetData);
+        }
+
+        $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
+        return $this->normalizeTheme($theme, $themeAssets);
     }
 
     /**
@@ -125,13 +139,19 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $this->themeModel->update($body, ['themeID' => $themeID]);
 
+        $assets = $body['assets'] ?? [];
+        foreach ($assets as $assetKey => $assetData) {
+            $this->setAsset($themeID, $assetKey, $assetData);
+        }
+
         $theme = $this->themeModel->selectSingle(
             ['themeID' => $themeID],
             ['select' => ['themeID', 'name', 'current', 'dateUpdated']]
         );
+        $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
         return $this->normalizeTheme(
             $theme,
-            $this->themeAssetModel->get(['themeID' => $themeID], ['select' => ['assetKey', 'data']])
+            $themeAssets
         );
     }
 
@@ -209,10 +229,37 @@ class DbThemeProvider implements ThemeProviderInterface {
             $asset = $this->themeAssetModel->getAsset($themeKey, $assetKey);
             $content = $asset['data'];
         } catch (NoResultsException $e) {
-            $content = \Vanilla\Models\ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
-            if ($assetKey === 'variables') {
+            $content = ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
+            if ($assetKey === ThemeModel::VARIABLES) {
                 $content = $this->addAddonVariables($content);
+            } elseif ($assetKey === ThemeModel::JAVASCRIPT) {
+                // when some asset is not defined on DB level yet
+                // lets check if parent theme template has it implemented and substitute it
+                // if we need to reset parent asset empty asset should be posted
+                $content = $this->getParentAssetData($themeKey, $assetKey);
             }
+        }
+        return $content;
+    }
+
+    /**
+     * Get parent theme asset data
+     *
+     * @param int $themeID Theme id
+     * @param string $assetKey Asset key
+     * @return string Asset data (content)
+     */
+    private function getParentAssetData(int $themeID, string $assetKey): string {
+        $content = '';
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
+        if (!empty($theme['parentTheme'])) {
+           $parentTheme = $this->addonManager->lookupTheme($theme['parentTheme']);
+           if ($filename = $parentTheme->getInfo()['assets'][$assetKey]['file'] ?? false) {
+               $filename = $parentTheme->path('/assets/'.$filename);
+                if (file_exists($filename)) {
+                    $content = file_get_contents($filename);
+                }
+           }
         }
         return $content;
     }
@@ -246,12 +293,15 @@ class DbThemeProvider implements ThemeProviderInterface {
         $res["assets"] = $this->getDefaultAssets($theme);
         $primaryAssets = array_intersect_key(
             $assets,
-            array_flip(["fonts", "footer", "header", "scripts", "variables", "styles", "javascript"])
+            array_flip(array_keys(ThemeModel::ASSET_LIST))
         );
 
         foreach ($primaryAssets as $assetKey => $asset) {
             $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
+
+        $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css', true);
+        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js', true);
 
         $logos = [
             "logo" => "Garden.Logo",
@@ -283,8 +333,8 @@ class DbThemeProvider implements ThemeProviderInterface {
             }
         }
 
-        $assets['styles'] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
-        $assets['javascript'] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
+        $assets[ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
+        $assets[ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
         return $assets;
     }
 
@@ -296,15 +346,15 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @return Asset
      */
     private function generateAsset(string $key, string $data): ?Asset {
-        $type = \Vanilla\Models\ThemeModel::ASSET_LIST[$key]["type"];
+        $type = ThemeModel::ASSET_LIST[$key]["type"];
 
         switch ($type) {
             case "html":
                 return new HtmlAsset($data);
             case "json":
-                if ($key === "fonts") {
+                if ($key === ThemeModel::FONTS) {
                     return new FontsAsset(json_decode($data, true));
-                } elseif ($key === "scripts") {
+                } elseif ($key === ThemeModel::SCRIPTS) {
                     return new ScriptsAsset(json_decode($data, true));
                 } else {
                     return new JsonAsset($data);

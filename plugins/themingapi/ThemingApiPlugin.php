@@ -19,6 +19,7 @@ use Vanilla\Models\ThemeModel;
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
  */
 class ThemingApiPlugin extends Gdn_Plugin {
+    const NAV_SECTION = "appearance";
 
     /** @var Gdn_Database */
     private $database;
@@ -76,6 +77,33 @@ class ThemingApiPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Event handler for adding navigation items into the dashboard.
+     *
+     * @param \Gdn_Pluggable $sender
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var \NestedCollectionAdapter */
+        $menu = $sender->EventArguments['SideMenu'];
+        $this->createDashboardMenus($menu);
+    }
+
+    /**
+     * Construct the Theming UI dashboard menu items.
+     *
+     * @param \NestedCollectionAdapter $navCollection
+     */
+    private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
+        $navCollection->addLink(
+            self::NAV_SECTION,
+            t('Theming UI'),
+            '/theming-ui-settings/themes',
+            'Garden.Settings.Manage'
+        );
+    }
+
+    /**
      * Ensure the database is configured.
      */
     public function structure() {
@@ -84,6 +112,8 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->primaryKey("themeID")
             ->column("name", "varchar(64)", false, ["index"])
             ->column("current", "tinyint(1)", 0, ["index"])
+            ->column("parentTheme", "varchar(32)", 0 )
+            ->column("parentVersion", "varchar(32)", 0)
             ->column("insertUserID", "int", false)
             ->column("updateUserID", "int", false)
             ->column("dateInserted", "datetime")

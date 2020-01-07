@@ -102,4 +102,16 @@ class ThemeAssetModel extends PipelineModel {
             'assetKey' => $assetKey
         ]);
     }
+
+    public function getLatestByThemeID(int $themeID) {
+        $result = $this->sql()
+            ->from($this->getTable().' a')
+            ->select(['a.assetKey', 'a.data'])
+            ->join($this->getTable().' l', 'a.themeID = l.themeID AND a.assetKey = l.assetKey AND a.dateUpdated < l.dateUpdated', 'left')
+            ->where('a.themeID', $themeID)
+            ->where(['l.themeID IS NULL' => ''])
+            ->get()->resultArray()
+        ;
+        return $result;
+    }
 }

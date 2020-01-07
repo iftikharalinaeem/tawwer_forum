@@ -3,7 +3,7 @@
     "description": "Provides an API to manage theme resources.",
     "version": "1.0",
     "priority": 1000,
-    "key": "ThemingApi",
+    "key": "themingapi",
     "type": "addon",
     "authors": [
         {
