@@ -38,8 +38,13 @@ export const panelBackgroundClasses = useThemeCache(() => {
         position: "absolute",
         left: 0,
         height: percent(100),
-        width: calc(`50% - ${unit(layoutVars.middleColumn.paddedWidth / 2 - globalVars.gutter.size)}`),
-        minWidth: unit(layoutVars.panel.paddedWidth + widgetVars.spacing.padding * 4),
+
+        width: calc(`50% - ${unit(layoutVars.middleColumn.paddedWidth / 2 + globalVars.gutter.size * 2 - 20)}`),
+        minWidth: unit(
+            layoutVars.panel.paddedWidth +
+                layoutVars.gutter.full -
+                layoutVars.panelLayoutSpacing.withPanelBackground.gutter,
+        ),
         backgroundColor: colorOut(vars.colors.backgroundColor),
         zIndex: 0,
     });

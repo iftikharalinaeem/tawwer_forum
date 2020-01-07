@@ -70,6 +70,7 @@ export class ArticleLayout extends React.Component<IProps> {
                         backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
                     />
                     <PanelLayout
+                        renderLeftPanelBackground={renderPanelBackground}
                         breadcrumbs={
                             this.props.device !== Devices.MOBILE &&
                             this.props.device !== Devices.XS &&
