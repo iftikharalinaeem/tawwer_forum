@@ -19,7 +19,7 @@ use Garden\Web\Exception\ClientException;
 /**
  * Test the /api/v2/themes endpoints.
  */
-class ThemesTest extends AbstractAPIv2Test {
+class ThemesDbTest extends AbstractAPIv2Test {
 
     /**
      * @var string The resource route.
