@@ -14,6 +14,9 @@ class ThemingUiSettingsController extends SettingsController {
     use TwigRenderTrait;
     use StaticCacheTranslationTrait;
 
+    /**
+     * ThemingUiSettingsController constructor.
+     */
     public function __construct() {
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/themingapi/views';
         parent::__construct();
@@ -21,12 +24,8 @@ class ThemingUiSettingsController extends SettingsController {
 
     /**
      * Render the /knowledge-settings/knowledge-categories page.
-     *
-     * @param int|null $knowledgeBaseID
-     * @param string|null $action
-     * @return void
      */
     public function themes() {
-        $this->render('index2');
+        $this->render('index');
     }
 }
