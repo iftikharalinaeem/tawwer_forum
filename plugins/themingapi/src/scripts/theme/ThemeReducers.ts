@@ -4,13 +4,12 @@
  */
 
 import ReduxReducer from "@library/redux/ReduxReducer";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { reducerWithInitialState, reducerWithoutInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
+import clone from "lodash/clone";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import ThemeActions from "./ThemeActions";
-import { IThemeState } from "@library/theming/themeReducer";
 
 export interface IThemeAssets {
     header: string;
@@ -33,29 +32,61 @@ export interface IPatchThemeRequest {
 }
 export interface ITheme {}
 
-export interface IThemePageState {
-    form: IThemeAssets;
-    results: ILoadable<IThemeAssets>;
-}
 export const INITIAL_STATE: IThemeState = {
     assets: {
         status: LoadStatus.PENDING,
     },
+    themeID: "",
+    type: "",
 };
-/**
- * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
- */
+export const INITIAL_ASSETS = {
+    header: "",
+    footer: "",
+    javascript: "",
+    style: "",
+};
+export interface IThemeState {
+    themeID: string;
+    type: string;
+    assets: ILoadable<IThemeAssets>;
+    formSubmit: ILoadable<{}>;
+}
 
-export const ThemePageReducer = produce(
-    reducerWithInitialState<IThemeState>(INITIAL_STATE)
+export default class ThemePageReducer implements ReduxReducer<IThemeState> {
+    public static INITIAL_STATE: IThemeState = {
+        themeID: "",
+        assets: INITIAL_ASSETS,
+        type: "",
+    };
+
+    public initialState = ThemePageReducer.INITIAL_STATE;
+    public reducer: ReducerType = (state = clone(this.initialState), action) => {
+        return produce(state, nextState => {
+            return this.internalReducer(nextState, action);
+        });
+    };
+    private internalReducer = reducerWithoutInitialState<IThemeState>()
+        .case(ThemeActions.initAssetsAC, (state, payload) => {
+            if (payload.themeID != null) {
+                const existingAsset = {
+                    ...state.assets, //themeID.data[payload.themeID],
+                };
+                state.assets = existingAsset;
+            } else {
+                console.log("restoring to initial");
+                state.assets = INITIAL_ASSETS;
+            }
+
+            return state;
+        })
         .case(ThemeActions.getAllThemes_ACS.started, state => {
             state.assets.status = LoadStatus.LOADING;
             return state;
         })
         .case(ThemeActions.getAllThemes_ACS.done, (state, payload) => {
             state.assets.status = LoadStatus.SUCCESS;
-            state.assets.data = payload.result;
-            console.log("sss=>", state);
+            state.assets = payload.result;
+
             return state;
         })
         .case(ThemeActions.getAllThemes_ACS.failed, (state, payload) => {
@@ -69,40 +100,49 @@ export const ThemePageReducer = produce(
                 state.assets.error = payload.error;
                 return state;
             }
-        }),
-    /*
-        .case(ThemeEditorActions.updateFormAC, (nextState, payload) => {
-            nextState.form = {
-                ...nextState.form,
+        })
+        .case(ThemeActions.updateAssetsAC, (state, payload) => {
+            state.assets = {
+                ...state.assets,
                 ...payload,
             };
-            return nextState;
+            return state;
         })
-        .case(ThemeEditorActions.getSearchACs.started, (nextState, payload) => {
-            nextState.results.status = LoadStatus.LOADING;
-            if (payload.page != null) {
-                nextState.form.page = payload.page;
-            }
-            return nextState;
+        .case(ThemeActions.postTheme_ACs.started, (state, payload) => {
+            state.formSubmit.status = LoadStatus.LOADING;
+            return state;
         })
-        .case(ThemeEditorActions.getSearchACs.done, (nextState, payload) => {
-            nextState.results.status = LoadStatus.SUCCESS;
-            nextState.results.data = payload.result.body;
-            nextState.pages = payload.result.pagination;
+        .case(ThemeActions.postTheme_ACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
+            return state;
+        })
+        .case(ThemeActions.postTheme_ACs.done, (state, payload) => {
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.formSubmit.data![payload.result.themeID] = payload.result;
+            return state;
+        })
+        .case(ThemeActions.patchTheme_ACs.started, (state, payload) => {
+            state.formSubmit.status = LoadStatus.LOADING;
 
-            return nextState;
+            return state;
         })
-        .case(ThemeEditorActions.getSearchACs.failed, (nextState, payload) => {
-            nextState.results.status = LoadStatus.ERROR;
-            nextState.results.error = payload.error;
+        .case(ThemeActions.patchTheme_ACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
 
-            return nextState;
+            return state;
         })
-        .case(ThemeEditorActions.resetAC, () => {
-            return INITIAL_STATE;
-        }),*/
-);
+        .case(ThemeActions.patchTheme_ACs.done, (state, payload) => {
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.formSubmit.data![payload.result.themeID] = payload.result;
 
-export function useThemePageData() {
-    return useSelector((state: IKnowledgeAppStoreState) => state.Theme);
+            return state;
+        });
+}
+
+type ReducerType = IThemeState;
+
+export function useThemeData() {
+    return useSelector((state: IThemeState) => state.assets);
 }

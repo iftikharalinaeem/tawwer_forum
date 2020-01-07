@@ -14,6 +14,7 @@ import TextEditor from "@library/textEditor/TextEditor";
 import apiv2 from "@library/apiv2";
 import { connect } from "react-redux";
 import ThemeActions from "./ThemeActions";
+import { useThemeData } from "./ThemeReducers";
 
 interface IProps {}
 
@@ -32,6 +33,7 @@ export function ThemeEditorPage(props: IProps) {
         { label: "CSS", panelData: "css", contents: <TextEditor language={"css"} /> },
         { label: "JS", panelData: "js", contents: <TextEditor language={"javascript"} /> },
     ];
+    const { assets } = useThemeData();
     return (
         <BrowserRouter>
             <React.Fragment>
@@ -57,6 +59,5 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapDispatchToProps)(ThemeEditorPage);
 /*
 const withRedux = connect(mapDispatchToProps);
-
 export default withRedux(withRouter(ThemeEditorPage));
 */

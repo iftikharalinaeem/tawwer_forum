@@ -4,67 +4,73 @@
  */
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import {} from "@knowledge/state/model";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IPostThemeRequest, IPatchThemeRequest, ITheme } from "./ThemeReducers";
+import { IPostThemeRequest, IPatchThemeRequest, ITheme, IThemeState } from "./ThemeReducers";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
 
 const actionCreator = actionCreatorFactory("@@knowledgeBases");
-interface IGetThemeRequest {
-    themekey: string;
+interface IGetThemeParams {
+    themeID: string;
 }
-type IGetThemeResponse = ITheme;
-type IPostThemeResponse = ITheme;
-type IPatchThemeResponse = ITheme;
+type IGetThemeResponse = IThemeState;
+type IPostThemeResponse = IThemeState;
+type IPatchThemeResponse = IThemeState;
 interface IGetAllThemesReauest {}
 
 /**
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
-export default class ThemeActions extends ReduxActions<IKnowledgeAppStoreState> {
-    [x: string]: any;
-    public static readonly getAllThemes_ACS = actionCreator.async<{}, ITheme, IApiError>("GET_ALL_Themes");
-    public static getThemeAssets_ACs = actionCreator.async<IGetThemeRequest, IGetThemeResponse, IApiError>("GET");
+
+export default class ThemeActions extends ReduxActions {
+    [themeID: string]: any;
+    public static readonly getAllThemes_ACS = actionCreator.async<{}, IThemeState, IApiError>("GET_ALL_THEMES");
+    public static getThemeAssets_ACs = actionCreator.async<IGetThemeParams, IGetThemeResponse, IApiError>("GET");
     public static postTheme_ACs = actionCreator.async<IPostThemeRequest, IPostThemeResponse, IApiError>("POST"); //Copy
     public static patchTheme_ACs = actionCreator.async<IPatchThemeRequest, IPatchThemeResponse, IApiError>("PATCH");
 
+    public static initAssetsAC = actionCreator<{ themeID?: number }>("INIT_ASSETS");
+    public initForm = this.bindDispatch(ThemeActions.initAssetsAC);
+    public static updateAssetsAC = actionCreator<Partial<IThemeState>>("UPDATE_ASSETS");
+    public updateForm = this.bindDispatch(ThemeActions.updateAssetsAC);
+
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
-            const response = await this.api.get(`/themes/`);
-            console.log("all->", response.data);
+            const params = { expand: "all" };
+            const response = await this.api.get(`/themes/`, { params });
+
             return response.data;
         })();
         return this.dispatch(thunk);
     };
-    public getThemeAssets(options: IGetThemeRequest) {
+    public getThemeAssets(options: IGetThemeParams) {
         const thunk = bindThunkAction(ThemeActions.getThemeAssets_ACs, async () => {
-            const { themekey } = options;
-            const response = await this.api.get(`/themes/${options.themekey}`);
+            const { themeID } = options;
+            const response = await this.api.get(`/themes/foundation`);
             return response.data;
         })(options);
 
         return this.dispatch(thunk);
     }
     public saveTheme = async () => {
-        const { data } = this.getState().Theme.assets;
+        const data: IThemeState = {};
 
-        // Kludge our image types to be empty strings if null.
-        /*if (data?.header === undefined) {
-            data?.header = "";
+        if (data.assets.data?.header === undefined) {
+            data.assets.data?.header = "";
         }
 
-        if (data?.footer === null) {
-            data?.footer = "";
+        if (data.assets.data?.header === null) {
+            data.assets.data?.footer = "";
         }
 
-        if (form.themekey != null) {
-            return await this.patchTheme(form as any);
+        if (data.themeID != null) {
+            return await this.patchTheme(data as any);
         } else {
-            return await this.patchTheme(form as any);
-        }*/
+            return await this.postTheme(data as any);
+        }
     };
 
     public postTheme(options: IPostThemeRequest) {
