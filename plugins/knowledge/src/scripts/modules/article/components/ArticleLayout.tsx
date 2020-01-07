@@ -53,9 +53,12 @@ export class ArticleLayout extends React.Component<IProps> {
         if (currentNavCategory) {
             title = currentNavCategory.name;
         }
+
+        const renderPanelBackground = this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS;
+
         return (
             <>
-                {this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS && <PanelBackground />}
+                {renderPanelBackground && <PanelBackground />}
                 <Container>
                     <TitleBar
                         useMobileBackButton={this.props.useBackButton}
@@ -64,6 +67,7 @@ export class ArticleLayout extends React.Component<IProps> {
                         mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
                         }
+                        backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
                     />
                     <PanelLayout
                         breadcrumbs={
