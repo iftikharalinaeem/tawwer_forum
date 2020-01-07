@@ -358,7 +358,11 @@ class GroupsHooks extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        $groupID = $args['FormPostValues']['GroupID'];
+        $groupID = null;
+        if (isset($args['FormPostValues']['GroupID'])) {
+            $groupID = $args['FormPostValues']['GroupID'];
+        }
+
         if ($groupID && $args['Insert']) {
             $model = new GroupModel();
             $model->incrementDiscussionCount($groupID, 1, val('DiscussionID', $args), valr('Fields.DateInserted', $args));
