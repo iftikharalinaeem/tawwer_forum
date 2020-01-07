@@ -32,13 +32,13 @@ export interface IPatchThemeRequest {
 }
 export interface ITheme {}
 
-export const INITIAL_STATE: IThemeState = {
+/*export const INITIAL_STATE: IThemeState = {
     assets: {
         status: LoadStatus.PENDING,
     },
     themeID: "",
     type: "",
-};
+};*/
 export const INITIAL_ASSETS = {
     header: "",
     footer: "",

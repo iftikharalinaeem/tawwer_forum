@@ -56,7 +56,7 @@ export default class ThemeActions extends ReduxActions {
         return this.dispatch(thunk);
     }
     public saveTheme = async () => {
-        const data: IThemeState = {};
+        /* const data: IThemeState = {};
 
         if (data.assets.data?.header === undefined) {
             data.assets.data?.header = "";
@@ -70,7 +70,7 @@ export default class ThemeActions extends ReduxActions {
             return await this.patchTheme(data as any);
         } else {
             return await this.postTheme(data as any);
-        }
+        }*/
     };
 
     public postTheme(options: IPostThemeRequest) {

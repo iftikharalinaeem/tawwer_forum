@@ -300,8 +300,8 @@ class DbThemeProvider implements ThemeProviderInterface {
             $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
         }
 
-        $res["assets"][ThemeModel::STYLES] = $this->request->url('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css', true);
-        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->url('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js', true);
+        $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css', true);
+        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js', true);
 
         $logos = [
             "logo" => "Garden.Logo",
@@ -333,8 +333,8 @@ class DbThemeProvider implements ThemeProviderInterface {
             }
         }
 
-        $assets[ThemeModel::STYLES] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
-        $assets[ThemeModel::JAVASCRIPT] = $this->request->url('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
+        $assets[ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
+        $assets[ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
         return $assets;
     }
 

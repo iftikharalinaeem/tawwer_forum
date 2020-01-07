@@ -4,29 +4,15 @@
  * @license Proprietary
  */
 
-use Garden\StaticCacheTranslationTrait;
-use Vanilla\Web\TwigRenderTrait;
-
 /**
  * Controller for serving the /theming-ui-settings pages.
  */
 class ThemingUiSettingsController extends SettingsController {
-    use TwigRenderTrait;
-    use StaticCacheTranslationTrait;
-
-    public function __construct() {
-        self::$twigDefaultFolder = PATH_ROOT . '/plugins/themingapi/views';
-        parent::__construct();
-    }
 
     /**
      * Render the /knowledge-settings/knowledge-categories page.
-     *
-     * @param int|null $knowledgeBaseID
-     * @param string|null $action
-     * @return void
      */
     public function themes() {
-        $this->render('index2');
+        $this->render('index');
     }
 }
