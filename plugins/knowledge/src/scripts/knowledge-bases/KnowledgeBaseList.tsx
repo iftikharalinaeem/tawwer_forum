@@ -12,7 +12,7 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
-import SubcommunityList from "@library/features/subcommunities/SubcommunityList";
+import Tiles from "@library/features/subcommunities/Tiles";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
 
@@ -38,7 +38,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
         }
 
         return (
-            <SubcommunityList
+            <Tiles
                 title={t("Choose a subcommunity")}
                 titleLevel={1}
                 hiddenTitle={true}
