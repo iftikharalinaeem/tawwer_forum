@@ -24,6 +24,8 @@ import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { PanelBackground } from "@library/layout/PanelBackground";
 
 /**
  * Implements the article's layout
@@ -52,91 +54,106 @@ export class ArticleLayout extends React.Component<IProps> {
         if (currentNavCategory) {
             title = currentNavCategory.name;
         }
+
+        const renderPanelBackground =
+            this.props.device !== Devices.MOBILE &&
+            this.props.device !== Devices.XS &&
+            panelBackgroundVariables().config.render;
+
         return (
-            <Container>
-                <TitleBar
-                    useMobileBackButton={this.props.useBackButton}
-                    isFixed={true}
-                    title={title}
-                    mobileDropDownContent={
-                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                    }
-                />
-                <PanelLayout
-                    breadcrumbs={
-                        this.props.device !== Devices.MOBILE &&
-                        this.props.device !== Devices.XS &&
-                        article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
-                    }
-                    leftBottom={
-                        <PanelWidget>
+            <>
+                {renderPanelBackground && <PanelBackground />}
+                <Container>
+                    <TitleBar
+                        useMobileBackButton={this.props.useBackButton}
+                        isFixed={true}
+                        title={title}
+                        mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                        </PanelWidget>
-                    }
-                    middleTop={
-                        <PanelWidget>
-                            <PageTitle
-                                title={article.name}
-                                headingClassName={typographyClasses().largeTitle}
-                                actions={
-                                    <ArticleMenu
-                                        article={article}
-                                        buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
-                                        device={this.props.device}
-                                    />
-                                }
-                                meta={
-                                    <ArticleMeta
-                                        updateUser={article.updateUser!}
-                                        dateUpdated={article.dateUpdated}
-                                        permaLink={article.url}
-                                    />
-                                }
-                                includeBackLink={
-                                    this.props.device !== Devices.MOBILE &&
-                                    this.props.device !== Devices.XS &&
-                                    this.props.useBackButton
-                                }
-                            />
-                            {messages && <div className="messages">{messages}</div>}
-                        </PanelWidget>
-                    }
-                    middleBottom={
-                        <>
+                        }
+                        backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
+                    />
+                    <PanelLayout
+                        renderLeftPanelBackground={renderPanelBackground}
+                        breadcrumbs={
+                            this.props.device !== Devices.MOBILE &&
+                            this.props.device !== Devices.XS &&
+                            article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
+                        }
+                        leftBottom={
                             <PanelWidget>
-                                <UserContent content={article.body} />
+                                <Navigation
+                                    collapsible={true}
+                                    activeRecord={activeRecord}
+                                    kbID={article.knowledgeBaseID}
+                                />
                             </PanelWidget>
+                        }
+                        middleTop={
                             <PanelWidget>
-                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                                <PageTitle
+                                    title={article.name}
+                                    headingClassName={typographyClasses().largeTitle}
+                                    actions={
+                                        <ArticleMenu
+                                            article={article}
+                                            buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
+                                            device={this.props.device}
+                                        />
+                                    }
+                                    meta={
+                                        <ArticleMeta
+                                            updateUser={article.updateUser!}
+                                            dateUpdated={article.dateUpdated}
+                                            permaLink={article.url}
+                                        />
+                                    }
+                                    includeBackLink={
+                                        this.props.device !== Devices.MOBILE &&
+                                        this.props.device !== Devices.XS &&
+                                        this.props.useBackButton
+                                    }
+                                />
+                                {messages && <div className="messages">{messages}</div>}
                             </PanelWidget>
-                            {(!!prevNavArticle || !!nextNavArticle) && (
+                        }
+                        middleBottom={
+                            <>
                                 <PanelWidget>
-                                    <NextPrevious
-                                        accessibleTitle={t("More Articles")}
-                                        prevItem={prevNavArticle}
-                                        nextItem={nextNavArticle}
-                                    />
+                                    <UserContent content={article.body} />
                                 </PanelWidget>
-                            )}
-                        </>
-                    }
-                    rightTop={
-                        <>
-                            {device !== Devices.MOBILE &&
-                                device !== Devices.TABLET &&
-                                article.outline &&
-                                article.outline.length > 0 && (
+                                <PanelWidget>
+                                    <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                                </PanelWidget>
+                                {(!!prevNavArticle || !!nextNavArticle) && (
                                     <PanelWidget>
-                                        <ArticleTOC items={article.outline} />
+                                        <NextPrevious
+                                            accessibleTitle={t("More Articles")}
+                                            prevItem={prevNavArticle}
+                                            nextItem={nextNavArticle}
+                                        />
                                     </PanelWidget>
                                 )}
-                            <PanelWidget>
-                                <OtherLanguages articleLocaleData={articlelocales} />
-                            </PanelWidget>
-                        </>
-                    }
-                />
-            </Container>
+                            </>
+                        }
+                        rightTop={
+                            <>
+                                {device !== Devices.MOBILE &&
+                                    device !== Devices.TABLET &&
+                                    article.outline &&
+                                    article.outline.length > 0 && (
+                                        <PanelWidget>
+                                            <ArticleTOC items={article.outline} />
+                                        </PanelWidget>
+                                    )}
+                                <PanelWidget>
+                                    <OtherLanguages articleLocaleData={articlelocales} />
+                                </PanelWidget>
+                            </>
+                        }
+                    />
+                </Container>
+            </>
         );
     }
 }

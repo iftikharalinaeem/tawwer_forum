@@ -17,40 +17,46 @@ import DocumentTitle from "@library/routing/DocumentTitle";
 import Splash from "@library/splash/Splash";
 import { splashVariables } from "@library/splash/splashStyles";
 import { t } from "@library/utility/appUtils";
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import VanillaHomeHeader from "@library/headers/TitleBarHome";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { useBackgroundContext } from "@library/layout/Backgrounds";
 
-export class HomePage extends React.Component<IProps> {
-    public render() {
-        const splashVars = splashVariables({});
-        const title = t(splashVars.title.text);
-        const { loadStatus, knowledgeBases } = this.props;
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <Loader />;
-        }
+const HomePage = (props: IProps) => {
+    const splashVars = splashVariables({});
+    const title = t(splashVars.title.text);
+    const { loadStatus, knowledgeBases } = props;
 
-        if (knowledgeBases.length === 1) {
-            const { urlCode } = knowledgeBases[0];
-            return <KnowledgeBasePage {...this.props} isOnlyKb match={{ ...this.props.match, params: { urlCode } }} />;
-        }
+    const { setIsHomePage, isHomePage } = useBackgroundContext();
 
-        return (
-            <>
-                <AnalyticsData uniqueKey="homePage" />
-                <Splash title={title} />
-                <Container>
-                    <DocumentTitle title={t("Home")}>
-                        <VanillaHomeHeader />
-                    </DocumentTitle>
-                    <KnowledgeBaseList />
-                </Container>
-            </>
-        );
+    useEffect(() => {
+        setIsHomePage(true);
+    });
+
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
+        return <Loader />;
     }
-}
+
+    if (knowledgeBases.length === 1) {
+        const { urlCode } = knowledgeBases[0];
+        return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;
+    }
+
+    return (
+        <>
+            <AnalyticsData uniqueKey="homePage" />
+            <Splash title={title} />
+            <Container>
+                <DocumentTitle title={t("Home")}>
+                    <VanillaHomeHeader />
+                </DocumentTitle>
+                <KnowledgeBaseList />
+            </Container>
+        </>
+    );
+};
 
 interface IOwnProps extends RouteComponentProps<any> {
     className?: string;

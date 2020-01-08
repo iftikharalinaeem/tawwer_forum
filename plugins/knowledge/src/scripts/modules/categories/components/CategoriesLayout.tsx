@@ -12,7 +12,7 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
+import { Devices, IDeviceProps, useDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
@@ -29,7 +29,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
 
-interface IProps extends IDeviceProps {
+interface IProps {
     category: IKbCategory;
     results: IResult[];
     query?: string;
@@ -41,17 +41,18 @@ interface IState {
     query?: string;
 }
 
-export class CategoriesLayout extends React.Component<IProps, IState> {
+export default class CategoriesLayout extends React.Component<IProps, IState> {
     public state: IState = {
         query: this.props.query || "",
     };
 
     public render() {
-        const { category, device, pages, results } = this.props;
+        const { category, pages, results } = this.props;
         const activeRecord = {
             recordType: KbRecordType.CATEGORY,
             recordID: category.knowledgeCategoryID,
         };
+        const device = useDevice();
         const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
         const classesSearchBar = searchBarClasses();
 
@@ -80,7 +81,6 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                     }
                 />
                 <PanelLayout
-                    device={this.props.device}
                     breadcrumbs={
                         category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
                     }
@@ -111,9 +111,7 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
                                     </LinkAsButton>
                                 }
                                 includeBackLink={
-                                    this.props.device !== Devices.MOBILE &&
-                                    this.props.device !== Devices.XS &&
-                                    this.props.useBackButton
+                                    device !== Devices.MOBILE && device !== Devices.XS && this.props.useBackButton
                                 }
                             >
                                 <label className={classNames("searchBar-label", classesSearchBar.label)}>
@@ -129,5 +127,3 @@ export class CategoriesLayout extends React.Component<IProps, IState> {
         );
     }
 }
-
-export default withDevice<IProps>(CategoriesLayout);

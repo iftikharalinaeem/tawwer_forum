@@ -12,9 +12,10 @@ import apiv2 from "@library/apiv2";
 import { t } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
-import SubcommunityList from "@library/features/subcommunities/SubcommunityList";
+
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
-import { subcommunityTileClasses } from "@library/features/subcommunities/subcommunityTitleStyles";
+import { tileClasses } from "@library/features/tiles/titleStyles";
+import Tiles from "@library/features/tiles/Tiles";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -27,8 +28,8 @@ import { subcommunityTileClasses } from "@library/features/subcommunities/subcom
  */
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
-        const { knowledgeBases, loadStatus, className } = this.props;
-        const classesSubCommunityTile = subcommunityTileClasses();
+        const { knowledgeBases, loadStatus, className, columns } = this.props;
+        const classesSubCommunityTile = tileClasses();
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
         }
@@ -38,13 +39,15 @@ class KnowledgeBaseList extends React.Component<IProps> {
         }
 
         return (
-            <SubcommunityList
+            <Tiles
                 title={t("Choose a subcommunity")}
                 titleLevel={1}
                 hiddenTitle={true}
                 items={knowledgeBases}
                 emptyMessage={t("No knowledge bases found.")}
                 fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
+                className={className}
+                columns={columns}
             />
         );
     }
@@ -61,6 +64,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
 
 interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {
     className?: string;
+    columns?: number;
 }
 
 function mapStateToProps(state: IKnowledgeAppStoreState) {

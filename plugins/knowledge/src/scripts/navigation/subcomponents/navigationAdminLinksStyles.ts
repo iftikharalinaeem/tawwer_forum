@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { allLinkStates, colorOut, debugHelper, margins, unit, flexHelper } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
-import { px, percent } from "csx";
+import { px, percent, translateY } from "csx";
 import { style } from "typestyle";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
@@ -26,6 +26,7 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
             ...margins({
                 all: 0,
             }),
+            transform: translateY(`${unit((buttonVars.sizing.minHeight - globalVars.icon.sizes.default) / -2)}`),
             ...debug.name(),
         },
         mediaQueries.oneColumnDown({
