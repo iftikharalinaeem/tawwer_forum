@@ -79,7 +79,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             }
         }
 
-        $form->setData($this->getTerms());
+        $form->setData($this->getActiveTerms());
         // Set up the form.
         $formFields['Link'] = ['LabelCode' => t('Link to Terms of Use'), 'Description' => t('External link to a \'Terms\' document.'), 'Control' => 'TextBox'];
         $formFields['Body'] = ['LabelCode' => t('Terms of Use Text'), 'Description' => 'If you have a link to internal document in \'Link to Terms of User\' above, \'Terms of Use Text\' will be ignored. Remove the link if you want to use this text.', 'Control' => 'TextBox', 'Options' => ['MultiLine' => true, 'rows' => 10, 'columns' => 100]];
@@ -116,9 +116,9 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function entryController_registerValidation_handler($sender, $args) {
-        $terms = $this->getTerms();
+        $terms = $this->getActiveTerms();
         // If disabled abort.
-        if (!val('Active', $terms)) {
+        if (!$terms) {
             return;
         }
         $this->addTermsValidation($sender, false);
@@ -192,10 +192,10 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function entryController_afterConnectData_handler($sender, $args) {
-        $terms = $this->getTerms();
-        // If disabled abort.
-        $termsActive = $terms->Active ?? false;
-        if (!$termsActive) {
+        $terms = $this->getActiveTerms();
+
+        // If disabled or not configured abort.
+        if (!$terms) {
             return;
         }
 
@@ -256,10 +256,10 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param bool $sso
      */
     private function addTermsValidation($sender, $sso = false) {
-        $terms = $this->getTerms();
+        $terms = $this->getActiveTerms();
 
-        // If disabled abort.
-        if (!val('Active', $terms)) {
+        // If disabled or not configured abort.
+        if (!$terms) {
             return;
         }
 
@@ -296,10 +296,10 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param string $wrapTag
      */
     private function addTermsCheckBox($sender, $wrapTag = 'li') {
-        $terms = $this->getTerms();
+        $terms = $this->getActiveTerms();
 
-        // If disabled abort.
-        if (!val('Active', $terms)) {
+        // If disabled or not configured abort.
+        if (!$terms) {
             return;
         }
 
@@ -341,14 +341,13 @@ class TermsManagerPlugin extends Gdn_Plugin {
         }
 
         $validationMessage = (val('Terms', $user) && val('ForceRenew', $terms)) ? t('<h2>We have recently updated our Terms of Use. You must agree to the code of conduct.</h2>') : '';
-        $link = val('Link', $terms) ? val('Link', $terms) : '/vanilla/terms';
-
-        $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
-        $anchor = (val('ShowInPopup', $terms)) ? anchor('Click here to read.', $link, $linkAttribute) : '';
-        $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
-        echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag, ['class' => 'managed-terms-message']);
-
-        if (!val('ShowInPopup', $terms)) {
+        if ($terms->ShowInPopup || $terms->Link) {
+            $link = $terms->Link ? $terms->Link : '/vanilla/terms';
+            $linkAttribute = ($link === '/vanilla/terms') ? ['class' =>'Popup'] : ['target' => '_blank'];
+            $anchor = $terms->ShowInPopup || $link ? anchor('Click here to read.', $link, $linkAttribute) : '';
+            $message = t('You must read and understand the provisions of the forums code of conduct before participating in the forums.');
+            echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag, ['class' => 'managed-terms-message']);
+        } else {
             $termsBody = t('Terms of service body text.', val('Body', $terms));
             $body = Gdn_Format::text($termsBody);
             echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag, ['class' => 'managed-terms-row']);
@@ -364,8 +363,12 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function vanillaController_terms_create($sender, $args) {
-        $terms = $this->getTerms();
-        $termsBody = t('Terms of service body text.', val('Body', $terms));
+        $terms = $this->getActiveTerms();
+        if ($terms) {
+            $termsBody = t('Terms of service body text.', val('Body', $terms));
+        } else {
+            $termsBody = t('Terms on disabled or not configured');
+        }
         $body = Gdn_Format::text($termsBody);
         $sender->setData('Body', $body);
         $sender->render('terms', '', 'plugins/termsmanager');
@@ -379,7 +382,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @return bool
      */
     private function save($form) {
-        $latestTerms = $this->getTerms();
+        $latestTerms = $this->getActiveTerms();
         $formValues = $form->formValues();
         $updateFields = [
             'Body' => $form->getValue('Body'),
@@ -405,11 +408,20 @@ class TermsManagerPlugin extends Gdn_Plugin {
     /**
      * Get the most recent custom terms from the db.
      *
-     * @return array
+     * @return object|bool An Object of most recent row in the Terms of Use table or FALSE.
      */
-    private function getTerms() {
-        return Gdn::sql()
+    private function getActiveTerms() {
+         $terms = Gdn::sql()
             ->get('TermsOfUse', 'TermsOfUseID', 'DESC', 1)
             ->firstRow();
+
+        if (!$terms) {
+            return false;
+        }
+
+        if (!$terms->Active || (!$terms->Body && !$terms->Link)) {
+            return false;
+        }
+         return $terms;
     }
 }
