@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-use Garden\Container\Container;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbedDisplayOptions;
 use Vanilla\EmbeddedContent\EmbedService;
@@ -37,7 +36,7 @@ class Warnings2Plugin extends Gdn_Plugin {
     /** @var RuleModel $ruleModel */
     private $ruleModel;
 
-    /** @var UserModel $userNoteModel */
+    /** @var UserNoteModel $userNoteModel */
     private $userNoteModel;
 
     /**
@@ -56,6 +55,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param FormatService $formatService
      * @param EmbedService $embedService
      * @param \RuleModel $ruleModel
+     * @param UserNoteModel $userNoteModel
      */
     public function __construct(
         \DiscussionModel $discussionModel,
@@ -1238,9 +1238,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_beforeDeleteUser_handler(\UserModel $sender, array $args) {
-        if ($this->userNoteModel) {
-            Gdn::userModel()->getDelete('UserNote', ['UserID' => $args['UserID']], $args['Content']);
-        }
+        $this->userModel->getDelete('UserNote', ['UserID' => $args['UserID']], $args['Content']);
     }
 
     /**
