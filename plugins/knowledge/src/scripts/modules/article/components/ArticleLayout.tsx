@@ -25,6 +25,7 @@ import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { PanelBackground } from "./PanelBackground";
+import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
 
 /**
  * Implements the article's layout
@@ -54,7 +55,10 @@ export class ArticleLayout extends React.Component<IProps> {
             title = currentNavCategory.name;
         }
 
-        const renderPanelBackground = this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS;
+        const renderPanelBackground =
+            this.props.device !== Devices.MOBILE &&
+            this.props.device !== Devices.XS &&
+            panelBackgroundVariables().config.render;
 
         return (
             <>

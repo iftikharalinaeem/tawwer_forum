@@ -12,8 +12,6 @@ import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const panelBackgroundVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelBackground");
-    const vars = globalVariables();
-    const layoutVars = layoutVariables();
 
     const config = makeThemeVars("config", {
         render: false,
