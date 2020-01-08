@@ -11,12 +11,12 @@ import { calc, color, percent, px } from "csx";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const panelBackgroundVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("panelBackgroundStyles");
+    const makeThemeVars = variableFactory("panelBackground");
     const vars = globalVariables();
     const layoutVars = layoutVariables();
 
     const config = makeThemeVars("config", {
-        render: true,
+        render: false,
     });
 
     const colors = makeThemeVars("colors", {
