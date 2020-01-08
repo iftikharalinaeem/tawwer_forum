@@ -45,7 +45,7 @@ export class HomePage extends React.Component<IProps> {
                     <DocumentTitle title={t("Home")}>
                         <VanillaHomeHeader />
                     </DocumentTitle>
-                    <KnowledgeBaseList columns={3} />
+                    <KnowledgeBaseList />
                 </Container>
             </>
         );
