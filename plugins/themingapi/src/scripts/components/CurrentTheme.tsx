@@ -11,22 +11,7 @@ import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import CurrentThemeInfo from "@library/theming/CurrentThemeInfo";
 
 export default function CurrentTheme(props) {
-    const themePreviewDefault = {
-        globalBg: "#fff",
-        globalPrimary: "#985E6D",
-        globalFg: "#555a62",
-        titleBarBg: "#0291db",
-        titleBarFg: "#fff",
-        isActiveTheme: false,
-    };
-    const {
-        currentTheme = {
-            name: "Success Theme",
-            authors: "Author",
-            description: "A responsive VanillaTheme with customisation for the header and footer",
-            preview: themePreviewDefault,
-        },
-    } = props;
+    const { currentTheme } = props;
     const {
         currentThemeStyles = {
             display: "flex",
@@ -41,7 +26,7 @@ export default function CurrentTheme(props) {
         <div>
             <DashboardHeaderBlock title={t("Themes")} />
             <div style={currentThemeStyles}>
-                <ThemePreviewCard {...currentTheme.preview} />
+                <ThemePreviewCard noActions={true} {...currentTheme.preview} />
                 <CurrentThemeInfo {...currentTheme} />
             </div>
         </div>

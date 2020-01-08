@@ -4,10 +4,9 @@
  */
 
 import ManageThemingPage from "@themingapi/theming-ui-settings/ManageThemingPage";
-import ThemeEditorPage from "@themingapi/theme/ThemeEditorPage";
 import { addComponent } from "@library/utility/componentRegistry";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { combineReducers } from "redux";
+import { themeSettingsReducer } from "@themingapi/theming-ui-settings/themeSettingsReducer";
 
+registerReducer("themeSettings", themeSettingsReducer);
 addComponent("theming-ui-manage", ManageThemingPage);
-addComponent("theme-editor", ThemeEditorPage);

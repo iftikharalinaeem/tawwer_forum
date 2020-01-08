@@ -58,8 +58,14 @@ class ThemeModel extends PipelineModel {
         $this->update(['current' => 1], ['themeID' => $themeID]);
         $this->update(['current' => 0], ['current' => 1, 'themeID <>' => $themeID]);
 
-        $theme = $this->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
-
+        $theme = $this->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'parentTheme', 'current', 'dateUpdated']]);
         return $theme;
+    }
+
+    /**
+     * Reset current DB theme when file based theme is activated.
+     */
+    public function resetCurrentTheme() {
+        $this->update(['current' => 0], ['current' => 1]);
     }
 }
