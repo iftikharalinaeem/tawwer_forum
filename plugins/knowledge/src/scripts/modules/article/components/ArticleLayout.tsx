@@ -24,8 +24,8 @@ import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
-import { PanelBackground } from "./PanelBackground";
-import { panelBackgroundVariables } from "@knowledge/modules/article/components/panelBackgroundStyles";
+import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
+import { PanelBackground } from "@library/layout/PanelBackground";
 
 /**
  * Implements the article's layout
