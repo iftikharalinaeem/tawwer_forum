@@ -171,16 +171,29 @@ class DbThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function setCurrent(int $themeID): array {
+    public function setCurrent($themeID): array {
         try {
             $theme = $this->normalizeTheme(
                 $this->themeModel->setCurrentTheme($themeID),
                 $this->themeAssetModel->get(['themeID' => $themeID], ['select' => ['assetKey', 'data']])
             );
+
+            if (!empty($theme['parentTheme'])) {
+                $this->config->set('Garden.Theme', $theme['parentTheme']);
+                $this->config->set('Garden.MobileTheme', $theme['parentTheme']);
+            }
+            $this->config->set('Garden.CurrentTheme', $themeID);
         } catch (NoResultsException $e) {
             throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
         }
         return $theme;
+    }
+
+    /**
+     * Reset current db theme when file based theme activated
+     */
+    public function resetCurrent() {
+        $this->themeModel->resetCurrentTheme();
     }
 
     /**
@@ -285,6 +298,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             "assets" => $assets,
             'themeID' => $theme['themeID'],
             'name' => $theme['name'],
+            'parentTheme' => $theme['parentTheme'] ?? null,
             'current' => $theme['current'],
             'type' => 'themeDB',
             'version' => $theme['version'] ?? crc32($theme['dateUpdated']->format('Y-m-d H:i:s'))
