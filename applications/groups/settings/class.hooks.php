@@ -358,7 +358,7 @@ class GroupsHooks extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
-        $getLower = array_change_key_case(Gdn::request()->get(), CASE_LOWER);
+        $getLower = array_change_key_case($args['FormPostValues'], CASE_LOWER);
         $groupID = $getLower['groupid'] ?? null;
         if ($groupID && $args['Insert']) {
             $model = new GroupModel();
