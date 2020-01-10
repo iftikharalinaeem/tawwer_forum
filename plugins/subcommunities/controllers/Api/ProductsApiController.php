@@ -87,7 +87,6 @@ class ProductsApiController extends AbstractApiController {
         return Schema::parse([
             "productID:i" => "Unique product ID.",
             "name:s" => [
-                "allowNull" => true,
                 "description" => "Name of the product.",
             ],
             "body:s" => [
@@ -177,7 +176,7 @@ class ProductsApiController extends AbstractApiController {
 
         $in = $this->schema(
             Schema::parse([
-                "name",
+                "name:s",
                 "body?",
             ]),
             "in"
