@@ -106,7 +106,7 @@ class WebhooksTest extends AbstractResourceTest {
         $record = [
             'name' => 'webhooktest',
             'url' => 'http://webhook.test',
-            'secret' => '123',
+            'secret' => '123456789abcdefghijk',
             'status' => 'active',
             'events' => ['comment', 'discussion'],
         ];
