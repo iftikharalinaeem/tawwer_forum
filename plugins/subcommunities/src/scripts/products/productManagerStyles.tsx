@@ -4,7 +4,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { flexHelper, singleBorder, unit } from "@library/styles/styleHelpers";
+import { flexHelper, singleBorder, unit, paddings } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
 
@@ -47,10 +47,14 @@ export const productManagerClasses = useThemeCache(() => {
     const emptyMessage = style("emptyMessage", {});
 
     const itemName = style("itemName", {
-        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "center",
         fontSize: globalVars.fonts.size.large,
         width: percent(100),
         flex: 1,
+        ...paddings({ vertical: 12 }),
     });
 
     const item = style("item", {

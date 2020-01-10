@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IServerError } from "@library/@types/api/core";
+import { IServerError, IFieldError } from "@library/@types/api/core";
 
 export interface IProduct {
     productID: number;
@@ -15,7 +15,7 @@ export interface IProduct {
     tempDeleted?: boolean;
 }
 
-export interface IProductDeleteError extends IServerError {
+export interface IProductDeleteError extends IFieldError {
     errorType: string;
     subcommunityCount: number;
     subcommunityIDs: number[];
