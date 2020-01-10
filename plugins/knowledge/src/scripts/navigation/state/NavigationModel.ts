@@ -136,6 +136,17 @@ export default class NavigationModel implements ReduxReducer<INavigationStoreSta
                 state.currentError.isLoading = true;
             }
             return state;
+        })
+        .default((nextState, action: any) => {
+            if (action.type === CategoryActions.POST_CATEGORY_ERROR) {
+                nextState.currentError = {
+                    type: NavigationActionType.OTHER,
+                    error: action.payload,
+                    isLoading: false,
+                };
+            }
+
+            return nextState;
         });
 
     /**
