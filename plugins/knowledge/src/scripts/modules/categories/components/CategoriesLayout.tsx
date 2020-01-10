@@ -12,7 +12,7 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, useDevice } from "@library/layout/DeviceContext";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
@@ -37,93 +37,77 @@ interface IProps {
     useBackButton?: boolean;
 }
 
-interface IState {
-    query?: string;
-}
-
-export default class CategoriesLayout extends React.Component<IProps, IState> {
-    public state: IState = {
-        query: this.props.query || "",
+export default function CategoriesLayout(props: IProps) {
+    const { category, pages, results } = props;
+    const activeRecord = {
+        recordType: KbRecordType.CATEGORY,
+        recordID: category.knowledgeCategoryID,
     };
+    const device = useDevice();
+    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+    const classesSearchBar = searchBarClasses();
 
-    public render() {
-        const { category, pages, results } = this.props;
-        const activeRecord = {
-            recordType: KbRecordType.CATEGORY,
-            recordID: category.knowledgeCategoryID,
-        };
-        const device = useDevice();
-        const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-        const classesSearchBar = searchBarClasses();
-
-        const pageContent =
-            results.length > 0 ? (
-                <>
-                    <ResultList results={this.props.results} />
-                    <SimplePager url={category.url + "/p:page:"} pages={pages} />
-                </>
-            ) : (
-                <PageErrorMessage
-                    className={inheritHeightClass()}
-                    defaultError={DefaultError.CATEGORY_NO_ARTICLES}
-                    knowledgeBaseID={category.knowledgeBaseID}
-                    knowledgeCategoryID={category.knowledgeCategoryID}
-                />
-            );
-
-        return (
-            <Container>
-                <TitleBar
-                    useMobileBackButton={true}
-                    title={category.name}
-                    mobileDropDownContent={
-                        <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
-                    }
-                />
-                <PanelLayout
-                    breadcrumbs={
-                        category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
-                    }
-                    leftBottom={
-                        <PanelWidget>
-                            <Navigation
-                                collapsible={true}
-                                activeRecord={activeRecord}
-                                kbID={category.knowledgeBaseID}
-                            />
-                        </PanelWidget>
-                    }
-                    middleTop={
-                        <PanelWidget>
-                            <PageTitle
-                                className="searchBar-heading"
-                                headingClassName={typographyClasses().largeTitle}
-                                title={category.name}
-                                actions={
-                                    <LinkAsButton
-                                        to={EditorRoute.url(category)}
-                                        onMouseOver={EditorRoute.preload}
-                                        className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                        baseClass={ButtonTypes.ICON_COMPACT}
-                                        title={t("Compose")}
-                                    >
-                                        <ComposeIcon />
-                                    </LinkAsButton>
-                                }
-                                includeBackLink={
-                                    device !== Devices.MOBILE && device !== Devices.XS && this.props.useBackButton
-                                }
-                            >
-                                <label className={classNames("searchBar-label", classesSearchBar.label)}>
-                                    {category.name}
-                                </label>
-                            </PageTitle>
-                        </PanelWidget>
-                    }
-                    middleBottom={pageContent}
-                    rightTop={isFullWidth && <></>}
-                />
-            </Container>
+    const pageContent =
+        results.length > 0 ? (
+            <>
+                <ResultList results={props.results} />
+                <SimplePager url={category.url + "/p:page:"} pages={pages} />
+            </>
+        ) : (
+            <PageErrorMessage
+                className={inheritHeightClass()}
+                defaultError={DefaultError.CATEGORY_NO_ARTICLES}
+                knowledgeBaseID={category.knowledgeBaseID}
+                knowledgeCategoryID={category.knowledgeCategoryID}
+            />
         );
-    }
+
+    return (
+        <Container>
+            <TitleBar
+                useMobileBackButton={true}
+                title={category.name}
+                mobileDropDownContent={
+                    <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
+                }
+            />
+            <PanelLayout
+                breadcrumbs={
+                    category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
+                }
+                leftBottom={
+                    <PanelWidget>
+                        <Navigation collapsible={true} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
+                    </PanelWidget>
+                }
+                middleTop={
+                    <PanelWidget>
+                        <PageTitle
+                            className="searchBar-heading"
+                            headingClassName={typographyClasses().largeTitle}
+                            title={category.name}
+                            actions={
+                                <LinkAsButton
+                                    to={EditorRoute.url(category)}
+                                    onMouseOver={EditorRoute.preload}
+                                    className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
+                                    baseClass={ButtonTypes.ICON_COMPACT}
+                                    title={t("Compose")}
+                                >
+                                    <ComposeIcon />
+                                </LinkAsButton>
+                            }
+                            includeBackLink={device !== Devices.MOBILE && device !== Devices.XS && props.useBackButton}
+                        >
+                            <label className={classNames("searchBar-label", classesSearchBar.label)}>
+                                {category.name}
+                            </label>
+                        </PageTitle>
+                    </PanelWidget>
+                }
+                middleBottom={pageContent}
+                rightTop={isFullWidth && <></>}
+            />
+        </Container>
+    );
 }
