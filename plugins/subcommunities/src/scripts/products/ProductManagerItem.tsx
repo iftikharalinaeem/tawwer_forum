@@ -156,7 +156,7 @@ export function ProductManagerItem(props: IProps) {
                     )}
                     <div className={classes.itemActions}>
                         {isEditMode ? (
-                            <Button baseClass={ButtonTypes.ICON} submit>
+                            <Button baseClass={ButtonTypes.ICON} submit disabled={inputValue.length < 1}>
                                 <PlusCircleIcon />
                             </Button>
                         ) : (
