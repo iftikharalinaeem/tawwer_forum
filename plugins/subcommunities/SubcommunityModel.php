@@ -246,7 +246,8 @@ class SubcommunityModel extends Gdn_Model {
         }
         $row['Locale'] = $canonicalLocale;
         $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
-        $row['Url'] = Gdn::request()->urlDomain('//').'/'.$row['Folder'];
+
+        $row['Url'] = Gdn::request()->getSimpleUrl("/{$row['Folder']}");
 
         if (array_key_exists("Attributes", $row)) {
             $attributes = dbdecode($row['Attributes']);
@@ -360,10 +361,13 @@ class SubcommunityModel extends Gdn_Model {
     /**
      * Gets the singleton instance of this class.
      *
+     * @param SubcommunityModel|null $instance
      * @return SubcommunityModel Returns the singleton instance of this class.
      */
-    public static function instance() {
-        if (!isset(self::$instance)) {
+    public static function instance(?SubcommunityModel $instance = null): SubcommunityModel {
+        if ($instance instanceof SubcommunityModel) {
+            self::$instance = $instance;
+        } elseif (!isset(self::$instance)) {
             self::$instance = \Gdn::getContainer()->get(\SubcommunityModel::class);
         }
         return self::$instance;
