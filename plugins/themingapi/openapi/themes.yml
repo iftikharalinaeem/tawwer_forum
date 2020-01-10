@@ -1,0 +1,276 @@
+openapi: 3.0.0
+info:
+paths:
+  /themes:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/Theme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Create a new theme.
+  /themes/{themeID}:
+    patch:
+      parameters:
+        - description: Unique themeID.
+          in: path
+          name: themeID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: "#/components/requestBodies/Theme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Update theme name.
+    delete:
+      parameters:
+        - description: Unique theme ID.
+          in: path
+          name: themeID
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Success
+      tags:
+        - Themes
+      summary: Delete theme.
+  /themes/current:
+      put:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    themeID:
+                      description: Theme ID.
+                      type: integer
+                  example: {"themeID": 3}
+                  required:
+                    - themeID
+          required: true
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/Theme"
+            description: Success
+        tags:
+          - Themes
+        summary: Set theme as "current".
+      get:
+        responses:
+          200:
+            content:
+                "application/json":
+                  schema:
+                    $ref: "#/components/schemas/Theme"
+            description: Success
+        tags:
+          - Themes
+        summary: Get current theme.
+  /themes/{themeID}/assets/{assetKey}:
+      put:
+        parameters:
+          - description: Unique themeID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - header.html
+                - footer.html
+                - variables.json
+                - fonts.json
+                - scripts.json
+                - styles.css
+                - javascript.js
+        requestBody:
+          $ref: "#/components/requestBodies/AssetData"
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/AssetData"
+            description: Success
+        tags:
+          - Themes
+        summary: Set theme asset or replace if already exists.
+      patch:
+        parameters:
+          - description: Unique themeID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - variables.json
+        requestBody:
+          $ref: "#/components/requestBodies/AssetData"
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/AssetData"
+            description: Success
+        tags:
+          - Themes
+        summary: "Sparse update or set theme asset. Note: only variables.json asset supported."
+      delete:
+        parameters:
+          - description: Unique theme ID.
+            in: path
+            name: themeID
+            required: true
+            schema:
+              type: integer
+          - description: Asset key.
+            in: path
+            name: assetKey
+            required: true
+            schema:
+              type: string
+              enum:
+                - header.html
+                - footer.html
+                - variables.json
+                - fonts.json
+                - scripts.json
+                - styles.css
+                - javascript.js
+        responses:
+          204:
+            description: Success
+        tags:
+          - Themes
+        summary: Delete theme asset.
+components:
+  requestBodies:
+    Theme:
+      content:
+          application/json:
+              schema:
+                  type: object
+                  properties:
+                    name:
+                      description: Theme name.
+                      type: string
+                    parentTheme:
+                      type: string
+                      description: Parent theme template
+                    parentVersion:
+                      type: string
+                      description: Parent theme template version
+                    assets:
+                      type: object
+                      properties:
+                        header:
+                          type: string
+                          description: Header asset should be valid html
+                          example: <div><!-- HEADER --></div>
+                        footer:
+                          type: string
+                          description: Footer asset should be valid html
+                          example: <div><!-- FOOTER --></div>
+                        variables:
+                          type: string
+                          description: Variables asset should be valid json encoded object
+                          example: '{"global": {"mainColors": {"primary": "#279b37"}}}'
+                        fonts:
+                          type: string
+                          description: Fonts asset should be valid json encoded array
+                          example: >
+                            [
+                                {
+                                    "type": "url",
+                                    "name": "Roboto",
+                                    "fallbacks": "",
+                                    "url": "https://fonts.googleapis.com/css?family=Roboto"
+                                }
+                            ]
+                        scripts:
+                          type: string
+                          description: Scripts asset should be valid json encoded array
+                          example: >
+                            [
+                                {
+                                    "url": "https://www.google-analytics.com/analytics.js"
+                                }
+                            ]
+                        styles:
+                          type: string
+                          description: Styles asset should be valid css
+                          example: '.is-hidden {display: none;}'
+                        javascript:
+                          type: string
+                          description: Javascipt asset should be valid javascipt code
+                          example: console.log("JavaScript asset loaded.");
+                  example: >
+                    {
+                        "name": "custom client theme",
+                        "parentTheme": "keystone",
+                        "parentVersion": "1.0.2",
+                        "assets": {
+                            "header": "<div><!-- HEADER --></div>",
+                            "footer": "<div><!-- FOOTER --></div>"
+                        }
+                    }
+                  required:
+                    - name
+      required: true
+    AssetData:
+      content:
+          application/json:
+              schema:
+                  type: object
+                  properties:
+                    data:
+                      description: Asset content data.
+                      type: string
+                  example: {"data":"some content"}
+                  required:
+                    - data
+      required: true
+  schemas:
+    AssetData:
+      type: object
+      properties:
+        data:
+          description: Asset content data.
+          type: string
+      example: {"data":"some content"}
+      required:
+        - data

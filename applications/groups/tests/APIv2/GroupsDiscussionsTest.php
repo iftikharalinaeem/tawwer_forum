@@ -100,6 +100,21 @@ class GroupsDiscussionsTest extends DiscussionsTest {
     }
 
     /**
+     * Verify group count is incremented when discussions added via the API.
+     */
+    public function testDiscussionIncrement() {
+        $groupID = self::$groups[0]['groupID'];
+        $group = $this->api()->get("groups/{$groupID}")->getBody();
+
+        $this->createDiscussion($groupID);
+
+        $updatedGroup = $this->api()->get("groups/{$groupID}")->getBody();
+        $expectedCount = $group["countDiscussions"] + 1;
+
+        $this->assertEquals($expectedCount, $updatedGroup["countDiscussions"]);
+    }
+
+    /**
      * Test /discussions?groupID={ID}
      */
     public function testIndexGroupFilter() {

@@ -126,15 +126,15 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
      * Test /comments/:discussionID endpoint with a public group and a member.
      */
     public function testPublicGroupMemberCommentID() {
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[0], false, false);
         $publicGroupID = self::$groups[0]['groupID'];
-        $publicDiscussionID = $this->createDiscussion($publicGroupID);
-        $publicCommentID = $this->createComment($publicDiscussionID);
         // add user as member to public group.
         $groupModel = static::container()->get('GroupModel');
         $groupModel->resetCachedPermissions();
         $groupModel->addUser($publicGroupID, self::$userIDs[0], 'Member');
-        $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$userIDs[0], false, false);
+        $publicDiscussionID = $this->createDiscussion($publicGroupID);
+        $publicCommentID = $this->createComment($publicDiscussionID);
         $result = $this->api()->get($this->baseUrl, ['discussionID' => $publicDiscussionID]);
         $this->assertEquals(200, $result->getStatusCode());
         $requestedDiscussion = $result->getBody();
@@ -160,15 +160,15 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
      * Test /comments/:discussionID endpoint with a secret group and a member.
      */
     public function testSuccessSecretGroupCommentID() {
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[2], false, false);
         $secretGroupID = self::$secretGroups[0]['groupID'];
-        $secretDiscussionID = $this->createDiscussion($secretGroupID);
-        $secretCommentID = $this->createComment($secretDiscussionID);
         // add user as member to secret group.
         $groupModel = static::container()->get('GroupModel');
         $groupModel->resetCachedPermissions();
         $groupModel->addUser($secretGroupID, self::$userIDs[2], 'Member');
-        $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$userIDs[2], false, false);
+        $secretDiscussionID = $this->createDiscussion($secretGroupID);
+        $secretCommentID = $this->createComment($secretDiscussionID);
         $result = $this->api()->get($this->baseUrl, ['discussionID' => $secretDiscussionID]);
         $this->assertEquals(200, $result->getStatusCode());
         $requestedDiscussion = $result->getBody();
@@ -181,28 +181,26 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
     public function testFailSecretGroupCommentID() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
-
         $secretGroupID = self::$secretGroups[1]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
-        $this->createComment($secretDiscussionID);
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[3], false, false);
-        $this->api()->get($this->baseUrl, ['discussionID' => $secretDiscussionID]);
+        $this->createComment($secretDiscussionID);
     }
 
     /**
      * Test /comments/:discussionID endpoint with a private group and a member.
      */
     public function testSuccessPrivateGroupCommentID() {
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start(self::$userIDs[4], false, false);
         $privateGroupID = self::$privateGroups[0]['groupID'];
-        $privateDiscussionID = $this->createDiscussion($privateGroupID);
-        $privateCommentID = $this->createComment($privateDiscussionID);
         // add user as member to secret group.
         $groupModel = static::container()->get('GroupModel');
         $groupModel->resetCachedPermissions();
         $groupModel->addUser($privateGroupID, self::$userIDs[4], 'Member');
-        $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$userIDs[4], false, false);
+        $privateDiscussionID = $this->createDiscussion($privateGroupID);
+        $privateCommentID = $this->createComment($privateDiscussionID);
         $result = $this->api()->get($this->baseUrl, ['discussionID' => $privateDiscussionID]);
         $this->assertEquals(200, $result->getStatusCode());
         $requestedDiscussion = $result->getBody();
@@ -215,12 +213,10 @@ class GroupsCommentsTest extends AbstractAPIv2Test {
     public function testFailPrivateGroupCommentID() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
-
         $privateGroupID = self::$privateGroups[1]['groupID'];
         $privateDiscussionID = $this->createDiscussion($privateGroupID);
-        $privateCommentID = $this->createComment($privateDiscussionID);
         $session = self::container()->get(\Gdn_Session::class);
         $session->start(self::$userIDs[5], false, false);
-        $this->api()->get($this->baseUrl, ['discussionID' => $privateDiscussionID]);
+        $this->createComment($privateDiscussionID);
     }
 }

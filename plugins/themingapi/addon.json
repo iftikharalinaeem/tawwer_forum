@@ -1,0 +1,17 @@
+{
+    "name": "Theming API",
+    "description": "Provides an API to manage theme resources.",
+    "version": "1.0",
+    "priority": 1000,
+    "key": "themingapi",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexander Kim",
+            "email": "alexander.k@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.8.3"
+    }
+}
