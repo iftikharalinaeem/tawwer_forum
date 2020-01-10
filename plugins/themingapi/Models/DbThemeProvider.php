@@ -7,6 +7,7 @@
 namespace Vanilla\ThemingApi;
 
 use Gdn_Upload;
+use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Models\ThemeModel;
@@ -282,6 +283,28 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function deleteAsset($themeKey, string $assetKey) {
         $this->themeAssetModel->deleteAsset($themeKey, $assetKey);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getThemeViewPath($themeID): string {
+        $themeKey = $this->config->get('Garden.Theme');
+        try {
+            $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+            if (!empty($theme['parentTheme'])) {
+                $themeKey = $theme['parentTheme'];
+            }
+        } catch (NoResultsException $e) {
+            // do nothing and default theme view folder of Garden.Theme
+        }
+
+        $theme = $this->addonManager->lookupTheme($themeKey);
+        if (!($theme instanceof Addon)) {
+            throw new NotFoundException("Theme");
+        }
+        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
+        return $path;
     }
 
     /**
