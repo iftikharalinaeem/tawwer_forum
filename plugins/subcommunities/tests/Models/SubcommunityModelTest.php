@@ -83,6 +83,6 @@ class SubcommunityModelTest extends TestCase {
         SubcommunityModel::calculateRow($row);
 
         // Bootstrap trait sets up the test case name as the webroot and asset root. Expect to see that included.
-        $this->assertEquals("//vanilla.test/subcommunitymodeltest/testcalculatesubcommunityurl", $row["Url"]);
+        $this->assertEquals("http://vanilla.test/subcommunitymodeltest/testcalculatesubcommunityurl", $row["Url"]);
     }
 }

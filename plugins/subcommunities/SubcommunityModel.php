@@ -247,11 +247,7 @@ class SubcommunityModel extends Gdn_Model {
         $row['Locale'] = $canonicalLocale;
         $row['LocaleShortName'] = str_replace('_', '-', $canonicalLocale);
 
-        $baseUrl = Gdn::request()->urlDomain('//');
-        if ($assetRoot = trim(Gdn::request()->getAssetRoot(), "/")) {
-            $baseUrl .= "/{$assetRoot}";
-        }
-        $row['Url'] = "{$baseUrl}/{$row['Folder']}";
+        $row['Url'] = Gdn::request()->getSimpleUrl("/{$row['Folder']}");
 
         if (array_key_exists("Attributes", $row)) {
             $attributes = dbdecode($row['Attributes']);
