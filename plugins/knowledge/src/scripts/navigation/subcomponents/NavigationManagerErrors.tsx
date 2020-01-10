@@ -32,8 +32,8 @@ class NavigationManagerErrors extends React.Component<IProps> {
         return (
             <Container>
                 <Message
+                    isFixed
                     icon={<ErrorIcon />}
-                    className={classes.formError}
                     onConfirm={retryHandler ? this.handleRetry : undefined}
                     confirmText={currentError.isLoading ? <ButtonLoader /> : t("Retry")}
                     onCancel={() => this.props.onClear()}

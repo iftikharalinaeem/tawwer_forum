@@ -484,6 +484,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
         const { deleteItem } = this.state;
         if (deleteItem) {
             const { recordType, recordID } = deleteItem.data;
+            this.setState({ selectedItem: null }); // Clear the selected item, because it is being deleted.
+
             switch (recordType) {
                 case KbRecordType.ARTICLE:
                     await this.props.articleActions.patchStatus({ articleID: recordID, status: PublishStatus.DELETED });
