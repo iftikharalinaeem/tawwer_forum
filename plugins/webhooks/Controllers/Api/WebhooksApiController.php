@@ -210,7 +210,9 @@ class WebhooksApiController extends \AbstractApiController {
                     'events',
                     'name',
                     'url',
-                    'secret',
+                    'secret' => [
+                        'minLength' => '20'
+                    ]
                 ])->add($this->fullSchema()),
                 'WebhookPost'
             );
@@ -252,7 +254,9 @@ class WebhooksApiController extends \AbstractApiController {
                 ]
             ],
             'url:s' => 'The target URL of the webhook.',
-            'secret:s' => 'The secret used to sign events associated with this webhook.',
+            'secret' => [
+                'type' => 'string'
+            ],
             'dateInserted:dt?' => 'The date/time that the webhook was created.',
             'insertUserID:i?' => 'The user that created the webhook.',
             'dateUpdated:dt|n?' => 'The date/time that the webhook was created.',

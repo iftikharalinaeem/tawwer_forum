@@ -53,8 +53,10 @@ class WebhooksPlugin extends \Gdn_Plugin {
             ->table("webhookDelivery")
             ->column("deliveryID", "varchar(36)", false, ["index"])
             ->column("webhookID", "int")
-            ->column("request", "text")
-            ->column("response", "text")
+            ->column("request", "mediumtext")
+            ->column("requestDuration", "int", true)
+            ->column("response", "mediumtext", true)
+            ->column("responseCode", "int", true)
             ->column('dateInserted', 'datetime')
             ->set();
     }

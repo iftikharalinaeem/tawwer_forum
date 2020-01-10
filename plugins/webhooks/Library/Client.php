@@ -62,19 +62,20 @@ class Client extends HttpClient {
             "X-Vanilla-ID" => $deliveryID,
             "X-Vanilla-Signature" => $this->payloadSignature($payload, $secret),
         ];
-
+        $startTime = microtime(true);
         $response = $this->post(
             $url,
             $payload,
             $headers
         );
-
+        $endTime = microtime(true);
+        $requestDuration = ($endTime - $startTime)*1000;
         $this->writeDeliveryRecord(
             $deliveryID,
             $webhookID,
-            $response
+            $response,
+            $requestDuration
         );
-
         return $response->isResponseClass("2xx");
     }
 
@@ -102,7 +103,7 @@ class Client extends HttpClient {
      * @param HttpResponse $response
      * @return void
      */
-    private function writeDeliveryRecord(string $deliveryID, int $webhookID, HttpResponse $response): void {
+    private function writeDeliveryRecord(string $deliveryID, int $webhookID, HttpResponse $response, int $requestDuration): void {
         $request = $response->getRequest();
         $row = [
             "deliveryID" => $deliveryID,
@@ -115,6 +116,8 @@ class Client extends HttpClient {
                 "headers" => $this->formatHeaderArray($response->getHeaders()),
                 "body" => $response->getBody(),
             ],
+            "responseCode" => $response->getStatusCode(),
+            "requestDuration" => $requestDuration,
         ];
 
         $this->deliveryModel->insert($row);
