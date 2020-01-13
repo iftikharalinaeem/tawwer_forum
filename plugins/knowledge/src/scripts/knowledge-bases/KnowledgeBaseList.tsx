@@ -29,7 +29,7 @@ import Tiles from "@library/features/tiles/Tiles";
 class KnowledgeBaseList extends React.Component<IProps> {
     public render() {
         const { knowledgeBases, loadStatus, className, columns } = this.props;
-        const classesSubCommunityTile = tileClasses();
+        const classes = tileClasses();
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
             return <Loader />;
         }
@@ -45,7 +45,7 @@ class KnowledgeBaseList extends React.Component<IProps> {
                 hiddenTitle={true}
                 items={knowledgeBases}
                 emptyMessage={t("No knowledge bases found.")}
-                fallbackIcon={knowledgeBaseNoIcon(classesSubCommunityTile.fallBackIcon)}
+                fallbackIcon={knowledgeBaseNoIcon(classes.fallBackIcon)}
                 className={className}
                 columns={columns}
             />
