@@ -14,7 +14,7 @@ export interface IThemeAssets {
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
-    header?: IThemeHeader | undefined;
+    header?: IThemeHeader;
     footer?: IThemeFooter | undefined;
     javascript?: string;
     styles?: string;
@@ -32,7 +32,7 @@ export interface IPostPatchThemeAssets {
 }
 
 export interface IThemeHeader {
-    data: string;
+    data: string | undefined;
     type: string;
 }
 export interface IThemeFooter {
