@@ -661,7 +661,7 @@ class GithubPlugin extends Gdn_Plugin {
      */
     public function discussionController_githubIssue_create($sender, $args) {
         if (!$this->isConnected()) {
-            $sender->setData('LoginURL', url('/profile/connections'));
+            $sender->setData('LoginURL', url('/profile/connections', true));
             $sender->render('reconnect', '', 'plugins/github');
             return;
         }
