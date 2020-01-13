@@ -6,21 +6,24 @@
 
 namespace Vanilla\Webhooks;
 
-use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Ramsey\Uuid\Uuid;
-use UserModel;
-use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Webhooks\Events\PingEvent;
-use Vanilla\Webhooks\Jobs\DispatchEventJob;
+use Vanilla\Webhooks\Library\EventScheduler;
+use Vanilla\Webhooks\Library\WebhookConfig;
 use Vanilla\Webhooks\Models\WebhookModel;
 
 /**
  * WebhooksApiController for the `/webhooks` resource.
  */
 class WebhooksApiController extends \AbstractApiController {
+
+    /** @var EventScheduler */
+    private $scheduler;
+
+    /** @var Schema */
+    private $idParamSchema;
 
     /** @var WebhookModel */
     private $webhookModel;
@@ -31,24 +34,15 @@ class WebhooksApiController extends \AbstractApiController {
     /** @var Schema */
     private $webhookPostSchema;
 
-    /** @var Schema */
-    private $idParamSchema;
-
-    /** @var SchedulerInterface */
-    private $scheduler;
-
-    /** @var UserModel */
-    private $userModel;
-
     /**
      * WebhooksApiController constructor.
      *
      * @param WebhookModel $webhookModel
+     * @param EventScheduler $scheduler
      */
-    public function __construct(WebhookModel $webhookModel, SchedulerInterface $scheduler, UserModel $userModel) {
+    public function __construct(WebhookModel $webhookModel, EventScheduler $scheduler) {
         $this->webhookModel = $webhookModel;
         $this->scheduler = $scheduler;
-        $this->userModel = $userModel;
     }
 
     /**
@@ -196,24 +190,13 @@ class WebhooksApiController extends \AbstractApiController {
         $in = $this->schema([]);
         $out = $this->schema(['webhookID'])->add($this->webhookSchema());
 
-        $webhook = $this->webhookModel->getID($id);
+        $row = $this->webhookModel->getID($id);
+        $webhookConfig = new WebhookConfig($row);
 
         $pingEvent = new PingEvent();
-        $this->scheduler->addJob(
-            DispatchEventJob::class,
-            [
-                "action" => $pingEvent->getAction(),
-                "deliveryID" => Uuid::uuid4()->toString(),
-                "payload" => $pingEvent->getPayload(),
-                "type" => $pingEvent->getType(),
-                "user" => $this->userModel->getFragmentByID($this->getSession()->UserID),
-                "webhookID" => $webhook["webhookID"],
-                "webhookUrl" => $webhook["url"],
-                "webhookSecret" => $webhook["secret"],
-            ]
-        );
+        $this->scheduler->addDispatchEventJob($pingEvent, $webhookConfig);
 
-        $result = $out->validate($webhook);
+        $result = $out->validate($row);
         return $result;
     }
 
