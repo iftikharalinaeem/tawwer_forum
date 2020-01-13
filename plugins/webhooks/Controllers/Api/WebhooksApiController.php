@@ -1,16 +1,20 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Webhooks;
 
+use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Ramsey\Uuid\Uuid;
+use UserModel;
 use Vanilla\Scheduler\SchedulerInterface;
-use Vanilla\Webhooks\Jobs\PingWebhook;
+use Vanilla\Webhooks\Events\PingEvent;
+use Vanilla\Webhooks\Jobs\DispatchEventJob;
 use Vanilla\Webhooks\Models\WebhookModel;
 
 /**
@@ -33,14 +37,18 @@ class WebhooksApiController extends \AbstractApiController {
     /** @var SchedulerInterface */
     private $scheduler;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * WebhooksApiController constructor.
      *
      * @param WebhookModel $webhookModel
      */
-    public function __construct(WebhookModel $webhookModel, SchedulerInterface $scheduler) {
+    public function __construct(WebhookModel $webhookModel, SchedulerInterface $scheduler, UserModel $userModel) {
         $this->webhookModel = $webhookModel;
         $this->scheduler = $scheduler;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -189,8 +197,21 @@ class WebhooksApiController extends \AbstractApiController {
         $out = $this->schema(['webhookID'])->add($this->webhookSchema());
 
         $webhook = $this->webhookModel->getID($id);
-        $message = $webhook + ["action" => "ping"];
-        $this->scheduler->addJob(PingWebhook::class, $message);
+
+        $pingEvent = new PingEvent();
+        $this->scheduler->addJob(
+            DispatchEventJob::class,
+            [
+                "event" => $pingEvent->getAction(),
+                "deliveryID" => Uuid::uuid4()->toString(),
+                "payload" => $pingEvent->getPayload(),
+                "type" => $pingEvent->getType(),
+                "user" => $this->userModel->getFragmentByID($this->getSession()->UserID),
+                "webhookID" => $webhook["webhookID"],
+                "webhookUrl" => $webhook["url"],
+                "webhookSecret" => $webhook["secret"],
+            ]
+        );
 
         $result = $out->validate($webhook);
         return $result;

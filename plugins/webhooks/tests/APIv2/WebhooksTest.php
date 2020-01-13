@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Dani M <dani.m@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
