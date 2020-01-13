@@ -28,7 +28,7 @@ interface IProps {
     value?: number | string | null;
     onChange?: (newValue: number | string | null) => void;
 
-    // Genenal props
+    // General props
     valueType: "sectionGroup" | "productID";
     disabled?: boolean;
     errors?: IFieldError[];
@@ -43,26 +43,14 @@ export const ProductSelectorFormGroup: React.FC<IProps> = (props: IProps) => {
     const { valueType } = props;
     const { subcommunitiesByProductID } = useSubcommunities();
     const options = useMemo(() => {
-        return Object.values(productsById)
-            .filter(productLoadable => {
-                const { productID } = productLoadable.product;
-                const subcommunities = subcommunitiesByProductID.data?.[productID];
-
-                if (!subcommunities) {
-                    // Hide products with no subcommunities.
-                    return false;
-                }
-
-                return true;
-            })
-            .map(productLoadable => {
-                const { productID } = productLoadable.product;
-                return {
-                    label: productLoadable.product.name,
-                    value: valueType === "sectionGroup" ? makeSiteSectionGroup({ productID }) : productID,
-                };
-            });
-    }, [productsById, subcommunitiesByProductID, valueType]);
+        return Object.values(productsById).map(productLoadable => {
+            const { productID } = productLoadable.product;
+            return {
+                label: productLoadable.product.name,
+                value: valueType === "sectionGroup" ? makeSiteSectionGroup({ productID }) : productID,
+            };
+        });
+    }, [productsById, valueType]);
     const [modalOpen, setModalOpen] = useState(false);
 
     const [ownValue, setOwnValue] = useState<number | string | null>(
