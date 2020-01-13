@@ -202,7 +202,7 @@ class WebhooksApiController extends \AbstractApiController {
         $this->scheduler->addJob(
             DispatchEventJob::class,
             [
-                "event" => $pingEvent->getAction(),
+                "action" => $pingEvent->getAction(),
                 "deliveryID" => Uuid::uuid4()->toString(),
                 "payload" => $pingEvent->getPayload(),
                 "type" => $pingEvent->getType(),
