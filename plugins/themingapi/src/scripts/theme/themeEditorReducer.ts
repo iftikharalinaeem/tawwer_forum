@@ -3,13 +3,24 @@
  * @license Proprietary
  */
 
-import { reducerWithInitialState, reducerWithoutInitialState } from "typescript-fsa-reducers";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
-import ThemeActions from "./ThemeActions";
+import ThemeActions from "./ThemeEditorActions";
 
 export interface IThemeAssets {
+    fonts?: { data: IThemeFont[] };
+    logo?: IThemeExternalAsset;
+    mobileLogo?: IThemeExternalAsset;
+    variables?: IThemeVariables;
+    header?: IThemeHeader | undefined;
+    footer?: IThemeFooter | undefined;
+    javascript?: string;
+    styles?: string;
+}
+
+export interface IPostPatchThemeAssets {
     fonts?: { data: IThemeFont[] };
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
@@ -17,7 +28,7 @@ export interface IThemeAssets {
     header?: string;
     footer?: string;
     javascript?: string;
-    style?: string;
+    styles?: string;
 }
 
 export interface IThemeHeader {
@@ -25,7 +36,7 @@ export interface IThemeHeader {
     type: string;
 }
 export interface IThemeFooter {
-    data: string;
+    data: string | undefined;
     type: string;
 }
 export interface IThemeFont {
@@ -62,10 +73,16 @@ export interface IThemeState {
     formSubmit: ILoadable<{}>;
 }
 export const INITIAL_ASSETS: IThemeAssets = {
-    header: "",
-    footer: "",
+    header: {
+        data: "",
+        type: "html",
+    },
+    footer: {
+        data: "",
+        type: "html",
+    },
     javascript: "",
-    style: "",
+    styles: "",
     fonts: {
         data: [],
     },
@@ -96,16 +113,18 @@ const INITIAL_STATE: IThemeState = {
 export const themeEditorReducer = produce(
     reducerWithInitialState(INITIAL_STATE)
         .case(ThemeActions.initAssetsAC, (state, payload) => {
+            console.log("payload==>", payload);
             if (payload.themeID != null) {
                 const existingAsset = {
-                    ...state.theme, //themeID.data[payload.themeID],
+                    ...state.form, //themeID.data[payload.themeID],
                 };
-                state.theme = existingAsset;
+                state.form = existingAsset;
+                console.log("==>", existingAsset);
             } else {
                 console.log("restoring initial");
                 state.form.assets = INITIAL_ASSETS;
             }
-
+            console.log("state==>", state);
             return state;
         })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {
@@ -145,7 +164,6 @@ export const themeEditorReducer = produce(
         })
         .case(ThemeActions.patchTheme_ACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
-
             return state;
         })
         .case(ThemeActions.patchTheme_ACs.failed, (state, payload) => {
@@ -157,7 +175,6 @@ export const themeEditorReducer = produce(
         .case(ThemeActions.patchTheme_ACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
             state.formSubmit.data = payload.result;
-
             return state;
         }),
 );
