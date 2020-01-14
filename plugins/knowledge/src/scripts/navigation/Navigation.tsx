@@ -19,6 +19,8 @@ import React, { useCallback, useEffect } from "react";
 import { connect } from "react-redux";
 import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/core";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
+import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -35,7 +37,7 @@ export function Navigation(props: IProps) {
                 void props.preloadArticle(item.recordID);
             }
         },
-        [props.preloadArticle],
+        [props],
     );
 
     /**
@@ -45,16 +47,21 @@ export function Navigation(props: IProps) {
         if (props.navItems.status === LoadStatus.PENDING) {
             void props.requestNavigation();
         }
-    }, [props.navItems.status]);
+    }, [props, props.navItems.status]);
 
     useEffect(() => {
         if (props.knowledgeBase.status === LoadStatus.PENDING) {
             props.requestKnowledgeBase();
         }
-    }, [props.knowledgeBase.status]);
+    }, [props, props.knowledgeBase.status]);
 
-    if (!knowledgeBase.data || !navItems.data) {
-        return null;
+    if (
+        !knowledgeBase.data ||
+        !navItems.data ||
+        knowledgeBase.status === LoadStatus.LOADING ||
+        navItems.status === LoadStatus.LOADING
+    ) {
+        return <NavigationPlaceholder />;
     }
 
     const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
