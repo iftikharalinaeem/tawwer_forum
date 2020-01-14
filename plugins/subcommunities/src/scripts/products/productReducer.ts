@@ -81,6 +81,14 @@ export const productsReducer = produce(
             };
             return state;
         })
+        .case(ProductActions.postACs.failed, (state, payload) => {
+            state.submittingProducts[payload.params.transactionID] = {
+                ...state.submittingProducts[payload.params.transactionID],
+                status: LoadStatus.PENDING,
+                error: payload.error,
+            };
+            return state;
+        })
         .case(ProductActions.patchACs.started, (state, payload) => {
             const existingProduct = state.productsById[payload.productID];
             existingProduct.patchProduct = {
@@ -93,6 +101,14 @@ export const productsReducer = produce(
             existingProduct.product = payload.result;
             existingProduct.patchProduct = {
                 status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(ProductActions.patchACs.failed, (state, payload) => {
+            const existingProduct = state.productsById[payload.params.productID];
+            existingProduct.patchProduct = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
             };
             return state;
         })

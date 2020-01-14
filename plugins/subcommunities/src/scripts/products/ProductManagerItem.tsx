@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef, useLayoutEffect, useEffect } from "react";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ILoadable, LoadStatus, IFieldError, IApiError } from "@library/@types/api/core";
 import { IProduct, IProductDeleteError } from "@subcommunities/products/productTypes";
 import { TempProduct, ILoadedProduct } from "@subcommunities/products/productReducer";
 import { useProductActions } from "@subcommunities/products/ProductActions";
@@ -86,7 +86,7 @@ export function ProductManagerItem(props: IProps) {
         if (!actualProduct && !isEditMode && props.onDismiss) {
             props.onDismiss();
         }
-    }, [actualProduct, isEditMode, props.onDismiss]);
+    }, [actualProduct, isEditMode, props, props.onDismiss]);
 
     ///
     /// Event Handling
@@ -119,6 +119,24 @@ export function ProductManagerItem(props: IProps) {
         props.afterDelete && props.afterDelete();
     };
 
+    const errors: Array<IApiError | IFieldError> = [];
+
+    if (props.productLoadable && "error" in props.productLoadable && props.productLoadable.error) {
+        // This is a temp item so the other errors shouldn't apply.
+        errors.push(props.productLoadable.error);
+    } else {
+        if (hasNoSubcommunities) {
+            errors.push(noSubcommunitiesFieldError());
+        }
+
+        if (loadedProduct?.patchProduct.error) {
+            errors.push(loadedProduct?.patchProduct.error);
+        }
+
+        if (loadedProduct?.deleteProduct.error) {
+            errors.push(loadedProduct?.deleteProduct.error);
+        }
+    }
     ///
     /// Rendering
     ///
@@ -149,14 +167,12 @@ export function ProductManagerItem(props: IProps) {
                     ) : (
                         <span className={classes.itemName}>
                             {actualProduct ? actualProduct.name : tempProduct ? tempProduct.name : null}
-                            {hasNoSubcommunities && (
-                                <ErrorMessages className={classes.error} errors={[noSubcommunitiesFieldError()]} />
-                            )}
+                            {errors.length > 0 && <ErrorMessages className={classes.error} errors={errors} />}
                         </span>
                     )}
                     <div className={classes.itemActions}>
                         {isEditMode ? (
-                            <Button baseClass={ButtonTypes.ICON} submit>
+                            <Button baseClass={ButtonTypes.ICON} submit disabled={inputValue.length < 1}>
                                 <PlusCircleIcon />
                             </Button>
                         ) : (

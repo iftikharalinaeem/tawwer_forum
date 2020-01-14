@@ -73,6 +73,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column("dateUpdated", "datetime", true )
             ->column("updateUserID", "int", true)
             ->set();
+
+        // Fixup any products that got empty names inserted before hand.
+        Gdn::sql()->update('product', ['name' => \Gdn::translate("(Untitled)")], ["name" => ""])->put();
     }
 
     /**
@@ -883,7 +886,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function discussionModel_beforeGetCount_handler($sender, $args) {
         $this->dicussionQueryFiltering($args);
     }
-    
+
     /**
      * Add filter to discussion queries based on certain conditions.
      *
