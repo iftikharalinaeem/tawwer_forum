@@ -58,6 +58,7 @@ class DispatchEventJob implements LocalJobInterface {
      * Setup the job.
      *
      * @param HttpClient $client
+     * @param DeliveryModel $deliveryModel
      */
     public function __construct(HttpClient $client, DeliveryModel $deliveryModel) {
         $this->client = $client;
