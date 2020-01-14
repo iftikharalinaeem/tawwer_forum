@@ -283,9 +283,12 @@ class WebhooksApiController extends \AbstractApiController {
         $row = $this->webhookModel->getID($id);
         $webhookConfig = new WebhookConfig($row);
 
-        $pingEvent = new PingEvent();
+        $pingEvent = new PingEvent(PingEvent::ACTION_PING, [
+            "webhookID" => $id,
+            "timestamp" => time(),
+        ]);
         $this->scheduler->addDispatchEventJob($pingEvent, $webhookConfig);
-
+ 
         $result = $out->validate($row);
         return $result;
     }
