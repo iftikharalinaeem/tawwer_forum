@@ -50,7 +50,6 @@ class EventScheduler {
             "deliveryID" => Uuid::uuid4()->toString(),
             "payload" => $event->getPayload(),
             "type" => $event->getType(),
-            //"user" => $this->userModel->getFragmentByID($this->getSession()->UserID),
             "webhookID" => $webhook->getWebhookID(),
             "webhookUrl" => $webhook->getUrl(),
             "webhookSecret" => $webhook->getSecret(),
