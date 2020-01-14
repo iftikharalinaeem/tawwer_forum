@@ -11,7 +11,6 @@ use Ramsey\Uuid\Uuid;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Webhooks\Jobs\DispatchEventJob;
-use UserModel;
 
 /**
  * Scheduler wrapper to simplify adding event dispatch jobs for webhooks.
@@ -21,18 +20,13 @@ class EventScheduler {
     /** @var SchedulerInterface */
     private $scheduler;
 
-    /** @var UserModel */
-    private $userModel;
-
     /**
      * Setup the scheduler.
      *
      * @param SchedulerInterface $scheduler
-     * @param UserModel $userModel
      */
-    public function __construct(SchedulerInterface $scheduler, UserModel $userModel) {
+    public function __construct(SchedulerInterface $scheduler) {
         $this->scheduler = $scheduler;
-        $this->userModel = $userModel;
     }
 
     /**

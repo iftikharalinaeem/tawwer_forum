@@ -6,15 +6,24 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\EventManager;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use ReflectionClass;
+use Vanilla\Scheduler\Job\JobInterface;
+use Vanilla\Scheduler\TrackingSlip;
+use Vanilla\Webhooks\Events\PingEvent;
+use Vanilla\Webhooks\Jobs\DispatchEventJob;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
- * Test /api/v2/webhooks/:id/ping endpoint.
+ * Test dispatching specific events to webhooks.
  */
-class WebhooksPingTest extends AbstractAPIv2Test {
+class WebhooksEventTest extends AbstractAPIv2Test {
+
+    /** @var array */
+    private $dispatchedTrackingSlips = [];
 
     /** @var MockHttpClient */
     private $httpClient;
@@ -44,8 +53,14 @@ class WebhooksPingTest extends AbstractAPIv2Test {
      */
     public function setup(): void {
         parent::setup();
+
         $this->httpClient = new MockHttpClient();
         static::container()->setInstance(HttpClient::class, $this->httpClient);
+
+        $eventManager = static::container()->get(EventManager::class);
+        $eventManager->bind("SchedulerDispatched", function (array $trackingSlips) {
+            $this->dispatchedTrackingSlips = $trackingSlips;
+        });
     }
 
     /**
@@ -78,8 +93,38 @@ class WebhooksPingTest extends AbstractAPIv2Test {
 
         $this->api()->post("webhooks/{$webhook['webhookID']}/pings");
 
-        // We should have one recorded delivery attempt: the ping.
-        $webhookDeliveries = $this->api()->get("webhooks/{$webhook['webhookID']}/deliveries")->getBody();
-        $this->assertCount(1, $webhookDeliveries);
+        $this->assertWebhookEventDispatched("ping", PingEvent::ACTION_PING);
+    }
+
+    /**
+     * Verify a particular type of event-dispatch job was scheduled.
+     *
+     * @param string $type
+     * @param string $action
+     * @return void
+     */
+    private function assertWebhookEventDispatched(string $type, string $action): void {
+        $result = false;
+
+        /** @var TrackingSlip $trackingSlip */
+        foreach ($this->dispatchedTrackingSlips as $trackingSlip) {
+            $driverSlip = $trackingSlip->getDriverSlip();
+
+            // Gotta do this the hard way, since jobs are instanced outside the container.
+            $reflection = new ReflectionClass($driverSlip);
+            $property = $reflection->getProperty("job");
+            $property->setAccessible(true);
+
+            /** @var JobInterface */
+            $job = $property->getValue($driverSlip);
+            if (!($job instanceof DispatchEventJob)) {
+                continue;
+            } elseif ($job->getType() === $type && $job->getAction() === $action) {
+                $result = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($result, "{$type}-{$action} was not dispatched to any webhook.");
     }
 }

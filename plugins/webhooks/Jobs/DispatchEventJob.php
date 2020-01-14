@@ -107,6 +107,24 @@ class DispatchEventJob implements LocalJobInterface {
     }
 
     /**
+     * Get the configured action.
+     *
+     * @return string|null
+     */
+    public function getAction(): ?string {
+        return $this->action;
+    }
+
+    /**
+     * Get the event type.
+     *
+     * @return string|null
+     */
+    public function getType(): ?string {
+        return $this->type;
+    }
+
+    /**
      * Generate the signature header for a particular payload.
      *
      * @param string $payload
