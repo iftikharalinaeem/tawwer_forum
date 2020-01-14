@@ -11,7 +11,7 @@ import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 
 export interface IPageTitle {
-    title: string;
+    title: React.ReactNode;
     actions?: React.ReactNode;
     meta?: React.ReactNode;
     className?: string;

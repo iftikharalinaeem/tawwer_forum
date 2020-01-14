@@ -15,6 +15,7 @@ import RouteHandler from "@library/routing/RouteHandler";
 import React from "react";
 import { Route } from "react-router-dom";
 import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
+import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
 
@@ -46,6 +47,7 @@ export const ArticleRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/article" */ "@knowledge/modules/article/ArticlePage"),
     "/kb/articles/:id(\\d+)(-[^/]+)?",
     (article: IArticle | IArticleFragment) => article.url,
+    NavigationLoadingLayout,
 );
 
 const CATEGORIES_KEY = "CategoriesPageKey";
@@ -53,7 +55,7 @@ export const CategoryRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/categories" */ "@knowledge/modules/categories/CategoriesPage"),
     "/kb/categories/:id(\\d+)(-[^/]+)?",
     (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
-    undefined,
+    NavigationLoadingLayout,
     CATEGORIES_KEY,
 );
 
