@@ -9,15 +9,20 @@ namespace Vanilla\Webhooks;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Webhooks\Events\PingEvent;
 use Vanilla\Webhooks\Library\EventScheduler;
 use Vanilla\Webhooks\Library\WebhookConfig;
+use Vanilla\Webhooks\Models\WebhookDeliveryModel;
 use Vanilla\Webhooks\Models\WebhookModel;
 
 /**
  * WebhooksApiController for the `/webhooks` resource.
  */
 class WebhooksApiController extends \AbstractApiController {
+
+    /** @var WebhookDeliveryModel */
+    private $deliveryModel;
 
     /** @var EventScheduler */
     private $scheduler;
@@ -40,9 +45,10 @@ class WebhooksApiController extends \AbstractApiController {
      * @param WebhookModel $webhookModel
      * @param EventScheduler $scheduler
      */
-    public function __construct(WebhookModel $webhookModel, EventScheduler $scheduler) {
+    public function __construct(WebhookModel $webhookModel, EventScheduler $scheduler, WebhookDeliveryModel $deliveryModel) {
         $this->webhookModel = $webhookModel;
         $this->scheduler = $scheduler;
+        $this->deliveryModel = $deliveryModel;
     }
 
     /**
@@ -73,6 +79,89 @@ class WebhooksApiController extends \AbstractApiController {
         $out = $this->schema($this->webhookSchema(), 'out');
         $webhook = $this->webhookByID($id);
         $result = $out->validate($webhook);
+
+        return $result;
+    }
+
+    /**
+     * Handle request for a specific webhook delivery.
+     *
+     * @param integer $webhookID
+     * @param string $webhookDeliveryID
+     * @return void
+     */
+    private function getDelivery(int $webhookID, string $webhookDeliveryID) {
+        $this->idParamSchema();
+        $out = $this->schema(
+            $this->webhookDeliverySchema(),
+            "out"
+        );
+
+        try {
+            $delivery = $this->deliveryModel->selectSingle([
+                "webhookDeliveryID" => $webhookDeliveryID,
+                "webhookID" => $webhookID,
+            ]);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Webhook Delivery");
+        }
+
+        $result = $out->validate($delivery);
+        return $result;
+    }
+
+    /**
+     * Handle request for a list of recent webhook deliveries.
+     *
+     * @param integer $webhookID
+     * @return void
+     */
+    private function getDeliveryIndex(int $webhookID) {
+        $this->idParamSchema();
+        $out = $this->schema(
+            [
+                ":a" => $this->schema(
+                    Schema::parse([
+                        "webhookDeliveryID",
+                        "webhookID",
+                        "requestDuration",
+                        "responseCode",
+                        "dateInserted",
+                        "dateUpdated",
+                    ])->add($this->webhookDeliverySchema())
+                )
+            ],
+            "out"
+        );
+
+        $deliveries = $this->deliveryModel->get(
+            ["webhookID" => $webhookID],
+            [
+                "limit" => 20,
+                "orderFields" => "dateInserted",
+                "orderDirection" => "desc",
+            ]
+        );
+        $result = $out->validate($deliveries);
+        return $result;
+    }
+
+    /**
+     * Get delivery attempts to a webhook.
+     *
+     * @param int $id The ID of the webhook.
+     * @param string $webhookDeliveryID
+     * @throws NotFoundException If the webhook could not be found.
+     * @return array
+     */
+    public function get_deliveries($id, $webhookDeliveryID = null) {
+        $this->permission('Garden.Settings.Manage');
+
+        if (is_string($webhookDeliveryID)) {
+            $result = $this->getDelivery($id, $webhookDeliveryID);
+        } else {
+            $result = $this->getDeliveryIndex($id);
+        }
 
         return $result;
     }
@@ -198,6 +287,42 @@ class WebhooksApiController extends \AbstractApiController {
 
         $result = $out->validate($row);
         return $result;
+    }
+
+    /**
+     * Get a schema representing a single webhook delivery row.
+     *
+     * @return Schema
+     */
+    private function webhookDeliverySchema(): Schema {
+        $schema = Schema::parse([
+            "webhookDeliveryID" => [
+                "type" => "string",
+            ],
+            "webhookID" => [
+                "type" => "integer",
+            ],
+            "requestBody",
+            "requestDuration" => [
+                "allowNull" => true,
+                "type" => "integer",
+            ],
+            "requestHeaders",
+            "responseBody",
+            "responseCode" => [
+                "allowNull" => true,
+                "type" => "integer",
+            ],
+            "responseHeaders",
+            "dateInserted" => [
+                "type" => "datetime",
+            ],
+            "dateUpdated" => [
+                "type" => "datetime",
+                "allowNull" => true,
+            ],
+        ]);
+        return $schema;
     }
 
     /**

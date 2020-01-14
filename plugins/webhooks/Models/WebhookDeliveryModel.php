@@ -13,7 +13,7 @@ use Vanilla\Webhooks\Processors\NormalizeDataProcessor;
 /**
  * Provides data management capabilities for webhook delivery information.
  */
-class DeliveryModel extends PipelineModel {
+class WebhookDeliveryModel extends PipelineModel {
 
     /**
      * WebhookDeliveryModel constructor.
@@ -23,13 +23,16 @@ class DeliveryModel extends PipelineModel {
 
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor
-            ->setInsertFields(["dateInserted"]);
+            ->setInsertFields(["dateInserted"])
+            ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
 
         $normalizeProcessor = new NormalizeDataProcessor();
         $normalizeProcessor
-            ->addSerializedField("request")
-            ->addSerializedField("response");
+            ->addSerializedField("requestBody")
+            ->addSerializedField("requestHeaders")
+            ->addSerializedField("responseBody")
+            ->addSerializedField("responseHeaders");
         $this->addPipelineProcessor($normalizeProcessor);
     }
 }

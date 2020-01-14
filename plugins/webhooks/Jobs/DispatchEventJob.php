@@ -7,11 +7,13 @@
 namespace Vanilla\Webhooks\Jobs;
 
 use Garden\Http\HttpClient;
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
-use Vanilla\Webhooks\Models\DeliveryModel;
+use Vanilla\Utility\StringUtils;
+use Vanilla\Webhooks\Models\WebhookDeliveryModel;
 
 /**
  * Dispatch an event to a webhook.
@@ -60,7 +62,7 @@ class DispatchEventJob implements LocalJobInterface {
      * @param HttpClient $client
      * @param DeliveryModel $deliveryModel
      */
-    public function __construct(HttpClient $client, DeliveryModel $deliveryModel) {
+    public function __construct(HttpClient $client, WebhookDeliveryModel $deliveryModel) {
         $this->client = $client;
         $this->deliveryModel = $deliveryModel;
     }
@@ -80,7 +82,7 @@ class DispatchEventJob implements LocalJobInterface {
             $body["user"] = $this->user;
         }
 
-        $json = json_encode($body);
+        $json = StringUtils::jsonEncodeChecked($body, \JSON_UNESCAPED_SLASHES);
 
         $headers = [
             "Content-Type" => "application/json",
@@ -98,30 +100,10 @@ class DispatchEventJob implements LocalJobInterface {
         $endTime = microtime(true);
         $requestDuration = ($endTime - $startTime) * 1000;
 
-        $this->writeDeliveryRecord(
-            $this->deliveryID,
-            $this->webhookID,
-            $response,
-            $requestDuration
-        );
+        $this->logRequest($response->getRequest());
+        $this->logResponse($response, $requestDuration);
 
         return $response->isResponseClass("2xx");
-    }
-
-    /**
-     * Given an array of HTTP headers, format them as a string.
-     *
-     * @param array $headers
-     * @return string
-     */
-    private function formatHeaderArray(array $headers): string {
-        $result = [];
-        foreach ($headers as $header => $values) {
-            foreach ($values as $value) {
-                $result[] = "{$header}: {$value}";
-            }
-        }
-        return implode("\n", $result);
     }
 
     /**
@@ -284,31 +266,39 @@ class DispatchEventJob implements LocalJobInterface {
     }
 
     /**
-     * Record details of a webhook event delivery attempt.
+     * Record request of an event dispatch attempt.
      *
-     * @param string $deliveryID
-     * @param integer $webhookID
+     * @param HttpRequest $request
+     * @return void
+     */
+    private function logRequest(HttpRequest $request): void {
+        $requestBody = $request->getBody();
+        $row = [
+            "webhookDeliveryID" => $this->deliveryID,
+            "webhookID" => $this->webhookID,
+            "requestHeaders" => $request->getHeaders(),
+            "requestBody" => is_string($requestBody) ? json_decode($requestBody) : $requestBody,
+        ];
+
+        $this->deliveryModel->insert($row);
+    }
+
+    /**
+     * Record response of an event dispatch attempt.
+     *
      * @param HttpResponse $response
      * @param integer $requestDuration
      * @return void
      */
-    private function writeDeliveryRecord(string $deliveryID, int $webhookID, HttpResponse $response, int $requestDuration): void {
-        $request = $response->getRequest();
-        $row = [
-            "deliveryID" => $deliveryID,
-            "webhookID" => $webhookID,
-            "request" => [
-                "headers" => $this->formatHeaderArray($request->getHeaders()),
-                "body" => $request->getBody(),
-            ],
-            "response" => [
-                "headers" => $this->formatHeaderArray($response->getHeaders()),
-                "body" => $response->getBody(),
-            ],
+    private function logResponse(HttpResponse $response, int $requestDuration): void {
+        $responseBody = $response->getBody();
+        $fields = [
+            "responseHeaders" => $response->getHeaders(),
+            "responseBody" => is_string($responseBody) ? json_decode($responseBody) : $responseBody,
             "responseCode" => $response->getStatusCode(),
             "requestDuration" => $requestDuration,
         ];
 
-        $this->deliveryModel->insert($row);
+        $this->deliveryModel->update($fields, ["webhookDeliveryID" => $this->deliveryID]);
     }
 }
