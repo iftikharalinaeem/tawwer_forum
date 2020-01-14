@@ -24,6 +24,7 @@ import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
+import classNames from "classnames";
 
 interface IProps {
     themeID: string | number;
@@ -49,12 +50,13 @@ export default function ThemeEditorPage(props: IProps) {
         if (theme.status === LoadStatus.PENDING && themeId !== null) {
             actions.getThemeById(themeId);
         }
-    }, [theme]);
+    }, [theme, form]);
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
 
     const { name, type, themeID, assets } = theme.data;
+
     const tabData = [
         {
             label: "Header",
@@ -64,6 +66,12 @@ export default function ThemeEditorPage(props: IProps) {
                     language={"html"}
                     value={assets.header?.data}
                     onChange={(event, newValue) => {
+                        updateAssets({
+                            header: {
+                                data: newValue,
+                                type: "html",
+                            },
+                        });
                         setHeader(newValue ? newValue : "");
                     }}
                 />
@@ -97,7 +105,7 @@ export default function ThemeEditorPage(props: IProps) {
                     language={"css"}
                     value={assets.styles}
                     onChange={(event, newValue) => {
-                        // updateAssets({ styles: newValue });
+                        updateAssets({ styles: newValue });
                         setCss(newValue ? newValue : "");
                     }}
                 />
@@ -111,31 +119,35 @@ export default function ThemeEditorPage(props: IProps) {
                     language={"javascript"}
                     value={assets.javascript}
                     onChange={(event, newValue) => {
-                        //  updateAssets({ javascript: newValue });
+                        updateAssets({ javascript: newValue });
                         setJS(newValue ? newValue : "");
                     }}
                 />
             ),
         },
     ];
-    const handleNameChange = () => {
-        console.log("ji");
+
+    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
     };
     const editThemeName = () => {};
     const newAssets = {
         header: header,
         footer: footer,
     };
-    const themeName = (
+    const title = (
         <div className={classes.themeName}>
-            {/*<span>{name}</span>*/}
             <span>
                 <InputTextBlock
-                    labelClassName="sr-only"
+                    wrapClassName={classNames(classes.inputWrapper)}
+                    disabled={false}
                     inputProps={{
                         value: name,
-                        onChange: handleNameChange,
+                        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                            handleNameChange(event);
+                        },
                         inputRef,
+                        inputClassNames: classNames(classes.themeInput),
                     }}
                 />
             </span>
@@ -159,7 +171,7 @@ export default function ThemeEditorPage(props: IProps) {
                     >
                         <ActionBar
                             callToActionTitle={"Save"}
-                            title={themeName}
+                            title={title}
                             fullWidth={true}
                             optionsMenu={
                                 <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.BELOW_LEFT}>

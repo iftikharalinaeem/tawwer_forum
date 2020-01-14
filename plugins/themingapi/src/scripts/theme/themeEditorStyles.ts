@@ -23,9 +23,30 @@ export const themeEitorClasses = useThemeCache(() => {
         display: "flex",
         fontWeight: globalVars.fonts.weights.semiBold,
     });
+
+    const themeInput = style("themeInput", {
+        $nest: {
+            "&&": {
+                padding: "0",
+                border: "0",
+                width: unit(145),
+                fontSize: globalVars.fonts.size.medium,
+                fontWeight: globalVars.fonts.weights.semiBold,
+            },
+        },
+    });
+    const inputWrapper = style("inputWrapper", {
+        $nest: {
+            "&&&": {
+                margin: 0,
+            },
+        },
+    });
     return {
         editIcon,
         themeName,
+        themeInput,
+        inputWrapper,
     };
 });
 
