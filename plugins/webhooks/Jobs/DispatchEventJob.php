@@ -88,7 +88,7 @@ class DispatchEventJob implements LocalJobInterface {
             "Content-Type" => "application/json",
             "X-Vanilla-Event" => $this->type,
             "X-Vanilla-ID" => $this->deliveryID,
-            "X-Vanilla-Signature" => $this->bodySignature($json, $this->webhookSecret),
+            "X-Vanilla-Signature" => $this->generateSignature($json, $this->webhookSecret),
         ];
 
         $startTime = microtime(true);
@@ -125,14 +125,14 @@ class DispatchEventJob implements LocalJobInterface {
     }
 
     /**
-     * Generate the signature header for a particular payload.
+     * Generate a signature for a value.
      *
-     * @param string $payload
+     * @param string $value
      * @param string $secret
      * @return string
      */
-    private function bodySignature(string $body, string $secret): string {
-        $signature = hash_hmac("sha1", $body, $secret);
+    private function generateSignature(string $value, string $secret): string {
+        $signature = hash_hmac("sha1", $value, $secret);
         $result = "sha1={$signature}";
         return $result;
     }
