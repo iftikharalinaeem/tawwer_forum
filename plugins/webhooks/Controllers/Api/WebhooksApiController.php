@@ -44,6 +44,7 @@ class WebhooksApiController extends \AbstractApiController {
      *
      * @param WebhookModel $webhookModel
      * @param EventScheduler $scheduler
+     * @param WebhookDeliveryModel $deliveryModel
      */
     public function __construct(WebhookModel $webhookModel, EventScheduler $scheduler, WebhookDeliveryModel $deliveryModel) {
         $this->webhookModel = $webhookModel;
@@ -302,13 +303,18 @@ class WebhooksApiController extends \AbstractApiController {
             "webhookID" => [
                 "type" => "integer",
             ],
-            "requestBody",
+            "requestBody" => [
+                "type" => "string",
+            ],
             "requestDuration" => [
                 "allowNull" => true,
                 "type" => "integer",
             ],
             "requestHeaders",
-            "responseBody",
+            "responseBody" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
             "responseCode" => [
                 "allowNull" => true,
                 "type" => "integer",

@@ -272,12 +272,11 @@ class DispatchEventJob implements LocalJobInterface {
      * @return void
      */
     private function logRequest(HttpRequest $request): void {
-        $requestBody = $request->getBody();
         $row = [
             "webhookDeliveryID" => $this->deliveryID,
             "webhookID" => $this->webhookID,
             "requestHeaders" => $request->getHeaders(),
-            "requestBody" => is_string($requestBody) ? json_decode($requestBody) : $requestBody,
+            "requestBody" => $request->getBody(),
         ];
 
         $this->deliveryModel->insert($row);
@@ -291,10 +290,9 @@ class DispatchEventJob implements LocalJobInterface {
      * @return void
      */
     private function logResponse(HttpResponse $response, int $requestDuration): void {
-        $responseBody = $response->getBody();
         $fields = [
             "responseHeaders" => $response->getHeaders(),
-            "responseBody" => is_string($responseBody) ? json_decode($responseBody) : $responseBody,
+            "responseBody" => $response->getRawBody(),
             "responseCode" => $response->getStatusCode(),
             "requestDuration" => $requestDuration,
         ];

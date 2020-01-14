@@ -29,9 +29,7 @@ class WebhookDeliveryModel extends PipelineModel {
 
         $normalizeProcessor = new NormalizeDataProcessor();
         $normalizeProcessor
-            ->addSerializedField("requestBody")
             ->addSerializedField("requestHeaders")
-            ->addSerializedField("responseBody")
             ->addSerializedField("responseHeaders");
         $this->addPipelineProcessor($normalizeProcessor);
     }
