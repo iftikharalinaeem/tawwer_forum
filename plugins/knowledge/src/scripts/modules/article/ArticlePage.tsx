@@ -39,12 +39,17 @@ interface IState {
  * Page component for an article.
  */
 export class ArticlePage extends React.Component<IProps, IState> {
+    public static defaultProps = {
+        forceLoading: false,
+    };
+
     /**
      * Render not found or the article.
      */
     public render(): React.ReactNode {
         const { article, articlelocales } = this.props;
         const articleID = this.articleID;
+
         if (!articleID) {
             return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
         }
@@ -62,7 +67,8 @@ export class ArticlePage extends React.Component<IProps, IState> {
             [LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) ||
             !article.data ||
             !articlelocales ||
-            !articlelocales.data
+            !articlelocales.data ||
+            this.props.forceLoading
         ) {
             return <NavigationLoadingLayout activeRecord={activeRecord} />;
         }
@@ -181,6 +187,7 @@ interface IOwnProps extends IDeviceProps {
     }>;
     isOnlyKb?: boolean;
     isHomeArticle?: boolean;
+    forceLoading?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
