@@ -26,6 +26,7 @@ import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlacehold
 
 interface IProps {
     activeRecord: IActiveRecord;
+    forceLoading?: boolean;
 }
 
 /**
@@ -44,15 +45,16 @@ export default function NavigationLoadingLayout(props: IProps) {
     const renderPanelBackground =
         device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
 
-    const navigation = lastKB ? (
-        <Navigation
-            activeRecord={props.activeRecord}
-            collapsible={lastKB.viewType === KbViewType.GUIDE}
-            kbID={lastKB.knowledgeBaseID}
-        />
-    ) : (
-        <NavigationPlaceholder />
-    );
+    const navigation =
+        !lastKB || props.forceLoading ? (
+            <NavigationPlaceholder />
+        ) : (
+            <Navigation
+                activeRecord={props.activeRecord}
+                collapsible={lastKB.viewType === KbViewType.GUIDE}
+                kbID={lastKB.knowledgeBaseID}
+            />
+        );
 
     return (
         <Container>

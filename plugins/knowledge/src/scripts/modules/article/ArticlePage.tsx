@@ -70,7 +70,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
             !articlelocales.data ||
             this.props.forceLoading
         ) {
-            return <NavigationLoadingLayout activeRecord={activeRecord} />;
+            return <NavigationLoadingLayout activeRecord={activeRecord} forceLoading={this.props.forceLoading} />;
         }
 
         const crumbs = article.data?.breadcrumbs;
