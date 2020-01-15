@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Dani M <dani.m@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -106,7 +106,7 @@ class WebhooksTest extends AbstractResourceTest {
         $record = [
             'name' => 'webhooktest',
             'url' => 'http://webhook.test',
-            'secret' => '123',
+            'secret' => '123456789abcdefghijk',
             'status' => 'active',
             'events' => ['comment', 'discussion'],
         ];
