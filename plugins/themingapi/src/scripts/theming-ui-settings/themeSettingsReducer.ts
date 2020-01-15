@@ -12,6 +12,9 @@ export interface IThemesState {
         themes: IManageTheme[];
     }>;
     applyStatus: ILoadable<{ themeID: number | string }>;
+    deleteThemeByID: {
+        [themeID: number]: ILoadable<{}>;
+    };
 }
 
 export interface IThemesStoreState extends ICoreStoreState {
@@ -25,6 +28,7 @@ const DEFAULT_THEMES_STATE: IThemesState = {
     applyStatus: {
         status: LoadStatus.PENDING,
     },
+    deleteThemeByID: {},
 };
 
 export const themeSettingsReducer = produce(
@@ -82,6 +86,35 @@ export const themeSettingsReducer = produce(
         .case(ThemesActions.putCurrentThemeACs.failed, (nextState, payload) => {
             nextState.applyStatus.status = LoadStatus.ERROR;
             nextState.applyStatus.error = payload.error;
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.started, (nextState, payload) => {
+            nextState.deleteThemeByID[payload.themeID] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.done, (nextState, payload) => {
+            //  delete nextState.deleteThemeByID![payload.params.themeID];
+            nextState.deleteThemeByID[payload.params.themeID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            if (nextState.themes.data) {
+                nextState.themes.data.themes = nextState.themes.data?.themes.filter(existingTemplate => {
+                    if (existingTemplate.themeID === payload.params.themeID) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+            }
+            return nextState;
+        })
+        .case(ThemesActions.deleteThemeACs.failed, (nextState, payload) => {
+            nextState.deleteThemeByID[payload.params.themeID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return nextState;
         }),
 );

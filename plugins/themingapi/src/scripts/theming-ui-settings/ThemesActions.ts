@@ -32,7 +32,6 @@ type IGetAllThemeResponse = IManageTheme[];
 /**
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
-
 export default class ThemesActions extends ReduxActions {
     public static readonly getAllThemes_ACS = actionCreator.async<{}, IGetAllThemeResponse, IApiError>(
         "GET_ALL_THEMES",
@@ -43,6 +42,13 @@ export default class ThemesActions extends ReduxActions {
         IManageTheme,
         IApiError
     >("PUT_CURRENT");
+
+    public static readonly deleteThemeACs = actionCreator.async<{ themeID: number | string }, undefined, IApiError>(
+        "DELETE",
+    );
+
+    public static clearDeleteStatus = actionCreator<{ ThemeID: number | string }>("CLEAR_DELETE_STATUS");
+    public clearDeleteStatus = this.bindDispatch(ThemesActions.clearDeleteStatus);
 
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemesActions.getAllThemes_ACS, async () => {
@@ -62,6 +68,14 @@ export default class ThemesActions extends ReduxActions {
             return response.data;
         })(body);
         return this.dispatch(thunk);
+    };
+
+    public deleteTheme = (themeID: number | string) => {
+        const apiThunk = bindThunkAction(ThemesActions.deleteThemeACs, async () => {
+            const response = await this.api.delete(`/themes/${themeID}`);
+            return response.data;
+        })({ themeID });
+        return this.dispatch(apiThunk);
     };
 }
 
