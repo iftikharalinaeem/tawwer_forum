@@ -91,7 +91,7 @@ class EventModel extends Gdn_Model {
             }
         }
 
-        $orWhere = ['DateStarts<=' => $startDate->format('Y-m-d H:i:s'), 'DateEnds>=' => $startDate->format('Y-m-d H:i:s')];
+        $orWhere = ['DateStarts <= ' => $startDate->format('Y-m-d H:i:s'), 'DateEnds >= ' => $startDate->format('Y-m-d H:i:s')];
         // Only events that are over
         if ($ended) {
             $where['DateEnds <='] = $startDate->format('Y-m-d H:i:s');
