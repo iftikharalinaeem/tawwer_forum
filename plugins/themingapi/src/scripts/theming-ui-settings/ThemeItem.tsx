@@ -20,6 +20,7 @@ export function ThemeItem(props: IProps) {
     const { putCurrentTheme } = useThemesActions();
     const classes = themeItemClasses();
     const { preview } = props.theme;
+
     return (
         <div className={classes.item}>
             <ThemePreviewCard
@@ -37,6 +38,7 @@ export function ThemeItem(props: IProps) {
                 titleBarBg={preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined}
                 titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
                 previewImage={preview?.previewImage}
+                themeType ={props.theme.type}
             />
             <h3 className={classes.title}>{props.theme.name}</h3>
         </div>
