@@ -10,6 +10,7 @@ namespace Vanilla\ThemingApi\Controllers;
 use Garden\Container\Container;
 
 use Vanilla\Theme\Controllers\Pages\ThemeEditorPage;
+use Vanilla\Web\ContentSecurityPolicyMiddleware;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -25,29 +26,15 @@ class ThemeSettingsPageController extends PageDispatchController {
      * @param int $id
      * @return \Garden\Web\Data
      */
-    public function index() {
-
-        return $this
-            ->useSimplePage(\Gdn::translate('Theme Editor'))
-            ->blockRobots()
-            ->requiresSession("/theme/theme-settings/edit")
-            ->render()
-            ;
-    }
-
-    /**
-     * Render out the /theme/theme-settings/{id}/edit page.
-     *
-     * @param int $id
-     * @return \Garden\Web\Data
-     */
     public function get_edit(int $id) {
-        return $this
+        $response = $this
             ->useSimplePage(\Gdn::translate('Theme Editor'))
             ->blockRobots()
             ->requiresSession("/theme/theme-settings/$id/edit")
             ->render()
-            ;
+        ;
+        $response->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);
+        return $response;
     }
 
     /**
@@ -58,12 +45,14 @@ class ThemeSettingsPageController extends PageDispatchController {
      */
     public function get_add(array $query) {
         $query = $query . 'test';
-        return $this
+        $response = $this
             ->useSimplePage(\Gdn::translate('Theme Editor'))
             ->blockRobots()
             ->requiresSession("/theme/theme-settings/add")
             ->render()
-            ;
+        ;
+        $response->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);
+        return $response;
     }
 
 }
