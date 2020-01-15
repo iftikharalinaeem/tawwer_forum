@@ -60,7 +60,7 @@ class EventModel extends Gdn_Model {
      *      (End date is optional so setting this will exclude events with no end date.)
      * @return type
      */
-    public function getUpcoming($future, $where = null, $ended = null) {
+    public function getUpcoming($future, $where = null, $ended = null, $limit = 30) {
         $uTC = new DateTimeZone('UTC');
         $startDate = new DateTime('now', $uTC);
         if ($future) {
@@ -91,14 +91,18 @@ class EventModel extends Gdn_Model {
             }
         }
 
+        $orWhere = ['DateStarts <=' => $startDate->format('Y-m-d H:i:s'), 'DateEnds >=' => $startDate->format('Y-m-d H:i:s')];
         // Only events that are over
         if ($ended) {
             $where['DateEnds <='] = $startDate->format('Y-m-d H:i:s');
+            $orWhere = ['DateStarts <=' => $startDate->format('Y-m-d H:i:s'), 'DateEnds is null' => ''];
         }
 
         $eventsQuery = $this->SQL
             ->select('e.*')
             ->where($where)
+            ->orWhere($orWhere)
+            ->limit($limit)
             ->orderBy('DateStarts', 'asc');
 
         if ($invitedUserID) {
