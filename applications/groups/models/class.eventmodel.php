@@ -60,7 +60,7 @@ class EventModel extends Gdn_Model {
      *      (End date is optional so setting this will exclude events with no end date.)
      * @return type
      */
-    public function getUpcoming($future, $where = null, $ended = null, $limit = false) {
+    public function getUpcoming($future, $where = null, $ended = null, $limit = 30) {
         $uTC = new DateTimeZone('UTC');
         $startDate = new DateTime('now', $uTC);
         if ($future) {
