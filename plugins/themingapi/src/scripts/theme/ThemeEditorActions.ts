@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IThemeAssets, ITheme, IPostPatchThemeAssets } from "./themeEditorReducer";
+import { IThemeAssets, ITheme, IPostPatchThemeAssets, IThemeState, IThemeForm } from "./themeEditorReducer";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -48,7 +48,7 @@ export default class ThemeActions extends ReduxActions {
     public static initAssetsAC = actionCreator<{ themeID?: string | number }>("INIT_ASSETS");
     public initAssets = this.bindDispatch(ThemeActions.initAssetsAC);
 
-    public static updateAssetsAC = actionCreator<Partial<IThemeAssets>>("UPDATE_ASSETS");
+    public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
     public getThemeById = async (themeID: number | string) => {
@@ -62,9 +62,11 @@ export default class ThemeActions extends ReduxActions {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
+            console.log("==>", response);
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
+
         // Update the form the response data.
         this.updateAssets(response.assets);
         return response;

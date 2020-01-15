@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useEffect, Dispatch, useRef } from "react";
+import React, { useState, useEffect, Dispatch, useRef, useCallback, useLayoutEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { themeEitorClasses } from "./themeEditorStyles";
 import { ActionBar } from "@library/headers/ActionBar";
@@ -42,15 +42,18 @@ export default function ThemeEditorPage(props: IProps) {
     const [footer, setFooter] = useState("");
     const [js, setJS] = useState("");
     const [css, setCss] = useState("");
+    const [isDisabled, setDisabled] = useState(true);
+    const [themeName, setThemeName] = useState("");
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const themeId = params.get("themeName");
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null); //React.createRef<InputTextBlock>();
     useEffect(() => {
         if (theme.status === LoadStatus.PENDING && themeId !== null) {
             actions.getThemeById(themeId);
+            //actions.initAssets({themeID});
         }
-    }, [theme, form]);
+    }, [theme]);
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
@@ -67,9 +70,11 @@ export default function ThemeEditorPage(props: IProps) {
                     value={assets.header?.data}
                     onChange={(event, newValue) => {
                         updateAssets({
-                            header: {
-                                data: newValue,
-                                type: "html",
+                            assets: {
+                                header: {
+                                    data: newValue,
+                                    type: "html",
+                                },
                             },
                         });
                         setHeader(newValue ? newValue : "");
@@ -87,9 +92,11 @@ export default function ThemeEditorPage(props: IProps) {
                     value={assets.footer?.data}
                     onChange={(event, newValue) => {
                         updateAssets({
-                            footer: {
-                                data: newValue,
-                                type: "html",
+                            assets: {
+                                footer: {
+                                    data: newValue,
+                                    type: "html",
+                                },
                             },
                         });
                         setFooter(newValue ? newValue : "");
@@ -105,7 +112,7 @@ export default function ThemeEditorPage(props: IProps) {
                     language={"css"}
                     value={assets.styles}
                     onChange={(event, newValue) => {
-                        updateAssets({ styles: newValue });
+                        updateAssets({ assets: { styles: newValue } });
                         setCss(newValue ? newValue : "");
                     }}
                 />
@@ -119,43 +126,62 @@ export default function ThemeEditorPage(props: IProps) {
                     language={"javascript"}
                     value={assets.javascript}
                     onChange={(event, newValue) => {
-                        updateAssets({ javascript: newValue });
+                        updateAssets({ assets: { javascript: newValue } });
                         setJS(newValue ? newValue : "");
                     }}
                 />
             ),
         },
     ];
-
-    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-    };
-    const editThemeName = () => {};
     const newAssets = {
         header: header,
         footer: footer,
     };
-    const title = (
-        <div className={classes.themeName}>
-            <span>
+    const handleNameChange = event => {
+        event.stopPropagation();
+        event.preventDefault();
+        setThemeName(event.target.value || "");
+    };
+
+    const editThemeName = (ref: React.RefObject<HTMLInputElement>) => {
+        setDisabled(false);
+        ref.current?.focus();
+    };
+
+    const Title = () => {
+        //setThemeName(name ? name : " ");
+        return (
+            <div className={classes.themeName}>
                 <InputTextBlock
+                    type="text"
                     wrapClassName={classNames(classes.inputWrapper)}
-                    disabled={false}
+                    disabled={isDisabled}
                     inputProps={{
-                        value: name,
-                        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                            handleNameChange(event);
+                        onChange: event => {
+                            //event.preventDefault();
+                            //handleNameChange;
+                            console.log(event.target.value);
+                            updateAssets({ name: event.target.value });
+                            setThemeName(event.target.value);
                         },
+                        disabled: isDisabled,
                         inputRef,
+                        value: themeName,
                         inputClassNames: classNames(classes.themeInput),
                     }}
                 />
-            </span>
-            <Button baseClass={ButtonTypes.ICON_COMPACT} onClick={editThemeName}>
-                <EditIcon className={classes.editIcon} small={true} />
-            </Button>
-        </div>
-    );
+
+                <Button
+                    baseClass={ButtonTypes.ICON_COMPACT}
+                    onClick={() => {
+                        editThemeName(inputRef);
+                    }}
+                >
+                    <EditIcon className={classes.editIcon} small={true} />
+                </Button>
+            </div>
+        );
+    };
 
     return (
         <BrowserRouter>
@@ -165,13 +191,13 @@ export default function ThemeEditorPage(props: IProps) {
                         onSubmit={async event => {
                             event.preventDefault();
                             if (themeId !== null) {
-                                void saveTheme(newAssets, type, name, parseInt(themeId, 10));
+                                void saveTheme(newAssets, type, themeName, parseInt(themeId, 10));
                             }
                         }}
                     >
                         <ActionBar
                             callToActionTitle={"Save"}
-                            title={title}
+                            title={<Title />}
                             fullWidth={true}
                             optionsMenu={
                                 <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.BELOW_LEFT}>
@@ -182,6 +208,7 @@ export default function ThemeEditorPage(props: IProps) {
                                 </DropDown>
                             }
                         />
+
                         <Tabs data={tabData} />
                     </form>
                 </Modal>

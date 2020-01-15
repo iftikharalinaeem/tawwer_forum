@@ -113,18 +113,15 @@ const INITIAL_STATE: IThemeState = {
 export const themeEditorReducer = produce(
     reducerWithInitialState(INITIAL_STATE)
         .case(ThemeActions.initAssetsAC, (state, payload) => {
-            console.log("payload==>", payload);
             if (payload.themeID != null) {
                 const existingAsset = {
-                    ...state.form, //themeID.data[payload.themeID],
+                    ...state.theme, //themeID.data[payload.themeID],
                 };
-                state.form = existingAsset;
-                console.log("==>", existingAsset);
+                state.theme = existingAsset;
             } else {
                 console.log("restoring initial");
                 state.form.assets = INITIAL_ASSETS;
             }
-            console.log("state==>", state);
             return state;
         })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {
