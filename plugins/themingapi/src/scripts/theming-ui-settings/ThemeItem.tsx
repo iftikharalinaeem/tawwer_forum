@@ -27,10 +27,11 @@ export function ThemeItem(props: IProps) {
         <>
         {deleteID !== null && (
             <ThemeDeleteModal
-                themeID={props.theme.themeID}
+                themeID={deleteID}
                 onDismiss={() => {
                     setDeleteID(null);
                 }}
+                elementToFocusOnExit={document.body}
             />
         )}
         <div className={classes.item}>

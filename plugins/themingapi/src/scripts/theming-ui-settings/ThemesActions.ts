@@ -47,9 +47,6 @@ export default class ThemesActions extends ReduxActions {
         "DELETE",
     );
 
-    public static clearDeleteStatus = actionCreator<{ ThemeID: number | string }>("CLEAR_DELETE_STATUS");
-    public clearDeleteStatus = this.bindDispatch(ThemesActions.clearDeleteStatus);
-
     public getAllThemes = () => {
         const thunk = bindThunkAction(ThemesActions.getAllThemes_ACS, async () => {
             const params = { expand: "all" };

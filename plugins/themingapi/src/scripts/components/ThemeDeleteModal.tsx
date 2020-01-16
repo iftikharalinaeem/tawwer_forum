@@ -14,10 +14,11 @@ import {useThemesActions} from "@themingapi/theming-ui-settings/ThemesActions";
 interface IProps {
     themeID: number|string;
     onDismiss: () => void;
+    elementToFocusOnExit?: HTMLElement;
 }
 
 export function ThemeDeleteModal(props: IProps) {
-    const { themeID, onDismiss } = props;
+    const { themeID, onDismiss, elementToFocusOnExit } = props;
     const { deleteTheme, clearDeleteStatus } = useThemesActions();
     const { status } = useDeleteStatus(props.themeID);
 
@@ -31,15 +32,6 @@ export function ThemeDeleteModal(props: IProps) {
         }
     }, [status, onDismiss]);
 
-    /** Teardown handler */
-    useEffect(() => {
-        return () => {
-            clearDeleteStatus({ ThemeID : themeID });
-        };
-    }, [clearDeleteStatus, themeID]);
-
-
-
     return (
         <ModalConfirm
             title={t("Delete Theme")}
@@ -47,6 +39,7 @@ export function ThemeDeleteModal(props: IProps) {
             onConfirm={handleConfirm}
             onCancel={props.onDismiss}
             isConfirmLoading={status === LoadStatus.LOADING}
+            elementToFocusOnExit={elementToFocusOnExit}
         >
             {t("Are you sure want to delete this theme? It will be permanently deleted.")}
         </ModalConfirm>
