@@ -19,7 +19,7 @@ interface IProps {
 
 export function ThemeDeleteModal(props: IProps) {
     const { themeID, onDismiss, elementToFocusOnExit } = props;
-    const { deleteTheme, clearDeleteStatus } = useThemesActions();
+    const { deleteTheme } = useThemesActions();
     const { status } = useDeleteStatus(props.themeID);
 
     const handleConfirm = async () => {

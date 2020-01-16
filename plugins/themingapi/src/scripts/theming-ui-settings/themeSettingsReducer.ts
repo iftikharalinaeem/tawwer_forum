@@ -4,6 +4,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import ThemesActions, { IManageTheme, ThemeType } from "@themingapi/theming-ui-settings/ThemesActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { resultsAriaMessage } from "react-select/lib/accessibility";
 
 export interface IThemesState {
     themes: ILoadable<{
@@ -79,6 +80,20 @@ export const themeSettingsReducer = produce(
 
             if (nextState.themes.data) {
                 nextState.themes.data.currentTheme = payload.result;
+
+                nextState.themes.data.themes = nextState.themes.data.themes.map(theme => {
+                    return {
+                        ...theme,
+                        current: theme.themeID === payload.result.themeID,
+                    };
+                });
+
+                nextState.themes.data.templates = nextState.themes.data.templates.map(templates => {
+                    return {
+                        ...templates,
+                        current: templates.themeID === payload.result.themeID,
+                    };
+                });
             }
 
             return nextState;
@@ -95,7 +110,6 @@ export const themeSettingsReducer = produce(
             return nextState;
         })
         .case(ThemesActions.deleteThemeACs.done, (nextState, payload) => {
-            //  delete nextState.deleteThemeByID![payload.params.themeID];
             nextState.deleteThemeByID[payload.params.themeID] = {
                 status: LoadStatus.SUCCESS,
             };
