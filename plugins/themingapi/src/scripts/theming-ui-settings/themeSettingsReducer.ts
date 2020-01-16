@@ -4,7 +4,6 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import ThemesActions, { IManageTheme, ThemeType } from "@themingapi/theming-ui-settings/ThemesActions";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { resultsAriaMessage } from "react-select/lib/accessibility";
 
 export interface IThemesState {
     themes: ILoadable<{
