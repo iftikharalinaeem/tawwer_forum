@@ -201,7 +201,6 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
                 };
                 state.form = existingKB;
             } else {
-                console.log("restoring to initial");
                 state.form = INITIAL_KB_FORM;
             }
 
