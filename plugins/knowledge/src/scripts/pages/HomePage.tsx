@@ -20,16 +20,16 @@ import { t } from "@library/utility/appUtils";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
-import VanillaHomeHeader from "@library/headers/TitleBarHome";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { useBackgroundContext } from "@library/layout/Backgrounds";
+import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 
 const HomePage = (props: IProps) => {
     const splashVars = splashVariables({});
     const title = t(splashVars.title.text);
     const { loadStatus, knowledgeBases } = props;
 
-    const { setIsHomePage, isHomePage } = useBackgroundContext();
+    const { setIsHomePage } = useBackgroundContext();
 
     useEffect(() => {
         setIsHomePage(true);
@@ -50,7 +50,7 @@ const HomePage = (props: IProps) => {
             <Splash title={title} />
             <Container>
                 <DocumentTitle title={t("Home")}>
-                    <VanillaHomeHeader />
+                    <TitleBar hasSubNav />
                 </DocumentTitle>
                 <KnowledgeBaseList />
             </Container>
