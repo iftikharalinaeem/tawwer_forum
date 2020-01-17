@@ -128,7 +128,6 @@ class WebhooksApiController extends \AbstractApiController {
                         "requestDuration",
                         "responseCode",
                         "dateInserted",
-                        "dateUpdated",
                     ])->add($this->webhookDeliverySchema())
                 )
             ],
@@ -278,18 +277,25 @@ class WebhooksApiController extends \AbstractApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([]);
-        $out = $this->schema(['webhookID'])->add($this->webhookSchema());
+        $out = $this->schema([
+            "webhookID" => ["type" => "integer"],
+            "dateInserted" => [
+                "type" => "string",
+                "format" => "date-time",
+            ]
+        ])->add($this->webhookSchema());
 
         $row = $this->webhookModel->getID($id);
         $webhookConfig = new WebhookConfig($row);
 
-        $pingEvent = new PingEvent(PingEvent::ACTION_PING, [
+        $payload = [
             "webhookID" => $id,
-            "dateTime" => date("c"),
-        ]);
+            "dateInserted" => date("c"),
+        ];
+        $pingEvent = new PingEvent(PingEvent::ACTION_PING, $payload);
         $this->scheduler->addDispatchEventJob($pingEvent, $webhookConfig);
  
-        $result = $out->validate($row);
+        $result = $out->validate($payload);
         return $result;
     }
 
@@ -325,10 +331,6 @@ class WebhooksApiController extends \AbstractApiController {
             "responseHeaders",
             "dateInserted" => [
                 "type" => "datetime",
-            ],
-            "dateUpdated" => [
-                "type" => "datetime",
-                "allowNull" => true,
             ],
         ]);
         return $schema;
