@@ -9,6 +9,7 @@ namespace Vanilla\Webhooks\Jobs;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
@@ -40,6 +41,9 @@ class DispatchEventJob implements LocalJobInterface {
 
     /** @var JobPriority */
     private $priority;
+
+    /** @var array */
+    private $sender;
 
     /** @var string */
     private $type;
@@ -76,6 +80,7 @@ class DispatchEventJob implements LocalJobInterface {
         $body = [
             "action" => $this->action,
             "payload" => $this->payload,
+            "sender" => $this->sender,
             "site" => $this->site(),
         ];
         if (is_array($this->user)) {
@@ -153,13 +158,14 @@ class DispatchEventJob implements LocalJobInterface {
      * @param array $message The webhook event message.
      */
     public function setMessage(array $message) {
-        $this->setType($message["type"]);
-        $this->setAction($message["action"]);
-        $this->setPayload($message["payload"]);
-        $this->setWebhookID($message["webhookID"]);
-        $this->setWebhookUrl($message["webhookUrl"]);
-        $this->setWebhookSecret($message["webhookSecret"]);
-        $this->setDeliveryID($message["deliveryID"]);
+        $this->setType($message["type"])
+            ->setAction($message["action"])
+            ->setPayload($message["payload"])
+            ->setSender($message["sender"])
+            ->setWebhookID($message["webhookID"])
+            ->setWebhookUrl($message["webhookUrl"])
+            ->setWebhookSecret($message["webhookSecret"])
+            ->setDeliveryID($message["deliveryID"]);
 
         $this->setUser($message["user"] ?? null);
     }
@@ -209,6 +215,18 @@ class DispatchEventJob implements LocalJobInterface {
      */
     public function setPriority(JobPriority $priority) {
         $this->priority = $priority;
+    }
+
+    /**
+     * Set the user fragment representing the originator (user) of the event.
+     *
+     * @param array $sender
+     * @return self
+     */
+    private function setSender(array $sender): self {
+        $schema = new UserFragmentSchema();
+        $this->sender = $schema->validate($sender);
+        return $this;
     }
 
     /**
