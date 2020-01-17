@@ -143,13 +143,6 @@ export const navigationManagerClasses = useThemeCache(() => {
         height: 55,
     });
 
-    const formError = style("formError", {
-        position: "absolute",
-        top: unit(globalVars.gutter.half),
-        left: 0,
-        right: 0,
-    });
-
     const header = style("header", {
         display: "flex",
         ...paddings({
@@ -413,7 +406,6 @@ export const navigationManagerClasses = useThemeCache(() => {
         root,
         container,
         containerWidth,
-        formError,
         header,
         item,
         draggable,

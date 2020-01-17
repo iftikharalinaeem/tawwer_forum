@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
@@ -16,6 +16,7 @@ import Loader from "@library/loaders/Loader";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { tileClasses } from "@library/features/tiles/titleStyles";
 import Tiles from "@library/features/tiles/Tiles";
+import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -26,40 +27,43 @@ import Tiles from "@library/features/tiles/Tiles";
  * - Data with no items.
  * - Data with items.
  */
-class KnowledgeBaseList extends React.Component<IProps> {
-    public render() {
-        const { knowledgeBases, loadStatus, className, columns } = this.props;
-        const classes = tileClasses();
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
-            return <Loader />;
-        }
+function KnowledgeBaseList(props: IProps) {
+    const { requestKnowledgeBases, knowledgeBases, loadStatus, className, columns } = props;
 
-        if (LoadStatus.SUCCESS === loadStatus) {
-            document.body.classList.remove("isLoading");
+    useEffect(() => {
+        if (loadStatus === LoadStatus.PENDING) {
+            requestKnowledgeBases();
         }
+    });
 
-        return (
-            <Tiles
-                title={t("Choose a subcommunity")}
-                titleLevel={1}
-                hiddenTitle={true}
-                items={knowledgeBases}
-                emptyMessage={t("No knowledge bases found.")}
-                fallbackIcon={knowledgeBaseNoIcon(classes.fallBackIcon)}
-                className={className}
-                columns={columns}
-            />
-        );
+    const { setLastKbID } = useNavHistory();
+    useEffect(() => {
+        // By Visiting This page there is a likely chance we will navigate to a new knowledge base.
+        // To prevent stale navigation state, we should clear the last KB.
+        setLastKbID(null);
+    });
+
+    const classes = tileClasses();
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
+        return <Loader />;
     }
 
-    /**
-     * Fetch the data on mount if we don't already have it.
-     */
-    public componentDidMount() {
-        if (this.props.loadStatus === LoadStatus.PENDING) {
-            this.props.requestKnowledgeBases();
-        }
+    if (LoadStatus.SUCCESS === loadStatus) {
+        document.body.classList.remove("isLoading");
     }
+
+    return (
+        <Tiles
+            title={t("Choose a subcommunity")}
+            titleLevel={1}
+            hiddenTitle={true}
+            items={knowledgeBases}
+            emptyMessage={t("No knowledge bases found.")}
+            fallbackIcon={knowledgeBaseNoIcon(classes.fallBackIcon)}
+            className={className}
+            columns={columns}
+        />
+    );
 }
 
 interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof mapDispatchToProps> {

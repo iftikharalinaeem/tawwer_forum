@@ -11,7 +11,7 @@ import getStore from "@library/redux/getStore";
 interface INavHistoryContext {
     lastKbID: number | null;
     lastKB: IKnowledgeBase | null;
-    setLastKbID: (id: number) => void;
+    setLastKbID: (id: number | null) => void;
 }
 
 const NavHistoryContext = React.createContext<INavHistoryContext>({
@@ -58,7 +58,7 @@ export function NavHistoryUpdater(props: IUpdaterProps) {
         if (props.lastKbID != null) {
             setLastKbID(props.lastKbID);
         }
-    }, [props.lastKbID]);
+    }, [props.lastKbID, setLastKbID]);
 
     return null;
 }
