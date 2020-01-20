@@ -73,11 +73,18 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
         const { themeID } = this.getState().themeEditor.form;
-
+        const assets = {
+            header: form.assets.header,
+            footer: form.assets.footer,
+            styles: form.assets.styles,
+            javascript: form.assets.javascript,
+        };
         const request = {
             name: form.name,
-            assets: form.assets,
+            assets: assets,
         };
+
+        console.log("-->", request);
         if (form.type == "themeDB") {
             if (themeID) {
                 return await this.patchTheme({

@@ -44,7 +44,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
     const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
-    const { theme, form } = useThemeEditorState();
+    const { theme, form, formSubmit } = useThemeEditorState();
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
 
@@ -161,6 +161,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                 callToActionTitle={"Save"}
                                 title={<Title themeName={theme.data.name} />}
                                 fullWidth={true}
+                                isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                                 optionsMenu={
                                     <DropDown
                                         flyoutType={FlyoutType.LIST}
