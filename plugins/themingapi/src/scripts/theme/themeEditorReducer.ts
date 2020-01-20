@@ -60,6 +60,8 @@ export interface ITheme {
     name: string;
     type: string;
     assets: IThemeAssets;
+    parentTheme: string;
+    parentVersion: string;
 }
 
 export interface IThemeForm {
@@ -67,13 +69,12 @@ export interface IThemeForm {
     name: string;
     type: string;
     assets: IThemeAssets;
+    parentTheme: string;
+    parentVersion: string;
 }
 
 export interface IThemeState {
     theme: ILoadable<ITheme>;
-    themeByID: ILoadable<{
-        [themeID: number]: ITheme;
-    }>;
     form: IThemeForm;
     formSubmit: ILoadable<{}>;
 }
@@ -102,9 +103,6 @@ export const INITIAL_ASSETS: IThemeAssets = {
     variables: { key: "" },
 };
 const INITIAL_STATE: IThemeState = {
-    themeByID: {
-        status: LoadStatus.PENDING,
-    },
     theme: {
         status: LoadStatus.PENDING,
     },
@@ -112,6 +110,8 @@ const INITIAL_STATE: IThemeState = {
         name: "",
         type: "themeDB",
         assets: INITIAL_ASSETS,
+        parentTheme: "",
+        parentVersion: "",
     },
     formSubmit: {
         status: LoadStatus.PENDING,
@@ -120,17 +120,39 @@ const INITIAL_STATE: IThemeState = {
 
 export const themeEditorReducer = produce(
     reducerWithInitialState<IThemeState>(INITIAL_STATE)
-        .case(ThemeActions.updateAssetsAC, (state, payload) => {
+        /* .case(ThemeActions.initAssetsAC, (state, payload) => {
+            if (payload.themeID != null) {
+                const existingKB = {
+                    ...state.theme,
+                };
+                state.theme = existingKB;
+            } else {
+                console.log("restoring to initial");
+                state.form = INITIAL_ASSETS;
+            }
+
+            return state;
+        })*/
+
+        /* .case(ThemeActions.updateHeaderAssetsAC, (state, payload) => {
             state.form = {
                 ...state.form,
                 ...payload,
             };
-
+            console.log("header state-->", state.form.assets.header);
             return state;
         })
+        .case(ThemeActions.updateFooterAssetsAC, (state, payload) => {
+            state.form = {
+                ...state.form,
+                ...payload,
+            };
+            console.log("footer state-->", state.form.assets.footer);
+            return state;
+        })*/
+
         .case(ThemeActions.getTheme_ACs.started, (state, payload) => {
             state.theme.status = LoadStatus.LOADING;
-            // Reset theform.
             return state;
         })
         .case(ThemeActions.getTheme_ACs.failed, (state, payload) => {
@@ -143,6 +165,18 @@ export const themeEditorReducer = produce(
             state.theme.data = payload.result;
             state.form = payload.result;
             // Fill the form with the payload.
+            return state;
+        })
+        .case(ThemeActions.updateAssetsAC, (state, payload) => {
+            state.form = {
+                ...state.form,
+                ...payload,
+                assets: {
+                    ...(state.form.assets ?? state.form.assets),
+                    ...(payload.assets ?? payload.assets),
+                },
+            };
+
             return state;
         })
         .case(ThemeActions.postTheme_ACs.started, (state, payload) => {

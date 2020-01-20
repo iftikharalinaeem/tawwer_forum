@@ -52,6 +52,12 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
+    public static updateHeaderAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_Header_ASSETS");
+    public updateHeaderAssets = this.bindDispatch(ThemeActions.updateHeaderAssetsAC);
+
+    public static updateFooterAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_Footer_ASSETS");
+    public updateFooterAssets = this.bindDispatch(ThemeActions.updateFooterAssetsAC);
+
     public getThemeById = async (themeID: number | string) => {
         const request = {
             themeID: themeID,
@@ -93,7 +99,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 });
             }
         } else {
-            return await this.postTheme(request);
+            return await this.postTheme({ ...request, parentTheme: form.parentTheme });
         }
     };
 
