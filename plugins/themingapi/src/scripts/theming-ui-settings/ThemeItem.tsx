@@ -33,18 +33,12 @@ export function ThemeItem(props: IProps) {
                     putCurrentTheme(props.theme.themeID);
                 }}
                 onEdit={
-                    <ThemeEditorRoute.Link
-                        data={{ themeID: themeID, action: "edit" }}
-                        className={classesDropDown.action}
-                    >
+                    <ThemeEditorRoute.Link data={{ themeID: themeID }} className={classesDropDown.action}>
                         {t("Edit")}
                     </ThemeEditorRoute.Link>
                 }
                 onCopy={
-                    <ThemeEditorRoute.Link
-                        data={{ themeID: themeID, action: "copy" }}
-                        className={classesDropDown.action}
-                    >
+                    <ThemeEditorRoute.Link data={{ templateName: themeID }} className={classesDropDown.action}>
                         {t("Copy")}
                     </ThemeEditorRoute.Link>
                 }

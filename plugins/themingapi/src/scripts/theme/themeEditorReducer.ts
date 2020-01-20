@@ -9,9 +9,6 @@ import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import ThemeActions, { useThemeActions } from "./ThemeEditorActions";
 import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
-import { IThemesStoreState, IThemesState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
-import { useThemesActions, IManageTheme, ThemeType } from "@themingapi/theming-ui-settings/ThemesActions";
-import { useEffect } from "react";
 
 export interface IThemeAssets {
     fonts?: { data: IThemeFont[] };

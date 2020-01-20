@@ -5,15 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import {
-    IThemeAssets,
-    ITheme,
-    IPostPatchThemeAssets,
-    IThemeState,
-    IThemeForm,
-    useThemeEditorState,
-    IThemeEditorStoreState,
-} from "./themeEditorReducer";
+import { IThemeAssets, ITheme, IPostPatchThemeAssets, IThemeForm, IThemeEditorStoreState } from "./themeEditorReducer";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -86,7 +78,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             name: form.name,
             assets: form.assets,
         };
-        console.log("request-->", request);
         if (form.type == "themeDB") {
             if (themeID) {
                 return await this.patchTheme({

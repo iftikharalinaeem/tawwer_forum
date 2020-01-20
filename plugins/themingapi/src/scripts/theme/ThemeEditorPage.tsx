@@ -42,17 +42,23 @@ interface IOwnProps
 
 export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const classes = themeEitorClasses();
     const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
     const { theme, form } = useThemeEditorState();
     const [themeName, setThemeName] = useState("");
-    const themeID = props.match.params.id;
+    let themeID = props.match.params.id;
+
+    const getTemplateName = () => {
+        const temp = qs.parse(props.history.location.search.replace(/^\?/, ""));
+        return temp.templateName;
+    };
+    if (themeID === undefined) {
+        themeID = getTemplateName();
+    }
 
     useEffect(() => {
         if (theme.status === LoadStatus.PENDING && themeID !== undefined) {
             actions.getThemeById(themeID);
-            // actions.initAssets({ themeID });
         }
     }, [form, actions.initAssets]);
 
@@ -66,7 +72,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
-    console.log("form-->", form);
     const { name, type, assets } = form;
 
     const tabData = [

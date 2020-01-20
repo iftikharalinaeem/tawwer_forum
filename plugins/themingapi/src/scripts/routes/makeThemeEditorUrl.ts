@@ -11,7 +11,7 @@ import { Store } from "redux";
 
 export interface IThemeEditorURLData {
     themeID?: string | number;
-    action: string;
+    templateName?: string;
 }
 
 /**
@@ -24,18 +24,18 @@ export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<ITh
     if (!data) {
         return defaultAddRoot;
     }
-    let baseUrl = "";
-    const baseTheme = "foundation";
+    let baseUrl = data.themeID ? `/theme/theme-settings/${data.themeID}/edit` : defaultAddRoot;
+    const { templateName } = data;
 
-    store = store ?? getStore<IThemeEditorURLData>();
-
-    if (data.action === "edit" && data.themeID !== null) {
-        baseUrl = `/theme/theme-settings/${data.themeID}/edit`;
-    } else if (data.action === "copy") {
-        baseUrl = `/theme/add?templateName=${data.themeID}`;
-    } else {
-        baseUrl = defaultAddRoot;
+    if (templateName === undefined) {
+        logWarning("Attempted to initialize theme editor without template name . Please check template name.");
     }
 
+    const query = qs.stringify({
+        templateName,
+    });
+    if (query) {
+        baseUrl += `?${query}`;
+    }
     return baseUrl;
 }
