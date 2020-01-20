@@ -8,11 +8,11 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@library/@types/api/core";
-import {IThemesStoreState} from "@themingapi/theming-ui-settings/themeSettingsReducer";
-import {useThemesActions} from "@themingapi/theming-ui-settings/ThemesActions";
+import { IThemesStoreState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
+import { useThemesActions } from "@themingapi/theming-ui-settings/ThemesActions";
 
 interface IProps {
-    themeID: number|string;
+    themeID: number | string;
     onDismiss: () => void;
     elementToFocusOnExit?: HTMLElement;
 }
@@ -43,14 +43,12 @@ export function ThemeDeleteModal(props: IProps) {
         >
             {t("Are you sure want to delete this theme? It will be permanently deleted.")}
         </ModalConfirm>
-);
+    );
 }
 
-function useDeleteStatus(themeID: number|string) {
+function useDeleteStatus(themeID: number | string) {
     return (
-        useSelector(
-            (state: IThemesStoreState) => state.themeSettings.deleteThemeByID[themeID],
-        ) ?? {
+        useSelector((state: IThemesStoreState) => state.themeSettings.deleteThemeByID[themeID]) ?? {
             status: LoadStatus.PENDING,
         }
     );
