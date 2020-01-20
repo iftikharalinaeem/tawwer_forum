@@ -5,11 +5,20 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IThemeAssets, ITheme, IPostPatchThemeAssets, IThemeState, IThemeForm } from "./themeEditorReducer";
+import {
+    IThemeAssets,
+    ITheme,
+    IPostPatchThemeAssets,
+    IThemeState,
+    IThemeForm,
+    useThemeEditorState,
+    IThemeEditorStoreState,
+} from "./themeEditorReducer";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
+import { IManageTheme } from "@themingapi/theming-ui-settings/ThemesActions";
 
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
@@ -19,8 +28,9 @@ interface IGetThemeParams {
 type IGetThemeResponse = ITheme;
 type IPostThemeResponse = ITheme;
 type IPatchThemeResponse = ITheme;
+
 export interface IPostThemeRequest {
-    name: string | number;
+    name: string;
     parentTheme?: string;
     parentVersion?: string;
     assets?: IPostPatchThemeAssets;
@@ -32,12 +42,13 @@ export interface IPatchThemeRequest {
     parentVersion?: string;
     assets?: Partial<IPostPatchThemeAssets>;
 }
+type IGetAllThemeResponse = IManageTheme[];
 
 /**
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
 
-export default class ThemeActions extends ReduxActions {
+export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static getTheme_ACs = actionCreator.async<IGetThemeParams, IGetThemeResponse, IApiError>("GET_THEME");
     public static postTheme_ACs = actionCreator.async<IPostThemeRequest, IPostThemeResponse, IApiError>("POST_THEME"); //Copy
 
@@ -62,32 +73,50 @@ export default class ThemeActions extends ReduxActions {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
-            console.log("==>", response);
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
 
-        // Update the form the response data.
-        this.updateAssets(response.assets);
+        this.updateAssets(response.assets); //Update the form the response data.
         return response;
     };
+    public static readonly getAllThemes_ACS = actionCreator.async<{}, IGetAllThemeResponse, IApiError>(
+        "GET_ALL_THEMES",
+    );
 
-    public saveTheme = async (
-        assets: Partial<IPostPatchThemeAssets>,
-        themeType: string,
-        themeName: string,
-        themeID?: number | string,
-    ) => {
+    public getAllThemes = () => {
+        const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
+            const params = { expand: "all" };
+            const response = await this.api.get(`/themes/`, { params });
+
+            return response.data;
+        })();
+        return this.dispatch(thunk);
+    };
+
+    public saveTheme = async () => {
+        const { form } = this.getState().themeEditor;
+        const { themeID } = this.getState().themeEditor.form;
+        const header = form.assets.header?.data;
+        const footer = form.assets.footer?.data;
+        const assets = {
+            header: header,
+            footer: footer,
+            javascript: form.assets.javascript,
+            styles: form.assets.styles,
+        };
         const request = {
-            name: themeName,
+            name: form.name,
             assets: assets,
         };
-
-        if (themeType == "themeDB") {
-            return await this.patchTheme({
-                ...request,
-                themeID,
-            });
+        console.log("request==>", request);
+        if (form.type == "themeDB") {
+            if (themeID) {
+                return await this.patchTheme({
+                    ...request,
+                    themeID,
+                });
+            }
         } else {
             return await this.postTheme(request);
         }

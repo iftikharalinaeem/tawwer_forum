@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, Dispatch, useRef, useCallback, useLayoutEffect } from "react";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, RouteComponentProps } from "react-router-dom";
 import { themeEitorClasses } from "./themeEditorStyles";
 import { ActionBar } from "@library/headers/ActionBar";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
@@ -12,27 +12,35 @@ import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/Dr
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor from "@library/textEditor/TextEditor";
 import { useThemeActions } from "./ThemeEditorActions";
-import { useThemeEditorState, IThemeAssets } from "./themeEditorReducer";
+import { useThemeEditorState, IThemeAssets, useAllThemes } from "./themeEditorReducer";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { t } from "@vanilla/i18n";
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import { useUniqueID, uniqueIDFromPrefix } from "@vanilla/library/src/scripts/utility/idUtils";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import classNames from "classnames";
+import { useLastValue } from "@vanilla/react-utils";
+import qs from "qs";
+import { useParams } from "react-router-dom";
 
-interface IProps {
+interface IProps extends IOwnProps {
     themeID: string | number;
-    type: string;
-    name: string;
-    assets: IThemeAssets;
+    type?: string;
+    name?: string;
+    assets?: IThemeAssets;
 }
-export default function ThemeEditorPage(props: IProps) {
+interface IOwnProps
+    extends RouteComponentProps<{
+        id: string;
+    }> {}
+
+export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
     const classes = themeEitorClasses();
     const { updateAssets, saveTheme } = useThemeActions();
@@ -42,23 +50,28 @@ export default function ThemeEditorPage(props: IProps) {
     const [footer, setFooter] = useState("");
     const [js, setJS] = useState("");
     const [css, setCss] = useState("");
-    const [isDisabled, setDisabled] = useState(true);
     const [themeName, setThemeName] = useState("");
-    const search = window.location.search;
-    const params = new URLSearchParams(search);
-    const themeId = params.get("themeName");
-    const inputRef = useRef<HTMLInputElement>(null); //React.createRef<InputTextBlock>();
+    const themeID = props.match.params.id;
+
     useEffect(() => {
-        if (theme.status === LoadStatus.PENDING && themeId !== null) {
-            actions.getThemeById(themeId);
-            //actions.initAssets({themeID});
+        if (theme.status === LoadStatus.PENDING && themeID !== undefined) {
+            actions.getThemeById(themeID);
+            // actions.initAssets({ themeID });
         }
-    }, [theme]);
+    }, [themeID, actions.initAssets]);
+
+    const lastStatus = useLastValue(theme.status);
+    useEffect(() => {
+        if (theme.status === LoadStatus.SUCCESS && lastStatus !== LoadStatus.SUCCESS && theme.data) {
+            setThemeName(theme.data.name);
+        }
+    });
+
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
 
-    const { name, type, themeID, assets } = theme.data;
+    const { name, type, assets } = theme.data;
 
     const tabData = [
         {
@@ -137,82 +150,90 @@ export default function ThemeEditorPage(props: IProps) {
         header: header,
         footer: footer,
     };
-    const handleNameChange = event => {
-        event.stopPropagation();
-        event.preventDefault();
-        setThemeName(event.target.value || "");
-    };
 
+    return (
+        <BrowserRouter>
+            <React.Fragment>
+                {
+                    <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                        <form
+                            onSubmit={async event => {
+                                event.preventDefault();
+                                if (themeID !== null) {
+                                    // void saveTheme(newAssets, type, themeName, parseInt(themeId, 10));
+                                    void saveTheme();
+                                }
+                            }}
+                        >
+                            <ActionBar
+                                callToActionTitle={"Save"}
+                                title={<Title themeName={theme.data.name} />}
+                                fullWidth={true}
+                                optionsMenu={
+                                    <DropDown
+                                        flyoutType={FlyoutType.LIST}
+                                        openDirection={DropDownOpenDirection.BELOW_LEFT}
+                                    >
+                                        <DropDownItemButton name={t("Copy")} onClick={() => {}} />
+                                        <DropDownItemButton name={t("Exit")} onClick={() => {}} />
+                                        <DropDownItemSeparator />
+                                        <DropDownItemButton name={t("Delete")} onClick={() => {}} />
+                                    </DropDown>
+                                }
+                            />
+
+                            <Tabs data={tabData} />
+                        </form>
+                    </Modal>
+                }
+            </React.Fragment>
+        </BrowserRouter>
+    );
+}
+interface IThemeTitleProps {
+    isDisabled?: boolean;
+    updateAssets?: void;
+    setThemeName?: string;
+    themeName?: string;
+    editThemeName?: void;
+}
+export const Title = (props: IThemeTitleProps) => {
+    const { updateAssets } = useThemeActions();
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [isDisabled, setDisabled] = useState(true);
+    const [name, setName] = useState(props.themeName);
+    const classes = themeEitorClasses();
     const editThemeName = (ref: React.RefObject<HTMLInputElement>) => {
         setDisabled(false);
         ref.current?.focus();
     };
 
-    const Title = () => {
-        //setThemeName(name ? name : " ");
-        return (
-            <div className={classes.themeName}>
-                <InputTextBlock
-                    type="text"
-                    wrapClassName={classNames(classes.inputWrapper)}
-                    disabled={isDisabled}
-                    inputProps={{
-                        onChange: event => {
-                            //event.preventDefault();
-                            //handleNameChange;
-                            console.log(event.target.value);
-                            updateAssets({ name: event.target.value });
-                            setThemeName(event.target.value);
-                        },
-                        disabled: isDisabled,
-                        inputRef,
-                        value: themeName,
-                        inputClassNames: classNames(classes.themeInput),
-                    }}
-                />
-
-                <Button
-                    baseClass={ButtonTypes.ICON_COMPACT}
-                    onClick={() => {
-                        editThemeName(inputRef);
-                    }}
-                >
-                    <EditIcon className={classes.editIcon} small={true} />
-                </Button>
-            </div>
-        );
-    };
-
     return (
-        <BrowserRouter>
-            <React.Fragment>
-                <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-                    <form
-                        onSubmit={async event => {
-                            event.preventDefault();
-                            if (themeId !== null) {
-                                void saveTheme(newAssets, type, themeName, parseInt(themeId, 10));
-                            }
-                        }}
-                    >
-                        <ActionBar
-                            callToActionTitle={"Save"}
-                            title={<Title />}
-                            fullWidth={true}
-                            optionsMenu={
-                                <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.BELOW_LEFT}>
-                                    <DropDownItemButton name={t("Copy")} onClick={() => {}} />
-                                    <DropDownItemButton name={t("Exit")} onClick={() => {}} />
-                                    <DropDownItemSeparator />
-                                    <DropDownItemButton name={t("Delete")} onClick={() => {}} />
-                                </DropDown>
-                            }
-                        />
+        <div className={classes.themeName}>
+            <InputTextBlock
+                wrapClassName={classNames(classes.inputWrapper)}
+                disabled={isDisabled}
+                inputProps={{
+                    required: true,
+                    inputClassNames: classNames(classes.themeInput),
+                    onChange: event => {
+                        updateAssets({ name: event.target.value });
+                        setName(event.target.value);
+                    },
+                    disabled: isDisabled,
+                    inputRef,
+                    value: name,
+                }}
+            />
 
-                        <Tabs data={tabData} />
-                    </form>
-                </Modal>
-            </React.Fragment>
-        </BrowserRouter>
+            <Button
+                baseClass={ButtonTypes.ICON_COMPACT}
+                onClick={() => {
+                    editThemeName(inputRef);
+                }}
+            >
+                <EditIcon className={classes.editIcon} small={true} />
+            </Button>
+        </div>
     );
-}
+};

@@ -7,14 +7,18 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
-import ThemeActions from "./ThemeEditorActions";
+import ThemeActions, { useThemeActions } from "./ThemeEditorActions";
+import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { IThemesStoreState, IThemesState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
+import { useThemesActions, IManageTheme, ThemeType } from "@themingapi/theming-ui-settings/ThemesActions";
+import { useEffect } from "react";
 
 export interface IThemeAssets {
     fonts?: { data: IThemeFont[] };
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
-    header?: IThemeHeader;
+    header?: IThemeHeader | undefined;
     footer?: IThemeFooter | undefined;
     javascript?: string;
     styles?: string;
@@ -55,20 +59,24 @@ export interface IThemeVariables {
 }
 
 export interface ITheme {
-    themeID: string;
-    name?: string;
+    themeID: string | number;
+    name: string;
     type: string;
     assets: IThemeAssets;
 }
 
 export interface IThemeForm {
-    name?: string;
+    themeID?: number | string;
+    name: string;
     type: string;
     assets: IThemeAssets;
 }
 
 export interface IThemeState {
     theme: ILoadable<ITheme>;
+    themeByID: ILoadable<{
+        [themeID: number]: ITheme;
+    }>;
     form: IThemeForm;
     formSubmit: ILoadable<{}>;
 }
@@ -97,6 +105,9 @@ export const INITIAL_ASSETS: IThemeAssets = {
     variables: { key: "" },
 };
 const INITIAL_STATE: IThemeState = {
+    themeByID: {
+        status: LoadStatus.PENDING,
+    },
     theme: {
         status: LoadStatus.PENDING,
     },
@@ -111,16 +122,18 @@ const INITIAL_STATE: IThemeState = {
 };
 
 export const themeEditorReducer = produce(
-    reducerWithInitialState(INITIAL_STATE)
+    reducerWithInitialState<IThemeState>(INITIAL_STATE)
         .case(ThemeActions.initAssetsAC, (state, payload) => {
             if (payload.themeID != null) {
                 const existingAsset = {
-                    ...state.theme, //themeID.data[payload.themeID],
+                    // ...state.themeByID.data?.[payload.themeID],
+                    //...state.theme,
                 };
                 state.theme = existingAsset;
+                console.log("====>", existingAsset);
             } else {
                 console.log("restoring initial");
-                state.form.assets = INITIAL_ASSETS;
+                state.form = INITIAL_ASSETS;
             }
             return state;
         })
@@ -129,10 +142,32 @@ export const themeEditorReducer = produce(
                 ...state.form,
                 ...payload,
             };
+
+            return state;
+        })
+        .case(ThemeActions.getAllThemes_ACS.started, (state, payload) => {
+            state.theme.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(ThemeActions.getAllThemes_ACS.done, (state, payload) => {
+            const normalized: { [id: number]: ITheme } = {};
+            for (const theme of payload.result) {
+                normalized[theme.themeID] = theme;
+            }
+
+            state.theme.status = LoadStatus.SUCCESS;
+            state.themeByID.data = normalized;
+
+            return state;
+        })
+        .case(ThemeActions.getAllThemes_ACS.failed, (state, payload) => {
+            state.theme.status = LoadStatus.ERROR;
+            state.theme.error = payload.error;
             return state;
         })
         .case(ThemeActions.getTheme_ACs.started, (state, payload) => {
             state.theme.status = LoadStatus.LOADING;
+            // Reset theform.
             return state;
         })
         .case(ThemeActions.getTheme_ACs.failed, (state, payload) => {
@@ -143,6 +178,8 @@ export const themeEditorReducer = produce(
         .case(ThemeActions.getTheme_ACs.done, (state, payload) => {
             state.theme.status = LoadStatus.SUCCESS;
             state.theme.data = payload.result;
+            state.form = payload.result;
+            // Fill the form with the payload.
             return state;
         })
         .case(ThemeActions.postTheme_ACs.started, (state, payload) => {
@@ -176,9 +213,20 @@ export const themeEditorReducer = produce(
         }),
 );
 
-export interface IThemeEditorStoreState {
+export interface IThemeEditorStoreState extends ICoreStoreState {
     themeEditor: IThemeState;
 }
+/*export function useAllThemes() {
+    const { themeByID } = useSelector((state: IThemeEditorStoreState) => state.themeEditor);
+    const { getAllThemes } = useThemeActions();
+
+    useEffect(() => {
+        if (themeByID.status === LoadStatus.PENDING) {
+            getAllThemes();
+        }
+    }, [themeByID, getAllThemes]);
+    return themeByID;
+}*/
 
 export function useThemeEditorState() {
     return useSelector((state: IThemeEditorStoreState) => state.themeEditor);
