@@ -1386,6 +1386,7 @@ if (!function_exists('writeReactions')) {
      * @throws Exception
      */
     function writeReactions($row) {
+        $dataDrivenColors = c("Feature.DataDrivenTheme.Enabled");
         $attributes = val('Attributes', $row);
         if (is_string($attributes)) {
             $attributes = dbdecode($attributes);
@@ -1470,11 +1471,17 @@ if (!function_exists('writeReactions')) {
             echo Gdn_Theme::bulletItem('Reactions');
         }
 
-        echo '<span class="ReactMenu">';
-        echo '<span class="ReactButtons">';
+        if (!$dataDrivenColors) {
+            echo '<span class="ReactMenu">';
+            echo '<span class="ReactButtons">';
+        }
+
         echo $reactionHtml;
-        echo '</span>';
-        echo '</span>';
+
+        if (!$dataDrivenColors) {
+            echo '</span>';
+            echo '</span>';
+        }
 
         if (checkPermission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'])) {
             echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
