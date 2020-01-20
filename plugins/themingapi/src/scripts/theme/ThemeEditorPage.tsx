@@ -12,7 +12,7 @@ import DropDown, { FlyoutType, DropDownOpenDirection } from "@library/flyouts/Dr
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor from "@library/textEditor/TextEditor";
 import { useThemeActions } from "./ThemeEditorActions";
-import { useThemeEditorState, IThemeAssets, useAllThemes } from "./themeEditorReducer";
+import { useThemeEditorState, IThemeAssets } from "./themeEditorReducer";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { t } from "@vanilla/i18n";
@@ -46,10 +46,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
     const { theme, form } = useThemeEditorState();
-    const [header, setHeader] = useState("");
-    const [footer, setFooter] = useState("");
-    const [js, setJS] = useState("");
-    const [css, setCss] = useState("");
     const [themeName, setThemeName] = useState("");
     const themeID = props.match.params.id;
 
@@ -58,7 +54,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             actions.getThemeById(themeID);
             // actions.initAssets({ themeID });
         }
-    }, [themeID, actions.initAssets]);
+    }, [form, actions.initAssets]);
 
     const lastStatus = useLastValue(theme.status);
     useEffect(() => {
@@ -70,8 +66,8 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
-
-    const { name, type, assets } = theme.data;
+    console.log("form-->", form);
+    const { name, type, assets } = form;
 
     const tabData = [
         {
@@ -90,7 +86,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                 },
                             },
                         });
-                        setHeader(newValue ? newValue : "");
                     }}
                 />
             ),
@@ -112,7 +107,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                 },
                             },
                         });
-                        setFooter(newValue ? newValue : "");
                     }}
                 />
             ),
@@ -126,7 +120,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                     value={assets.styles}
                     onChange={(event, newValue) => {
                         updateAssets({ assets: { styles: newValue } });
-                        setCss(newValue ? newValue : "");
                     }}
                 />
             ),
@@ -140,16 +133,11 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                     value={assets.javascript}
                     onChange={(event, newValue) => {
                         updateAssets({ assets: { javascript: newValue } });
-                        setJS(newValue ? newValue : "");
                     }}
                 />
             ),
         },
     ];
-    const newAssets = {
-        header: header,
-        footer: footer,
-    };
 
     return (
         <BrowserRouter>
@@ -160,7 +148,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                             onSubmit={async event => {
                                 event.preventDefault();
                                 if (themeID !== null) {
-                                    // void saveTheme(newAssets, type, themeName, parseInt(themeId, 10));
                                     void saveTheme();
                                 }
                             }}

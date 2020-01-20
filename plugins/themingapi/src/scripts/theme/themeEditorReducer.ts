@@ -18,8 +18,8 @@ export interface IThemeAssets {
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
-    header?: IThemeHeader | undefined;
-    footer?: IThemeFooter | undefined;
+    header?: IThemeHeader;
+    footer?: IThemeFooter;
     javascript?: string;
     styles?: string;
 }
@@ -29,18 +29,18 @@ export interface IPostPatchThemeAssets {
     logo?: IThemeExternalAsset;
     mobileLogo?: IThemeExternalAsset;
     variables?: IThemeVariables;
-    header?: string;
-    footer?: string;
+    header?: IThemeHeader;
+    footer?: IThemeFooter;
     javascript?: string;
     styles?: string;
 }
 
 export interface IThemeHeader {
-    data: string | undefined;
+    data?: string;
     type: string;
 }
 export interface IThemeFooter {
-    data: string | undefined;
+    data?: string;
     type: string;
 }
 export interface IThemeFont {
@@ -123,46 +123,12 @@ const INITIAL_STATE: IThemeState = {
 
 export const themeEditorReducer = produce(
     reducerWithInitialState<IThemeState>(INITIAL_STATE)
-        .case(ThemeActions.initAssetsAC, (state, payload) => {
-            if (payload.themeID != null) {
-                const existingAsset = {
-                    // ...state.themeByID.data?.[payload.themeID],
-                    //...state.theme,
-                };
-                state.theme = existingAsset;
-                console.log("====>", existingAsset);
-            } else {
-                console.log("restoring initial");
-                state.form = INITIAL_ASSETS;
-            }
-            return state;
-        })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {
             state.form = {
                 ...state.form,
                 ...payload,
             };
 
-            return state;
-        })
-        .case(ThemeActions.getAllThemes_ACS.started, (state, payload) => {
-            state.theme.status = LoadStatus.LOADING;
-            return state;
-        })
-        .case(ThemeActions.getAllThemes_ACS.done, (state, payload) => {
-            const normalized: { [id: number]: ITheme } = {};
-            for (const theme of payload.result) {
-                normalized[theme.themeID] = theme;
-            }
-
-            state.theme.status = LoadStatus.SUCCESS;
-            state.themeByID.data = normalized;
-
-            return state;
-        })
-        .case(ThemeActions.getAllThemes_ACS.failed, (state, payload) => {
-            state.theme.status = LoadStatus.ERROR;
-            state.theme.error = payload.error;
             return state;
         })
         .case(ThemeActions.getTheme_ACs.started, (state, payload) => {
@@ -216,17 +182,6 @@ export const themeEditorReducer = produce(
 export interface IThemeEditorStoreState extends ICoreStoreState {
     themeEditor: IThemeState;
 }
-/*export function useAllThemes() {
-    const { themeByID } = useSelector((state: IThemeEditorStoreState) => state.themeEditor);
-    const { getAllThemes } = useThemeActions();
-
-    useEffect(() => {
-        if (themeByID.status === LoadStatus.PENDING) {
-            getAllThemes();
-        }
-    }, [themeByID, getAllThemes]);
-    return themeByID;
-}*/
 
 export function useThemeEditorState() {
     return useSelector((state: IThemeEditorStoreState) => state.themeEditor);

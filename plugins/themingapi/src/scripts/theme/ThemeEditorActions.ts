@@ -18,7 +18,6 @@ import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
-import { IManageTheme } from "@themingapi/theming-ui-settings/ThemesActions";
 
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
@@ -42,10 +41,9 @@ export interface IPatchThemeRequest {
     parentVersion?: string;
     assets?: Partial<IPostPatchThemeAssets>;
 }
-type IGetAllThemeResponse = IManageTheme[];
 
 /**
- * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
+ * Actions for working with resources from the /api/v2/theme endpoint.
  */
 
 export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
@@ -76,40 +74,19 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
-
         this.updateAssets(response.assets); //Update the form the response data.
         return response;
-    };
-    public static readonly getAllThemes_ACS = actionCreator.async<{}, IGetAllThemeResponse, IApiError>(
-        "GET_ALL_THEMES",
-    );
-
-    public getAllThemes = () => {
-        const thunk = bindThunkAction(ThemeActions.getAllThemes_ACS, async () => {
-            const params = { expand: "all" };
-            const response = await this.api.get(`/themes/`, { params });
-
-            return response.data;
-        })();
-        return this.dispatch(thunk);
     };
 
     public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
         const { themeID } = this.getState().themeEditor.form;
-        const header = form.assets.header?.data;
-        const footer = form.assets.footer?.data;
-        const assets = {
-            header: header,
-            footer: footer,
-            javascript: form.assets.javascript,
-            styles: form.assets.styles,
-        };
+
         const request = {
             name: form.name,
-            assets: assets,
+            assets: form.assets,
         };
-        console.log("request==>", request);
+        console.log("request-->", request);
         if (form.type == "themeDB") {
             if (themeID) {
                 return await this.patchTheme({
