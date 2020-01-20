@@ -1,10 +1,10 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-namespace Vanilla\Webhooks;
+namespace Vanilla\Webhooks\Models;
 
 use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;

@@ -36,6 +36,9 @@ class Warnings2Plugin extends Gdn_Plugin {
     /** @var RuleModel $ruleModel */
     private $ruleModel;
 
+    /** @var UserNoteModel $userNoteModel */
+    private $userNoteModel;
+
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
      */
@@ -52,6 +55,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param FormatService $formatService
      * @param EmbedService $embedService
      * @param \RuleModel $ruleModel
+     * @param UserNoteModel $userNoteModel
      */
     public function __construct(
         \DiscussionModel $discussionModel,
@@ -59,14 +63,16 @@ class Warnings2Plugin extends Gdn_Plugin {
         \UserModel $userModel,
         FormatService $formatService,
         EmbedService $embedService,
-        RuleModel $ruleModel
+        RuleModel $ruleModel,
+        UserNoteModel $userNoteModel
     ) {
-        $this->userModel = $userModel;
-        $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
+        $this->commentModel = $commentModel;
+        $this->userModel = $userModel;
         $this->formatService = $formatService;
         $this->embedService = $embedService;
         $this->ruleModel = $ruleModel;
+        $this->userNoteModel = $userModel;
         parent::__construct();
 
         $this->fireEvent('Init');
@@ -1223,6 +1229,16 @@ class Warnings2Plugin extends Gdn_Plugin {
         $authorIDs = $this->getAuthorIDs($discussionIDs, 'discussion');
 
         $actionMessage .= ' '.anchor(t('Warn'), 'profile/multiplewarnings?userids='.join($authorIDs, ',').'&recordtype=Discussion&recordids='.join($discussionIDs, ','), 'Warn Popup');
+    }
+
+    /**
+     * Remove data when deleting a user.
+     *
+     * @param \UserModel $sender
+     * @param array $args
+     */
+    public function userModel_beforeDeleteUser_handler(\UserModel $sender, array $args) {
+        $this->userModel->getDelete('UserNote', ['UserID' => $args['UserID']], $args['Content']);
     }
 
     /**

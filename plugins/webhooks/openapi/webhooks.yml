@@ -151,7 +151,7 @@ paths:
       summary: Re-send a specific delivery attempt.
       tags:
         - Webhooks
-  '/webhooks/{id}/ping':
+  '/webhooks/{id}/pings':
     post:
       summary: Ping a webhook for testing.
       tags:

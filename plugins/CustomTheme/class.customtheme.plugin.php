@@ -158,7 +158,7 @@ class CustomThemePlugin extends Gdn_Plugin {
             return false;
         }
         // Make sure the current theme uses a smarty master template instead of php
-        $themeRoot = PATH_THEMES . '/' . val('Folder', $themeInfo, '');
+        $themeRoot = $this->getThemeRoot(val('Folder', $themeInfo, ''));
         return val('Index', $themeInfo) === 'default' || !file_exists($themeRoot . '/views/default.master.php');
     }
 
@@ -169,13 +169,15 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @return string Returns the theme root.
      */
     public static function getThemeRoot($subfolder = '') {
+        $themeRoot = paths(PATH_THEMES, self::getCurrentThemeKey(), ltrim($subfolder, '/'));
+        $addonThemeRoot = paths(PATH_ADDONS_THEMES, self::getCurrentThemeKey());
+        $root = file_exists($addonThemeRoot) ? $addonThemeRoot : $themeRoot;
+
         if ($subfolder) {
-            $path = paths(PATH_THEMES, self::getCurrentThemeKey(), ltrim($subfolder, '/'));
-        } else {
-            $path = paths(PATH_THEMES, self::getCurrentThemeKey());
+            $root = paths($root, ltrim($subfolder, '/'));
         }
 
-        return $path;
+        return $root;
     }
 
     /**
@@ -246,7 +248,7 @@ class CustomThemePlugin extends Gdn_Plugin {
         // Backwards compatibility
         $theme = self::getCurrentThemeKey();
         $previewHtml = c('Plugins.CustomTheme.PreviewHtml', '');
-        $htmlFile = paths(PATH_THEMES, $theme, 'views', $previewHtml);
+        $htmlFile = paths($this->getThemeRoot(), 'views', $previewHtml);
         if ($previewHtml == '' || !file_exists($htmlFile)) {
             $htmlFile = '';
         }
@@ -347,9 +349,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      */
     public function getDefaultMasterView() {
         $htmlContents = '';
-        $themeKey = self::getCurrentThemeKey();
-        $folder = paths(PATH_THEMES, $themeKey);
-        $themeMasterView = paths($folder, 'views/default.master.tpl');
+        $themeMasterView = paths($this->getThemeRoot(), 'views/default.master.tpl');
         if (file_exists($themeMasterView)) {
             $htmlContents = file_get_contents($themeMasterView);
         } else {
@@ -390,10 +390,6 @@ class CustomThemePlugin extends Gdn_Plugin {
         $sender->addJsFile('customtheme.js', 'plugins/CustomTheme');
         $sender->addJsFile('jquery.textarea.js', 'plugins/CustomTheme');
         $sender->addCssFile('customtheme.css', 'plugins/CustomTheme');
-
-        // Get our folder, which must match our key.
-        $themeKey = self::getCurrentThemeKey();
-        $folder = paths(PATH_THEMES, $themeKey);
 
         // This is the new method:
         $liveRevisionID = self::getRevisionID('LiveRevisionID');
@@ -694,10 +690,7 @@ Here are some things you should know before you begin:
                 Gdn::sql()->put('CustomThemeRevision', $set, ['RevisionID' => $workingRevisionID]);
             } else {
                 // If there isn't a working revision, create it.
-                $currentThemeInfo = Gdn::addonManager()->getTheme()->getInfo();
-                $currentThemeFolder = basename(val('ThemeRoot', $currentThemeInfo));
-                $folder = PATH_THEMES . DS . $currentThemeFolder;
-                $themeMasterView = paths($folder, 'views/default.master.tpl');
+                $themeMasterView = paths($this->getThemeRoot(), 'views/default.master.tpl');
                 if (file_exists($themeMasterView)) {
                     $set['Html'] = file_get_contents($themeMasterView);
                 } else {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -47,6 +47,20 @@ class WebhooksPlugin extends \Gdn_Plugin {
             ->column('insertUserID', 'int', true)
             ->column('dateUpdated', 'datetime', true)
             ->column('updateUserID', 'int', true)
+            ->set();
+
+        $this->database->structure()
+            ->table("webhookDelivery")
+            ->column("webhookDeliveryID", "varchar(36)", false, ["index"])
+            ->column("webhookID", "int", false, ["index"])
+            ->column("requestBody", "mediumtext")
+            ->column("requestHeaders", "mediumtext")
+            ->column("requestDuration", "int", true)
+            ->column("responseBody", "mediumtext", true)
+            ->column("responseCode", "int", true)
+            ->column("responseHeaders", "mediumtext", true)
+            ->column("dateInserted", "datetime")
+            ->column("dateUpdated", "datetime", true)
             ->set();
     }
 }

@@ -115,12 +115,12 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function postTheme(array $body): array {
         $themeID = $this->themeModel->insert($body);
-
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
-            $this->setAsset($themeID, $assetKey, $assetData);
+                $data = $assetData['data'] ?? $assetData;
+                $this->setAsset($themeID, $assetKey, $data);
         }
 
         $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
@@ -142,7 +142,8 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
-            $this->setAsset($themeID, $assetKey, $assetData);
+            $data = $assetData['data'] ?? $assetData;
+            $this->setAsset($themeID, $assetKey, $data);
         }
 
         $theme = $this->themeModel->selectSingle(
