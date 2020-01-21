@@ -41,8 +41,14 @@ class ThemesDbTest extends AbstractAPIv2Test {
                 'parentTheme' => 'test',
                 'parentVersion' => '1.0',
                 "assets" => [
-                            "header" => "<div><!-- HEADER --></div>",
-                            "footer" => "<div><!-- FOOTER --></div>"
+                            "header" => [
+                                "data" => "<div><!-- HEADER --></div>",
+                                "type" => "html"
+                            ],
+                            "footer" => [
+                                "data" => "<div><!-- FOOTER --></div>",
+                                 "type" => "html"
+                            ]
                 ]
             ]
         );

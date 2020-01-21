@@ -3,24 +3,33 @@
  * @license Proprietary
  */
 
-import { IManageTheme, useThemesActions } from "@themingapi/theming-ui-settings/ThemesActions";
+import { IManageTheme, useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
-import { useThemeSettingsState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
+import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
-import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
 
 interface IProps {
     theme: IManageTheme;
 }
 
 export function ThemeItem(props: IProps) {
-    const { applyStatus } = useThemeSettingsState();
-    const { putCurrentTheme } = useThemesActions();
+    const { applyStatus, previewStatus } = useThemeSettingsState();
+    const { putCurrentTheme, putPreviewTheme } = useThemesActions();
     const classes = themeItemClasses();
     const { preview } = props.theme;
+
+    const handlePreview = async () => {
+        putPreviewTheme({ themeID: props.theme.themeID, type: PreviewStatusType.PREVIEW });
+    };
+
+    useEffect(() => {
+        if (previewStatus.status === LoadStatus.SUCCESS) {
+            window.location.href = "/";
+        }
+    });
     const [deleteID, setDeleteID] = useState<number | string | null>(null);
 
     return (
@@ -44,6 +53,7 @@ export function ThemeItem(props: IProps) {
                     isApplyLoading={
                         applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                     }
+                    onPreview={handlePreview}
                     globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                     globalBg={preview?.["global.mainColors.bg"] ?? undefined}
                     globalFg={preview?.["global.mainColors.fg"] ?? undefined}

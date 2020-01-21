@@ -105,11 +105,10 @@ class GroupController extends Gdn_Controller {
         $this->setData('Announcements', $discussions);
 
         // Get Events
-        $MaxEvents = c('Groups.Events.MaxList', 5);
+        $maxEvents = c('Groups.Events.MaxList', 5);
         $EventModel = new EventModel();
-        $Events = $EventModel
-            ->getWhere(['GroupID' => $GroupID, 'DateStarts >=' => gmdate('Y-m-d H:i:s')], 'DateStarts', 'asc', $MaxEvents)
-            ->resultArray();
+        $upcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
+        $Events = $EventModel->getUpcoming($upcomingRange, ['GroupID' => $GroupID], null, $maxEvents);
 
         $this->EventArguments['Events'] = &$Events;
         $this->fireEvent('GroupEventsLoaded');

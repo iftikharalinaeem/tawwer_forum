@@ -6,6 +6,7 @@
 
 namespace Vanilla\ThemingApi;
 
+use Garden\Web\Exception\ServerException;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -26,6 +27,7 @@ use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ImageAsset;
+use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Class DbThemeProvider
@@ -41,6 +43,9 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @var ThemingModel
      */
     private $themeModel;
+
+    /** @var ThemeModelHelper */
+    private $themeHelper;
 
     /** @var ConfigurationInterface */
     private $config;
@@ -65,10 +70,12 @@ class DbThemeProvider implements ThemeProviderInterface {
         ThemingModel $themeModel,
         ConfigurationInterface $config,
         Gdn_Request $request,
-        AddonManager $addonManager
+        AddonManager $addonManager,
+        ThemeModelHelper $themeHelper
     ) {
         $this->themeAssetModel = $themeAssetModel;
         $this->themeModel = $themeModel;
+        $this->themeHelper = $themeHelper;
         $this->config = $config;
         $this->request = $request;
         $this->addonManager = $addonManager;
@@ -115,12 +122,12 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function postTheme(array $body): array {
         $themeID = $this->themeModel->insert($body);
-
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
-            $this->setAsset($themeID, $assetKey, $assetData);
+                $data = $assetData['data'] ?? $assetData;
+                $this->setAsset($themeID, $assetKey, $data);
         }
 
         $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
@@ -142,7 +149,8 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
-            $this->setAsset($themeID, $assetKey, $assetData);
+            $data = $assetData['data'] ?? $assetData;
+            $this->setAsset($themeID, $assetKey, $data);
         }
 
         $theme = $this->themeModel->selectSingle(
@@ -195,6 +203,19 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function resetCurrent() {
         $this->themeModel->resetCurrentTheme();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPreviewTheme($themeID): array {
+        $this->themeHelper->setSessionPreviewTheme($themeID, $this);
+        if (!empty($themeID)) {
+            $theme = $this->getThemeWithAssets($themeID);
+        } else {
+            $theme = $this->getCurrent();
+        }
+        return $theme;
     }
 
     /**
@@ -305,6 +326,22 @@ class DbThemeProvider implements ThemeProviderInterface {
         }
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMasterThemeKey($themeID): string {
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+        return $theme['parentTheme'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName($themeID): string {
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name']]);
+        return $theme['name'];
     }
 
     /**
