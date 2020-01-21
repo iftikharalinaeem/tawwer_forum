@@ -6,6 +6,7 @@
 
 namespace Vanilla\ThemingApi;
 
+use Garden\Web\Exception\ServerException;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
@@ -26,6 +27,7 @@ use Vanilla\Theme\StyleAsset;
 use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ImageAsset;
+use Vanilla\Models\ThemeModelHelper;
 
 /**
  * Class DbThemeProvider
@@ -41,6 +43,9 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @var ThemingModel
      */
     private $themeModel;
+
+    /** @var ThemeModelHelper */
+    private $themeHelper;
 
     /** @var ConfigurationInterface */
     private $config;
@@ -65,10 +70,12 @@ class DbThemeProvider implements ThemeProviderInterface {
         ThemingModel $themeModel,
         ConfigurationInterface $config,
         Gdn_Request $request,
-        AddonManager $addonManager
+        AddonManager $addonManager,
+        ThemeModelHelper $themeHelper
     ) {
         $this->themeAssetModel = $themeAssetModel;
         $this->themeModel = $themeModel;
+        $this->themeHelper = $themeHelper;
         $this->config = $config;
         $this->request = $request;
         $this->addonManager = $addonManager;
@@ -201,6 +208,19 @@ class DbThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
+    public function setPreviewTheme($themeID): array {
+        $this->themeHelper->setSessionPreviewTheme($themeID, $this);
+        if (!empty($themeID)) {
+            $theme = $this->getThemeWithAssets($themeID);
+        } else {
+            $theme = $this->getCurrent();
+        }
+        return $theme;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getCurrent(): ?array {
         try {
             $theme = $this->themeModel->selectSingle(['current' => 1]);
@@ -306,6 +326,22 @@ class DbThemeProvider implements ThemeProviderInterface {
         }
         $path = PATH_ROOT . $theme->getSubdir() . '/views/';
         return $path;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMasterThemeKey($themeID): string {
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+        return $theme['parentTheme'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getName($themeID): string {
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name']]);
+        return $theme['name'];
     }
 
     /**
