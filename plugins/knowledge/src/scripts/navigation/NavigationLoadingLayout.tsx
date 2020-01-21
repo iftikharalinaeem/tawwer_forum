@@ -46,7 +46,7 @@ export default function NavigationLoadingLayout(props: IProps) {
         device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
 
     const navigation =
-        !lastKB || props.forceLoading ? (
+        !lastKB || !props.activeRecord || props.forceLoading ? (
             <NavigationPlaceholder />
         ) : (
             <Navigation
