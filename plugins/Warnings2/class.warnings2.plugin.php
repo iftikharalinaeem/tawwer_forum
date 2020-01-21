@@ -276,9 +276,22 @@ class Warnings2Plugin extends Gdn_Plugin {
             return;
         }
 
+        $rule = [];
+        if (isset($warning['RuleID'])) {
+            $rule = $this->ruleModel->getID($warning['RuleID']);
+        }
+
         $issuer = Gdn::userModel()->getID($warning['InsertUserID'], DATASET_TYPE_ARRAY);
 
-        $content = wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
+        $content = "";
+        if (!empty($rule['Name']) && !empty($rule['Description'])) {
+            $name = htmlspecialchars($rule['Name']);
+            $description = htmlspecialchars($rule['Description']);
+
+            $content .= wrap(t('Infringed rule'), 'strong') . ' ' . wrap($name, 'span', ['title' => $description]);
+            $content .= "<br>";
+        }
+        $content .= wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
         $content .= "<br>";
         $content .= wrap(t('Points'), 'strong') . ' ' . $warning['Points'];
 
