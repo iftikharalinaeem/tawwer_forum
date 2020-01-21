@@ -70,14 +70,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         }
     });
 
-    const onSubmit = useCallback(
-        (event: React.FormEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            void actions.saveTheme(props.history, pushSmartLocation);
-        },
-        [actions.saveTheme, props.history, pushSmartLocation],
-    );
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
@@ -158,13 +150,12 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 {
                     <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
                         <form
-                            /* onSubmit={async event => {
+                            onSubmit={async event => {
                                 event.preventDefault();
                                 if (themeID !== null) {
                                     void saveTheme();
                                 }
-                            }}*/
-                            onSubmit={onSubmit}
+                            }}
                         >
                             <ActionBar
                                 callToActionTitle={"Save"}

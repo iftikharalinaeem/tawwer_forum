@@ -27,10 +27,6 @@ export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<ITh
     let baseUrl = data.themeID ? `/theme/theme-settings/${data.themeID}/edit` : defaultAddRoot;
     const { templateName } = data;
 
-    if (templateName === undefined) {
-        logWarning("Attempted to initialize theme editor without template name . Please check template name.");
-    }
-
     const query = qs.stringify({
         templateName,
     });

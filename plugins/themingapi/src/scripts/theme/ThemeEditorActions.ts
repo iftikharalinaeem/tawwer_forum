@@ -90,7 +90,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         return response;
     };
 
-    public saveTheme = async (history: History, pushSmartLocation: (location: string) => void) => {
+    public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
         const { themeID } = this.getState().themeEditor.form;
         const assets = {
@@ -114,16 +114,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         } else {
             return await this.postTheme({ ...request, parentTheme: form.themeID, parentVersion: form.version });
         }
-        // Redirect
-        const editLocation = {
-            ...history.location,
-            pathname: "/theming-ui-settings/themes",
-            search: "",
-        };
-
-        history.replace(editLocation);
-
-        pushSmartLocation("/theming-ui-settings/themes");
     };
 
     public postTheme(options: IPostThemeRequest) {
