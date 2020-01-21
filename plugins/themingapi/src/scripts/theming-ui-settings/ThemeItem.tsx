@@ -40,7 +40,7 @@ export function ThemeItem(props: IProps) {
                 }}
                 onPreview={handlePreview}
                 isApplyLoading={
-                    applyStatus.status === LoadStatus.LOADING && applyStatus.data.themeID === props.theme.themeID
+                    applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                 }
                 globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                 globalBg={preview?.["global.mainColors.bg"] ?? undefined}
