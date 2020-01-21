@@ -5,7 +5,7 @@
 
 import { IManageTheme, useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
@@ -22,14 +22,14 @@ export function ThemeItem(props: IProps) {
     const { preview } = props.theme;
 
     const handlePreview = async () => {
-        putPreviewTheme({themeID: props.theme.themeID, type: PreviewStatusType.PREVIEW});
-    }
+        putPreviewTheme({ themeID: props.theme.themeID, type: PreviewStatusType.PREVIEW });
+    };
 
     useEffect(() => {
         if (previewStatus.status === LoadStatus.SUCCESS) {
-            window.location.href = '/';
+            window.location.href = "/";
         }
-    })
+    });
     return (
         <div className={classes.item}>
             <ThemePreviewCard
