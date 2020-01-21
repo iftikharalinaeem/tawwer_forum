@@ -158,7 +158,7 @@ export const themeEditorReducer = produce(
         })
         .case(ThemeActions.postTheme_ACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
-            state.formSubmit.data![payload.result.themeID] = payload.result;
+            state.formSubmit.data = payload.result;
             return state;
         })
         .case(ThemeActions.patchTheme_ACs.started, (state, payload) => {

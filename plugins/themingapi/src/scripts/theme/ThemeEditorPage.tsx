@@ -28,6 +28,7 @@ import classNames from "classnames";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
 import { useParams } from "react-router-dom";
+import { useLinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -47,7 +48,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { theme, form, formSubmit } = useThemeEditorState();
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
-
+    const { pushSmartLocation } = useLinkContext();
     const getTemplateName = () => {
         const temp = qs.parse(props.history.location.search.replace(/^\?/, ""));
         return temp.templateName;
@@ -69,11 +70,18 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         }
     });
 
+    const onSubmit = useCallback(
+        (event: React.FormEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            void actions.saveTheme(props.history, pushSmartLocation);
+        },
+        [actions.saveTheme, props.history, pushSmartLocation],
+    );
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
     }
     const { assets } = form;
-    //console.log("theme -->", theme);
     const tabData = [
         {
             label: "Header",
@@ -150,12 +158,13 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 {
                     <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
                         <form
-                            onSubmit={async event => {
+                            /* onSubmit={async event => {
                                 event.preventDefault();
                                 if (themeID !== null) {
                                     void saveTheme();
                                 }
-                            }}
+                            }}*/
+                            onSubmit={onSubmit}
                         >
                             <ActionBar
                                 callToActionTitle={"Save"}

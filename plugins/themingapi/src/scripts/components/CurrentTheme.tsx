@@ -9,6 +9,8 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import { BrowserRouter } from "react-router-dom";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import CurrentThemeInfo from "@library/theming/CurrentThemeInfo";
+import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 export default function CurrentTheme(props) {
     const { currentTheme } = props;
@@ -27,7 +29,17 @@ export default function CurrentTheme(props) {
             <DashboardHeaderBlock title={t("Themes")} />
             <div style={currentThemeStyles}>
                 <ThemePreviewCard noActions={true} {...currentTheme.preview} />
-                <CurrentThemeInfo {...currentTheme} />
+                <CurrentThemeInfo
+                    {...currentTheme}
+                    onEdit={
+                        <ThemeEditorRoute.Link data={{ themeID: props.themeID }}>{t("Edit")}</ThemeEditorRoute.Link>
+                    }
+                    onCopy={
+                        <ThemeEditorRoute.Link data={{ templateName: props.themeID }}>
+                            {t("Copy")}
+                        </ThemeEditorRoute.Link>
+                    }
+                />
             </div>
         </div>
     );

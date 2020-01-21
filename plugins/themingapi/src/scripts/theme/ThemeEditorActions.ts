@@ -10,7 +10,7 @@ import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
-
+import { History } from "history";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -86,11 +86,11 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
-        this.updateAssets(response.assets); //Update the form the response data.
+        this.updateAssets(response.assets);
         return response;
     };
 
-    public saveTheme = async () => {
+    public saveTheme = async (history: History, pushSmartLocation: (location: string) => void) => {
         const { form } = this.getState().themeEditor;
         const { themeID } = this.getState().themeEditor.form;
         const assets = {
@@ -114,6 +114,16 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         } else {
             return await this.postTheme({ ...request, parentTheme: form.themeID, parentVersion: form.version });
         }
+        // Redirect
+        const editLocation = {
+            ...history.location,
+            pathname: "/theming-ui-settings/themes",
+            search: "",
+        };
+
+        history.replace(editLocation);
+
+        pushSmartLocation("/theming-ui-settings/themes");
     };
 
     public postTheme(options: IPostThemeRequest) {

@@ -25,7 +25,6 @@ export function ThemeItem(props: IProps) {
     const { preview } = props.theme;
     const themeID = props.theme.themeID;
     const classesDropDown = dropDownClasses();
-    const classesThemeCard = themeCardClasses();
     return (
         <div className={classes.item}>
             <ThemePreviewCard
@@ -52,6 +51,7 @@ export function ThemeItem(props: IProps) {
                 canCopy={props.theme.type === "themeDB" ? false : true}
                 canEdit={props.theme.type === "themeDB" ? true : false}
                 canDelete={props.theme.type === "themeDB" ? true : false}
+
                 //canCopyCustom={props.theme.type === "themeDB" ? true : false}
             />
             <h3 className={classes.title}>{props.theme.name}</h3>
