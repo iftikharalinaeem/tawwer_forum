@@ -16,13 +16,10 @@ import { BrowserRouter } from "react-router-dom";
 import AddTheme from "@vanilla/library/src/scripts/theming/AddTheme";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
-import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
-import { classes } from "typestyle";
 
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
     const actions = useThemesActions();
-    const classesDropDown = dropDownClasses();
 
     useEffect(() => {
         if (themeSettingsState.themes.status === LoadStatus.PENDING) {
@@ -79,10 +76,7 @@ export default function ManageThemingPage(props) {
                         <div style={{ padding: "19px 0", width: `calc(100% / 3)` }}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link
-                                        data={{ templateName: "foundation" }}
-                                        className={classesDropDown.action}
-                                    >
+                                    <ThemeEditorRoute.Link data={{ templateName: "foundation" }}>
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }

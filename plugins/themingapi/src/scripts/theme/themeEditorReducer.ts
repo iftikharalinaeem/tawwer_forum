@@ -61,7 +61,7 @@ export interface ITheme {
     type: string;
     assets: IThemeAssets;
     parentTheme: string;
-    parentVersion: string;
+    version: string;
 }
 
 export interface IThemeForm {
@@ -70,7 +70,7 @@ export interface IThemeForm {
     type: string;
     assets: IThemeAssets;
     parentTheme: string;
-    parentVersion: string;
+    version: string;
 }
 
 export interface IThemeState {
@@ -111,7 +111,7 @@ const INITIAL_STATE: IThemeState = {
         type: "themeDB",
         assets: INITIAL_ASSETS,
         parentTheme: "",
-        parentVersion: "",
+        version: "",
     },
     formSubmit: {
         status: LoadStatus.PENDING,
@@ -120,37 +120,6 @@ const INITIAL_STATE: IThemeState = {
 
 export const themeEditorReducer = produce(
     reducerWithInitialState<IThemeState>(INITIAL_STATE)
-        /* .case(ThemeActions.initAssetsAC, (state, payload) => {
-            if (payload.themeID != null) {
-                const existingKB = {
-                    ...state.theme,
-                };
-                state.theme = existingKB;
-            } else {
-                console.log("restoring to initial");
-                state.form = INITIAL_ASSETS;
-            }
-
-            return state;
-        })*/
-
-        /* .case(ThemeActions.updateHeaderAssetsAC, (state, payload) => {
-            state.form = {
-                ...state.form,
-                ...payload,
-            };
-            console.log("header state-->", state.form.assets.header);
-            return state;
-        })
-        .case(ThemeActions.updateFooterAssetsAC, (state, payload) => {
-            state.form = {
-                ...state.form,
-                ...payload,
-            };
-            console.log("footer state-->", state.form.assets.footer);
-            return state;
-        })*/
-
         .case(ThemeActions.getTheme_ACs.started, (state, payload) => {
             state.theme.status = LoadStatus.LOADING;
             return state;
@@ -164,7 +133,6 @@ export const themeEditorReducer = produce(
             state.theme.status = LoadStatus.SUCCESS;
             state.theme.data = payload.result;
             state.form = payload.result;
-            // Fill the form with the payload.
             return state;
         })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {
@@ -172,7 +140,7 @@ export const themeEditorReducer = produce(
                 ...state.form,
                 ...payload,
                 assets: {
-                    ...(state.form.assets ?? state.form.assets),
+                    ...state.form.assets,
                     ...(payload.assets ?? payload.assets),
                 },
             };

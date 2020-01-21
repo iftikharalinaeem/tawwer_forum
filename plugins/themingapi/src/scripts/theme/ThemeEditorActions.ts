@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IThemeAssets, ITheme, IPostPatchThemeAssets, IThemeForm, IThemeEditorStoreState } from "./themeEditorReducer";
+import { ITheme, IPostPatchThemeAssets, IThemeForm, IThemeEditorStoreState } from "./themeEditorReducer";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -22,7 +22,7 @@ type IPatchThemeResponse = ITheme;
 
 export interface IPostThemeRequest {
     name: string;
-    parentTheme?: string;
+    parentTheme?: number | string;
     parentVersion?: string;
     assets?: IPostPatchThemeAssets;
 }
@@ -69,6 +69,20 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
+
+            // KLUDGE - There is currently no get_edit endpoint.
+            const { assets } = response.data;
+
+            if ("styles" in assets) {
+                const stylesResponse = await this.api.get(`/themes/${options.themeID}/assets/styles.css`);
+                assets.styles = stylesResponse.data;
+            }
+
+            if ("javascript" in assets) {
+                const javascriptResponse = await this.api.get(`/themes/${options.themeID}/assets/javascript.js`);
+                assets.javascript = javascriptResponse.data;
+            }
+
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
@@ -90,7 +104,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             assets: assets,
         };
 
-        console.log("-->", request);
         if (form.type == "themeDB") {
             if (themeID) {
                 return await this.patchTheme({
@@ -99,7 +112,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 });
             }
         } else {
-            return await this.postTheme({ ...request, parentTheme: form.parentTheme });
+            return await this.postTheme({ ...request, parentTheme: form.themeID, parentVersion: form.version });
         }
     };
 

@@ -12,6 +12,7 @@ import { useThemeSettingsState } from "@themingapi/theming-ui-settings/themeSett
 import { LoadStatus } from "@library/@types/api/core";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import themeCardClasses from "@vanilla/library/src/scripts/theming/themeCardStyles";
 
 interface IProps {
     theme: IManageTheme;
@@ -24,6 +25,7 @@ export function ThemeItem(props: IProps) {
     const { preview } = props.theme;
     const themeID = props.theme.themeID;
     const classesDropDown = dropDownClasses();
+    const classesThemeCard = themeCardClasses();
     return (
         <div className={classes.item}>
             <ThemePreviewCard
@@ -37,11 +39,7 @@ export function ThemeItem(props: IProps) {
                         {t("Edit")}
                     </ThemeEditorRoute.Link>
                 }
-                onCopy={
-                    <ThemeEditorRoute.Link data={{ templateName: themeID }} className={classesDropDown.action}>
-                        {t("Copy")}
-                    </ThemeEditorRoute.Link>
-                }
+                onCopy={<ThemeEditorRoute.Link data={{ templateName: themeID }}>{t("Copy")}</ThemeEditorRoute.Link>}
                 isApplyLoading={
                     applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                 }
