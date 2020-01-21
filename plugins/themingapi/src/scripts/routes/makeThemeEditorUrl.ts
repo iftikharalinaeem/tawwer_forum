@@ -1,5 +1,5 @@
 /**
- * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
+ *
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */

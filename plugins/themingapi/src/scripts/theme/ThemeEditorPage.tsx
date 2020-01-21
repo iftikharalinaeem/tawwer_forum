@@ -29,6 +29,7 @@ import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
 import { useLinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
+import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -48,10 +49,9 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { theme, form, formSubmit } = useThemeEditorState();
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
-    const { pushSmartLocation } = useLinkContext();
     const getTemplateName = () => {
-        const temp = qs.parse(props.history.location.search.replace(/^\?/, ""));
-        return temp.templateName;
+        const query = qs.parse(props.history.location.search.replace(/^\?/, ""));
+        return query.templateName;
     };
     if (themeID === undefined) {
         themeID = getTemplateName();
@@ -76,7 +76,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const submitHandler = async event => {
         event.preventDefault();
         if (themeID !== null) {
-            await saveTheme();
+            await saveTheme(history);
             history.goBack(); //history.push("/theming-ui-settings/themes");
         }
     };
@@ -158,31 +158,26 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     return (
         <BrowserRouter>
             <React.Fragment>
-                {
-                    <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-                        <form onSubmit={submitHandler}>
-                            <ActionBar
-                                callToActionTitle={"Save"}
-                                title={<Title themeName={theme.data.name} />}
-                                fullWidth={true}
-                                isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                                optionsMenu={
-                                    <DropDown
-                                        flyoutType={FlyoutType.LIST}
-                                        openDirection={DropDownOpenDirection.BELOW_LEFT}
-                                    >
-                                        <DropDownItemButton name={t("Copy")} onClick={() => {}} />
-                                        <DropDownItemButton name={t("Exit")} onClick={() => {}} />
-                                        <DropDownItemSeparator />
-                                        <DropDownItemButton name={t("Delete")} onClick={() => {}} />
-                                    </DropDown>
-                                }
-                            />
+                <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                    <form onSubmit={submitHandler}>
+                        <ActionBar
+                            callToActionTitle={t("Save")}
+                            title={<Title themeName={theme.data.name} />}
+                            fullWidth={true}
+                            isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
+                            optionsMenu={
+                                <DropDown flyoutType={FlyoutType.LIST} openDirection={DropDownOpenDirection.BELOW_LEFT}>
+                                    <DropDownItemButton name={t("Copy")} onClick={() => {}} />
+                                    <DropDownItemButton name={t("Exit")} onClick={() => {}} />
+                                    <DropDownItemSeparator />
+                                    <DropDownItemButton name={t("Delete")} onClick={() => {}} />
+                                </DropDown>
+                            }
+                        />
 
-                            <Tabs data={tabData} />
-                        </form>
-                    </Modal>
-                }
+                        <Tabs data={tabData} />
+                    </form>
+                </Modal>
             </React.Fragment>
         </BrowserRouter>
     );

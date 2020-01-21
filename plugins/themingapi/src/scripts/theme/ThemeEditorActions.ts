@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
 import { History } from "history";
+import qs from "qs";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -84,7 +85,10 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         return response;
     };
 
-    public saveTheme = async () => {
+    public saveTheme = async (history: History) => {
+        const query = qs.parse(history.location.search.replace(/^\?/, ""));
+        const canEdit = !query.templateName;
+
         const { form } = this.getState().themeEditor;
         const { themeID } = this.getState().themeEditor.form;
         const assets = {
@@ -98,7 +102,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             assets: assets,
         };
 
-        if (form.type == "themeDB") {
+        if (form.type == "themeDB" && canEdit) {
             if (themeID) {
                 return await this.patchTheme({
                     ...request,
