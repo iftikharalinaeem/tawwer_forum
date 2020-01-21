@@ -9,6 +9,7 @@ import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import ThemeActions, { useThemeActions } from "./ThemeEditorActions";
 import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import { INITIAL_THEMES_STATE } from "@vanilla/library/src/scripts/features/users/userModel";
 
 export interface IThemeAssets {
     fonts?: { data: IThemeFont[] };
@@ -136,14 +137,18 @@ export const themeEditorReducer = produce(
             return state;
         })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {
-            state.form = {
-                ...state.form,
-                ...payload,
-                assets: {
-                    ...state.form.assets,
-                    ...(payload.assets ?? payload.assets),
-                },
-            };
+            if (payload !== undefined) {
+                state.form = {
+                    ...state.form,
+                    ...payload,
+                    assets: {
+                        ...state.form.assets,
+                        ...payload.assets,
+                    },
+                };
+            } else {
+                state.form.assets = INITIAL_ASSETS;
+            }
 
             return state;
         })
