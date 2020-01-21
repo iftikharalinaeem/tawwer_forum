@@ -10,6 +10,7 @@ import { t } from "@vanilla/i18n";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
+import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
 
 interface IProps {
     theme: IManageTheme;

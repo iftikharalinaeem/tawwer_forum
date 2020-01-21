@@ -8,8 +8,8 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@library/@types/api/core";
-import { IThemesStoreState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
-import { useThemesActions } from "@themingapi/theming-ui-settings/ThemesActions";
+import { IThemesStoreState } from "@library/theming/themeSettingsReducer";
+import { useThemesActions } from "@library/theming/ThemesActions";
 
 interface IProps {
     themeID: number | string;
