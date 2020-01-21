@@ -96,6 +96,7 @@ export function ThemeItem(props: IProps) {
                     onDelete={() => {
                         setDeleteID(props.theme.themeID);
                     }}
+                    canCopyCustom={copyCustomTheme}
                 />
                 <h3 className={classes.title}>{props.theme.name}</h3>
             </div>
