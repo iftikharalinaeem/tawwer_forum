@@ -206,13 +206,15 @@ class TermsManagerPlugin extends Gdn_Plugin {
         // Check if the user already exists
         $userModel = Gdn::userModel();
         $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
-        $userID = val('UserID', $auth);
+        $connectedUserID = $auth['UserID'] ?? false;
+        $existingUser = false;
         $user = [];
-        if ($userID) {
-            $user = $userModel->getID($userID, 'array');
+        if ($connectedUserID) {
+            $user = $userModel->getID($connectedUserID, 'array');
         } else {
             $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
         }
+
         $existingName = $user['Name'] ?? '';
         $connectName = '';
         $sender->setData('HidePassword', true);
@@ -231,6 +233,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $sender->setData('ExistingUsers', [$user]);
                 $sender->setData('HideName', true);
                 $sender->Form->setFormValue('Name', $existingName);
+                $sender->Form->addHidden('UserSelect', $user['UserID']);
 
                 // Because we are interrupting the connect process, the Password Field will be presented.
                 // If the forum is configured for AutoConnect or if the user has already connected
@@ -243,15 +246,17 @@ class TermsManagerPlugin extends Gdn_Plugin {
             }
 
             $sender->Form->setFormValue('ConnectName', $connectName);
-        } elseif (val('UserID', $user)) {
-            // If a the user exists, and they have submitted the terms form, update the User table.
-            Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
-            return;
+
+            if (!$sender->Form->validationResults() && $sender->Form->getFormValue('Terms') && $user['UserID']) {
+                // If a the user exists, and they have submitted the terms form, update the User table.
+                Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
+                return;
+            }
         }
 
         $sender->Form->addHidden('LatestTerms', val('Terms', $user));
         if ($this->addTermsValidation($sender, true)) {
-            $sender->UserModel->Validation->applyRule('Terms', 'Validate', t('You must agree to the terms of service.'));
+            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the terms of service.'));
         }
     }
 
