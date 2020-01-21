@@ -12,7 +12,7 @@ import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
 import { CategoryRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
@@ -22,7 +22,6 @@ import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { articleEventFields } from "../analytics/KnowledgeAnalytics";
@@ -30,6 +29,8 @@ import { ArticleUntranslatedMessage } from "@knowledge/modules/article/component
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { hasPermission } from "@library/features/users/Permission";
+import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
+
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -51,11 +52,11 @@ export class ArticlePage extends React.Component<IProps, IState> {
         const articleID = this.articleID;
 
         if (!articleID) {
-            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+            return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
         }
 
         if (article.status === LoadStatus.ERROR) {
-            return <ErrorPage error={article.error} />;
+            return <KbErrorPage error={article.error} />;
         }
 
         const activeRecord = {

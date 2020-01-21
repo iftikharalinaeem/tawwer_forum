@@ -6,7 +6,6 @@
 import { colorOut, margins, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
-import { viewHeight } from "csx";
 
 export const pageErrorMessageClasses = () => {
     const style = styleFactory("pageErrorMessage");
@@ -44,14 +43,18 @@ export const pageErrorMessageClasses = () => {
     });
 
     const errorIcon = style("icon", {
-        display: "block",
-        color: colorOut(globalVars.mainColors.primary),
-        height: unit(85),
-        width: unit(85),
-        ...margins({
-            bottom: 12,
-            horizontal: "auto",
-        }),
+        $nest: {
+            "&&": {
+                display: "block",
+                color: colorOut(globalVars.mainColors.primary),
+                height: unit(85),
+                width: unit(85),
+                ...margins({
+                    bottom: 12,
+                    horizontal: "auto",
+                }),
+            }
+        }
     });
 
     return {

@@ -15,7 +15,7 @@ import SearchPagination from "@knowledge/modules/search/components/SearchPaginat
 import { IResult } from "@library/result/Result";
 import { ResultMeta } from "@library/result/ResultMeta";
 import Loader from "@library/loaders/Loader";
-import PageErrorMessage from "@knowledge/modules/common/PageErrorMessage";
+import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
 
 interface IProps {}
 
@@ -28,7 +28,7 @@ export function SearchFormResults(props: IProps) {
         case LoadStatus.LOADING:
             return <Loader />;
         case LoadStatus.ERROR:
-            return <PageErrorMessage apiError={results.error} />;
+            return <KbErrorPage apiError={results.error} />;
         case LoadStatus.SUCCESS:
             const { next, prev } = pages;
             let paginationNextClick: React.MouseEventHandler | undefined;

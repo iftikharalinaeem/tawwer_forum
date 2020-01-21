@@ -8,11 +8,10 @@ import { IArticleFragment } from "@knowledge/@types/api/article";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoriesPageActions from "@knowledge/modules/categories/CategoriesPageActions";
 import CategoriesLayout from "@knowledge/modules/categories/components/CategoriesLayout";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -24,6 +23,7 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
+import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
 
 /**
  * Page component for a flat category list.
@@ -59,17 +59,17 @@ export function CategoriesPage(props: IProps) {
 
     // Handle errors
     if (id === null) {
-        return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+        return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
     }
 
     const articlesError = articles.status === LoadStatus.ERROR && articles.error;
     if (articlesError) {
-        return <ErrorPage apiError={articles.error} />;
+        return <KbErrorPage apiError={articles.error} />;
     }
 
     const categoryError = category.status === LoadStatus.ERROR && category.error;
     if (categoryError) {
-        return <ErrorPage apiError={category.error} />;
+        return <KbErrorPage apiError={category.error} />;
     }
 
     // Handle loading statuses

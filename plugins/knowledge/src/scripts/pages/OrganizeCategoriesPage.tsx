@@ -7,31 +7,31 @@
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
-import ErrorPage from "@knowledge/pages/ErrorPage";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { LoadStatus } from "@library/@types/api/core";
+import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import {IKnowledgeAppStoreState} from "@knowledge/state/model";
+import {LoadStatus} from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
-import { useUniqueID } from "@library/utility/idUtils";
+import {t} from "@library/utility/appUtils";
+import {useUniqueID} from "@library/utility/idUtils";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import Loader from "@library/loaders/Loader";
 import Heading from "@library/layout/Heading";
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { match } from "react-router";
+import React, {useEffect, useState} from "react";
+import {connect} from "react-redux";
+import {match} from "react-router";
 import NavigationManagerErrors from "@knowledge/navigation/subcomponents/NavigationManagerErrors";
 import classNames from "classnames";
-import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import {navigationManagerClasses} from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
+import {AnalyticsData} from "@library/analytics/AnalyticsData";
 import OrganizeCategoriesTranslator from "@knowledge/navigation/NavigationTranslator";
 import Message from "@library/messages/Message";
-import { messagesClasses } from "@library/messages/messageStyles";
-import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
+import {messagesClasses} from "@library/messages/messageStyles";
+import {LocaleDisplayer, useLocaleInfo} from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
-import { ErrorIcon } from "@library/icons/common";
+import {ErrorIcon} from "@library/icons/common";
 
 function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
@@ -72,10 +72,10 @@ function OrganizeCategoriesPage(props: IProps) {
     }
 
     if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
-        return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+        return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
     }
     return (
-        <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
+        <Permission permission="articles.add" fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}>
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
             <FullKnowledgeModal scrollable={true} titleID={titleID}>
                 <NavigationManagerMenu />

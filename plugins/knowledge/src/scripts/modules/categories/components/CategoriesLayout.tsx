@@ -24,10 +24,11 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import PageErrorMessage, { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
 
 interface IProps {
     category: IKbCategory;
@@ -54,9 +55,9 @@ export default function CategoriesLayout(props: IProps) {
                 <SimplePager url={category.url + "/p:page:"} pages={pages} />
             </>
         ) : (
-            <PageErrorMessage
+            <KbErrorPage
                 className={inheritHeightClass()}
-                defaultError={DefaultError.CATEGORY_NO_ARTICLES}
+                defaultError={DefaultKbError.CATEGORY_NO_ARTICLES}
                 knowledgeBaseID={category.knowledgeBaseID}
                 knowledgeCategoryID={category.knowledgeCategoryID}
             />

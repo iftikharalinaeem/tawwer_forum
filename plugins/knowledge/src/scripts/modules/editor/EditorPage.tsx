@@ -4,11 +4,10 @@
  * @license Proprietary
  */
 
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+
 import EditorForm from "@knowledge/modules/editor/EditorForm";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
-import ErrorPage from "@knowledge/pages/ErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -26,6 +25,8 @@ import { RouteComponentProps } from "react-router-dom";
 import Container from "@library/layout/components/Container";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { HomeRoute } from "@knowledge/routes/pageRoutes";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 
 /**
  * Page for editing an article.
@@ -45,7 +46,7 @@ export class EditorPage extends React.Component<IProps> {
                 <AnalyticsData uniqueKey={this.id} />
                 <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 {this.renderErrorMessage()}
-                <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
+                <Permission permission="articles.add" fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}>
                     {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
                 </Permission>

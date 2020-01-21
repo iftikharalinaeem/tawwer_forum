@@ -24,7 +24,7 @@ import { Router } from "@library/Router";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { AppContext } from "@library/AppContext";
 import { mountReact } from "@vanilla/react-utils";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import  {KbErrorPage} from "@knowledge/pages/KbErrorPage";
 import { serverReducer } from "@knowledge/server/serverReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import kbReducer from "@knowledge/state/reducer";
@@ -44,7 +44,7 @@ registerReducer("knowledge", kbReducer);
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
     mountReact(
-        <AppContext errorComponent={<ErrorPage />}>
+        <AppContext errorComponent={<KbErrorPage />}>
             <KnowledgeApp />
         </AppContext>,
         app,
