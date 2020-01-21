@@ -3,12 +3,12 @@
  * @license Proprietary
  */
 
-import { IManageTheme, useThemesActions } from "@themingapi/theming-ui-settings/ThemesActions";
+import { IManageTheme, useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
-import React from "react";
+import React, { useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
-import { useThemeSettingsState } from "@themingapi/theming-ui-settings/themeSettingsReducer";
+import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 
 interface IProps {
@@ -16,10 +16,20 @@ interface IProps {
 }
 
 export function ThemeItem(props: IProps) {
-    const { applyStatus } = useThemeSettingsState();
-    const { putCurrentTheme } = useThemesActions();
+    const { applyStatus, previewStatus } = useThemeSettingsState();
+    const { putCurrentTheme, putPreviewTheme } = useThemesActions();
     const classes = themeItemClasses();
     const { preview } = props.theme;
+
+    const handlePreview = async () => {
+        putPreviewTheme({ themeID: props.theme.themeID, type: PreviewStatusType.PREVIEW });
+    };
+
+    useEffect(() => {
+        if (previewStatus.status === LoadStatus.SUCCESS) {
+            window.location.href = "/";
+        }
+    });
     return (
         <div className={classes.item}>
             <ThemePreviewCard
@@ -28,6 +38,7 @@ export function ThemeItem(props: IProps) {
                 onApply={() => {
                     putCurrentTheme(props.theme.themeID);
                 }}
+                onPreview={handlePreview}
                 isApplyLoading={
                     applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                 }

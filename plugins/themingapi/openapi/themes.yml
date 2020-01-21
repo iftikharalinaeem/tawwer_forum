@@ -50,6 +50,31 @@ paths:
       tags:
         - Themes
       summary: Delete theme.
+  /themes/preview:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                themeID:
+                  description: Theme ID.
+                  type: integer
+              example: {"themeID": 3}
+              required:
+                - themeID
+        required: true
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: "Set preview theme. Note: only applies to current user session"
   /themes/current:
       put:
         requestBody:
