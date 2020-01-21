@@ -1386,7 +1386,7 @@ if (!function_exists('writeReactions')) {
      * @throws Exception
      */
     function writeReactions($row) {
-        $dataDrivenColors = c("Feature.DataDrivenTheme.Enabled");
+        $dataDrivenColors = Gdn::themeFeatures()->useDataDrivenTheme();
         $attributes = val('Attributes', $row);
         if (is_string($attributes)) {
             $attributes = dbdecode($attributes);
