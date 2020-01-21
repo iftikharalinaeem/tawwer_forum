@@ -13,6 +13,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import themeCardClasses from "@vanilla/library/src/scripts/theming/themeCardStyles";
+import classNames from "classnames";
 
 interface IProps {
     theme: IManageTheme;
@@ -25,6 +26,8 @@ export function ThemeItem(props: IProps) {
     const { preview } = props.theme;
     const themeID = props.theme.themeID;
     const classesDropDown = dropDownClasses();
+    const classesThemeCard = themeCardClasses();
+    const copyCustomTheme = props.theme.type === "themeDB" ? true : false;
     return (
         <div className={classes.item}>
             <ThemePreviewCard
@@ -34,11 +37,24 @@ export function ThemeItem(props: IProps) {
                     putCurrentTheme(props.theme.themeID);
                 }}
                 onEdit={
-                    <ThemeEditorRoute.Link data={{ themeID: themeID }} className={classesDropDown.action}>
+                    <ThemeEditorRoute.Link
+                        data={{ themeID: themeID }}
+                        className={classNames(classesDropDown.action, classesThemeCard.action)}
+                    >
                         {t("Edit")}
                     </ThemeEditorRoute.Link>
                 }
-                onCopy={<ThemeEditorRoute.Link data={{ templateName: themeID }}>{t("Copy")}</ThemeEditorRoute.Link>}
+                onCopy={
+                    <ThemeEditorRoute.Link
+                        data={{ templateName: themeID }}
+                        className={classNames({
+                            [classesDropDown.action]: copyCustomTheme,
+                            [classesThemeCard.action]: copyCustomTheme,
+                        })}
+                    >
+                        {t("Copy")}
+                    </ThemeEditorRoute.Link>
+                }
                 isApplyLoading={
                     applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                 }
@@ -51,8 +67,7 @@ export function ThemeItem(props: IProps) {
                 canCopy={props.theme.type === "themeDB" ? false : true}
                 canEdit={props.theme.type === "themeDB" ? true : false}
                 canDelete={props.theme.type === "themeDB" ? true : false}
-
-                //canCopyCustom={props.theme.type === "themeDB" ? true : false}
+                canCopyCustom={copyCustomTheme}
             />
             <h3 className={classes.title}>{props.theme.name}</h3>
         </div>
