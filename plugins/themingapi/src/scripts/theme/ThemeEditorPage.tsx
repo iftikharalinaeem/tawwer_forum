@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useEffect, Dispatch, useRef, useCallback, useLayoutEffect } from "react";
-import { BrowserRouter, RouteComponentProps } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
 import { themeEitorClasses } from "./themeEditorStyles";
 import { ActionBar } from "@library/headers/ActionBar";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
@@ -19,7 +19,7 @@ import { t } from "@vanilla/i18n";
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import { useUniqueID, uniqueIDFromPrefix } from "@vanilla/library/src/scripts/utility/idUtils";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
@@ -27,8 +27,8 @@ import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import classNames from "classnames";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
-import { useParams } from "react-router-dom";
 import { useLinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
+import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -43,7 +43,7 @@ interface IOwnProps
 
 export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme, updateHeaderAssets, updateFooterAssets } = useThemeActions();
+    const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
     const { theme, form, formSubmit } = useThemeEditorState();
     const [themeName, setThemeName] = useState("");
@@ -57,6 +57,8 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         themeID = getTemplateName();
     }
 
+    useFallbackBackUrl("/theming-ui-settings/themes");
+
     useEffect(() => {
         if (theme.status === LoadStatus.PENDING && themeID !== undefined) {
             actions.getThemeById(themeID);
@@ -69,6 +71,15 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             setThemeName(theme.data.name);
         }
     });
+
+    const history = useHistory();
+    const submitHandler = async event => {
+        event.preventDefault();
+        if (themeID !== null) {
+            await saveTheme();
+            history.goBack(); //history.push("/theming-ui-settings/themes");
+        }
+    };
 
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
         return <Loader />;
@@ -149,14 +160,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             <React.Fragment>
                 {
                     <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-                        <form
-                            onSubmit={async event => {
-                                event.preventDefault();
-                                if (themeID !== null) {
-                                    void saveTheme();
-                                }
-                            }}
-                        >
+                        <form onSubmit={submitHandler}>
                             <ActionBar
                                 callToActionTitle={"Save"}
                                 title={<Title themeName={theme.data.name} />}
