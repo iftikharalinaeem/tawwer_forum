@@ -63,6 +63,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(ThemeModel::class)
             ->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)])
+            ->addCall("setThemeManagePageUrl", ["/theming-ui-settings/themes"])
         ;
 
         $container
