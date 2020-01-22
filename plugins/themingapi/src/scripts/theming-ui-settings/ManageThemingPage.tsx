@@ -76,7 +76,7 @@ export default function ManageThemingPage(props) {
                         <div style={{ padding: "19px 0", width: `calc(100% / 3)` }}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link data={{ templateName: "foundation" }}>
+                                    <ThemeEditorRoute.Link data={{ templateName: "theme-foundation" }}>
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }
