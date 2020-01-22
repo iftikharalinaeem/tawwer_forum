@@ -62,25 +62,8 @@ export function ThemeItem(props: IProps) {
                     isApplyLoading={
                         applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                     }
-                    onEdit={
-                        <ThemeEditorRoute.Link
-                            data={{ themeID: themeID }}
-                            className={classNames(classesDropDown.action, classesThemeCard.action)}
-                        >
-                            {t("Edit")}
-                        </ThemeEditorRoute.Link>
-                    }
-                    onCopy={
-                        <ThemeEditorRoute.Link
-                            data={{ templateName: themeID }}
-                            className={classNames({
-                                [classesDropDown.action]: copyCustomTheme,
-                                [classesThemeCard.action]: copyCustomTheme,
-                            })}
-                        >
-                            {t("Copy")}
-                        </ThemeEditorRoute.Link>
-                    }
+                    onEdit={ThemeEditorRoute.url({ themeID: themeID })}
+                    onCopy={ThemeEditorRoute.url({ templateName: themeID })}
                     onPreview={handlePreview}
                     globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                     globalBg={preview?.["global.mainColors.bg"] ?? undefined}

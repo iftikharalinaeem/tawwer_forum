@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
+import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { margins, unit, negative } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 
 export const themeEditorVariables = useThemeCache(() => {
@@ -29,7 +29,8 @@ export const themeEitorClasses = useThemeCache(() => {
             "&&": {
                 padding: "0",
                 border: "0",
-                width: unit(145),
+                width: unit(180),
+                textAlign: "center",
                 fontSize: globalVars.fonts.size.medium,
                 fontWeight: globalVars.fonts.weights.semiBold,
             },

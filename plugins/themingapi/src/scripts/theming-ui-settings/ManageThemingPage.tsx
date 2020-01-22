@@ -17,6 +17,8 @@ import AddTheme from "@vanilla/library/src/scripts/theming/AddTheme";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 
+const DEFAULT_THEME = "theme-foundation";
+
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
     const actions = useThemesActions();
@@ -76,7 +78,7 @@ export default function ManageThemingPage(props) {
                         <div style={{ padding: "19px 0", width: `calc(100% / 3)` }}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link data={{ templateName: "theme-foundation" }}>
+                                    <ThemeEditorRoute.Link data={{ templateName: DEFAULT_THEME }}>
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }

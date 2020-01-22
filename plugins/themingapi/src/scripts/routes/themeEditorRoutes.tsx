@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import ModalLoader from "@library/modal/ModalLoader";
 import RouteHandler from "@library/routing/RouteHandler";
 import { makeThemeEditorUrl } from "./makeThemeEditorUrl";

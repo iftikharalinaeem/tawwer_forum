@@ -9,34 +9,57 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import CurrentThemeInfo from "@library/theming/CurrentThemeInfo";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import LinkAsButton from "@vanilla/library/src/scripts/routing/LinkAsButton";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import currentThemeClasses from "@vanilla/library/src/scripts/theming/currentThemeStyles";
+import { IManageTheme, ThemeType } from "@vanilla/library/src/scripts/theming/ThemesActions";
 
-export default function CurrentTheme(props) {
+interface IProps {
+    currentTheme: IManageTheme;
+}
+
+export default function CurrentTheme(props: IProps) {
+    const classes = currentThemeClasses();
     const { currentTheme } = props;
-    const {
-        currentThemeStyles = {
-            display: "flex",
-            backgroundColor: "#f6f9fb",
-            padding: 23,
-            marginLeft: -18,
-            marginRight: -18,
-        },
-    } = props;
+    const { preview } = currentTheme;
     return (
         <div>
             <DashboardHeaderBlock title={t("Themes")} />
-            <div style={currentThemeStyles}>
-                <ThemePreviewCard noActions={true} {...currentTheme.preview} />
+            <div className={classes.root}>
+                <ThemePreviewCard
+                    noActions={true}
+                    globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
+                    globalBg={preview?.["global.mainColors.bg"] ?? undefined}
+                    globalFg={preview?.["global.mainColors.fg"] ?? undefined}
+                    titleBarBg={
+                        preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
+                    }
+                    titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
+                    previewImage={preview?.previewImage}
+                    isActiveTheme={true}
+                />
                 <CurrentThemeInfo
                     {...currentTheme}
-                    onEdit={
-                        <ThemeEditorRoute.Link data={{ themeID: props.currentTheme.themeID }}>
-                            {t("Edit")}
-                        </ThemeEditorRoute.Link>
+                    editButton={
+                        currentTheme.type === ThemeType.DB ? (
+                            <LinkAsButton
+                                className={classes.themeActionButton}
+                                baseClass={ButtonTypes.PRIMARY}
+                                to={ThemeEditorRoute.url({ themeID: props.currentTheme.themeID })}
+                            >
+                                {t("Edit")}
+                            </LinkAsButton>
+                        ) : (
+                            undefined
+                        )
                     }
-                    onCopy={
-                        <ThemeEditorRoute.Link data={{ templateName: props.currentTheme.themeID }}>
+                    copyButton={
+                        <LinkAsButton
+                            className={classes.themeActionButton}
+                            to={ThemeEditorRoute.url({ templateName: props.currentTheme.themeID })}
+                        >
                             {t("Copy")}
-                        </ThemeEditorRoute.Link>
+                        </LinkAsButton>
                     }
                 />
             </div>
