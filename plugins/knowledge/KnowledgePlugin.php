@@ -80,7 +80,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
         $attributes = $discussion->Attributes ?? [];
         $canonicalUrl = $attributes["CanonicalUrl"] ?? null;
-        $label = $canonicalUrl ? "Remove Article Link" : "Convert To Article";
+        $label = $canonicalUrl ? t("Remove Article Link") : t("Convert to Article");
         $class = $canonicalUrl ? "js-unlinkDiscussion" : "js-convertDiscussionToArticle";
 
         $dropdown->addLink($label, "#", "discussionArticleConvert", $class, [], [
