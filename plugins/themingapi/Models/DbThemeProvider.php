@@ -94,7 +94,17 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getThemeWithAssets($themeKey): array {
         try {
             $theme = $this->normalizeTheme(
-                $this->themeModel->selectSingle(['themeID' => $themeKey], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]),
+                $this->themeModel->selectSingle(
+                    ['themeID' => $themeKey],
+                    ['select' => [
+                        'themeID',
+                        'name',
+                        'current',
+                        'parentTheme',
+                        'dateInserted',
+                        'dateUpdated']
+                    ]
+                ),
                 $this->themeAssetModel->get(['themeID' => $themeKey], ['select' => ['assetKey', 'data']])
             );
         } catch (NoResultsException $e) {
@@ -387,6 +397,15 @@ class DbThemeProvider implements ThemeProviderInterface {
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
             }
         }
+
+        $parentTheme = $this->addonManager->lookupTheme($theme['parentTheme']);
+        if (!($parentTheme instanceof Addon)) {
+            $res['preview']['info']['Warning'] = ['type'=>'string', 'info'=>'Parent theme ('.$theme['parentTheme'].') is not valid'];
+        } else {
+            $res['preview']['info']['Parent theme'] = ['type'=>'string', 'info'=>$parentTheme->getInfoValue('name')];
+        }
+        $res['preview']['info']['Created'] = ['type'=>'date', 'info' => $theme['dateInserted']->format('Y-m-d H:i:s')];
+        $res['preview']['info']['Updated'] = ['type'=>'date', 'info' => $theme['dateUpdated']->format('Y-m-d H:i:s')];
 
         return $res;
     }

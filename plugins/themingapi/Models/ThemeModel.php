@@ -58,7 +58,18 @@ class ThemeModel extends PipelineModel {
         $this->update(['current' => 1], ['themeID' => $themeID]);
         $this->update(['current' => 0], ['current' => 1, 'themeID <>' => $themeID]);
 
-        $theme = $this->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'parentTheme', 'current', 'dateUpdated']]);
+        $theme = $this->selectSingle(
+            ['themeID' => $themeID],
+            ['select' => [
+                'themeID',
+                'name',
+                'parentTheme',
+                'current',
+                'dateInserted',
+                'dateUpdated']
+            ]
+        );
+
         return $theme;
     }
 
