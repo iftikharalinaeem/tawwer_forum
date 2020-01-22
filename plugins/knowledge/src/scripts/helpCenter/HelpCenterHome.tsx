@@ -20,7 +20,6 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import Splash from "@library/splash/Splash";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
@@ -30,6 +29,7 @@ import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import Hero from "@library/hero/Hero";
 
 /**
  * Component representing the the full home page of a help center.
@@ -75,7 +75,7 @@ export class HelpCenterHome extends React.Component<IProps> {
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
                 <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
-                <Splash
+                <Hero
                     action={splashAction}
                     styleOverwrite={{ outerBackgroundImage: bannerImage }}
                     title={knowledgeBase.name}
