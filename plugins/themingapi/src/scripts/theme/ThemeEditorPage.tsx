@@ -28,6 +28,7 @@ import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
 import { themeEitorClasses } from "./themeEditorStyles";
+import {formatUrl} from "@library/utility/appUtils";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -77,7 +78,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         event.preventDefault();
         if (themeID !== null) {
             await saveTheme(history);
-            history.goBack(); //history.push("/theming-ui-settings/themes");
+            window.location.href = formatUrl( "/theming-ui-settings/themes",true);
         }
     };
 
