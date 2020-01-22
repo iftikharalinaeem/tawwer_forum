@@ -27,7 +27,7 @@ export default function CurrentTheme(props) {
             <DashboardHeaderBlock title={t("Themes")} />
             <div style={currentThemeStyles}>
                 <ThemePreviewCard noActions={true} {...currentTheme.preview} />
-                <CurrentThemeInfo {...currentTheme} info={currentTheme.preview.info}/>
+                <CurrentThemeInfo {...currentTheme} info={currentTheme.preview.info} />
             </div>
         </div>
     );
