@@ -11,6 +11,10 @@ import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyle
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
+import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import themeCardClasses from "@vanilla/library/src/scripts/theming/themeCardStyles";
+import classNames from "classnames";
 
 interface IProps {
     theme: IManageTheme;
@@ -21,6 +25,10 @@ export function ThemeItem(props: IProps) {
     const { putCurrentTheme, putPreviewTheme } = useThemesActions();
     const classes = themeItemClasses();
     const { preview } = props.theme;
+    const themeID = props.theme.themeID;
+    const classesDropDown = dropDownClasses();
+    const classesThemeCard = themeCardClasses();
+    const copyCustomTheme = props.theme.type === "themeDB" ? true : false;
 
     const handlePreview = async () => {
         putPreviewTheme({ themeID: props.theme.themeID, type: PreviewStatusType.PREVIEW });
@@ -54,6 +62,8 @@ export function ThemeItem(props: IProps) {
                     isApplyLoading={
                         applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
                     }
+                    onEdit={ThemeEditorRoute.url({ themeID: themeID })}
+                    onCopy={ThemeEditorRoute.url({ templateName: themeID })}
                     onPreview={handlePreview}
                     globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                     globalBg={preview?.["global.mainColors.bg"] ?? undefined}
@@ -69,6 +79,7 @@ export function ThemeItem(props: IProps) {
                     onDelete={() => {
                         setDeleteID(props.theme.themeID);
                     }}
+                    canCopyCustom={copyCustomTheme}
                 />
                 <h3 className={classes.title}>{props.theme.name}</h3>
             </div>
