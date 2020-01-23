@@ -110,7 +110,11 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 });
             }
         } else {
-            return await this.postTheme({ ...request, parentTheme: form.themeID, parentVersion: form.version });
+            return await this.postTheme({
+                ...request,
+                parentTheme: form.type === "themeDB" ? form.parentTheme : form.themeID,
+                parentVersion: form.version,
+            });
         }
     };
 

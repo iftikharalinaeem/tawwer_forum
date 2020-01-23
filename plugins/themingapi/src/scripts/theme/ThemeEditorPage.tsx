@@ -57,7 +57,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         themeID = getTemplateName();
     }
 
-    useFallbackBackUrl("/theming-ui-settings/themes");
+    useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
     useEffect(() => {
@@ -78,7 +78,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         event.preventDefault();
         if (themeID !== null) {
             await saveTheme(history);
-            window.location.href = formatUrl("/theming-ui-settings/themes", true);
+            window.location.href = formatUrl("/theme/theme-settings", true);
         }
     };
 
