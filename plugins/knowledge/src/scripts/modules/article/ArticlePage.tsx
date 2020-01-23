@@ -12,7 +12,7 @@ import ArticleLayout from "@knowledge/modules/article/components/ArticleLayout";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { CategoryRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
@@ -29,8 +29,7 @@ import { ArticleUntranslatedMessage } from "@knowledge/modules/article/component
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { hasPermission } from "@library/features/users/Permission";
-import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
-
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 interface IState {
     showRestoreDialogue: boolean;

@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-
 import EditorForm from "@knowledge/modules/editor/EditorForm";
 import EditorPageActions from "@knowledge/modules/editor/EditorPageActions";
 import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
@@ -46,7 +45,10 @@ export class EditorPage extends React.Component<IProps> {
                 <AnalyticsData uniqueKey={this.id} />
                 <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 {this.renderErrorMessage()}
-                <Permission permission="articles.add" fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}>
+                <Permission
+                    permission="articles.add"
+                    fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}
+                >
                     {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
                 </Permission>

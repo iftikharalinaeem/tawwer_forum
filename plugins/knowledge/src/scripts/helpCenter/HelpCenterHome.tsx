@@ -4,16 +4,16 @@
  */
 
 import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNavigation";
-import {IKnowledgeBase} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
-import {EditorRoute, HomeRoute} from "@knowledge/routes/pageRoutes";
-import {IKnowledgeAppStoreState} from "@knowledge/state/model";
-import {ILinkListData, ILoadable, LoadStatus} from "@library/@types/api/core";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import { EditorRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Permission from "@library/features/users/Permission";
-import {ButtonTypes} from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonStyles";
 import Container from "@library/layout/components/Container";
 import WidgetContainer from "@library/layout/components/WidgetContainer";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
@@ -21,15 +21,15 @@ import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import Splash from "@library/splash/Splash";
-import {t} from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import TitleBar from "@library/headers/TitleBar";
-import {AnalyticsData} from "@library/analytics/AnalyticsData";
-import {ComposeIcon} from "@library/icons/common";
-import {FallbackBackUrlSetter} from "@library/routing/links/BackRoutingProvider";
-import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import { ComposeIcon } from "@library/icons/common";
+import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 /**
  * Component representing the the full home page of a help center.

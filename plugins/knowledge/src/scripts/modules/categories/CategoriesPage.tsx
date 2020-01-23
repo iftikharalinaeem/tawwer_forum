@@ -11,7 +11,7 @@ import CategoriesLayout from "@knowledge/modules/categories/components/Categorie
 import { NavHistoryUpdater } from "@knowledge/navigation/NavHistoryContext";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
@@ -23,7 +23,7 @@ import { connect } from "react-redux";
 import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
-import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 /**
  * Page component for a flat category list.

@@ -3,27 +3,27 @@
  * @license Proprietary
  */
 
-import {EditorRoute} from "@knowledge/routes/pageRoutes";
+import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import Permission from "@library/features/users/Permission";
-import {buttonClasses} from "@library/forms/buttonStyles";
-import {SearchErrorIcon} from "@library/icons/common";
+import { buttonClasses } from "@library/forms/buttonStyles";
+import { SearchErrorIcon } from "@library/icons/common";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import {t} from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import React from "react";
-import {pageErrorMessageClasses} from "@library/errorPages/pageErrorMessageStyles"
+import { pageErrorMessageClasses } from "@library/errorPages/pageErrorMessageStyles";
 import {
     DefaultError,
     getErrorCode,
     IError,
     IErrorMessageProps,
     messageFromErrorCode,
-    parseErrorCode
+    parseErrorCode,
 } from "@library/errorPages/CoreErrorMessages";
 import classNames from "classnames";
 
-export default function KbErrorMessages (props: IKbErrorMessageProps) {
+export default function KbErrorMessages(props: IKbErrorMessageProps) {
     const classes = pageErrorMessageClasses();
     const error = {
         ...parseKbErrorCode(props, getErrorCode(props)),
@@ -40,7 +40,6 @@ export default function KbErrorMessages (props: IKbErrorMessageProps) {
         </div>
     );
 }
-
 
 function parseKbErrorCode(props: IKbErrorMessageProps, errorCode?: string | number): IError {
     const classes = pageErrorMessageClasses();
@@ -73,10 +72,7 @@ function parseKbErrorCode(props: IKbErrorMessageProps, errorCode?: string | numb
                 ) : null,
                 actionItem: knowledgeBaseID ? (
                     <Permission permission="articles.add">
-                        <EditorRoute.Link
-                            className={buttons.primary}
-                            data={{ knowledgeBaseID, knowledgeCategoryID }}
-                        >
+                        <EditorRoute.Link className={buttons.primary} data={{ knowledgeBaseID, knowledgeCategoryID }}>
                             {t("New Article")}
                         </EditorRoute.Link>
                     </Permission>
@@ -117,12 +113,11 @@ export function messageFromKbErrorCode(errorCode?: string | number) {
     }
 }
 
-export interface IKbErrorMessageProps extends IErrorMessageProps{
+export interface IKbErrorMessageProps extends IErrorMessageProps {
     className?: string;
     knowledgeBaseID?: number;
     knowledgeCategoryID?: number;
 }
-
 
 export enum DefaultKbError {
     GENERIC = "generic",

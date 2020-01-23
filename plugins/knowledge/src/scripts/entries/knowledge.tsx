@@ -24,7 +24,7 @@ import { Router } from "@library/Router";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { AppContext } from "@library/AppContext";
 import { mountReact } from "@vanilla/react-utils";
-import  {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { serverReducer } from "@knowledge/server/serverReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import kbReducer from "@knowledge/state/reducer";

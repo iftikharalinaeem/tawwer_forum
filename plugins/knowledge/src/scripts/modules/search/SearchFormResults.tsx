@@ -15,7 +15,7 @@ import SearchPagination from "@knowledge/modules/search/components/SearchPaginat
 import { IResult } from "@library/result/Result";
 import { ResultMeta } from "@library/result/ResultMeta";
 import Loader from "@library/loaders/Loader";
-import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 
 interface IProps {}
 

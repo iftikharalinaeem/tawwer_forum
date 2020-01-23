@@ -27,8 +27,8 @@ import * as React from "react";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
-import {KbErrorPage} from "@knowledge/pages/KbErrorPage";
-import {DefaultKbError} from "@knowledge/modules/common/KbErrorMessages";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 interface IProps {
     category: IKbCategory;

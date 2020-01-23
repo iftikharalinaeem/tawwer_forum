@@ -11,9 +11,11 @@ import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLa
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
-import KbErrorMessages, {IKbErrorMessageProps, messageFromKbErrorCode} from "@knowledge/modules/common/KbErrorMessages";
-import {getErrorCode} from "@library/errorPages/CoreErrorMessages";
-
+import KbErrorMessages, {
+    IKbErrorMessageProps,
+    messageFromKbErrorCode,
+} from "@knowledge/modules/common/KbErrorMessages";
+import { getErrorCode } from "@library/errorPages/CoreErrorMessages";
 
 export class KbErrorPage extends React.Component<IProps> {
     public render() {
@@ -39,4 +41,3 @@ export class KbErrorPage extends React.Component<IProps> {
 }
 
 interface IProps extends IKbErrorMessageProps {}
-
