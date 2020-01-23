@@ -40,6 +40,7 @@ export default function CurrentTheme(props: IProps) {
                 />
                 <CurrentThemeInfo
                     {...currentTheme}
+                    info={currentTheme.preview.info}
                     editButton={
                         currentTheme.type === ThemeType.DB ? (
                             <LinkAsButton
