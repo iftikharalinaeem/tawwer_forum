@@ -3,18 +3,14 @@
  * @license Proprietary
  */
 
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { percent } from "csx";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 
 export const themeItemClasses = useThemeCache(() => {
     const style = styleFactory("themeItem");
     const vars = globalVariables();
 
-    const item = style("item", {
-        padding: 18,
-        width: "calc(100% / 3)",
-    });
+    const item = style("item", {});
 
     const title = style("title", {
         fontSize: vars.fonts.size.medium,

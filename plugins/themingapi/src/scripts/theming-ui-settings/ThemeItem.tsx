@@ -18,6 +18,7 @@ import classNames from "classnames";
 
 interface IProps {
     theme: IManageTheme;
+    className?: string;
 }
 
 export function ThemeItem(props: IProps) {
@@ -26,8 +27,6 @@ export function ThemeItem(props: IProps) {
     const classes = themeItemClasses();
     const { preview } = props.theme;
     const themeID = props.theme.themeID;
-    const classesDropDown = dropDownClasses();
-    const classesThemeCard = themeCardClasses();
     const copyCustomTheme = props.theme.type === "themeDB" ? true : false;
 
     const handlePreview = async () => {
@@ -52,7 +51,7 @@ export function ThemeItem(props: IProps) {
                     elementToFocusOnExit={document.body}
                 />
             )}
-            <div className={classes.item}>
+            <div className={classNames(classes.item, props.className)}>
                 <ThemePreviewCard
                     name={props.theme.name || t("Unknown Theme")}
                     isActiveTheme={props.theme.current}

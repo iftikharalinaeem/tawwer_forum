@@ -13,9 +13,10 @@ import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { t } from "@vanilla/i18n";
 import React, { useEffect } from "react";
 import { BrowserRouter } from "react-router-dom";
-import AddTheme from "@vanilla/library/src/scripts/theming/AddTheme";
+import { AddTheme } from "@vanilla/library/src/scripts/theming/AddTheme";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
+import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
 
 const DEFAULT_THEME = "theme-foundation";
 
@@ -34,17 +35,7 @@ export default function ManageThemingPage(props) {
     }
 
     const { currentTheme, templates, themes } = themeSettingsState.themes.data;
-
-    const {
-        themeTemplatesStyles = {
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "flex-start",
-            padding: 24,
-            marginLeft: -36,
-            marginRight: -36,
-        },
-    } = props;
+    const classes = manageThemingClasses();
 
     return (
         <BrowserRouter>
@@ -55,9 +46,9 @@ export default function ManageThemingPage(props) {
                     {t("Templates are the standard themes. To customize them, you have to create a copy.")}
                 </div>
             </div>
-            <div style={themeTemplatesStyles}>
+            <div className={classes.grid}>
                 {templates.map((templateTheme, key) => (
-                    <ThemeItem key={key} theme={templateTheme} />
+                    <ThemeItem key={key} theme={templateTheme} className={classes.gridItem} />
                 ))}
             </div>
             {themes.length > 0 && (
@@ -70,15 +61,18 @@ export default function ManageThemingPage(props) {
                             )}
                         </div>
                     </div>
-                    <div style={themeTemplatesStyles}>
+                    <div className={classes.grid}>
                         {themes.map((theme, key) => (
-                            <ThemeItem key={key} theme={theme} />
+                            <ThemeItem key={key} theme={theme} className={classes.gridItem} />
                         ))}
 
-                        <div style={{ padding: "19px 0", width: `calc(100% / 3)` }}>
+                        <div className={classes.gridItem}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link data={{ templateName: DEFAULT_THEME }}>
+                                    <ThemeEditorRoute.Link
+                                        data={{ templateName: DEFAULT_THEME }}
+                                        className={classes.gridItem}
+                                    >
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }
