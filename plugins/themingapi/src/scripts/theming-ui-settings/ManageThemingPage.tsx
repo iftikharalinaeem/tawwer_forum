@@ -17,6 +17,7 @@ import { AddTheme } from "@vanilla/library/src/scripts/theming/AddTheme";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
+import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 
 const DEFAULT_THEME = "theme-foundation";
 
@@ -69,14 +70,14 @@ export default function ManageThemingPage(props) {
                         <div className={classes.gridItem}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link
-                                        data={{ templateName: DEFAULT_THEME }}
-                                        className={classes.gridItem}
-                                    >
+                                    <ThemeEditorRoute.Link data={{ templateName: DEFAULT_THEME }}>
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }
                             />
+                            <h3 className={themeItemClasses().title} aria-hidden={true}>
+                                &nbsp;
+                            </h3>
                         </div>
                     </div>
                 </>
