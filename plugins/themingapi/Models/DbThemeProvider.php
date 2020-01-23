@@ -33,6 +33,9 @@ use Vanilla\Models\ThemeModelHelper;
  * Class DbThemeProvider
  */
 class DbThemeProvider implements ThemeProviderInterface {
+
+    const SELECT_FIELDS = ['themeID', 'parentTheme', 'name', 'current', 'dateUpdated', 'dateInserted'];
+
     use ThemeVariablesTrait;
     /**
      * @var ThemeAssetModel
@@ -96,14 +99,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             $theme = $this->normalizeTheme(
                 $this->themeModel->selectSingle(
                     ['themeID' => $themeKey],
-                    ['select' => [
-                        'themeID',
-                        'name',
-                        'current',
-                        'parentTheme',
-                        'dateInserted',
-                        'dateUpdated']
-                    ]
+                    ['select' => self::SELECT_FIELDS]
                 ),
                 $this->themeAssetModel->get(['themeID' => $themeKey], ['select' => ['assetKey', 'data']])
             );
@@ -132,7 +128,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function postTheme(array $body): array {
         $themeID = $this->themeModel->insert($body);
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => self::SELECT_FIELDS]);
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
@@ -165,7 +161,7 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $theme = $this->themeModel->selectSingle(
             ['themeID' => $themeID],
-            ['select' => ['themeID', 'name', 'current', 'dateUpdated', 'dateInserted']]
+            ['select' => self::SELECT_FIELDS]
         );
         $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
         return $this->normalizeTheme(
