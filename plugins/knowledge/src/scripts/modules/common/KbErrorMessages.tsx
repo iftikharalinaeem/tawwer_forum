@@ -12,7 +12,7 @@ import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import {t} from "@library/utility/appUtils";
 import React from "react";
-import {pageErrorMessageClasses} from "@knowledge/modules/common/pageErrorMessageStyles";
+import {pageErrorMessageClasses} from "@library/errorPages/pageErrorMessageStyles"
 import {
     DefaultError,
     getErrorCode,
