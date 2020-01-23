@@ -12,8 +12,6 @@ import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
-import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
-import themeCardClasses from "@vanilla/library/src/scripts/theming/themeCardStyles";
 import classNames from "classnames";
 
 interface IProps {
