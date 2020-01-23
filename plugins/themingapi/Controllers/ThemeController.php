@@ -8,7 +8,12 @@
  * Controller for theme editor.
  */
 class ThemeController extends SettingsController {
+
+    /**
+     * Controller to render the /themes/theme-settings page.
+     */
     public function themeSettings() {
+        $this->permission("Garden.Settings.Manage");
         $this->render('themesettings');
     }
 }
