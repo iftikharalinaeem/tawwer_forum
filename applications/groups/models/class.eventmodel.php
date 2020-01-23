@@ -96,7 +96,7 @@ class EventModel extends Gdn_Model {
             // recent events
             $eventsQuery
                 ->beginWhereGroup()
-                ->where('DateEnds <=',  $startDate->format('Y-m-d H:i:s'))
+                ->where('DateEnds <=', $startDate->format('Y-m-d H:i:s'))
                 ->orwhere('DateStarts <=', $startDate->format('Y-m-d H:i:s'))
                 ->Where('DateEnds is  null', '')
                 ->endWhereGroup();
