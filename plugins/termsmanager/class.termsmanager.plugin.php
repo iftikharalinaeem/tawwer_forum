@@ -124,11 +124,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
         if ($this->addTermsValidation($sender, false)) {
             $sender->UserModel->Validation->applyRule('Terms', 'Required', t('You must agree to the terms of service.'));
         }
-        // If the custom terms are active and the client has not specified showing both
-        // custom and default, do not validate default because it has been hidden in $this->addTermsCheckBox()
-        if (!c('TermsManager.ShowDefault')) {
-            $sender->UserModel->Validation->unapplyRule('TermsOfService', true);
-        }
     }
 
 
@@ -333,11 +328,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
         // is and existing user whose Terms hasn't been checked but ForceRenew is off.
         if (!$isUpToDate && !$forceRenew && val('UserID', $user)) {
             return;
-        }
-
-        // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
-        if (!c('TermsManager.ShowDefault')) {
-            $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
         }
 
         // If it is an existing user and Admin who has agreed to most recent terms and Admin is not
