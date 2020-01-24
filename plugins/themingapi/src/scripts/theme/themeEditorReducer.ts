@@ -63,6 +63,7 @@ export interface ITheme {
     assets: IThemeAssets;
     parentTheme: string;
     version: string;
+    pageType: string;
 }
 
 export interface IThemeForm {
@@ -72,6 +73,7 @@ export interface IThemeForm {
     assets: IThemeAssets;
     parentTheme: string;
     version: string;
+    pageType: string;
 }
 
 export interface IThemeState {
@@ -113,6 +115,7 @@ const INITIAL_STATE: IThemeState = {
         assets: INITIAL_ASSETS,
         parentTheme: "",
         version: "",
+        pageType: "add",
     },
     formSubmit: {
         status: LoadStatus.PENDING,

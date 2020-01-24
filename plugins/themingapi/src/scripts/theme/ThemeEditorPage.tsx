@@ -62,7 +62,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const themeStatus = theme.status;
     useEffect(() => {
         if (themeStatus === LoadStatus.PENDING && themeID !== undefined) {
-            getThemeById(themeID);
+            getThemeById(themeID, history);
         }
     }, [themeStatus, themeID, getThemeById]);
 
@@ -77,7 +77,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const submitHandler = async event => {
         event.preventDefault();
         if (themeID !== null) {
-            await saveTheme(history);
+            await saveTheme();
             window.location.href = formatUrl("/theme/theme-settings", true);
         }
     };
@@ -164,7 +164,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                         <ActionBar
                             useShadow={false}
                             callToActionTitle={t("Save")}
-                            title={<Title themeName={theme.data.name} />}
+                            title={<Title themeName={theme.data.name} pageType={form.pageType} />}
                             fullWidth={true}
                             isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                             optionsMenu={
@@ -198,6 +198,7 @@ interface IThemeTitleProps {
     setThemeName?: string;
     themeName?: string;
     editThemeName?: void;
+    pageType?: string;
 }
 export const Title = (props: IThemeTitleProps) => {
     const { updateAssets } = useThemeActions();
@@ -212,6 +213,8 @@ export const Title = (props: IThemeTitleProps) => {
             inputRef.current?.focus();
         });
     };
+    console.log(props.pageType);
+    const inputValue = props.pageType === "add" ? `${name} Copy` : "Untitled";
 
     return (
         <li className={classes.themeName}>
@@ -227,7 +230,7 @@ export const Title = (props: IThemeTitleProps) => {
                     },
                     disabled: isDisabled,
                     inputRef,
-                    value: name,
+                    value: inputValue,
                 }}
             />
 

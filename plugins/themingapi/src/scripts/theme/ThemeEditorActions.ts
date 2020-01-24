@@ -53,14 +53,16 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
-    public getThemeById = async (themeID: number | string) => {
+    public getThemeById = async (themeID: number | string, history: History) => {
         const request = {
             themeID: themeID,
         };
-        return await this.getTheme(request);
+        const query = qs.parse(history.location.search.replace(/^\?/, ""));
+        const pageType = query.templateName ? "add" : "edit";
+        return await this.getTheme(request, pageType);
     };
 
-    public getTheme = async (options: IGetThemeParams) => {
+    public getTheme = async (options: IGetThemeParams, pageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
@@ -78,6 +80,8 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 assets.javascript = javascriptResponse.data;
             }
 
+            response.data.pageType = pageType;
+
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
@@ -85,12 +89,9 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         return response;
     };
 
-    public saveTheme = async (history: History) => {
-        const query = qs.parse(history.location.search.replace(/^\?/, ""));
-        const canEdit = !query.templateName;
-
+    public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
-        const { themeID } = this.getState().themeEditor.form;
+        const { themeID, pageType } = this.getState().themeEditor.form;
         const assets = {
             header: form.assets.header,
             footer: form.assets.footer,
@@ -102,7 +103,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             assets: assets,
         };
 
-        if (form.type == "themeDB" && canEdit) {
+        if (form.type == "themeDB" && pageType === "edit") {
             if (themeID) {
                 return await this.patchTheme({
                     ...request,
