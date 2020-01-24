@@ -3,32 +3,34 @@
  * @license GPL-2.0-only
  */
 
-import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import { ActionBar } from "@library/headers/ActionBar";
-import { Tabs } from "@library/sectioning/Tabs";
-import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
-import { t } from "@vanilla/i18n";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
-import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
-import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
-import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
-import Loader from "@vanilla/library/src/scripts/loaders/Loader";
-import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
-import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
-import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
-import { useLastValue } from "@vanilla/react-utils";
-import classNames from "classnames";
-import qs from "qs";
 import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
+import { themeEitorClasses } from "./themeEditorStyles";
+import { ActionBar } from "@library/headers/ActionBar";
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
+import { Tabs } from "@library/sectioning/Tabs";
+import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
-import { themeEitorClasses } from "./themeEditorStyles";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
+import { t } from "@vanilla/i18n";
+import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
+import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
+import Modal from "@vanilla/library/src/scripts/modal/Modal";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import Button from "@vanilla/library/src/scripts/forms/Button";
+import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
+import classNames from "classnames";
+import { useLastValue } from "@vanilla/react-utils";
+import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
+import { useLinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
+import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
+import { ErrorPage } from "@library/errorPages/ErrorComponent";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -82,8 +84,12 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         }
     };
 
-    if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING || !theme.data) {
+    if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         return <Loader />;
+    }
+
+    if (theme.status === LoadStatus.ERROR || !theme.data) {
+        return <ErrorPage error={theme.error} />;
     }
     const { assets } = form;
     const tabData = [
@@ -156,6 +162,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         },
     ];
 
+    // @ts-ignore
     return (
         <BrowserRouter>
             <React.Fragment>
