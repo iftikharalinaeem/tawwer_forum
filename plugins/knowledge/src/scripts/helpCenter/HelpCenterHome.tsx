@@ -7,7 +7,7 @@ import HelpCenterNavigation from "@knowledge/helpCenter/components/HelpCenterNav
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { EditorRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILinkListData, ILoadable, LoadStatus } from "@library/@types/api/core";
@@ -26,10 +26,10 @@ import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
 import TitleBar from "@library/headers/TitleBar";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 /**
  * Component representing the the full home page of a help center.
@@ -44,13 +44,13 @@ export class HelpCenterHome extends React.Component<IProps> {
         }
 
         if (status === LoadStatus.ERROR) {
-            return <ErrorPage error={this.props.error} />;
+            return <KbErrorPage error={this.props.error} />;
         }
 
         if (knowledgeBase.countArticles === 0) {
             return (
-                <ErrorPage
-                    defaultError={DefaultError.NO_ARTICLES}
+                <KbErrorPage
+                    defaultError={DefaultKbError.NO_ARTICLES}
                     knowledgeBaseID={knowledgeBaseID}
                     knowledgeCategoryID={knowledgeBase.rootCategoryID}
                 />

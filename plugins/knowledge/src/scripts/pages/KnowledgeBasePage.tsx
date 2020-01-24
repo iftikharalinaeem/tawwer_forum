@@ -6,7 +6,7 @@ import HelpCenterHome from "@knowledge/helpCenter/HelpCenterHome";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import KnowledgeBaseModel, { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import ArticlePage from "@knowledge/modules/article/ArticlePage";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Loader from "@library/loaders/Loader";
@@ -14,7 +14,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { LoadStatus } from "@library/@types/api/core";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 class KnowledgeBasePage extends React.Component<IProps> {
     public render(): React.ReactNode {
@@ -25,7 +25,7 @@ class KnowledgeBasePage extends React.Component<IProps> {
         }
 
         if (knowledgeBase === null) {
-            return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+            return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
         }
 
         switch (knowledgeBase.viewType) {
@@ -45,7 +45,10 @@ class KnowledgeBasePage extends React.Component<IProps> {
     private renderGuide(knowledgeBase: IKnowledgeBase): React.ReactNode {
         if (knowledgeBase.defaultArticleID === null) {
             return (
-                <ErrorPage defaultError={DefaultError.NO_ARTICLES} knowledgeBaseID={knowledgeBase.knowledgeBaseID} />
+                <KbErrorPage
+                    defaultError={DefaultKbError.NO_ARTICLES}
+                    knowledgeBaseID={knowledgeBase.knowledgeBaseID}
+                />
             );
         }
 

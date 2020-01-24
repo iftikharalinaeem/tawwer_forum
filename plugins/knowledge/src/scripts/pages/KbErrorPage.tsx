@@ -11,16 +11,16 @@ import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLa
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
-import PageErrorMessage, {
-    getErrorCode,
-    IErrorMessageProps,
-    messageFromErrorCode,
-} from "@knowledge/modules/common/PageErrorMessage";
+import KbErrorMessages, {
+    IKbErrorMessageProps,
+    messageFromKbErrorCode,
+} from "@knowledge/modules/common/KbErrorMessages";
+import { getErrorCode } from "@library/errorPages/CoreErrorMessages";
 
-export class ErrorPage extends React.Component<IProps> {
+export class KbErrorPage extends React.Component<IProps> {
     public render() {
         const code = getErrorCode(this.props);
-        const message = messageFromErrorCode(code);
+        const message = messageFromKbErrorCode(code);
         const classes = {
             inheritHeight: inheritHeightClass(),
         };
@@ -31,7 +31,7 @@ export class ErrorPage extends React.Component<IProps> {
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>
-                            <PageErrorMessage {...this.props} className={classes.inheritHeight} />
+                            <KbErrorMessages {...this.props} className={classes.inheritHeight} />
                         </PanelWidget>
                     </PanelWidgetVerticalPadding>
                 </Container>
@@ -40,6 +40,4 @@ export class ErrorPage extends React.Component<IProps> {
     }
 }
 
-interface IProps extends IErrorMessageProps, IDeviceProps {}
-
-export default withDevice(ErrorPage);
+interface IProps extends IKbErrorMessageProps {}
