@@ -159,7 +159,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     return (
         <BrowserRouter>
             <React.Fragment>
-                <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
                     <form onSubmit={submitHandler}>
                         <ActionBar
                             useShadow={false}
