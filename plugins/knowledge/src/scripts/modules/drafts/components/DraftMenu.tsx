@@ -62,17 +62,17 @@ export class DraftMenu extends React.Component<IProps, IState> {
                         className="draftPreview-option"
                     />
                 </DropDown>
-                {this.state.showDeleteDialogue && (
-                    <ModalConfirm
-                        title={t("Delete Draft")}
-                        onCancel={this.closeDeleteDialogue}
-                        onConfirm={this.deleteDraft}
-                        elementToFocusOnExit={this.toggleButtonRef.current! as HTMLElement}
-                        isConfirmLoading={this.props.deleteDraft.status === LoadStatus.LOADING}
-                    >
-                        {t("This is a destructive action. You will not be able to restore your draft.")}
-                    </ModalConfirm>
-                )}
+
+                <ModalConfirm
+                    isVisible={this.state.showDeleteDialogue}
+                    title={t("Delete Draft")}
+                    onCancel={this.closeDeleteDialogue}
+                    onConfirm={this.deleteDraft}
+                    elementToFocusOnExit={this.toggleButtonRef.current! as HTMLElement}
+                    isConfirmLoading={this.props.deleteDraft.status === LoadStatus.LOADING}
+                >
+                    {t("This is a destructive action. You will not be able to restore your draft.")}
+                </ModalConfirm>
             </React.Fragment>
         );
     }

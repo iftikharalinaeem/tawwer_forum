@@ -92,13 +92,12 @@ export default function NavigationAdminLinks(props: IProps) {
                     )}
                 </li>
             </ul>
-            {modalOpen && (
-                <NewCategoryForm
-                    buttonRef={categoryButtonRef}
-                    exitHandler={closeModal}
-                    parentCategoryID={knowledgeBase.rootCategoryID}
-                />
-            )}
+            <NewCategoryForm
+                isVisible={modalOpen}
+                buttonRef={categoryButtonRef}
+                exitHandler={closeModal}
+                parentCategoryID={knowledgeBase.rootCategoryID}
+            />
         </Permission>
     );
 }

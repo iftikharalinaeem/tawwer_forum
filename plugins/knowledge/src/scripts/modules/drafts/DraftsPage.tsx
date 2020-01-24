@@ -40,6 +40,7 @@ export class DraftsPage extends React.Component<IProps> {
     public render() {
         return (
             <Modal
+                isVisible={true}
                 scrollable={true}
                 titleID={this.titleID}
                 size={ModalSizes.FULL_SCREEN}

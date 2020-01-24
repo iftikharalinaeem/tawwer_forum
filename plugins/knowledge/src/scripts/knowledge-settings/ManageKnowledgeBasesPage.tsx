@@ -29,7 +29,7 @@ export function ManageKnowledgeBasesPage() {
     const { initForm } = useKnowledgeBaseActions();
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
-    const [deleteID, setStatusChangeID] = useState<number | null>(null);
+    const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
     const [purgeID, setPurgeID] = useState<number | null>(null);
 
     const closeForm = () => {
@@ -68,28 +68,22 @@ export function ManageKnowledgeBasesPage() {
                     }}
                 />
             )}
-            {deleteID !== null && (
-                <KnowledgeBasePatchStatusModal
-                    newStatus={
-                        // Switching to the opposite status
-                        status === KnowledgeBaseStatus.DELETED
-                            ? KnowledgeBaseStatus.PUBLISHED
-                            : KnowledgeBaseStatus.DELETED
-                    }
-                    knowledgeBaseID={deleteID}
-                    onDismiss={() => {
-                        setStatusChangeID(null);
-                    }}
-                />
-            )}
-            {purgeID !== null && (
-                <KnowledgeBasePurgeModal
-                    knowledgeBaseID={purgeID}
-                    onDismiss={() => {
-                        setPurgeID(null);
-                    }}
-                />
-            )}
+            <KnowledgeBasePatchStatusModal
+                newStatus={
+                    // Switching to the opposite status
+                    status === KnowledgeBaseStatus.DELETED ? KnowledgeBaseStatus.PUBLISHED : KnowledgeBaseStatus.DELETED
+                }
+                knowledgeBaseID={statusChangeID}
+                onDismiss={() => {
+                    setStatusChangeID(null);
+                }}
+            />
+            <KnowledgeBasePurgeModal
+                knowledgeBaseID={purgeID}
+                onDismiss={() => {
+                    setPurgeID(null);
+                }}
+            />
             <DashboardTable
                 head={
                     <tr>
@@ -123,6 +117,7 @@ export function ManageKnowledgeBasesPage() {
                                     : undefined
                             }
                             onStatusChangeClick={() => {
+                                console.log("setting status is", kb.knowledgeBaseID);
                                 setStatusChangeID(kb.knowledgeBaseID);
                             }}
                         />
