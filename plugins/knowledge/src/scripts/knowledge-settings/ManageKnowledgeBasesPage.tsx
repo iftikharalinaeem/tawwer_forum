@@ -117,7 +117,6 @@ export function ManageKnowledgeBasesPage() {
                                     : undefined
                             }
                             onStatusChangeClick={() => {
-                                console.log("setting status is", kb.knowledgeBaseID);
                                 setStatusChangeID(kb.knowledgeBaseID);
                             }}
                         />

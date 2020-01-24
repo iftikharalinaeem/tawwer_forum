@@ -41,7 +41,6 @@ export function KnowledgeBasePatchStatusModal(props: IProps) {
 
     useEffect(() => {
         if (status === LoadStatus.SUCCESS) {
-            console.log("dismissing because success");
             dismissModal();
         }
     }, [dismissModal, status]);
