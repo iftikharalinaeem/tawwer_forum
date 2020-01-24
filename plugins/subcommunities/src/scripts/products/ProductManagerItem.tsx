@@ -75,7 +75,6 @@ export function ProductManagerItem(props: IProps) {
     // Dismiss the edit mode if we lose focus.
     useFocusWatcher(rootRef, newFocus => {
         if (!newFocus) {
-            console.log(document.activeElement);
             setIsEditMode(false);
         }
     });
@@ -145,6 +144,7 @@ export function ProductManagerItem(props: IProps) {
         <>
             {loadedProduct && loadedProduct.deleteProduct.error && (
                 <ProductDeleteErrorModal
+                    isVisible={true}
                     elementToFocusOnExit={deleteIconRef.current}
                     onClose={() => clearDeleteError(loadedProduct.product.productID)}
                     product={loadedProduct.product}

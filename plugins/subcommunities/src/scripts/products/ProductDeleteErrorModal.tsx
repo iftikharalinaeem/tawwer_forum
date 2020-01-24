@@ -30,6 +30,7 @@ interface IProps {
     onClose: () => void;
     elementToFocusOnExit: HTMLElement | null;
     product: IProduct;
+    isVisible: boolean;
 }
 
 export function ProductDeleteErrorModal(props: IProps) {
@@ -40,6 +41,7 @@ export function ProductDeleteErrorModal(props: IProps) {
     const classFrameFooter = frameFooterClasses();
     return (
         <Modal
+            isVisible={props.isVisible}
             size={ModalSizes.SMALL}
             elementToFocus={cancelRef.current}
             exitHandler={props.onClose}
