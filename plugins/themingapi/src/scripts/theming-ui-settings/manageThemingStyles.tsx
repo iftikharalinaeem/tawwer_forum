@@ -42,6 +42,8 @@ export function manageThemingClasses() {
     const gridItem = style("gridItem", {
         flex: 1,
         padding: 18,
+        display: "flex",
+        flexDirection: "column",
     });
 
     return { root, grid, gridItem };

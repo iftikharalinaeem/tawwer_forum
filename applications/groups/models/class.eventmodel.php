@@ -77,8 +77,6 @@ class EventModel extends Gdn_Model {
         if ($limitDate > $startDate) {
             if ($ended === false) {
                 $where['DateEnds >='] = $startDate->format('Y-m-d H:i:s');
-            } else {
-                $where['DateStarts >='] = $startDate->format('Y-m-d H:i:s');
             }
 
             if ($future) {
@@ -90,18 +88,26 @@ class EventModel extends Gdn_Model {
                 $where['DateStarts >='] = $limitDate->format('Y-m-d H:i:s');
             }
         }
-
-        $orWhere = ['DateStarts <=' => $startDate->format('Y-m-d H:i:s'), 'DateEnds >=' => $startDate->format('Y-m-d H:i:s')];
-        // Only events that are over
-        if ($ended) {
-            $where['DateEnds <='] = $startDate->format('Y-m-d H:i:s');
-            $orWhere = ['DateStarts <=' => $startDate->format('Y-m-d H:i:s'), 'DateEnds is null' => ''];
-        }
-
         $eventsQuery = $this->SQL
             ->select('e.*')
-            ->where($where)
-            ->orWhere($orWhere)
+            ->where($where);
+
+        if ($ended) {
+            // recent events
+            $eventsQuery
+                ->beginWhereGroup()
+                ->where('DateEnds <=', $startDate->format('Y-m-d H:i:s'))
+                ->orWhere('DateEnds is  null')
+                ->endWhereGroup();
+        } else {
+            // upcoming events
+            $eventsQuery
+                ->beginWhereGroup()
+                ->where('DateStarts >=', $startDate->format('Y-m-d H:i:s'))
+                ->orWhere('DateEnds >=', $startDate->format('Y-m-d H:i:s'))
+                ->endWhereGroup();
+        }
+        $eventsQuery
             ->limit($limit)
             ->orderBy('DateStarts', 'asc');
 
