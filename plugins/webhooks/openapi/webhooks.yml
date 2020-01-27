@@ -46,7 +46,7 @@ paths:
           required: true
           schema:
             type: integer
-      summary: Get information about a specific webhook.
+      summary: Get information about a webhook.
       tags:
         - Webhooks
       responses:
