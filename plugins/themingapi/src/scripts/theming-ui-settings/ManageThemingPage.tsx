@@ -19,7 +19,7 @@ import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 
-const DEFAULT_THEME = "theme-foundation";
+
 
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
@@ -70,7 +70,7 @@ export default function ManageThemingPage(props) {
                         <div className={classes.gridItem}>
                             <AddTheme
                                 onAdd={
-                                    <ThemeEditorRoute.Link data={{ templateName: DEFAULT_THEME }}>
+                                    <ThemeEditorRoute.Link data={{ newTheme: true }}>
                                         <PlusIcon />
                                     </ThemeEditorRoute.Link>
                                 }

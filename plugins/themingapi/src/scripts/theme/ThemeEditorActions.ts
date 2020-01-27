@@ -54,11 +54,21 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
     public getThemeById = async (themeID: number | string, history: History) => {
+        const query = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        let pageType = '';
+        if (history.location.pathname === '/theme/theme-settings/add' && !query.templateName) {
+            pageType = 'newTheme';
+        } else if (query.templateName) {
+            pageType = 'copy'
+        } else {
+            pageType = 'edit'
+        }
+
         const request = {
             themeID: themeID,
         };
-        const query = qs.parse(history.location.search.replace(/^\?/, ""));
-        const pageType = query.templateName ? "add" : "edit";
+
         return await this.getTheme(request, pageType);
     };
 
@@ -81,7 +91,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             }
 
             response.data.pageType = pageType;
-
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
