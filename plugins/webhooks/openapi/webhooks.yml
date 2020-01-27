@@ -57,6 +57,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Webhook'
     patch:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
       summary: Update a webhook.
       tags:
         - Webhooks
@@ -64,15 +71,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Webhook'
+              $ref: '#/components/schemas/WebhookPatch'
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebhookPatch'
+                $ref: '#/components/schemas/Webhook'
     delete:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
       summary: Delete a webhook.
       tags:
         - Webhooks
@@ -121,34 +135,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WebhookDelivery'
+                $ref: '#/components/schemas/WebhookDeliveryWithRequest'
       summary: Get a specific webhook delivery record.
-      tags:
-        - Webhooks
-  '/webhooks/{id}/deliveries/{deliveryID}/redeliver':
-    post:
-      parameters:
-        - name: id
-          in: path
-          description: The webhook ID.
-          required: true
-          schema:
-            type: integer
-        - name: deliveryID
-          in: path
-          description: Unique delivery ID.
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        201:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WebhookDelivery'
-      summary: Re-send a specific delivery attempt.
       tags:
         - Webhooks
   '/webhooks/{id}/pings':
@@ -170,9 +158,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    description: Unique ID sent as part of the ping payload.
+                  webhookID:
+                    description: Unique ID of the webhook being pinged.
                     type: string
+                  dateInserted:
+                    description: The date and time of the ping request.
+                    type: string
+                    format: date-time
           description: Success
 components:
   callbacks:
@@ -267,30 +259,39 @@ components:
           type: integer
     WebhookDelivery:
       properties:
-        deliveryID:
+        webhookDeliveryID:
           description: Unique ID of the delivery.
           type: string
           format: uuid
         webhookID:
           description: Unique ID of the associated webhook.
           type: integer
-        request:
-          properties:
-            headers:
-              description: Headers sent as part of the delivery.
-              type: string
-            payload:
-              description: Full body of the delivery payload.
-              type: string
+        requestDuration:
+          description: Total duration of the request in miliseconds.
+          type: integer
+        responseCode:
+          description: HTTP response code received from the server upon delivery.
+          type: integer
+        dateInserted:
+          description: Date and time of the delivery attempt.
+          type: string
+          format: date-time
+      type: object
+    WebhookDeliveryWithRequest:
+      allOf:
+        - $ref: '#/components/schemas/WebhookDelivery'
+      properties:
+        requestBody:
+          description: Full string representation of request body.
+          type: string
+        requestHeaders:
+          description: Collection of headers sent in the request, grouped by type.
           type: object
-        response:
-          properties:
-            headers:
-              description: Headers received during the delivery.
-              type: string
-            body:
-              description: Full body of the response to the delivery.
-              type: string
+        responseBody:
+          description: Full string representation of response body.
+          type: string
+        responseHeaders:
+          description: Collection of headers received in the response, grouped by type.
           type: object
       type: object
     WebhookEvent:
@@ -300,18 +301,6 @@ components:
         - comment
         - discussion
         - user
-    WebhookLastResponse:
-      type: object
-      properties:
-        code:
-          description: HTTP code.
-          nullable: true
-          type: integer
-        message:
-          description: Response content.
-          nullable: true
-          type: string
-      readOnly: true
     WebhookPost:
       type: object
       properties:
@@ -371,8 +360,6 @@ components:
         secret:
           type: string
           description: The secret used to sign events associated with this webhook.
-        lastResponse:
-          $ref: '#/components/schemas/WebhookLastResponse'
         dateInserted:
           type: string
           description: The date/time that the webhook was created.
@@ -396,6 +383,15 @@ components:
     WebhookPatch:
       type: object
       properties:
+        name:
+          type: string
+          description: User-friendly name.
+
+        events:
+          type: array
+          description: Events to be forwarded to this webhook.
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
         url:
           type: string
           description: The target URL of the webhook.
