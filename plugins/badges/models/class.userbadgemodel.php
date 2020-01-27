@@ -46,7 +46,7 @@ class UserBadgeModel extends Gdn_Model {
         $userBadge = $this->getByUser($userID, $badgeID);
 
         // Grab relevant parameters
-        $timeout = val('Timeout', $userBadge['Attributes'], 0);
+        $timeout = val('Timeout', $badge['Attributes'], 0);
         $threshold = val('Threshold', $badge, false);
 
         // Get new timestamp and add to events
