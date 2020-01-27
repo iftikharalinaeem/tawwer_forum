@@ -117,8 +117,22 @@ class WebhooksApiController extends \AbstractApiController {
      * @param integer $webhookID
      * @return void
      */
-    private function getDeliveryIndex(int $webhookID) {
+    private function getDeliveryIndex(int $webhookID, array $query = []) {
         $this->idParamSchema();
+
+        $in = $this->schema([
+            "limit" => [
+                "default" => WebhookDeliveryModel::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
+            ],
+            "page:i?" => [
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ]
+        ], 'in');
         $out = $this->schema(
             [
                 ":a" => $this->schema(
@@ -128,17 +142,20 @@ class WebhooksApiController extends \AbstractApiController {
                         "requestDuration",
                         "responseCode",
                         "dateInserted",
-                        "dateUpdated",
                     ])->add($this->webhookDeliverySchema())
                 )
             ],
             "out"
         );
 
+        $query = $in->validate($query);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+
         $deliveries = $this->deliveryModel->get(
             ["webhookID" => $webhookID],
             [
-                "limit" => 20,
+                "limit" => $limit,
+                "offset" => $offset,
                 "orderFields" => "dateInserted",
                 "orderDirection" => "desc",
             ]
@@ -155,13 +172,13 @@ class WebhooksApiController extends \AbstractApiController {
      * @throws NotFoundException If the webhook could not be found.
      * @return array
      */
-    public function get_deliveries($id, $webhookDeliveryID = null) {
+    public function get_deliveries($id, $webhookDeliveryID = null, array $query = []) {
         $this->permission('Garden.Settings.Manage');
 
         if (is_string($webhookDeliveryID)) {
             $result = $this->getDelivery($id, $webhookDeliveryID);
         } else {
-            $result = $this->getDeliveryIndex($id);
+            $result = $this->getDeliveryIndex($id, $query);
         }
 
         return $result;
@@ -278,18 +295,25 @@ class WebhooksApiController extends \AbstractApiController {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([]);
-        $out = $this->schema(['webhookID'])->add($this->webhookSchema());
+        $out = $this->schema([
+            "webhookID" => ["type" => "integer"],
+            "dateInserted" => [
+                "type" => "string",
+                "format" => "date-time",
+            ]
+        ])->add($this->webhookSchema());
 
         $row = $this->webhookModel->getID($id);
         $webhookConfig = new WebhookConfig($row);
 
-        $pingEvent = new PingEvent(PingEvent::ACTION_PING, [
+        $payload = [
             "webhookID" => $id,
-            "dateTime" => date("c"),
-        ]);
+            "dateInserted" => date("c"),
+        ];
+        $pingEvent = new PingEvent(PingEvent::ACTION_PING, $payload);
         $this->scheduler->addDispatchEventJob($pingEvent, $webhookConfig);
  
-        $result = $out->validate($row);
+        $result = $out->validate($payload);
         return $result;
     }
 
@@ -325,10 +349,6 @@ class WebhooksApiController extends \AbstractApiController {
             "responseHeaders",
             "dateInserted" => [
                 "type" => "datetime",
-            ],
-            "dateUpdated" => [
-                "type" => "datetime",
-                "allowNull" => true,
             ],
         ]);
         return $schema;
