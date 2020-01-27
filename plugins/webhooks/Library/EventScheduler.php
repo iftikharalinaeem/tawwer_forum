@@ -9,7 +9,7 @@ namespace Vanilla\Webhooks\Library;
 use Garden\Events\ResourceEvent;
 use Gdn_Session as SessionInterface;
 use Ramsey\Uuid\Uuid;
-use UserModel;
+use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Webhooks\Jobs\DispatchEventJob;
@@ -25,18 +25,18 @@ class EventScheduler {
     /** @var SessionInterface */
     private $session;
 
-    /** @var UserModel */
-    private $userModel;
+    /** @var UserProviderInterface */
+    private $userProvider;
 
     /**
      * Setup the scheduler.
      *
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(SchedulerInterface $scheduler, UserModel $userModel, SessionInterface $session) {
+    public function __construct(SchedulerInterface $scheduler, UserProviderInterface $userProvider, SessionInterface $session) {
         $this->scheduler = $scheduler;
         $this->session = $session;
-        $this->userModel = $userModel;
+        $this->userProvider = $userProvider;
     }
 
     /**
@@ -46,9 +46,9 @@ class EventScheduler {
      */
     private function getSender(): array {
         if ($this->session->UserID) {
-            $sender = $this->userModel->getFragmentByID($this->session->UserID);
+            $sender = $this->userProvider->getFragmentByID($this->session->UserID);
         } else {
-            $sender = $this->userModel->getGeneratedFragment(UserModel::GENERATED_FRAGMENT_KEY_GUEST);
+            $sender = $this->userProvider->getGeneratedFragment(\UserModel::GENERATED_FRAGMENT_KEY_GUEST);
         }
         return $sender;
     }
