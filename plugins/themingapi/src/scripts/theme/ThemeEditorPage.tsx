@@ -79,6 +79,17 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const submitHandler = async event => {
         event.preventDefault();
         if (themeID !== null) {
+            if (assets.variables) {
+                updateAssets({
+                    assets: {
+                        variables: {
+                            data: JSON.stringify(assets.variables.data),
+                            type: 'json'
+                        },
+                    }
+                })
+            }
+
             await saveTheme();
             window.location.href = formatUrl("/theme/theme-settings", true);
         }
@@ -92,6 +103,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         return <ErrorPage error={theme.error} />;
     }
     const { assets } = form;
+
     const tabData = [
         {
             label: "Header",

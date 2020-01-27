@@ -101,11 +101,13 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
         const { themeID, pageType } = this.getState().themeEditor.form;
+
         const assets = {
             header: form.assets.header,
             footer: form.assets.footer,
             styles: form.assets.styles,
             javascript: form.assets.javascript,
+            variables:  form.assets.variables,
         };
         const request = {
             name: form.name,
