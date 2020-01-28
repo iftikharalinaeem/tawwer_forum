@@ -89,7 +89,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                     }
                 })
             }
-
             await saveTheme();
             window.location.href = formatUrl("/theme/theme-settings", true);
         }
@@ -260,6 +259,7 @@ export const Title = (props: IThemeTitleProps) => {
                     },
                     disabled: isDisabled,
                     inputRef,
+                    value: props.pageType === 'edit' ? name : undefined,
                     placeholder: getPlaceholder(),
                 }}
             />
