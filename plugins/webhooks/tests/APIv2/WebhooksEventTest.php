@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\Webhooks;
+namespace VanillaTests\APIv2;
 
 use Garden\EventManager;
 use Garden\Http\HttpClient;
