@@ -62,7 +62,7 @@ class WebhookModel extends PipelineModel {
      * {@inheritDoc}
      */
     public function delete(array $where, array $options = []): bool {
-        $result = parent::update($where, $options);
+        $result = parent::delete($where, $options);
         $this->cache->remove(self::ACTIVE_CACHE_KEY);
         return $result;
     }
