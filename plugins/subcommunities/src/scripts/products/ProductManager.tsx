@@ -107,7 +107,7 @@ export function ProductManager(props: IProps) {
 
     if (props.asModal) {
         content = (
-            <Modal titleID={titleID} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
+            <Modal isVisible={true} titleID={titleID} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
                 {content}
             </Modal>
         );
