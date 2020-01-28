@@ -63,7 +63,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
     public function container_init(\Garden\Container\Container $container) {
         $container->rule(ThemeModel::class)
             ->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)])
-            ->addCall("setThemeManagePageUrl", ["/theming-ui-settings/themes"])
+            ->addCall("setThemeManagePageUrl", ["/theme/theme-settings"])
         ;
 
         $container
@@ -110,7 +110,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
         $navCollection->addLink(
             self::NAV_SECTION,
             t('Theming UI'),
-            '/theming-ui-settings/themes',
+            '/theme/theme-settings',
             'Garden.Settings.Manage'
         );
     }

@@ -26,20 +26,23 @@ export default function CurrentTheme(props: IProps) {
         <div>
             <DashboardHeaderBlock title={t("Themes")} />
             <div className={classes.root}>
-                <ThemePreviewCard
-                    noActions={true}
-                    globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
-                    globalBg={preview?.["global.mainColors.bg"] ?? undefined}
-                    globalFg={preview?.["global.mainColors.fg"] ?? undefined}
-                    titleBarBg={
-                        preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
-                    }
-                    titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
-                    previewImage={preview?.previewImage}
-                    isActiveTheme={true}
-                />
+                <div className={classes.cardContainer}>
+                    <ThemePreviewCard
+                        noActions={true}
+                        globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
+                        globalBg={preview?.["global.mainColors.bg"] ?? undefined}
+                        globalFg={preview?.["global.mainColors.fg"] ?? undefined}
+                        titleBarBg={
+                            preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
+                        }
+                        titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
+                        previewImage={preview?.previewImage}
+                        isActiveTheme={true}
+                    />
+                </div>
                 <CurrentThemeInfo
                     {...currentTheme}
+                    info={currentTheme.preview.info}
                     editButton={
                         currentTheme.type === ThemeType.DB ? (
                             <LinkAsButton

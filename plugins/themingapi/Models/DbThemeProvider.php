@@ -33,6 +33,9 @@ use Vanilla\Models\ThemeModelHelper;
  * Class DbThemeProvider
  */
 class DbThemeProvider implements ThemeProviderInterface {
+
+    const SELECT_FIELDS = ['themeID', 'parentTheme', 'name', 'current', 'dateUpdated', 'dateInserted'];
+
     use ThemeVariablesTrait;
     /**
      * @var ThemeAssetModel
@@ -94,7 +97,10 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getThemeWithAssets($themeKey): array {
         try {
             $theme = $this->normalizeTheme(
-                $this->themeModel->selectSingle(['themeID' => $themeKey], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]),
+                $this->themeModel->selectSingle(
+                    ['themeID' => $themeKey],
+                    ['select' => self::SELECT_FIELDS]
+                ),
                 $this->themeAssetModel->get(['themeID' => $themeKey], ['select' => ['assetKey', 'data']])
             );
         } catch (NoResultsException $e) {
@@ -122,7 +128,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function postTheme(array $body): array {
         $themeID = $this->themeModel->insert($body);
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name', 'current', 'dateUpdated']]);
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => self::SELECT_FIELDS]);
 
         $assets = $body['assets'] ?? [];
         foreach ($assets as $assetKey => $assetData) {
@@ -155,7 +161,7 @@ class DbThemeProvider implements ThemeProviderInterface {
 
         $theme = $this->themeModel->selectSingle(
             ['themeID' => $themeID],
-            ['select' => ['themeID', 'name', 'current', 'dateUpdated']]
+            ['select' => self::SELECT_FIELDS]
         );
         $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
         return $this->normalizeTheme(
@@ -387,6 +393,15 @@ class DbThemeProvider implements ThemeProviderInterface {
                 $res["assets"][$logoName] = new ImageAsset($logoUrl);
             }
         }
+
+        $parentTheme = isset($theme['parentTheme']) ? $this->addonManager->lookupTheme($theme['parentTheme']) : null;
+        if (!($parentTheme instanceof Addon)) {
+            $res['preview']['info']['Warning'] = ['type' => 'string', 'info' => 'Parent theme ('.$theme['parentTheme'].') is not valid'];
+        } else {
+            $res['preview']['info']['Template'] = ['type' => 'string', 'info' => $parentTheme->getInfoValue('name')];
+        }
+        $res['preview']['info']['Created'] = ['type' => 'date', 'info' => $theme['dateInserted']->format('Y-m-d H:i:s')];
+        $res['preview']['info']['Updated'] = ['type' => 'date', 'info' => $theme['dateUpdated']->format('Y-m-d H:i:s')];
 
         return $res;
     }

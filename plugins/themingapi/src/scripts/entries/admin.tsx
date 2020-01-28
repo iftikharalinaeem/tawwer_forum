@@ -12,13 +12,8 @@ import ThemeEditorPage from "@themingapi/theme/ThemeEditorPage";
 
 import { Router } from "@library/Router";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
-import { AppContext } from "@library/AppContext";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+
 import React from "react";
-import { mountReact } from "@vanilla/react-utils/src";
-import PageLoader from "@library/routing/PageLoader";
-import { onReady } from "@library/utility/appUtils";
-import { LoadStatus } from "@library/@types/api/core";
 
 registerReducer("themeEditor", themeEditorReducer);
 addComponent("theme-editor", ThemeEditorPage);
