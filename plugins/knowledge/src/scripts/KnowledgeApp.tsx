@@ -5,11 +5,11 @@
  */
 
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import RouteActions from "@knowledge/routes/RouteActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
@@ -42,7 +42,7 @@ function KnowledgeApp() {
     if (routeState.error) {
         content = (
             <BrowserRouter>
-                <ErrorPage error={routeState.error} />
+                <KbErrorPage error={routeState.error} />
             </BrowserRouter>
         );
     } else if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(kbLoadable.status)) {
@@ -58,7 +58,7 @@ function KnowledgeApp() {
     ) {
         content = (
             <BrowserRouter>
-                <ErrorPage defaultError={DefaultError.NO_KNOWLEDGE_BASE} />
+                <KbErrorPage defaultError={DefaultKbError.NO_KNOWLEDGE_BASE} />
             </BrowserRouter>
         );
     }

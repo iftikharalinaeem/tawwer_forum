@@ -7,15 +7,15 @@
 import { IArticle, IArticleFragment } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import { IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import ErrorPage from "@knowledge/pages/ErrorPage";
 import ModalLoader from "@library/modal/ModalLoader";
 import RouteHandler from "@library/routing/RouteHandler";
 import React from "react";
 import { Route } from "react-router-dom";
 import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
 
@@ -100,7 +100,7 @@ export const OrganizeCategoriesRoute = new RouteHandler(
 );
 
 const NotFound = () => {
-    return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+    return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
 };
 
 /**

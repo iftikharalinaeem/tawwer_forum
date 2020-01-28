@@ -7,7 +7,7 @@
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
 import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
-import ErrorPage from "@knowledge/pages/ErrorPage";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -24,7 +24,7 @@ import classNames from "classnames";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import Permission from "@library/features/users/Permission";
 import FullKnowledgeModal from "@knowledge/modules/common/FullKnowledgeModal";
-import { DefaultError } from "@knowledge/modules/common/PageErrorMessage";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import OrganizeCategoriesTranslator from "@knowledge/navigation/NavigationTranslator";
 import Message from "@library/messages/Message";
@@ -72,10 +72,10 @@ function OrganizeCategoriesPage(props: IProps) {
     }
 
     if (knowledgeBase.status === LoadStatus.ERROR || !knowledgeBase.data) {
-        return <ErrorPage defaultError={DefaultError.NOT_FOUND} />;
+        return <KbErrorPage defaultError={DefaultKbError.NOT_FOUND} />;
     }
     return (
-        <Permission permission="articles.add" fallback={<ErrorPage defaultError={DefaultError.PERMISSION} />}>
+        <Permission permission="articles.add" fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}>
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
             <FullKnowledgeModal scrollable={true} titleID={titleID}>
                 <NavigationManagerMenu />
