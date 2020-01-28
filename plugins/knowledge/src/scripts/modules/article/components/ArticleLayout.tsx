@@ -67,17 +67,22 @@ export class ArticleLayout extends React.Component<IProps> {
                     <TitleBar
                         useMobileBackButton={this.props.useBackButton}
                         isFixed={true}
+                        backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
+                        hamburger={true}
                         title={title}
                         mobileDropDownContent={
                             <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
                         }
-                        backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
                     />
+                    {/* title={title}
+                        mobileDropDownContent={
+                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
+                        }*/}
                     <PanelLayout
                         renderLeftPanelBackground={renderPanelBackground}
                         breadcrumbs={
-                            this.props.device !== Devices.MOBILE &&
-                            this.props.device !== Devices.XS &&
+                            //this.props.device !== Devices.MOBILE &&
+                            // this.props.device !== Devices.XS &&
                             article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
                         }
                         leftBottom={
