@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Webhooks;
 
 use Garden\EventManager;
 use Garden\Http\HttpClient;
@@ -15,10 +15,12 @@ use Vanilla\Scheduler\Job\JobInterface;
 use Vanilla\Scheduler\TrackingSlip;
 use Vanilla\Webhooks\Events\PingEvent;
 use Vanilla\Webhooks\Jobs\DispatchEventJob;
+use Vanilla\Webhooks\Mocks\DiscussionEvent;
+use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockHttpClient;
 
 /**
- * Test dispatching specific events to webhooks.
+ * Test dispatching events to webhooks.
  */
 class WebhooksEventTest extends AbstractAPIv2Test {
 
@@ -76,7 +78,35 @@ class WebhooksEventTest extends AbstractAPIv2Test {
      *
      * @return void
      */
-    public function testPing(): void {
+    public function testResourceEvent(): void {
+        $webhook = $this->addWebhook(__FUNCTION__);
+
+        $response = new HttpResponse(
+            200,
+            ["Content-Type" => "application/json"],
+            json_encode(["success" => true])
+        );
+        $response->setRequest(new HttpRequest(HttpRequest::METHOD_POST));
+        $this->httpClient->addMockResponse(
+            $webhook["url"],
+            $response,
+            HttpRequest::METHOD_POST
+        );
+
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
+        $event = new DiscussionEvent(DiscussionEvent::ACTION_INSERT, ["foo" => "bar"]);
+        $eventManager->dispatch($event);
+
+        $this->assertWebhookEventDispatched("discussion", DiscussionEvent::ACTION_INSERT);
+    }
+
+    /**
+     * Test a basic webhook ping.
+     *
+     * @return void
+     */
+    public function testPingEndpoint(): void {
         $webhook = $this->addWebhook(__FUNCTION__);
 
         $response = new HttpResponse(

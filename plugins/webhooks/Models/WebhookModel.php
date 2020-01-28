@@ -17,6 +17,15 @@ use Vanilla\Webhooks\Processors\NormalizeDataProcessor;
  */
 class WebhookModel extends PipelineModel {
 
+    /** Marker used to indicate all events should be matched. */
+    public const EVENT_WILDCARD = "*";
+
+    /** Status flag value indicating a webhook should receive events. */
+    public const STATUS_ACTIVE = "active";
+
+    /** @var array Active webhooks, grouped by event. */
+    private $activeByEvent;
+
     /**
      * WebhookModel constructor.
      *
@@ -39,6 +48,59 @@ class WebhookModel extends PipelineModel {
         $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
             ->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
+    }
+
+    /**
+     * Lazy load webhooks, grouped by event type.
+     *
+     * @return array
+     */
+    private function getActiveByEvent(): array {
+        if (!isset($this->activeByEvent)) {
+            $rows = $this->get();
+
+            $result = [];
+            foreach ($rows as $row) {
+                $events = $row["events"] ?? [];
+
+                if (!is_array($events) || empty($events)) {
+                    continue;
+                } elseif (in_array(self::EVENT_WILDCARD, $events)) {
+                    if (!array_key_exists(self::EVENT_WILDCARD, $result)) {
+                        $result[self::EVENT_WILDCARD] = [];
+                    }
+                    $result[self::EVENT_WILDCARD][] = $row;
+                    continue;
+                }
+
+                foreach ($events as $type) {
+                    if (!is_string($type)) {
+                        continue;
+                    } elseif (!array_key_exists($type, $result)) {
+                        $result[$type] = [];
+                    }
+
+                    $result[$type][] = $row;
+                }
+            }
+
+            $this->activeByEvent = $result;
+        }
+
+        return $this->activeByEvent;
+    }
+
+    /**
+     * Given an event type, return all rows configured to receive it.
+     *
+     * @param string $event
+     * @return array
+     */
+    public function getByEvent(string $event): array {
+        $rows = $this->getActiveByEvent();
+        $result = $rows[$event] ?? [];
+        $result = array_merge($result, $rows[self::EVENT_WILDCARD] ?? []);
+        return $result;
     }
 
     /**
