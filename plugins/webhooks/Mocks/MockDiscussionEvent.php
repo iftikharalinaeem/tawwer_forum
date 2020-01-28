@@ -11,6 +11,12 @@ use Garden\Events\ResourceEvent;
 /**
  * Mock discussion event for testing purposes.
  */
-class DiscussionEvent extends ResourceEvent {
+class MockDiscussionEvent extends ResourceEvent {
 
+    /**
+     * {@inheritDoc}
+     */
+    public function getType(): string {
+        return "discussion";
+    }
 }

@@ -43,10 +43,10 @@ class EventDispatcher {
      * @param ResourceEvent $event
      * @return void
      */
-    public function dispatch(ResourceEvent $event) {
+    public function dispatch(ResourceEvent $event): ResourceEvent {
         $type = $this->eventFromClass(get_class($event));
         if ($type === null) {
-            return;
+            return $event;
         }
 
         $webhooks = $this->getWebhooksForEvent($type);
@@ -54,6 +54,8 @@ class EventDispatcher {
             $webhookConfig = new WebhookConfig($webhook);
             $this->scheduler->addDispatchEventJob($event, $webhookConfig);
         }
+
+        return $event;
     }
 
     /**
