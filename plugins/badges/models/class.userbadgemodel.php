@@ -222,6 +222,7 @@ class UserBadgeModel extends Gdn_Model {
             ->select('ub.DateCompleted')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
+            ->where('b.Active', 1)
             ->where('ub.UserID', $userID)
             ->where('ub.DateCompleted is not null')
             ->limit($limit ?? false)
