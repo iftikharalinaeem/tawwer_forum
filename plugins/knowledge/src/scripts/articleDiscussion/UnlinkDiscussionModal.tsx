@@ -26,10 +26,10 @@ export class UnlinkDiscussionModal extends React.Component<IProps, IState> {
     public render() {
         return (
             <ModalConfirm
+                isVisible={true}
                 title={t("Remove Article Link")}
                 onConfirm={this.handleConfirm}
                 isConfirmLoading={this.state.unlinkStatus === LoadStatus.LOADING}
-                elementToFocusOnExit={document.body}
                 confirmTitle={t("Remove Link")}
             >
                 <Translate source="This will remove the link to the article, but will not remove the article itself." />

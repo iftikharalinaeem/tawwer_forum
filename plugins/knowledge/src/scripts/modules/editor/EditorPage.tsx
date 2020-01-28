@@ -37,6 +37,7 @@ export class EditorPage extends React.Component<IProps> {
         const { article } = this.props;
         return (
             <Modal
+                isVisible={true}
                 titleID={this.titleID}
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={this.navigateToBacklink}

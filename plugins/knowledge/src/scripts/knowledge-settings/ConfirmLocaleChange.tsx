@@ -9,9 +9,10 @@ import ModalSizes from "@library/modal/ModalSizes";
 import Paragraph from "@library/layout/Paragraph";
 import Translate from "@library/content/Translate";
 
-export function ConfirmLocaleChange(props: { onCancel?: () => void; onConfirm: () => void }) {
+export function ConfirmLocaleChange(props: { onCancel?: () => void; onConfirm: () => void; isVisible: boolean }) {
     return (
         <ModalConfirm
+            isVisible={props.isVisible}
             title={t("Are you sure?")}
             onCancel={props.onCancel}
             onConfirm={props.onConfirm}

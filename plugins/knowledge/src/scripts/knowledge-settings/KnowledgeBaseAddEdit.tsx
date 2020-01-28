@@ -101,7 +101,7 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const kbAddEditClasses = knowledgeBaseAddEditClasses();
 
     return (
-        <Modal size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
+        <Modal isVisible={true} size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
             <form
                 className={modalClasses().frameWrapper}
                 onSubmit={async event => {
@@ -314,19 +314,18 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         })}
                                     />
                                 </DashboardFormGroup>
-                                {localeToConfirm !== null && (
-                                    <ConfirmLocaleChange
-                                        onConfirm={() => {
-                                            updateForm({ sourceLocale: localeToConfirm });
-                                            setLocaleToConfirm(null);
-                                            localeSelectRef.current?.focus();
-                                        }}
-                                        onCancel={() => {
-                                            setLocaleToConfirm(null);
-                                            localeSelectRef.current?.focus();
-                                        }}
-                                    />
-                                )}
+                                <ConfirmLocaleChange
+                                    isVisible={localeToConfirm !== null}
+                                    onConfirm={() => {
+                                        updateForm({ sourceLocale: localeToConfirm });
+                                        setLocaleToConfirm(null);
+                                        localeSelectRef.current?.focus();
+                                    }}
+                                    onCancel={() => {
+                                        setLocaleToConfirm(null);
+                                        localeSelectRef.current?.focus();
+                                    }}
+                                />
                             </DashboardFormList>
                         </FrameBody>
                     }

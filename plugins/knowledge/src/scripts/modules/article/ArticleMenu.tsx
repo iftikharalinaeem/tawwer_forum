@@ -110,17 +110,16 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private renderDeleteModal(): React.ReactNode {
         return (
-            this.state.showDeleteDialogue && (
-                <ModalConfirm
-                    title={t("Delete an Article")}
-                    onCancel={this.closeDeleteDialogue}
-                    onConfirm={this.handleDeleteDialogueConfirm}
-                    isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
-                    elementToFocusOnExit={document.activeElement as HTMLElement}
-                >
-                    {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
-                </ModalConfirm>
-            )
+            <ModalConfirm
+                isVisible={this.state.showDeleteDialogue}
+                title={t("Delete an Article")}
+                onCancel={this.closeDeleteDialogue}
+                onConfirm={this.handleDeleteDialogueConfirm}
+                isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
+                {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
+            </ModalConfirm>
         );
     }
 
@@ -179,17 +178,16 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
      */
     private renderRestoreModal(): React.ReactNode {
         return (
-            this.state.showRestoreDialogue && (
-                <ModalConfirm
-                    title={t("Restore an Article")}
-                    onCancel={this.closeRestoreDialogue}
-                    onConfirm={this.handleRestoreDialogueConfirm}
-                    isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
-                    elementToFocusOnExit={document.activeElement as HTMLElement}
-                >
-                    {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
-                </ModalConfirm>
-            )
+            <ModalConfirm
+                isVisible={this.state.showRestoreDialogue}
+                title={t("Restore an Article")}
+                onCancel={this.closeRestoreDialogue}
+                onConfirm={this.handleRestoreDialogueConfirm}
+                isConfirmLoading={this.props.delete.status === LoadStatus.LOADING}
+                elementToFocusOnExit={document.activeElement as HTMLElement}
+            >
+                {t("This is a non-destructive action. You will be able to restore your article if you wish.")}
+            </ModalConfirm>
         );
     }
 

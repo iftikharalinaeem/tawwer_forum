@@ -15,7 +15,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps {
-    knowledgeBaseID: number;
+    knowledgeBaseID: number | null;
     onDismiss: () => void;
 }
 
@@ -25,24 +25,21 @@ export function KnowledgeBasePurgeModal(props: IProps) {
     const { status } = useDeleteStatus(props.knowledgeBaseID);
 
     const handleConfirm = async () => {
-        deleteKB({ kbID: knowledgeBaseID });
+        if (knowledgeBaseID !== null) {
+            deleteKB({ kbID: knowledgeBaseID });
+        }
     };
 
     useEffect(() => {
-        if (status === LoadStatus.SUCCESS) {
+        if (status === LoadStatus.SUCCESS && knowledgeBaseID) {
             onDismiss();
-        }
-    }, [status, onDismiss]);
-
-    /** Teardown handler */
-    useEffect(() => {
-        return () => {
             clearDeleteStatus({ kbID: knowledgeBaseID });
-        };
-    }, [clearDeleteStatus, knowledgeBaseID]);
+        }
+    }, [status, onDismiss, knowledgeBaseID, clearDeleteStatus]);
 
     return (
         <ModalConfirm
+            isVisible={knowledgeBaseID !== null}
             title={t("Purge Knowledge Base")}
             confirmTitle={t("Purge")}
             onConfirm={handleConfirm}
@@ -54,12 +51,16 @@ export function KnowledgeBasePurgeModal(props: IProps) {
     );
 }
 
-function useDeleteStatus(knowledgeBaseID: number) {
+function useDeleteStatus(knowledgeBaseID: number | null) {
+    const defaultStatus = {
+        status: LoadStatus.PENDING,
+    };
+
     return (
-        useSelector(
-            (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.deletesByID[knowledgeBaseID],
-        ) ?? {
-            status: LoadStatus.PENDING,
-        }
+        useSelector((state: IKnowledgeAppStoreState) => {
+            return knowledgeBaseID !== null
+                ? state.knowledge.knowledgeBases.deletesByID[knowledgeBaseID]
+                : knowledgeBaseID;
+        }) ?? defaultStatus
     );
 }

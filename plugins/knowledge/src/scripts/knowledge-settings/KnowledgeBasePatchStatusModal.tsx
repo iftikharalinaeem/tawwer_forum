@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useDebugValue } from "react";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import ModalConfirm from "@library/modal/ModalConfirm";
@@ -15,7 +15,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps {
-    knowledgeBaseID: number;
+    knowledgeBaseID: number | null;
     newStatus: KnowledgeBaseStatus;
     onDismiss: () => void;
 }
@@ -26,24 +26,28 @@ export function KnowledgeBasePatchStatusModal(props: IProps) {
     const { status } = usePatchStatus(props.knowledgeBaseID);
 
     const handleConfirm = async () => {
-        patchKBStatus(knowledgeBaseID, props.newStatus);
+        if (knowledgeBaseID !== null) {
+            await patchKBStatus(knowledgeBaseID, props.newStatus);
+            clearPatchStatus({ kbID: knowledgeBaseID });
+        }
     };
+
+    const dismissModal = useCallback(() => {
+        if (knowledgeBaseID !== null) {
+            clearPatchStatus({ kbID: knowledgeBaseID });
+        }
+        onDismiss();
+    }, [clearPatchStatus, knowledgeBaseID, onDismiss]);
 
     useEffect(() => {
         if (status === LoadStatus.SUCCESS) {
-            onDismiss();
+            dismissModal();
         }
-    }, [status, onDismiss]);
-
-    /** Teardown handler */
-    useEffect(() => {
-        return () => {
-            clearPatchStatus({ kbID: knowledgeBaseID });
-        };
-    }, [clearPatchStatus, knowledgeBaseID]);
+    }, [dismissModal, status]);
 
     return (
         <ModalConfirm
+            isVisible={knowledgeBaseID !== null}
             title={
                 props.newStatus === KnowledgeBaseStatus.DELETED
                     ? t("Delete Knowledge Base")
@@ -51,7 +55,7 @@ export function KnowledgeBasePatchStatusModal(props: IProps) {
             }
             confirmTitle={t("Confirm")}
             onConfirm={handleConfirm}
-            onCancel={props.onDismiss}
+            onCancel={dismissModal}
             isConfirmLoading={status === LoadStatus.LOADING}
         >
             {props.newStatus === KnowledgeBaseStatus.DELETED
@@ -61,12 +65,18 @@ export function KnowledgeBasePatchStatusModal(props: IProps) {
     );
 }
 
-function usePatchStatus(knowledgeBaseID: number) {
-    return (
-        useSelector(
-            (state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases.patchStatusesByID[knowledgeBaseID],
-        ) ?? {
-            status: LoadStatus.PENDING,
-        }
-    );
+function usePatchStatus(knowledgeBaseID: number | null) {
+    const defaultStatus = {
+        status: LoadStatus.PENDING,
+    };
+
+    const result =
+        useSelector((state: IKnowledgeAppStoreState) => {
+            return knowledgeBaseID !== null
+                ? state.knowledge.knowledgeBases.patchStatusesByID[knowledgeBaseID]
+                : knowledgeBaseID;
+        }) ?? defaultStatus;
+
+    useDebugValue(result);
+    return result;
 }

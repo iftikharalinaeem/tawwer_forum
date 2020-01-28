@@ -63,6 +63,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
 
         return (
             <Modal
+                isVisible={true}
                 scrollable={true}
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={history.goBack}
