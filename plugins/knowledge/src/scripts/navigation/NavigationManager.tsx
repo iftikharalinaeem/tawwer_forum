@@ -418,13 +418,12 @@ export class NavigationManager extends React.Component<IProps, IState> {
      */
     private renderNewCategoryModal(): React.ReactNode {
         return (
-            this.state.showNewCategoryModal && (
-                <NewCategoryForm
-                    exitHandler={this.hideNewFolderModal}
-                    parentCategoryID={this.currentTargetCategoryID}
-                    buttonRef={this.newCategoryButtonRef}
-                />
-            )
+            <NewCategoryForm
+                isVisible={this.state.showNewCategoryModal}
+                exitHandler={this.hideNewFolderModal}
+                parentCategoryID={this.currentTargetCategoryID}
+                buttonRef={this.newCategoryButtonRef}
+            />
         );
     }
 
@@ -454,13 +453,14 @@ export class NavigationManager extends React.Component<IProps, IState> {
     private renderDeleteModal(): React.ReactNode {
         const { deleteItem } = this.state;
         return (
-            deleteItem && (
-                <ModalConfirm
-                    title={((<Translate source={'Delete "<0/>"'} c0={deleteItem.data.name} />) as unknown) as string}
-                    onCancel={this.dismissDeleteModal}
-                    onConfirm={this.handleDeleteConfirm}
-                    elementToFocusOnExit={this.state.elementToFocusOnDeleteClose || document.body}
-                >
+            <ModalConfirm
+                isVisible={!!deleteItem}
+                title={((<Translate source={'Delete "<0/>"'} c0={deleteItem?.data.name} />) as unknown) as string}
+                onCancel={this.dismissDeleteModal}
+                onConfirm={this.handleDeleteConfirm}
+                elementToFocusOnExit={this.state.elementToFocusOnDeleteClose || document.body}
+            >
+                {deleteItem && (
                     <Translate
                         source={'Are you sure you want to delete <0/> "<1/>" ?'}
                         c0={this.getItemTypeLabel(deleteItem.data)}
@@ -470,8 +470,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                             </strong>
                         }
                     />
-                </ModalConfirm>
-            )
+                )}
+            </ModalConfirm>
         );
     }
 

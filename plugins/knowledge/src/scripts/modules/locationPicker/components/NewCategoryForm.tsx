@@ -24,6 +24,7 @@ import * as React from "react";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 
 interface IProps {
+    isVisible: boolean;
     exitHandler: (e: React.SyntheticEvent) => void;
     className?: string;
     parentCategoryID: number;
@@ -52,15 +53,17 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
     private categoryActions = new CategoryActions(getStore().dispatch, apiv2);
 
     private id = uniqueIDFromPrefix("navigationItemList");
-    private inputRef = React.createRef<InputTextBlock>();
+    private inputRef = React.createRef<HTMLInputElement>();
 
     public render() {
         const classesFrameFooter = frameFooterClasses();
         return (
             <Modal
+                isVisible={this.props.isVisible}
                 titleID={this.titleID}
                 size={ModalSizes.SMALL}
                 exitHandler={this.props.exitHandler}
+                elementToFocus={this.inputRef.current as HTMLElement}
                 elementToFocusOnExit={this.props.buttonRef.current! as HTMLElement}
             >
                 <form onSubmit={this.handleFormSubmit}>
@@ -75,11 +78,11 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                         body={
                             <FrameBody>
                                 <InputTextBlock
-                                    ref={this.inputRef}
                                     label={t("New Category")}
                                     labelClassName="sr-only"
                                     className="isFirst isLast"
                                     inputProps={{
+                                        inputRef: this.inputRef,
                                         value: this.state.categoryName,
                                         onChange: this.handleNameChange,
                                         placeholder: t("Example: Appearance"),
@@ -111,10 +114,6 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
                 </form>
             </Modal>
         );
-    }
-
-    public componentDidMount() {
-        this.inputRef.current!.focus();
     }
 
     private get titleID() {

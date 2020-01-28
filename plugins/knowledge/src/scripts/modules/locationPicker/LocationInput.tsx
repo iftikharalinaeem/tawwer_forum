@@ -91,22 +91,21 @@ export class LocationInput extends React.PureComponent<IProps, IState> {
                         />
                     )}
                 </label>
-                {this.state.showLocationPicker && (
-                    <Modal
-                        exitHandler={this.hideLocationPicker}
-                        size={ModalSizes.SMALL}
-                        className={classNames(modalClassName)}
-                        label={t("Choose a location for this page.")}
-                        elementToFocusOnExit={this.changeLocationButton.current!}
-                        // scrollable={true}
-                    >
-                        <LocationPicker
-                            afterChoose={this.handleChoose}
-                            onCloseClick={this.hideLocationPicker}
-                            {...passThrough}
-                        />
-                    </Modal>
-                )}
+                <Modal
+                    isVisible={this.state.showLocationPicker}
+                    exitHandler={this.hideLocationPicker}
+                    size={ModalSizes.SMALL}
+                    className={classNames(modalClassName)}
+                    label={t("Choose a location for this page.")}
+                    elementToFocusOnExit={this.changeLocationButton.current!}
+                    // scrollable={true}
+                >
+                    <LocationPicker
+                        afterChoose={this.handleChoose}
+                        onCloseClick={this.hideLocationPicker}
+                        {...passThrough}
+                    />
+                </Modal>
             </>
         );
     }

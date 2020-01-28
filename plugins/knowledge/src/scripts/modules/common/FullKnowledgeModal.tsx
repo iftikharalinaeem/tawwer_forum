@@ -23,10 +23,10 @@ export class FullKnowledgeModal extends React.Component<IProps> {
     public render() {
         return (
             <Modal
+                isVisible={true}
                 titleID={this.props.titleID}
                 size={ModalSizes.FULL_SCREEN}
                 exitHandler={this.navigateToBacklink}
-                elementToFocusOnExit={document.activeElement as HTMLElement}
                 className={this.props.className}
                 scrollable={this.props.scrollable}
             >

@@ -30,6 +30,7 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
             ...debug.name(),
         },
         mediaQueries.oneColumnDown({
+            transform: "none",
             ...margins({
                 vertical: 16,
             }),
