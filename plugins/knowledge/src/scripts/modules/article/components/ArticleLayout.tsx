@@ -69,10 +69,6 @@ export class ArticleLayout extends React.Component<IProps> {
                         isFixed={true}
                         backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
                         hamburger={true}
-                        title={title}
-                        mobileDropDownContent={
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
-                        }
                     />
                     {/* title={title}
                         mobileDropDownContent={

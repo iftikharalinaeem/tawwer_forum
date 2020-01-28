@@ -82,7 +82,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                 />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} />
+                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} hamburger={true} />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}
