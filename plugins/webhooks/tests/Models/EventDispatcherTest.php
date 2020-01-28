@@ -94,7 +94,6 @@ class EventDispatcherTest extends TestCase {
      */
     public function testResourceEvent(): void {
         $webhook = $this->addWebhook(__FUNCTION__);
-        $this->eventDispatcher->registerEvent(MockDiscussionEvent::class, "discussion");
 
         $response = new HttpResponse(
             200,
@@ -111,7 +110,6 @@ class EventDispatcherTest extends TestCase {
         /** @var EventManager */
         $eventManager = $this->container()->get(EventManager::class);
         $event = new MockDiscussionEvent(MockDiscussionEvent::ACTION_INSERT, ["foo" => "bar"]);
-        $scheduler = $this->container()->get(SchedulerInterface::class);
         $eventManager->dispatch($event);
 
         $this->assertWebhookEventDispatched("discussion", MockDiscussionEvent::ACTION_INSERT);

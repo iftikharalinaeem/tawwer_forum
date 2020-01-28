@@ -14,9 +14,6 @@ use Vanilla\Webhooks\Models\WebhookModel;
  */
 class EventDispatcher {
 
-    /** @var array */
-    private $registeredEvents = [];
-
     /** @var EventScheduler */
     private $scheduler;
 
@@ -44,12 +41,7 @@ class EventDispatcher {
      * @return void
      */
     public function dispatch(ResourceEvent $event): ResourceEvent {
-        $type = $this->eventFromClass(get_class($event));
-        if ($type === null) {
-            return $event;
-        }
-
-        $webhooks = $this->getWebhooksForEvent($type);
+        $webhooks = $this->getWebhooksForEvent($event->getType());
         foreach ($webhooks as $webhook) {
             $webhookConfig = new WebhookConfig($webhook);
             $this->scheduler->addDispatchEventJob($event, $webhookConfig);
@@ -84,30 +76,5 @@ class EventDispatcher {
         }
 
         return $result;
-    }
-
-    /**
-     * Given an even class, return its associated event type.
-     *
-     * @param string $class
-     * @return string|null
-     */
-    private function eventFromClass(string $class): ?string {
-        $class = strtolower($class);
-        $result = $this->registeredEvents[$class] ?? null;
-        return $result;
-    }
-
-    /**
-     * Given a resource event, determine its type based on standard naming conventions.
-     *
-     * @param string $class
-     * @param string $event
-     * @return void
-     */
-    public function registerEvent(string $class, string $event): void {
-        $class = strtolower($class);
-        $event = strtolower($event);
-        $this->registeredEvents[$class] = $event;
     }
 }

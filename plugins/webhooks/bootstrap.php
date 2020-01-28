@@ -8,10 +8,7 @@ use Garden\EventManager;
 use Vanilla\Webhooks\Library\EventDispatcher;
 
 $container = Gdn::getContainer();
-$container
-    ->rule(EventDispatcher::class)
-    ->setShared(true)
-    ->addCall("registerEvent", ["Vanilla\\Community\\Events\\DiscussionEvent", "discussion"]);
+$container->rule(EventDispatcher::class)->setShared(true);
 
 /** @var EventManager */
 $eventManager = Gdn::getContainer()->get(EventManager::class);
