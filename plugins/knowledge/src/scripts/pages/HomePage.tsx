@@ -21,11 +21,11 @@ import { RouteComponentProps } from "react-router";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { useBackgroundContext } from "@library/layout/Backgrounds";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
-import { heroVariables } from "@library/hero/heroStyles";
-import Hero from "@library/hero/Hero";
+import { bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 const HomePage = (props: IProps) => {
-    const splashVars = heroVariables({});
+    const splashVars = bannerVariables({});
     const title = t(splashVars.title.text);
     const { loadStatus, knowledgeBases } = props;
 
@@ -47,7 +47,7 @@ const HomePage = (props: IProps) => {
     return (
         <>
             <AnalyticsData uniqueKey="homePage" />
-            <Hero title={title} />
+            <Banner title={title} />
             <Container>
                 <DocumentTitle title={t("Home")}>
                     <TitleBar hasSubNav />

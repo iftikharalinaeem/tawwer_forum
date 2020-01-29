@@ -29,7 +29,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
-import Hero from "@vanilla/library/src/scripts/hero/Hero";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 /**
  * Component representing the the full home page of a help center.
@@ -57,7 +57,7 @@ export class HelpCenterHome extends React.Component<IProps> {
             );
         }
 
-        const heroAction = (
+        const bannerAction = (
             <Permission permission="articles.add">
                 <LinkAsButton
                     to={EditorRoute.url({ knowledgeBaseID, knowledgeCategoryID: rootCategoryID })}
@@ -75,8 +75,8 @@ export class HelpCenterHome extends React.Component<IProps> {
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
                 <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
-                <Hero
-                    action={heroAction}
+                <Banner
+                    action={bannerAction}
                     styleOverwrite={{ outerBackgroundImage: bannerImage }}
                     title={knowledgeBase.name}
                 />
