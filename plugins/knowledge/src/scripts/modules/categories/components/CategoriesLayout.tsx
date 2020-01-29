@@ -65,13 +65,7 @@ export default function CategoriesLayout(props: IProps) {
 
     return (
         <Container>
-            <TitleBar
-                useMobileBackButton={true}
-                title={category.name}
-                mobileDropDownContent={
-                    <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
-                }
-            />
+            <TitleBar useMobileBackButton={true} hamburger={true} />
             <PanelLayout
                 breadcrumbs={
                     category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
