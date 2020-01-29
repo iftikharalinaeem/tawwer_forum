@@ -19,8 +19,6 @@ import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
 import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 
-
-
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
     const actions = useThemesActions();

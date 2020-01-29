@@ -4,7 +4,6 @@
  * @license Proprietary
  */
 
-
 import qs from "qs";
 import { Store } from "redux";
 

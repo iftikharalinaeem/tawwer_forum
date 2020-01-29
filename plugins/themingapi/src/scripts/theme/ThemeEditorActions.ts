@@ -56,13 +56,13 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public getThemeById = async (themeID: number | string, history: History) => {
         const query = qs.parse(history.location.search.replace(/^\?/, ""));
 
-        let pageType = '';
-        if (history.location.pathname === '/theme/theme-settings/add' && !query.templateName) {
-            pageType = 'newTheme';
+        let pageType = "";
+        if (history.location.pathname === "/theme/theme-settings/add" && !query.templateName) {
+            pageType = "newTheme";
         } else if (query.templateName) {
-            pageType = 'copy'
+            pageType = "copy";
         } else {
-            pageType = 'edit'
+            pageType = "edit";
         }
 
         const request = {
@@ -91,6 +91,16 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             }
 
             response.data.pageType = pageType;
+
+            switch (pageType) {
+                case "newTheme":
+                    response.data.name = "Untitled";
+                    break;
+                case "copy":
+                    response.data.name = `${response.data.name} copy`;
+                    break;
+            }
+
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
@@ -107,8 +117,9 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             footer: form.assets.footer,
             styles: form.assets.styles,
             javascript: form.assets.javascript,
-            variables:  form.assets.variables,
+            variables: form.assets.variables,
         };
+
         const request = {
             name: form.name,
             assets: assets,

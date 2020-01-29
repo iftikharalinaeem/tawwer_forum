@@ -34,6 +34,7 @@ export function ThemeDeleteModal(props: IProps) {
 
     return (
         <ModalConfirm
+            isVisible={true}
             title={t("Delete Theme")}
             confirmTitle={t("Delete")}
             onConfirm={handleConfirm}

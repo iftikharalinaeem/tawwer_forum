@@ -3,30 +3,30 @@
  * @license GPL-2.0-only
  */
 
-import React, {useEffect, useRef, useState} from "react";
-import {BrowserRouter, RouteComponentProps, useHistory} from "react-router-dom";
-import {themeEitorClasses} from "./themeEditorStyles";
-import {ActionBar} from "@library/headers/ActionBar";
-import {Tabs} from "@library/sectioning/Tabs";
-import TextEditor, {TextEditorContextProvider} from "@library/textEditor/TextEditor";
-import {useThemeActions} from "./ThemeEditorActions";
-import {IThemeAssets, useThemeEditorState} from "./themeEditorReducer";
-import {LoadStatus} from "@vanilla/library/src/scripts/@types/api/core";
+import React, { useEffect, useRef, useState } from "react";
+import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
+import { themeEitorClasses } from "./themeEditorStyles";
+import { ActionBar } from "@library/headers/ActionBar";
+import { Tabs } from "@library/sectioning/Tabs";
+import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
+import { useThemeActions } from "./ThemeEditorActions";
+import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
-import {t} from "@vanilla/i18n";
-import {EditIcon} from "@vanilla/library/src/scripts/icons/common";
+import { t } from "@vanilla/i18n";
+import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import {useUniqueID} from "@vanilla/library/src/scripts/utility/idUtils";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
-import {ButtonTypes} from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import classNames from "classnames";
-import {useLastValue} from "@vanilla/react-utils";
+import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
-import {formatUrl} from "@library/utility/appUtils";
-import {useFallbackBackUrl} from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
-import {ErrorPage} from "@library/errorPages/ErrorComponent";
+import { formatUrl } from "@library/utility/appUtils";
+import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
+import { ErrorPage } from "@library/errorPages/ErrorComponent";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -52,7 +52,9 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
 
     const getTemplateName = () => {
         const query = qs.parse(props.history.location.search.replace(/^\?/, ""));
-        return (props.history.location.pathname === '/theme/theme-settings/add' && !query.templateName) ? DEFAULT_THEME : query.templateName;
+        return props.history.location.pathname === "/theme/theme-settings/add" && !query.templateName
+            ? DEFAULT_THEME
+            : query.templateName;
     };
 
     if (themeID === undefined) {
@@ -78,16 +80,17 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const history = useHistory();
     const submitHandler = async event => {
         event.preventDefault();
+
         if (themeID !== null) {
             if (assets.variables) {
                 updateAssets({
                     assets: {
                         variables: {
                             data: JSON.stringify(assets.variables.data),
-                            type: 'json'
+                            type: "json",
                         },
-                    }
-                })
+                    },
+                });
             }
             await saveTheme();
             window.location.href = formatUrl("/theme/theme-settings", true);
@@ -172,17 +175,17 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             ),
         },
     ];
-
+    console.log(theme.data.name);
     // @ts-ignore
     return (
         <BrowserRouter>
             <React.Fragment>
-                <Modal scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
                     <form onSubmit={submitHandler}>
                         <ActionBar
                             useShadow={false}
                             callToActionTitle={t("Save")}
-                            title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                            title={<Title themeName={theme.data.name} />}
                             fullWidth={true}
                             isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                             optionsMenu={
@@ -210,6 +213,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         </BrowserRouter>
     );
 }
+
 interface IThemeTitleProps {
     isDisabled?: boolean;
     updateAssets?: void;
@@ -232,19 +236,6 @@ export const Title = (props: IThemeTitleProps) => {
         });
     };
 
-    const getPlaceholder = () => {
-        switch (props.pageType) {
-            case 'newTheme':
-                return 'Untitled';
-            case 'copy':
-                return `${props.themeName} copy`;
-            case 'edit':
-                return props.themeName;
-            default:
-                return props.themeName;
-        }
-    }
-
     return (
         <li className={classes.themeName}>
             <InputTextBlock
@@ -259,8 +250,7 @@ export const Title = (props: IThemeTitleProps) => {
                     },
                     disabled: isDisabled,
                     inputRef,
-                    value: props.pageType === 'edit' ? name : undefined,
-                    placeholder: getPlaceholder(),
+                    value: name,
                 }}
             />
 
