@@ -104,6 +104,11 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     if (theme.status === LoadStatus.ERROR || !theme.data) {
         return <ErrorPage error={theme.error} />;
     }
+
+    if (formSubmit.status === LoadStatus.ERROR) {
+        return <ErrorPage apiError={formSubmit.error} />;
+    }
+
     const { assets } = form;
 
     const tabData = [
@@ -175,7 +180,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             ),
         },
     ];
-    console.log(theme.data.name);
+
     // @ts-ignore
     return (
         <BrowserRouter>
