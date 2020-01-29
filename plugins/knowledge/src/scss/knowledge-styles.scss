@@ -5,9 +5,8 @@
  */
 
 @import "base/overwrite";
-@import "~library-scss/base";
-
-@import "~library-scss/layouts/mobileMenu";
+@import "~library-scss/coreVariables";
+@import "~library-scss/mixins/mixins";
 
 @import "components/metas";
 @import "components/icons";
