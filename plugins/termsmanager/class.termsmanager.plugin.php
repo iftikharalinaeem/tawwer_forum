@@ -121,11 +121,8 @@ class TermsManagerPlugin extends Gdn_Plugin {
         if (!$terms) {
             return;
         }
-        $this->addTermsValidation($sender, false);
-        // If the custom terms are active and the client has not specified showing both
-        // custom and default, do not validate default because it has been hidden in $this->addTermsCheckBox()
-        if (!c('TermsManager.ShowDefault')) {
-            $sender->UserModel->Validation->unapplyRule('TermsOfService', true);
+        if ($this->addTermsValidation($sender, false)) {
+            $sender->UserModel->Validation->applyRule('Terms', 'Required', t('You must agree to the terms of service.'));
         }
     }
 
@@ -171,7 +168,9 @@ class TermsManagerPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function entryController_signIn_handler($sender, $args) {
-        $this->addTermsValidation($sender);
+        if ($this->addTermsValidation($sender)) {
+            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the terms of service.'));
+        }
         if ($sender->Form->getFormValue('Terms')) {
             $email = $sender->Form->getFormValue('Email');
             $user = Gdn::userModel()->getByEmail($email);
@@ -202,13 +201,15 @@ class TermsManagerPlugin extends Gdn_Plugin {
         // Check if the user already exists
         $userModel = Gdn::userModel();
         $auth = $userModel->getAuthentication($sender->Form->getFormValue('UniqueID'), $sender->Form->getFormValue('Provider'));
-        $userID = val('UserID', $auth);
+        $connectedUserID = $auth['UserID'] ?? false;
+        $existingUser = false;
         $user = [];
-        if ($userID) {
-            $user = $userModel->getID($userID, 'array');
+        if ($connectedUserID) {
+            $user = $userModel->getID($connectedUserID, 'array');
         } else {
             $user = (array) $userModel->getByEmail($sender->Form->getFormValue('Email'));
         }
+
         $existingName = $user['Name'] ?? '';
         $connectName = '';
         $sender->setData('HidePassword', true);
@@ -227,6 +228,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
                 $sender->setData('ExistingUsers', [$user]);
                 $sender->setData('HideName', true);
                 $sender->Form->setFormValue('Name', $existingName);
+                $sender->Form->addHidden('UserSelect', $user['UserID']);
 
                 // Because we are interrupting the connect process, the Password Field will be presented.
                 // If the forum is configured for AutoConnect or if the user has already connected
@@ -239,14 +241,18 @@ class TermsManagerPlugin extends Gdn_Plugin {
             }
 
             $sender->Form->setFormValue('ConnectName', $connectName);
-        } elseif (val('UserID', $user)) {
-            // If a the user exists, and they have submitted the terms form, update the User table.
-            Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
-            return;
+
+            if (!$sender->Form->validationResults() && $sender->Form->getFormValue('Terms') && $user['UserID']) {
+                // If a the user exists, and they have submitted the terms form, update the User table.
+                Gdn::userModel()->save(['UserID' => val('UserID', $user), 'Terms' => $sender->Form->getFormValue('Terms')]);
+                return;
+            }
         }
 
         $sender->Form->addHidden('LatestTerms', val('Terms', $user));
-        $this->addTermsValidation($sender, true);
+        if ($this->addTermsValidation($sender, true)) {
+            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the terms of service.'));
+        }
     }
 
     /**
@@ -260,7 +266,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
         // If disabled or not configured abort.
         if (!$terms) {
-            return;
+            return false;
         }
 
         // Find out if it is an existing user.
@@ -275,16 +281,16 @@ class TermsManagerPlugin extends Gdn_Plugin {
         $isUpToDate = (val('Terms', $user) === val('TermsOfUseID', $terms));
         $forceRenew = val('ForceRenew', $terms);
         if ($isUpToDate) {
-            return;
+            return false;
         }
 
         if (!$isUpToDate && !$forceRenew && val('UserID', $user)) {
-            return;
+            return false;
         }
 
         // "Manually" flag SSO connections because the form is not being posted back.
         if ($sender->Form->isPostBack() || $sso) {
-            $sender->Form->validateRule('Terms', 'ValidateRequired', t('You must agree to the terms of service.'));
+            return true;
         }
     }
 
@@ -322,11 +328,6 @@ class TermsManagerPlugin extends Gdn_Plugin {
         // is and existing user whose Terms hasn't been checked but ForceRenew is off.
         if (!$isUpToDate && !$forceRenew && val('UserID', $user)) {
             return;
-        }
-
-        // If client has not specified that they would like to show both default and custom terms, hide custom terms with CSS
-        if (!c('TermsManager.ShowDefault')) {
-            $sender->Head->addString('<style type="text/css">.DefaultTermsLabel {display: none !important}</style>');
         }
 
         // If it is an existing user and Admin who has agreed to most recent terms and Admin is not

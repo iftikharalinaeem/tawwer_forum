@@ -1,33 +1,46 @@
 <?php
 /**
+ * @author Dani M <dani.m@vanillaforums.com>
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Webhooks;
 
 use Garden\EventManager;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use Vanilla\Scheduler\Job\JobInterface;
-use Vanilla\Scheduler\TrackingSlip;
-use Vanilla\Webhooks\Events\PingEvent;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Webhooks\Jobs\DispatchEventJob;
-use VanillaTests\APIv2\AbstractAPIv2Test;
+use Vanilla\Webhooks\Library\EventDispatcher;
+use Vanilla\Webhooks\Mocks\MockDiscussionEvent;
+use Vanilla\Webhooks\Models\WebhookModel;
 use VanillaTests\Fixtures\MockHttpClient;
+use VanillaTests\SiteTestTrait;
 
 /**
- * Test dispatching events to webhooks.
+ * Test the EventDispatcher class.
  */
-class WebhooksEventTest extends AbstractAPIv2Test {
+class EventDispatcherTest extends TestCase {
+
+    use SiteTestTrait {
+        setUpBeforeClass as private siteSetupBeforeClass;
+    }
 
     /** @var array */
     private $dispatchedTrackingSlips = [];
 
+    /** @var EventDispatcher */
+    private $eventDispatcher;
+
     /** @var MockHttpClient */
     private $httpClient;
+
+    /** @var WebhookModel */
+    private $webhookModel;
 
     /**
      * Create a new webhook row.
@@ -37,28 +50,29 @@ class WebhooksEventTest extends AbstractAPIv2Test {
      * @return array
      */
     private function addWebhook(string $name, ?array $events = null): array {
-        $result = $this->api()->post(
-            "webhooks",
-            [
+        $webhookID = $this->webhookModel->insert([
                 "name" => $name,
                 "url" => "https://vanilla.test/webhook?name=".urlencode($name),
                 "secret" => md5(time()),
                 "events" => $events ?: ["*"],
-            ]
-        )->getBody();
+        ]);
+        $result = $this->webhookModel->selectSingle(["webhookID" => $webhookID]);
         return $result;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setup(): void {
-        parent::setup();
+    public function setUp(): void {
+        parent::setUp();
+        $this->eventDispatcher = $this->container()->get(EventDispatcher::class);
+        $this->webhookModel = $this->container()->get(WebhookModel::class);
 
         $this->httpClient = new MockHttpClient();
         static::container()->setInstance(HttpClient::class, $this->httpClient);
 
-        $eventManager = static::container()->get(EventManager::class);
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
         $eventManager->bind("SchedulerDispatched", function (array $trackingSlips) {
             $this->dispatchedTrackingSlips = $trackingSlips;
         });
@@ -67,9 +81,10 @@ class WebhooksEventTest extends AbstractAPIv2Test {
     /**
      * {@inheritDoc}
      */
-    public static function setupBeforeClass(): void {
+    public static function setUpBeforeClass(): void {
         static::$addons = ["webhooks"];
-        parent::setupBeforeClass();
+        parent::setUpBeforeClass();
+        self::siteSetupBeforeClass();
     }
 
     /**
@@ -77,7 +92,7 @@ class WebhooksEventTest extends AbstractAPIv2Test {
      *
      * @return void
      */
-    public function testPingEndpoint(): void {
+    public function testResourceEvent(): void {
         $webhook = $this->addWebhook(__FUNCTION__);
 
         $response = new HttpResponse(
@@ -92,9 +107,12 @@ class WebhooksEventTest extends AbstractAPIv2Test {
             HttpRequest::METHOD_POST
         );
 
-        $this->api()->post("webhooks/{$webhook['webhookID']}/pings");
+        /** @var EventManager */
+        $eventManager = $this->container()->get(EventManager::class);
+        $event = new MockDiscussionEvent(MockDiscussionEvent::ACTION_INSERT, ["foo" => "bar"]);
+        $eventManager->dispatch($event);
 
-        $this->assertWebhookEventDispatched("ping", PingEvent::ACTION_PING);
+        $this->assertWebhookEventDispatched("discussion", MockDiscussionEvent::ACTION_INSERT);
     }
 
     /**

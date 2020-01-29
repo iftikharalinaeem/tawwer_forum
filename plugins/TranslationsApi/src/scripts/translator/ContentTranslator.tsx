@@ -154,58 +154,55 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
             >
                 <TranslateIcon />
             </Button>
-            {displayModal && (
-                <Modal
-                    titleID={titleID}
-                    exitHandler={promptCloseConfirmation}
-                    size={props.isFullScreen ? ModalSizes.FULL_SCREEN : ModalSizes.LARGE}
-                    scrollable={props.isFullScreen}
+            <Modal
+                isVisible={displayModal}
+                titleID={titleID}
+                exitHandler={promptCloseConfirmation}
+                size={props.isFullScreen ? ModalSizes.FULL_SCREEN : ModalSizes.LARGE}
+                scrollable={props.isFullScreen}
+            >
+                <form
+                    onSubmit={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!translationLocale) {
+                            return;
+                        }
+                        publishForm(props.properties);
+                        if (props.afterSave) {
+                            props.afterSave();
+                        }
+                    }}
                 >
-                    <form
-                        onSubmit={e => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            if (!translationLocale) {
-                                return;
-                            }
-                            publishForm(props.properties);
-                            if (props.afterSave) {
-                                props.afterSave();
-                            }
-                        }}
-                    >
-                        {content}
-                    </form>
-                </Modal>
-            )}
-            {showCloseConfirm && (
-                <ModalConfirm
-                    title={t("Unsaved Changes")}
-                    onConfirm={closeSelf}
-                    onCancel={() => setShowCloseConfirm(false)}
-                >
-                    {t(
-                        "You have unsaved changes and your work will be lost. Are you sure you want to continue without saving?",
-                    )}
-                </ModalConfirm>
-            )}
+                    {content}
+                </form>
+            </Modal>
+            <ModalConfirm
+                isVisible={!!showCloseConfirm}
+                title={t("Unsaved Changes")}
+                onConfirm={closeSelf}
+                onCancel={() => setShowCloseConfirm(false)}
+            >
+                {t(
+                    "You have unsaved changes and your work will be lost. Are you sure you want to continue without saving?",
+                )}
+            </ModalConfirm>
 
-            {showChangeConfirm && (
-                <ModalConfirm
-                    title={t("Unsaved Changes")}
-                    onConfirm={() => {
-                        setLocale(showChangeConfirm!);
-                        setShowChangeConfirm(null);
-                    }}
-                    onCancel={() => {
-                        setShowChangeConfirm(null);
-                    }}
-                >
-                    {t(
-                        "You have unsaved changes and your work will be lost. Are you sure you want to continue without saving?",
-                    )}
-                </ModalConfirm>
-            )}
+            <ModalConfirm
+                isVisible={!!showChangeConfirm}
+                title={t("Unsaved Changes")}
+                onConfirm={() => {
+                    setLocale(showChangeConfirm!);
+                    setShowChangeConfirm(null);
+                }}
+                onCancel={() => {
+                    setShowChangeConfirm(null);
+                }}
+            >
+                {t(
+                    "You have unsaved changes and your work will be lost. Are you sure you want to continue without saving?",
+                )}
+            </ModalConfirm>
         </Permission>
     );
 };
