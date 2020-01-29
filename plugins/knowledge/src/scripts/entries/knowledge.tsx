@@ -5,6 +5,7 @@
  */
 
 // Import stylesheets
+import "@library/theming/reset";
 import "../../scss/knowledge-styles.scss";
 
 // Vendors
