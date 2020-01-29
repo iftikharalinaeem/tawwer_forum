@@ -15,6 +15,9 @@ use Vanilla\Webhooks\Processors\NormalizeDataProcessor;
  */
 class WebhookDeliveryModel extends PipelineModel {
 
+    /** Default limit on number of deliveries that should be returned. */
+    public const LIMIT_DEFAULT = 10;
+
     /**
      * WebhookDeliveryModel constructor.
      */

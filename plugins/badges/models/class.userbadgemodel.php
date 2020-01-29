@@ -46,7 +46,7 @@ class UserBadgeModel extends Gdn_Model {
         $userBadge = $this->getByUser($userID, $badgeID);
 
         // Grab relevant parameters
-        $timeout = val('Timeout', $userBadge['Attributes'], 0);
+        $timeout = val('Timeout', $badge['Attributes'], 0);
         $threshold = val('Threshold', $badge, false);
 
         // Get new timestamp and add to events
@@ -222,6 +222,7 @@ class UserBadgeModel extends Gdn_Model {
             ->select('ub.DateCompleted')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
+            ->where('b.Active', 1)
             ->where('ub.UserID', $userID)
             ->where('ub.DateCompleted is not null')
             ->limit($limit ?? false)

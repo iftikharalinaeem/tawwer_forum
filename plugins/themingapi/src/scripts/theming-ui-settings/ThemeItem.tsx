@@ -42,6 +42,7 @@ export function ThemeItem(props: IProps) {
         <>
             {deleteID !== null && (
                 <ThemeDeleteModal
+                    isVisible={deleteID !== null}
                     themeID={deleteID}
                     onDismiss={() => {
                         setDeleteID(null);

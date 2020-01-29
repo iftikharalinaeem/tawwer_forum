@@ -15,6 +15,7 @@ interface IProps {
     themeID: number | string;
     onDismiss: () => void;
     elementToFocusOnExit?: HTMLElement;
+    isVisible: boolean;
 }
 
 export function ThemeDeleteModal(props: IProps) {
@@ -34,7 +35,7 @@ export function ThemeDeleteModal(props: IProps) {
 
     return (
         <ModalConfirm
-            isVisible={true}
+            isVisible={props.isVisible}
             title={t("Delete Theme")}
             confirmTitle={t("Delete")}
             onConfirm={handleConfirm}
