@@ -27,6 +27,7 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import ModalLoader from "@vanilla/library/src/scripts/modal/ModalLoader";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -45,6 +46,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const actions = useThemeActions();
     const { getThemeById } = actions;
     const { theme, form, formSubmit } = useThemeEditorState();
+    const { assets } = form;
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
 
@@ -64,11 +66,12 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
+    const history = useHistory();
     useEffect(() => {
         if (themeStatus === LoadStatus.PENDING && themeID !== undefined) {
             getThemeById(themeID, history);
         }
-    }, [themeStatus, themeID, getThemeById]);
+    }, [themeStatus, themeID, getThemeById, history]);
 
     const lastStatus = useLastValue(theme.status);
     useEffect(() => {
@@ -77,12 +80,12 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         }
     }, [theme.status, theme.data, lastStatus]);
 
-    const history = useHistory();
     const submitHandler = async event => {
         event.preventDefault();
 
         if (themeID !== null) {
             if (assets.variables) {
+                console.log("assets variables", assets.variables);
                 updateAssets({
                     assets: {
                         variables: {
@@ -97,106 +100,94 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         }
     };
 
+    let content: React.ReactNode;
+
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
-        return <Loader />;
-    }
-
-    if (theme.status === LoadStatus.ERROR || !theme.data) {
-        return <ErrorPage error={theme.error} />;
-    }
-
-    if (formSubmit.status === LoadStatus.ERROR) {
-        return <ErrorPage apiError={formSubmit.error} />;
-    }
-
-    const { assets } = form;
-
-    const tabData = [
-        {
-            label: "Header",
-            panelData: "header",
-            contents: (
-                <TextEditor
-                    language={"html"}
-                    value={assets.header?.data}
-                    onChange={(event, newValue) => {
-                        updateAssets({
-                            assets: {
-                                header: {
-                                    data: newValue,
-                                    type: "html",
+        content = <Loader />;
+    } else if (theme.status === LoadStatus.ERROR || !theme.data) {
+        content = <ErrorPage error={theme.error} />;
+    } else {
+        const tabData = [
+            {
+                label: "Header",
+                panelData: "header",
+                contents: (
+                    <TextEditor
+                        language={"html"}
+                        value={assets.header?.data}
+                        onChange={(event, newValue) => {
+                            updateAssets({
+                                assets: {
+                                    header: {
+                                        data: newValue,
+                                        type: "html",
+                                    },
                                 },
-                            },
-                        });
-                    }}
-                />
-            ),
-        },
+                            });
+                        }}
+                    />
+                ),
+            },
 
-        {
-            label: "Footer",
-            panelData: "footer",
-            contents: (
-                <TextEditor
-                    language={"html"}
-                    value={assets.footer?.data}
-                    onChange={(event, newValue) => {
-                        updateAssets({
-                            assets: {
-                                footer: {
-                                    data: newValue,
-                                    type: "html",
+            {
+                label: "Footer",
+                panelData: "footer",
+                contents: (
+                    <TextEditor
+                        language={"html"}
+                        value={assets.footer?.data}
+                        onChange={(event, newValue) => {
+                            updateAssets({
+                                assets: {
+                                    footer: {
+                                        data: newValue,
+                                        type: "html",
+                                    },
                                 },
-                            },
-                        });
-                    }}
-                />
-            ),
-        },
-        {
-            label: "CSS",
-            panelData: "css",
-            contents: (
-                <TextEditor
-                    language={"css"}
-                    value={assets.styles}
-                    onChange={(event, newValue) => {
-                        updateAssets({ assets: { styles: newValue } });
-                    }}
-                />
-            ),
-        },
-        {
-            label: "JS",
-            panelData: "js",
-            contents: (
-                <TextEditor
-                    language={"javascript"}
-                    value={assets.javascript}
-                    onChange={(event, newValue) => {
-                        updateAssets({ assets: { javascript: newValue } });
-                    }}
-                />
-            ),
-        },
-    ];
-
-    // @ts-ignore
-    return (
-        <BrowserRouter>
-            <React.Fragment>
-                <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-                    <form onSubmit={submitHandler}>
-                        <ActionBar
-                            useShadow={false}
-                            callToActionTitle={t("Save")}
-                            title={<Title themeName={theme.data.name} />}
-                            fullWidth={true}
-                            isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                            optionsMenu={
-                                <>
-                                    {/* WIP not wired up. */}
-                                    {/* <DropDown
+                            });
+                        }}
+                    />
+                ),
+            },
+            {
+                label: "CSS",
+                panelData: "css",
+                contents: (
+                    <TextEditor
+                        language={"css"}
+                        value={assets.styles}
+                        onChange={(event, newValue) => {
+                            updateAssets({ assets: { styles: newValue } });
+                        }}
+                    />
+                ),
+            },
+            {
+                label: "JS",
+                panelData: "js",
+                contents: (
+                    <TextEditor
+                        language={"javascript"}
+                        value={assets.javascript}
+                        onChange={(event, newValue) => {
+                            updateAssets({ assets: { javascript: newValue } });
+                        }}
+                    />
+                ),
+            },
+        ];
+        content = (
+            <form onSubmit={submitHandler}>
+                <ActionBar
+                    useShadow={false}
+                    callToActionTitle={t("Save")}
+                    title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                    fullWidth={true}
+                    isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
+                    optionsMenu={
+                        <>
+                            {/* WIP not wired up. */}
+                            {/* <DropDown
                                         flyoutType={FlyoutType.LIST}
                                         openDirection={DropDownOpenDirection.BELOW_LEFT}
                                     >
@@ -205,17 +196,22 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                         <DropDownItemSeparator />
                                         <DropDownItemButton name={t("Delete")} onClick={() => {}} />
                                     </DropDown> */}
-                                </>
-                            }
-                        />
+                        </>
+                    }
+                />
 
-                        <TextEditorContextProvider>
-                            <Tabs data={tabData} />
-                        </TextEditorContextProvider>
-                    </form>
-                </Modal>
-            </React.Fragment>
-        </BrowserRouter>
+                <TextEditorContextProvider>
+                    <Tabs data={tabData} />
+                </TextEditorContextProvider>
+            </form>
+        );
+    }
+
+    // @ts-ignore
+    return (
+        <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+            {content}
+        </Modal>
     );
 }
 
@@ -241,6 +237,19 @@ export const Title = (props: IThemeTitleProps) => {
         });
     };
 
+    const getPlaceholder = () => {
+        switch (props.pageType) {
+            case "newTheme":
+                return "Untitled";
+            case "copy":
+                return `${props.themeName} copy`;
+            case "edit":
+                return props.themeName;
+            default:
+                return props.themeName;
+        }
+    };
+
     return (
         <li className={classes.themeName}>
             <InputTextBlock
@@ -255,7 +264,8 @@ export const Title = (props: IThemeTitleProps) => {
                     },
                     disabled: isDisabled,
                     inputRef,
-                    value: name,
+                    value: props.pageType === "edit" ? name : undefined,
+                    placeholder: getPlaceholder(),
                 }}
             />
 
