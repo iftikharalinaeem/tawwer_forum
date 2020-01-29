@@ -106,6 +106,8 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
         content = <ErrorPage error={theme.error} />;
+    } else if (formSubmit.status === LoadStatus.ERROR) {
+        content = <ErrorPage apiError={formSubmit.error} />;
     } else {
         const tabData = [
             {
@@ -237,19 +239,6 @@ export const Title = (props: IThemeTitleProps) => {
         });
     };
 
-    const getPlaceholder = () => {
-        switch (props.pageType) {
-            case "newTheme":
-                return "Untitled";
-            case "copy":
-                return `${props.themeName} copy`;
-            case "edit":
-                return props.themeName;
-            default:
-                return props.themeName;
-        }
-    };
-
     return (
         <li className={classes.themeName}>
             <InputTextBlock
@@ -264,8 +253,7 @@ export const Title = (props: IThemeTitleProps) => {
                     },
                     disabled: isDisabled,
                     inputRef,
-                    value: props.pageType === "edit" ? name : undefined,
-                    placeholder: getPlaceholder(),
+                    value: name,
                 }}
             />
 
