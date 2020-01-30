@@ -893,8 +893,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param  array $args
      * @return mixed
      */
-
-    public function advancedSearchPlugin_beforeSearch_handler(array $args) {
+    public function advancedSearchPlugin_beforeSearch_handler($args) {
         $searchCategory = $args['search']['cat'] ?? '';
         $inSubCommunity = true;
 
@@ -904,8 +903,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             // If the search category id isn't the subcommunity category id, check if it's in
             // the subcommunity and use that id for the search.
             if ($searchCategory !== $subCommunityCategory['CategoryID']) {
-                $subcommunityCategoryIDs = array_flip($this->getCategoryIDs());
-                $inSubCommunity = array_key_exists($searchCategory, $subcommunityCategoryIDs);
+                $subcommunityCategoryIDs = $this->getCategoryIDs();
+                $inSubCommunity = in_array($searchCategory, $subcommunityCategoryIDs);
             }
             $args['categoryID'] = ($inSubCommunity) ? $searchCategory : $subCommunityCategory['CategoryID'];
             $args['search']['subcats'] = ( $args['categoryID']) ? 1 : $args['subcats'];
