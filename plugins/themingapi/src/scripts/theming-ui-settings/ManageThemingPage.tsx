@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 import CurrentTheme from "@themingapi/components/CurrentTheme";
