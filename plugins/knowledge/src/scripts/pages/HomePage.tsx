@@ -20,7 +20,7 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { useBackgroundContext } from "@library/layout/Backgrounds";
-import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
+import TitleBar from "@library/headers/TitleBar";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import Banner from "@library/banner/Banner";
 
