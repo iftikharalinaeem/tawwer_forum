@@ -66,7 +66,7 @@
         <div class="P AdvancedSearch-Author-WhatToSearch">
             <?php
             echo $Form->label('What to search', '', ['class' => 'Heading']);
-            echo '<div class="Inline">';
+            echo '<div class="Checkboxes Inline">';
             foreach ($this->Types as $name => $label) {
                  echo ' '.$Form->checkBox($name, $label, ['nohidden' => true]).' ';
             }
