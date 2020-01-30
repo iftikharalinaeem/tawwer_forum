@@ -41,7 +41,7 @@
                     ?>
                 </div>
                 <div class="Summary">
-                    <?php echo $Row['Summary']; ?>
+                    <?php echo htmlspecialchars($Row['Summary']); ?>
                 </div>
                 <?php
                 $Count = getValue('Count', $Row);
