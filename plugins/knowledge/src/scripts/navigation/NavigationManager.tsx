@@ -155,8 +155,8 @@ export class NavigationManager extends React.Component<IProps, IState> {
                 firstID={this.getFirstItemID()}
                 getItemID={this.getItemId}
                 isInRoot={this.isItemInRoot(item.parentID)}
-                isDeletedDisabled={!!canEdit && item.children.length !== 0}
-                isRenameDisabled={!!canEdit}
+                isDeletedDisabled={!canEdit || item.children.length !== 0}
+                isRenameDisabled={!canEdit}
             />
         );
     };
