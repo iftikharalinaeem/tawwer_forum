@@ -29,7 +29,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { ComposeIcon } from "@library/icons/common";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
-import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import Banner from "@library/banner/Banner";
 
 /**
  * Component representing the the full home page of a help center.
