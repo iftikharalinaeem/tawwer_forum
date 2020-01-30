@@ -5,14 +5,6 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Knowledge;
-
-use Garden\Container\Reference;
-use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-use Vanilla\Contracts\Site\TranslationProviderInterface;
-use Vanilla\Models\ThemeModel;
-use Vanilla\Navigation\BreadcrumbModel;
-
 $container = \Gdn::getContainer();
 
 $container->rule(\Vanilla\Site\SiteSectionModel::class)
