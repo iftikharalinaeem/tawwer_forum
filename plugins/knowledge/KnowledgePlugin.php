@@ -343,7 +343,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
         // Update knowledge baese when missing sourceLocale
         /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
-        //$kbModel = \Gdn::getContainer()->get(KnowledgeBaseModel::class);
         $kbNoLocales = $this->kbModel->get(['sourceLocale' => '']);
         if (!empty($kbNoLocales)) {
             $this->kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
