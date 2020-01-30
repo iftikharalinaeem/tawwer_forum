@@ -7,14 +7,24 @@
 
 namespace Vanilla\Knowledge;
 
-use Vanilla\Knowledge\Controllers\KbRootAppRoutes;
+use Garden\Container\Reference;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
+use Vanilla\Models\ThemeModel;
+use Vanilla\Knowledge\Models\KnowledgeVariablesProvider;
+use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
+use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -77,6 +87,32 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 "data-discussionID" => $discussion->DiscussionID,
             ],
         ]);
+    }
+
+    /**
+     * Initialize controller class detection under Knowledge base application
+     *
+     * @param \Garden\Container\Container $container Container to support dependency injection
+     */
+    public function container_init(\Garden\Container\Container $container) {
+        $container->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new Reference(KbPageRoutes::class), 'kb-page'])
+            ->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(KbBreadcrumbProvider::class)])
+            ->rule(ThemeModel::class)
+            ->addCall("addVariableProvider", [new Reference(KnowledgeVariablesProvider::class)])
+            ->rule(SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeArticle()])
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->addCall('add', [new Reference(\Vanilla\Site\Application::class, ['knowledge-base', ['kb']])])
+
+            ->rule(\Vanilla\Menu\CounterModel::class)
+                ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
+
+            ->rule(TranslationProviderInterface::class)
+            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
+            ;
+        ;
     }
 
     /**
