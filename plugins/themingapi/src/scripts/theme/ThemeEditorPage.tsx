@@ -27,7 +27,6 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import ModalLoader from "@vanilla/library/src/scripts/modal/ModalLoader";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -85,7 +84,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
 
         if (themeID !== null) {
             if (assets.variables) {
-                console.log("assets variables", assets.variables);
                 updateAssets({
                     assets: {
                         variables: {
@@ -111,7 +109,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     } else {
         const tabData = [
             {
-                label: "Header",
+                label: t("Header"),
                 panelData: "header",
                 contents: (
                     <TextEditor
@@ -132,7 +130,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             },
 
             {
-                label: "Footer",
+                label: t("Footer"),
                 panelData: "footer",
                 contents: (
                     <TextEditor
@@ -152,7 +150,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 ),
             },
             {
-                label: "CSS",
+                label: t("CSS"),
                 panelData: "css",
                 contents: (
                     <TextEditor
@@ -165,7 +163,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 ),
             },
             {
-                label: "JS",
+                label: t("JS"),
                 panelData: "js",
                 contents: (
                     <TextEditor
@@ -209,7 +207,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         );
     }
 
-    // @ts-ignore
     return (
         <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
             {content}

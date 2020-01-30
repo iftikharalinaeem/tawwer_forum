@@ -12,6 +12,7 @@ import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
 import { History } from "history";
 import qs from "qs";
+import { t } from "@vanilla/i18n/src";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -35,6 +36,12 @@ export interface IPatchThemeRequest {
     assets?: Partial<IPostPatchThemeAssets>;
 }
 
+export enum pageType {
+    NEW_THEME = "newTheme",
+    COPY = "copy",
+    EDIT_THEME = "edit",
+}
+
 /**
  * Actions for working with resources from the /api/v2/theme endpoint.
  */
@@ -56,23 +63,24 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public getThemeById = async (themeID: number | string, history: History) => {
         const query = qs.parse(history.location.search.replace(/^\?/, ""));
 
-        let pageType = "";
+        let currentPageType = "";
+
         if (history.location.pathname === "/theme/theme-settings/add" && !query.templateName) {
-            pageType = "newTheme";
+            currentPageType = pageType.NEW_THEME;
         } else if (query.templateName) {
-            pageType = "copy";
+            currentPageType = pageType.COPY;
         } else {
-            pageType = "edit";
+            currentPageType = pageType.EDIT_THEME;
         }
 
         const request = {
             themeID: themeID,
         };
 
-        return await this.getTheme(request, pageType);
+        return await this.getTheme(request, currentPageType);
     };
 
-    public getTheme = async (options: IGetThemeParams, pageType: string) => {
+    public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
@@ -90,14 +98,16 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 assets.javascript = javascriptResponse.data;
             }
 
-            response.data.pageType = pageType;
+            response.data.pageType = currentPageType;
 
-            switch (pageType) {
-                case "newTheme":
-                    response.data.name = "Untitled";
+            switch (currentPageType) {
+                case pageType.NEW_THEME:
+                    response.data.name = t("Untitled");
                     break;
-                case "copy":
-                    response.data.name = `${response.data.name} copy`;
+                case pageType.COPY:
+                    let themeName = t("ThemeEditor.Copy", "<0/> copy");
+                    themeName = themeName.replace("<0/>", `${response.data.name}`);
+                    response.data.name = themeName;
                     break;
             }
 
