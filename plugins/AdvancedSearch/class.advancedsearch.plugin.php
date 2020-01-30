@@ -372,6 +372,7 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
             }
             unset($record);
 
+            $Row['Summary'] = $Row['Summary'] ?? '';
             $Row['ImageUrls'] = $this->formatService->parseImageUrls($Row['Summary'], $Row['Format']);
             $Row['Summary'] = searchExcerpt($this->formatService->renderPlainText($Row['Summary'], $Row['Format']), $SearchTerms, $Length);
 

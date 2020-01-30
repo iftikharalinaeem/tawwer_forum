@@ -164,7 +164,7 @@ button .SpSearch, .QuickSearch .SpSearch {
   height: 113px;
 }
 .Media .ImgExt img {
-  width: 200px;
+  max-width: 200px;
 }
 .Media .ImgExt.Open {
   max-height: 306px;
