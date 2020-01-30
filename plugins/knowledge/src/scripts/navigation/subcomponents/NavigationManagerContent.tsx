@@ -33,7 +33,8 @@ interface IProps {
     firstID: string | null;
     getItemID: (id: string) => string;
     isInRoot: boolean;
-    isDisable?: boolean; // for enable/disable Delete category button
+    isDeletedDisabled?: boolean;
+    isRenameDisabled?: boolean;
 }
 
 interface IState {
@@ -50,7 +51,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
     };
 
     public render() {
-        const { item, provided, snapshot, isInRoot, isDisable } = this.props;
+        const { item, provided, snapshot, isInRoot, isDeletedDisabled, isRenameDisabled } = this.props;
         const { error } = item.data;
         const isEditing = this.props.writeMode && !!this.isCurrent();
         const classesNavigationManager = navigationManagerClasses();
@@ -136,7 +137,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 )}
                                 baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.renameButtonRef}
-                                disabled={isDisable}
+                                disabled={isRenameDisabled}
                                 tabIndex={0}
                             >
                                 {t("Rename")}
@@ -154,7 +155,7 @@ export default class NavigationManagerContent extends React.Component<IProps, IS
                                 baseClass={ButtonTypes.CUSTOM}
                                 buttonRef={this.deleteButtonRef}
                                 tabIndex={0}
-                                disabled={isDisable}
+                                disabled={isDeletedDisabled}
                             >
                                 {t("Delete")}
                             </Button>

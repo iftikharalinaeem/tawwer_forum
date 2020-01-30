@@ -1474,7 +1474,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
             // Deleted articles have a special permission check.
-            $this->permission('kb.articles.add');
+            $this->permission('knowledge.articles.add');
         }
 
         return $record;
