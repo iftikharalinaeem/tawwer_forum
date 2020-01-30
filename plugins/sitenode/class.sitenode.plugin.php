@@ -85,7 +85,7 @@ class SiteNodePlugin extends Gdn_Plugin {
                     'Category',
                     ['OverrideHub' => 1],
                     ['Type' => 'Reporting', 'OverrideHub' => 0]
-                );
+                )->put();
             }
         }
     }
