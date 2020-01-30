@@ -22,6 +22,7 @@ export const themeEitorClasses = useThemeCache(() => {
     const themeName = style("themeName", {
         display: "flex",
         fontWeight: globalVars.fonts.weights.semiBold,
+        alignItems: "center",
     });
 
     const themeInput = style("themeInput", {
