@@ -36,7 +36,7 @@ export interface IPatchThemeRequest {
     assets?: Partial<IPostPatchThemeAssets>;
 }
 
-export enum pageType {
+export enum pageTypes {
     NEW_THEME = "newTheme",
     COPY = "copy",
     EDIT_THEME = "edit",
@@ -66,11 +66,11 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         let currentPageType = "";
 
         if (history.location.pathname === "/theme/theme-settings/add" && !query.templateName) {
-            currentPageType = pageType.NEW_THEME;
+            currentPageType = pageTypes.NEW_THEME;
         } else if (query.templateName) {
-            currentPageType = pageType.COPY;
+            currentPageType = pageTypes.COPY;
         } else {
-            currentPageType = pageType.EDIT_THEME;
+            currentPageType = pageTypes.EDIT_THEME;
         }
 
         const request = {
@@ -101,10 +101,10 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             response.data.pageType = currentPageType;
 
             switch (currentPageType) {
-                case pageType.NEW_THEME:
+                case pageTypes.NEW_THEME:
                     response.data.name = t("Untitled");
                     break;
-                case pageType.COPY:
+                case pageTypes.COPY:
                     let themeName = t("ThemeEditor.Copy", "<0/> copy");
                     themeName = themeName.replace("<0/>", `${response.data.name}`);
                     response.data.name = themeName;
@@ -135,7 +135,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             assets: assets,
         };
 
-        if (form.type == "themeDB" && pageType === "edit") {
+        if (form.type == "themeDB" && pageType === pageTypes.EDIT_THEME) {
             if (themeID) {
                 return await this.patchTheme({
                     ...request,
