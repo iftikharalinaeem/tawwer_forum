@@ -10,7 +10,7 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
+import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
@@ -54,12 +54,13 @@ export class ArticleLayout extends React.Component<IProps> {
         if (currentNavCategory) {
             title = currentNavCategory.name;
         }
+        const crumbs = article.breadcrumbs;
+        const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
         const renderPanelBackground =
             this.props.device !== Devices.MOBILE &&
             this.props.device !== Devices.XS &&
             panelBackgroundVariables().config.render;
-
         return (
             <>
                 {renderPanelBackground && <PanelBackground />}
@@ -74,7 +75,12 @@ export class ArticleLayout extends React.Component<IProps> {
                     <PanelLayout
                         renderLeftPanelBackground={renderPanelBackground}
                         breadcrumbs={
-                            article.breadcrumbs && <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
+                            (this.props.device === Devices.XS || this.props.device === Devices.MOBILE) &&
+                            article.breadcrumbs
+                                ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
+                                : article.breadcrumbs && (
+                                      <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
+                                  )
                         }
                         leftBottom={
                             <PanelWidget>
