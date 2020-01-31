@@ -7,7 +7,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import produce from "immer";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
-import ThemeActions, { useThemeActions } from "./ThemeEditorActions";
+import ThemeActions, { pageTypes, useThemeActions } from "./ThemeEditorActions";
 import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import { INITIAL_THEMES_STATE } from "@vanilla/library/src/scripts/features/users/userModel";
 
@@ -63,6 +63,7 @@ export interface ITheme {
     assets: IThemeAssets;
     parentTheme: string;
     version: string;
+    pageType: pageTypes;
 }
 
 export interface IThemeForm {
@@ -72,6 +73,7 @@ export interface IThemeForm {
     assets: IThemeAssets;
     parentTheme: string;
     version: string;
+    pageType: pageTypes;
 }
 
 export interface IThemeState {
@@ -113,6 +115,7 @@ const INITIAL_STATE: IThemeState = {
         assets: INITIAL_ASSETS,
         parentTheme: "",
         version: "",
+        pageType: pageTypes.NEW_THEME,
     },
     formSubmit: {
         status: LoadStatus.PENDING,

@@ -8,15 +8,10 @@ import { addComponent } from "@library/utility/componentRegistry";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { themeEditorReducer } from "@themingapi/theme/themeEditorReducer";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
-import ThemeEditorPage from "@themingapi/theme/ThemeEditorPage";
-
 import { Router } from "@library/Router";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 
-import React from "react";
-
 registerReducer("themeEditor", themeEditorReducer);
-addComponent("theme-editor", ThemeEditorPage);
 
 registerReducer("themeSettings", themeSettingsReducer);
 addComponent("theming-ui-manage", ManageThemingPage);

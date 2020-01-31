@@ -12,6 +12,7 @@ import apiv2 from "@library/apiv2";
 import { useMemo } from "react";
 import { History } from "history";
 import qs from "qs";
+import { t } from "@vanilla/i18n/src";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -35,6 +36,12 @@ export interface IPatchThemeRequest {
     assets?: Partial<IPostPatchThemeAssets>;
 }
 
+export enum pageTypes {
+    NEW_THEME = "newTheme",
+    COPY = "copy",
+    EDIT_THEME = "edit",
+}
+
 /**
  * Actions for working with resources from the /api/v2/theme endpoint.
  */
@@ -53,14 +60,27 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
-    public getThemeById = async (themeID: number | string) => {
+    public getThemeById = async (themeID: number | string, history: History) => {
+        const query = qs.parse(history.location.search.replace(/^\?/, ""));
+
+        let currentPageType = "";
+
+        if (history.location.pathname === "/theme/theme-settings/add" && !query.templateName) {
+            currentPageType = pageTypes.NEW_THEME;
+        } else if (query.templateName) {
+            currentPageType = pageTypes.COPY;
+        } else {
+            currentPageType = pageTypes.EDIT_THEME;
+        }
+
         const request = {
             themeID: themeID,
         };
-        return await this.getTheme(request);
+
+        return await this.getTheme(request, currentPageType);
     };
 
-    public getTheme = async (options: IGetThemeParams) => {
+    public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
             const response = await this.api.get(`/themes/${options.themeID}`);
@@ -78,6 +98,19 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 assets.javascript = javascriptResponse.data;
             }
 
+            response.data.pageType = currentPageType;
+
+            switch (currentPageType) {
+                case pageTypes.NEW_THEME:
+                    response.data.name = t("Untitled");
+                    break;
+                case pageTypes.COPY:
+                    let themeName = t("ThemeEditor.Copy", "<0/> copy");
+                    themeName = themeName.replace("<0/>", `${response.data.name}`);
+                    response.data.name = themeName;
+                    break;
+            }
+
             return response.data;
         })(options);
         const response = this.dispatch(thunk);
@@ -85,24 +118,24 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         return response;
     };
 
-    public saveTheme = async (history: History) => {
-        const query = qs.parse(history.location.search.replace(/^\?/, ""));
-        const canEdit = !query.templateName;
-
+    public saveTheme = async () => {
         const { form } = this.getState().themeEditor;
-        const { themeID } = this.getState().themeEditor.form;
+        const { themeID, pageType } = this.getState().themeEditor.form;
+
         const assets = {
             header: form.assets.header,
             footer: form.assets.footer,
             styles: form.assets.styles,
             javascript: form.assets.javascript,
+            variables: form.assets.variables,
         };
+
         const request = {
             name: form.name,
             assets: assets,
         };
 
-        if (form.type == "themeDB" && canEdit) {
+        if (form.type == "themeDB" && pageType === pageTypes.EDIT_THEME) {
             if (themeID) {
                 return await this.patchTheme({
                     ...request,

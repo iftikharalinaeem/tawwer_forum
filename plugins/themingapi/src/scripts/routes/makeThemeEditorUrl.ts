@@ -4,14 +4,13 @@
  * @license Proprietary
  */
 
-import getStore from "@library/redux/getStore";
-import { logWarning } from "@vanilla/utils";
 import qs from "qs";
 import { Store } from "redux";
 
 export interface IThemeEditorURLData {
     themeID?: string | number;
     templateName?: string;
+    newTheme?: boolean;
 }
 
 /**
@@ -21,7 +20,7 @@ export interface IThemeEditorURLData {
  */
 export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<IThemeEditorURLData>) {
     const defaultAddRoot = "/theme/theme-settings/add";
-    if (!data) {
+    if (!data || data.newTheme) {
         return defaultAddRoot;
     }
     let baseUrl = data.themeID ? `/theme/theme-settings/${data.themeID}/edit` : defaultAddRoot;
