@@ -888,6 +888,31 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Restricting searches to the immediate subcommunity.
+     *
+     * @param  array $args
+     * @return mixed
+     */
+    public function advancedSearchPlugin_beforeSearch_handler($args) {
+        $searchCategory = $args['search']['cat'] ?? '';
+        $inSubCommunity = true;
+
+        if ($searchCategory !== 'all') {
+            $subCommunityCategory = SubcommunityModel::getCurrent() ?? null;
+
+            // If the search category id isn't the subcommunity category id, check if it's in
+            // the subcommunity and use that id for the search.
+            if ($searchCategory !== $subCommunityCategory['CategoryID']) {
+                $subcommunityCategoryIDs = $this->getCategoryIDs();
+                $inSubCommunity = in_array($searchCategory, $subcommunityCategoryIDs);
+            }
+            $args['categoryID'] = ($inSubCommunity) ? $searchCategory : $subCommunityCategory['CategoryID'];
+            $args['search']['subcats'] = ( $args['categoryID']) ? 1 : $args['subcats'];
+        }
+        return $args;
+    }
+
+    /**
      * Add filter to discussion queries based on certain conditions.
      *
      * @param array $args
