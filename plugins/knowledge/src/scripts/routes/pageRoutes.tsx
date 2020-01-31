@@ -86,6 +86,12 @@ export const HomeRoute = new RouteHandler(
     (data?: undefined) => "/kb",
 );
 
+export const HomeAppRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/index" */ "@knowledge/pages/HomePage"),
+    "/",
+    (data?: undefined) => "/",
+);
+
 export const KnowledgeBasePage = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
     "/kb/:urlCode([\\w\\d-]+)",
@@ -124,6 +130,7 @@ export function getPageRoutes() {
         OrganizeCategoriesRoute.route,
         KnowledgeBasePage.route,
         HomeRoute.route,
+        HomeAppRoute.route,
         <Route component={NotFound} key={"not found"} />,
     ];
 }

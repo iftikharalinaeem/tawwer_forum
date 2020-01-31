@@ -7,7 +7,6 @@
 
 namespace Vanilla\Knowledge;
 
-use Gdn_Router as Router;
 use Garden\Container\Reference;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
@@ -41,22 +40,28 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var SessionInterface */
     private $session;
 
+    /** @var KnowledgeBaseModel $kbModel */
+    private $kbModel;
+
     /**
      * KnowledgePlugin constructor.
      *
      * @param \Gdn_Database $database
      * @param SessionInterface $session
      * @param \Gdn_Request $request
+     * @param KnowledgeBaseModel $kbModel
      */
     public function __construct(
         \Gdn_Database $database,
         SessionInterface $session,
-        \Gdn_Request $request
+        \Gdn_Request $request,
+        KnowledgeBaseModel $kbModel
     ) {
         parent::__construct();
         $this->database = $database;
         $this->session = $session;
         $this->request = $request;
+        $this->kbModel = $kbModel;
     }
 
     /**
@@ -338,10 +343,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
         // Update knowledge baese when missing sourceLocale
         /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
-        $kbModel = \Gdn::getContainer()->get(KnowledgeBaseModel::class);
-        $kbNoLocales = $kbModel->get(['sourceLocale' => '']);
+        $kbNoLocales = $this->kbModel->get(['sourceLocale' => '']);
         if (!empty($kbNoLocales)) {
-            $kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
+            $this->kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
         }
     }
 }
