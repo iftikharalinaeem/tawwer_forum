@@ -61,6 +61,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('Sort', 'smallint', '1000')
             ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->column('ProductID', 'smallint', true)
+            ->column('defaultController', 'varchar(30)', true)
             ->set();
 
         Gdn::structure()

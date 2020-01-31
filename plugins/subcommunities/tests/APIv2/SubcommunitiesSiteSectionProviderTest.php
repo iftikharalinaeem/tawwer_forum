@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Subcommunities\Models\SubcomunitiesSiteSectionProvider;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Tests for SubcommunitiesSiteSectionProvider.
@@ -27,7 +28,10 @@ class SubcommunitiesSiteSectionProviderTest extends AbstractAPIv2Test {
         parent::setupBeforeClass();
 
         self::createSubcommunities();
-        $provider = new SubcomunitiesSiteSectionProvider(self::container()->get(\SubcommunityModel::class));
+        $subcommunityModel = self::container()->get(\SubcommunityModel::class);
+        $config = self::container()->get(ConfigurationInterface::class);
+        $router = self::container()->get(\Gdn_Router::class);
+        $provider = new SubcomunitiesSiteSectionProvider($subcommunityModel, $config, $router);
         static::container()->setInstance(SiteSectionProviderInterface::class, $provider);
         self::$provider = static::container()->get(SiteSectionModel::class);
     }

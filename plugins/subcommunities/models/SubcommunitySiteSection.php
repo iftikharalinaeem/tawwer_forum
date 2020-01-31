@@ -8,6 +8,8 @@ namespace Vanilla\Subcommunities\Models;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Site\SiteSectionSchema;
+use Vanilla\Contracts\ConfigurationInterface;
+use Gdn_Router;
 
 /**
  * Site section implementation for Subcommunities.
@@ -42,17 +44,36 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
+    /** @var ConfigurationInterface $config */
+    private $config;
+
+    /** @var Gdn_Router $router */
+    private $router;
+
+    /** @var array $defaultRoute */
+    private $defaultRoute;
+
     /**
      * DI.
      *
      * @param array $subcommunity Subcommunity model record
+     * @param ConfigurationInterface $config
+     * @param Gdn_Router $router
      */
-    public function __construct(array $subcommunity) {
+    public function __construct(
+        array $subcommunity,
+        ConfigurationInterface $config,
+        Gdn_Router $router
+    ) {
         $this->siteSectionName = $subcommunity["Name"];
         $this->locale = $subcommunity['Locale'];
         $this->siteSectionPath = '/'.$subcommunity["Folder"];
         $this->sectionGroup = ProductModel::makeSiteSectionGroupKey($subcommunity['ProductID'] ?? null);
         $this->siteSectionID = self::SUBCOMMUNITY_SECTION_PREFIX.$subcommunity["SubcommunityID"];
+        $configDefaultController = !empty($subcommunity["defaultController"])
+            ? $subcommunity["defaultController"]
+            : $config->get('Routes.DefaultController');
+        $this->defaultRoute = $router->parseRoute($configDefaultController);
     }
 
     /**
@@ -95,5 +116,12 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      */
     public function getSectionGroup(): string {
         return $this->sectionGroup;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getDefaultRoute(): array {
+        return $this->defaultRoute;
     }
 }

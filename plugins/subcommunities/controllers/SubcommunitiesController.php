@@ -7,6 +7,9 @@
 
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Subcommunities\Models\ProductModel;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Contracts\ConfigurationInterface;
+use Gdn_Router as Router;
 
 /**
  * Controller for routing the /subcommunities
@@ -33,16 +36,36 @@ class SubcommunitiesController extends DashboardController {
     /** @var ProductModel */
     private $productModel;
 
+    /** @var SiteSectionModel $siteSectionModel */
+    private $siteSectionModel;
+
+    /** @var ConfigurationInterface $config */
+    private $config;
+
+    /** @var Router $router */
+    private $router;
+
     /// Methods ///
 
     /**
      * DI.
      *
      * @param ProductModel $productModel
+     * @param SiteSectionModel $siteSectionModel
+     * @param ConfigurationInterface $config
+     * @param Gdn_Router $router
      */
-    public function __construct(ProductModel $productModel) {
+    public function __construct(
+        ProductModel $productModel,
+        SiteSectionModel $siteSectionModel,
+        ConfigurationInterface $config,
+        Router $router
+    ) {
         parent::__construct();
         $this->productModel = $productModel;
+        $this->siteSectionModel = $siteSectionModel;
+        $this->config = $config;
+        $this->router = $router;
     }
 
     public function add() {
@@ -95,6 +118,17 @@ class SubcommunitiesController extends DashboardController {
         $categories = array_column($categories, 'Name', 'CategoryID');
         $this->setData('Categories', $categories);
 
+        $layoutOptions = $this->siteSectionModel->getLayoutOptions();
+        foreach ($layoutOptions as $key => &$value) {
+            $value = t($value);
+        }
+        $configDefaultController = $this->config->get('Routes.DefaultController');
+
+        $default= sprintf(t('Default (%s)'), $layoutOptions[$this->router->parseRoute($configDefaultController)['Destination']]);
+
+        $layoutOptions = ['null' => $default] + $layoutOptions;
+        $defaultController = ['LabelCode' => 'Homepage', 'Control' => 'DropDown', 'Items' => $layoutOptions];
+
         // Set the form elements on the add/edit form.
         $form = [
             'Name' => ['Description' => 'Enter a friendly name for the site.'],
@@ -103,6 +137,8 @@ class SubcommunitiesController extends DashboardController {
             'CategoryID' => ['LabelCode' => 'Category', 'Control' => 'DropDown', 'Items' => $this->data('Categories'), 'Options' => ['IncludeNull' => true]],
             'Locale' => ['Control' => 'DropDown', 'Items' => $this->data('Locales'), 'Options' => ['IncludeNull' => true]],
         ];
+
+        $form['defaultController'] = $defaultController;
 
         if (!FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
             unset($form['ProductID']);
@@ -121,6 +157,10 @@ class SubcommunitiesController extends DashboardController {
             // Unchecked checkboxes are not sent in post data :P
             if (empty($postData['IsDefault'])) {
                 $postData['IsDefault'] = null;
+            }
+
+            if ($postData['defaultController'] === 'null') {
+                $postData['defaultController'] = null;
             }
 
             if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {

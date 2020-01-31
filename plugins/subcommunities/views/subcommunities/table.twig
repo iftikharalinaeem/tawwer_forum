@@ -7,6 +7,7 @@
                 <th class="column-sm">{{ t('Locale') }}</th>
                 {% if useProducts %}
                     <th>{{ t('Product') }}</th>
+                    <th>{{ t('Homepage') }}</th>
                 {% endif %}
                 <th class="column-sm"></th>
             </tr>
@@ -21,6 +22,11 @@
                         <td>
                             {% if row.product is defined %}
                                 {{ row.product.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.defaultController is defined %}
+                                {{ row.defaultController }}
                             {% endif %}
                         </td>
                     {% endif %}

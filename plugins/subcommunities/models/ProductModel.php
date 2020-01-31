@@ -9,6 +9,8 @@ namespace Vanilla\Subcommunities\Models;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Schema\Schema;
+use Gdn_Router as Router;
+use Vanilla\Contracts\ConfigurationInterface;
 use Gdn_Session;
 
 /**
@@ -21,6 +23,12 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var Router $router */
+    private $router;
+
+    /** @var ConfigurationInterface $config */
+    private $config;
+
     /** @var Schema */
     public $productSchema;
 
@@ -28,10 +36,18 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
      * ProductModel constructor.
      *
      * @param Gdn_Session $session
+     * @param Router $router
+     * @param ConfigurationInterface $config
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(
+        Gdn_Session $session,
+        Router $router,
+        ConfigurationInterface $config
+    ) {
         parent::__construct("product");
         $this->session = $session;
+        $this->config = $config;
+        $this->router = $router;
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
             ->setUpdateFields(["dateUpdated"]);
@@ -76,11 +92,15 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
                 try {
                     $product = $this->selectSingle(["productID" => $row['ProductID']]);
                     if ($product) {
-                        setValue('product', $row, $product);
+                        $row['product'] = $product;
                     }
                 } catch (NoResultsException $e) {
                     logException($e);
                 }
+            }
+            if (empty($row['defaultController'] ?? '')) {
+                $configDefaultController = $this->config->get('Routes.DefaultController');
+                $row['defaultController'] = sprintf(t('Default (%s)'), $this->router->parseRoute($configDefaultController)['Destination']);
             }
         };
 
