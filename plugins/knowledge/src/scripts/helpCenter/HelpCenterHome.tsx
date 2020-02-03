@@ -37,7 +37,7 @@ import Banner from "@library/banner/Banner";
 export class HelpCenterHome extends React.Component<IProps> {
     public render() {
         const { knowledgeBase, status, data, rootCategoryUrl } = this.props;
-        const { bannerImage, knowledgeBaseID, rootCategoryID } = knowledgeBase;
+        const { bannerImage, bannerContentImage, knowledgeBaseID, rootCategoryID, description } = knowledgeBase;
 
         if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
             return <Loader />;
@@ -77,12 +77,14 @@ export class HelpCenterHome extends React.Component<IProps> {
                 <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
                 <Banner
                     action={bannerAction}
-                    styleOverwrite={{ outerBackgroundImage: bannerImage }}
+                    backgroundImage={bannerImage}
+                    contentImage={bannerContentImage}
                     title={knowledgeBase.name}
+                    description={description}
                 />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} />
+                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} hamburger={true} />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}

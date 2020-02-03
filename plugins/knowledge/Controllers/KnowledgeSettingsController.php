@@ -12,6 +12,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Web\TwigRenderTrait;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\JsInterpop\ReduxAction;
 
 /**
@@ -37,24 +38,31 @@ class KnowledgeSettingsController extends SettingsController {
 
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
+
     /**
      * Constructor for DI.
      *
      * @param KnowledgeBasesApiController $apiController
      * @param Gdn_Request $request
      * @param KnowledgeBaseKludgedVars $kludgedVars
-     * @param  KnowledgeBaseModel $knowledgeBaseModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param ThemeFeatures $themeFeatures
      */
     public function __construct(
         KnowledgeBasesApiController $apiController,
         Gdn_Request $request,
         KnowledgeBaseKludgedVars $kludgedVars,
-        KnowledgeBaseModel $knowledgeBaseModel
+        KnowledgeBaseModel $knowledgeBaseModel,
+        ThemeFeatures $themeFeatures
     ) {
         $this->apiController = $apiController;
         $this->request = $request;
         $this->kludgedVars = $kludgedVars;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->themeFeatures = $themeFeatures;
         self::$twigDefaultFolder = PATH_ROOT . '/plugins/knowledge/views';
         parent::__construct();
     }
@@ -99,27 +107,30 @@ class KnowledgeSettingsController extends SettingsController {
         $configurationModule = new ConfigurationModule($this);
         $configValues = [];
         $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getBannerVariables());
-        $configValues += [
-            "GlobalColorsTitle" => [
-                "Control" => "title",
-                "Title" => "Global Site Colors",
-            ],
-        ];
-        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getGlobalColors());
-        $configValues += [
-            "HeaderVarstitle" => [
-                "Control" => "title",
-                "Title" => "Title Bar Options",
-            ],
-        ];
-        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getHeaderVars());
-        $configValues += [
-            "SizingVarsTitle" => [
-                "Control" => "title",
-                "Title" => "Sizing Options",
-            ],
-        ];
-        $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getSizingVariables());
+
+        if (!$this->themeFeatures->disableKludgedVars()) {
+            $configValues += [
+                "GlobalColorsTitle" => [
+                    "Control" => "title",
+                    "Title" => "Global Site Colors",
+                ],
+            ];
+            $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getGlobalColors());
+            $configValues += [
+                "HeaderVarstitle" => [
+                    "Control" => "title",
+                    "Title" => "Title Bar Options",
+                ],
+            ];
+            $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getHeaderVars());
+            $configValues += [
+                "SizingVarsTitle" => [
+                    "Control" => "title",
+                    "Title" => "Sizing Options",
+                ],
+            ];
+            $configValues += $this->kludgedVars->prepareAsFormValues($this->kludgedVars->getSizingVariables());
+        }
 
         $configurationModule->initialize($configValues);
 

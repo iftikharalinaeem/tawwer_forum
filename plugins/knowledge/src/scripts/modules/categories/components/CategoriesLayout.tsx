@@ -47,6 +47,8 @@ export default function CategoriesLayout(props: IProps) {
     const device = useDevice();
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
     const classesSearchBar = searchBarClasses();
+    const crumbs = category.breadcrumbs;
+    const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
     const pageContent =
         results.length > 0 ? (
@@ -65,16 +67,12 @@ export default function CategoriesLayout(props: IProps) {
 
     return (
         <Container>
-            <TitleBar
-                useMobileBackButton={true}
-                title={category.name}
-                mobileDropDownContent={
-                    <Navigation collapsible={false} activeRecord={activeRecord} kbID={category.knowledgeBaseID} />
-                }
-            />
+            <TitleBar useMobileBackButton={true} hamburger={true} />
             <PanelLayout
                 breadcrumbs={
-                    category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
+                    (device === Devices.XS || device === Devices.MOBILE) && category.breadcrumbs
+                        ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
+                        : category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
                 }
                 leftBottom={
                     <PanelWidget>

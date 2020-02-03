@@ -44,7 +44,7 @@ export default function KbErrorMessages(props: IKbErrorMessageProps) {
 function parseKbErrorCode(props: IKbErrorMessageProps, errorCode?: string | number): IError {
     const classes = pageErrorMessageClasses();
     const buttons = buttonClasses();
-    const message = messageFromErrorCode(errorCode);
+    const message = messageFromKbErrorCode(errorCode);
 
     switch (errorCode) {
         case DefaultKbError.NO_KNOWLEDGE_BASE: {

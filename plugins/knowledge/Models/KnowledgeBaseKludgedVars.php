@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 
 use Garden\StaticCacheTranslationTrait;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\ThemeFeatures;
 
 /**
  * Class containing config-based kludged variables.
@@ -22,6 +23,8 @@ class KnowledgeBaseKludgedVars {
 
     /** Maximum length allowed for the KB chooser page. */
     const CHOOSER_TITLE_MAX_LENGTH = 50;
+    const CHOOSER_DESCRIPTION_MAX_LENGTH = 300;
+
 
     const FG_MESSAGE = "Foreground colors are used mostly used for text and icons. This should contrast with the background color.";
     const BG_MESSAGE = "Background colors are used as the background of elements. This should have good constrast with the foreground color.";
@@ -36,6 +39,18 @@ class KnowledgeBaseKludgedVars {
      */
     public function __construct(ConfigurationInterface $config) {
         $this->config = $config;
+    }
+
+    /**
+     * Lazily check if we can use kludge vars.
+     *
+     * We cannot DI this class because it leads to an infinite loop.
+     * Instead we will lazily fetch it.
+     *
+     * @return bool
+     */
+    private function disableKludgedVars(): bool {
+        return \Gdn::themeFeatures()->disableKludgedVars();
     }
 
     /**
@@ -96,6 +111,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getGlobalColors(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "global.mainColors.primary",
@@ -136,6 +154,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getHeaderVars(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "titleBar.colors.bg",
@@ -181,7 +202,13 @@ class KnowledgeBaseKludgedVars {
                 "VariableName" => "splash.title.text",
                 "ConfigName" => "Knowledge.ChooserTitle",
                 "LabelCode" => self::t("Knowledge Base Chooser Title"),
-                "Description" => self::t("This title will appear on the Knowledge homepage. It should be 20 characters or less."),
+                "Description" => sprintf(
+                    self::t("This %s will appear on the Knowledge homepage."),
+                    self::t("title")
+                ) . ' ' . sprintf(
+                    self::t("It should be %s characters or less."),
+                    self::CHOOSER_TITLE_MAX_LENGTH
+                ),
                 "Control" => "textbox",
                 "Options" => [
                     "placeholder" => \Gdn::locale()->translate('How can we help you?'),
@@ -189,15 +216,59 @@ class KnowledgeBaseKludgedVars {
                 ]
             ],
             [
+                "VariableName" => "banner.description.text",
+                "ConfigName" => "Knowledge.ChooserDescription",
+                "LabelCode" => self::t("Knowledge Base Chooser Description"),
+                "Description" => sprintf(
+                    self::t("This %s will appear on the Knowledge homepage."),
+                    self::t("description")
+                ),
+                "Control" => "textbox",
+                "Options" => [
+                    "multiline" => true,
+                    "placeholder" => self::t(
+                        "KB.GeneralApperance.Description.Placeholder",
+                        'Welcome to our Knowledge Base. Here you\'ll find answers to common support issues.'
+                    ),
+                    "maxlength" => self::CHOOSER_DESCRIPTION_MAX_LENGTH,
+                ]
+            ],
+            [
                 "VariableName" => "splash.outerBackground.image",
                 "ConfigName" => "Knowledge.DefaultBannerImage",
-                "Description" =>
-                    self::t("The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
-                    . " Recommended dimensions are about 1000px by 400px or a similar ratio."),
-                "LabelCode" => self::t("Banner Image"),
-                "Control" => "imageupload",
+                "Label" => mb_convert_case(self::t("banner background image"), MB_CASE_TITLE),
+                "Description" => sprintf(
+                    self::t("The %s to use on the knowledge base chooser."),
+                    self::t("banner background image")
+                ) . " "
+                . self::t("This can be overridden on a per knowledge base basis.")
+                . " " . sprintf(
+                    self::t("Recommended dimensions are about %s by %s or a similar ratio."),
+                    "1000px",
+                    "400px"
+                ),
+                "Control" => "imageuploadreact",
                 "Options" => [
-                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner background image"))
+                ],
+            ],
+            [
+                "VariableName" => "banner.imageElement.image",
+                "ConfigName" => "Knowledge.DefaultBannerContentImage",
+                "Label" => mb_convert_case(self::t("banner content image"), MB_CASE_TITLE),
+                "Description" => sprintf(
+                    self::t("The %s to use on the knowledge base chooser."),
+                    self::t("banner content image")
+                ) . " "
+                . self::t("This can be overridden on a per knowledge base basis.")
+                . " " . sprintf(
+                    self::t("Recommended dimensions are about %s by %s or a similar ratio."),
+                    "600px",
+                    "400px"
+                ),
+                "Control" => "imageuploadreact",
+                "Options" => [
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner content image"))
                 ],
             ],
             [
@@ -216,6 +287,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getSizingVariables(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "global.middleColumn.width",

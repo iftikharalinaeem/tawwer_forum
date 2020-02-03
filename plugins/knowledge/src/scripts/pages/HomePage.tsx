@@ -25,7 +25,7 @@ import { bannerVariables } from "@library/banner/bannerStyles";
 import Banner from "@library/banner/Banner";
 
 const HomePage = (props: IProps) => {
-    const splashVars = bannerVariables({});
+    const splashVars = bannerVariables();
     const title = t(splashVars.title.text);
     const { loadStatus, knowledgeBases } = props;
 
@@ -50,7 +50,7 @@ const HomePage = (props: IProps) => {
             <Banner title={title} />
             <Container>
                 <DocumentTitle title={t("Home")}>
-                    <TitleBar hasSubNav />
+                    <TitleBar hamburger={true} useMobileBackButton={false} />
                 </DocumentTitle>
                 <KnowledgeBaseList />
             </Container>
