@@ -1177,22 +1177,39 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->schema([":a" => $this->knowledgeApiController->searchResultSchema()], "out");
 
         $query = $in->validate($query);
-
+        $minimumArticles = $query['minimumArticles'] ?? null;
         $article = $this->articleByID($id, true);
-        $knowledgeBase =  $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $article["knowledgeBaseID"]]);
-        $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
+        $knowledgeBaseID = $article["knowledgeBaseID"] ?? '';
+        $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? '';
+
+        $query = [
+            "all" => $article["name"],
+            "locale" => $query["locale"],
+            "knowledgeCategoryID" => $article["knowledgeCategoryID"],
+            "limit" => 10
+        ];
 
         $articles = $this->getRelatedArticles($id, $query);
 
-        if ($query["minimumArticles"] ?? null && count($articles) < $query["minimumArticles"]) {
+        if (count($articles) < $minimumArticles) {
             $query = [
                 "all" => $article["name"],
                 "locale" => $query["locale"],
-                "siteSectionGroup" => $siteSectionGroup,
                 "limit" => 10
             ];
+
+            if ($siteSectionGroup) {
+                $query["siteSectionGroup"] = $siteSectionGroup;
+            }
+
+            if ($knowledgeBaseID) {
+                $query["knowledgeBaseID"] = $knowledgeBaseID;
+            }
+
             $articles = $this->getRelatedArticles($id, $query);
         }
+
         $articles = $out->validate($articles);
 
         return $articles;
@@ -1574,20 +1591,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get related articles using search endpoint.
+     *
      * @param int $id
      * @param array $query
-     * @param array $article
+     *
      * @return array
      */
     protected function getRelatedArticles(int $id, array $query): array {
         $results = $this->knowledgeApiController->get_search($query);
 
         $articles = $results->getData();
-//        foreach ($articles as $key => $article) {
-//            if ($article["recordID"] === $id) {
-//                unset($articles[$key]);
-//            }
-//        }
-        return $articles;
+        foreach ($articles as $key => $article) {
+            if ($article["recordID"] === $id) {
+                unset($articles[$key]);
+                break;
+            }
+        }
+        return array_values($articles);
     }
 }
