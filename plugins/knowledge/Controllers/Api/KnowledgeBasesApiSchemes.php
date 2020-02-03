@@ -94,6 +94,10 @@ trait KnowledgeBasesApiSchemes {
                 "description" => "Full URL to the banner image of knowledge base.",
                 "type" => "string",
             ],
+            "bannerContentImage" => [
+                "description" => "Full URL to the banner content image of knowledge base.",
+                "type" => "string",
+            ],
             "sourceLocale" => [
                 "description" => "sourceLocale of knowledge base.",
                 "type" => "string",
@@ -140,6 +144,7 @@ trait KnowledgeBasesApiSchemes {
                     "description",
                     "icon?",
                     "bannerImage?",
+                    "bannerContentImage?",
                     "siteSectionGroup",
                     "sourceLocale",
                     "viewType",

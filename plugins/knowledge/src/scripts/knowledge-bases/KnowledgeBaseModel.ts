@@ -29,6 +29,7 @@ export interface IKbFormState {
     description: string;
     icon: string | null;
     bannerImage: string | null;
+    bannerContentImage: string | null;
     viewType: KbViewType;
     sourceLocale: string | null;
     sortArticles: KnowledgeBaseSortMode;
@@ -122,7 +123,8 @@ export interface IKnowledgeBase {
     url: string;
     icon: string;
     status: KnowledgeBaseStatus;
-    bannerImage: string;
+    bannerImage?: string;
+    bannerContentImage?: string;
     sourceLocale: string;
     viewType: KbViewType;
     rootCategoryID: number;

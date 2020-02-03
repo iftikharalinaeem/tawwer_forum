@@ -194,8 +194,20 @@ class KnowledgeBaseKludgedVars {
                 "Description" =>
                     self::t("The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
                     . " Recommended dimensions are about 1000px by 400px or a similar ratio."),
-                "LabelCode" => self::t("Banner Image"),
-                "Control" => "imageupload",
+                "Label" => self::t("Banner Image"),
+                "Control" => "imageuploadreact",
+                "Options" => [
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
+                ],
+            ],
+            [
+                "VariableName" => "banner.imageElement.image",
+                "ConfigName" => "Knowledge.DefaultBannerContentImage",
+                "Description" =>
+                    self::t("The banner content image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
+                    . " Recommended dimensions are around 600px by 400px or a similar ratio."),
+                "Label" => self::t("Banner Content Image"),
+                "Control" => "imageuploadreact",
                 "Options" => [
                     "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
                 ],

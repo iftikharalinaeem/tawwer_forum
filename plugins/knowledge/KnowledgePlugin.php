@@ -309,6 +309,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("urlCode", "varchar(191)", false, 'unique.urlCode')
             ->column("icon", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("bannerImage", "varchar(255)", ['Null' => false, 'Default' => ''])
+            ->column("bannerContentImage", "varchar(255)", ['Null' => false, 'Default' => ''])
             ->column("sourceLocale", "varchar(5)", ['Null' => false, 'Default' => c("Garden.Locale")])
             ->column(
                 "viewType",
