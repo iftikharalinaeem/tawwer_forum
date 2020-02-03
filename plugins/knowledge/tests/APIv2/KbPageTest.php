@@ -50,7 +50,8 @@ class KbPageTest extends AbstractAPIv2Test {
      * Test validation of site section groups.
      */
     public function testGroupValidation() {
-        $defaultSection = new DefaultSiteSection(new MockConfig());
+        $router = self::container()->get(\Gdn_Router::class);
+        $defaultSection = new DefaultSiteSection(new MockConfig(), $router);
         /** @var SiteSectionProviderInterface $siteSectionProvider */
         $siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
 
@@ -59,14 +60,22 @@ class KbPageTest extends AbstractAPIv2Test {
             'en',
             '/en',
             "mockSiteSection-en",
-            "mockSiteSectionGroup-1"
+            "mockSiteSectionGroup-1",
+            [
+                'Destination' => 'discussions',
+                'Type' => 'Internal'
+            ]
         );
         $section2 = new MockSiteSection(
             "ssg2_siteSectionName_en",
             'en',
             '/ssg2-en',
             "ssg2-mockSiteSection-en",
-            "mockSiteSectionGroup-2"
+            "mockSiteSectionGroup-2",
+            [
+                'Destination' => 'discussions',
+                'Type' => 'Internal'
+            ]
         );
 
         // Insert a knowledge base in $section1's group.
