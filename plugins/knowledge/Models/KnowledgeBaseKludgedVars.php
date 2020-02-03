@@ -202,7 +202,13 @@ class KnowledgeBaseKludgedVars {
                 "VariableName" => "splash.title.text",
                 "ConfigName" => "Knowledge.ChooserTitle",
                 "LabelCode" => self::t("Knowledge Base Chooser Title"),
-                "Description" => self::t("This title will appear on the Knowledge homepage. It should be 50 characters or less."),
+                "Description" => sprintf(
+                    self::t("This %s will appear on the Knowledge homepage."),
+                    self::t("title")
+                ) . ' ' . sprintf(
+                    self::t("It should be %s characters or less."),
+                    self::CHOOSER_TITLE_MAX_LENGTH
+                ),
                 "Control" => "textbox",
                 "Options" => [
                     "placeholder" => \Gdn::locale()->translate('How can we help you?'),
@@ -212,37 +218,57 @@ class KnowledgeBaseKludgedVars {
             [
                 "VariableName" => "banner.description.text",
                 "ConfigName" => "Knowledge.ChooserDescription",
-                "LabelCode" => self::t("Knowledge Base Description Title"),
-                "Description" => self::t("This description will appear on the Knowledge homepage."),
+                "LabelCode" => self::t("Knowledge Base Chooser Description"),
+                "Description" => sprintf(
+                    self::t("This %s will appear on the Knowledge homepage."),
+                    self::t("description")
+                ),
                 "Control" => "textbox",
                 "Options" => [
                     "multiline" => true,
-                    "placeholder" => \Gdn::locale()->translate('Welcome to our Knowledge Base. Here you\'ll find answers to common support issues.'),
+                    "placeholder" => self::t(
+                        "KB.GeneralApperance.Description.Placeholder",
+                        'Welcome to our Knowledge Base. Here you\'ll find answers to common support issues.'
+                    ),
                     "maxlength" => self::CHOOSER_DESCRIPTION_MAX_LENGTH,
                 ]
             ],
             [
                 "VariableName" => "splash.outerBackground.image",
                 "ConfigName" => "Knowledge.DefaultBannerImage",
-                "Description" =>
-                    self::t("The banner image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
-                    . " Recommended dimensions are about 1000px by 400px or a similar ratio."),
-                "Label" => self::t("Banner Image"),
+                "Label" => mb_convert_case(self::t("banner background image"), MB_CASE_TITLE),
+                "Description" => sprintf(
+                    self::t("The %s to use on the knowledge base chooser."),
+                    self::t("banner background image")
+                ) . " "
+                . self::t("This can be overridden on a per knowledge base basis.")
+                . " " . sprintf(
+                    self::t("Recommended dimensions are about %s by %s or a similar ratio."),
+                    "1000px",
+                    "400px"
+                ),
                 "Control" => "imageuploadreact",
                 "Options" => [
-                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner background image"))
                 ],
             ],
             [
                 "VariableName" => "banner.imageElement.image",
                 "ConfigName" => "Knowledge.DefaultBannerContentImage",
-                "Description" =>
-                    self::t("The banner content image to use on the knowledge base chooser. This can be overridden on a per-knoweldge base basis."
-                    . " Recommended dimensions are around 600px by 400px or a similar ratio."),
-                "Label" => self::t("Banner Content Image"),
+                "Label" => mb_convert_case(self::t("banner content image"), MB_CASE_TITLE),
+                "Description" => sprintf(
+                    self::t("The %s to use on the knowledge base chooser."),
+                    self::t("banner content image")
+                ) . " "
+                . self::t("This can be overridden on a per knowledge base basis.")
+                . " " . sprintf(
+                    self::t("Recommended dimensions are about %s by %s or a similar ratio."),
+                    "600px",
+                    "400px"
+                ),
                 "Control" => "imageuploadreact",
                 "Options" => [
-                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner image"))
+                    "RemoveConfirmText" => sprintf(self::t("Are you sure you want to delete your %s?"), self::t("banner content image"))
                 ],
             ],
             [
