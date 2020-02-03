@@ -22,6 +22,8 @@ class KnowledgeBaseKludgedVars {
 
     /** Maximum length allowed for the KB chooser page. */
     const CHOOSER_TITLE_MAX_LENGTH = 50;
+    const CHOOSER_DESCRIPTION_MAX_LENGTH = 300;
+
 
     const FG_MESSAGE = "Foreground colors are used mostly used for text and icons. This should contrast with the background color.";
     const BG_MESSAGE = "Background colors are used as the background of elements. This should have good constrast with the foreground color.";
@@ -181,11 +183,23 @@ class KnowledgeBaseKludgedVars {
                 "VariableName" => "splash.title.text",
                 "ConfigName" => "Knowledge.ChooserTitle",
                 "LabelCode" => self::t("Knowledge Base Chooser Title"),
-                "Description" => self::t("This title will appear on the Knowledge homepage. It should be 20 characters or less."),
+                "Description" => self::t("This title will appear on the Knowledge homepage. It should be 50 characters or less."),
                 "Control" => "textbox",
                 "Options" => [
                     "placeholder" => \Gdn::locale()->translate('How can we help you?'),
                     "maxlength" => self::CHOOSER_TITLE_MAX_LENGTH,
+                ]
+            ],
+            [
+                "VariableName" => "banner.description.text",
+                "ConfigName" => "Knowledge.ChooserDescription",
+                "LabelCode" => self::t("Knowledge Base Description Title"),
+                "Description" => self::t("This description will appear on the Knowledge homepage."),
+                "Control" => "textbox",
+                "Options" => [
+                    "multiline" => true,
+                    "placeholder" => \Gdn::locale()->translate('Welcome to our Knowledge Base. Here you\'ll find answers to common support issues.'),
+                    "maxlength" => self::CHOOSER_DESCRIPTION_MAX_LENGTH,
                 ]
             ],
             [
