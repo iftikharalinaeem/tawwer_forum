@@ -75,14 +75,10 @@ export class HelpCenterHome extends React.Component<IProps> {
             <>
                 <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
                 <FallbackBackUrlSetter url={HomeRoute.url(undefined)} />
-                <Banner
-                    action={bannerAction}
-                    styleOverwrite={{ outerBackgroundImage: bannerImage }}
-                    title={knowledgeBase.name}
-                />
+                <Banner action={bannerAction} title={knowledgeBase.name} />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} />
+                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} hamburger={true} />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}
