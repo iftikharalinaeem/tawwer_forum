@@ -37,6 +37,7 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -99,6 +100,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var EventManager */
     private $eventManager;
 
+    /** @var KnowledgeBasesApiController */
+
+    private $knowledgeApiController;
+
     /**
      * ArticlesApiController constructor
      *
@@ -119,6 +124,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param DiscussionArticleModel $discussionArticleModel
      * @param PageRouteAliasModel $pageRouteAliasModel
      * @param EventManager $eventManager
+     * @param KnowledgeApiController $knowledgeApiController
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -137,7 +143,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         BreadcrumbModel $breadcrumbModel,
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
-        EventManager $eventManager
+        EventManager $eventManager,
+        KnowledgeApiController $knowledgeApiController
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -153,6 +160,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
         $this->eventManager = $eventManager;
+        $this->knowledgeApiController = $knowledgeApiController;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -1149,6 +1157,49 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * @param int $id
+     * @param array $query
+     * @return array
+     */
+    public function get_articlesRelated(int $id, array $query): array {
+        $this->permission("knowledge.articles.add");
+        $query["locale"] = $query["locale"] ?? 'en';
+        $query["limit"] = $query["limit"] ?? 10;
+
+        $in = $this->schema(Schema::parse([
+            "name:s?",
+            "limit:i?",
+            "categoryFallBack:i?",
+            "locale:s?",
+            "minimumArticles:i?"
+        ], "in")->setDescription("Get related Articles"));
+
+        $out = $this->schema([":a" => $this->knowledgeApiController->searchResultSchema()], "out");
+
+        $query = $in->validate($query);
+
+        $article = $this->articleByID($id, true);
+        $knowledgeBase =  $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $article["knowledgeBaseID"]]);
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"];
+
+        $articles = $this->getRelatedArticles($id, $query);
+
+        if ($query["minimumArticles"] ?? null && count($articles) < $query["minimumArticles"]) {
+            $query = [
+                "all" => $article["name"],
+                "locale" => $query["locale"],
+                "siteSectionGroup" => $siteSectionGroup,
+                "limit" => 10
+            ];
+            $articles = $this->getRelatedArticles($id, $query);
+        }
+        $articles = $out->validate($articles);
+
+        return $articles;
+    }
+
+
+    /**
      * Separate article and revision fields from request input and save to the proper resources.
      *
      * @param array $fields
@@ -1474,7 +1525,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
             // Deleted articles have a special permission check.
-            $this->permission('knowledge.articles.add');
+            $this->permission('kb.articles.add');
         }
 
         return $record;
@@ -1520,5 +1571,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "status" => ArticleModel::STATUS_PUBLISHED,
             ]
         );
+    }
+
+    /**
+     * @param int $id
+     * @param array $query
+     * @param array $article
+     * @return array
+     */
+    protected function getRelatedArticles(int $id, array $query): array {
+        $results = $this->knowledgeApiController->get_search($query);
+
+        $articles = $results->getData();
+//        foreach ($articles as $key => $article) {
+//            if ($article["recordID"] === $id) {
+//                unset($articles[$key]);
+//            }
+//        }
+        return $articles;
     }
 }

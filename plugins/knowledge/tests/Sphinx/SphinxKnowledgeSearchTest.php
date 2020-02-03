@@ -174,6 +174,24 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
         $this->expectException(ServerException::class);
         $response = $this->api()->get('/knowledge/search?'.http_build_query($params));
     }
+
+    /**
+     * @depends testData
+     */
+    public function testGetRelatedArticles() {
+        $params = [
+            'knowledgeBaseID' => self::$testData['rootCategory']['knowledgeBaseID']
+        ];
+        $response = $this->api()->get('/knowledge/search?'.http_build_query($params));
+        $result = $response->getBody();
+
+        $article = reset($result);
+        $response = $this->api()->get('/articles/'.$article['recordID'].'/articles-related');
+
+    }
+
+
+
     /**
      * Generate few categories and attach few articles
      */
