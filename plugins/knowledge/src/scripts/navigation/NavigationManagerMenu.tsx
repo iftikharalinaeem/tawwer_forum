@@ -16,6 +16,7 @@ import { px } from "csx";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { modalClasses } from "@library/modal/modalStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
+import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 
 interface IProps {
     className?: string;
@@ -44,6 +45,7 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
+                            <TitleBar hamburger={true} useMobileBackButton={false} />
                             <ul className={classNames("navigationManagerMenu-items", height)}>
                                 <li className={classNames("navigationManagerMenu-item", "isPullLeft", height)}>
                                     <BackLink

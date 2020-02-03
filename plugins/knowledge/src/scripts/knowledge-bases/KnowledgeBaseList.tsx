@@ -14,7 +14,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
-import { tileClasses } from "@vanilla/library/src/scripts/features/tiles/tileStyles";
+import { tileClasses } from "@library/features/tiles/tileStyles";
 import Tiles from "@library/features/tiles/Tiles";
 import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
 

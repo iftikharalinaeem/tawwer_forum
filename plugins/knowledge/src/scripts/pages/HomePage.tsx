@@ -50,7 +50,7 @@ const HomePage = (props: IProps) => {
             <Banner title={title} />
             <Container>
                 <DocumentTitle title={t("Home")}>
-                    <TitleBar hasSubNav />
+                    <TitleBar hamburger={true} useMobileBackButton={false} />
                 </DocumentTitle>
                 <KnowledgeBaseList />
             </Container>
