@@ -13,7 +13,6 @@ use MediaModel;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Gdn_Format;
 use UserModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatCompatTrait;
@@ -37,7 +36,6 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
-use Vanilla\Site\DefaultSiteSection;
 
 /**
  * API controller for managing the articles resource.
@@ -1163,24 +1161,25 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function get_articlesRelated(int $id, array $query): array {
         $this->permission("knowledge.articles.add");
+
         $query["locale"] = $query["locale"] ?? 'en';
         $query["limit"] = $query["limit"] ?? 10;
 
         $in = $this->schema(Schema::parse([
             "name:s?",
             "limit:i?",
-            "categoryFallBack:i?",
             "locale:s?",
             "minimumArticles:i?"
         ], "in")->setDescription("Get related Articles"));
 
         $out = $this->schema([":a" => $this->knowledgeApiController->searchResultSchema()], "out");
-
         $query = $in->validate($query);
+
         $minimumArticles = $query['minimumArticles'] ?? null;
         $article = $this->articleByID($id, true);
         $knowledgeBaseID = $article["knowledgeBaseID"] ?? '';
         $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+        $knowledgeBase = reset($knowledgeBase);
         $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? '';
 
         $query = [
@@ -1202,8 +1201,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             if ($siteSectionGroup) {
                 $query["siteSectionGroup"] = $siteSectionGroup;
             }
-
-            if ($knowledgeBaseID) {
+            else {
                 $query["knowledgeBaseID"] = $knowledgeBaseID;
             }
 
