@@ -16,6 +16,7 @@ import { IResult } from "@library/result/Result";
 import { ResultMeta } from "@library/result/ResultMeta";
 import Loader from "@library/loaders/Loader";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import KbErrorMessages from "@knowledge/modules/common/KbErrorMessages";
 
 interface IProps {}
 
@@ -28,7 +29,7 @@ export function SearchFormResults(props: IProps) {
         case LoadStatus.LOADING:
             return <Loader />;
         case LoadStatus.ERROR:
-            return <KbErrorPage apiError={results.error} />;
+            return <KbErrorMessages apiError={results.error} />;
         case LoadStatus.SUCCESS:
             const { next, prev } = pages;
             let paginationNextClick: React.MouseEventHandler | undefined;
