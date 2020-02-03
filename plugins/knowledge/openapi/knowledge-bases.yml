@@ -87,6 +87,16 @@ paths:
                         - dateInsertedDesc
                       nullable: true
                       type: string
+                    bannerImage:
+                      description: Full URL to a banner background image of the knowledge base.
+                      maxLength: 255
+                      type: string
+                      nullable: true
+                    bannerContentImage:
+                      description: Full URL to a banner content image of the knowledge base.
+                      maxLength: 255
+                      type: string
+                      nullable: true
                     sourceLocale:
                       description: sourceLocale of knowledge base.
                       type: string

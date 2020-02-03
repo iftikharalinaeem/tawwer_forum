@@ -25,7 +25,7 @@ import { bannerVariables } from "@library/banner/bannerStyles";
 import Banner from "@library/banner/Banner";
 
 const HomePage = (props: IProps) => {
-    const splashVars = bannerVariables({});
+    const splashVars = bannerVariables();
     const title = t(splashVars.title.text);
     const { loadStatus, knowledgeBases } = props;
 

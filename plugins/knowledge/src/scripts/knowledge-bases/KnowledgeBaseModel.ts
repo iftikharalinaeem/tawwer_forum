@@ -28,7 +28,8 @@ export interface IKbFormState {
     siteSectionGroup: string | null;
     description: string;
     icon: string | null;
-    bannerImage: string | null;
+    bannerImage?: string | null;
+    bannerContentImage?: string | null;
     viewType: KbViewType;
     sourceLocale: string | null;
     sortArticles: KnowledgeBaseSortMode;
@@ -65,6 +66,7 @@ export const INITIAL_KB_FORM: IKbFormState = {
     description: "",
     icon: null,
     bannerImage: null,
+    bannerContentImage: null,
     viewType: KbViewType.GUIDE,
     sortArticles: KnowledgeBaseSortMode.MANUAL,
     sourceLocale: getCurrentLocale(),
@@ -122,7 +124,8 @@ export interface IKnowledgeBase {
     url: string;
     icon: string;
     status: KnowledgeBaseStatus;
-    bannerImage: string;
+    bannerImage?: string;
+    bannerContentImage?: string;
     sourceLocale: string;
     viewType: KbViewType;
     rootCategoryID: number;
