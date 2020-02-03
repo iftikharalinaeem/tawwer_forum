@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 
 use Garden\StaticCacheTranslationTrait;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\ThemeFeatures;
 
 /**
  * Class containing config-based kludged variables.
@@ -38,6 +39,18 @@ class KnowledgeBaseKludgedVars {
      */
     public function __construct(ConfigurationInterface $config) {
         $this->config = $config;
+    }
+
+    /**
+     * Lazily check if we can use kludge vars.
+     *
+     * We cannot DI this class because it leads to an infinite loop.
+     * Instead we will lazily fetch it.
+     *
+     * @return bool
+     */
+    private function disableKludgedVars(): bool {
+        return \Gdn::themeFeatures()->disableKludgedVars();
     }
 
     /**
@@ -98,6 +111,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getGlobalColors(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "global.mainColors.primary",
@@ -138,6 +154,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getHeaderVars(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "titleBar.colors.bg",
@@ -242,6 +261,9 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getSizingVariables(): array {
+        if ($this->disableKludgedVars()) {
+            return [];
+        }
         return [
             [
                 "VariableName" => "global.middleColumn.width",
