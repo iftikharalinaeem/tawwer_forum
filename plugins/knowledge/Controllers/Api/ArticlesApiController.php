@@ -1155,6 +1155,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+     * Get related articles.
+     *
      * @param int $id
      * @param array $query
      * @return array
@@ -1200,8 +1202,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             if ($siteSectionGroup) {
                 $query["siteSectionGroup"] = $siteSectionGroup;
-            }
-            else {
+            } else {
                 $query["knowledgeBaseID"] = $knowledgeBaseID;
             }
 
