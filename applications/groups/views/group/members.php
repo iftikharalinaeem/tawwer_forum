@@ -8,7 +8,7 @@ $form = $this->Form;
 $pageUrl = groupUrl($this->data('Group'), 'members');
 $memberFilter = Gdn::request()->get('memberFilter');
 
-echo $form->open(['action' => $pageUrl, 'method' => 'get']);
+echo $form->open(['action' => $pageUrl, 'method' => 'get', 'class' => 'groupsMemberFilter']);
 ?>
 <div class="group-members-filter-box">
     <?php echo $form->textBox('memberFilter', [
