@@ -202,3 +202,17 @@ export interface IArticleTranslation {
     sourceLocale: string;
     translationStatus: ArticleTranslationStatus;
 }
+
+export interface IRelatedArticle {
+    name: string;
+    body: string;
+    url: string;
+    insertUserID: number;
+    updateUserID: number;
+    dateInserted: string;
+    dateUpdated: string;
+    knowledgeCategoryID: number;
+    status: PublishStatus;
+    recordID: number;
+    recordType: string;
+}

@@ -29,6 +29,7 @@ import {
     IPostArticleDraftResponse,
     IPostArticleRequestBody,
     IPostArticleResponseBody,
+    IRelatedArticle,
 } from "@knowledge/@types/api/article";
 import {
     IGetArticleRevisionsRequestBody,
@@ -45,7 +46,7 @@ import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
-import { ISearchResponseBody } from "@knowledge/@types/api/search";
+import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -137,18 +138,17 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public static readonly GET_RELATED_ARTICLES_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     public static readonly GET_RELATED_ARTICLES_ERROR = "@@article/GET_ARTICLE_ERROR";
 
-    public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, ISearchResponseBody, IApiError>(
+    public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, IRelatedArticle, IApiError>(
         "GET_RELATED_ARTICLES",
     );
 
-    public getRelatedArticles = (params: IRelatedArticles) => {
-        const { articleID, ...query } = params;
+    public getRelatedArticles = (query: IRelatedArticles) => {
+        const { articleID, ...params } = query;
 
-        console.log(query);
         const apiThunk = bindThunkAction(ArticleActions.getRelatedArticleACs, async () => {
-            const response = await this.api.get(`/articles/${articleID}/articlesRelated`, { query });
+            const response = await this.api.get(`/articles/${articleID}/articlesRelated`, { params });
             return response.data;
-        })(params);
+        })(query);
         return this.dispatch(apiThunk);
     };
 

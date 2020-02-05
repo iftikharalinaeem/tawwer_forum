@@ -4,7 +4,13 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocale } from "@knowledge/@types/api/article";
+import {
+    IArticle,
+    IArticleFragment,
+    IResponseArticleDraft,
+    IArticleLocale,
+    IRelatedArticle,
+} from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -14,7 +20,7 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import {ISearchResponseBody} from "@knowledge/@types/api/search";
+import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
 
 export interface IArticleState {
     articlesByID: {
@@ -36,10 +42,9 @@ export interface IArticleState {
         [draftID: number]: IResponseArticleDraft;
     };
     relatedArticlesLoadable: {
-        [articleID: number]: ILoadable<ISearchResponseBody[]>;
+        [articleID: number]: ILoadable<IRelatedArticle[]>;
     };
     articleIDsWithTranslationFallback: number[];
-
 }
 
 type ReducerType = KnowledgeReducer<IArticleState>;
@@ -105,21 +110,6 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     public static selectDraft(state: IKnowledgeAppStoreState, draftID: number): IResponseArticleDraft | null {
         const stateSlice = this.stateSlice(state);
         return stateSlice.draftsByID[draftID] || null;
-    }
-
-    /**
-     * Select an article draft out of the stored drafts.
-     *
-     * @param state A full state instance.
-     * @param articleID The ID of the draft to select.
-     */
-    public static selectRelatedArticles(state: IKnowledgeAppStoreState, articleID: number): ILoadable<unknown[]> {
-        const stateSlice = this.stateSlice(state);
-        return (
-            stateSlice.relatedArticlesLoadable[articleID] || {
-                status: LoadStatus.PENDING,
-            }
-        );
     }
 
     /**
@@ -229,7 +219,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
             .case(ArticleActions.getArticleLocalesACs.started, (nextState, payload) => {
                 const existing = nextState.articleLocalesByID[payload.articleID] || {};
                 nextState.articleLocalesByID[payload.articleID] = {
-                        ...existing,
+                    ...existing,
                     status: LoadStatus.LOADING,
                 };
                 return nextState;

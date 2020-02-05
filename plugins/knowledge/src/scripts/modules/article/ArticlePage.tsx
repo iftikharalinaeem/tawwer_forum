@@ -213,7 +213,9 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
         articlelocales: article.data ? ArticleModel.selectArticleLocale(state, article.data.articleID) : null,
-        relatedArticles: article.data ? state.knowledge.articles.relatedArticlesLoadable[article.data.articleID].data : null,
+        relatedArticles: article.data
+            ? state.knowledge.articles.relatedArticlesLoadable[article.data.articleID].data
+            : null,
         notifyTranslationFallback,
     };
 }

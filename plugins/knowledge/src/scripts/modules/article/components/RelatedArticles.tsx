@@ -6,8 +6,9 @@
 
 import * as React from "react";
 
-import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
+import { ISearchResult } from "@knowledge/@types/api/search";
 import SmartLink from "@library/routing/links/SmartLink";
+import { IRelatedArticle } from "@knowledge/@types/api/article";
 
 export interface ICard {
     image?: string;
@@ -17,7 +18,7 @@ export interface ICard {
 }
 
 interface IProps {
-    articles: ISearchResult[];
+    articles: IRelatedArticle[];
 }
 
 /**
@@ -30,13 +31,15 @@ export default function RelatedArticles(props: IProps) {
         <>
             <h3>Related Articles</h3>
             <ul>
-                {articles.map(article => {
-                    return (
-                        <li key={article.recordID}>
-                            <SmartLink to={article.url}>{article.name}</SmartLink>
-                        </li>
-                    );
-                })}
+                {articles
+                    .filter((article, index) => index <= 4)
+                    .map(article => {
+                        return (
+                            <li key={article.recordID}>
+                                <SmartLink to={article.url}>{article.name}</SmartLink>
+                            </li>
+                        );
+                    })}
             </ul>
         </>
     );

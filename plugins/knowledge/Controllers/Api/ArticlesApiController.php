@@ -1191,7 +1191,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "limit" => 10
         ];
 
-        $articles = $this->getRelatedArticles($id, $query);
+        $articles = $this->queryRelatedArticles($id, $query);
 
         if (count($articles) < $minimumArticles) {
             $query = [
@@ -1206,7 +1206,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $query["knowledgeBaseID"] = $knowledgeBaseID;
             }
 
-            $articles = $this->getRelatedArticles($id, $query);
+            $articles = $this->queryRelatedArticles($id, $query);
         }
 
         $articles = $out->validate($articles);
@@ -1597,7 +1597,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @return array
      */
-    protected function getRelatedArticles(int $id, array $query): array {
+    protected function queryRelatedArticles(int $id, array $query): array {
         $results = $this->knowledgeApiController->get_search($query);
 
         $articles = $results->getData();

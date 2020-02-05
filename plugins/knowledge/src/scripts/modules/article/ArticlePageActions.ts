@@ -71,7 +71,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             articleID: articleID,
             locale: getCurrentLocale(),
             limit: 10,
-            minimumArticles: 10,
+            minimumArticles: 5,
         });
 
         return article;
