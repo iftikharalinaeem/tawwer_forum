@@ -13,6 +13,9 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { getMeta } from "@library/utility/appUtils";
 import { ProductSearchFormFilter } from "@subcommunities/forms/ProductSeachFormFilter";
 import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
+import { addHamburgerNavGroup } from "@vanilla/library/src/scripts/flyouts/Hamburger";
+import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 const providerArgs = {
     hideNoProductCommunities: getMeta("featureFlags.SubcommunityProducts.Enabled"),
@@ -31,17 +34,16 @@ TitleBar.registerBeforeMeBox(() => {
     );
 });
 
-TitleBarNav.addNavItem(() => {
-    const device = useDevice();
-
-    if (device !== Devices.MOBILE && device !== Devices.XS) {
-        return null;
-    }
-
+addHamburgerNavGroup(() => {
     return (
-        <CommunityFilterContext.Provider value={providerArgs}>
-            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
-        </CommunityFilterContext.Provider>
+        <>
+            <DropDownItemSeparator />
+            <SubcommunityChooserDropdown
+                buttonType={ButtonTypes.CUSTOM}
+                buttonClass={dropDownClasses().action}
+                fullWidth
+            />
+        </>
     );
 });
 

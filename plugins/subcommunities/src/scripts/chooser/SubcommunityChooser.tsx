@@ -13,14 +13,18 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
-import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
+import {
+    subcommunityChooserClasses,
+    subcommunityChooserVariables,
+} from "@subcommunities/chooser/subcommunityChooserStyles";
 import {
     useCurrentSubcommunity,
     useAvailableSubcommunityLocales,
 } from "@subcommunities/subcommunities/subcommunitySelectors";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
-import { useLocaleInfo } from "@vanilla/i18n";
+import { useLocaleInfo, t } from "@vanilla/i18n";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 type SectionName = "locale" | "product";
 
@@ -28,7 +32,6 @@ interface IDropdownProps {
     buttonType?: ButtonTypes;
     fullWidth?: boolean;
     buttonClass?: string;
-    forceIcon?: boolean;
 }
 
 export function SubcommunityChooserDropdown(props: IDropdownProps) {
@@ -46,11 +49,25 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
 
     const hasMultipleLocales = Object.values(availableLocales).length > 1;
 
+    const { options } = subcommunityChooserVariables();
     const classes = subcommunityChooserClasses();
 
+    const forceIcon = options.forceIcon && !props.fullWidth;
+
     let toggleName: React.ReactNode = <GlobeIcon />;
-    if (hasMultipleLocales && subcommunity && !props.forceIcon) {
+    if (hasMultipleLocales && subcommunity && !forceIcon) {
         toggleName = `${subcommunity.name} (${subcommunity.locale}) `;
+    } else if (props.fullWidth) {
+        toggleName = t("Language");
+    }
+
+    if (props.fullWidth) {
+        toggleName = (
+            <>
+                <GlobeIcon className={dropDownClasses().actionIcon} />
+                {toggleName}
+            </>
+        );
     }
 
     return (
@@ -61,14 +78,12 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
             isSmall
             flyoutType={FlyoutType.FRAME}
             buttonBaseClass={props.buttonType || ButtonTypes.STANDARD}
-            toggleButtonClassName={classNames(props.fullWidth && classes.toggleFullWidth, props.buttonClass)}
+            toggleButtonClassName={classNames(props.buttonClass)}
             openDirection={DropDownOpenDirection.AUTO}
             buttonContents={
-                <span className={classNames(classes.toggle)}>
+                <span className={classNames(classes.toggle, props.fullWidth && classes.toggleFullWidth)}>
                     {toggleName}
-                    <DownTriangleIcon
-                        className={classNames(classes.toggleArrow, props.fullWidth && classes.toggleArrowFullWidth)}
-                    />
+                    {!props.fullWidth && <DownTriangleIcon className={classNames(classes.toggleArrow)} />}
                 </span>
             }
         >
@@ -132,9 +147,9 @@ export function SubcommunityChooser(props: {
     useEffect(() => {
         if (currentLocale) {
             setSelectedLocale(currentLocale);
-            props.setActiveSection("product");
+            setActiveSection("product");
         }
-    }, [subcommunity]);
+    }, [currentLocale, setActiveSection, subcommunity]);
 
     const [communityID] = useState<number | null>(null);
 

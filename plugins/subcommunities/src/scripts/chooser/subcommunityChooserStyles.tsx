@@ -16,6 +16,10 @@ export const subcommunityChooserVariables = useThemeCache(() => {
     const vars = variableFactory("subcommunityChooser");
     const titleBarVars = titleBarVariables();
 
+    const options = vars("options", {
+        forceIcon: titleBarVars.navAlignment.alignment === "center",
+    });
+
     const arrow = vars("arrow", {
         size: 12,
         margin: 6,
@@ -28,7 +32,7 @@ export const subcommunityChooserVariables = useThemeCache(() => {
         height: 0, // IE11 compat.
     });
 
-    return { arrow, toggle };
+    return { arrow, toggle, options };
 });
 
 export const subcommunityChooserClasses = useThemeCache(() => {
@@ -51,15 +55,6 @@ export const subcommunityChooserClasses = useThemeCache(() => {
 
     const toggleArrow = style("toggleArrow", {
         ...margins({ horizontal: unit(4) }),
-    });
-
-    const toggleArrowFullWidth = style("toggleArrowFullWidth", {
-        // absolute
-        position: "absolute",
-        right: unit(buttonGlobalVariables().padding.side),
-        top: 0,
-        bottom: 0,
-        ...margins({ vertical: "auto" }),
     });
 
     const rowMixin: NestedCSSProperties = {
@@ -119,7 +114,6 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         toggle,
         toggleFullWidth,
         toggleArrow,
-        toggleArrowFullWidth,
         row,
         rowArrow,
         rowIndented,
