@@ -33,7 +33,7 @@ import Permission from "@library/features/users/Permission";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
-import { generateNavItems } from "@library/headers/navigationVariables";
+import { registerDefaultNavItem } from "@library/headers/navigationVariables";
 
 debug(getMeta("context.debug"));
 
@@ -71,7 +71,18 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
     );
 });
 
-generateNavItems();
+const kbEnabled = getMeta('siteSection.apps.knowledgeBase', true);
+const forumEnabled = getMeta('siteSection.apps.forum', true);
+
+if (kbEnabled && forumEnabled) {
+    registerDefaultNavItem(() => {
+        return {
+            children: t("Help Menu", "Help"),
+            permission: "kb.view",
+            to: "/kb",
+        };
+    });
+}
 
 onReady(() => {
     initAllUserContent();

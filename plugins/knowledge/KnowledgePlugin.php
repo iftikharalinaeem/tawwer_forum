@@ -173,8 +173,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function base_render_before($sender) {
         $menu  = is_object($sender) ? $sender->Menu ?? null : null;
-        $apps = $this->siteSectionModel->getCurrentSiteSection()->applications();
-        if ($apps[SiteSectionInterface::APP_KB] ?? false) {
+        $kbEnabled = $this->siteSectionModel->getCurrentSiteSection()->applicationEnabled(SiteSectionInterface::APP_KB);
+        if ($kbEnabled) {
             if (is_object($menu) && $this->session->checkPermission('knowledge.kb.view')) {
                 $menu->addLink('Help', t('Help Menu', 'Help'), '/kb/', false, ['class' => 'Knowledge']);
             }

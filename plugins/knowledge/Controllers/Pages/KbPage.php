@@ -141,8 +141,8 @@ abstract class KbPage extends ThemedPage {
      * @inheritdoc
      */
     public function render(): Data {
-        $apps = $this->siteSectionModel->getCurrentSiteSection()->applications();
-        if (!$apps[SiteSectionInterface::APP_KB]) {
+        $kbEnabled = $this->siteSectionModel->getCurrentSiteSection()->applicationEnabled(SiteSectionInterface::APP_KB);
+        if (!$kbEnabled) {
             throw new NotFoundException();
         }
         if ($this->siteMeta->getDebugModeEnabled() && !$this->siteSectionValidated) {
