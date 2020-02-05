@@ -91,7 +91,7 @@ $params = [
     'method' => $method,
     'arguments' => null,
     'headers' => $headers,
-    'secure' => false,
+    'secure' => true,
     'hub' => true,
     'nodes' => false
 ];
