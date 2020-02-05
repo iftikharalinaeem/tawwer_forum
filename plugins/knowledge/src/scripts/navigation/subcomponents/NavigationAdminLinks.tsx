@@ -23,6 +23,7 @@ import DropDownSection from "@vanilla/library/src/scripts/flyouts/items/DropDown
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
 import DropDownItemLink from "@vanilla/library/src/scripts/flyouts/items/DropDownItemLink";
 import DropDownItemButton from "@vanilla/library/src/scripts/flyouts/items/DropDownItemButton";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 interface IProps {
     className?: string;
@@ -61,7 +62,7 @@ export default function NavigationAdminLinks(props: IProps) {
     if (props.inHamburger) {
         newCategoryButton = (
             <DropDownItemButton onClick={openModal} buttonRef={categoryButtonRef} disabled={isDisabled}>
-                <NewFolderIcon className={classes.linkIcon} />
+                <NewFolderIcon className={dropDownClasses().actionIcon} />
                 {t("New Category")}
             </DropDownItemButton>
         );
@@ -90,7 +91,7 @@ export default function NavigationAdminLinks(props: IProps) {
             <>
                 <DropDownItemSeparator />
                 <DropDownItemLink to={OrganizeCategoriesRoute.url({ kbID: knowledgeBase.knowledgeBaseID })}>
-                    {organize(classes.linkIcon)}
+                    {organize(dropDownClasses().actionIcon)}
                     {t("Organize Categories")}
                 </DropDownItemLink>
                 {newCategoryButton}

@@ -48,7 +48,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     />
                     <DropDownItemSeparator />
                     <DropDownItem>
-                        <RevisionsRoute.Link data={article} className={classesDropDown.action()}>
+                        <RevisionsRoute.Link data={article} className={classesDropDown.action}>
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>
