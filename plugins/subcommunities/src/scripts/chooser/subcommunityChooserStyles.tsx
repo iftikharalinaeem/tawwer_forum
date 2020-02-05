@@ -42,6 +42,7 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         alignItems: "center",
         lineHeight: unit(vars.toggle.lineHeight),
         fontWeight: globalVars.fonts.weights.normal,
+        color: colorOut(vars.toggle.color),
     });
 
     const toggleFullWidth = style("toggleFullWidth", {
@@ -111,7 +112,7 @@ export const subcommunityChooserClasses = useThemeCache(() => {
     });
 
     const check = style("check", {
-        color: colorOut(globalVars.mainColors.primary),
+        color: "inherit",
     });
 
     return {
