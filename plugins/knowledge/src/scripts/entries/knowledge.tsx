@@ -53,7 +53,7 @@ const render = () => {
 };
 
 UserDropDownContents.registerBeforeUserDropDown(props => {
-    const kbEnabled = getMeta('siteSection.apps.knowledgeBase');
+    const kbEnabled = getMeta('siteSection.apps.knowledgeBase', true);
 
     if (!kbEnabled) {
         return null;
