@@ -67,7 +67,17 @@ export default function CategoriesLayout(props: IProps) {
 
     return (
         <Container>
-            <TitleBar useMobileBackButton={true} hamburger={true} />
+            <TitleBar
+                extraBurgerNavigation={
+                    <Navigation
+                        inHamburger
+                        collapsible={true}
+                        activeRecord={activeRecord}
+                        kbID={category.knowledgeBaseID}
+                    />
+                }
+                useMobileBackButton={true}
+            />
             <PanelLayout
                 breadcrumbs={
                     (device === Devices.XS || device === Devices.MOBILE) && category.breadcrumbs
