@@ -60,8 +60,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
                     renderLeft={true}
-                    openAsModal={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}
-                    title={isMobile ? t("Article") : undefined}
+                    mobileTitle={t("Article")}
                     flyoutType={FlyoutType.LIST}
                 >
                     <InsertUpdateMetas

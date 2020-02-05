@@ -21,6 +21,7 @@ import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/
 import { getCurrentLocale } from "@vanilla/i18n";
 import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
+import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -68,30 +69,51 @@ export function Navigation(props: IProps) {
     const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
     const title = hasTitle ? t("Subcategories") : undefined;
 
-    return (
-        <SiteNav
-            title={title}
-            hiddenTitle={hasTitle}
-            collapsible={props.collapsible!}
-            activeRecord={props.activeRecord}
-            bottomCTA={
-                <NavigationAdminLinks
-                    knowledgeBase={props.knowledgeBase.data!}
-                    showDivider={navItems.data!.length > 0}
+    if (props.inHamburger) {
+        const adminLinks = (
+            <NavigationAdminLinks
+                inHamburger={props.inHamburger}
+                knowledgeBase={knowledgeBase.data}
+                showDivider={true}
+            />
+        );
+
+        if (navItems.data.length > 0) {
+            return (
+                <DropDownPanelNav
+                    title={title ?? knowledgeBase.data.name}
+                    navItems={navItems.data}
+                    isNestable={props.collapsible}
+                    afterNavSections={adminLinks}
                 />
-            }
-            onItemHover={preloadItem}
-            clickableCategoryLabels={clickableCategoryLabels}
-        >
-            {navItems.data}
-        </SiteNav>
-    );
+            );
+        } else {
+            return adminLinks;
+        }
+    } else {
+        return (
+            <SiteNav
+                title={title}
+                hiddenTitle={hasTitle}
+                collapsible={props.collapsible}
+                activeRecord={props.activeRecord}
+                bottomCTA={
+                    <NavigationAdminLinks knowledgeBase={knowledgeBase.data} showDivider={navItems.data.length > 0} />
+                }
+                onItemHover={preloadItem}
+                clickableCategoryLabels={clickableCategoryLabels}
+            >
+                {navItems.data}
+            </SiteNav>
+        );
+    }
 }
 
 interface IOwnProps {
     activeRecord: IActiveRecord;
     collapsible: boolean;
     kbID: number;
+    inHamburger?: boolean;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;

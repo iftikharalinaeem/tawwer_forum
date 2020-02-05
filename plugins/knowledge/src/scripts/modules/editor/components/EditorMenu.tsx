@@ -37,7 +37,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     id={this.domID}
                     name={t("Article Options")}
                     buttonClassName={this.props.buttonClassName}
-                    renderLeft={true}
+                    mobileTitle={t("Article")}
                     flyoutType={FlyoutType.LIST}
                 >
                     <InsertUpdateMetas
@@ -48,7 +48,7 @@ export default class EditorMenu extends React.PureComponent<IProps> {
                     />
                     <DropDownItemSeparator />
                     <DropDownItem>
-                        <RevisionsRoute.Link data={article} className={classesDropDown.action}>
+                        <RevisionsRoute.Link data={article} className={classesDropDown.action()}>
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>
