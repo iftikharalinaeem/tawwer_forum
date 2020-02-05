@@ -5,17 +5,8 @@
  */
 
 import * as React from "react";
-
-import { ISearchResult } from "@knowledge/@types/api/search";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IRelatedArticle } from "@knowledge/@types/api/article";
-
-export interface ICard {
-    image?: string;
-    title: string;
-    description: string;
-    url: string;
-}
 
 interface IProps {
     articles: IRelatedArticle[];

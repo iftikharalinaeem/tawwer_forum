@@ -41,7 +41,7 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import ReduxActions, { ActionsUnion, bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
@@ -529,8 +529,4 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             );
         }
     };
-}
-
-export function useArticleActions() {
-    return useReduxActions(ArticleActions);
 }

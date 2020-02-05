@@ -11,7 +11,6 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
-import { dummyRecommendedArticlesWithImage } from "@library/features/articleCards/recommendedArticle.storyData";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
