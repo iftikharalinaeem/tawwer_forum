@@ -537,17 +537,7 @@ EOT
         }
         //Get tag values from form and append default status.
         if ($sender->Form->authenticatedPostBack()) {
-            $defaultStatus = val('TagID', StatusModel::instance()->getDefaultStatus());
-            $userTags = $sender->Form->getFormValue('Tags');
-            $tags = "";
-            if ($defaultStatus) {
-                $tags = "$defaultStatus,";
-            }
-            if ($userTags) {
-                $tags .= $userTags;
-            }
-            $sender->Form->setFormValue('Tags', $tags);
-            $sender->setData('Tags', $tags);
+            $sender->setData('Tags', $sender->Form->getFormValue('Tags'));
         }
 
         $sender->setData('Type', 'Idea');
@@ -628,6 +618,22 @@ EOT
             'plural' => 'Statuses',
             'addtag' => false
         ]);
+    }
+
+
+    public function taggingPlugin_saveDiscussion_handler($sender, $args) {
+//        Gdn::pluginManager()->fireAs('TaggingPlugin')->fireEvent('SaveDiscussion', [
+//            'Data' => $formPostValues,
+//            'Tags' => &$formTags,
+//            'Types' => &$types,
+//            'CategoryID' => $categoryID,
+//        ]);
+
+        $type = $args['Data']['Type'] ?? '';
+        $isNew = $args['Data']['IsNewDiscussion'] ?? '';
+        if (strcasecmp($type, 'idea') === 0 && $isNew) {
+            $args['Tags'][] = val('TagID', StatusModel::instance()->getDefaultStatus());
+        }
     }
 
     /**
