@@ -81,6 +81,7 @@ export function Navigation(props: IProps) {
         if (navItems.data.length > 0) {
             return (
                 <DropDownPanelNav
+                    activeRecord={props.activeRecord}
                     title={title ?? knowledgeBase.data.name}
                     navItems={navItems.data}
                     isNestable={props.collapsible}
