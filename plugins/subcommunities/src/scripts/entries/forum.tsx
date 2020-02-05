@@ -31,7 +31,7 @@ addComponent("subcommunity-chooser", ChooserWithProvider);
 TitleBar.registerBeforeMeBox(() => {
     return (
         <CommunityFilterContext.Provider value={providerArgs}>
-            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} forceIcon={true} />
+            <SubcommunityChooserDropdown buttonType={ButtonTypes.TITLEBAR_LINK} />
         </CommunityFilterContext.Provider>
     );
 });
