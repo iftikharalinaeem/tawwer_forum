@@ -62,6 +62,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('IsDefault', 'tinyint(1)', true, 'unique.IsDefault')
             ->column('ProductID', 'smallint', true)
             ->column('defaultController', 'varchar(30)', true)
+            ->column('knowledgeBase', 'tinyint(1)', true)
+            ->column('forum', 'tinyint(1)', true)
             ->set();
 
         Gdn::structure()

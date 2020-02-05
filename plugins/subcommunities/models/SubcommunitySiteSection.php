@@ -53,6 +53,9 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var array $defaultRoute */
     private $defaultRoute;
 
+    /** @var array $apps */
+    private $apps;
+
     /**
      * DI.
      *
@@ -74,6 +77,10 @@ class SubcommunitySiteSection implements SiteSectionInterface {
             ? $subcommunity["defaultController"]
             : $config->get('Routes.DefaultController');
         $this->defaultRoute = $router->parseRoute($configDefaultController);
+        $forumApp = $subcommunity[self::APP_FORUM] ?? $config->get('Vanilla.Forum.Disabled');
+        $this->apps[self::APP_FORUM] = ($forumApp != 1);
+        $kbApp = $subcommunity[self::APP_KB] ?? false;
+        $this->apps[self::APP_KB] = ($kbApp != 1);
     }
 
     /**
@@ -123,5 +130,26 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      */
     public function getDefaultRoute(): array {
         return $this->defaultRoute;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applications(): array {
+        return $this->apps;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applicationEnabled(string $app): bool {
+        return $this->apps[$app] ?? true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setApplication(string $app, bool $enable = true) {
+        $this->apps[$app] = $enable;
     }
 }
