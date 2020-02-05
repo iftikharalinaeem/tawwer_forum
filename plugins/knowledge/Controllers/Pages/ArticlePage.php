@@ -79,6 +79,9 @@ class ArticlePage extends KbPage {
         $translationResponse = $this->articlesApi->get_translations($articleID, []);
         $translationData = Data::box($translationResponse);
 
+        $relatedArticlesResponse = $this->articlesApi->get_articlesRelated($articleID, []);
+        $relatedArticlesResponse = Data::box($relatedArticlesResponse);
+
         // Add translation meta tags for alternative language versions.
         foreach ($translationData->getData() as $translation) {
             $this->addLinkTag([
@@ -92,6 +95,13 @@ class ArticlePage extends KbPage {
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ARTICLE_LOCALES,
             $translationData,
+            ['articleID' => $articleID]
+        ));
+
+        // Preload the data for the frontend.
+        $this->addReduxAction(new ReduxAction(
+            ActionConstants::GET_RELATED_ARTICLES,
+            $relatedArticlesResponse,
             ['articleID' => $articleID]
         ));
     }

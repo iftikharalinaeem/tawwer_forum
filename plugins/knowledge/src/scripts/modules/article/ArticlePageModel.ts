@@ -11,7 +11,6 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import clone from "lodash/clone";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { ArticlePage } from "@knowledge/modules/article/ArticlePage";
 
 export interface IArticlePageState {
     articleID: number | null;

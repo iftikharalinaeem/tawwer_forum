@@ -26,6 +26,9 @@ import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { PanelBackground } from "@library/layout/PanelBackground";
+import RelatedArticles from "@knowledge/modules/article/components/RelatedArticles";
+import ArticleCards from "@library/features/articleCards/AricleCards";
+import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
 
 /**
  * Implements the article's layout
@@ -40,6 +43,7 @@ export class ArticleLayout extends React.Component<IProps> {
             nextNavArticle,
             prevNavArticle,
             articlelocales,
+            relatedArticles,
         } = this.props;
 
         const { articleID } = article;
@@ -136,6 +140,9 @@ export class ArticleLayout extends React.Component<IProps> {
                                         />
                                     </PanelWidget>
                                 )}
+                                <PanelWidget>
+                                    <RelatedArticles articles={relatedArticles} />
+                                </PanelWidget>
                             </>
                         }
                         rightTop={
@@ -168,6 +175,7 @@ interface IProps extends IDeviceProps {
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
     articlelocales: IArticleLocale[];
+    relatedArticles: ISearchResponseBody[];
 }
 
 export default withDevice(ArticleLayout);

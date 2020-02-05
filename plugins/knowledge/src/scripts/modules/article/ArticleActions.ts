@@ -40,11 +40,12 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
+import { ISearchResponseBody } from "@knowledge/@types/api/search";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -55,6 +56,13 @@ const createAction = actionCreatorFactory("@@article");
 interface IHelpfulParams {
     articleID: number;
     helpful: "yes" | "no";
+}
+
+export interface IRelatedArticles {
+    articleID: number;
+    locale: string;
+    limit: number;
+    minimumArticles: number;
 }
 
 /**
@@ -123,6 +131,25 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             page,
         };
         return this.dispatchApi("get", `/articles`, ArticleActions.getArticlesACs, query);
+    };
+
+    public static readonly GET_RELATED_ARTICLES_REQUEST = "@@article/GET_ARTICLE_REQUEST";
+    public static readonly GET_RELATED_ARTICLES_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
+    public static readonly GET_RELATED_ARTICLES_ERROR = "@@article/GET_ARTICLE_ERROR";
+
+    public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, ISearchResponseBody, IApiError>(
+        "GET_RELATED_ARTICLES",
+    );
+
+    public getRelatedArticles = (params: IRelatedArticles) => {
+        const { articleID, ...query } = params;
+
+        console.log(query);
+        const apiThunk = bindThunkAction(ArticleActions.getRelatedArticleACs, async () => {
+            const response = await this.api.get(`/articles/${articleID}/articlesRelated`, { query });
+            return response.data;
+        })(params);
+        return this.dispatch(apiThunk);
     };
 
     public static readonly PATCH_ARTICLE_STATUS_REQUEST = "@@article/PATCH_ARTICLE_STATUS_REQUEST";
@@ -502,4 +529,8 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             );
         }
     };
+}
+
+export function useArticleActions() {
+    return useReduxActions(ArticleActions);
 }

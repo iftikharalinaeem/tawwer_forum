@@ -11,6 +11,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
+import { dummyRecommendedArticlesWithImage } from "@library/features/articleCards/recommendedArticle.storyData";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
@@ -60,13 +61,19 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             if (!articleResponse) {
                 return;
             }
-
             article = articleResponse;
         }
 
         await this.articleActions.fetchLocales({ articleID });
         const kbID = article.knowledgeBaseID;
         await this.navigationActions.getNavigationFlat(kbID);
+        await this.articleActions.getRelatedArticles({
+            articleID: articleID,
+            locale: getCurrentLocale(),
+            limit: 10,
+            minimumArticles: 10,
+        });
+
         return article;
     };
 }
