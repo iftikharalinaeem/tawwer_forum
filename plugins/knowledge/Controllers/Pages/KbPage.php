@@ -11,6 +11,7 @@ use Garden\EventManager;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Knowledge\Models\SearchJsonLD;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Exception\Database\NoResultsException;
@@ -140,6 +141,10 @@ abstract class KbPage extends ThemedPage {
      * @inheritdoc
      */
     public function render(): Data {
+        $apps = $this->siteSectionModel->getCurrentSiteSection()->applications();
+        if (!$apps[SiteSectionInterface::APP_KB]) {
+            throw new NotFoundException();
+        }
         if ($this->siteMeta->getDebugModeEnabled() && !$this->siteSectionValidated) {
             throw new ServerException(
                 "Site Section must be validated.",

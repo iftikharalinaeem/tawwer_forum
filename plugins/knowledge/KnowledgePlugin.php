@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge;
 
 use Garden\Container\Reference;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
@@ -25,6 +26,7 @@ use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -43,6 +45,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var KnowledgeBaseModel $kbModel */
     private $kbModel;
 
+    /** @var SiteSectionModel $siteSectionModel */
+    private $siteSectionModel;
+
     /**
      * KnowledgePlugin constructor.
      *
@@ -50,18 +55,21 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param SessionInterface $session
      * @param \Gdn_Request $request
      * @param KnowledgeBaseModel $kbModel
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         \Gdn_Database $database,
         SessionInterface $session,
         \Gdn_Request $request,
-        KnowledgeBaseModel $kbModel
+        KnowledgeBaseModel $kbModel,
+        SiteSectionModel $siteSectionModel
     ) {
         parent::__construct();
         $this->database = $database;
         $this->session = $session;
         $this->request = $request;
         $this->kbModel = $kbModel;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -165,8 +173,11 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function base_render_before($sender) {
         $menu  = is_object($sender) ? $sender->Menu ?? null : null;
-        if (is_object($menu) && $this->session->checkPermission('knowledge.kb.view')) {
-            $menu->addLink('Help', t('Help Menu', 'Help'), '/kb/', false, ['class' => 'Knowledge']);
+        $apps = $this->siteSectionModel->getCurrentSiteSection()->applications();
+        if ($apps[SiteSectionInterface::APP_KB] ?? false) {
+            if (is_object($menu) && $this->session->checkPermission('knowledge.kb.view')) {
+                $menu->addLink('Help', t('Help Menu', 'Help'), '/kb/', false, ['class' => 'Knowledge']);
+            }
         }
     }
 

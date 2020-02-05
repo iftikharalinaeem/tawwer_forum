@@ -33,7 +33,7 @@ import Permission from "@library/features/users/Permission";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
-import { registerDefaultNavItem } from "@library/headers/navigationVariables";
+import { generateNavItems } from "@library/headers/navigationVariables";
 
 debug(getMeta("context.debug"));
 
@@ -53,6 +53,11 @@ const render = () => {
 };
 
 UserDropDownContents.registerBeforeUserDropDown(props => {
+    const kbEnabled = getMeta('siteSection.apps.knowledgeBase');
+
+    if (!kbEnabled) {
+        return null;
+    }
     return (
         <Permission permission="articles.add">
             <DropDownSection title={t("Articles")}>
@@ -66,13 +71,7 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
     );
 });
 
-registerDefaultNavItem(() => {
-    return {
-        children: t("Help Menu", "Help"),
-        permission: "kb.view",
-        to: "/kb",
-    };
-});
+generateNavItems();
 
 onReady(() => {
     initAllUserContent();

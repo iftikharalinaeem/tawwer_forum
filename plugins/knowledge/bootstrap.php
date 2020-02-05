@@ -19,4 +19,11 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
             ]
         ]
     )
+    ->addCall(
+        'registerApplication',
+        [
+            'knowledgeBase',
+            ['name' => 'Knowledge Base']
+        ]
+    )
 ;
