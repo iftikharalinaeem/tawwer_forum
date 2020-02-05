@@ -24,7 +24,7 @@ import KnowledgeApp from "@knowledge/KnowledgeApp";
 import { Router } from "@library/Router";
 import { getPageRoutes } from "@knowledge/routes/pageRoutes";
 import { AppContext } from "@library/AppContext";
-import { mountReact } from "@vanilla/react-utils";
+import { mountReact, applySharedPortalContext } from "@vanilla/react-utils";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { serverReducer } from "@knowledge/server/serverReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
@@ -37,6 +37,10 @@ import { registerDefaultNavItem } from "@library/headers/navigationVariables";
 
 debug(getMeta("context.debug"));
 
+applySharedPortalContext(props => {
+    return <AppContext errorComponent={<KbErrorPage />}>{props.children}</AppContext>;
+});
+
 apiv2.interceptors.response.use(deploymentKeyMiddleware);
 Router.addRoutes(getPageRoutes());
 
@@ -44,12 +48,7 @@ registerReducer("server", serverReducer);
 registerReducer("knowledge", kbReducer);
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;
-    mountReact(
-        <AppContext errorComponent={<KbErrorPage />}>
-            <KnowledgeApp />
-        </AppContext>,
-        app,
-    );
+    mountReact(<KnowledgeApp />, app);
 };
 
 UserDropDownContents.registerBeforeUserDropDown(props => {
