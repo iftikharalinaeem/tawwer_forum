@@ -45,7 +45,7 @@ export default class NavigationManagerMenu extends React.Component<IProps> {
                 <Container>
                     <PanelArea>
                         <PanelWidgetHorizontalPadding>
-                            <TitleBar hamburger={true} useMobileBackButton={false} />
+                            <TitleBar useMobileBackButton={false} />
                             <ul className={classNames("navigationManagerMenu-items", height)}>
                                 <li className={classNames("navigationManagerMenu-item", "isPullLeft", height)}>
                                     <BackLink
