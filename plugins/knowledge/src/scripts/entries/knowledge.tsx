@@ -53,7 +53,7 @@ const render = () => {
 };
 
 UserDropDownContents.registerBeforeUserDropDown(props => {
-    const kbEnabled = getMeta('siteSection.apps.knowledgeBase', true);
+    const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
 
     if (!kbEnabled) {
         return null;
@@ -71,8 +71,8 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
     );
 });
 
-const kbEnabled = getMeta('siteSection.apps.knowledgeBase', true);
-const forumEnabled = getMeta('siteSection.apps.forum', true);
+const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
+const forumEnabled = getMeta("siteSection.apps.forum", true);
 
 if (kbEnabled && forumEnabled) {
     registerDefaultNavItem(() => {
