@@ -78,10 +78,6 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
                 $attributes = $form->formData()['Attributes'] + ['AwardManually' => true];
                 $sender->BadgeModel->removeFilterField('Attributes');
                 $form->formValues($formArray + ['Attributes' => $attributes]);
-            } else {
-                $attributes = $form->formData()['Attributes'] + ['AwardManually' => false];
-                $sender->BadgeModel->removeFilterField('Attributes');
-                $form->formValues($formArray + ['Attributes' => $attributes]);
             }
         } else {
             $formArray = (array) $form->formData();
