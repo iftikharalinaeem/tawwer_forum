@@ -860,6 +860,13 @@ class Warnings2Plugin extends Gdn_Plugin {
 
         $rules = $this->ruleModel->get();
 
+        if (!empty($rules)) {
+            foreach ($rules as &$rule) {
+                $rule['EditUrl'] = url('/dashboard/settings/add-edit-rule/' . $rule['RuleID']);
+                $rule['DeleteUrl'] = url('/dashboard/settings/delete-rule?ruleid=' . $rule['RuleID']);
+            }
+        }
+
         $sender->setData('Title', Gdn::translate('Rules'));
         $sender->setData('Form', new TwigFormWrapper($sender->Form));
         $sender->setData('Rules', $rules);
