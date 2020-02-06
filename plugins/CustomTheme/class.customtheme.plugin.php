@@ -142,7 +142,7 @@ class CustomThemePlugin extends Gdn_Plugin {
             $message .= $form->button('Exit Preview', ['class' => 'PreviewThemeButton']).'</div>'. $form->close();
 
             $sender->informMessage($message, ['CssClass' => 'NoDismiss', 'id' => 'InPreviewCustomTheme']);
-        } else if (Gdn::session()->getPreference('LiveEditCSS')) {
+        } elseif (Gdn::session()->getPreference('LiveEditCSS')) {
             // Inform the user of the preview status
             $message = 'You are in "Edit CSS" mode: ' . anchor('Exit', 'settings/customtheme/exiteditcss', ['target' => '_top']);
             $sender->informMessage($message, ['CssClass' => 'NoDismiss InLiveEditCssMode', 'id' => 'InLiveEditCssMode']);
@@ -169,7 +169,7 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @return string Returns the theme root.
      */
     public static function getThemeRoot($subfolder = '') {
-        $themeRoot = paths(PATH_THEMES, self::getCurrentThemeKey(), ltrim($subfolder, '/'));
+        $themeRoot = paths(PATH_THEMES, self::getCurrentThemeKey());
         $addonThemeRoot = paths(PATH_ADDONS_THEMES, self::getCurrentThemeKey());
         $root = file_exists($addonThemeRoot) ? $addonThemeRoot : $themeRoot;
 
@@ -780,6 +780,9 @@ Here are some things you should know before you begin:
  */
 class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
 
+    /**
+     * @var \Smarty
+     */
     protected $smarty;
     protected $defaultMasterTemplate;
 
@@ -804,7 +807,12 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
         $htmlEnabled = $pluginEnabled && !c('Plugins.CustomTheme.DisableHtml', false);
 
         if ($htmlEnabled) {
-            $data = Gdn::sql()->select('Html,DateInserted')->from('CustomThemeRevision')->where('RevisionID', $revisionID)->get()->firstRow();
+            $data = Gdn::sql()
+                ->select('Html,DateInserted,ThemeName')
+                ->from('CustomThemeRevision')
+                ->where('RevisionID', $revisionID)
+                ->get()
+                ->firstRow();
 
             if ($data) {
                 if (stringIsNullOrEmpty($data->Html)) {
@@ -813,7 +821,7 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
 
                 $dir = CustomThemePlugin::getThemeRoot('/views');
                 if ($dir) {
-                    $this->smarty->template_dir = $dir;
+                    $this->smarty->setTemplateDir([$dir]);
                 }
 
                 $mtime = strtotime($data->DateInserted);
@@ -838,7 +846,11 @@ class Smarty_Resource_CustomTheme extends Smarty_Resource_Custom {
      */
     protected function fetchTimestamp($name) {
         $modTime = c('Plugins.CustomTheme.LiveTime');
-        if (!$modTime || !($mtime = strtotime($modTime))) {
+        if (!$modTime) {
+            return null;
+        } elseif (is_int($modTime)) {
+            return $modTime;
+        } elseif (!($mtime = strtotime($modTime))) {
             return null;
         }
         return $mtime;
