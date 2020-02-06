@@ -535,10 +535,6 @@ EOT
         if (isset($groupID)) {
             throw forbiddenException('@'.t(" You cannot post an idea inside a group."));
         }
-        //Get tag values from form and append default status.
-        if ($sender->Form->authenticatedPostBack()) {
-            $sender->setData('Tags', $sender->Form->getFormValue('Tags'));
-        }
 
         $sender->setData('Type', 'Idea');
         $sender->Form->setFormValue('Type', 'Idea');
@@ -622,13 +618,6 @@ EOT
 
 
     public function taggingPlugin_saveDiscussion_handler($sender, $args) {
-//        Gdn::pluginManager()->fireAs('TaggingPlugin')->fireEvent('SaveDiscussion', [
-//            'Data' => $formPostValues,
-//            'Tags' => &$formTags,
-//            'Types' => &$types,
-//            'CategoryID' => $categoryID,
-//        ]);
-
         $type = $args['Data']['Type'] ?? '';
         $isNew = $args['Data']['IsNewDiscussion'] ?? '';
         if (strcasecmp($type, 'idea') === 0 && $isNew) {
