@@ -775,9 +775,9 @@ EOT
         }
 
         if (isset($args['DiscussionOptions'])) {
-            $args['DiscussionOptions']['Ideation'] = ['Label' => t('Ideation').'...', 'Url' => '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
+            $args['DiscussionOptions']['Ideation'] = ['Label' => t('Ideation'), 'Url' => '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Class' => 'Popup'];
         } elseif (isset($sender->Options)) {
-            $sender->Options .= '<li>'.anchor(t('Ideation').'...', '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Popup IdeationOptions') . '</li>';
+            $sender->Options .= '<li>'.anchor(t('Ideation'), '/discussion/ideationoptions?discussionid='.$discussion->DiscussionID, 'Popup IdeationOptions') . '</li>';
         }
 
         if (!$this->isIdea($discussion)) {
