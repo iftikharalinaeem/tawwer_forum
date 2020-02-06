@@ -124,7 +124,8 @@ class SubcommunitiesController extends DashboardController {
         }
         $configDefaultController = $this->config->get('Routes.DefaultController');
 
-        $default= sprintf(t('Default (%s)'), $layoutOptions[$this->router->parseRoute($configDefaultController)['Destination']]);
+        $defaultHomepage = $this->router->parseRoute($configDefaultController)['Destination'];
+        $default= sprintf(t('Default (%s)'), $layoutOptions[$defaultHomepage]);
 
         $layoutOptions = ['null' => $default] + $layoutOptions;
         $defaultController = ['LabelCode' => 'Homepage', 'Control' => 'DropDown', 'Items' => $layoutOptions];
@@ -139,6 +140,17 @@ class SubcommunitiesController extends DashboardController {
         ];
 
         $form['defaultController'] = $defaultController;
+
+        $apps = $this->siteSectionModel->applications();
+        if (count($apps)>1) {
+            foreach ($apps as $app => $settings) {
+                $form[$app] =[
+                    'Control' => 'Toggle',
+                    'LabelCode' => 'Disable '.$settings['name'] ?? $app,
+                    'Description' => 'Disable application menu items and pages.'
+                ];
+            }
+        }
 
         if (!FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
             unset($form['ProductID']);
@@ -166,6 +178,8 @@ class SubcommunitiesController extends DashboardController {
             if (FeatureFlagHelper::featureEnabled(ProductModel::FEATURE_FLAG)) {
                 $this->siteModel->validateProduct($postData);
             }
+
+            $this->siteModel->validateApps($postData, $defaultHomepage);
 
             if ($this->site) {
                 $siteID = $this->site['SubcommunityID'];

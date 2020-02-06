@@ -3,6 +3,7 @@
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Subcommunities\Models\ProductModel;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 
 class SubcommunityModel extends Gdn_Model {
     const CACHE_KEY = 'subcommunities';
@@ -427,6 +428,37 @@ class SubcommunityModel extends Gdn_Model {
                 $this->productModel->selectSingle(['productID' =>$product]);
             } catch (NoResultsException $e) {
                 $this->Validation->addValidationResult('ProductID', 'The specified product doesn\'t exist');
+            }
+        }
+    }
+
+    /**
+     * Ensure that at least one app is enabled.
+     *
+     * @param array $formPostValues
+     * @param string $defaultHomepage
+     */
+    public function validateApps(array $formPostValues, string $defaultHomepage): void {
+        if ((bool)($formPostValues[SiteSectionInterface::APP_KB] ?? false)
+            && (bool)($formPostValues[SiteSectionInterface::APP_FORUM] ?? false)) {
+            $this->Validation->addValidationResult($formPostValues[SiteSectionInterface::APP_KB], 'At least one application should stay enabled.');
+        }
+        if ((bool)($formPostValues[SiteSectionInterface::APP_FORUM] ?? false)) {
+            $homepage = $formPostValues['defaultController'] ?? $defaultHomepage;
+            if (in_array($homepage, ['discussions', 'categories'])) {
+                $this->Validation->addValidationResult(
+                    $formPostValues['defaultController'],
+                    'Selected homepage belongs to disabled forum application.'
+                );
+            }
+        }
+        if ((bool)($formPostValues[SiteSectionInterface::APP_KB] ?? false)) {
+            $homepage = $formPostValues['defaultController'] ?? $defaultHomepage;
+            if ($homepage === 'kb') {
+                $this->Validation->addValidationResult(
+                    $formPostValues['defaultController'],
+                    'Selected homepage belongs to disabled knowledge base application.'
+                );
             }
         }
     }
