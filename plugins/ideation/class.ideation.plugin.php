@@ -616,7 +616,12 @@ EOT
         ]);
     }
 
-
+    /**
+     * Handle setting default tags for Idea-type discussions
+     *
+     * @param Gdn_PluginManager $sender
+     * @param array $args
+     */
     public function taggingPlugin_saveDiscussion_handler($sender, $args) {
         $type = $args['Data']['Type'] ?? '';
         $isNew = $args['Data']['IsNewDiscussion'] ?? '';
