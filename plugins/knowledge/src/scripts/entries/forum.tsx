@@ -9,7 +9,7 @@ import { delegateEvent } from "@vanilla/dom-utils";
 import { mountModal } from "@library/modal/Modal";
 import React from "react";
 import { registerDefaultNavItem } from "@library/headers/navigationVariables";
-import { t } from "@vanilla/i18n";
+import { getMeta, t } from "@library/utility/appUtils";
 
 delegateEvent("click", ".js-convertDiscussionToArticle", (event, triggeringElement) => {
     event.preventDefault();
@@ -33,10 +33,15 @@ delegateEvent("click", ".js-unlinkDiscussion", (event, triggeringElement) => {
     mountModal(<UnlinkDiscussionModal discussionID={id} />);
 });
 
-registerDefaultNavItem(() => {
-    return {
-        children: t("Help Menu", "Help"),
-        permission: "kb.view",
-        to: "/kb",
-    };
-});
+const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
+const forumEnabled = getMeta("siteSection.apps.forum", true);
+
+if (kbEnabled && forumEnabled) {
+    registerDefaultNavItem(() => {
+        return {
+            children: t("Help Menu", "Help"),
+            permission: "kb.view",
+            to: "/kb",
+        };
+    });
+}

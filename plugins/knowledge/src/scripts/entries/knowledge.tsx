@@ -52,6 +52,11 @@ const render = () => {
 };
 
 UserDropDownContents.registerBeforeUserDropDown(props => {
+    const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
+
+    if (!kbEnabled) {
+        return null;
+    }
     return (
         <Permission permission="articles.add">
             <DropDownSection title={t("Articles")}>
@@ -65,13 +70,18 @@ UserDropDownContents.registerBeforeUserDropDown(props => {
     );
 });
 
-registerDefaultNavItem(() => {
-    return {
-        children: t("Help Menu", "Help"),
-        permission: "kb.view",
-        to: "/kb",
-    };
-});
+const kbEnabled = getMeta("siteSection.apps.knowledgeBase", true);
+const forumEnabled = getMeta("siteSection.apps.forum", true);
+
+if (kbEnabled && forumEnabled) {
+    registerDefaultNavItem(() => {
+        return {
+            children: t("Help Menu", "Help"),
+            permission: "kb.view",
+            to: "/kb",
+        };
+    });
+}
 
 onReady(() => {
     initAllUserContent();
