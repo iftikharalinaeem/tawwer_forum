@@ -51,7 +51,9 @@ class LogDeliveryJob implements LocalJobInterface {
             "webhookID" => [
                 "type" => "integer",
             ],
-            "requestHeaders",
+            "requestHeaders" => [
+                "type" => "string",
+            ],
             "requestBody" => [
                 "type" => "string",
             ],
@@ -59,7 +61,9 @@ class LogDeliveryJob implements LocalJobInterface {
                 "allowNull" => true,
                 "type" => "integer",
             ],
-            "responseHeaders",
+            "responseHeaders" => [
+                "type" => "string",
+            ],
             "responseBody" => [
                 "allowNull" => true,
                 "type" => "string",

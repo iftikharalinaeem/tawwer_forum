@@ -139,10 +139,10 @@ class HttpRequestJob implements LocalJobInterface {
 
         $request = $response->getRequest();
         $defaultMessage = [
-            "requestHeaders" => $request->getHeaders(),
+            "requestHeaders" => $this->stringifyHeaders($request->getHeaders()),
             "requestBody" => $request->getBody(),
             "requestDuration" => $duration,
-            "responseHeaders" => $response->getHeaders(),
+            "responseHeaders" => $this->stringifyHeaders($response->getHeaders()),
             "responseBody" => $response->getRawBody(),
             "responseCode" => $response->getStatusCode(),
         ];
@@ -242,5 +242,24 @@ class HttpRequestJob implements LocalJobInterface {
      */
     private function setUri(string $uri): void {
         $this->uri = $uri;
+    }
+
+    /**
+     * Given an associative array of headers, return the string version.
+     *
+     * @param array $headers
+     * @return string
+     */
+    private function stringifyHeaders(array $headers): string {
+        $headerStrings = [];
+        foreach ($headers as $directive => $values) {
+            if (is_array($values)) {
+                foreach ($values as $val) {
+                    $headerStrings[] = "{$directive}: {$val}";
+                }
+            }
+        }
+        $result = implode("\n", $headerStrings);
+        return $result;
     }
 }
