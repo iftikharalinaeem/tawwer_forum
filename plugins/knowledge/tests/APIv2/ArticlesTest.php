@@ -380,6 +380,31 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PUT /articles/<id>/featured.
+     */
+    public function testPutFeatured() {
+        $article = $this->testPost();
+        $this->assertEmpty($article['dateFeatured']);
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/featured",
+            ['featured' => true]
+        )->getBody();
+
+        $this->assertTrue($body['featured']);
+        $this->assertNotEmpty($body['dateFeatured']);
+
+        sleep(1);
+        $unFeatured = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/featured",
+            ['featured' => false]
+        )->getBody();
+
+        $this->assertFalse($unFeatured['featured']);
+        $this->assertGreaterThan($body['dateFeatured'], $unFeatured['dateFeatured']);
+    }
+
+    /**
      * Test POST /articles when DiscussionID provided
      * to set discussion canonical link to the article created
      */

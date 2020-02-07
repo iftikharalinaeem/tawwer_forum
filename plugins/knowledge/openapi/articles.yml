@@ -746,6 +746,37 @@ paths:
                             type: object
                 required: true
             summary: Set the status of an article.
+    "/articles/{id}/featured":
+        put:
+            parameters:
+                - description: The article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                featured:
+                                    description: Article featured flag.
+                                    type: boolean
+                            required:
+                                - featured
+                            type: object
+                required: true
+            summary: Set / unset article as featured.
     "/articles/from-discussion":
         get:
             parameters:
@@ -1117,6 +1148,13 @@ components:
                 updateUserID:
                     description: Unique ID of the last user to update the article.
                     type: integer
+                featured:
+                    description: "Article is featured"
+                    type: boolean
+                dateFeatured:
+                    description: "When the article was last set or unset as featured"
+                    format: date-time
+                    type: string
                 url:
                     description: Full URL to the article.
                     minLength: 1
