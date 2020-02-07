@@ -54,6 +54,7 @@ class HttpRequestJob implements LocalJobInterface {
      * Setup the job.
      *
      * @param HttpClient $client
+     * @param SchedulerInterface $scheduler
      */
     public function __construct(HttpClient $client, SchedulerInterface $scheduler) {
         $this->client = $client;
