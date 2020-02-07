@@ -88,7 +88,7 @@ class KnowledgeBaseKludgedVars {
             $value = (int) $value;
         }
 
-        if ($value !== null && $varInfo['Control'] === "imageupload") {
+        if ($value !== null && ($varInfo['Control'] === "imageupload" || $varInfo['Control'] === "imageuploadreact")) {
             $value = \Gdn_Upload::url($value);
         }
 
