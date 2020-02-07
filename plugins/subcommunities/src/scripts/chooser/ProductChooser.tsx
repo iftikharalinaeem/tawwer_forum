@@ -62,7 +62,7 @@ export function ProductChooser(props: IProps) {
                 return (
                     <DropDownItemLink
                         key={`product${product ? product.productID : ""}-sub${community.subcommunityID}`}
-                        to={siteUrl("/" + community.folder + options.linkSuffix)}
+                        to={siteUrl("/" + community.folder)}
                     >
                         <span className={classes.rowIndented}>
                             {community.name}

@@ -25,6 +25,7 @@ import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocaleInfo, t } from "@vanilla/i18n";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
 
 type SectionName = "locale" | "product";
 
@@ -32,6 +33,22 @@ interface IDropdownProps {
     buttonType?: ButtonTypes;
     fullWidth?: boolean;
     buttonClass?: string;
+}
+
+export function SubcommunityChooserHamburgerGroup() {
+    if (!subcommunityChooserVariables().options.enabled) {
+        return null;
+    }
+    return (
+        <>
+            <DropDownItemSeparator />
+            <SubcommunityChooserDropdown
+                buttonType={ButtonTypes.CUSTOM}
+                buttonClass={dropDownClasses().action}
+                fullWidth
+            />
+        </>
+    );
 }
 
 export function SubcommunityChooserDropdown(props: IDropdownProps) {
@@ -43,22 +60,21 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const device = useDevice();
     const showHeader = device === Devices.MOBILE || device === Devices.XS;
 
-    if (!availableLocales) {
+    const { options } = subcommunityChooserVariables();
+    const classes = subcommunityChooserClasses();
+    const forceIcon = options.forceIcon && !props.fullWidth;
+
+    if (!availableLocales || !options.enabled) {
         return null;
     }
 
     const hasMultipleLocales = Object.values(availableLocales).length > 1;
 
-    const { options } = subcommunityChooserVariables();
-    const classes = subcommunityChooserClasses();
-
-    const forceIcon = options.forceIcon && !props.fullWidth;
-
     let toggleName: React.ReactNode = <GlobeIcon />;
     if (hasMultipleLocales && subcommunity && !forceIcon) {
         toggleName = `${subcommunity.name} (${subcommunity.locale}) `;
     } else if (props.fullWidth) {
-        toggleName = t("Language");
+        toggleName = hasMultipleLocales ? t("Language") : t("Product");
     }
 
     if (props.fullWidth) {
