@@ -14,8 +14,10 @@ use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Utility\StringUtils;
+use Vanilla\Webhooks\Jobs\DeliveryFeedbackJob;
 use Vanilla\Webhooks\Jobs\HttpRequestJob;
 use Vanilla\Webhooks\Jobs\LogDeliveryJob;
+use Vanilla\Webhooks\Jobs\RemoteRequestJob;
 
 /**
  * Scheduler wrapper to simplify adding event dispatch jobs for webhooks.
@@ -27,6 +29,9 @@ class EventScheduler {
 
     /** @var SessionInterface */
     private $session;
+
+    /** @var bool */
+    private $useHostedQueue = false;
 
     /** @var UserProviderInterface */
     private $userProvider;
@@ -79,7 +84,7 @@ class EventScheduler {
 
         $message = [
             "body" => $json,
-            "feedbackJob" => LogDeliveryJob::class,
+            "feedbackJob" => $this->shouldUseHostedQueue() ? DeliveryFeedbackJob::class : LogDeliveryJob::class,
             "feedbackMessage" => [
                 "webhookDeliveryID" => $deliveryID,
                 "webhookID" => $webhook->getWebhookID(),
@@ -95,7 +100,7 @@ class EventScheduler {
         ];
 
         $this->scheduler->addJob(
-            HttpRequestJob::class,
+            $this->shouldUseHostedQueue() ? RemoteRequestJob::class : HttpRequestJob::class,
             $message,
             $jobPriority,
             $delay
@@ -116,6 +121,15 @@ class EventScheduler {
     }
 
     /**
+     * Should the hosted queue be used for event deliveries?
+     *
+     * @return boolean
+     */
+    public function shouldUseHostedQueue(): bool {
+        return $this->useHostedQueue;
+    }
+
+    /**
      * Get site details to include alongside event data.
      *
      * @return array
@@ -127,5 +141,15 @@ class EventScheduler {
             $result = ["siteID" => 0];
         }
         return $result;
+    }
+
+    /**
+     * Define whether or not the hosted queue should be use to schedule event deliveries.
+     *
+     * @param boolean $useHostedQueue
+     * @return void
+     */
+    public function useHostedQueue(bool $useHostedQueue): void {
+        $this->useHostedQueue = $useHostedQueue;
     }
 }
