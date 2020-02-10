@@ -1,8 +1,8 @@
 {
     "key": "openapi-embed",
-    "name": "OpenAPI Embed (Beta)",
+    "name": "OpenAPI Embed",
     "description": "Adds an OpenAPI embed to Rich Editor",
-    "version": "0.5.0",
+    "version": "1.0.0",
     "mobileFriendly": true,
     "license": "GPL-2.0-only",
     "type": "addon",
@@ -13,6 +13,7 @@
             "homepage": "https://github.com/charrondev"
         }
     ],
+    "icon": "openapi-embed.png",
     "require": {
         "vanilla": ">=4.0"
     }
