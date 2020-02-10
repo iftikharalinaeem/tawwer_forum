@@ -12,7 +12,7 @@ import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import React, { useState, useMemo } from "react";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
-import { useSwaggerUI, ISwaggerHeading } from "@openapi-embed/embed/swagger/useSwaggerUI";
+import { useSwaggerUI, ISwaggerHeading } from "@vanilla/library/src/scripts/features/swagger/useSwaggerUI";
 
 export const OPEN_API_EMBED_TYPE = "openapi";
 

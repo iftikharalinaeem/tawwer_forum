@@ -9,7 +9,7 @@ import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import Frame from "@vanilla/library/src/scripts/layout/frame/Frame";
 import FrameHeader from "@vanilla/library/src/scripts/layout/frame/FrameHeader";
 import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
-import { useSwaggerUI, ISwaggerHeading } from "@openapi-embed/embed/swagger/useSwaggerUI";
+import { useSwaggerUI, ISwaggerHeading } from "@vanilla/library/src/scripts/features/swagger/useSwaggerUI";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import FrameFooter from "@vanilla/library/src/scripts/layout/frame/FrameFooter";
 import Button from "@vanilla/library/src/scripts/forms/Button";

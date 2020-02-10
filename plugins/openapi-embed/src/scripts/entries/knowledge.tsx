@@ -12,7 +12,7 @@ import { OpenApiEmbed, IOpenApiEmbedData } from "../embed/OpenApiEmbed";
 import { useEditor } from "@rich-editor/editor/context";
 import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
-import { SwaggerIcon } from "@openapi-embed/embed/swagger/SwaggerIcon";
+import { SwaggerIcon } from "@library/features/swagger/SwaggerIcon";
 import classNames from "classnames";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { t } from "@vanilla/i18n";

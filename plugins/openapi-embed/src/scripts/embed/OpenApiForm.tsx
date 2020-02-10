@@ -18,7 +18,7 @@ import { frameFooterClasses } from "@vanilla/library/src/scripts/layout/frame/fr
 import { isAllowedUrl, t } from "@vanilla/library/src/scripts/utility/appUtils";
 import { IOpenApiEmbedData } from "@openapi-embed/embed/OpenApiEmbed";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
-import { ISwaggerHeading } from "@openapi-embed/embed/swagger/useSwaggerUI";
+import { ISwaggerHeading } from "@vanilla/library/src/scripts/features/swagger/useSwaggerUI";
 import axios from "axios";
 import { LoadStatus, IApiError } from "@vanilla/library/src/scripts/@types/api/core";
 import ButtonLoader from "@vanilla/library/src/scripts/loaders/ButtonLoader";
