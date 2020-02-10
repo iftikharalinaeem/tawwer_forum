@@ -13,6 +13,8 @@ import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import React, { useState, useMemo } from "react";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";
 import { useSwaggerUI, ISwaggerHeading } from "@vanilla/library/src/scripts/features/swagger/useSwaggerUI";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
+import { loaderClasses } from "@vanilla/library/src/scripts/loaders/loaderStyles";
 
 export const OPEN_API_EMBED_TYPE = "openapi";
 
@@ -69,7 +71,12 @@ function FullOpenApiSpec(props: IProps) {
     const decoded = useMemo(() => {
         return JSON.parse(specJson);
     }, [specJson]);
-    const { swaggerRef } = useSwaggerUI({ spec: decoded, url: props.url });
+    const { swaggerRef, isLoading } = useSwaggerUI({ spec: decoded, url: props.url });
 
-    return <div ref={swaggerRef}></div>;
+    return (
+        <>
+            {isLoading && <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />}
+            <div ref={swaggerRef}></div>
+        </>
+    );
 }
