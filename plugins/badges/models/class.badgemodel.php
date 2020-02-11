@@ -246,6 +246,9 @@ class BadgeModel extends Gdn_Model {
             $existingBadge = $this->getID($data['Slug']);
         }
 
+        // The second condition of this if-statement--!val('BadgeID', $data)--was part of the function's logic
+        // before the most recent refactoring. I'm not sure why it's there and think we could get rid of it, but
+        // didn't want to touch it while refactoring to address another issue.
         if ($existingBadge && !val('BadgeID', $data)) {
             $different = false;
             foreach ($data as $key => $value) {
