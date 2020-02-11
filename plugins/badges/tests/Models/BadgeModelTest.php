@@ -103,9 +103,9 @@ class BadgeModelTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
-     * Test where updateAttributes is set to false.
+     * Test where the settings parameter is also passed.
      */
-    public function testUpdateAttributesIsFalse() {
+    public function testUpdateSettingsParamIsIncluded() {
         $originalBadge = [
             'Name' => '50 Answers',
             'Slug' => 'answer-50',
@@ -130,8 +130,8 @@ class BadgeModelTest extends \PHPUnit\Framework\TestCase {
         ];
         $this->model->save($originalBadge);
         $testResult = $this->model->getId('answer-50');
-        $this->model->save($updatedBadge, ['replaceAttributes' => false]);
-        $expected = ['AwardManually' => true];
+        $this->model->save($updatedBadge, ['foo' => 'bar']);
+        $expected = ['AwardManually' => true, 'Column' => 'CountComments'];
         $actual = $this->model->getID($updatedBadge['Slug'])['Attributes'];
         $this->assertSame($expected, $actual);
     }

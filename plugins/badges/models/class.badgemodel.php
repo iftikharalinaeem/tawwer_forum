@@ -231,9 +231,12 @@ class BadgeModel extends Gdn_Model {
      * @return int|false Returns the ID of the badge or **false** on error.
      */
     public function save($data, $settings = []) {
-        $settings = isset($settings['replaceAttributes']) ? $settings : (array)$settings + [
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+        $settings += [
             'replaceAttributes' => true,
-        ];
+            ];
 
         // See if there is an existing badge.
         $existingBadge = null;
