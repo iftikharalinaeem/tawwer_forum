@@ -242,6 +242,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("updateUserID", "int")
             ->column("dateUpdated", "datetime")
+            ->column("featured", "tinyint(1)", 0, 'index')
+            ->column("dateFeatured", "datetime")
             ->column(
                 "status",
                 ["enum", Models\ArticleModel::getAllStatuses()],
