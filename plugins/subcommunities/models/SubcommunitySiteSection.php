@@ -16,6 +16,8 @@ use Gdn_Router;
  */
 class SubcommunitySiteSection implements SiteSectionInterface {
 
+    const CATEGEGORIES_INDEX_ROUTE = "categories(.json)?(?=$|\?)";
+
     /** @const string Site section prefix */
     const SUBCOMMUNITY_SECTION_PREFIX = 'subcommunities-section-';
 
@@ -56,10 +58,13 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var array $apps */
     private $apps;
 
+    /** @var array */
+    private $attributes = [];
+
     /**
      * DI.
      *
-     * @param array $subcommunity Subcommunity model record
+     * @param array $subcommunity Subcommunity model record.
      * @param ConfigurationInterface $config
      * @param Gdn_Router $router
      */
@@ -76,7 +81,19 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $configDefaultController = !empty($subcommunity["defaultController"])
             ? $subcommunity["defaultController"]
             : $config->get('Routes.DefaultController');
+
         $this->defaultRoute = $router->parseRoute($configDefaultController);
+
+        if (isset($subcommunity['CategoryID'])) {
+            $this->attributes['CategoryID'] = $subcommunity['CategoryID'];
+
+            if ($this->defaultRoute['Destination'] === 'categories') {
+                $internalCategoryIDPath = "categories/" . $subcommunity['CategoryID'];
+                $categoryUrl = $internalCategoryIDPath;
+                $this->defaultRoute['Destination'] = $categoryUrl;
+            }
+        }
+
         $forumApp = $subcommunity[self::APP_FORUM] ?? $config->get('Vanilla.Forum.Disabled');
         $this->apps[self::APP_FORUM] = ($forumApp != 1);
         $kbApp = $subcommunity[self::APP_KB] ?? false;
@@ -151,5 +168,12 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      */
     public function setApplication(string $app, bool $enable = true) {
         $this->apps[$app] = $enable;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getAttributes(): array {
+        return $this->attributes;
     }
 }
