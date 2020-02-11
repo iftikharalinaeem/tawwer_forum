@@ -225,29 +225,42 @@ class BadgeModel extends Gdn_Model {
      * Insert or update badge data.
      *
      * @param array $data The badge we're creating or updating.
-     * @param array $settings Not used.
+     * @param array $settings If settings is not included or does not have a 'replaceAttributes' key,
+     * it will add any new attributes to the attribute array. If 'replaceAttributes' is set to false,
+     * it will overwrite the attribute array.
      * @return int|false Returns the ID of the badge or **false** on error.
      */
     public function save($data, $settings = []) {
-        // See if there is an existing badge.
-        if (val('Slug', $data) && !val('BadgeID', $data)) {
-            $existingBadge = $this->getID($data['Slug']);
-            if ($existingBadge) {
-                $different = false;
-                foreach ($data as $key => $value) {
-                    if (array_key_exists($key, $existingBadge) && $existingBadge[$key] != $value) {
-                        $different = true;
-                        break;
-                    }
-                }
-                if (!$different) {
-                    return $existingBadge['BadgeID'];
-                }
-                $data['BadgeID'] = $existingBadge['BadgeID'];
+        $settings = isset($settings['replaceAttributes']) ? $settings : (array)$settings + [
+            'replaceAttributes' => true,
+        ];
 
-            }
+        // See if there is an existing badge.
+        $existingBadge = null;
+        if (val('BadgeID', $data)) {
+            $existingBadge = $this->getID((int)$data['BadgeID']);
+        } elseif (val('Slug', $data)) {
+            $existingBadge = $this->getID($data['Slug']);
         }
+
+        if ($existingBadge && !val('BadgeID', $data)) {
+            $different = false;
+            foreach ($data as $key => $value) {
+                if (array_key_exists($key, $existingBadge) && $existingBadge[$key] != $value) {
+                    $different = true;
+                    break;
+                }
+            }
+            if (!$different) {
+                return $existingBadge['BadgeID'];
+            }
+            $data['BadgeID'] = $existingBadge['BadgeID'];
+        }
+
         if (isset($data['Attributes']) && is_array($data['Attributes'])) {
+            if ($existingBadge && $settings['replaceAttributes']) {
+                $data['Attributes'] = array_replace($data['Attributes'], $existingBadge['Attributes']);
+            }
             $data['Attributes'] = dbencode($data['Attributes']);
         }
         if (!isset($data['BadgeID'])) {
