@@ -30,6 +30,9 @@ class BadgeModelTest extends \PHPUnit\Framework\TestCase {
         return ['vanilla', 'badges'];
     }
 
+    /**
+     * Set up BadgeModel for testing.
+     */
     public function setUp(): void {
         $this->model = $this->container()->get(\BadgeModel::class);
     }
