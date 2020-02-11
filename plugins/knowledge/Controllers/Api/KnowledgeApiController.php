@@ -239,15 +239,14 @@ class KnowledgeApiController extends AbstractApiController {
     public function get_search(array $query = []): \Garden\Web\Data {
         $this->permission("knowledge.kb.view");
 
-        $in = $this->schema($this->inputSchema(), "in")
-            ->setDescription("Get a navigation-friendly category hierarchy flat mode.")
-        ;
+        $in = $this->schema($this->inputSchema(), "in");
 
         $out = $this->schema([":a" => $this->searchResultSchema()], "out");
         $this->query = $in->validate($query);
         $searchResults = $this->sphinxSearch();
 
-        $results = $this->getNormalizedData($searchResults);
+        $sphinxOrder = (bool)($query['featured'] ?? false);
+        $results = $this->getNormalizedData($searchResults, $sphinxOrder);
 
         $result = $out->validate($results);
 
@@ -386,6 +385,12 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['siteSectionGroup'])) {
             $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
+
+        if ($this->query['featured'] ?? false) {
+            $this->sphinx->setFilter('featured', [1]);
+            $this->sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'dateFeatured');
+        }
+
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
             $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
         }
@@ -433,14 +438,14 @@ class KnowledgeApiController extends AbstractApiController {
      * @param array $searchResults Result set returned by Sphinx search
      * @return array
      */
-    protected function getNormalizedData(array $searchResults): array {
+    protected function getNormalizedData(array $searchResults, bool $keepSphinxOrder = false): array {
         $results = [];
         $this->results['matches'] = $searchResults['matches'] ?? [];
-
+        $i = 0;
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
             foreach ($searchResults['matches'] as $guid => $record) {
-                $this->results['matches'][$guid]['orderIndex'] = $record['weight'];
+                $this->results['matches'][$guid]['orderIndex'] = ($keepSphinxOrder) ? $i-- : $record['weight'];
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -656,6 +661,7 @@ class KnowledgeApiController extends AbstractApiController {
             "all:s?" => "Keywords to search against article name or body.",
             "locale:s?" => "The locale articles are published in",
             "siteSectionGroup:s?" => "The site-section-group articles are associated to",
+            "featured:b?" => "Search for featured articles only. Default: false",
             "global:b?" => "Global search flag. Default: false",
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
