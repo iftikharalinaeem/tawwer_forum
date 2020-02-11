@@ -422,41 +422,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
     }
 
-    /**
-     * Default Routing
-     *
-     * This forces the default controller to be /account, since the vanilla
-     * application is not loaded and we don't have any discussions.
-     *
-     * @param Gdn_Router $sender
-     */
-    public function gdn_router_beforeLoadRoutes_handler($sender, $args) {
-        $routes =& $args['Routes'];
-        $site = SubcommunityModel::getCurrent();
-
-        // Set the default routes.
-        if (val('CategoryID', $site)) {
-            $category = CategoryModel::categories($site['CategoryID']);
-
-            // Set the default category root.
-            $routes[base64_encode('categories(.json)?(?=$|\?)')] = ltrim(categoryUrl($category, '', '/'), '/').'$1';
-
-            $defaultRoute = val('DefaultController', $routes);
-            if (is_array($defaultRoute)) {
-                $defaultRoute = array_shift($defaultRoute);
-            }
-            $this->savedDefaultRoute = $defaultRoute;
-            switch ($defaultRoute) {
-                case 'categories':
-                    $defaultRoute = ltrim(categoryUrl($category, '', '/'), '/');
-                    break;
-            }
-            if ($defaultRoute) {
-                $routes['DefaultController'] = $defaultRoute;
-            }
-        }
-    }
-
     public function settingsController_homepage_render($sender) {
         if ($this->savedDefaultRoute) {
             $sender->setData('CurrentTarget', $this->savedDefaultRoute);
