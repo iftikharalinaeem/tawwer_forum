@@ -235,7 +235,7 @@ class BadgeModel extends Gdn_Model {
             $settings = [];
         }
         $settings += [
-            'replaceAttributes' => true,
+            'updateAttributes' => true,
             ];
 
         // See if there is an existing badge.
@@ -264,7 +264,7 @@ class BadgeModel extends Gdn_Model {
         }
 
         if (isset($data['Attributes']) && is_array($data['Attributes'])) {
-            if ($existingBadge && $settings['replaceAttributes']) {
+            if ($existingBadge && $settings['updateAttributes']) {
                 $data['Attributes'] = array_replace($data['Attributes'], $existingBadge['Attributes']);
             }
             $data['Attributes'] = dbencode($data['Attributes']);
