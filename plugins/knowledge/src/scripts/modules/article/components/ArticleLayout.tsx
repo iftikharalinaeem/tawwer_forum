@@ -27,8 +27,8 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { PanelBackground } from "@library/layout/PanelBackground";
 import RelatedArticles from "@knowledge/modules/article/components/RelatedArticles";
-import ArticleCards from "@library/features/articleCards/AricleCards";
-import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
+import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
+import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 
 /**
  * Implements the article's layout
@@ -65,6 +65,19 @@ export class ArticleLayout extends React.Component<IProps> {
             this.props.device !== Devices.MOBILE &&
             this.props.device !== Devices.XS &&
             panelBackgroundVariables().config.render;
+
+        const relatedArticlesComponent = relatedArticles ? (
+            <RelatedArticles articles={relatedArticles} />
+        ) : (
+            <RelatedArticlesPlaceHolder />
+        );
+
+        const otherLanguagesComponent = !articlelocales ? (
+            <OtherLangaugesPlaceHolder />
+        ) : (
+            <OtherLanguages articleLocaleData={articlelocales} />
+        );
+
         return (
             <>
                 {renderPanelBackground && <PanelBackground />}
@@ -140,9 +153,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                         />
                                     </PanelWidget>
                                 )}
-                                <PanelWidget>
-                                    <RelatedArticles articles={relatedArticles} />
-                                </PanelWidget>
+                                <PanelWidget>{relatedArticlesComponent}</PanelWidget>
                             </>
                         }
                         rightTop={
@@ -155,9 +166,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                             <ArticleTOC items={article.outline} />
                                         </PanelWidget>
                                     )}
-                                <PanelWidget>
-                                    <OtherLanguages articleLocaleData={articlelocales} />
-                                </PanelWidget>
+                                <PanelWidget>{otherLanguagesComponent}</PanelWidget>
                             </>
                         }
                     />
@@ -174,8 +183,8 @@ interface IProps extends IDeviceProps {
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
-    articlelocales: IArticleLocale[];
-    relatedArticles: IRelatedArticle[];
+    articlelocales: IArticleLocale[] | null;
+    relatedArticles: IRelatedArticle[] | null;
 }
 
 export default withDevice(ArticleLayout);

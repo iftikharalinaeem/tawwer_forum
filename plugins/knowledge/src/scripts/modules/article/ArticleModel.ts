@@ -7,9 +7,9 @@
 import {
     IArticle,
     IArticleFragment,
-    IResponseArticleDraft,
     IArticleLocale,
     IRelatedArticle,
+    IResponseArticleDraft,
 } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions from "@knowledge/modules/article/ArticleActions";
@@ -20,7 +20,6 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
 
 export interface IArticleState {
     articlesByID: {
@@ -74,6 +73,25 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         const stateSlice = this.stateSlice(state);
         return (
             stateSlice.articleLocalesByID[articleID] || {
+                status: LoadStatus.PENDING,
+            }
+        );
+    }
+
+    /**
+     * Select article locales out of the stored ones.
+     *
+     * @param state
+     * @param articleID
+     */
+    public static selectRelatedArticles(
+        state: IKnowledgeAppStoreState,
+        articleID: number,
+    ): ILoadable<IRelatedArticle[]> {
+        const stateSlice = this.stateSlice(state);
+
+        return (
+            stateSlice.relatedArticlesLoadable[articleID] || {
                 status: LoadStatus.PENDING,
             }
         );
@@ -252,17 +270,15 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                 return ArticleModel.INITIAL_STATE;
             })
             .case(ArticleActions.getRelatedArticleACs.started, (nextState, payload) => {
-                const existing = nextState.relatedArticlesLoadable[payload.articleID] || {};
-                nextState.relatedArticlesLoadable[payload.articleID] = {
-                    ...existing,
-                    status: LoadStatus.LOADING,
-                };
+                if (nextState.relatedArticlesLoadable[payload.articleID]?.status) {
+                    nextState.relatedArticlesLoadable[payload.articleID].status = LoadStatus.LOADING;
+                }
                 return nextState;
             })
             .case(ArticleActions.getRelatedArticleACs.done, (nextState, payload) => {
                 nextState.relatedArticlesLoadable[payload.params.articleID] = {
                     status: LoadStatus.SUCCESS,
-                    data: payload.result,
+                    data: [...payload.result],
                 };
                 return nextState;
             })

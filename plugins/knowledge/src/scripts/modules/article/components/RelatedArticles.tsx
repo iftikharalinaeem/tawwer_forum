@@ -7,6 +7,10 @@
 import * as React from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IRelatedArticle } from "@knowledge/@types/api/article";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
+import { relatedArticlesClasses } from "@knowledge/modules/article/components/relatedArticlesStyles";
+import Heading from "@library/layout/Heading";
 
 interface IProps {
     articles: IRelatedArticle[];
@@ -17,21 +21,28 @@ interface IProps {
  */
 export default function RelatedArticles(props: IProps) {
     const { articles } = props;
-
-    return (
-        <>
-            <h3>Related Articles</h3>
-            <ul>
-                {articles
-                    .filter((article, index) => index <= 4)
-                    .map(article => {
-                        return (
-                            <li key={article.recordID}>
-                                <SmartLink to={article.url}>{article.name}</SmartLink>
-                            </li>
-                        );
-                    })}
-            </ul>
-        </>
-    );
+    const classes = relatedArticlesClasses();
+    const content =
+        articles.length === 0 ? (
+            <></>
+        ) : (
+            <>
+                <hr className={classes.border} />
+                <Heading depth={3} title={"Related Articles"} className={classes.header} />
+                <ul className={classes.linkList}>
+                    {articles
+                        .filter((article, index) => index < 4)
+                        .map(article => {
+                            return (
+                                <li key={article.recordID} className={classes.linkItem}>
+                                    <SmartLink to={article.url} className={classes.link}>
+                                        {article.name}
+                                    </SmartLink>
+                                </li>
+                            );
+                        })}
+                </ul>
+            </>
+        );
+    return content;
 }

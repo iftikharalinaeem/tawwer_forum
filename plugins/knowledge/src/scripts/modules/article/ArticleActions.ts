@@ -138,12 +138,17 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public static readonly GET_RELATED_ARTICLES_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
     public static readonly GET_RELATED_ARTICLES_ERROR = "@@article/GET_ARTICLE_ERROR";
 
-    public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, IRelatedArticle, IApiError>(
+    public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, IRelatedArticle[], IApiError>(
         "GET_RELATED_ARTICLES",
     );
 
     public getRelatedArticles = (query: IRelatedArticles) => {
         const { articleID, ...params } = query;
+
+        const existingLoadable = this.getState().knowledge.articles.relatedArticlesLoadable[articleID];
+        if (existingLoadable && existingLoadable.status !== LoadStatus.PENDING) {
+            return existingLoadable;
+        }
 
         const apiThunk = bindThunkAction(ArticleActions.getRelatedArticleACs, async () => {
             const response = await this.api.get(`/articles/${articleID}/articlesRelated`, { params });

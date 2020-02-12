@@ -184,7 +184,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
         $params = [
             'knowledgeBaseID' => self::$testData['rootCategory']['knowledgeBaseID']
         ];
-        $response = $this->api()->get('/knowledge/search', $params );
+        $response = $this->api()->get('/knowledge/search', $params);
         $result = $response->getBody();
 
         $article = reset($result);
