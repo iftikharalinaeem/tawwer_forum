@@ -86,7 +86,14 @@ export class ArticleLayout extends React.Component<IProps> {
                         useMobileBackButton={this.props.useBackButton}
                         isFixed={true}
                         backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
-                        hamburger={true}
+                        extraBurgerNavigation={
+                            <Navigation
+                                collapsible={true}
+                                activeRecord={activeRecord}
+                                kbID={article.knowledgeBaseID}
+                                inHamburger
+                            />
+                        }
                     />
 
                     <PanelLayout

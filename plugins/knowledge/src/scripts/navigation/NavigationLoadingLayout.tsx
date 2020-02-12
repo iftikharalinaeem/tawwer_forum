@@ -63,7 +63,7 @@ export default function NavigationLoadingLayout(props: IProps) {
             <ScrollLock>
                 <>
                     <TitleBar
-                        useMobileBackButton={false}
+                        useMobileBackButton={true}
                         isFixed={true}
                         backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
                     />

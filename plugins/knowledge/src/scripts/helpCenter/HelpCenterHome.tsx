@@ -30,6 +30,7 @@ import { ComposeIcon } from "@library/icons/common";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import Banner from "@library/banner/Banner";
+import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 
 /**
  * Component representing the the full home page of a help center.
@@ -84,7 +85,12 @@ export class HelpCenterHome extends React.Component<IProps> {
                 />
                 <Container>
                     <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar useMobileBackButton={!this.props.isOnlyKb} hamburger={true} />
+                        <TitleBar
+                            useMobileBackButton={!this.props.isOnlyKb}
+                            extraBurgerNavigation={
+                                <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
+                            }
+                        />
                     </DocumentTitle>
 
                     {/*For Screen Readers / SEO*/}

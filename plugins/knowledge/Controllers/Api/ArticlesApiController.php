@@ -16,7 +16,7 @@ use Garden\Web\Exception\ServerException;
 use UserModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatCompatTrait;
-use Vanilla\Knowledge\Models\ArticleDraft;
+use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -34,7 +34,6 @@ use Vanilla\Models\ReactionOwnerModel;
 use DiscussionsApiController;
 use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
-use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
 
 /**
@@ -48,6 +47,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     use FormatCompatTrait;
 
+    use ArticlesApiHelper;
+    use ArticlesApiDrafts;
+    use ArticlesApiMigration;
+
     const REVISIONS_LIMIT = 10;
 
     /** @var ArticleModel */
@@ -58,6 +61,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /** @var ArticleReactionModel */
     private $articleReactionModel;
+
+    /** @var ArticleFeaturedModel */
+    private $articleFeaturedModel;
 
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
@@ -123,6 +129,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param PageRouteAliasModel $pageRouteAliasModel
      * @param EventManager $eventManager
      * @param KnowledgeApiController $knowledgeApiController
+     * @param ArticleFeaturedModel $articleFeaturedModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -142,11 +149,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
         EventManager $eventManager,
-        KnowledgeApiController $knowledgeApiController
+        KnowledgeApiController $knowledgeApiController,
+        ArticleFeaturedModel $articleFeaturedModel
+
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleReactionModel = $articleReactionModel;
+        $this->articleFeaturedModel = $articleFeaturedModel;
         $this->userModel = $userModel;
         $this->draftModel = $draftModel;
         $this->reactionModel = $reactionModel;
@@ -202,61 +212,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             throw new NotFoundException("Article");
         }
         return $article;
-    }
-
-    /**
-     * Delete an article draft.
-     *
-     * @param int $draftID
-     * @return mixed
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws NotFoundException If the article draft could not be found.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If the output fails to validate against the schema.
-     */
-    public function delete_drafts(int $draftID) {
-        $this->permission("Garden.SignIn.Allow");
-        $in = $this->schema([
-            "draftID" => [
-                "description" => "Target article draft ID.",
-                "type" => "integer",
-            ],
-        ], "in")->setDescription("Delete an article draft.");
-        $out = $this->schema([], "out");
-
-        $draft = $this->draftByID($draftID, true);
-        if ($draft["insertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Settings.Manage");
-        }
-        $this->draftModel->delete(
-            ["draftID" => $draft["draftID"]]
-        );
-    }
-
-    /**
-     * Get an article draft by its numeric ID.
-     *
-     * @param int $id Article ID.
-     * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
-     *
-     * @return array
-     * @throws NotFoundException If the draft could not be found.
-     * @throws ValidationException If the result fails schema validation.
-     */
-    private function draftByID(int $id, bool $includeDeleted = false): array {
-        try {
-            $draft = $this->draftModel->selectSingle([
-                "draftID" => $id,
-                "recordType" => "article",
-            ]);
-            if (!$includeDeleted && ($draft['recordID'] ?? false)) {
-                //check if article exists and knowledge base is "published"
-                $this->articleByID($draft['recordID']);
-            }
-        } catch (NoResultsException $e) {
-            throw new NotFoundException("Draft");
-        }
-        return $draft;
     }
 
     /**
@@ -340,34 +295,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $result =  $this->getArticleTranslationData($article);
         $result = $out->validate($result);
 
-        return $result;
-    }
-
-    /**
-     * Get a single article draft.
-     *
-     * @param int $draftID
-     * @return mixed
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws NotFoundException If the article draft could not be found.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If the output fails to validate against the schema.
-     */
-    public function get_drafts(int $draftID) {
-        $this->permission("knowledge.articles.add");
-
-        $in = $this->schema([
-            "draftID" => [
-                "description" => "Target article draft ID.",
-                "type" => "integer",
-            ],
-        ], "in")->setDescription("Get a single article draft.");
-        $out = $this->schema($this->fullDraftSchema(), "out");
-
-        $draft = $this->draftByID($draftID, true);
-        $draft = (new ArticleDraft($this->formatterService))->normalizeDraftFields($draft);
-        $result = $out->validate($draft);
-        $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
     }
 
@@ -525,90 +452,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Get a community discussion in a format that is easy to consume when creating a new article.
-     *
-     * @param array $query Request query.
-     */
-    public function index_fromDiscussion(array $query) {
-        $this->permission("knowledge.articles.add");
-
-        $in = $this->schema([
-            "discussionID" => [
-                "description" => "Unique identifier for the community discussion.",
-                "type" => "integer",
-            ]
-        ], "in");
-        $out = $this->discussionArticleSchema("out");
-
-        $query = $in->validate($query);
-        $article = $this->discussionArticleModel->discussionData($query["discussionID"]);
-
-        $result = $out->validate($article);
-        return $result;
-    }
-
-    /**
-     * List article drafts.
-     *
-     * @param array $query
-     * @return mixed
-     * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     * @throws ValidationException If input validation fails.
-     * @throws ValidationException If output validation fails.
-     */
-    public function index_drafts(array $query) {
-        $this->permission("knowledge.articles.add");
-
-        $in = $this->schema([
-            "articleID?" => [
-                "description" => "Unique ID article associated with a draft.",
-                "type" => "integer",
-                "x-filter" => [
-                    "field" => "recordID",
-                ],
-            ],
-            "insertUserID?" => [
-                "description" => "Unique ID of the user who created the article draft.",
-                "type" => "integer",
-                "x-filter" => [
-                    "field" => "insertUserID",
-                ],
-            ],
-            "expand?" => ApiUtils::getExpandDefinition(["insertUser", "updateUser"]),
-        ], "in")->setDescription("List article drafts.")->requireOneOf(["articleID", "insertUserID"]);
-        $out = $this->schema([
-            ":a" => $this->fullDraftSchema(),
-        ], "out");
-
-        $query = $in->validate($query);
-        if ($query['articleID'] ?? false) {
-            //check if article exists and knowledge base is "published"
-            $this->articleByID($query['articleID']);
-        }
-
-        $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
-        $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
-        $rows = $this->draftModel->get($where, $options);
-        $rows = (new ArticleDraft($this->formatterService))->normalizeDraftFields($rows, false);
-
-        $expandUsers = $this->resolveExpandFields(
-            $query,
-            [
-                "insertUser" => "insertUserID",
-                "updateUser" => "updateUserID",
-            ]
-        );
-        $this->userModel->expandUsers(
-            $rows,
-            $expandUsers
-        );
-
-        $result = $out->validate($rows);
-        return $result;
-    }
-
-    /**
      * Get revisions from a specific article.
      *
      * @param int $id
@@ -697,57 +540,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Get an knowledge category by its numeric ID.
-     *
-     * @param int $id Knowledge category ID.
-     * @param bool $includeDeleted Include knowledge category which belongs to knowledge base "deleted"
-     * @return array
-     * @throws NotFoundException If the knowledge category could not be found.
-     * @throws ValidationException If the result fails schema validation.
-     */
-    private function knowledgeCategoryByID(int $id, bool $includeDeleted = false): array {
-        try {
-            $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
-            if (!$includeDeleted) {
-                $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
-            }
-        } catch (NoResultsException $e) {
-            throw new NotFoundException("Knowledge Category");
-        }
-        return $knowledgeCategory;
-    }
-
-    /**
-     * Massage article row data for useful API output.
-     *
-     * @param array $row
-     * @return array
-     * @throws ServerException If no article ID was found in the row.
-     */
-    public function normalizeOutput(array $row): array {
-        $articleID = $row["articleID"] ?? null;
-        if (!$articleID) {
-            throw new ServerException("No ID in article row.");
-        }
-        $row["url"] = $this->articleModel->url($row);
-
-        if (isset($row["queryLocale"])) {
-            $row["translationStatus"] = ($row["locale"] === $row["queryLocale"]) ?
-                ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE :
-                ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
-        }
-
-        $bodyRendered = $row["bodyRendered"] ?? null;
-        $row["body"] = $bodyRendered;
-        $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
-        // Placeholder data.
-        $row["seoName"] = null;
-        $row["seoDescription"] = null;
-        $row["slug"] = $this->articleModel->getSlug($row);
-        return $row;
-    }
-
-    /**
      * Update an existing article.
      *
      * @param int $id
@@ -779,41 +571,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row['breadcrumbs'] = $crumbs;
 
         $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
-    }
-
-    /**
-     * Update an article draft.
-     *
-     * @param int $draftID
-     * @param array $body
-     * @return array
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function patch_drafts(int $draftID, array $body): array {
-        $this->permission("knowledge.articles.add");
-
-        $this->schema(["draftID" => "Target article draft ID."], "in");
-        $in = $this->schema($this->draftPostSchema(), "in")
-            ->setDescription("Update an article draft.");
-        $out = $this->schema($this->fullDraftSchema(), "out");
-
-        $body = $in->validate($body, true);
-
-        $body["recordType"] = "article";
-        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
-
-        $draft = $this->draftByID($draftID, true);
-        if ($draft["insertUserID"] !== $this->getSession()->UserID) {
-            $this->permission("Garden.Settings.Manage");
-        }
-
-        $this->draftModel->update($body, ["draftID" => $draftID]);
-        $row = $this->draftByID($draftID, true);
-        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -857,127 +614,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
         return $result;
-    }
-
-    /**
-     * PUT article aliases.
-     *
-     * @param int $id ArticleID
-     * @param array $body Incoming json array with 'aliases'.
-     *
-     * @return array Data array Article record/item
-
-     */
-    public function put_aliases(int $id, array $body): array {
-        $this->permission("knowledge.articles.add");
-
-        $this->idParamSchema();
-        $in = $this->schema([
-            "aliases:a" => [
-                "description" => "Article aliases list",
-                "items" => ["type" => "string"]
-            ],
-        ], "in")
-            ->addValidator("aliases", [ArticlesApiSchemes::class, 'validateAliases'])
-            ->setDescription("Set article aliases.");
-        $out = $this->articleSchema("out");
-        $body = $in->validate($body);
-
-        // This is just check if article exists and knowledge base has status "published"
-        $article = $this->articleByID($id);
-
-        $aliases = array_unique($body['aliases']);
-
-        $existingAliases = $this->pageRouteAliasModel->getAliases(
-            ArticleModel::RECORD_TYPE,
-            $id
-        );
-        foreach ($aliases as $alias) {
-            if ($exists = array_search($alias, $existingAliases)) {
-                unset($existingAliases[$exists]);
-            } else {
-                $this->pageRouteAliasModel->addAlias(
-                    ArticleModel::RECORD_TYPE,
-                    $id,
-                    $alias
-                );
-            }
-        }
-        if (count($existingAliases) > 0) {
-            $this->pageRouteAliasModel->dropAliases(
-                ArticleModel::RECORD_TYPE,
-                $id,
-                $existingAliases
-            );
-        }
-
-
-        $row = $this->articleByID($id, true);
-
-        $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
-        $row['aliases']  = $this->pageRouteAliasModel->getAliases(
-            ArticleModel::RECORD_TYPE,
-            $id,
-            true
-        );
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
-    }
-
-    /**
-     * Get article aliases.
-     *
-     * @param int $id ArticleID
-     *
-     * @return array Data array Article record/item
-
-     */
-    public function get_aliases(int $id): array {
-        $this->permission("knowledge.articles.add");
-
-        $this->idParamSchema();
-        $in = $this->schema([], "in")->setDescription("Get article aliases.");
-        $out = $this->articleAliasesSchema("out");
-
-        $row = $this->articleByID($id, true);
-
-        $row['aliases']  = $this->pageRouteAliasModel->getAliases(
-            ArticleModel::RECORD_TYPE,
-            $id,
-            true
-        );
-        $row = $this->normalizeOutput($row);
-        $result = $out->validate($row);
-        return $result;
-    }
-
-    /**
-     * Get article by its alias.
-     *
-     * @param array $query Query should have one mandatory argument: alias
-     *
-     * @return array Data array Article record/item
-
-     */
-    public function get_byAlias(array $query): array {
-        $this->permission("knowledge.kb.view");
-
-        $in = $this->schema([
-            "alias" => [
-                "type" => "string",
-            ],
-        ], "in")->setDescription("Get article by its alias.");
-        $out = $this->articleSchema("out");
-        $query = $in->validate($query);
-
-        try {
-            $articleID = $this->pageRouteAliasModel->getRecordID(ArticleModel::RECORD_TYPE, $query['alias']);
-        } catch (NoResultsException $e) {
-            throw new NotFoundException("Article with alias: ".$query['alias'].' not found.');
-        }
-
-        return $this->get($articleID);
     }
 
     /**
@@ -1092,38 +728,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Create a new article draft.
-     *
-     * @param array $body
-     * @return array
-     * @throws Exception If no session is available.
-     * @throws HttpException If a ban has been applied on the permission(s) for this session.
-     * @throws PermissionException If the user does not have the specified permission(s).
-     */
-    public function post_drafts(array $body): array {
-        $this->permission("knowledge.articles.add");
-
-        $in = $this->schema($this->draftPostSchema(), "in")
-            ->setDescription("Create a new article draft.");
-        $out = $this->schema($this->fullDraftSchema(), "out");
-
-        $body = $in->validate($body);
-        $body["recordType"] = "article";
-        if ($body['recordID'] ?? false) {
-            //check if article exists and knowledge base is "published"
-            $this->articleByID($body['recordID']);
-        }
-
-        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
-
-        $draftID = $this->draftModel->insert($body);
-        $row = $this->draftByID($draftID);
-        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
-        $result = $out->validate($row);
-        return $result;
-    }
-
-    /**
      * Invalidate article translations.
      *
      * @param int $id
@@ -1155,6 +759,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
+<<<<<<< HEAD
      * Get related articles.
      *
      * @param int $id
@@ -1487,106 +1092,29 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     /**
      * Check if the required fields are there for the first revision in a different locale.
+     * Add the PUT /api/v2/articles/{id}/featured resource.
      *
      * @param int $id
      * @param array $body
+     *
      * @return array
      */
-    private function validateFirstArticleRevision(int $id, array $body) {
-        $revisions = $this->articleRevisionModel->get(["articleID" => $id]);
-        $revisionForLocale = array_column($revisions, "locale");
-        if (!in_array($body["locale"], $revisionForLocale)) {
-            $firstRevisionSchema = $this->firstArticleRevisionPatchSchema("in")
-                ->setDescription("Update an existing article.");
-            $body = $firstRevisionSchema->validate($body);
-        }
-        return $body;
-    }
+    public function put_featured(int $id, array $body) {
+        $this->permission("kb.articles.add");
 
-    /**
-     * Get an article row by it's id and locale.
-     *
-     * @param int $id
-     * @param array $query
-     * @return array
-     * @throws ClientException When no record is found.
-     */
-    private function retrieveRow(int $id, array $query = []): array {
-        $article = $this->articleModel->selectSingle(["articleID" => $id]);
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($article["knowledgeCategoryID"]);
-        $options = [];
-        $where = [];
+        $this->idParamSchema();
+        $in = $this->schema(Schema::parse([
+            "featured:b",
+        ]), "in");
 
-        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
+        // Check that the article exists.
+        $this->articleByID($id);
 
-        if ($options['only-translated']) {
-            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
-        } else {
-            $where['ar.locale'] = $knowledgeBase['sourceLocale'];
-            if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
-                $options['arl.locale'] = $query['locale'];
-            }
-        }
+        $body = $in->validate($body);
 
-        $where["a.articleID"] = $id;
-        $where["kb.status"] = KnowledgeBaseModel::STATUS_PUBLISHED;
-        $options["limit"] = ArticleRevisionModel::DEFAULT_LIMIT;
-
-        $record = $this->articleModel->getWithRevision($where, $options);
-        $record = reset($record);
-
-        if (!$record) {
-            throw new NotFoundException("Article");
-        }
-
-        if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
-            // Deleted articles have a special permission check.
-            $this->permission('knowledge.articles.add');
-        }
-
-        return $record;
-    }
-
-
-    /**
-     * Check if an locale is supported by a knowledge-base.
-     *
-     * @param string $locale
-     * @param array $knowledgeBase
-     * @throws ClientException If locale is not supported.
-     */
-    private function checkKbSupportsLocale(string $locale, array $knowledgeBase) {
-        $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
-        $allLocales = array_column($allLocales, "locale");
-        $allLocales[] = $knowledgeBase["sourceLocale"];
-        $supportedLocale = in_array($locale, $allLocales);
-        if (!$supportedLocale) {
-            throw new ClientException("Locale {$locale} not supported in this Knowledge-Base");
-        }
-    }
-
-    /**
-     * Update translation status to out-of-date.
-     *
-     * @param int $id
-     */
-    private function updateInvalidateArticleTranslations(int $id) {
-        $articles = $this->articleModel->getIDWithRevision($id, true);
-        $firstArticle = reset($articles);
-        $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
-        $supportedLocales = $this->knowledgeBaseModel->getSupportedLocalesByKnowledgeBase($knowledgeBase);
-        $locales = array_diff($supportedLocales, [$knowledgeBase["sourceLocale"]]);
-
-        $this->articleRevisionModel->update(
-            [
-                "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_OUT_TO_DATE
-            ],
-            [
-                "articleID" => $id,
-                "locale" => $locales,
-                "status" => ArticleModel::STATUS_PUBLISHED,
-            ]
-        );
+        $this->articleFeaturedModel->update(['featured' => ($body['featured'] ? 1 : 0)], ['articleID' => $id]);
+        $this->knowledgeBaseModel->resetSphinxCounters();
+        return $this->get($id);
     }
 
     /**

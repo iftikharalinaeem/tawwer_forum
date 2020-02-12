@@ -380,6 +380,31 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PUT /articles/<id>/featured.
+     */
+    public function testPutFeatured() {
+        $article = $this->testPost();
+        $this->assertEmpty($article['dateFeatured']);
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/featured",
+            ['featured' => true]
+        )->getBody();
+
+        $this->assertTrue($body['featured']);
+        $this->assertNotEmpty($body['dateFeatured']);
+
+        sleep(1);
+        $unFeatured = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/featured",
+            ['featured' => false]
+        )->getBody();
+
+        $this->assertFalse($unFeatured['featured']);
+        $this->assertGreaterThan($body['dateFeatured'], $unFeatured['dateFeatured']);
+    }
+
+    /**
      * Test POST /articles when DiscussionID provided
      * to set discussion canonical link to the article created
      */
@@ -715,7 +740,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
-        $this->assertEquals(19, count($articles));
+        $this->assertEquals(20, count($articles));
     }
 
     /**
@@ -739,9 +764,9 @@ class ArticlesTest extends AbstractResourceTest {
         $article = $response->getBody();
         $locales = array_count_values(array_column($article, "locale"));
 
-        $this->assertEquals(20, count($article));
+        $this->assertEquals(21, count($article));
         $this->assertEquals(2, $locales["ru"]);
-        $this->assertEquals(18, $locales["en"]);
+        $this->assertEquals(19, $locales["en"]);
     }
 
     /**

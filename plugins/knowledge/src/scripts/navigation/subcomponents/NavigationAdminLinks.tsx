@@ -19,11 +19,17 @@ import { NewFolderIcon } from "@library/icons/common";
 import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import Translate from "@library/content/Translate";
+import DropDownSection from "@vanilla/library/src/scripts/flyouts/items/DropDownSection";
+import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
+import DropDownItemLink from "@vanilla/library/src/scripts/flyouts/items/DropDownItemLink";
+import DropDownItemButton from "@vanilla/library/src/scripts/flyouts/items/DropDownItemButton";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 interface IProps {
     className?: string;
     knowledgeBase: IKnowledgeBase;
     showDivider: boolean;
+    inHamburger?: boolean;
 }
 
 /**
@@ -40,7 +46,7 @@ export default function NavigationAdminLinks(props: IProps) {
     const sourceLocale = knowledgeBase.sourceLocale;
     const isDisabled = sourceLocale !== currentLocale;
 
-    const newCategoryButton = (
+    let newCategoryButton = (
         <Button
             onClick={openModal}
             buttonRef={categoryButtonRef}
@@ -53,8 +59,46 @@ export default function NavigationAdminLinks(props: IProps) {
         </Button>
     );
 
-    return (
-        <Permission permission="articles.add">
+    if (props.inHamburger) {
+        newCategoryButton = (
+            <DropDownItemButton onClick={openModal} buttonRef={categoryButtonRef} disabled={isDisabled}>
+                <NewFolderIcon className={dropDownClasses().actionIcon} />
+                {t("New Category")}
+            </DropDownItemButton>
+        );
+    }
+
+    newCategoryButton = isDisabled ? (
+        <ToolTip
+            label={
+                <Translate
+                    source="You can only add categories in the source locale: <0/>."
+                    c0={<LocaleDisplayer localeContent={sourceLocale || " "} displayLocale={sourceLocale || " "} />}
+                />
+            }
+            ariaLabel={"You can only add categories in the source locale."}
+        >
+            <span>{newCategoryButton}</span>
+        </ToolTip>
+    ) : (
+        newCategoryButton
+    );
+
+    let content: React.ReactNode;
+
+    if (props.inHamburger) {
+        content = (
+            <>
+                <DropDownItemSeparator />
+                <DropDownItemLink to={OrganizeCategoriesRoute.url({ kbID: knowledgeBase.knowledgeBaseID })}>
+                    {organize(dropDownClasses().actionIcon)}
+                    {t("Organize Categories")}
+                </DropDownItemLink>
+                {newCategoryButton}
+            </>
+        );
+    } else {
+        content = (
             <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
                 {props.showDivider && (
                     <hr role="separator" className={classNames("siteNavAdminLinks-divider", classes.divider)} />
@@ -92,6 +136,12 @@ export default function NavigationAdminLinks(props: IProps) {
                     )}
                 </li>
             </ul>
+        );
+    }
+
+    return (
+        <Permission permission="articles.add">
+            {content}
             <NewCategoryForm
                 isVisible={modalOpen}
                 buttonRef={categoryButtonRef}

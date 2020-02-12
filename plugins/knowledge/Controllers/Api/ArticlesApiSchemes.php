@@ -263,6 +263,8 @@ trait ArticlesApiSchemes {
                 "reactions?",
                 "aliases?",
                 "status",
+                "featured",
+                "dateFeatured",
                 "locale",
                 "translationStatus"
             ])->add($this->fullSchema()), "Article");
@@ -554,6 +556,8 @@ trait ArticlesApiSchemes {
             "dateInserted:dt" => "When the article was created.",
             "insertUser?" => $this->getUserFragmentSchema(),
             "updateUser?" => $this->getUserFragmentSchema(),
+            "featured:b",
+            "dateFeatured?:dt",
         ]);
     }
 
