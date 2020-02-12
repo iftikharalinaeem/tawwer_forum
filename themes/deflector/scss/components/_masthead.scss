@@ -37,10 +37,6 @@
       padding: 0 20px;
     }
 
-    .AdvancedSearch select {
-      color: $navbar-brand-color;
-    }
-
     input[type="submit"] {
       position: absolute;
       top: 5px;
@@ -48,6 +44,15 @@
       float: right;
       padding: 10px 25px;
     }
+  }
+
+  .AdvancedSearch .AdvancedSearch-Category,
+  .AdvancedSearch .AdvancedSearch-Date {
+
+    select {
+      color: $navbar-brand-color ;
+    }
+
   }
 
   .AdvancedSearch input[type="text"] {
