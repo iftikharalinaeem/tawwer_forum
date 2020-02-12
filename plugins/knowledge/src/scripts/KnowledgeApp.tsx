@@ -23,6 +23,7 @@ import React, { useCallback, useEffect, useDebugValue } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import PageLoader from "@library/routing/PageLoader";
+import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
 
 /*
  * Top level application component for knowledge.
@@ -58,6 +59,7 @@ function KnowledgeApp() {
     ) {
         content = (
             <BrowserRouter>
+                <Backgrounds />
                 <KbErrorPage defaultError={DefaultKbError.NO_KNOWLEDGE_BASE} />
             </BrowserRouter>
         );
@@ -74,6 +76,7 @@ function KnowledgeApp() {
             <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
                 <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
                     <NavHistoryContextProvider>
+                        <Backgrounds />
                         <PageLoader status={kbLoadable.status}>{content}</PageLoader>
                     </NavHistoryContextProvider>
                 </SearchContext.Provider>
