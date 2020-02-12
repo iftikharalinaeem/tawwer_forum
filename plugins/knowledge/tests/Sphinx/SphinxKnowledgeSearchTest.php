@@ -141,7 +141,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
         $params = [
             'featured' => true
         ];
-        $response = $this->api()->get('/knowledge/search?'.http_build_query($params));
+        $response = $this->api()->get('/knowledge/search', $params);
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
