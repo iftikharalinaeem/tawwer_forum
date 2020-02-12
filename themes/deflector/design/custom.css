@@ -870,6 +870,9 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
       right: 5px;
       float: right;
       padding: 10px 25px; }
+  .masthead .AdvancedSearch .AdvancedSearch-Category select,
+  .masthead .AdvancedSearch .AdvancedSearch-Date select {
+    color: #333; }
   .masthead .AdvancedSearch input[type="text"] {
     padding: 0 20px; }
   .masthead .container > *:first-child {
@@ -1067,37 +1070,29 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
 
 .Profile .DataCounts {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-align: center;
-  -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between; }
   .Profile .DataCounts .CountItem a {
     display: -webkit-box;
-    display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
-    -webkit-flex-direction: column;
         -ms-flex-direction: column;
             flex-direction: column;
     -webkit-box-align: center;
-    -webkit-align-items: center;
         -ms-flex-align: center;
             align-items: center; }
   .Profile .DataCounts .CountItemWrap {
     -webkit-box-flex: 1;
-    -webkit-flex: 1;
         -ms-flex: 1;
             flex: 1;
     width: auto; }
