@@ -418,8 +418,22 @@ MESSAGE
             ]
         );
         $sql->query($query, 'update');
+        $this->reindexSphinx();
     }
 
+    /**
+     * Try to reindex sphinx when localhost
+     * Note: this method should be refactored to implement some infrastructure call to reindex sphinx
+     *     Developers should add this to their local config file
+     *     $Configuration['Plugins']['Sphinx']['Debug'] = true;
+     *     That will allow dynamic sphinx reindexing
+     */
+    private function reindexSphinx() {
+        if (c('Plugins.Sphinx.Debug')) {
+            $sphinxHost = c('Plugins.Sphinx.Server');
+            exec('curl '.$sphinxHost.':9399', $dockerResponse);
+        }
+    }
     /**
      * Validate sort value of fields to be written to a new or existing knowledge base row.
      *

@@ -137,6 +137,22 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
     /**
      * @depends testData
      */
+    public function testFeatured() {
+        $params = [
+            'featured' => true
+        ];
+        $response = $this->api()->get('/knowledge/search', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(1, count($results));
+        $this->assertEquals(self::$testData['featuredArticle']['articleID'], $results[0]['recordID']);
+    }
+
+    /**
+     * @depends testData
+     */
     public function testSearchByAllCategoryIDs() {
         $params = [
             'knowledgeCategoryIDs' => [
@@ -221,11 +237,15 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
             "parentID" => $childCategory["knowledgeCategoryID"],
         ])->getBody();
 
-        $this->api()->post($this->kbArticlesUrl, [
+        $featuredArticle = $this->api()->post($this->kbArticlesUrl, [
             "knowledgeCategoryID" => $childCategory2["knowledgeCategoryID"],
             "name" => "Primary Category Article",
             "body" => json_encode([["insert" => "Article body with apple"]]),
             "format" => "rich",
+        ])->getBody();
+
+        $this->api()->put($this->kbArticlesUrl.'/'.$featuredArticle['articleID'].'/featured', [
+            "featured" => true
         ])->getBody();
 
         //Lets move this category now level Up
@@ -241,6 +261,7 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
             'childCategory' => $childCategory,
             'child2Category' => $child2Category,
             'childCategory2' => $childCategory2,
+            'featuredArticle' => $featuredArticle
         ];
     }
 }

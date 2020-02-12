@@ -771,6 +771,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
 
         $this->articleFeaturedModel->update(['featured' => ($body['featured'] ? 1 : 0)], ['articleID' => $id]);
+        $this->knowledgeBaseModel->resetSphinxCounters();
         return $this->get($id);
     }
 }

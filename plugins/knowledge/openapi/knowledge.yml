@@ -103,6 +103,12 @@ paths:
         name: all
         schema:
           type: string
+      - description: Filter only featured articles.
+        in: query
+        name: featured
+        schema:
+          type: boolean
+          default: false
       - description: 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).'
         in: query
         name: page
