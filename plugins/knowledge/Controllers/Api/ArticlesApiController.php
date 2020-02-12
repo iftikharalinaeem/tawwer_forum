@@ -106,7 +106,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var KnowledgeBasesApiController */
     private $knowledgeApiController;
 
-
     /**
      * ArticlesApiController constructor
      *
