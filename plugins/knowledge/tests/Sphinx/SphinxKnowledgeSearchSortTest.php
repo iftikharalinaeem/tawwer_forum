@@ -36,16 +36,20 @@ class SphinxKnowledgeSearchSortTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test name, dateInserted, dateFeatured sorting options (both ascending and descending variants).
+     *
+     * @param string $sort
+     * @param array $correctOrder
      * @depends testData
      * @dataProvider sortOptionsProvider
      */
-    public function testSort($sort, $correctOrder) {
+    public function testSort(string $sort, array $correctOrder) {
         $response = $this->api()->get('/knowledge/search', ['sort' => $sort]);
         $this->assertEquals(200, $response->getStatusCode());
 
         $results = $response->getBody();
         $this->assertEquals(4, count($results));
-        for($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             $this->assertEquals(self::$testData[$correctOrder[$i]]['articleID'], $results[$i]['recordID']);
         }
     }

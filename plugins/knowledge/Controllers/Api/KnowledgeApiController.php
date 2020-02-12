@@ -391,7 +391,7 @@ class KnowledgeApiController extends AbstractApiController {
         }
 
         if ($this->query['sort'] ?? false) {
-            $field = ltrim($this->query['sort'],'-');
+            $field = ltrim($this->query['sort'], '-');
             if ($field === $this->query['sort']) {
                 $this->sphinx->setSortMode(SPH_SORT_ATTR_ASC, $field);
             } else {
