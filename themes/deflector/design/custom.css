@@ -872,7 +872,7 @@ a.Bookmarked:before, a.Bookmarked:hover:before {
       padding: 10px 25px; }
   .masthead .AdvancedSearch .AdvancedSearch-Category select,
   .masthead .AdvancedSearch .AdvancedSearch-Date select {
-    color: #666; }
+    color: #333; }
   .masthead .AdvancedSearch input[type="text"] {
     padding: 0 20px; }
   .masthead .container > *:first-child {
