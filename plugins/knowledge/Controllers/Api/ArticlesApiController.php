@@ -811,7 +811,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
         $knowledgeBase = reset($knowledgeBase);
         $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? '';
-        $limit = $query["limit"] ?? 4;
+        $limit = $query["limit"] ?? self::RELATED_ARTICLES_LIMIT;
 
         $query = [
             "all" => $article["name"],
