@@ -320,43 +320,42 @@ class BadgeController extends BadgesAppController {
      * @param string $name
      */
     public function index($badgeID = '', $name = '') {
+        $this->permission('Reputation.Badge.View');
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
         Gdn_Theme::section('Badge');
 
-        if ($this->permission('Reputation.Badge.View')) {
-            // Get badge data or 404
-            $this->Badge = $this->BadgeModel->getID($badgeID);
-            if (!$this->Badge) {
-                throw new Exception(t('Badge404', 'Badge not found.'), 404);
-            }
-
-            // Don't show badge descriptions for the non-default locale since they can't be translated.
-            if (Gdn::locale()->current() !== c('Garden.Locale')) {
-                $this->Badge['Body'] = '';
-            }
-
-            $this->setData('Badge', $this->Badge);
-
-            // Current user a recipient?
-            $this->UserBadge = false;
-            if (Gdn::session()->isValid()) {
-                $this->UserBadge = $this->UserBadgeModel->getByUser(Gdn::session()->User->UserID, $this->data('Badge.BadgeID'));
-            }
-            $this->setData('UserBadge', $this->UserBadge);
-
-            // Get recipients
-            $this->setData('Recipients', $this->UserBadgeModel->getUsers($badgeID, ['Limit' => 15])->resultArray());
-            $this->setData('BadgeID', $badgeID, true);
-
-            if (val('_New', $this->UserBadge) && BadgeModel::isRequestable($this->Badge)) {
-                $this->addModule('RequestBadgeModule');
-            }
-            $this->addModule('BadgesModule');
-
-            $this->render();
+        // Get badge data or 404
+        $this->Badge = $this->BadgeModel->getID($badgeID);
+        if (!$this->Badge) {
+            throw new Exception(t('Badge404', 'Badge not found.'), 404);
         }
+
+        // Don't show badge descriptions for the non-default locale since they can't be translated.
+        if (Gdn::locale()->current() !== c('Garden.Locale')) {
+            $this->Badge['Body'] = '';
+        }
+
+        $this->setData('Badge', $this->Badge);
+
+        // Current user a recipient?
+        $this->UserBadge = false;
+        if (Gdn::session()->isValid()) {
+            $this->UserBadge = $this->UserBadgeModel->getByUser(Gdn::session()->User->UserID, $this->data('Badge.BadgeID'));
+        }
+        $this->setData('UserBadge', $this->UserBadge);
+
+        // Get recipients
+        $this->setData('Recipients', $this->UserBadgeModel->getUsers($badgeID, ['Limit' => 15])->resultArray());
+        $this->setData('BadgeID', $badgeID, true);
+
+        if (val('_New', $this->UserBadge) && BadgeModel::isRequestable($this->Badge)) {
+            $this->addModule('RequestBadgeModule');
+        }
+        $this->addModule('BadgesModule');
+
+        $this->render();
     }
 
     /**
