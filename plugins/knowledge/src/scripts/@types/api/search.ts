@@ -44,6 +44,7 @@ export interface ISearchRequestBody {
     categoryIDs?: number[];
     locale?: string;
     siteSectionGroup?: string;
+    featured?: boolean;
 }
 
 export type ISearchResponseBody = ISearchResult[];

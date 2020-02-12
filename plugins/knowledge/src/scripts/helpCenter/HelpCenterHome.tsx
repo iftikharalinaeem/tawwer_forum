@@ -20,7 +20,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { t } from "@library/utility/appUtils";
+import { t, getSiteSection } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";
 import { connect } from "react-redux";
@@ -31,6 +31,8 @@ import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvide
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import Banner from "@library/banner/Banner";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
+import { ArticlesWidget } from "@knowledge/widgets/ArticlesWidget";
+import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
 
 /**
  * Component representing the the full home page of a help center.
@@ -101,6 +103,20 @@ export class HelpCenterHome extends React.Component<IProps> {
                         <HelpCenterNavigation data={data!} rootCategoryUrl={rootCategoryUrl} />
                     </WidgetContainer>
                 </Container>
+                <ArticlesWidget
+                    title={t("Recommended Articles")}
+                    maxItemCount={4}
+                    containerOptions={{
+                        maxColumnCount: 2,
+                    }}
+                    params={{
+                        featured: true,
+                        siteSectionGroup:
+                            getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+                        locale: getSiteSection().contentLocale,
+                        knowledgeBaseID: knowledgeBase.knowledgeBaseID,
+                    }}
+                />
             </>
         );
     }

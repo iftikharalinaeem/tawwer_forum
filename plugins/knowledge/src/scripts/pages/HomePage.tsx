@@ -14,7 +14,7 @@ import apiv2 from "@library/apiv2";
 import Container from "@library/layout/components/Container";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { t } from "@library/utility/appUtils";
+import { t, getSiteSection } from "@library/utility/appUtils";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
@@ -23,6 +23,8 @@ import { useBackgroundContext } from "@library/layout/Backgrounds";
 import TitleBar from "@library/headers/TitleBar";
 import { bannerVariables } from "@library/banner/bannerStyles";
 import Banner from "@library/banner/Banner";
+import { ArticlesWidget } from "@knowledge/widgets/ArticlesWidget";
+import { tilesVariables } from "@vanilla/library/src/scripts/features/tiles/tilesStyles";
 
 const HomePage = (props: IProps) => {
     const splashVars = bannerVariables();
@@ -44,16 +46,33 @@ const HomePage = (props: IProps) => {
         return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;
     }
 
+    const recommendedColumnCount = tilesVariables().options.columns - 1;
+
     return (
         <>
             <AnalyticsData uniqueKey="homePage" />
+            <DocumentTitle title={t("Home")}>
+                <></>
+            </DocumentTitle>
+            <TitleBar useMobileBackButton={false} />
             <Banner title={title} />
             <Container>
-                <DocumentTitle title={t("Home")}>
-                    <TitleBar useMobileBackButton={false} />
-                </DocumentTitle>
                 <KnowledgeBaseList />
             </Container>
+            <ArticlesWidget
+                title={t("Recommended Articles")}
+                maxItemCount={tilesVariables().options.columns * 2}
+                containerOptions={{
+                    maxWidth: tilesVariables().calculatedMaxWidth,
+                    maxColumnCount: recommendedColumnCount,
+                }}
+                params={{
+                    featured: true,
+                    siteSectionGroup:
+                        getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+                    locale: getSiteSection().contentLocale,
+                }}
+            />
         </>
     );
 };
