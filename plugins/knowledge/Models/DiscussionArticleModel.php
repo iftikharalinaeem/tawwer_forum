@@ -39,7 +39,7 @@ class DiscussionArticleModel {
      * @throws NotFoundException If the discussion does not exist.
      */
     public function discussionData(int $discussionID) {
-        $discussion = $this->discussionsApiController->get($discussionID, ["expand" => "all"]);
+        $discussion = $this->discussionsApiController->get($discussionID, []);
         $discussionRaw = $this->discussionsApiController->get_edit($discussionID);
 
         $result = [
