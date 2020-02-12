@@ -33,17 +33,15 @@ export default function RelatedArticles(props: IProps) {
                 <hr className={classNames(classes.border, panelClasses.title)} />
                 <Heading depth={3} title={"Related Articles"} className={classes.header} />
                 <ul className={classes.linkList}>
-                    {articles
-                        .filter((article, index) => index < 4)
-                        .map(article => {
-                            return (
-                                <li key={article.recordID} className={classes.linkItem}>
-                                    <SmartLink to={article.url} className={classes.link}>
-                                        {article.name}
-                                    </SmartLink>
-                                </li>
-                            );
-                        })}
+                    {articles.map(article => {
+                        return (
+                            <li key={article.recordID} className={classes.linkItem}>
+                                <SmartLink to={article.url} className={classes.link}>
+                                    {article.name}
+                                </SmartLink>
+                            </li>
+                        );
+                    })}
                 </ul>
             </>
         );

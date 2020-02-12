@@ -75,8 +75,8 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             this.articleActions.getRelatedArticles({
                 articleID: articleID,
                 locale: getCurrentLocale(),
-                limit: 10,
-                minimumArticles: 5,
+                limit: 4,
+                minimumArticles: 4,
             }),
         ];
 
