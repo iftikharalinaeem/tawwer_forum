@@ -2,9 +2,8 @@
 \ * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
-import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { mixinTextLink } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { paddings } from "@library/styles/styleHelpersSpacing";
@@ -45,6 +44,7 @@ export const relatedArticlesClasses = useThemeCache(() => {
     const border = style("border", {
         ...borders({
             width: 1,
+            bottom: { width: 0 },
         }),
         marginTop: unit(16),
         marginBottom: unit(25.5),
