@@ -236,7 +236,6 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
 
             $sql = $this->sql();
 
-            print_r($options['selectColumns']);
             foreach ($options['selectColumns'] as $selectColumn) {
                 if (is_array($selectColumn)) {
                     $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);
