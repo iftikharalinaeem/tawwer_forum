@@ -48,7 +48,7 @@ const HomePage = (props: IProps) => {
         <>
             <AnalyticsData uniqueKey="homePage" />
             <Banner title={title} />
-            <Container>
+            <Container fullGutter>
                 <DocumentTitle title={t("Home")}>
                     <TitleBar useMobileBackButton={false} />
                 </DocumentTitle>
