@@ -62,8 +62,8 @@ interface IHelpfulParams {
 export interface IRelatedArticles {
     articleID: number;
     locale: string;
-    limit: number;
-    minimumArticles: number;
+    limit?: number;
+    minimumArticles?: number;
 }
 
 /**
@@ -133,10 +133,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         };
         return this.dispatchApi("get", `/articles`, ArticleActions.getArticlesACs, query);
     };
-
-    public static readonly GET_RELATED_ARTICLES_REQUEST = "@@article/GET_ARTICLE_REQUEST";
-    public static readonly GET_RELATED_ARTICLES_RESPONSE = "@@article/GET_ARTICLE_RESPONSE";
-    public static readonly GET_RELATED_ARTICLES_ERROR = "@@article/GET_ARTICLE_ERROR";
 
     public static getRelatedArticleACs = createAction.async<IGetArticleRequestBody, IRelatedArticle[], IApiError>(
         "GET_RELATED_ARTICLES",

@@ -11,7 +11,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
-import { IArticle, IGetArticleResponseBody } from "@knowledge/@types/api/article";
+import { IArticle } from "@knowledge/@types/api/article";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
@@ -75,8 +75,6 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
             this.articleActions.getRelatedArticles({
                 articleID: articleID,
                 locale: getCurrentLocale(),
-                limit: 4,
-                minimumArticles: 4,
             }),
         ];
 

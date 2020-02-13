@@ -97,8 +97,8 @@ class ArticlePage extends KbPage {
 
         $relatedArticlesResponse = $this->articlesApi->get_articlesRelated($articleID, [
             'locale' => $currentLocale,
-            'limit' => 4,
-            'minimumArticles' => 4,
+            'limit' => ArticleModel::RELATED_ARTICLES_LIMIT,
+            'minimumArticles' => ArticleModel::RELATED_ARTICLES_LIMIT,
         ]);
         $relatedArticlesResponse = Data::box($relatedArticlesResponse);
 

@@ -51,7 +51,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     use ArticlesApiMigration;
 
     const REVISIONS_LIMIT = 10;
-    const RELATED_ARTICLES_LIMIT = 4;
+
 
     /** @var ArticleModel */
     private $articleModel;
@@ -793,7 +793,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->permission("knowledge.articles.add");
 
         $query["locale"] = $query["locale"] ?? 'en';
-        $query["limit"] = $query["limit"] ?? 10;
+        $query["limit"] = $query["limit"] ?? ArticleModel::RELATED_ARTICLES_LIMIT;
 
         $in = $this->schema(Schema::parse([
             "name:s?",
@@ -811,13 +811,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
         $knowledgeBase = reset($knowledgeBase);
         $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? '';
-        $limit = $query["limit"] ?? self::RELATED_ARTICLES_LIMIT;
 
         $query = [
             "all" => $article["name"],
             "locale" => $query["locale"],
             "knowledgeCategoryID" => $article["knowledgeCategoryID"],
-            "limit" => $limit
+            "limit" => $query["limit"]
         ];
 
         $articles = $this->queryRelatedArticles($id, $query);
@@ -826,7 +825,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $query = [
                 "all" => $article["name"],
                 "locale" => $query["locale"],
-                "limit" => self::RELATED_ARTICLES_LIMIT
+                "limit" => $query["limit"]
             ];
 
             if ($siteSectionGroup) {
