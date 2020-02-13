@@ -46,12 +46,12 @@ export const relatedArticlesClasses = useThemeCache(() => {
             width: 1,
             bottom: { width: 0 },
         }),
-        marginTop: unit(16),
-        marginBottom: unit(25.5),
+        marginTop: unit(12),
+        marginBottom: unit(35.5),
     });
 
     const header = style("header", {
-        marginBottom: unit(15),
+        marginBottom: unit(12),
         ...paddings({
             horizontal: 8,
         }),
