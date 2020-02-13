@@ -225,6 +225,7 @@ class KnowledgeApiController extends AbstractApiController {
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
+                "seoImage:s?" => ["type" => "string"],
             ],
             "searchResultSchema"
         );

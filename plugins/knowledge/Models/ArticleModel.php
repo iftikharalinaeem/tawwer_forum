@@ -112,6 +112,10 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 "allowNull" => true,
                 "type" => "string",
             ],
+            "seoImage?" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
             "translationStatus?" => [
                 "allowNull" => true,
                 "type" => "string",
@@ -185,6 +189,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             || empty($options['arl.locale'])) {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
+                "ar.seoImage",
                 "ar.articleRevisionID",
                 "ar.name",
                 "ar.locale",
@@ -200,6 +205,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         } else {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
+                ['arl.seoImage, ar.seoImage', 'COALESCE', 'seoImage'],
                 "ar.articleRevisionID",
                 ['arl.name, ar.name', 'COALESCE', 'name'],
                 ['arl.locale, ar.locale', 'COALESCE', 'locale'],
@@ -229,6 +235,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $offset = $options["offset"] ?? 0;
 
             $sql = $this->sql();
+
+            print_r($options['selectColumns']);
             foreach ($options['selectColumns'] as $selectColumn) {
                 if (is_array($selectColumn)) {
                     $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);
