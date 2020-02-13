@@ -38,6 +38,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     /** Default limit on the number of results returned. */
     const LIMIT_DEFAULT = 30;
 
+    /** Default limit on related articles returned */
+    const RELATED_ARTICLES_LIMIT = 4;
+
     /** @var Gdn_Session */
     private $session;
 

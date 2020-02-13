@@ -52,6 +52,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     const REVISIONS_LIMIT = 10;
 
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -103,6 +104,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var EventManager */
     private $eventManager;
 
+    /** @var KnowledgeBasesApiController */
+    private $knowledgeApiController;
+
     /**
      * ArticlesApiController constructor
      *
@@ -124,6 +128,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param PageRouteAliasModel $pageRouteAliasModel
      * @param EventManager $eventManager
      * @param ArticleFeaturedModel $articleFeaturedModel
+     * @param KnowledgeApiController $knowledgeApiController
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -143,7 +148,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
         EventManager $eventManager,
-        ArticleFeaturedModel $articleFeaturedModel
+        ArticleFeaturedModel $articleFeaturedModel,
+        KnowledgeApiController $knowledgeApiController
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -160,6 +166,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
         $this->eventManager = $eventManager;
+        $this->knowledgeApiController = $knowledgeApiController;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -277,7 +284,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "translationStatus:s" => [
                 "enum" =>["up-to-date", "out-of-date", "not-translated"]
             ],
-            ], "out")
+        ], "out")
         ]);
 
         $query = $in->validate($query);
@@ -773,5 +780,86 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->articleFeaturedModel->update(['featured' => ($body['featured'] ? 1 : 0)], ['articleID' => $id]);
         $this->knowledgeBaseModel->resetSphinxCounters();
         return $this->get($id);
+    }
+
+    /**
+    * Get related articles.
+    *
+    * @param int $id
+    * @param array $query
+    * @return array
+    */
+    public function get_articlesRelated(int $id, array $query): array {
+        $this->permission("knowledge.articles.add");
+
+        $query["locale"] = $query["locale"] ?? 'en';
+        $query["limit"] = $query["limit"] ?? ArticleModel::RELATED_ARTICLES_LIMIT;
+
+        $in = $this->schema(Schema::parse([
+            "name:s?",
+            "limit:i?",
+            "locale:s?",
+            "minimumArticles:i?"
+        ], "in")->setDescription("Get related Articles"));
+
+        $out = $this->schema([":a" => $this->knowledgeApiController->searchResultSchema()], "out");
+        $query = $in->validate($query);
+
+        $minimumArticles = $query['minimumArticles'] ?? null;
+        $article = $this->articleByID($id, true);
+        $knowledgeBaseID = $article["knowledgeBaseID"] ?? '';
+        $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
+        $knowledgeBase = reset($knowledgeBase);
+        $siteSectionGroup = $knowledgeBase["siteSectionGroup"] ?? '';
+
+        $query = [
+            "all" => $article["name"],
+            "locale" => $query["locale"],
+            "knowledgeCategoryID" => $article["knowledgeCategoryID"],
+            "limit" => $query["limit"]
+        ];
+
+        $articles = $this->queryRelatedArticles($id, $query);
+
+        if (count($articles) < $minimumArticles) {
+            $query = [
+                "all" => $article["name"],
+                "locale" => $query["locale"],
+                "limit" => $query["limit"]
+            ];
+
+            if ($siteSectionGroup) {
+                $query["siteSectionGroup"] = $siteSectionGroup;
+            } else {
+                $query["knowledgeBaseID"] = $knowledgeBaseID;
+            }
+
+            $articles = $this->queryRelatedArticles($id, $query);
+        }
+
+        $articles = $out->validate($articles);
+
+        return $articles;
+    }
+
+    /**
+     * Get related articles using search endpoint.
+     *
+     * @param int $id
+     * @param array $query
+     *
+     * @return array
+     */
+    protected function queryRelatedArticles(int $id, array $query): array {
+        $results = $this->knowledgeApiController->get_search($query);
+
+        $articles = $results->getData();
+        foreach ($articles as $key => $article) {
+            if ($article["recordID"] === $id) {
+                unset($articles[$key]);
+                break;
+            }
+        }
+        return array_values($articles);
     }
 }
