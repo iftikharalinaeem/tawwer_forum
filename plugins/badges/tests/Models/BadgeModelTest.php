@@ -38,6 +38,39 @@ class BadgeModelTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Test changing 'AwardManually' attribute from true to false.
+     */
+    public function testChangeAwardManuallyAttribute() {
+        $originalBadge = [
+            'Name' => '50 Answers',
+            'Slug' => 'answer-50',
+            'Body' => 'Why use Google when we could just ask you?',
+            'Points' => '5',
+            'Class' => 'Answerer',
+            'Level' => '3',
+            'Threshold' => '50',
+            'Save' => 'Save',
+            'Attributes' => ['AwardManually' => true],
+        ];
+        $updatedBadge = [
+            'Name' => '50 Answers',
+            'Slug' => 'answer-50',
+            'Body' => 'Why use Google when we could just ask you?',
+            'Points' => '5',
+            'Class' => 'Answerer',
+            'Level' => '3',
+            'Threshold' => '50',
+            'Save' => 'Save',
+            'Attributes' => ['AwardManually' => false],
+        ];
+        $this->model->save($originalBadge);
+        $this->model->save($updatedBadge, ['AwardManually' => false]);
+        $expected = ['AwardManually' => false];
+        $actual = $this->model->getID($updatedBadge['Slug'])['Attributes'];
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
      * Test save() with new Attributes where there is no BadgeID.
      */
     public function testUpdateAttributesField() {
@@ -129,7 +162,6 @@ class BadgeModelTest extends \PHPUnit\Framework\TestCase {
             'Attributes' => ['AwardManually' => true],
         ];
         $this->model->save($originalBadge);
-        $testResult = $this->model->getId('answer-50');
         $this->model->save($updatedBadge, ['foo' => 'bar']);
         $expected = ['AwardManually' => true, 'Column' => 'CountComments'];
         $actual = $this->model->getID($updatedBadge['Slug'])['Attributes'];
