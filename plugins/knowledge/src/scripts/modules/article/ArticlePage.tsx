@@ -92,6 +92,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     messages={this.renderMessages()}
                     articlelocales={articlelocales?.data ?? null}
                     relatedArticles={relatedArticles?.data ?? null}
+                    featured={article.data.featured}
                 />
             </DocumentTitle>
         );

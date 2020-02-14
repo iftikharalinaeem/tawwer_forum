@@ -36,6 +36,7 @@ interface IArticleDefaultedData {
     body: string; // Content of the article. Defaults to an empty string.
     name: string; // Name of the article. Defaults to an empty string.
     format: string; // Format of the content. Defaults to the site's configured default format.
+    featured: boolean; // The featured article status
 }
 
 export interface IOutlineItem {
@@ -215,4 +216,9 @@ export interface IRelatedArticle {
     status: PublishStatus;
     recordID: number;
     recordType: string;
+}
+
+export interface IFeatureArticle {
+    articleID: number;
+    featured: boolean;
 }
