@@ -163,7 +163,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
      */
     private function getDiscussionBadge($discussionID) {
         if ($discussionID) {
-            $badge = Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->firstRow();
+            $badge = Gdn::sql()->select()->from('Badge')->where(['BadgeDiscussion' => $discussionID])->get()->firstRow(DATASET_TYPE_ARRAY);
             if ($badge) {
                 return $badge;
             }
@@ -183,16 +183,19 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         // pass the insertUserID, if it doesn't exist pass the updateUserID and allow the userBadgeModel()->give() decide to give it or not.
         $userID = valr('FormPostValues.InsertUserID', $args, valr('FormPostValues.UpdateUserID', $args));
         $badge = $this->getDiscussionBadge($discussionID);
+        if ($badge && !$badge['Active']) {
+            return;
+        }
         // When the user saves a comment check if there is a badge associated with it.
         if ($badge && $userID) {
-            $attributes = dbdecode(val('Attributes', $badge));
+            $attributes = dbdecode($badge['Attributes']);
             $userBadgeModel = new UserBadgeModel();
-            if (!val('AwardManually', $attributes)) {
+            if (!$attributes['AwardManually']) {
                 // If the badge is not flagged as AwardManually, give the badge.
-                $userBadgeModel->give($userID, val('BadgeID', $badge), val('Body', $badge));
+                $userBadgeModel->give($userID, $badge['BadgeID'], $badge['Body']);
             } else {
                 // Otherwise generate a request for a badge.
-                $userBadgeModel->request($userID, val('BadgeID', $badge), val('Body', $badge));
+                $userBadgeModel->request($userID, $badge['BadgeID'], $badge['Body']);
             }
         }
     }
@@ -208,7 +211,7 @@ class BadgifyCommentsPlugin extends Gdn_Plugin {
         $discussionBadge = $this->getDiscussionBadge(valr('Discussion.DiscussionID', $args));
         if ($discussionBadge) {
             $args['CssClass'] .= ' Badgified';
-            if (val('AwardManually', $discussionBadge)) {
+            if ($discussionBadge['AwardManually']) {
                 $args['CssClass'] .= ' ManualBadge';
             }
         }
