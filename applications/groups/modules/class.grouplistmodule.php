@@ -134,7 +134,10 @@ class GroupListModule extends Gdn_Module {
       * @return array A data array representing a group item in a group list.
       */
      protected function getGroupInfo($group, $layout, $withOptions, $sectionId) {
-          $item['text'] = htmlspecialchars(sliceString(Gdn_Format::plainText(val('Description', $group), val('Format', $group)), c('Groups.CardDescription.ExcerptLength', 150)));
+          $item['text'] = sliceString(
+              Gdn::formatService()->renderPlainText(val('Description', $group), val('Format', $group)),
+              c('Groups.CardDescription.ExcerptLength', 150)
+          );
           $item['textCssClass'] = 'GroupDescription';
           $item['imageSource'] = val('Icon', $group) ? Gdn_Upload::url(val('Icon', $group)) : c('Groups.DefaultIcon', false);
           $item['imageCssClass'] = 'Group-Icon';
