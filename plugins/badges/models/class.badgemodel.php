@@ -265,7 +265,7 @@ class BadgeModel extends Gdn_Model {
 
         if (isset($data['Attributes']) && is_array($data['Attributes'])) {
             if ($existingBadge && !$settings['overwriteAttributes']) {
-                $data['Attributes'] = array_replace($data['Attributes'], $existingBadge['Attributes']);
+                $data['Attributes'] = array_replace($existingBadge['Attributes'], $data['Attributes']);
             }
             $data['Attributes'] = dbencode($data['Attributes']);
         }
