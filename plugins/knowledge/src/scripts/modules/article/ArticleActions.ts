@@ -49,7 +49,6 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
-import ThemeActions from "@themingapi/theme/ThemeEditorActions";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
