@@ -96,12 +96,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>
-                    <DropDownItem>
-                        <RecommendArticle
-                            article={article}
-                            isLoading={this.props.featured.status === LoadStatus.LOADING}
-                        />
-                    </DropDownItem>
+                    <RecommendArticle article={article} />
                     <DropDownItemSeparator />
                     {this.props.article.status === PublishStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>

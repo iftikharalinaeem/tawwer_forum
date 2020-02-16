@@ -5,14 +5,16 @@
  */
 
 import * as React from "react";
-import ButtonSwitch from "@library/forms/ButtonSwitch";
+import { useState } from "react";
+
 import { IArticle } from "@knowledge/@types/api/article";
 import { useArticleActions } from "@knowledge/modules/article/ArticleActions";
-import { useState } from "react";
+import { useArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
+import { LoadStatus } from "@library/@types/api/core";
+import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
 
 export interface IRecommendArticleProps {
     article: IArticle;
-    isLoading: boolean;
 }
 
 /**
@@ -20,6 +22,7 @@ export interface IRecommendArticleProps {
  */
 export default function RecommendArticle(props: IRecommendArticleProps) {
     const { putFeaturedArticles } = useArticleActions();
+    const { featured } = useArticleMenuState();
     const [status, setStatus] = useState(props.article.featured);
 
     const featureArticle = () => {
@@ -28,11 +31,11 @@ export default function RecommendArticle(props: IRecommendArticleProps) {
     };
 
     return (
-        <ButtonSwitch
+        <DropDownSwitchButton
             onClick={featureArticle}
             label={"Recommend Articles"}
             status={status}
-            isLoading={props.isLoading}
+            isLoading={featured.status === LoadStatus.LOADING}
         />
     );
 }

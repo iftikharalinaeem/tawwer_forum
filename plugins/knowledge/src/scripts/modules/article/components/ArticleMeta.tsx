@@ -42,7 +42,7 @@ export class ArticleMeta extends React.Component<IProps> {
                         }
                     />
                 </span>
-                {featured ? <span>{"Recommended"}</span> : <></>}
+                {featured ? <span className={classesMetas.meta}>{"Recommended"}</span> : <></>}
             </React.Fragment>
         );
     }

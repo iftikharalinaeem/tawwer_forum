@@ -11,10 +11,11 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IFeatureArticle } from "@knowledge/@types/api/article";
+import { useSelector } from "react-redux";
 
 export interface IArticleMenuState {
     delete: ILoadable<{}>;
-    featured: ILoadable<IFeatureArticle>;
+    featured: ILoadable<{}>;
 }
 
 type ReducerType = KnowledgeReducer<IArticleMenuState>;
@@ -55,14 +56,11 @@ export default class ArticleMenuModel implements ReduxReducer<IArticleMenuState>
     public reducer = produce(
         reducerWithInitialState<IArticleMenuState>(ArticleMenuModel.INITIAL_STATE)
             .case(ArticleActions.putFeaturedArticles.started, (nextState, payload) => {
-                nextState.featured.status = LoadStatus.PENDING;
+                nextState.featured.status = LoadStatus.LOADING;
                 return nextState;
             })
             .case(ArticleActions.putFeaturedArticles.done, (nextState, payload) => {
-                if (nextState.featured.data) {
-                    nextState.featured.data.featured = payload.params.featured;
-                    nextState.featured.status = LoadStatus.SUCCESS;
-                }
+                nextState.featured.status = LoadStatus.SUCCESS;
                 return nextState;
             })
             .case(ArticleActions.putFeaturedArticles.failed, (nextState, payload) => {
@@ -71,4 +69,8 @@ export default class ArticleMenuModel implements ReduxReducer<IArticleMenuState>
             })
             .default(this.internalReducer),
     );
+}
+
+export function useArticleMenuState() {
+    return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.articleMenu);
 }
