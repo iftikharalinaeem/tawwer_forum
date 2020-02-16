@@ -21,7 +21,7 @@ import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
-import RecommendArticle from "@knowledge/modules/article/components/RecommendArticleComponent";
+import FeatureArticle from "@knowledge/modules/article/components/FeatureArticle";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
@@ -96,7 +96,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                             {t("Revision History")}
                         </RevisionsRoute.Link>
                     </DropDownItem>
-                    <RecommendArticle article={article} />
+                    <FeatureArticle article={article} />
                     <DropDownItemSeparator />
                     {this.props.article.status === PublishStatus.PUBLISHED ? deleteButton : restoreButton}
                 </DropDown>

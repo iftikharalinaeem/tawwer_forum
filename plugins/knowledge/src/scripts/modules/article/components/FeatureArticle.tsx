@@ -12,6 +12,7 @@ import { useArticleActions } from "@knowledge/modules/article/ArticleActions";
 import { useArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { LoadStatus } from "@library/@types/api/core";
 import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
+import { t } from "@vanilla/i18n/src";
 
 export interface IRecommendArticleProps {
     article: IArticle;
@@ -20,7 +21,7 @@ export interface IRecommendArticleProps {
 /**
  *
  */
-export default function RecommendArticle(props: IRecommendArticleProps) {
+export default function FeatureArticle(props: IRecommendArticleProps) {
     const { putFeaturedArticles } = useArticleActions();
     const { featured } = useArticleMenuState();
     const [status, setStatus] = useState(props.article.featured);
@@ -33,7 +34,7 @@ export default function RecommendArticle(props: IRecommendArticleProps) {
     return (
         <DropDownSwitchButton
             onClick={featureArticle}
-            label={"Recommend Articles"}
+            label={t("Feature Article")}
             status={status}
             isLoading={featured.status === LoadStatus.LOADING}
         />
