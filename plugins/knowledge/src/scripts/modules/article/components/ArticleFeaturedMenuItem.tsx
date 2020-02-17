@@ -19,9 +19,9 @@ export interface IRecommendArticleProps {
 }
 
 /**
- *
+ * Implements featuring/un-featuring and article.
  */
-export default function FeatureArticle(props: IRecommendArticleProps) {
+export default function ArticleFeaturedMenuItem(props: IRecommendArticleProps) {
     const { putFeaturedArticles } = useArticleActions();
     const { featured } = useArticleMenuState();
     const [status, setStatus] = useState(props.article.featured);

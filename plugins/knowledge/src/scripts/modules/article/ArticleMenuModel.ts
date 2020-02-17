@@ -10,7 +10,6 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { IFeatureArticle } from "@knowledge/@types/api/article";
 import { useSelector } from "react-redux";
 
 export interface IArticleMenuState {
