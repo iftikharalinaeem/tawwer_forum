@@ -9,7 +9,6 @@ namespace Vanilla\ThemingApi;
 use Garden\Web\Exception\ServerException;
 use Gdn_Upload;
 use Vanilla\Addon;
-use Vanilla\AddonManager;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeModel as ThemingModel;
@@ -19,6 +18,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn_Request;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Models\FsThemeProvider;
 use Vanilla\Theme\Asset;
 use Vanilla\Theme\FontsAsset;
 use Vanilla\Theme\HtmlAsset;
@@ -56,8 +56,8 @@ class DbThemeProvider implements ThemeProviderInterface {
     /** @var Gdn_Request */
     private $request;
 
-    /** @var AddonManager */
-    private $addonManager;
+    /** @var FsThemeProvider */
+    private $fsThemeProvider;
 
     /**
      * DbThemeProvider constructor.
@@ -66,22 +66,21 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @param ThemingModel $themeModel
      * @param ConfigurationInterface $config
      * @param Gdn_Request $request
-     * @param AddonManager $addonManager
      */
     public function __construct(
         ThemeAssetModel $themeAssetModel,
         ThemingModel $themeModel,
         ConfigurationInterface $config,
         Gdn_Request $request,
-        AddonManager $addonManager,
-        ThemeModelHelper $themeHelper
+        ThemeModelHelper $themeHelper,
+        FsThemeProvider $fsThemeProvider
     ) {
         $this->themeAssetModel = $themeAssetModel;
         $this->themeModel = $themeModel;
         $this->themeHelper = $themeHelper;
         $this->config = $config;
         $this->request = $request;
-        $this->addonManager = $addonManager;
+        $this->fsThemeProvider = $fsThemeProvider;
     }
 
     /**
@@ -294,13 +293,13 @@ class DbThemeProvider implements ThemeProviderInterface {
         $content = '';
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
         if (!empty($theme['parentTheme'])) {
-           $parentTheme = $this->addonManager->lookupTheme($theme['parentTheme']);
-           if ($filename = $parentTheme->getInfo()['assets'][$assetKey]['file'] ?? false) {
-               $filename = $parentTheme->path('/assets/'.$filename);
+            $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
+            if ($filename = $parentTheme->getInfo()['assets'][$assetKey]['file'] ?? false) {
+                $filename = $parentTheme->path('/assets/'.$filename);
                 if (file_exists($filename)) {
                     $content = file_get_contents($filename);
                 }
-           }
+            }
         }
         return $content;
     }
@@ -326,12 +325,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             // do nothing and default theme view folder of Garden.Theme
         }
 
-        $theme = $this->addonManager->lookupTheme($themeKey);
-        if (!($theme instanceof Addon)) {
-            throw new NotFoundException("Theme");
-        }
-        $path = PATH_ROOT . $theme->getSubdir() . '/views/';
-        return $path;
+        return $this->fsThemeProvider->getThemeViewPath($themeKey);
     }
 
     /**
@@ -339,7 +333,8 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function getMasterThemeKey($themeID): string {
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
-        return $theme['parentTheme'];
+        $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
+        return $parentTheme->getKey();
     }
 
     /**
@@ -394,7 +389,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             }
         }
 
-        $parentTheme = isset($theme['parentTheme']) ? $this->addonManager->lookupTheme($theme['parentTheme']) : null;
+        $parentTheme = isset($theme['parentTheme']) ? $this->fsThemeProvider->getThemeAddon($theme['parentTheme']) : null;
         if (!($parentTheme instanceof Addon)) {
             $res['preview']['info']['Warning'] = ['type' => 'string', 'info' => 'Parent theme ('.$theme['parentTheme'].') is not valid'];
         } else {
