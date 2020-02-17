@@ -70,6 +70,7 @@ export function dummyArticle(overrides: Partial<IArticle> = {}): IArticle {
         url: "/kb/articles/1-example-article",
         reactions: [],
         translationStatus: "up-to-date",
+        featured: false,
         ...overrides,
     };
 }

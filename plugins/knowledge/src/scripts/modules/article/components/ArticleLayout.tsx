@@ -19,7 +19,7 @@ import NextPrevious from "@library/navigation/NextPrevious";
 import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
-import { IArticle, IArticleLocale, IRelatedArticle } from "@knowledge/@types/api/article";
+import { IArticle, IArticleLocale, IFeatureArticle, IRelatedArticle } from "@knowledge/@types/api/article";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
@@ -44,6 +44,7 @@ export class ArticleLayout extends React.Component<IProps> {
             prevNavArticle,
             articlelocales,
             relatedArticles,
+            featured,
         } = this.props;
 
         const { articleID } = article;
@@ -132,6 +133,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                             updateUser={article.updateUser!}
                                             dateUpdated={article.dateUpdated}
                                             permaLink={article.url}
+                                            featured={featured}
                                         />
                                     }
                                     includeBackLink={
@@ -192,6 +194,7 @@ interface IProps extends IDeviceProps {
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
     articlelocales: IArticleLocale[] | null;
     relatedArticles: IRelatedArticle[] | null;
+    featured: boolean;
 }
 
 export default withDevice(ArticleLayout);

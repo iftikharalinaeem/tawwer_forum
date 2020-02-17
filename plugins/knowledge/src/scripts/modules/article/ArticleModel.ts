@@ -289,6 +289,16 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                 };
                 return nextState;
             })
+            .case(ArticleActions.putFeaturedArticles.done, (nextState, payload) => {
+                const { articleID } = payload.params;
+                const { featured } = payload.result;
+                const existingArticle = nextState.articlesByID[articleID];
+                if (existingArticle) {
+                    existingArticle.featured = featured;
+                }
+
+                return nextState;
+            })
             .default(this.internalReducer),
     );
 }

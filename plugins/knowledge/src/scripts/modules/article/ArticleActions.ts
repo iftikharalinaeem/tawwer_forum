@@ -30,6 +30,7 @@ import {
     IPostArticleRequestBody,
     IPostArticleResponseBody,
     IRelatedArticle,
+    IFeatureArticle,
 } from "@knowledge/@types/api/article";
 import {
     IGetArticleRevisionsRequestBody,
@@ -46,7 +47,8 @@ import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
-import { ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
+import { useDispatch } from "react-redux";
+import { useMemo } from "react";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -150,6 +152,18 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             const response = await this.api.get(`/articles/${articleID}/articlesRelated`, { params });
             return response.data;
         })(query);
+        return this.dispatch(apiThunk);
+    };
+    public static putFeaturedArticles = createAction.async<IFeatureArticle, IGetArticleResponseBody, IApiError>(
+        "PUT_FEATURED_ARTICLES",
+    );
+
+    public putFeaturedArticles = (params: IFeatureArticle) => {
+        const { articleID, ...body } = params;
+        const apiThunk = bindThunkAction(ArticleActions.putFeaturedArticles, async () => {
+            const response = await this.api.put(`/articles/${articleID}/featured`, body);
+            return response.data;
+        })(params);
         return this.dispatch(apiThunk);
     };
 
@@ -530,4 +544,10 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             );
         }
     };
+}
+
+export function useArticleActions() {
+    const dispatch = useDispatch();
+    const actions = useMemo(() => new ArticleActions(dispatch, apiv2), [dispatch]);
+    return actions;
 }

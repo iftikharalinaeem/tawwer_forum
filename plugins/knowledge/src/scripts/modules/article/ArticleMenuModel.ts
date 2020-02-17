@@ -9,9 +9,12 @@ import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/mode
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import ReduxReducer from "@library/redux/ReduxReducer";
 import produce from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { useSelector } from "react-redux";
 
 export interface IArticleMenuState {
     delete: ILoadable<{}>;
+    featured: ILoadable<{}>;
 }
 
 type ReducerType = KnowledgeReducer<IArticleMenuState>;
@@ -28,22 +31,45 @@ export default class ArticleMenuModel implements ReduxReducer<IArticleMenuState>
         delete: {
             status: LoadStatus.PENDING,
         },
+        featured: {
+            status: LoadStatus.PENDING,
+        },
     };
 
-    public reducer: ReducerType = (state = ArticleMenuModel.INITIAL_STATE, action) => {
-        return produce(state, draft => {
-            switch (action.type) {
-                case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
-                    draft.delete.status = LoadStatus.LOADING;
-                    break;
-                case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
-                    draft.delete.status = LoadStatus.SUCCESS;
-                    break;
-                case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
-                    draft.delete.status = LoadStatus.ERROR;
-                    draft.delete.error = action.payload;
-                    break;
-            }
-        });
+    public internalReducer: ReducerType = (nextState = ArticleMenuModel.INITIAL_STATE, action) => {
+        switch (action.type) {
+            case ArticleActions.PATCH_ARTICLE_STATUS_REQUEST:
+                nextState.delete.status = LoadStatus.LOADING;
+                break;
+            case ArticleActions.PATCH_ARTICLE_STATUS_RESPONSE:
+                nextState.delete.status = LoadStatus.SUCCESS;
+                break;
+            case ArticleActions.PATCH_ARTICLE_STATUS_ERROR:
+                nextState.delete.status = LoadStatus.ERROR;
+                nextState.delete.error = action.payload;
+                break;
+        }
+
+        return nextState;
     };
+    public reducer = produce(
+        reducerWithInitialState<IArticleMenuState>(ArticleMenuModel.INITIAL_STATE)
+            .case(ArticleActions.putFeaturedArticles.started, (nextState, payload) => {
+                nextState.featured.status = LoadStatus.LOADING;
+                return nextState;
+            })
+            .case(ArticleActions.putFeaturedArticles.done, (nextState, payload) => {
+                nextState.featured.status = LoadStatus.SUCCESS;
+                return nextState;
+            })
+            .case(ArticleActions.putFeaturedArticles.failed, (nextState, payload) => {
+                nextState.featured.status = LoadStatus.ERROR;
+                return nextState;
+            })
+            .default(this.internalReducer),
+    );
+}
+
+export function useArticleMenuState() {
+    return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.articleMenu);
 }
