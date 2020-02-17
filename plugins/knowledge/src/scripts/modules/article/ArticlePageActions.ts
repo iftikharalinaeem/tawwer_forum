@@ -11,6 +11,7 @@ import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
+import { IArticle } from "@knowledge/@types/api/article";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
@@ -47,26 +48,37 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
      */
     public reset = this.bindDispatch(ArticlePageActions.createResetAction);
 
-    public init = async (articleID: number) => {
+    private takeArticleFromCacheOrRequest = async (articleID: number): Promise<IArticle | undefined> => {
         let article = ArticleModel.selectArticle(this.getState(), articleID);
         if (article) {
             this.dispatch(ArticlePageActions.createInitAction(articleID, true));
         } else {
             this.dispatch(ArticlePageActions.createInitAction(articleID));
-            const articleResponse = await this.articleActions.fetchByID({
+            const article = await this.articleActions.fetchByID({
                 locale: getCurrentLocale(),
                 articleID,
             });
-            if (!articleResponse) {
-                return;
-            }
-
-            article = articleResponse;
+            return article;
         }
+    };
 
-        await this.articleActions.fetchLocales({ articleID });
-        const kbID = article.knowledgeBaseID;
-        await this.navigationActions.getNavigationFlat(kbID);
+    public init = async (articleID: number) => {
+        const promises = [
+            this.takeArticleFromCacheOrRequest(articleID).then(article => {
+                if (article) {
+                    const kbID = article.knowledgeBaseID;
+                    void this.navigationActions.getNavigationFlat(kbID);
+                }
+                return article;
+            }),
+            this.articleActions.fetchLocales({ articleID }),
+            this.articleActions.getRelatedArticles({
+                articleID: articleID,
+                locale: getCurrentLocale(),
+            }),
+        ];
+
+        const [article] = await Promise.all(promises);
         return article;
     };
 }

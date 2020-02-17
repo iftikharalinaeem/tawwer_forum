@@ -23,6 +23,8 @@ import { panelBackgroundVariables } from "@vanilla/library/src/scripts/layout/pa
 import { typographyClasses } from "@vanilla/library/src/scripts/styles/typographyStyles";
 import ScrollLock from "react-scrolllock";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
+import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
+import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -100,16 +102,16 @@ export default function NavigationLoadingLayout(props: IProps) {
                                     <LoadingSpacer height={12} />
                                     <LoadingRectange height={14} width={"85%"} />
                                 </PanelWidget>
+                                <PanelWidget>
+                                    <RelatedArticlesPlaceHolder />
+                                </PanelWidget>
                             </>
                         }
                         rightTop={
                             <>
                                 {device !== Devices.MOBILE && device !== Devices.TABLET && (
                                     <PanelWidget>
-                                        <LoadingRectange height={18} />
-                                        <LoadingSpacer height={18} />
-                                        <LoadingRectange height={14} />
-                                        <LoadingSpacer height={12} />
+                                        <OtherLangaugesPlaceHolder />
                                     </PanelWidget>
                                 )}
                             </>

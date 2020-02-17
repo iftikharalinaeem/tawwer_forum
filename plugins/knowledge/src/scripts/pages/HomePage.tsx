@@ -56,7 +56,7 @@ const HomePage = (props: IProps) => {
             </DocumentTitle>
             <TitleBar useMobileBackButton={false} />
             <Banner title={title} />
-            <Container>
+            <Container fullGutter>
                 <KnowledgeBaseList />
             </Container>
             <ArticlesWidget

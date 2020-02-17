@@ -5,56 +5,45 @@
  */
 
 import * as React from "react";
-import { PanelWidget } from "@library/layout/PanelLayout";
-import { t } from "@library/utility/appUtils";
+import SmartLink from "@library/routing/links/SmartLink";
+import { IRelatedArticle } from "@knowledge/@types/api/article";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { unit } from "@library/styles/styleHelpers";
+import { relatedArticlesClasses } from "@knowledge/modules/article/components/relatedArticlesStyles";
 import Heading from "@library/layout/Heading";
-import { Link } from "react-router-dom";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 
-export interface IInternalLink {
-    name: string;
-    to: string;
-}
-
 interface IProps {
-    children: IInternalLink[];
+    articles: IRelatedArticle[];
 }
 
 /**
  * Implements the related articles component
  */
-export default class RelatedArticles extends React.Component<IProps> {
-    public render() {
-        const classes = panelListClasses();
-        if (this.props.children && this.props.children.length > 0) {
-            const contents = this.props.children.map((item, i) => {
-                return (
-                    <li className={classNames("panelList-item", "relatedArticles-item")} key={"related-" + i}>
-                        <Link
-                            to={item.to}
-                            className={classNames("panelList-link", classes.link, "relatedArticles-link")}
-                            title={item.name}
-                        >
-                            {item.name}
-                        </Link>
-                    </li>
-                );
-            });
-
-            return (
-                <PanelWidget>
-                    <nav className={classNames("panelList", "relatedArticles")}>
-                        <Heading
-                            title={t("Related Articles")}
-                            className={classNames("panelList-title", "relatedArticles-title")}
-                        />
-                        <ul className={classNames("panelList-items", "relatedArticles-items")}>{contents}</ul>
-                    </nav>
-                </PanelWidget>
-            );
-        } else {
-            return null;
-        }
-    }
+export default function RelatedArticles(props: IProps) {
+    const { articles } = props;
+    const classes = relatedArticlesClasses();
+    const panelClasses = panelListClasses();
+    const content =
+        articles.length === 0 ? (
+            <></>
+        ) : (
+            <>
+                <hr className={classNames(classes.border, panelClasses.title)} />
+                <Heading depth={3} title={"Related Articles"} className={classes.header} />
+                <ul className={classes.linkList}>
+                    {articles.map(article => {
+                        return (
+                            <li key={article.recordID} className={classes.linkItem}>
+                                <SmartLink to={article.url} className={classes.link}>
+                                    {article.name}
+                                </SmartLink>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </>
+        );
+    return content;
 }

@@ -109,6 +109,18 @@ paths:
         schema:
           type: boolean
           default: false
+      - description: Sort option to order search results.
+        in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+          - dateInserted
+          - -dateInserted
+          - dateFeatured
+          - -dateFeatured
+          - name
+          - -name
       - description: 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).'
         in: query
         name: page

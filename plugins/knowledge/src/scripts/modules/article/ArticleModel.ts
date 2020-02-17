@@ -4,7 +4,13 @@
  * @license Proprietary
  */
 
-import { IArticle, IArticleFragment, IResponseArticleDraft, IArticleLocale } from "@knowledge/@types/api/article";
+import {
+    IArticle,
+    IArticleFragment,
+    IArticleLocale,
+    IRelatedArticle,
+    IResponseArticleDraft,
+} from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
 import ArticleActions, { useArticleActions } from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
@@ -37,6 +43,9 @@ export interface IArticleState {
     };
     draftsByID: {
         [draftID: number]: IResponseArticleDraft;
+    };
+    relatedArticlesLoadable: {
+        [articleID: number]: ILoadable<IRelatedArticle[]>;
     };
     articleIDsWithTranslationFallback: number[];
     articleListsByParamHash: {
@@ -84,6 +93,25 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         const stateSlice = this.stateSlice(state);
         return (
             stateSlice.articleLocalesByID[articleID] || {
+                status: LoadStatus.PENDING,
+            }
+        );
+    }
+
+    /**
+     * Select article locales out of the stored ones.
+     *
+     * @param state
+     * @param articleID
+     */
+    public static selectRelatedArticles(
+        state: IKnowledgeAppStoreState,
+        articleID: number,
+    ): ILoadable<IRelatedArticle[]> {
+        const stateSlice = this.stateSlice(state);
+
+        return (
+            stateSlice.relatedArticlesLoadable[articleID] || {
                 status: LoadStatus.PENDING,
             }
         );
@@ -146,6 +174,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         articleIDsWithTranslationFallback: [],
         articleLocalesByID: {},
         articleListsByParamHash: {},
+        relatedArticlesLoadable: {},
     };
 
     public initialState: IArticleState = ArticleModel.INITIAL_STATE;
@@ -287,6 +316,36 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
             })
             .case(NavigationActions.patchNavigationFlatACs.done, () => {
                 return ArticleModel.INITIAL_STATE;
+            })
+            .case(ArticleActions.getRelatedArticleACs.started, (nextState, payload) => {
+                if (nextState.relatedArticlesLoadable[payload.articleID]?.status) {
+                    nextState.relatedArticlesLoadable[payload.articleID].status = LoadStatus.LOADING;
+                }
+                return nextState;
+            })
+            .case(ArticleActions.getRelatedArticleACs.done, (nextState, payload) => {
+                nextState.relatedArticlesLoadable[payload.params.articleID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: [...payload.result],
+                };
+                return nextState;
+            })
+            .case(ArticleActions.getRelatedArticleACs.failed, (nextState, payload) => {
+                nextState.relatedArticlesLoadable[payload.params.articleID] = {
+                    status: LoadStatus.ERROR,
+                    error: payload.error,
+                };
+                return nextState;
+            })
+            .case(ArticleActions.putFeaturedArticles.done, (nextState, payload) => {
+                const { articleID } = payload.params;
+                const { featured } = payload.result;
+                const existingArticle = nextState.articlesByID[articleID];
+                if (existingArticle) {
+                    existingArticle.featured = featured;
+                }
+
+                return nextState;
             })
             .default(this.internalReducer),
     );

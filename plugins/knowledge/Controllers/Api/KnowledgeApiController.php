@@ -225,6 +225,7 @@ class KnowledgeApiController extends AbstractApiController {
                 "updateUser?" => $this->getUserFragmentSchema(),
                 "insertUser?" => $this->getUserFragmentSchema(),
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
+                "seoImage:s?" => ["type" => "string"],
             ],
             "searchResultSchema"
         );
@@ -245,8 +246,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->query = $in->validate($query);
         $searchResults = $this->sphinxSearch();
 
-        $sphinxOrder = (bool)($query['featured'] ?? false);
-        $results = $this->getNormalizedData($searchResults, $sphinxOrder);
+        $results = $this->getNormalizedData($searchResults, $query);
 
         $result = $out->validate($results);
 
@@ -391,6 +391,16 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'dateFeatured');
         }
 
+        if ($this->query['sort'] ?? false) {
+            $this->query['sort'] = str_replace('name', 'title', $this->query['sort']);
+            $field = ltrim($this->query['sort'], '-');
+            if ($field === $this->query['sort']) {
+                $this->sphinx->setSortMode(SPH_SORT_ATTR_ASC, $field);
+            } else {
+                $this->sphinx->setSortMode(SPH_SORT_ATTR_DESC, $field);
+            }
+        }
+
         if (isset($this->query['name']) && !empty(trim($this->query['name']))) {
             $this->sphinxQuery .= '@name (' . $this->sphinx->escapeString($this->query['name']) . ')*';
         }
@@ -436,16 +446,22 @@ class KnowledgeApiController extends AbstractApiController {
      * Get articles data from articleRevisionsModel and normalize records for output
      *
      * @param array $searchResults Result set returned by Sphinx search
+     * @param array $query GET query params
      * @return array
      */
-    protected function getNormalizedData(array $searchResults, bool $keepSphinxOrder = false): array {
+    protected function getNormalizedData(array $searchResults, array $query = []): array {
         $results = [];
         $this->results['matches'] = $searchResults['matches'] ?? [];
+
+        $keepSphinxOrder = (bool)($query['sort'] ?? false);
+        if (!$keepSphinxOrder) {
+            $keepSphinxOrder = (bool)($query['featured'] ?? false);
+        }
         $i = 0;
         if (($searchResults['total'] ?? 0) > 0) {
             $ids = [];
             foreach ($searchResults['matches'] as $guid => $record) {
-                $this->results['matches'][$guid]['orderIndex'] = ($keepSphinxOrder) ? $i-- : $record['weight'];
+                $this->results['matches'][$guid]['orderIndex'] = $keepSphinxOrder ? $i++ : -$record['weight'];
                 $type = self::RECORD_TYPES[$record['attrs']['dtype']];
                 $ids[$record['attrs']['dtype']][] = ($guid - $type['offset']) / $type['multiplier'];
             };
@@ -454,14 +470,10 @@ class KnowledgeApiController extends AbstractApiController {
                 array_push($results, ...$this->{self::RECORD_TYPES[$dtype]['getRecordsFunction']}($recordIds, $dtype));
             }
         }
+
         usort($results, function ($a, $b) {
-            if ($a['orderIndex'] == $b['orderIndex']) {
-                return 0;
-            }
-
-            return ($a['orderIndex'] > $b['orderIndex']) ? -1 : 1;
+            return $a['orderIndex'] <=> $b['orderIndex'];
         });
-
         return $results;
     }
 
@@ -663,6 +675,18 @@ class KnowledgeApiController extends AbstractApiController {
             "siteSectionGroup:s?" => "The site-section-group articles are associated to",
             "featured:b?" => "Search for featured articles only. Default: false",
             "global:b?" => "Global search flag. Default: false",
+            "sort:s?" => [
+                "description" => "Sort option to order search results.",
+                "enum" => [
+                    "name",
+                    "-name",
+                    "dateInserted",
+                    "-dateInserted",
+                    "dateFeatured",
+                    "-dateFeatured",
+                ]
+            ],
+
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,

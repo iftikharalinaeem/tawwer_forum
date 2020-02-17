@@ -16,11 +16,12 @@ interface IProps {
     updateUser: IUserFragment;
     dateUpdated: string;
     permaLink: string;
+    featured?: boolean;
 }
 
 export class ArticleMeta extends React.Component<IProps> {
     public render() {
-        const { dateUpdated, updateUser, permaLink } = this.props;
+        const { dateUpdated, updateUser, permaLink, featured } = this.props;
         const classesMetas = metasClasses();
 
         return (
@@ -41,6 +42,13 @@ export class ArticleMeta extends React.Component<IProps> {
                         }
                     />
                 </span>
+                {featured ? (
+                    <span className={classesMetas.meta}>
+                        <Translate source={"Featured Article"} />
+                    </span>
+                ) : (
+                    <></>
+                )}
             </React.Fragment>
         );
     }

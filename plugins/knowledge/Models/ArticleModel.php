@@ -38,6 +38,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     /** Default limit on the number of results returned. */
     const LIMIT_DEFAULT = 30;
 
+    /** Default limit on related articles returned */
+    const RELATED_ARTICLES_LIMIT = 4;
+
     /** @var Gdn_Session */
     private $session;
 
@@ -109,6 +112,10 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 "type" => "string",
             ],
             "locale?" => [
+                "allowNull" => true,
+                "type" => "string",
+            ],
+            "seoImage?" => [
                 "allowNull" => true,
                 "type" => "string",
             ],
@@ -185,6 +192,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             || empty($options['arl.locale'])) {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
+                "ar.seoImage",
                 "ar.articleRevisionID",
                 "ar.name",
                 "ar.locale",
@@ -200,6 +208,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         } else {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
+                ['arl.seoImage, ar.seoImage', 'COALESCE', 'seoImage'],
                 "ar.articleRevisionID",
                 ['arl.name, ar.name', 'COALESCE', 'name'],
                 ['arl.locale, ar.locale', 'COALESCE', 'locale'],
@@ -229,6 +238,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             $offset = $options["offset"] ?? 0;
 
             $sql = $this->sql();
+
             foreach ($options['selectColumns'] as $selectColumn) {
                 if (is_array($selectColumn)) {
                     $sql->select($selectColumn[0], $selectColumn[1], $selectColumn[2]);

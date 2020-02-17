@@ -19,13 +19,16 @@ import NextPrevious from "@library/navigation/NextPrevious";
 import { t } from "@library/utility/appUtils";
 import { withDevice, Devices, IDeviceProps } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
-import { IArticle, IArticleLocale } from "@knowledge/@types/api/article";
+import { IArticle, IArticleLocale, IFeatureArticle, IRelatedArticle } from "@knowledge/@types/api/article";
 import classNames from "classnames";
 import TitleBar from "@library/headers/TitleBar";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { PanelBackground } from "@library/layout/PanelBackground";
+import RelatedArticles from "@knowledge/modules/article/components/RelatedArticles";
+import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
+import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 
 /**
  * Implements the article's layout
@@ -40,6 +43,8 @@ export class ArticleLayout extends React.Component<IProps> {
             nextNavArticle,
             prevNavArticle,
             articlelocales,
+            relatedArticles,
+            featured,
         } = this.props;
 
         const { articleID } = article;
@@ -61,6 +66,19 @@ export class ArticleLayout extends React.Component<IProps> {
             this.props.device !== Devices.MOBILE &&
             this.props.device !== Devices.XS &&
             panelBackgroundVariables().config.render;
+
+        const relatedArticlesComponent = relatedArticles ? (
+            <RelatedArticles articles={relatedArticles} />
+        ) : (
+            <RelatedArticlesPlaceHolder />
+        );
+
+        const otherLanguagesComponent = !articlelocales ? (
+            <OtherLangaugesPlaceHolder />
+        ) : (
+            <OtherLanguages articleLocaleData={articlelocales} />
+        );
+
         return (
             <>
                 {renderPanelBackground && <PanelBackground />}
@@ -115,6 +133,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                             updateUser={article.updateUser!}
                                             dateUpdated={article.dateUpdated}
                                             permaLink={article.url}
+                                            featured={featured}
                                         />
                                     }
                                     includeBackLink={
@@ -143,6 +162,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                         />
                                     </PanelWidget>
                                 )}
+                                <PanelWidget>{relatedArticlesComponent}</PanelWidget>
                             </>
                         }
                         rightTop={
@@ -155,9 +175,7 @@ export class ArticleLayout extends React.Component<IProps> {
                                             <ArticleTOC items={article.outline} />
                                         </PanelWidget>
                                     )}
-                                <PanelWidget>
-                                    <OtherLanguages articleLocaleData={articlelocales} />
-                                </PanelWidget>
+                                <PanelWidget>{otherLanguagesComponent}</PanelWidget>
                             </>
                         }
                     />
@@ -174,7 +192,9 @@ interface IProps extends IDeviceProps {
     prevNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     nextNavArticle: IKbNavigationItem<KbRecordType.ARTICLE> | null;
     currentNavCategory: IKbNavigationItem<KbRecordType.CATEGORY> | null;
-    articlelocales: IArticleLocale[];
+    articlelocales: IArticleLocale[] | null;
+    relatedArticles: IRelatedArticle[] | null;
+    featured: boolean;
 }
 
 export default withDevice(ArticleLayout);

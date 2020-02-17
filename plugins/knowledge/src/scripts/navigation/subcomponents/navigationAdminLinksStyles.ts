@@ -5,7 +5,7 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allLinkStates, colorOut, debugHelper, margins, unit, flexHelper } from "@library/styles/styleHelpers";
+import { allLinkStates, colorOut, debugHelper, margins, unit, flexHelper, borders } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { px, percent, translateY } from "csx";
 import { style } from "typestyle";
@@ -44,7 +44,10 @@ export const siteNavAdminLinksClasses = useThemeCache(() => {
     });
 
     const divider = style({
-        borderBottom: `solid 1px ${globalVars.mixBgAndFg(0.5)}`,
+        ...borders({
+            width: 1,
+            bottom: { width: 0 },
+        }),
         marginTop: px(16),
         marginBottom: px(16),
         ...debug.name("i"),

@@ -190,6 +190,51 @@ class SphinxKnowledgeSearchTest extends AbstractAPIv2Test {
         $this->expectException(ServerException::class);
         $response = $this->api()->get('/knowledge/search?'.http_build_query($params));
     }
+
+    /**
+     * The get the GET /articles/related-articles endpoint.
+     *
+     * @depends testData
+     */
+    public function testGetRelatedArticles() {
+        $params = [
+            'knowledgeBaseID' => self::$testData['rootCategory']['knowledgeBaseID']
+        ];
+        $response = $this->api()->get('/knowledge/search', $params);
+        $result = $response->getBody();
+
+        $article = reset($result);
+        $response = $this->api()->get('/articles/'.$article['recordID'].'/articles-related');
+
+        $this->assertEquals(1, count($response->getBody()));
+    }
+
+    /**
+     * The get the GET /articles/related-articles endpoint.
+     *
+     * @depends testData
+     */
+    public function testGetRelatedArticleswithMinimum() {
+        $article = $this->api()->post($this->kbArticlesUrl, [
+            "knowledgeCategoryID" => self::$testData['rootCategory']['knowledgeBaseID'],
+            "name" => "Article apple",
+            "body" => json_encode([["insert" => "apples are good"]]),
+            "format" => "rich",
+        ])->getBody();
+
+        self::sphinxReindex();
+
+        $params = [
+            'minimumArticles' => 2
+        ];
+
+        $response = $this->api()->get('/articles/'.$article['articleID'].'/articles-related?'.http_build_query($params));
+
+        $this->assertEquals(2, count($response->getBody()));
+    }
+
+
+
     /**
      * Generate few categories and attach few articles
      */

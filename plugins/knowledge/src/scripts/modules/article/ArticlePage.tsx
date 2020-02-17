@@ -47,7 +47,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
      * Render not found or the article.
      */
     public render(): React.ReactNode {
-        const { article, articlelocales } = this.props;
+        const { article, articlelocales, relatedArticles } = this.props;
         const articleID = this.articleID;
 
         if (!articleID) {
@@ -66,8 +66,6 @@ export class ArticlePage extends React.Component<IProps, IState> {
         if (
             [LoadStatus.PENDING, LoadStatus.LOADING].includes(article.status) ||
             !article.data ||
-            !articlelocales ||
-            !articlelocales.data ||
             this.props.forceLoading
         ) {
             return <NavigationLoadingLayout activeRecord={activeRecord} forceLoading={this.props.forceLoading} />;
@@ -92,7 +90,9 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     nextNavArticle={this.props.nextNavArticle}
                     currentNavCategory={this.props.currentNavCategory}
                     messages={this.renderMessages()}
-                    articlelocales={articlelocales.data}
+                    articlelocales={articlelocales?.data ?? null}
+                    relatedArticles={relatedArticles?.data ?? null}
+                    featured={article.data.featured}
                 />
             </DocumentTitle>
         );
@@ -211,6 +211,7 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
         nextNavArticle: ArticlePageSelector.selectNextNavArticle(state),
         prevNavArticle: ArticlePageSelector.selectPrevNavArticle(state),
         articlelocales: article.data ? ArticleModel.selectArticleLocale(state, article.data.articleID) : null,
+        relatedArticles: article.data ? ArticleModel.selectRelatedArticles(state, article.data.articleID) : null,
         notifyTranslationFallback,
     };
 }
