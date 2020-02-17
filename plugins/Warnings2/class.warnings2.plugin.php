@@ -288,8 +288,9 @@ class Warnings2Plugin extends Gdn_Plugin {
             $name = htmlspecialchars($rule['Name']);
             $description = htmlspecialchars($rule['Description']);
 
-            $content .= wrap(t('Infringed rule'), 'strong') . ' ' . wrap($name, 'span', ['title' => $description]);
+            $content .= wrap(t('Infringed rule'), 'strong') . ' ' . wrap($name);
             $content .= "<br>";
+            $content .= wrap($description, 'p');
         }
         $content .= wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
         $content .= "<br>";
