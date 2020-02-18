@@ -12,7 +12,7 @@ import {
     IResponseArticleDraft,
 } from "@knowledge/@types/api/article";
 import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
-import ArticleActions from "@knowledge/modules/article/ArticleActions";
+import ArticleActions, { useArticleActions } from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
@@ -20,6 +20,10 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ISearchResult, ISearchRequestBody } from "@knowledge/@types/api/search";
+import { hashString } from "@vanilla/utils";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 
 export interface IArticleState {
     articlesByID: {
@@ -44,6 +48,9 @@ export interface IArticleState {
         [articleID: number]: ILoadable<IRelatedArticle[]>;
     };
     articleIDsWithTranslationFallback: number[];
+    articleListsByParamHash: {
+        [paramHash: number]: ILoadable<ISearchResult[]>;
+    };
 }
 
 type ReducerType = KnowledgeReducer<IArticleState>;
@@ -52,6 +59,19 @@ type ReducerType = KnowledgeReducer<IArticleState>;
  * Selectors and reducer for the article resources.
  */
 export default class ArticleModel implements ReduxReducer<IArticleState> {
+    public static selectArticleListByParams(
+        state: IKnowledgeAppStoreState,
+        params: ISearchRequestBody,
+    ): ILoadable<ISearchResult[]> {
+        const hash = hashArticleListParams(params);
+        const result = state.knowledge.articles.articleListsByParamHash[hash];
+        return (
+            result ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    }
+
     /**
      * Select an article out of the stored articles.
      *
@@ -153,6 +173,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
         draftsByID: {},
         articleIDsWithTranslationFallback: [],
         articleLocalesByID: {},
+        articleListsByParamHash: {},
         relatedArticlesLoadable: {},
     };
 
@@ -209,6 +230,33 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 
     public reducer = produce(
         reducerWithInitialState<IArticleState>(ArticleModel.INITIAL_STATE)
+            .case(ArticleActions.getArticleListACs.started, (nextState, payload) => {
+                const hash = hashArticleListParams(payload);
+                const existingLoadable = nextState.articleListsByParamHash[hash];
+                nextState.articleListsByParamHash[hash] = {
+                    ...existingLoadable,
+                    status: LoadStatus.LOADING,
+                };
+                return nextState;
+            })
+            .case(ArticleActions.getArticleListACs.done, (nextState, payload) => {
+                const hash = hashArticleListParams(payload.params);
+                nextState.articleListsByParamHash[hash] = {
+                    status: LoadStatus.SUCCESS,
+                    data: payload.result,
+                };
+                return nextState;
+            })
+            .case(ArticleActions.getArticleListACs.failed, (nextState, payload) => {
+                const hash = hashArticleListParams(payload.params);
+                const existingLoadable = nextState.articleListsByParamHash[hash];
+                nextState.articleListsByParamHash[hash] = {
+                    ...existingLoadable,
+                    error: payload.error,
+                    status: LoadStatus.ERROR,
+                };
+                return nextState;
+            })
             .case(ArticleActions.getArticleACs.done, (nextState, payload) => {
                 const { articleID } = payload.params;
                 nextState.articlesByID[articleID] = payload.result;
@@ -301,4 +349,31 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
             })
             .default(this.internalReducer),
     );
+}
+
+export function hashArticleListParams(params: ISearchRequestBody): number {
+    // Sort the object first.
+    const ordered: any = {};
+    Object.keys(params)
+        .sort()
+        .forEach(function(key) {
+            ordered[key] = params[key];
+        });
+    return hashString(JSON.stringify(ordered));
+}
+
+export function useArticleList(params: ISearchRequestBody) {
+    const hash = hashArticleListParams(params);
+    const actions = useArticleActions();
+    const existingList = useSelector((state: IKnowledgeAppStoreState) =>
+        ArticleModel.selectArticleListByParams(state, params),
+    );
+
+    useEffect(() => {
+        void actions.getArticleList(params);
+        // Deps are manually calculated into the hash. don't watch on params which may change often.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hash, actions]);
+
+    return existingList;
 }

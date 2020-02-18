@@ -34,6 +34,7 @@ use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\ThemedPage;
 use Vanilla\Contracts\Analytics\ClientInterface as AnalyticsClient;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 
 /**
  * Base knowledge base page.
@@ -55,6 +56,9 @@ abstract class KbPage extends ThemedPage {
 
     /** @var KnowledgeBasesApiController */
     protected $kbApi;
+
+    /** @var KnowledgeApiController */
+    protected $rootApi;
 
     /** @var KnowledgeNavigationApiController */
     protected $navApi;
@@ -98,6 +102,7 @@ abstract class KbPage extends ThemedPage {
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         BreadcrumbModel $breadcrumbModel = null,
         \UsersApiController $usersApi = null, // Default needed for method extensions
+        KnowledgeApiController $rootApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
@@ -116,6 +121,7 @@ abstract class KbPage extends ThemedPage {
         );
         $this->breadcrumbModel = $breadcrumbModel;
         $this->usersApi = $usersApi;
+        $this->rootApi = $rootApi;
         $this->kbApi = $kbApi;
         $this->navApi = $navApi;
         $this->categoriesApi = $categoriesApi;
@@ -237,6 +243,17 @@ abstract class KbPage extends ThemedPage {
                 []
             ));
         }
+    }
+
+    /**
+     * Preload some list of articles from the search endpoint.
+     *
+     * @param array $params Parameters to pass to the search endpoint.
+     */
+    protected function preloadArticleList(array $params) {
+        $result = $this->rootApi->get_search($params);
+
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, $result, $params));
     }
 
     /**

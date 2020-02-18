@@ -122,11 +122,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
             ->rule(\Vanilla\Menu\CounterModel::class)
                 ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
-
-            ->rule(TranslationProviderInterface::class)
-            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
-            ;
         ;
+        $container->rule(TranslationProviderInterface::class)
+            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
+
     }
 
     /**

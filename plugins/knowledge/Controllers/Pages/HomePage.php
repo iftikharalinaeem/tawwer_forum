@@ -48,6 +48,13 @@ class HomePage extends KbPage {
             $this->knowledgeBasePage->initialize($urlCode);
             return $this->knowledgeBasePage->render();
         }
+
+        $siteSection = $this->siteSectionModel->getCurrentSiteSection();
+        $this->preloadArticleList([
+            'featured' => true,
+            'siteSectionGroup' => $siteSection->getSectionGroup(),
+            'locale' => $siteSection->getContentLocale(),
+        ]);
         return parent::render();
     }
 }

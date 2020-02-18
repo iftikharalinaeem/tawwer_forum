@@ -5,6 +5,10 @@
  * @license Proprietary
  */
 
+use Garden\Container\Reference;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+
 $container = \Gdn::getContainer();
 
 $container->rule(\Vanilla\Site\SiteSectionModel::class)

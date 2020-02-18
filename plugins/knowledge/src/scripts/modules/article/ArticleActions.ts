@@ -42,11 +42,12 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import ReduxActions, { ActionsUnion, bindThunkAction } from "@library/redux/ReduxActions";
+import ReduxActions, { ActionsUnion, bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
 
@@ -94,6 +95,25 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         IGetArticleLocalesResponseBody,
         IApiError
     >("GET_LOCALES");
+
+    public static getArticleListACs = createAction.async<ISearchRequestBody, ISearchResult[], IApiError>(
+        "GET_ARTICLE_LIST",
+    );
+
+    public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
+        const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
+
+        if (!force && existingList.status !== LoadStatus.PENDING) {
+            return Promise.resolve(existingList);
+        }
+
+        const thunk = bindThunkAction(ArticleActions.getArticleListACs, async () => {
+            const response = await this.api.get("/knowledge/search", { params });
+            return response.data;
+        })(params);
+
+        return this.dispatch(thunk);
+    };
 
     // FSA actions.
 
@@ -547,7 +567,5 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 }
 
 export function useArticleActions() {
-    const dispatch = useDispatch();
-    const actions = useMemo(() => new ArticleActions(dispatch, apiv2), [dispatch]);
-    return actions;
+    return useReduxActions(ArticleActions);
 }
