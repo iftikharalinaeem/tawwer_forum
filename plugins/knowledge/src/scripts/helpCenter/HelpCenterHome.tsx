@@ -85,29 +85,26 @@ export class HelpCenterHome extends React.Component<IProps> {
                     title={knowledgeBase.name}
                     description={description}
                 />
-                <Container>
-                    <DocumentTitle title={knowledgeBase.name}>
-                        <TitleBar
-                            useMobileBackButton={!this.props.isOnlyKb}
-                            extraBurgerNavigation={
-                                <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
-                            }
-                        />
-                    </DocumentTitle>
+                <DocumentTitle title={knowledgeBase.name}>
+                    <TitleBar
+                        useMobileBackButton={!this.props.isOnlyKb}
+                        extraBurgerNavigation={
+                            <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
+                        }
+                    />
+                </DocumentTitle>
 
-                    {/*For Screen Readers / SEO*/}
-                    <ScreenReaderContent>
-                        <h1>{knowledgeBase.name}</h1>
-                    </ScreenReaderContent>
-                    <WidgetContainer>
-                        <HelpCenterNavigation data={data!} rootCategoryUrl={rootCategoryUrl} />
-                    </WidgetContainer>
-                </Container>
+                {/*For Screen Readers / SEO*/}
+                <ScreenReaderContent>
+                    <h1>{knowledgeBase.name}</h1>
+                </ScreenReaderContent>
+                <HelpCenterNavigation data={data!} rootCategoryUrl={rootCategoryUrl} />
                 <ArticlesWidget
                     title={t("Recommended Articles")}
                     maxItemCount={4}
                     containerOptions={{
                         maxColumnCount: 2,
+                        borderType: "navLinks",
                     }}
                     params={{
                         featured: true,

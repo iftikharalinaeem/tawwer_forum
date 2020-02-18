@@ -46,7 +46,9 @@ const HomePage = (props: IProps) => {
         return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;
     }
 
-    const recommendedColumnCount = tilesVariables().options.columns - 1;
+    const tileColumnCount = tilesVariables().options.columns;
+    const recommendedColumnCount = [1, 2].includes(tileColumnCount) ? 1 : 3;
+    const maxItems = [1, 2].includes(tileColumnCount) ? 4 : 3;
 
     return (
         <>
@@ -61,7 +63,7 @@ const HomePage = (props: IProps) => {
             </Container>
             <ArticlesWidget
                 title={t("Recommended Articles")}
-                maxItemCount={tilesVariables().options.columns * 2}
+                maxItemCount={maxItems}
                 containerOptions={{
                     maxWidth: tilesVariables().calculatedMaxWidth,
                     maxColumnCount: recommendedColumnCount,
