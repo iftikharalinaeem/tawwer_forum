@@ -572,7 +572,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                 // This is added so we don't get 422 errors when reaction name is empty.
                 foreach ($summary as $key => $reaction) {
                    if ($reaction['Name'] === '') {
-                       $summary[$key]['Name']  = 'Invalid';
+                       $summary[$key]['Name'] = 'Invalid';
                    }
                 }
                 $summary = $schema->validate($summary);
