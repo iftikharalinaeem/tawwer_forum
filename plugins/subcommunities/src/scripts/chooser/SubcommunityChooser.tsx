@@ -95,6 +95,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
             </>
         );
     }
+
     if (subcommunitiesByID.data) {
         if (Object.entries(subcommunitiesByID.data).length === 0) {
             return null;
