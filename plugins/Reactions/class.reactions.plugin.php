@@ -570,10 +570,8 @@ class ReactionsPlugin extends Gdn_Plugin {
                 $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
-                foreach ($summary as $key => $reaction) {
-                    if ($reaction['Name'] === '') {
-                        $summary[$key]['Name'] = 'Invalid';
-                    }
+                foreach ($summary as &$reaction) {
+                    $reaction['Name'] = $reaction['Name'] ?: 'Invalid';
                 }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;
