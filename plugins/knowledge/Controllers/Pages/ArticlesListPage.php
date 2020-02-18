@@ -6,7 +6,6 @@
 
 namespace Vanilla\Knowledge\Controllers\Pages;
 
-
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
@@ -17,13 +16,11 @@ use Vanilla\Web\JsInterpop\ReduxAction;
  */
 class ArticlesListPage extends KbPage {
 
-
     /** @var ArticlesApiController */
     protected $articlesApi;
 
     /** @var KnowledgeApiController */
     protected $knowledgeApiController;
-
 
     /**
      * Dependency Injection.
@@ -83,5 +80,4 @@ class ArticlesListPage extends KbPage {
             $params
         ));
     }
-
 }
