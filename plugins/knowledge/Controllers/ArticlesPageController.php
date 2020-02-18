@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Pages\ArticlePage;
+use Vanilla\Knowledge\Controllers\Pages\ArticlesListPage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
 use Vanilla\Web\PageDispatchController;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
@@ -99,12 +100,11 @@ class ArticlesPageController extends PageDispatchController {
      * @return Data
      */
     public function index(array $query) {
-        return $this
-            ->useSimplePage(\Gdn::translate('Revisions'))
-            ->blockRobots()
-            ->requiresSession("/kb/articles")
-            ->render()
-            ;
+        /** @var ArticlesListPage $page */
+        $page = $this->usePage(ArticlesListPage::class);
+        $page->initialize($query);
+
+        return $page->render();
     }
 
     /**
