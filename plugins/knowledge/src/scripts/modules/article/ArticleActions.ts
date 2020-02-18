@@ -47,9 +47,10 @@ import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
-import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
+import { ISearchRequestBody, ISearchResponseBody, ISearchResult } from "@knowledge/@types/api/search";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
+import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -96,11 +97,21 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         IApiError
     >("GET_LOCALES");
 
-    public static getArticleListACs = createAction.async<ISearchRequestBody, ISearchResult[], IApiError>(
-        "GET_ARTICLE_LIST",
-    );
+    public static getArticleListACs = createAction.async<
+        ISearchRequestBody,
+        { body: ISearchResponseBody; pagination: ILinkPages },
+        IApiError
+    >("GET_ARTICLE_LIST");
 
     public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
+        console.log("params", params);
+
+        const { page, limit } = params;
+        params.page = page || 1;
+        params.limit = limit || 10;
+
+        console.log("params", params);
+
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 
         if (!force && existingList.status !== LoadStatus.PENDING) {
@@ -109,7 +120,10 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
         const thunk = bindThunkAction(ArticleActions.getArticleListACs, async () => {
             const response = await this.api.get("/knowledge/search", { params });
-            return response.data;
+            return {
+                body: response.data,
+                pagination: SimplePagerModel.parseLinkHeader(response.headers["link"], "page"),
+            };
         })(params);
 
         return this.dispatch(thunk);

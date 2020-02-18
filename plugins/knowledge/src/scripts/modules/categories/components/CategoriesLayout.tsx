@@ -38,6 +38,7 @@ interface IProps {
     useBackButton?: boolean;
 }
 
+//rename to articlelist
 export default function CategoriesLayout(props: IProps) {
     const { category, pages, results } = props;
     const activeRecord = {

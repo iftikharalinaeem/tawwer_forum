@@ -16,6 +16,7 @@ import { Route } from "react-router-dom";
 import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import { ArticleListPage } from "@knowledge/modules/article/ArticleListPage";
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
 
@@ -65,6 +66,12 @@ export const CategoryPagedRoute = new RouteHandler(
     (category: IKbCategory | IKbCategoryFragment | IKbNavigationItem) => category.url,
     undefined,
     CATEGORIES_KEY,
+);
+
+export const ArticleListPageRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/articles" */ "@knowledge/modules/article/ArticleListPage"),
+    "/kb/articles",
+    (data?: undefined) => "/kb/articles",
 );
 
 export const SearchRoute = new RouteHandler(
@@ -128,6 +135,7 @@ export function getPageRoutes() {
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
+        ArticleListPageRoute.route,
         KnowledgeBasePage.route,
         HomeRoute.route,
         HomeAppRoute.route,

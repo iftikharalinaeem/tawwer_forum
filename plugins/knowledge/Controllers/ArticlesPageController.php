@@ -41,7 +41,7 @@ class ArticlesPageController extends PageDispatchController {
      * @param string $path The path from the dispatcher.
      * @return Data
      */
-    public function index(string $path) {
+    public function get(string $path) {
         /** @var ArticlePage $page */
         $page = $this->usePage(ArticlePage::class);
         $page->initialize($path);
@@ -91,6 +91,23 @@ class ArticlesPageController extends PageDispatchController {
             ->render()
         ;
     }
+
+    /**
+     * Render out the /kb/articles page.
+     *
+     * @param int $id URI article id.
+     * @param int $revisionID URI revision ID.
+     * @return Data
+     */
+    public function index(array $query) {
+        return $this
+            ->useSimplePage(\Gdn::translate('Revisions'))
+            ->blockRobots()
+            ->requiresSession("/kb/articles")
+            ->render()
+            ;
+    }
+
 
     /**
      * Redirect out the /kb/articles/aliases{$path} request.
