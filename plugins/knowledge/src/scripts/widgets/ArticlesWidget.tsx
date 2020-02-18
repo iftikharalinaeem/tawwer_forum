@@ -43,7 +43,7 @@ export function ArticlesWidget(props: IProps) {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     }
 
-    if (!mappedItemData) {
+    if (!mappedItemData || mappedItemData.length === 0) {
         return null;
     }
 

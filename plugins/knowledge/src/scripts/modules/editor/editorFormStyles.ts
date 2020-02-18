@@ -58,7 +58,7 @@ export const editorFormClasses = useThemeCache(() => {
     const title = style("title", {
         $nest: {
             "&.inputText, &&": {
-                ...textInputSizingFromSpacing(vars.title.fontSize, 0, formElementVars.border.fullWidth),
+                ...textInputSizingFromSpacing(vars.title.fontSize, 0, formElementVars.border.width * 2),
                 color: colorOut(formElementVars.colors.fg),
                 backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",

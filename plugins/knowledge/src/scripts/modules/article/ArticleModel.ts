@@ -353,7 +353,14 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
 }
 
 export function hashArticleListParams(params: ISearchRequestBody): number {
-    return hashString(JSON.stringify(params));
+    // Sort the object first.
+    const ordered: any = {};
+    Object.keys(params)
+        .sort()
+        .forEach(function(key) {
+            ordered[key] = params[key];
+        });
+    return hashString(JSON.stringify(ordered));
 }
 
 export function useArticleList(params: ISearchRequestBody) {
