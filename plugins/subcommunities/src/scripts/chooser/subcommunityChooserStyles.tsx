@@ -27,7 +27,6 @@ export const subcommunityChooserVariables = useThemeCache(() => {
 
     const toggle = vars("toggle", {
         lineHeight: unit(titleBarVars.button.size),
-        color: colorOut(titleBarVars.colors.fg),
         minHeight: unit(titleBarVars.button.size),
         height: 0, // IE11 compat.
     });
@@ -46,7 +45,6 @@ export const subcommunityChooserClasses = useThemeCache(() => {
         alignItems: "center",
         lineHeight: unit(vars.toggle.lineHeight),
         fontWeight: globalVars.fonts.weights.normal,
-        color: colorOut(vars.toggle.color),
     });
 
     const toggleFullWidth = style("toggleFullWidth", {
