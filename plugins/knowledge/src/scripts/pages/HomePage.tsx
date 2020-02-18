@@ -25,20 +25,40 @@ import { bannerVariables } from "@library/banner/bannerStyles";
 import Banner from "@library/banner/Banner";
 import { ArticlesWidget } from "@knowledge/widgets/ArticlesWidget";
 import { tilesVariables } from "@vanilla/library/src/scripts/features/tiles/tilesStyles";
+import { useArticleList } from "@knowledge/modules/article/ArticleModel";
+import { ISearchRequestBody } from "@knowledge/@types/api/search";
+import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 
 const HomePage = (props: IProps) => {
     const splashVars = bannerVariables();
     const title = t(splashVars.title.text);
-    const { loadStatus, knowledgeBases } = props;
+    const { loadable, knowledgeBases } = props;
 
     const { setIsHomePage } = useBackgroundContext();
+    const widgetParams: ISearchRequestBody = {
+        featured: true,
+        siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+        locale: getSiteSection().contentLocale,
+    };
+    const articleList = useArticleList(widgetParams);
 
     useEffect(() => {
         setIsHomePage(true);
     });
 
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(loadStatus)) {
+    if (
+        [LoadStatus.PENDING, LoadStatus.LOADING].includes(loadable.status) ||
+        [LoadStatus.PENDING, LoadStatus.LOADING].includes(articleList.status)
+    ) {
         return <Loader />;
+    }
+
+    if (loadable.error) {
+        return <KbErrorPage error={loadable.error}></KbErrorPage>;
+    }
+
+    if (articleList.error) {
+        return <KbErrorPage error={loadable.error}></KbErrorPage>;
     }
 
     if (knowledgeBases.length === 1) {
@@ -68,12 +88,7 @@ const HomePage = (props: IProps) => {
                     maxWidth: tilesVariables().calculatedMaxWidth,
                     maxColumnCount: recommendedColumnCount,
                 }}
-                params={{
-                    featured: true,
-                    siteSectionGroup:
-                        getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
-                    locale: getSiteSection().contentLocale,
-                }}
+                params={widgetParams}
             />
         </>
     );
@@ -87,7 +102,7 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 function mapStateToProps(state: IKnowledgeAppStoreState) {
     return {
         knowledgeBases: KnowledgeBaseModel.selectKnowledgeBases(state),
-        loadStatus: state.knowledge.knowledgeBases.knowledgeBasesByID.status,
+        loadable: state.knowledge.knowledgeBases.knowledgeBasesByID,
     };
 }
 
