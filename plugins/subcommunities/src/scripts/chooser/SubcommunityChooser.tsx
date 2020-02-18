@@ -66,13 +66,6 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const classes = subcommunityChooserClasses();
     const forceIcon = options.forceIcon && !props.fullWidth;
     const { subcommunitiesByID } = useSubcommunities();
-    const { getAll } = useSubcommunityActions();
-
-    useEffect(() => {
-        if (subcommunitiesByID.status === LoadStatus.PENDING) {
-            getAll();
-        }
-    }, [subcommunitiesByID, getAll]);
 
     if (!availableLocales || !options.enabled) {
         return null;
