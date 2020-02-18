@@ -32,7 +32,7 @@ class KnowledgeBasePage extends React.Component<IProps> {
             case KbViewType.GUIDE:
                 return this.renderGuide(knowledgeBase);
             case KbViewType.HELP:
-                return <HelpCenterHome knowledgeBase={knowledgeBase} />;
+                return <HelpCenterHome key={knowledgeBase.knowledgeBaseID} knowledgeBase={knowledgeBase} />;
         }
     }
 
