@@ -758,7 +758,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     public function put_featured(int $id, array $body) {
-        $this->permission("kb.articles.add");
+        $this->permission("knowledge.articles.add");
 
         $this->idParamSchema();
         $in = $this->schema(Schema::parse([
