@@ -20,12 +20,15 @@ import {
 import {
     useCurrentSubcommunity,
     useAvailableSubcommunityLocales,
+    useSubcommunities,
 } from "@subcommunities/subcommunities/subcommunitySelectors";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { useLocaleInfo, t } from "@vanilla/i18n";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
+import { useSubcommunityActions } from "@subcommunities/subcommunities/SubcommunityActions";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 type SectionName = "locale" | "product";
 
@@ -59,10 +62,17 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
     const availableLocales = useAvailableSubcommunityLocales();
     const device = useDevice();
     const showHeader = device === Devices.MOBILE || device === Devices.XS;
-
     const { options } = subcommunityChooserVariables();
     const classes = subcommunityChooserClasses();
     const forceIcon = options.forceIcon && !props.fullWidth;
+    const { subcommunitiesByID } = useSubcommunities();
+    const { getAll } = useSubcommunityActions();
+
+    useEffect(() => {
+        if (subcommunitiesByID.status === LoadStatus.PENDING) {
+            getAll();
+        }
+    }, [subcommunitiesByID, getAll]);
 
     if (!availableLocales || !options.enabled) {
         return null;
@@ -84,6 +94,11 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
                 {toggleName}
             </>
         );
+    }
+    if (subcommunitiesByID.data) {
+        if (Object.entries(subcommunitiesByID.data).length === 0) {
+            return null;
+        }
     }
 
     return (
@@ -160,6 +175,7 @@ export function SubcommunityChooser(props: {
     const availableLocales = useAvailableSubcommunityLocales();
 
     const { currentLocale } = useLocaleInfo();
+
     useEffect(() => {
         if (currentLocale) {
             setSelectedLocale(currentLocale);
