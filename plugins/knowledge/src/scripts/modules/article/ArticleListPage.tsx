@@ -32,7 +32,7 @@ export default function ArticleListPage() {
         featured: query.recommended ? query.recommended : true,
         [queryParam]: queryValue,
         locale: siteSection.contentLocale,
-        expand: ["user"],
+        expand: ["users"],
         page: query.page ? query.page : 1,
         limit: 10,
     });
