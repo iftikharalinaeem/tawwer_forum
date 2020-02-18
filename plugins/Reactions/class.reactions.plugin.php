@@ -569,6 +569,12 @@ class ReactionsPlugin extends Gdn_Plugin {
             array_walk($result, function(&$row) use ($attributes, $schema) {
                 $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
+                // This is added so we don't get 422 errors when reaction name is empty.
+                foreach ($summary as $key => $reaction) {
+                   if ($reaction['Name'] === '') {
+                       $summary[$key]['Name']  = 'Invalid';
+                   }
+                }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;
             });
