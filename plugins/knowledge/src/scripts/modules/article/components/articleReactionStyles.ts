@@ -7,7 +7,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
-import { important, percent, px, ColorHelper, em } from "csx";
+import { important, percent, px } from "csx";
 import { setAllLinkColors } from "@library/styles/styleHelpers";
 
 export const reactionClasses = useThemeCache(() => {
@@ -59,7 +59,7 @@ export const reactionClasses = useThemeCache(() => {
     const linkColors = setAllLinkColors();
     const link = style("link", {
         fontWeight: vars.fonts.weights.bold,
-        color: linkColors.color,
+        color: colorOut(linkColors.color),
         $nest: linkColors.nested,
     });
 

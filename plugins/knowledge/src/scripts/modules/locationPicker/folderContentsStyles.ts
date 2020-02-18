@@ -80,7 +80,7 @@ export const folderContentsClasses = useThemeCache(() => {
             "&:focus": {
                 $nest: {
                     "& + .folderContents-content": {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
+                        backgroundColor: colorOut(globalVars.states.hover.highlight),
                     },
                 },
             },
@@ -107,7 +107,7 @@ export const folderContentsClasses = useThemeCache(() => {
                 cursor: "pointer",
                 $nest: {
                     "&:hover": {
-                        backgroundColor: colorOut(globalVars.states.hover.color),
+                        backgroundColor: colorOut(globalVars.states.hover.highlight),
                     },
                 },
             },
@@ -154,16 +154,16 @@ export const folderContentsClasses = useThemeCache(() => {
                     color: colorOut(vars.colors.fg),
                 },
                 hover: {
-                    backgroundColor: colorOut(globalVars.states.hover.color),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
                 focus: {
-                    backgroundColor: colorOut(globalVars.states.hover.color),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
                 accessibleFocus: {
-                    backgroundColor: colorOut(globalVars.states.hover.color),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
                 active: {
-                    backgroundColor: colorOut(globalVars.states.hover.color),
+                    backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
             }),
         },

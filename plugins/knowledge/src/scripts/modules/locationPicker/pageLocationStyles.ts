@@ -6,7 +6,7 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { colorOut, paddings, unit, borders, userSelect } from "@library/styles/styleHelpers";
+import { colorOut, paddings, unit, borders, userSelect, EMPTY_BORDER } from "@library/styles/styleHelpers";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 
@@ -57,6 +57,7 @@ export const pageLocationClasses = useThemeCache(() => {
         justifyContent: "center",
         fontWeight: globalVars.fonts.weights.semiBold,
         ...borders({
+            ...EMPTY_BORDER,
             radius: formVars.sizing.height / 2,
         }),
         ...userSelect(),
