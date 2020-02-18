@@ -51,10 +51,15 @@ class ArticlesListPage extends KbPage {
         ];
 
         if ($query["knowledgeBaseID"] ?? null) {
+            $this->validateSiteSection($query["knowledgeBaseID"]);
             $params["knowledegBaseID"] = $query["knowledgeBaseID"];
         } else {
+            $this->disableSiteSectionValidation();
             $params["siteSectionGroup"] = $currentSiteSection->getSectionGroup();
         }
+        $this
+            ->setSeoRequired(false)
+            ->setSeoTitle("Featured Articles");
 
         $articles = $this->knowledgeApiController->get_search($params);
 
