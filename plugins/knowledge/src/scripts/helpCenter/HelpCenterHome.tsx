@@ -103,7 +103,7 @@ export class HelpCenterHome extends React.Component<IProps> {
                     title={t("Recommended Articles")}
                     maxItemCount={4}
                     containerOptions={{
-                        maxColumnCount: 2,
+                        maxColumnCount: 1,
                         borderType: "navLinks",
                     }}
                     params={{
