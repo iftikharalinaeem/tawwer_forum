@@ -377,7 +377,7 @@ class RanksPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     protected function addManualRanks($Sender) {
-        if (!checkPermission('Garden.Settings.Manage')) {
+        if (!checkPermission(['Garden.Settings.Manage', 'Garden.Users.Edit'])) {
             return;
         }
 
