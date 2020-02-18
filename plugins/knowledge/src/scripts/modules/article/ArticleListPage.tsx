@@ -1,5 +1,5 @@
 /**
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @author Chris Chabilall <chris.c@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -17,6 +17,7 @@ import { getSiteSection } from "@library/utility/appUtils";
 import FeaturedArticleLayout from "@knowledge/modules/article/components/FeaturedArticlesLayout";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import { t } from "@vanilla/i18n/src";
+import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 export default function ArticleListPage() {
     const siteSection = getSiteSection();
@@ -45,9 +46,9 @@ export default function ArticleListPage() {
     }
 
     if (!articles.data) {
-        return <></>;
+        return <KbErrorPage defaultError={DefaultKbError.GENERIC} />;
     }
-    console.log(articles.data.body);
+
     const articleResults = articles.data.body.map((article: ISearchResult) => {
         return {
             name: article.name || "",

@@ -95,8 +95,7 @@ class ArticlesPageController extends PageDispatchController {
     /**
      * Render out the /kb/articles page.
      *
-     * @param int $id URI article id.
-     * @param int $revisionID URI revision ID.
+     * @param array $query Query string.
      * @return Data
      */
     public function index(array $query) {
@@ -107,7 +106,6 @@ class ArticlesPageController extends PageDispatchController {
             ->render()
             ;
     }
-
 
     /**
      * Redirect out the /kb/articles/aliases{$path} request.
