@@ -16,7 +16,6 @@ import { Route } from "react-router-dom";
 import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
-import { ArticleListPage } from "@knowledge/modules/article/ArticleListPage";
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
 

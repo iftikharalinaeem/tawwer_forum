@@ -16,18 +16,20 @@ import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { getSiteSection } from "@library/utility/appUtils";
 import FeaturedArticleLayout from "@knowledge/modules/article/components/FeaturedArticlesLayout";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
-import SearchPagination from "@knowledge/modules/search/components/SearchPagination";
-import { useArticleActions } from "@knowledge/modules/article/ArticleActions";
+import { t } from "@vanilla/i18n/src";
 
 export default function ArticleListPage() {
     const siteSection = getSiteSection();
     const query = qs.parse(window.location.search.replace(/^\?/, ""));
 
-    //useFallbackBackUrl(props.knowledgeBase?.url);
+    useFallbackBackUrl("/kb");
+
+    let queryParam = query.knowledgeBaseID ? "knowledgeBaseID" : "siteSectionGroup";
+    let queryValue = queryParam === "knowledgeBaseID" ? query.knowledgeBaseID : siteSection.sectionGroup;
 
     const articles = useArticleList({
-        featured: true,
-        siteSectionGroup: siteSection.sectionGroup,
+        featured: query.recommended ? query.recommended : true,
+        [queryParam]: queryValue,
         locale: siteSection.contentLocale,
         page: query.page ? query.page : 1,
         limit: 10,
@@ -45,7 +47,7 @@ export default function ArticleListPage() {
     if (!articles.data) {
         return <></>;
     }
-
+    console.log(articles.data.body);
     const articleResults = articles.data.body.map((article: ISearchResult) => {
         return {
             name: article.name || "",
@@ -57,7 +59,7 @@ export default function ArticleListPage() {
     });
 
     return (
-        <DocumentTitle title={"Featured Articles"}>
+        <DocumentTitle title={t("Featured Articles")}>
             <FeaturedArticleLayout results={articleResults} pages={articles.data.pagination} />
         </DocumentTitle>
     );

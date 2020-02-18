@@ -99,18 +99,14 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
     public static getArticleListACs = createAction.async<
         ISearchRequestBody,
-        { body: ISearchResponseBody; pagination: ILinkPages },
+        { body: ISearchResult; pagination: ILinkPages },
         IApiError
     >("GET_ARTICLE_LIST");
 
     public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
-        console.log("params", params);
-
         const { page, limit } = params;
         params.page = page || 1;
         params.limit = limit || 10;
-
-        console.log("params", params);
 
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 

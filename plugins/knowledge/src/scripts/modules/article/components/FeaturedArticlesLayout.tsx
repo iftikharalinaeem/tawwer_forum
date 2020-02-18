@@ -33,7 +33,7 @@ import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 interface IProps {
     results: IResult[];
     query?: string;
-    pages?: ILinkPages;
+    pages: ILinkPages;
 }
 
 export default function FeaturedArticleLayout(props: IProps) {
