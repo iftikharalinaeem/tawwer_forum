@@ -11,20 +11,20 @@ import {
     IRelatedArticle,
     IResponseArticleDraft,
 } from "@knowledge/@types/api/article";
-import {IRevision, IRevisionFragment} from "@knowledge/@types/api/articleRevision";
-import ArticleActions, {useArticleActions} from "@knowledge/modules/article/ArticleActions";
+import { IRevision, IRevisionFragment } from "@knowledge/@types/api/articleRevision";
+import ArticleActions, { useArticleActions } from "@knowledge/modules/article/ArticleActions";
 import CategoryActions from "@knowledge/modules/categories/CategoryActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
-import {IKnowledgeAppStoreState, KnowledgeReducer} from "@knowledge/state/model";
+import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/model";
 import ReduxReducer from "@library/redux/ReduxReducer";
-import {produce} from "immer";
-import {reducerWithInitialState} from "typescript-fsa-reducers";
-import {ILoadable, LoadStatus} from "@library/@types/api/core";
-import {ISearchRequestBody, ISearchResult} from "@knowledge/@types/api/search";
-import {hashString} from "@vanilla/utils";
-import {useSelector} from "react-redux";
-import {useEffect} from "react";
-import {IWithPagination} from "@library/navigation/SimplePagerModel";
+import { produce } from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
+import { hashString } from "@vanilla/utils";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { IWithPagination } from "@library/navigation/SimplePagerModel";
 
 export interface IArticleState {
     articlesByID: {
@@ -50,7 +50,7 @@ export interface IArticleState {
     };
     articleIDsWithTranslationFallback: number[];
     articleListsByParamHash: {
-        [paramHash: number]: ILoadable<IWithPagination<ISearchResult[]>> ;
+        [paramHash: number]: ILoadable<IWithPagination<ISearchResult[]>>;
     };
 }
 
@@ -66,11 +66,11 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     ): ILoadable<IWithPagination<ISearchResult[]>> {
         const hash = hashArticleListParams(params);
         const result = state.knowledge.articles.articleListsByParamHash[hash];
-        return ( result) ? result :
-            {
-                    status: LoadStatus.PENDING
-                }
-
+        return result
+            ? result
+            : {
+                  status: LoadStatus.PENDING,
+              };
     }
 
     /**
