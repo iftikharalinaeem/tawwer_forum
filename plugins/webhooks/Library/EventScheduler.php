@@ -43,7 +43,11 @@ class EventScheduler {
      * @param UserProviderInterface $userProvider
      * @param SessionInterface $session
      */
-    public function __construct(SchedulerInterface $scheduler, UserProviderInterface $userProvider, SessionInterface $session) {
+    public function __construct(
+        SchedulerInterface $scheduler,
+        UserProviderInterface $userProvider,
+        SessionInterface $session
+    ) {
         $this->scheduler = $scheduler;
         $this->session = $session;
         $this->userProvider = $userProvider;
@@ -74,15 +78,35 @@ class EventScheduler {
      */
     public function addDispatchEventJob(ResourceEvent $event, WebhookConfig $webhook, ?JobPriority $jobPriority = null, ?int $delay = null) {
         $deliveryID = Uuid::uuid4()->toString();
+        $message = $this->generateJobMessage($event, $webhook, $deliveryID);
+
+        $this->scheduler->addJob(
+            $this->shouldUseHostedQueue() ? RemoteRequestJob::class : HttpRequestJob::class,
+            $message,
+            $jobPriority,
+            $delay
+        );
+    }
+
+    /**
+     * Generate the job message, given an event and a webhook config.
+     *
+     * @param ResourceEvent $event
+     * @param WebhookConfig $webhook
+     * @param string $deliveryID
+     * @return array
+     */
+    public function generateJobMessage(ResourceEvent $event, WebhookConfig $webhook, string $deliveryID): array {
         $body = [
             "action" => $event->getAction(),
             "payload" => $event->getPayload(),
             "sender" => $this->getSender(),
             "site" => $this->site(),
         ];
+
         $json = StringUtils::jsonEncodeChecked($body, \JSON_UNESCAPED_SLASHES);
 
-        $message = [
+        $result = [
             "body" => $json,
             "feedbackJob" => $this->shouldUseHostedQueue() ? DeliveryFeedbackJob::class : LogDeliveryJob::class,
             "feedbackMessage" => [
@@ -99,12 +123,7 @@ class EventScheduler {
             "uri" => $webhook->getUrl(),
         ];
 
-        $this->scheduler->addJob(
-            $this->shouldUseHostedQueue() ? RemoteRequestJob::class : HttpRequestJob::class,
-            $message,
-            $jobPriority,
-            $delay
-        );
+        return $result;
     }
 
     /**
