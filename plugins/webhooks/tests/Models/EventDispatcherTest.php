@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\Webhooks;
+namespace VanillaTests\Webhooks\Models;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
