@@ -20,10 +20,11 @@ import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { ISearchResult, ISearchRequestBody } from "@knowledge/@types/api/search";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { hashString } from "@vanilla/utils";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { ILinkPages, IWithPagination } from "@library/navigation/SimplePagerModel";
 
 export interface IArticleState {
     articlesByID: {
@@ -49,7 +50,7 @@ export interface IArticleState {
     };
     articleIDsWithTranslationFallback: number[];
     articleListsByParamHash: {
-        [paramHash: number]: ILoadable<ISearchResult[]>;
+        [paramHash: number]: ILoadable<IWithPagination<ISearchResult[]>>;
     };
 }
 
@@ -62,14 +63,14 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
     public static selectArticleListByParams(
         state: IKnowledgeAppStoreState,
         params: ISearchRequestBody,
-    ): ILoadable<ISearchResult[]> {
+    ): ILoadable<IWithPagination<ISearchResult[]>> {
         const hash = hashArticleListParams(params);
         const result = state.knowledge.articles.articleListsByParamHash[hash];
-        return (
-            result ?? {
-                status: LoadStatus.PENDING,
-            }
-        );
+        return result
+            ? result
+            : {
+                  status: LoadStatus.PENDING,
+              };
     }
 
     /**
@@ -243,7 +244,10 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                 const hash = hashArticleListParams(payload.params);
                 nextState.articleListsByParamHash[hash] = {
                     status: LoadStatus.SUCCESS,
-                    data: payload.result,
+                    data: {
+                        pagination: payload.result.pagination,
+                        body: payload.result.body,
+                    },
                 };
                 return nextState;
             })

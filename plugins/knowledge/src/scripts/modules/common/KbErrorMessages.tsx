@@ -103,7 +103,7 @@ export function messageFromKbErrorCode(errorCode?: string | number) {
         case DefaultKbError.NO_KNOWLEDGE_BASE:
             return t("There are no knowledge bases");
         case DefaultKbError.NO_ARTICLES:
-            return t("This knowledge base does not have any articles.");
+            return t("No articles were found.");
         case DefaultKbError.CATEGORY_NO_ARTICLES:
             return t("This category does not have any articles.");
         case 404:

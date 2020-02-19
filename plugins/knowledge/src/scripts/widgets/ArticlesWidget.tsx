@@ -29,7 +29,7 @@ interface IProps {
 export function ArticlesWidget(props: IProps) {
     const itemLoadable = useArticleList(props.params);
     const mappedItemData: IHomeWidgetItemProps[] | undefined = useMemo(() => {
-        return itemLoadable.data?.map(searchResult => {
+        return itemLoadable.data?.body?.map(searchResult => {
             const widgetItem: IHomeWidgetItemProps = {
                 to: searchResult.url,
                 name: searchResult.name,

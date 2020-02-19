@@ -10,6 +10,7 @@ namespace Vanilla\Knowledge\Controllers;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Pages\ArticlePage;
+use Vanilla\Knowledge\Controllers\Pages\ArticlesListPage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
 use Vanilla\Web\PageDispatchController;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
@@ -41,7 +42,7 @@ class ArticlesPageController extends PageDispatchController {
      * @param string $path The path from the dispatcher.
      * @return Data
      */
-    public function index(string $path) {
+    public function get(string $path) {
         /** @var ArticlePage $page */
         $page = $this->usePage(ArticlePage::class);
         $page->initialize($path);
@@ -90,6 +91,20 @@ class ArticlesPageController extends PageDispatchController {
             ->requiresSession("/kb/articles/$id/revisions/$revisionID")
             ->render()
         ;
+    }
+
+    /**
+     * Render out the /kb/articles page.
+     *
+     * @param array $query Query string.
+     * @return Data
+     */
+    public function index(array $query) {
+        /** @var ArticlesListPage $page */
+        $page = $this->usePage(ArticlesListPage::class);
+        $page->initialize($query);
+
+        return $page->render();
     }
 
     /**

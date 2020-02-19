@@ -67,6 +67,12 @@ export const CategoryPagedRoute = new RouteHandler(
     CATEGORIES_KEY,
 );
 
+export const ArticleListPageRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/kb/articles" */ "@knowledge/modules/article/ArticleListPage"),
+    "/kb/articles",
+    (data?: undefined) => "/kb/articles",
+);
+
 export const SearchRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
     "/kb/search",
@@ -128,6 +134,7 @@ export function getPageRoutes() {
         SearchRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
+        ArticleListPageRoute.route,
         KnowledgeBasePage.route,
         HomeRoute.route,
         HomeAppRoute.route,
