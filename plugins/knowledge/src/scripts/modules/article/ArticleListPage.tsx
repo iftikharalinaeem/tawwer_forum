@@ -53,7 +53,12 @@ export default function ArticleListPage() {
     const articleResults = articles.data.body.map((article: ISearchResult) => {
         return {
             name: article.name || "",
-            meta: <ResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />,
+            meta:
+                article.updateUser && article.dateUpdated ? (
+                    <ResultMeta updateUser={article.updateUser} dateUpdated={article.dateUpdated} />
+                ) : (
+                    <></>
+                ),
             url: article.url,
             attachments: [],
             location: [],

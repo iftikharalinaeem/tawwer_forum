@@ -47,7 +47,7 @@ import actionCreatorFactory from "typescript-fsa";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
-import { ISearchRequestBody, ISearchResponseBody } from "@knowledge/@types/api/search";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export interface IArticleActionsProps {
@@ -97,7 +97,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
     public static getArticleListACs = createAction.async<
         ISearchRequestBody,
-        { body: ISearchResponseBody; pagination: ILinkPages },
+        { body: ISearchResult[]; pagination: ILinkPages },
         IApiError
     >("GET_ARTICLE_LIST");
 
