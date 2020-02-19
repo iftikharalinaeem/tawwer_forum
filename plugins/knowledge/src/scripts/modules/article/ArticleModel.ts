@@ -19,12 +19,12 @@ import { IKnowledgeAppStoreState, KnowledgeReducer } from "@knowledge/state/mode
 import ReduxReducer from "@library/redux/ReduxReducer";
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { ILoadable, LoadStatus} from "@library/@types/api/core";
-import {ISearchRequestBody, ISearchResult} from "@knowledge/@types/api/search";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { hashString } from "@vanilla/utils";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import {ILinkPages, IWithPagination} from "@library/navigation/SimplePagerModel";
+import { ILinkPages, IWithPagination } from "@library/navigation/SimplePagerModel";
 
 export interface IArticleState {
     articlesByID: {
@@ -246,7 +246,7 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     status: LoadStatus.SUCCESS,
                     data: {
                         pagination: payload.result.pagination,
-                        body: payload.result.body
+                        body: payload.result.body,
                     },
                 };
                 return nextState;
