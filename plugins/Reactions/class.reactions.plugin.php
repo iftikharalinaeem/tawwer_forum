@@ -16,6 +16,7 @@
 
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
+use Vanilla\Contracts\LocaleInterface;
 
 /**
  * Class ReactionsPlugin
@@ -44,6 +45,9 @@ class ReactionsPlugin extends Gdn_Plugin {
     /** @var UserModel */
     private $userModel;
 
+    /** @var LocaleInterface */
+    private $locale;
+
     /**
      * ReactionsPlugin constructor.
      *
@@ -64,6 +68,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         $this->userModel = $userModel;
 
         parent::__construct();
+        $this->locale = Gdn::getContainer()->get(LocaleInterface::class);
     }
 
     /**
@@ -571,7 +576,7 @@ class ReactionsPlugin extends Gdn_Plugin {
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
                 foreach ($summary as &$reaction) {
-                    $reaction['Name'] = $reaction['Name'] ?: 'Invalid';
+                    $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('Invalid');
                 }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;
