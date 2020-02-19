@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent, calc, px } from "csx";
+import { important, percent, calc, px, rgba } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
@@ -211,7 +211,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             minHeight: unit(vars.item.mobileHeight),
         }),
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         }),
         marginLeft: unit(18),
     });
@@ -230,7 +230,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         textShadow: `${colorOut(vars.actionButton.shadowColor)} 0 0 2px`,
         whiteSpace: "nowrap",
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
         }),
         ...allButtonStates({
             hover: {
@@ -263,7 +263,7 @@ export const navigationManagerClasses = useThemeCache(() => {
 
     const input = style("input", {
         ...borders({
-            color: "transparent",
+            color: rgba(0, 0, 0, 0),
             radius: 0,
             width: 1,
         }),
