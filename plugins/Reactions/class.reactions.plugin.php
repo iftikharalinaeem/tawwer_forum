@@ -58,11 +58,11 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param LocaleInterface $locale
      */
     public function __construct(
-            DiscussionModel $discussionModel,
-            CommentModel $commentModel,
-            ReactionModel $reactionModel,
-            UserModel $userModel,
-            LocaleInterface $locale) {
+        DiscussionModel $discussionModel,
+        CommentModel $commentModel,
+        ReactionModel $reactionModel,
+        UserModel $userModel,
+        LocaleInterface $locale) {
 
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
