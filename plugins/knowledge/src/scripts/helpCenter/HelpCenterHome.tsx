@@ -128,7 +128,7 @@ export function HelpCenterHome(props: IProps) {
                     maxColumnCount: 1,
                     borderType: "navLinks",
                     viewAll: {
-                        to: formatUrl(`/kb/articles?recommend=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`),
+                        to: `/kb/articles?recommend=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`,
                     },
                 }}
                 params={widgetParams}

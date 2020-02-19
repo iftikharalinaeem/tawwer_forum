@@ -253,7 +253,10 @@ abstract class KbPage extends ThemedPage {
     protected function preloadArticleList(array $params) {
         $result = $this->rootApi->get_search($params);
 
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, $result, $params));
+        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, Data::box([
+            'body' => $result,
+            'pagination' => $result->getMeta('paging')
+        ]), $params));
     }
 
     /**
