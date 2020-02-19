@@ -28,7 +28,7 @@ interface IProps {
 }
 
 export default function FeaturedArticleLayout(props: IProps) {
-    const { results, pages, title } = props;
+    const { results, pages, title, query } = props;
     const device = useDevice();
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device);
 
@@ -36,7 +36,7 @@ export default function FeaturedArticleLayout(props: IProps) {
         results.length > 0 ? (
             <>
                 <ResultList results={props.results} />
-                <SimplePager url={formatUrl("/kb/articles?page=:page:", true)} pages={pages} />
+                <SimplePager url={formatUrl(`/kb/articles?page=:page:${query}`, true)} pages={pages} />
             </>
         ) : (
             <KbErrorPage className={inheritHeightClass()} defaultError={DefaultKbError.NO_ARTICLES} />

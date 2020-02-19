@@ -14,7 +14,7 @@ import apiv2 from "@library/apiv2";
 import Container from "@library/layout/components/Container";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { t, getSiteSection } from "@library/utility/appUtils";
+import { t, getSiteSection, formatUrl } from "@library/utility/appUtils";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
@@ -87,6 +87,7 @@ const HomePage = (props: IProps) => {
                 containerOptions={{
                     maxWidth: tilesVariables().calculatedMaxWidth,
                     maxColumnCount: recommendedColumnCount,
+                    viewAll: { to: formatUrl("/kb/articles?recommend=true") },
                 }}
                 params={widgetParams}
             />

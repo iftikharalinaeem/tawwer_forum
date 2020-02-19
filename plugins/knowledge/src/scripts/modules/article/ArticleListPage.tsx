@@ -37,13 +37,16 @@ export default function ArticleListPage() {
         limit: 10,
     });
 
+    let queryString = query.knowledgeBaseID ? `&knowledgBaseID=${query.knowledgeBaseID}` : "";
+    queryString = query.recommended ? queryString + `&recommended=${query.recommended}` : queryString + "";
+
     if (articles.status === LoadStatus.PENDING || articles.status === LoadStatus.LOADING) {
         return <Loader />;
     }
 
     const articlesError = articles.status === LoadStatus.ERROR && articles.error;
     if (articlesError) {
-        return <KbErrorPage apiError={articles.error} />;
+        return <KbErrorPage defaultError={DefaultKbError.NO_ARTICLES} />;
     }
 
     if (!articles.data) {
@@ -67,7 +70,12 @@ export default function ArticleListPage() {
 
     return (
         <DocumentTitle title={title}>
-            <FeaturedArticleLayout results={articleResults} pages={articles.data.pagination} title={title} />
+            <FeaturedArticleLayout
+                results={articleResults}
+                pages={articles.data.pagination}
+                title={title}
+                query={queryString}
+            />
         </DocumentTitle>
     );
 }

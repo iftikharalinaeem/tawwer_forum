@@ -20,7 +20,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { t, getSiteSection } from "@library/utility/appUtils";
+import { t, getSiteSection, formatUrl } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
@@ -127,6 +127,9 @@ export function HelpCenterHome(props: IProps) {
                 containerOptions={{
                     maxColumnCount: 1,
                     borderType: "navLinks",
+                    viewAll: {
+                        to: formatUrl(`/kb/articles?recommend=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`),
+                    },
                 }}
                 params={widgetParams}
             />
