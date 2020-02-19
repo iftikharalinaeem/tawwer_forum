@@ -62,7 +62,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         CommentModel $commentModel,
         ReactionModel $reactionModel,
         UserModel $userModel,
-        LocaleInterface $locale) {
+        LocaleInterface $locale
+    ) {
 
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
