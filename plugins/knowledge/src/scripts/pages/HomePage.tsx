@@ -87,7 +87,7 @@ const HomePage = (props: IProps) => {
                 containerOptions={{
                     maxWidth: tilesVariables().calculatedMaxWidth,
                     maxColumnCount: recommendedColumnCount,
-                    viewAll: { to: "/kb/articles?recommend=true" },
+                    viewAll: { to: "/kb/articles?recommended=true" },
                 }}
                 params={widgetParams}
             />
