@@ -25,12 +25,12 @@ export default function ArticleListPage() {
 
     useFallbackBackUrl("/kb");
 
-    let queryParam = query.knowledgeBaseID ? "knowledgeBaseID" : "siteSectionGroup";
-    let queryValue = queryParam === "knowledgeBaseID" ? query.knowledgeBaseID : siteSection.sectionGroup;
+    const title = query.recommended ? t("Featured Articles") : t("Articles");
 
     const articles = useArticleList({
-        featured: query.recommended ? query.recommended : true,
-        [queryParam]: queryValue,
+        featured: query.recommended ? query.recommended : false,
+        knowledgeBaseID: query.knowledgeBaseID ? query.knowledgeBaseID : undefined,
+        siteSectionGroup: siteSection.sectionGroup === "vanilla" ? undefined : siteSection.sectionGroup,
         locale: siteSection.contentLocale,
         expand: ["users"],
         page: query.page ? query.page : 1,
@@ -47,7 +47,7 @@ export default function ArticleListPage() {
     }
 
     if (!articles.data) {
-        return <KbErrorPage defaultError={DefaultKbError.GENERIC} />;
+        return <KbErrorPage defaultError={DefaultKbError.NO_ARTICLES} />;
     }
 
     const articleResults = articles.data.body.map((article: ISearchResult) => {
@@ -66,8 +66,8 @@ export default function ArticleListPage() {
     });
 
     return (
-        <DocumentTitle title={t("Featured Articles")}>
-            <FeaturedArticleLayout results={articleResults} pages={articles.data.pagination} />
+        <DocumentTitle title={title}>
+            <FeaturedArticleLayout results={articleResults} pages={articles.data.pagination} title={title} />
         </DocumentTitle>
     );
 }

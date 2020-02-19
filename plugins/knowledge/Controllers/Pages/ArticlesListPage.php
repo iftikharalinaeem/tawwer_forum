@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Controllers\Pages;
 
+use Garden\Web\Data;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
@@ -37,14 +38,19 @@ class ArticlesListPage extends KbPage {
      * Initialize for the URL format /kb/articles
      *
      * @param array|null $query
+     * @return Data
      */
     public function initialize(array $query = null) {
         $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
         $currentLocale = $currentSiteSection->getContentLocale();
         $pageNumber = $query["page"] ?? 1;
 
+        $siteSectionGroup = $currentSiteSection->getSectionGroup();
+
         $params = [
-            "featured" => true,
+            "featured" => $query["recommended"] ?? false,
+            "knowledgeBaseID" =>  $query["knowledgeBaseID"] ?? null,
+            "siteSectionGroup" => ($siteSectionGroup === "vanilla") ? null : $siteSectionGroup,
             "locale" => $currentLocale,
             "expand" => "users",
             "page" => $pageNumber,
@@ -53,10 +59,8 @@ class ArticlesListPage extends KbPage {
 
         if ($query["knowledgeBaseID"] ?? null) {
             $this->validateSiteSection($query["knowledgeBaseID"]);
-            $params["knowledegBaseID"] = $query["knowledgeBaseID"];
         } else {
             $this->disableSiteSectionValidation();
-            $params["siteSectionGroup"] = $currentSiteSection->getSectionGroup();
         }
         $this
             ->setSeoRequired(false)

@@ -21,13 +21,14 @@ import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 interface IProps {
+    title: string;
     results: IResult[];
     query?: string;
     pages: ILinkPages;
 }
 
 export default function FeaturedArticleLayout(props: IProps) {
-    const { results, pages } = props;
+    const { results, pages, title } = props;
     const device = useDevice();
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device);
 
@@ -51,7 +52,7 @@ export default function FeaturedArticleLayout(props: IProps) {
                         <PageTitle
                             className="searchBar-heading"
                             headingClassName={typographyClasses().largeTitle}
-                            title={t("Featured Articles")}
+                            title={title}
                             includeBackLink={true}
                         />
                     </PanelWidget>
