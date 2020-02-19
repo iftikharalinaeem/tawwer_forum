@@ -102,10 +102,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     >("GET_ARTICLE_LIST");
 
     public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
-        const { page, limit } = params;
-        params.page = page || 1;
-        params.limit = limit || 10;
-
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 
         if (!force && existingList.status !== LoadStatus.PENDING) {

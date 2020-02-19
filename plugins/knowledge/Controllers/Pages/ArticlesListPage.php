@@ -46,6 +46,7 @@ class ArticlesListPage extends KbPage {
         $params = [
             "featured" => true,
             "locale" => $currentLocale,
+            "expand" => "users",
             "page" => $pageNumber,
             "limit" => 10
         ];
@@ -79,10 +80,7 @@ class ArticlesListPage extends KbPage {
             $this->addLinkTag(['rel' => 'prev', 'href' => $prevUrl]);
         }
 
-        $this->addReduxAction(new ReduxAction(
-            ActionConstants:: GET_ARTICLE_LIST,
-            $articles,
-            $params
-        ));
+        $this->preloadArticleList($params);
+        return parent::render();
     }
 }
