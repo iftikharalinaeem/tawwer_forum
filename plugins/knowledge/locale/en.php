@@ -35,3 +35,7 @@ $Definition["Are you sure you want to purge this knowledge base?"] = <<<MESSAGE
 Are you sure you want to purge this knowledge base?
 All associated content will be irrecoverably lost.
 MESSAGE;
+
+$Definition["Feature Article"] = "Recommend Article";
+$Definition["Featured Article"] = "Recommended Article";
+$Definition["Featured Articles"] = "Recommended Articles";
