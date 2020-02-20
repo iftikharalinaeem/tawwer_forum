@@ -47,7 +47,7 @@ export function HelpCenterHome(props: IProps) {
         if (status === LoadStatus.PENDING) {
             void requestData();
         }
-    }, [status, requestData]);
+    }, [status, requestData, knowledgeBaseID]);
 
     const widgetParams: ISearchRequestBody = {
         featured: true,
@@ -109,6 +109,7 @@ export function HelpCenterHome(props: IProps) {
             />
             <DocumentTitle title={knowledgeBase.name}>
                 <TitleBar
+                    key={knowledgeBaseID}
                     useMobileBackButton={!props.isOnlyKb}
                     extraBurgerNavigation={
                         <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
