@@ -27,6 +27,7 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import ThemeColorPicker from "./ThemeColorPicker";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -99,7 +100,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     };
 
     let content: React.ReactNode;
-
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
@@ -108,6 +108,11 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         content = <ErrorPage apiError={formSubmit.error} />;
     } else {
         const tabData = [
+            {
+                label: t("Styles"),
+                panelData: "style",
+                contents: <ThemeColorPicker />,
+            },
             {
                 label: t("Header"),
                 panelData: "header",
