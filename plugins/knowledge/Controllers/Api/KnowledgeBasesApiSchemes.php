@@ -151,6 +151,8 @@ trait KnowledgeBasesApiSchemes {
                     "sortArticles?",
                     "status?",
                     "urlCode",
+                    "isUniversalSource:b?",
+                    "universalTargetIDs:a?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );

@@ -460,7 +460,6 @@ MESSAGE
             throw new \InvalidArgumentException("A guide must be manually sorted.");
         }
     }
-
     /**
      * Validate potential sortArticle value for a KB.
      * This method is intended to be applied as a custom validator on a {@see \Garden\Schema\Schema} instance.
@@ -470,6 +469,7 @@ MESSAGE
      * @param integer $recordID
      */
     public function validateSortArticles(array $data, ValidationField $validation, int $recordID = null) {
+
         if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
             // Avoid additional validation if neither relevant field is detected.
             return true;
@@ -483,6 +483,46 @@ MESSAGE
         }
 
         return true;
+    }
+
+    /**
+     * @param array $data
+     * @param ValidationField $validation
+     * @param int|null $recordID
+     * @return bool
+     */
+    public function validateIsUniversalSource(array $data, ValidationField $validation) {
+        if ($data["universalTargetIDs"] ?? null) {
+            if (!$data["isUniversalSource"] ?? null) {
+                $validation->getValidation()->addError(
+                    $validation->getName(),
+                    "Invalid universal source status, isUniversalSource parameter must be set to true if target KB's are passed."
+                )
+                ;
+            }
+        }
+
+        if ($data["universalTargetIDs"] ?? null) {
+            foreach ($data["universalTargetIDs"] as $targetkB ) {
+                try {
+                    $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $targetkB , "status" => self::STATUS_PUBLISHED]);
+                    if ($knowledgeBase["isUniversalSource"] ?? null) {
+                        $validation->getValidation()->addError(
+                            "universalTargetIDs",
+                            "Universal Target Knowledge-Base can't be an existing universal knowledge-base"
+                        )
+                        ;
+                    }
+                } catch (NoResultsException $e) {
+                    $validation->getValidation()->addError(
+                        "universalTargetIDs",
+                        "Invalid universalTargetID, one or more target ID's are invalid."
+                    )
+                    ;
+                }
+            }
+        }
+
     }
 
     /**
@@ -557,4 +597,5 @@ MESSAGE
         }
         return $valid;
     }
+
 }

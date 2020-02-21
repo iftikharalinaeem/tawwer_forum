@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Knowledge\Models\KnowledgeUniversalSourceModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
@@ -37,6 +38,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var KnowledgeUniversalSourceModel */
+    private $knowledgeUniversalSourceModel;
+
     /** @var TranslationProviderInterface $translation */
     private $translation;
 
@@ -52,6 +56,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
      * @param LocalesApiController $localeApi
+     * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
      */
     public function __construct(
         KnowledgeBaseModel $knowledgeBaseModel,
@@ -59,7 +64,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        LocalesApiController $localeApi
+        LocalesApiController $localeApi,
+        KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
@@ -67,6 +73,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
         $this->localeApi = $localeApi;
+        $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
     }
 
     /**
@@ -230,6 +237,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         ;
         $in = $this->applyUrlCodeValidator($in);
         $this->applySortTypeValidator($in);
+        $this->applyIsUniversalSourceValidation($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
@@ -241,12 +249,37 @@ class KnowledgeBasesApiController extends AbstractApiController {
         ]);
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
+        if ($body["isUniversalSource"] ?? null && $body["universalTargetIDs"] ?? null) {
+            foreach ($body["universalTargetIDs"] as $universalTargetID) {
+                $this->knowledgeUniversalSourceModel->insert([
+                    "sourceKnowledgeBaseID" => $knowledgeBaseID,
+                    "targetKnowledgeBaseID" => $universalTargetID
+                ]);
+            }
+        }
+
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
         return $result;
     }
+
+    /**
+     *
+     * @param Schema $schema
+     * @param integer $recordID
+     */
+    private function applyIsUniversalSourceValidation(Schema $schema, int $recordID = null) {
+        $schema->addValidator(
+            "",
+            function (array $data, ValidationField $validationField) use ($recordID) {
+                return $this->knowledgeBaseModel->validateIsUniversalSource($data, $validationField, $recordID);
+            }
+        );
+    }
+
+
 
     /**
      * Get a knowledge base for editing.
