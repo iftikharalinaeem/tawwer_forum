@@ -4,9 +4,10 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { color, percent } from "csx";
 import { colorOut, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { media } from "typestyle";
+import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
 
 export const themeColorPickerVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themeColorPicker");
@@ -14,31 +15,60 @@ export const themeColorPickerVariables = useThemeCache(() => {
         bg: color("#f5f6f7"),
     });
 
+    const frame = makeThemeVars("frame", {
+        width: 80,
+    });
+    const styleOptions = makeThemeVars("styleOptions", {
+        width: 20,
+    });
+
     return {
         colors,
+        frame,
+        styleOptions,
     };
 });
 export const themeColorPickerClasses = useThemeCache(() => {
     const vars = themeColorPickerVariables();
-    const globalVars = globalVariables();
     const style = styleFactory("themeColorPicker");
 
-    const wrapper = style("wrapper", {
-        display: "flex",
-    });
-    const frame = style("frame", {
-        width: percent(80),
-    });
-    const options = style("options", {
-        backgroundColor: colorOut(vars.colors.bg),
-        height: unit(500), //needs to go
-        width: percent(20),
-    });
+    const mediaQueries = layoutVariables().mediaQueries();
+    const wrapper = style(
+        "wrapper",
+        {
+            display: "flex",
+        },
+        mediaQueries.oneColumnDown({
+            display: "block",
+        }),
+    );
+    const frame = style(
+        "frame",
+        {
+            width: percent(80),
+        },
+        mediaQueries.oneColumnDown({
+            width: percent(100),
+        }),
+    );
+    const styleOptions = style(
+        "styleOptions",
+        {
+            backgroundColor: colorOut(vars.colors.bg),
+            boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
+            maxHeight: unit(500),
+            height: unit(500),
+            width: percent(20),
+        },
+        mediaQueries.oneColumnDown({
+            width: percent(100),
+        }),
+    );
 
     return {
         frame,
         wrapper,
-        options,
+        styleOptions,
     };
 });
 

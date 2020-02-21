@@ -100,6 +100,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     };
 
     let content: React.ReactNode;
+
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
