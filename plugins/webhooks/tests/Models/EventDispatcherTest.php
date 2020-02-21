@@ -5,20 +5,15 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\Webhooks;
+namespace VanillaTests\Webhooks\Models;
 
-use Garden\EventManager;
-use Garden\Http\HttpClient;
-use Garden\Http\HttpRequest;
-use Garden\Http\HttpResponse;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use Vanilla\Scheduler\SchedulerInterface;
-use Vanilla\Webhooks\Jobs\DispatchEventJob;
 use Vanilla\Webhooks\Library\EventDispatcher;
+use Vanilla\Webhooks\Library\EventScheduler;
+use Vanilla\Webhooks\Library\WebhookConfig;
 use Vanilla\Webhooks\Mocks\MockDiscussionEvent;
 use Vanilla\Webhooks\Models\WebhookModel;
-use VanillaTests\Fixtures\MockHttpClient;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -30,14 +25,11 @@ class EventDispatcherTest extends TestCase {
         setUpBeforeClass as private siteSetupBeforeClass;
     }
 
-    /** @var array */
-    private $dispatchedTrackingSlips = [];
-
     /** @var EventDispatcher */
     private $eventDispatcher;
 
-    /** @var MockHttpClient */
-    private $httpClient;
+    /** @var MockObject */
+    private $mockScheduler;
 
     /** @var WebhookModel */
     private $webhookModel;
@@ -61,21 +53,39 @@ class EventDispatcherTest extends TestCase {
     }
 
     /**
+     * Provide data for testing basic resource event dispatching.
+     *
+     * @return array
+     */
+    public function provideTestResourceEventData(): array {
+        $result = [
+            "Wildcard-only hook" => [["*"], 1],
+            "Discussion-only hook" => [["discussion"], 1],
+            "Comment-only event" => [["comment"], 0],
+            "Discussion and comment hook" => [["comment", "discussion"], 1],
+        ];
+
+        return $result;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function setUp(): void {
         parent::setUp();
-        $this->eventDispatcher = $this->container()->get(EventDispatcher::class);
+
+        /** @var WebhookModel */
         $this->webhookModel = $this->container()->get(WebhookModel::class);
 
-        $this->httpClient = new MockHttpClient();
-        static::container()->setInstance(HttpClient::class, $this->httpClient);
+        /** @var EventScheduler */
+        $this->mockScheduler = $this->getMockBuilder(EventScheduler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        /** @var EventManager */
-        $eventManager = $this->container()->get(EventManager::class);
-        $eventManager->bind("SchedulerDispatched", function (array $trackingSlips) {
-            $this->dispatchedTrackingSlips = $trackingSlips;
-        });
+        $this->eventDispatcher = new EventDispatcher($this->webhookModel, $this->mockScheduler);
+
+        // Cleanup webhook data between tests.
+        $this->webhookModel->delete(["webhookID >" => 0]);
     }
 
     /**
@@ -88,62 +98,26 @@ class EventDispatcherTest extends TestCase {
     }
 
     /**
-     * Test a basic webhook ping.
+     * Test basic webhook event scheduling.
      *
+     * @param array $events
+     * @param int $dispatches
      * @return void
+     * @dataProvider provideTestResourceEventData
      */
-    public function testResourceEvent(): void {
-        $webhook = $this->addWebhook(__FUNCTION__);
-
-        $response = new HttpResponse(
-            200,
-            ["Content-Type" => "application/json"],
-            json_encode(["success" => true])
-        );
-        $response->setRequest(new HttpRequest(HttpRequest::METHOD_POST));
-        $this->httpClient->addMockResponse(
-            $webhook["url"],
-            $response,
-            HttpRequest::METHOD_POST
+    public function testResourceEvent(array $events, int $dispatches): void {
+        $webhook = $this->addWebhook(__FUNCTION__, $events);
+        $config = new WebhookConfig($webhook);
+        $event = new MockDiscussionEvent(
+            MockDiscussionEvent::ACTION_INSERT,
+            ["foo" => "bar"]
         );
 
-        /** @var EventManager */
-        $eventManager = $this->container()->get(EventManager::class);
-        $event = new MockDiscussionEvent(MockDiscussionEvent::ACTION_INSERT, ["foo" => "bar"]);
-        $eventManager->dispatch($event);
+        $this->mockScheduler
+            ->expects($this->exactly($dispatches))
+            ->method("addDispatchEventJob")
+            ->with($this->identicalTo($event), $config);
 
-        $this->assertWebhookEventDispatched("discussion", MockDiscussionEvent::ACTION_INSERT);
-    }
-
-    /**
-     * Verify a particular type of event-dispatch job was scheduled.
-     *
-     * @param string $type
-     * @param string $action
-     * @return void
-     */
-    private function assertWebhookEventDispatched(string $type, string $action): void {
-        $result = false;
-
-        /** @var TrackingSlip $trackingSlip */
-        foreach ($this->dispatchedTrackingSlips as $trackingSlip) {
-            $driverSlip = $trackingSlip->getDriverSlip();
-
-            // Gotta do this the hard way, since jobs are instanced outside the container.
-            $reflection = new ReflectionClass($driverSlip);
-            $property = $reflection->getProperty("job");
-            $property->setAccessible(true);
-
-            /** @var JobInterface */
-            $job = $property->getValue($driverSlip);
-            if (!($job instanceof DispatchEventJob)) {
-                continue;
-            } elseif ($job->getType() === $type && $job->getAction() === $action) {
-                $result = true;
-                break;
-            }
-        }
-
-        $this->assertTrue($result, "{$type}-{$action} was not dispatched to any webhook.");
+        $this->eventDispatcher->dispatch($event);
     }
 }
