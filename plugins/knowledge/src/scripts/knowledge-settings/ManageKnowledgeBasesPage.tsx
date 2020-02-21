@@ -13,7 +13,7 @@ import React, { useState } from "react";
 import { EmptyKnowledgeBasesResults } from "@knowledge/knowledge-settings/EmptyKnowledgeBasesResults";
 import { t } from "@vanilla/i18n";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
-import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/KnowledgeBaseAddEdit";
+import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEdit";
 import { BrowserRouter } from "react-router-dom";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
