@@ -6,7 +6,11 @@
 import ModalLoader from "@library/modal/ModalLoader";
 import RouteHandler from "@library/routing/RouteHandler";
 import { makeThemeEditorUrl } from "./makeThemeEditorUrl";
-const themeEditorPaths = ["/theme/theme-settings/add", "/theme/theme-settings/:id(\\d+)/edit"];
+const themeEditorPaths = [
+    "/theme/theme-settings/add",
+    "/theme/theme-settings/:id(\\d+)/edit",
+    "/theme/theme-settings/preview",
+];
 
 //Editor
 const THEME_EDITOR_KEY = "ThemeEditorPageKey";

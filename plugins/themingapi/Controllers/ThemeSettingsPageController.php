@@ -55,5 +55,23 @@ class ThemeSettingsPageController extends PageDispatchController {
         return $response;
     }
 
+    /**
+     * Render out the /theme/theme-settings/preview.
+     *
+     * @param int $id
+     * @return \Garden\Web\Data
+     */
+    public function get_preview() {
+        $response = $this
+            ->useSimplePage(\Gdn::translate('Theme Editor'))
+            ->blockRobots()
+            ->requiresSession("/theme/theme-settings/preview")
+            ->render()
+        ;
+        //$response->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);
+        return $response;
+    }
+
+
 }
 
