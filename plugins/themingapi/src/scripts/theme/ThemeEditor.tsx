@@ -4,16 +4,9 @@
  */
 
 import React from "react";
-<<<<<<< HEAD:plugins/themingapi/src/scripts/theme/ThemeColorPicker.tsx
-import { themeColorPickerClasses } from "./themeColorPickerStyles";
-import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
-=======
 import { themeEditorClasses } from "./themeEditorStyles";
->>>>>>> 8635eb7935db360c57c37972b1cb9b79af58482d:plugins/themingapi/src/scripts/theme/ThemeEditor.tsx
 
-export interface IProps {
-    themeID: number | string;
-}
+export interface IProps {}
 
 export default function ThemeEditor(props: IProps) {
     const classes = themeEditorClasses();

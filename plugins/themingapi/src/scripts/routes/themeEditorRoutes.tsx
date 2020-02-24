@@ -24,7 +24,7 @@ export const ThemeEditorRoute = new RouteHandler(
     THEME_EDITOR_KEY,
 );
 export const ThemePreviewRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/resourceAddEdit" */ "@themingapi/theme/ThemeStylePreview"),
+    () => import(/* webpackChunkName: "pages/resourceAddEdit" */ "@themingapi/theme/ThemeEditorPreview"),
     "/theme/theme-settings/preview",
     (data?: undefined) => "theme/theme-settings/preview",
 );
