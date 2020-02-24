@@ -11,11 +11,9 @@ interface IProps {}
 export default function ThemeEditor(props: IProps) {
     const classes = themeEditorClasses();
     return (
-        <>
-            <div className={classes.wrapper}>
-                <div className={classes.frame}></div>
-                <div className={classes.styleOptions}></div>
-            </div>
-        </>
+        <div className={classes.wrapper}>
+            <div className={classes.frame}></div>
+            <div className={classes.styleOptions}></div>
+        </div>
     );
 }
