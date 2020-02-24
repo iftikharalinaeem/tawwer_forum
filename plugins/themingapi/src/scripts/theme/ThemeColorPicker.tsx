@@ -7,7 +7,9 @@ import React from "react";
 import { themeColorPickerClasses } from "./themeColorPickerStyles";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 
-interface IProps {}
+export interface IProps {
+    themeID: number | string;
+}
 
 export default function ThemeColorPicker(props: IProps) {
     const classes = themeColorPickerClasses();
@@ -15,7 +17,11 @@ export default function ThemeColorPicker(props: IProps) {
         <>
             <div className={classes.wrapper}>
                 <div className={classes.frame}>
-                    <iframe src={ThemeEditorRoute.url({ preview: true })} width="100%" height="100%"></iframe>
+                    <iframe
+                        src="https://dev.vanilla.localhost/theme/theme-settings/preview"
+                        width="100%"
+                        height="100%"
+                    ></iframe>
                 </div>
                 <div className={classes.styleOptions}></div>
             </div>

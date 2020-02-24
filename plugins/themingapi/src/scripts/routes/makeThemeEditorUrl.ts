@@ -11,7 +11,6 @@ export interface IThemeEditorURLData {
     themeID?: string | number;
     templateName?: string;
     newTheme?: boolean;
-    preview?: true;
 }
 
 /**
@@ -21,20 +20,11 @@ export interface IThemeEditorURLData {
  */
 export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<IThemeEditorURLData>) {
     const defaultAddRoot = "/theme/theme-settings/add";
-    const defaultPreviewRoot = "/theme/theme-settings/preview";
     if (!data || data.newTheme) {
         return defaultAddRoot;
     }
 
-    if (data.preview) {
-        return "/theme/theme-settings/preview";
-    }
-
-    let baseUrl = data.themeID
-        ? `/theme/theme-settings/${data.themeID}/edit`
-        : data.preview
-        ? defaultPreviewRoot
-        : defaultAddRoot;
+    let baseUrl = data.themeID ? `/theme/theme-settings/${data.themeID}/edit` : defaultAddRoot;
     const { templateName } = data;
 
     const query = qs.stringify({
@@ -43,6 +33,8 @@ export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<ITh
     if (query) {
         baseUrl += `?${query}`;
     }
-
     return baseUrl;
+}
+export function makeThemeEditorUrl1(data?: IThemeEditorURLData, store?: Store<IThemeEditorURLData>) {
+    return "/theme/theme-settings/preview";
 }

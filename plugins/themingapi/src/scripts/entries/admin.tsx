@@ -9,11 +9,13 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 import { themeEditorReducer } from "@themingapi/theme/themeEditorReducer";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { Router } from "@library/Router";
-import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import { ThemeEditorRoute, ThemePreviewRoute, getThemeRoute } from "@themingapi/routes/themeEditorRoutes";
 
 registerReducer("themeEditor", themeEditorReducer);
 
 registerReducer("themeSettings", themeSettingsReducer);
 addComponent("theming-ui-manage", ManageThemingPage);
 
-Router.addRoutes([ThemeEditorRoute.route]);
+//Router.addRoutes([ThemeEditorRoute.route]);
+
+Router.addRoutes(getThemeRoute());

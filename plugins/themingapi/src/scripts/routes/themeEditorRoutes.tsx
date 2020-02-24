@@ -23,3 +23,12 @@ export const ThemeEditorRoute = new RouteHandler(
     ModalLoader,
     THEME_EDITOR_KEY,
 );
+export const ThemePreviewRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "pages/resourceAddEdit" */ "@themingapi/theme/ThemeStylePreview"),
+    "/theme/theme-settings/preview",
+    (data?: undefined) => "theme/theme-settings/preview",
+);
+
+export function getThemeRoute() {
+    return [ThemePreviewRoute.route, ThemeEditorRoute.route];
+}
