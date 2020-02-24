@@ -19,8 +19,11 @@ export default function ThemeStylePreview() {
     const classes = themeEditorPreviewClasses();
     return (
         <BrowserRouter>
-            <div>
-                <TitleBar />
+            <div className={classes.contentContainer}>
+                <div className={classes.themeTitleBar}>
+                    <TitleBar />
+                </div>
+
                 <Banner />
                 <Container fullGutter>
                     <div className={classes.content}>

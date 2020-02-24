@@ -6,15 +6,19 @@
 import { unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { percent } from "csx";
 
 export const themeEditorPageVariables = useThemeCache(() => {
     const makeThemeEditorVars = variableFactory("themeEditorPage");
 });
-export const themeEditorClasses = useThemeCache(() => {
+export const themeEditorPageClasses = useThemeCache(() => {
     const vars = themeEditorPageVariables();
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
 
+    const form = style("form", {
+        height: percent(100),
+    });
     const editIcon = style("editIcon", {
         verticalAlign: "bottom",
     });
@@ -45,6 +49,7 @@ export const themeEditorClasses = useThemeCache(() => {
         },
     });
     return {
+        form,
         editIcon,
         themeName,
         themeInput,

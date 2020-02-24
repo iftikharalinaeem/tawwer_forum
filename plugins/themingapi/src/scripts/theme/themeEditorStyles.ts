@@ -35,7 +35,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const wrapper = style(
         "wrapper",
         {
-
             ...absolutePosition.fullSizeOfParent(),
             width: percent(100),
             height: percent(100),
@@ -44,7 +43,6 @@ export const themeEditorClasses = useThemeCache(() => {
                     display: "flex",
                 }
             }
-
         },
         mediaQueries.oneColumnDown({
             display: "block",
@@ -62,6 +60,7 @@ export const themeEditorClasses = useThemeCache(() => {
             ),
             overflow: "auto",
         },
+
         mediaQueries.oneColumnDown({
             width: percent(100),
         }),
@@ -80,10 +79,12 @@ export const themeEditorClasses = useThemeCache(() => {
         }),
     );
 
+
     return {
         frame,
         wrapper,
         styleOptions,
+
     };
 });
 

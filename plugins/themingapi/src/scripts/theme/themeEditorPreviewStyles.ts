@@ -99,6 +99,8 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         }
 
     });
+    const themeTitleBar = style("themeTitleBar", {});
+    const contentContainer = style("contentContainer", {});
 
     return {
         content,
@@ -106,7 +108,9 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         buttonStyles,
         inputStyles,
         title,
-        styleContent
+        styleContent,
+        contentContainer,
+        themeTitleBar
     };
 });
 
