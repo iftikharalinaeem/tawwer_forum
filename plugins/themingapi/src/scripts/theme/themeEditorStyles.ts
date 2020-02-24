@@ -41,8 +41,8 @@ export const themeEditorClasses = useThemeCache(() => {
             $nest: {
                 "&&&": {
                     display: "flex",
-                }
-            }
+                },
+            },
         },
         mediaQueries.oneColumnDown({
             display: "block",
@@ -51,14 +51,9 @@ export const themeEditorClasses = useThemeCache(() => {
     const frame = style(
         "frame",
         {
+            width: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
 
-            width: calc(
-                `${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`,
-            ),
-
-            flexBasis: calc(
-                `${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`,
-            ),
+            flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
             overflow: "auto",
         },
 
