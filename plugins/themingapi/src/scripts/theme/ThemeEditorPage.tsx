@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useRef, useState } from "react";
-import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
-import { themeEitorClasses } from "./themeEditorStyles";
+import { RouteComponentProps, useHistory } from "react-router-dom";
+import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
@@ -27,6 +27,7 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import ThemeEditor from "./ThemeEditor";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -48,6 +49,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
+    const classes = themeEditorPageClasses();
 
     const DEFAULT_THEME = "theme-foundation";
 
@@ -108,6 +110,11 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         content = <ErrorPage apiError={formSubmit.error} />;
     } else {
         const tabData = [
+            {
+                label: t("Styles"),
+                panelData: "style",
+                contents: <ThemeEditor />,
+            },
             {
                 label: t("Header"),
                 panelData: "header",
@@ -177,7 +184,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             },
         ];
         content = (
-            <form onSubmit={submitHandler}>
+            <form className={classes.form} onSubmit={submitHandler}>
                 <ActionBar
                     useShadow={false}
                     callToActionTitle={t("Save")}
@@ -227,7 +234,7 @@ export const Title = (props: IThemeTitleProps) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [isDisabled, setDisabled] = useState(true);
     const [name, setName] = useState(props.themeName);
-    const classes = themeEitorClasses();
+    const classes = themeEditorPageClasses();
 
     const editThemeName = () => {
         setDisabled(false);
