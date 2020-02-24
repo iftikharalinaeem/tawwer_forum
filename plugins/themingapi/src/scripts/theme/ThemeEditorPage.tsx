@@ -5,7 +5,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
-import { themeEitorClasses } from "./themeEditorStyles";
+import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
@@ -27,7 +27,7 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import ThemeColorPicker from "./ThemeColorPicker";
+import ThemeColorPicker from "./ThemeEditor";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -233,7 +233,7 @@ export const Title = (props: IThemeTitleProps) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [isDisabled, setDisabled] = useState(true);
     const [name, setName] = useState(props.themeName);
-    const classes = themeEitorClasses();
+    const classes = themeEditorPageClasses();
 
     const editThemeName = () => {
         setDisabled(false);
