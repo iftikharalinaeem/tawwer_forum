@@ -4,12 +4,12 @@
  */
 
 import React from "react";
-import { themeColorPickerClasses } from "./themeColorPickerStyles";
+import { themeEditorClasses } from "./themeEditorStyles";
 
 interface IProps {}
 
-export default function ThemeColorPicker(props: IProps) {
-    const classes = themeColorPickerClasses();
+export default function ThemeEditor(props: IProps) {
+    const classes = themeEditorClasses();
     return (
         <>
             <div className={classes.wrapper}>
