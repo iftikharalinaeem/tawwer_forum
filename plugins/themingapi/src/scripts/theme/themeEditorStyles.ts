@@ -6,7 +6,6 @@
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { color, percent } from "csx";
 import { colorOut, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
-import { media } from "typestyle";
 import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
 
 export const themeEditorVariables = useThemeCache(() => {
@@ -30,7 +29,7 @@ export const themeEditorVariables = useThemeCache(() => {
 });
 export const themeEditorClasses = useThemeCache(() => {
     const vars = themeEditorVariables();
-    const style = styleFactory("themeColorPicker");
+    const style = styleFactory("themeEditor");
 
     const mediaQueries = layoutVariables().mediaQueries();
     const wrapper = style(

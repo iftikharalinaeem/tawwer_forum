@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useRef, useState } from "react";
-import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
+import { RouteComponentProps, useHistory } from "react-router-dom";
 import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
@@ -27,7 +27,7 @@ import qs from "qs";
 import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import ThemeColorPicker from "./ThemeEditor";
+import ThemeEditor from "./ThemeEditor";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -112,7 +112,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             {
                 label: t("Styles"),
                 panelData: "style",
-                contents: <ThemeColorPicker />,
+                contents: <ThemeEditor />,
             },
             {
                 label: t("Header"),
