@@ -10,7 +10,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 export const themeEditorPageVariables = useThemeCache(() => {
     const makeThemeEditorVars = variableFactory("themeEditorPage");
 });
-export const themeEditorPageClasses = useThemeCache(() => {
+export const themeEditorClasses = useThemeCache(() => {
     const vars = themeEditorPageVariables();
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
