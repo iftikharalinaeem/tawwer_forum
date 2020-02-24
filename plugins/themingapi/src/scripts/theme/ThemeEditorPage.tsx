@@ -49,6 +49,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
+    const classes = themeEditorPageClasses();
 
     const DEFAULT_THEME = "theme-foundation";
 
@@ -183,7 +184,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             },
         ];
         content = (
-            <form onSubmit={submitHandler}>
+            <form className={classes.form} onSubmit={submitHandler}>
                 <ActionBar
                     useShadow={false}
                     callToActionTitle={t("Save")}

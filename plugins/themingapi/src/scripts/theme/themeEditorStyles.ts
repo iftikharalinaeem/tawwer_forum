@@ -4,8 +4,8 @@
  */
 
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { color, percent } from "csx";
-import { colorOut, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { color, percent, calc } from "csx";
+import { colorOut, unit, absolutePosition } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
 
 export const themeEditorVariables = useThemeCache(() => {
@@ -15,10 +15,10 @@ export const themeEditorVariables = useThemeCache(() => {
     });
 
     const frame = makeThemeVars("frame", {
-        width: 80,
+        width: 100,
     });
     const styleOptions = makeThemeVars("styleOptions", {
-        width: 20,
+        width: 376,
     });
 
     return {
@@ -35,7 +35,14 @@ export const themeEditorClasses = useThemeCache(() => {
     const wrapper = style(
         "wrapper",
         {
-            display: "flex",
+            ...absolutePosition.fullSizeOfParent(),
+            width: percent(100),
+            height: percent(100),
+            $nest: {
+                "&&&": {
+                    display: "flex",
+                }
+            }
         },
         mediaQueries.oneColumnDown({
             display: "block",
@@ -44,8 +51,17 @@ export const themeEditorClasses = useThemeCache(() => {
     const frame = style(
         "frame",
         {
-            width: percent(80),
+
+            width: calc(
+                `${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`,
+            ),
+
+            flexBasis: calc(
+                `${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`,
+            ),
+            overflow: "auto",
         },
+
         mediaQueries.oneColumnDown({
             width: percent(100),
         }),
@@ -55,9 +71,8 @@ export const themeEditorClasses = useThemeCache(() => {
         {
             backgroundColor: colorOut(vars.colors.bg),
             boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
-            maxHeight: unit(500),
-            height: unit(500),
-            width: percent(20),
+            width: unit(vars.styleOptions.width),
+            flexBasis: unit(vars.styleOptions.width),
         },
         mediaQueries.oneColumnDown({
             width: percent(100),
