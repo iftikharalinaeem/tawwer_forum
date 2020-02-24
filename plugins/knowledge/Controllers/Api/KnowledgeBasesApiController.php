@@ -153,7 +153,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             "sourceLocale?",
             "locale?",
             "siteSectionGroup?",
-            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections"]),
+            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections", "universalTargets", "universalSources"]),
         ])->add($this->getKnowledgeBaseSchema())->setDescription("List knowledge bases.");
 
         $out = $this->schema([":a" => $this->fullSchema()], "out");
@@ -161,6 +161,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // Get the expand params and then remove from the query.
+        $expandUniversalTargets = $this->isExpandField("universalTargets", $query["expand"]);
+        $expandUniversalSources = $this->isExpandField("universalSources", $query["expand"]);
         $expandSiteSections = $this->isExpandField('siteSections', $query['expand']);
         unset($query["expand"]);
 
@@ -177,12 +179,24 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $rows = $this->translateProperties($rows, $translateLocale);
         }
 
-        $rows = array_map(function ($row) use ($expandSiteSections, $translateLocale) {
+
+        $rows = array_map(function ($row) use (
+            $expandSiteSections,
+            $translateLocale,
+            $expandUniversalTargets,
+            $expandUniversalSources
+        ) {
             if ($expandSiteSections) {
                 $this->expandSiteSections($row);
             }
             if (isset($translateLocale)) {
                 $row['locale'] = $translateLocale;
+            }
+            if ($expandUniversalTargets){
+                $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
+            }
+            if ($expandUniversalSources){
+                $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
             }
             return $this->normalizeOutput($row);
         }, $rows);
@@ -240,6 +254,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->applyIsUniversalSourceValidation($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
+
+        if (array_key_exists('isUniversalSource', $body)) {
+            $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
+        }
+
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert([
@@ -249,14 +268,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         ]);
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
-        if ($body["isUniversalSource"] ?? null && $body["universalTargetIDs"] ?? null) {
-            foreach ($body["universalTargetIDs"] as $universalTargetID) {
-                $this->knowledgeUniversalSourceModel->insert([
-                    "sourceKnowledgeBaseID" => $knowledgeBaseID,
-                    "targetKnowledgeBaseID" => $universalTargetID
-                ]);
-            }
-        }
+        $this->knowledgeUniversalSourceModel->setUniversalContent($body , $knowledgeBaseID);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $row = $this->normalizeOutput($row);
@@ -411,12 +423,31 @@ class KnowledgeBasesApiController extends AbstractApiController {
         ;
         $in = $this->applyUrlCodeValidator($in, $id);
         $this->applySortTypeValidator($in, $id);
+        $this->applyIsUniversalSourceValidation($in, $id);
 
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
 
         $prevState = $this->knowledgeBaseByID($id);
+
+        $isUniversal = 0;
+        $prevUniversalSourceState = 0;
+
+        if (array_key_exists('isUniversalSource', $prevState) ) {
+            $prevUniversalSourceState = ($prevState['isUniversalSource'] === 1) ? true : false ;
+        }
+
+        if (array_key_exists('isUniversalSource', $body)) {
+            $isUniversal = $body['isUniversalSource'];
+            $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
+        } elseif ($prevUniversalSourceState) {
+            $isUniversal = $prevUniversalSourceState;
+        }
+
+
+        $universalTargetIDs = $body['universalTargetIDs'] ?? null;
+
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
         if (isset($body['name']) && $prevState['name'] !== $body['name']) {
             $this->knowledgeCategoryModel->update(
@@ -424,12 +455,28 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 ['knowledgeCategoryID' => $prevState['rootCategoryID']]
             );
         }
-        // Check if KB status changed: deleted vs published
-        if (isset($body['status']) && ($body['status'] !== $prevState['status'])
-            || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
-            // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
-            $this->knowledgeBaseModel->resetSphinxCounters();
+
+        // If the universalSource flag has been change update according to the new status.
+        if ($isUniversal !== $prevUniversalSourceState){
+            // switch to a universal from not
+            if ($isUniversal && $universalTargetIDs) {
+                $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
+            }
+
+            // switch from universal to not and delete records from knowledgeUniversalSource table.
+            if (!$isUniversal && $prevState['isUniversalSource']) {
+                $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
+            }
+        } elseif ($isUniversal && $universalTargetIDs) {
+            $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
         }
+
+            // Check if KB status changed: deleted vs published
+            if (isset($body['status']) && ($body['status'] !== $prevState['status'])
+                || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
+                // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
+                $this->knowledgeBaseModel->resetSphinxCounters();
+            }
 
         $row = $this->knowledgeBaseByID($id);
         $row = $this->normalizeOutput($row);
@@ -560,6 +607,29 @@ class KnowledgeBasesApiController extends AbstractApiController {
             } else {
                 $record['defaultArticleID'] = null;
             }
+        }
+
+        if (array_key_exists("isUniversalSource", $record)) {
+            if ($record["isUniversalSource"]) {
+                $universalTargets =  $this->knowledgeUniversalSourceModel->get(["sourceKnowledgeBaseID" => $record["knowledgeBaseID"]]);
+                $targetKBIDs = [];
+                foreach ($universalTargets as $universalTarget) {
+                    $targetKBIDs[] = $universalTarget["targetKnowledgeBaseID"];
+                }
+                $record["universalTargetIDs"] = $targetKBIDs;
+                $record["universalSourceIDs"] = [];
+            }
+
+            if (!$record["isUniversalSource"]) {
+                $sourceKbs =  $this->knowledgeUniversalSourceModel->get(["targetKnowledgeBaseID" => $record["knowledgeBaseID"]]);
+                $sourceKbIDs = [];
+                foreach ($sourceKbs as $sourceKb) {
+                    $sourceKbIDs[] = $sourceKb["sourceKnowledgeBaseID"];
+                }
+                $record["universalSourceIDs"] = $sourceKbIDs;
+                $record["universalTargetIDs"] = [];
+            }
+
         }
         $record['url'] = $this->knowledgeBaseModel->url($record);
         $this->expandSiteSections($record);
