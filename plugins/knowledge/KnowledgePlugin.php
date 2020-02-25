@@ -357,8 +357,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
         $this->database->structure()
             ->table("knowledgeUniversalSource")
-            ->column("sourceKnowledgeBaseID", "int",null,'unique.universalPair')
-            ->column("targetKnowledgeBaseID", "int",null,'unique.universalPair')
+            ->column("sourceKnowledgeBaseID", "int", null, 'unique.universalPair')
+            ->column("targetKnowledgeBaseID", "int", null, 'unique.universalPair')
             ->set();
 
 

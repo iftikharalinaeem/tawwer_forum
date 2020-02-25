@@ -512,29 +512,11 @@ MESSAGE
             if (!$isUniversalKB) {
                 $validation->getValidation()->addError(
                     $validation->getName(),
-                    "Invalid universal source status,Knowledge-Base universal status must be set to true if target KB's are passed."
+                    "Invalid universal source status, Knowledge-Base universal status must be set to true if target KB's are passed."
                 );
             }
         }
-        // Make sure that the none of the universal target ID's are currently set to Universal Sources.
-        if ($data["universalTargetIDs"] ?? null) {
-            foreach ($data["universalTargetIDs"] as $targetkB) {
-                try {
-                    $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $targetkB , "status" => self::STATUS_PUBLISHED]);
-                    if ($knowledgeBase["isUniversalSource"] ?? null) {
-                        $validation->getValidation()->addError(
-                            "universalTargetIDs",
-                            "Universal Target Knowledge-Base can't be an existing universal knowledge-base"
-                        );
-                    }
-                } catch (NoResultsException $e) {
-                    $validation->getValidation()->addError(
-                        "universalTargetIDs",
-                        "Invalid universalTargetID, one or more target ID's are invalid."
-                    );
-                }
-            }
-        }
+
     }
 
     /**

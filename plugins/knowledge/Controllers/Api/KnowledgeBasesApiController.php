@@ -447,18 +447,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $prevState = $this->knowledgeBaseByID($id);
 
-        $isUniversal = 0;
-        $prevUniversalSourceState = 0;
-
-        if (array_key_exists('isUniversalSource', $prevState)) {
-            $prevUniversalSourceState = ($prevState['isUniversalSource'] === 1) ? true : false;
-        }
+        $isUniversal =  $body['isUniversalSource'] ?? $prevState['isUniversalSource'] ?? false;
 
         if (array_key_exists('isUniversalSource', $body)) {
-            $isUniversal = $body['isUniversalSource'];
             $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
-        } elseif ($prevUniversalSourceState) {
-            $isUniversal = $prevUniversalSourceState;
         }
         
         $universalTargetIDs = $body['universalTargetIDs'] ?? null;
@@ -472,17 +464,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
 
         // Update if knowledgeUniversalSource table
-        // If the status has changed from previous Status
-        if ($isUniversal !== $prevUniversalSourceState) {
-            if ($isUniversal && $universalTargetIDs) {
+        if ($isUniversal) {
+            if ($universalTargetIDs) {
                 $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
             }
+        } elseif ($prevState['isUniversalSource'] && !$isUniversal) {
+            $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
 
-            if (!$isUniversal && $prevState['isUniversalSource']) {
-                $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
-            }
-        } elseif ($isUniversal && $universalTargetIDs) {
-            $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
         }
 
         // Check if KB status changed: deleted vs published
@@ -631,21 +619,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         if (array_key_exists("isUniversalSource", $record)) {
             if ($record["isUniversalSource"]) {
-                $universalTargets =  $this->knowledgeUniversalSourceModel->get(["sourceKnowledgeBaseID" => $record["knowledgeBaseID"]]);
-                $targetKBIDs = [];
-                foreach ($universalTargets as $universalTarget) {
-                    $targetKBIDs[] = $universalTarget["targetKnowledgeBaseID"];
-                }
+                $idType = "sourceKnowledgeBaseID";
+                $targetKBIDs = $this->knowledgeUniversalSourceModel->getUniversalInformation($idType, $record);
                 $record["universalTargetIDs"] = $targetKBIDs;
                 $record["universalSourceIDs"] = [];
-            }
-
-            if (!$record["isUniversalSource"]) {
-                $sourceKbs =  $this->knowledgeUniversalSourceModel->get(["targetKnowledgeBaseID" => $record["knowledgeBaseID"]]);
-                $sourceKbIDs = [];
-                foreach ($sourceKbs as $sourceKb) {
-                    $sourceKbIDs[] = $sourceKb["sourceKnowledgeBaseID"];
-                }
+            } elseif (!$record["isUniversalSource"]) {
+                $idType = "targetKnowledgeBaseID";
+                $sourceKbIDs = $this->knowledgeUniversalSourceModel->getUniversalInformation($idType, $record);
                 $record["universalSourceIDs"] = $sourceKbIDs;
                 $record["universalTargetIDs"] = [];
             }

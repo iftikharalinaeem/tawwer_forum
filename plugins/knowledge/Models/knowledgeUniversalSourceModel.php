@@ -6,10 +6,11 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Garden\Web\Exception\ClientException;
 use Vanilla\Exception\Database\NoResultsException;
 
 /**
- * A model for managing knowledge bases.
+ * A model for managing knowledge-bases universal content.
  */
 class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
 
@@ -38,6 +39,7 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
     public function setUniversalContent(array $body, int $id) {
         if ($body["universalTargetIDs"] ?? null) {
             foreach ($body["universalTargetIDs"] as $universalTargetID) {
+                $this->validateTargetKBUniversalSource($universalTargetID);
                 $where = [
                     "sourceKnowledgeBaseID" => $id,
                     "targetKnowledgeBaseID" => $universalTargetID
@@ -47,6 +49,24 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                     $this->insert($where);
                 }
             }
+        }
+    }
+
+    /**
+     * Validate that universal target kb exists and is not a universal source.
+     *
+     * @param int $id
+     * @throws ClientException
+     * @throws NoResultsException
+     */
+    protected function validateTargetKBUniversalSource(int $id) {
+        try {
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $id , "status" => KnowledgeBaseModel::STATUS_PUBLISHED]);
+            if ($knowledgeBase["isUniversalSource"] ?? null) {
+                throw new ClientException("Invalid universalTargetID, one or more target ID's are invalid.");
+            }
+        } catch (NoResultsException $e) {
+            throw new NoResultsException(  "Invalid universalTargetID, one or more target ID's are invalid.");
         }
     }
 
@@ -104,5 +124,22 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                 $populate($row, $name);
             }
         }
+    }
+
+    /**
+     * Get the universal content data based on idType.
+     *
+     * @param string $idType
+     * @param array $record
+     * @return array
+     */
+    public function getUniversalInformation(string $idType, array $record): array {
+        $universalTargets = $this->get([$idType => $record["knowledgeBaseID"]]);
+        $targetKBIDs = [];
+        foreach ($universalTargets as $universalTarget) {
+            $column = ($idType === "sourceKnowledgeBaseID") ? "targetKnowledgeBaseID" : "sourceKnowledgeBaseID";
+            $targetKBIDs[] = $universalTarget[$column];
+        }
+        return $targetKBIDs;
     }
 }
