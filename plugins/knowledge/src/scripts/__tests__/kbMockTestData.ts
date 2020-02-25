@@ -153,6 +153,8 @@ export function dummyKnowledgeBase(overrides: Partial<IKnowledgeBase> = {}): IKn
         defaultArticleID: null,
         siteSectionGroup: "vanilla",
         siteSections: [dummySiteSection()],
+        isUniversalSource: false,
+        hasCustomPermissions: false,
         ...overrides,
     };
 }

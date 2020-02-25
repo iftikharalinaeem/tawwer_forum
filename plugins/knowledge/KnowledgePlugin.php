@@ -349,6 +349,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("customPermissionRequired", "int", ['Null' => false, 'Default' => 0])
             ->column("permissionKnowledgeBaseID", "int", ['Null' => false, 'Default' => -1])
             ->column("sort", "int", true)
+            ->column("isUniversalSource", "tinyint(1)", 0)
             ->column(
                 "status",
                 KnowledgeBaseModel::getAllStatuses(),
@@ -367,6 +368,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
             'knowledgeBase',
             'permissionKnowledgeBaseID'
         );
+
+        $this->database->structure()
+            ->table("knowledgeUniversalSource")
+            ->column("sourceKnowledgeBaseID", "int", null, 'unique.universalPair')
+            ->column("targetKnowledgeBaseID", "int", null, 'unique.universalPair')
+            ->set();
 
         // Update knowledge baese when missing sourceLocale
         /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
