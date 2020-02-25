@@ -17,7 +17,6 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
-
     /**
      * KnowledgeUniversalSourceModel constructor.
      *
@@ -87,17 +86,10 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
         $populate = function (array &$row, $name) {
             if ($row["knowledgeBaseID"] ?? null) {
                 $ids = [];
-
                 if ($name === "universalTargets") {
-                    $allSourceTargets = $this->get(["sourceKnowledgeBaseID" => $row["knowledgeBaseID"]]);
-                    foreach ($allSourceTargets as $sourceTarget) {
-                        $ids[] = $sourceTarget["targetKnowledgeBaseID"];
-                    }
+                    $ids = $this->getUniversalInformation("sourceKnowledgeBaseID", $row);
                 } elseif ($name === "universalSources") {
-                    $allSourceTargets = $this->get(["targetKnowledgeBaseID" => $row["knowledgeBaseID"]]);
-                    foreach ($allSourceTargets as $sourceTarget) {
-                        $ids[] = $sourceTarget["sourceKnowledgeBaseID"];
-                    }
+                    $ids = $this->getUniversalInformation("targetKnowledgeBaseID", $row);
                 }
 
                 foreach ($ids as $id) {
@@ -105,10 +97,16 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                         $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $id]);
                         if ($knowledgeBase) {
                             $row[$name][] = [
-                                "knowledgeBaseID" => $knowledgeBase['knowledgeBaseID'],
-                                "name" => $knowledgeBase['name'],
-                                "rootCategoryID" => $knowledgeBase["rootCategoryID"]
+                                "knowledgeBaseID" => $knowledgeBase['knowledgeBaseID'] ?? null,
+                                "name" => $knowledgeBase['name'] ?? null,
+                                "description" => $knowledgeBase['description'] ?? null,
+                                "icon" => $knowledgeBase['icon'] ?? null,
+                                "sortArticles" => $knowledgeBase["sortArticles"] ?? null,
+                                "viewType" => $knowledgeBase["viewType"] ?? null,
+                                "url" => $this->knowledgeBaseModel->url($knowledgeBase),
+                                "siteSectionGroup" => $knowledgeBase["siteSectionGroup"] ?? null,
                             ];
+
                         }
                     } catch (NoResultsException $e) {
                         logException($e);
@@ -134,12 +132,12 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function getUniversalInformation(string $idType, array $record): array {
-        $universalTargets = $this->get([$idType => $record["knowledgeBaseID"]]);
-        $targetKBIDs = [];
-        foreach ($universalTargets as $universalTarget) {
+        $universalKBs = $this->get([$idType => $record["knowledgeBaseID"]]);
+        $ids = [];
+        foreach ($universalKBs as $universalKB) {
             $column = ($idType === "sourceKnowledgeBaseID") ? "targetKnowledgeBaseID" : "sourceKnowledgeBaseID";
-            $targetKBIDs[] = $universalTarget[$column];
+            $ids[] = $universalKB[$column];
         }
-        return $targetKBIDs;
+        return $ids;
     }
 }

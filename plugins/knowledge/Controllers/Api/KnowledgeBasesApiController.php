@@ -93,7 +93,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $expandUniversalTargets = $this->isExpandField("universalTargets", $query["expand"]);
         $expandUniversalSources = $this->isExpandField("universalSources", $query["expand"]);
-        $expandSiteSections = $this->isExpandField('siteSections', $query['expand']);
         unset($query["expand"]);
 
 
@@ -245,7 +244,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    private function expandSiteSections(array &$row) {
+    public function expandSiteSections(array &$row) {
         $siteSections = $this->siteSectionModel->getForSectionGroup($row['siteSectionGroup']);
         $row['siteSections'] = $siteSections;
     }
@@ -463,7 +462,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             );
         }
 
-        // Update if knowledgeUniversalSource table
         if ($isUniversal) {
             if ($universalTargetIDs) {
                 $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);

@@ -493,7 +493,6 @@ MESSAGE
      * @param int|null $recordID
      */
     public function validateIsUniversalSource(array $data, ValidationField $validation, int $recordID = null) {
-        // make sure that if we have universal targetID's that the universalSource status is set correctly
         if (($data["universalTargetIDs"] ?? null) && !$recordID) {
             if (array_key_exists("isUniversalSource", $data) && !$data["isUniversalSource"]) {
                 $validation->getValidation()->addError(
@@ -512,11 +511,10 @@ MESSAGE
             if (!$isUniversalKB) {
                 $validation->getValidation()->addError(
                     $validation->getName(),
-                    "Invalid universal source status, Knowledge-Base universal status must be set to true if target KB's are passed."
+                    "Invalid universal source status, isUniversalSource parameter must be set to true if target KB's are passed."
                 );
             }
         }
-
     }
 
     /**

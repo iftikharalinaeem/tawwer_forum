@@ -155,7 +155,11 @@ trait KnowledgeBasesApiSchemes {
             $this->knowledgeBaseFragmentSchema = Schema::parse([
                 "knowledgeBaseID",
                 "name",
-                "rootCategoryID",
+                "icon?",
+                "sortArticles?",
+                "viewType",
+                "urlCode",
+                "siteSectionGroup",
             ], $type);
         }
         return $this->knowledgeBaseFragmentSchema;
