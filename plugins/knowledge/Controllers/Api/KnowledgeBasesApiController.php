@@ -324,14 +324,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'bannerImage',
             'sortArticles',
             'sourceLocale',
-            'urlCode',
-            'isUniversalSource?',
-            'universalTargetIDs?',
+            'urlCode'
         ])->add($this->fullSchema()), "out");
 
 
         $row = $this->knowledgeBaseByID($id);
-        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
         return $result;

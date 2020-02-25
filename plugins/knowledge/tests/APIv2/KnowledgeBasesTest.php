@@ -38,8 +38,6 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         'sourceLocale',
         'urlCode',
         'siteSectionGroup',
-        'isUniversalSource',
-        'universalTargetIDs',
     ];
 
     /**
