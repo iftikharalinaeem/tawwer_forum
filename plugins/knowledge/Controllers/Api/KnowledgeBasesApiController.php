@@ -73,7 +73,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
         LocalesApiController $localeApi,
-        PermissionModel $permissionModel
+        PermissionModel $permissionModel,
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
