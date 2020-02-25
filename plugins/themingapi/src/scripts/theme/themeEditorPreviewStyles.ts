@@ -37,32 +37,32 @@ export const themeEditorPreviewVariables = useThemeCache(() => {
     const styleContent = previewVars("buttonContent", {
         padding: {
             top: 18,
-        }
+        },
     });
     const buttonStyles = previewVars("buttonStyles", {
         padding: {
             top: 40,
-        }
+        },
     });
     const inputStyles = previewVars("buttonStyles", {
         padding: {
             top: 30,
-            bottom: 30
-        }
+            bottom: 30,
+        },
     });
 
     const title = previewVars("title", {
         margin: {
-            bottom: 18
-        }
-    })
+            bottom: 18,
+        },
+    });
     return {
         content,
         description,
         styleContent,
         buttonStyles,
         inputStyles,
-        title
+        title,
     };
 });
 export const themeEditorPreviewClasses = useThemeCache(() => {
@@ -81,19 +81,19 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
-        marginBottom: vars.title.margin.bottom
+        marginBottom: vars.title.margin.bottom,
     });
 
     const buttonStyles = style("buttonStyles", {
         ...paddings({
             top: vars.buttonStyles.padding.top,
-        })
+        }),
     });
     const inputStyles = style("inputStyles", {
         ...paddings({
             top: vars.inputStyles.padding.top,
             bottom: vars.inputStyles.padding.bottom,
-        })
+        }),
     });
     const styleContent = style("styleContent", {
         paddingTop: unit(vars.styleContent.padding.top),
@@ -102,30 +102,28 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         $nest: {
             "&& button": {
                 marginRight: unit(12),
-            }
-        }
-
+            },
+        },
     });
 
     const contentContainer = style("contentContainer", {
         $nest: {
             [`&& #page`]: {
-                overflow: "auto"
+                overflow: "auto",
             },
             [`& .${titleBarClasses().logoContainer}`]: {
-                pointerEvents: "none"
+                pointerEvents: "none",
             },
             [`& .${dropDownClasses().action}`]: {
-                pointerEvents: "none"
+                pointerEvents: "none",
             },
             [`& .${titleBarNavClasses().link}`]: {
-                pointerEvents: "none"
-            }
-            ,
+                pointerEvents: "none",
+            },
             [`& .${bannerClasses().searchButton}`]: {
-                pointerEvents: "none"
-            }
-        }
+                pointerEvents: "none",
+            },
+        },
     });
 
     return {

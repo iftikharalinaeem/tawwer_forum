@@ -54,8 +54,7 @@ export const themeEditorClasses = useThemeCache(() => {
         {
             width: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
             flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
-            height: percent(100)
-
+            height: percent(100),
         },
 
         mediaQueries.oneColumnDown({
@@ -66,7 +65,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const styleOptions = style(
         "styleOptions",
         {
-
             backgroundColor: colorOut(vars.colors.bg),
             boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
             width: unit(vars.styleOptions.width),
@@ -77,13 +75,9 @@ export const themeEditorClasses = useThemeCache(() => {
         }),
     );
 
-
     return {
         frame,
         wrapper,
         styleOptions,
-
     };
 });
-
-export default themeEditorClasses;

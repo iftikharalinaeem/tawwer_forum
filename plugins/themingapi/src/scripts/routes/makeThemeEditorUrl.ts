@@ -35,6 +35,3 @@ export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<ITh
     }
     return baseUrl;
 }
-export function makeThemeEditorUrl1(data?: IThemeEditorURLData, store?: Store<IThemeEditorURLData>) {
-    return "/theme/theme-settings/preview";
-}
