@@ -327,7 +327,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'urlCode'
         ])->add($this->fullSchema()), "out");
 
-
         $row = $this->knowledgeBaseByID($id);
         $result = $out->validate($row);
 

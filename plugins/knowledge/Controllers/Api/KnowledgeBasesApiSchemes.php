@@ -145,7 +145,7 @@ trait KnowledgeBasesApiSchemes {
     }
 
     /**
-     * Simplified product schema.
+     * Simplified knowledge-base schema.
      *
      * @param string $type
      * @return Schema
