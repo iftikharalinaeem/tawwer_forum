@@ -15,13 +15,14 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 
 export default function ThemeStylePreview() {
+    const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
     document.body.classList.add(classes.contentContainer);
     return (
         <BrowserRouter>
-            <TitleBar />
+            <TitleBar disablePointerEvent={true} />
 
-            <Banner title="Welcome To Your Theme" />
+            <Banner title="Welcome To Your Theme" disablePointerEvent={true} />
             <Container fullGutter>
                 <div className={classes.content}>
                     <Paragraph className={classes.description}>
@@ -43,7 +44,15 @@ export default function ThemeStylePreview() {
                         <h2 className={classes.title}>Inputs</h2>
                         <p>User inputs are based on the global background and text colors.</p>
                         <div className={classes.styleContent}>
-                            <InputTextBlock inputProps={{ value: "Text Input" }} />
+                            <InputTextBlock
+                                inputProps={{
+                                    value: intialInputValue,
+                                    placeholder: "Text Input",
+                                    onChange: event => {
+                                        newInputValue(event.target.value);
+                                    },
+                                }}
+                            />
                         </div>
                     </div>
                 </div>

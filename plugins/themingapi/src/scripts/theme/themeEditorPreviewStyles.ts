@@ -13,6 +13,7 @@ import { titleBarClasses } from "@vanilla/library/src/scripts/headers/titleBarSt
 import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNavStyles";
 import { searchBarVariables, searchBarClasses } from "@vanilla/library/src/scripts/features/search/searchBarStyles";
 import { bannerClasses } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -110,6 +111,12 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         $nest: {
             [`&& #page`]: {
                 overflow: "auto"
+            },
+            [`& .${titleBarClasses().logoContainer}`]: {
+                pointerEvents: "none"
+            },
+            [`& .${dropDownClasses().action}`]: {
+                pointerEvents: "none"
             },
             [`& .${titleBarNavClasses().link}`]: {
                 pointerEvents: "none"
