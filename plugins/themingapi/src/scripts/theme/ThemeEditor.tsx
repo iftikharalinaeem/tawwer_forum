@@ -17,6 +17,7 @@ export default function ThemeEditor(props: IProps) {
                     src="https://dev.vanilla.localhost/theme/theme-settings/preview"
                     width="100%"
                     height="100%"
+                    scrolling="yes"
                 ></iframe>
             </div>
             <div className={classes.styleOptions}></div>

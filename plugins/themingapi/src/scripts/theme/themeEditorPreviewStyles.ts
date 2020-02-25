@@ -9,6 +9,10 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
 import { TileAlignment } from "@vanilla/library/src/scripts/features/tiles/Tiles";
+import { titleBarClasses } from "@vanilla/library/src/scripts/headers/titleBarStyles";
+import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNavStyles";
+import { searchBarVariables, searchBarClasses } from "@vanilla/library/src/scripts/features/search/searchBarStyles";
+import { bannerClasses } from "@vanilla/library/src/scripts/banner/bannerStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -42,6 +46,7 @@ export const themeEditorPreviewVariables = useThemeCache(() => {
     const inputStyles = previewVars("buttonStyles", {
         padding: {
             top: 30,
+            bottom: 30
         }
     });
 
@@ -86,6 +91,7 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
     const inputStyles = style("inputStyles", {
         ...paddings({
             top: vars.inputStyles.padding.top,
+            bottom: vars.inputStyles.padding.bottom,
         })
     });
     const styleContent = style("styleContent", {
@@ -99,8 +105,21 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         }
 
     });
-    const themeTitleBar = style("themeTitleBar", {});
-    const contentContainer = style("contentContainer", {});
+
+    const contentContainer = style("contentContainer", {
+        $nest: {
+            [`&& #page`]: {
+                overflow: "auto"
+            },
+            [`& .${titleBarNavClasses().link}`]: {
+                pointerEvents: "none"
+            }
+            ,
+            [`& .${bannerClasses().searchButton}`]: {
+                pointerEvents: "none"
+            }
+        }
+    });
 
     return {
         content,
@@ -110,7 +129,6 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         title,
         styleContent,
         contentContainer,
-        themeTitleBar
     };
 });
 
