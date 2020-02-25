@@ -1,379 +1,278 @@
 openapi: 3.0.0
 info:
 paths:
-  "/knowledge-bases":
-    get:
-      parameters:
-        - description: Knowledge base status.
-          in: query
-          name: status
-          required: false
-          schema:
-            default: published
-            enum:
-              - deleted
-              - published
-            type: string
-        - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
-          in: query
-          name: locale
-          required: false
-          schema:
-            type: string
-          example: fr
-        - description: Locale key to filter results by their `sourceLocale` property.
-          in: query
-          name: sourceLocale
-          required: false
-          schema:
-            type: string
-          example: en
-        - description: siteSectionGroup to filter results by their `siteSectionGroup` property.
-          in: query
-          name: siteSectionGroup
-          required: false
-          schema:
-            type: string
-          example: vanilla
-      responses:
-        "200":
-          content:
-            "application/json":
-              schema:
-                items:
-                  properties:
-                    countArticles:
-                      description: Total articles in the knowledge base.
-                      type: integer
-                    countCategories:
-                      description: Total categories in the knowledge base.
-                      type: integer
-                    dateInserted:
-                      description: When the knowledge base was created.
-                      format: date-time
-                      type: string
-                    dateUpdated:
-                      description: When the knowledge base was last updated.
-                      format: date-time
-                      type: string
-                    description:
-                      description: Description for the knowledge base.
-                      maxLength: 255
-                      type: string
-                    icon:
-                      description: Full URL to the icon of knowledge base.
-                      type: string
-                    insertUserID:
-                      description: >-
-                        Unique ID of the user who originally created the
-                        knowledge base.
-                      type: integer
-                    knowledgeBaseID:
-                      description: Unique knowledge base ID.
-                      type: integer
-                    name:
-                      description: Name for the knowledge base.
-                      maxLength: 255
-                      type: string
-                    rootCategoryID:
-                      description: Root knowledge category ID of knowledge base.
-                      type: integer
-                    sortArticles:
-                      description: Sort order for articles of the knowledge base.
+    "/knowledge-bases":
+        get:
+            parameters:
+                - description: Knowledge base status.
+                  in: query
+                  name: status
+                  required: false
+                  schema:
+                      default: published
                       enum:
+                          - deleted
+                          - published
+                      type: string
+                - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
+                  example: fr
+                - description: Locale key to filter results by their `sourceLocale` property.
+                  in: query
+                  name: sourceLocale
+                  required: false
+                  schema:
+                      type: string
+                  example: en
+                - description: >-
+                    siteSectionGroup to filter results by their `siteSectionGroup` property.
+                  in: query
+                  name: siteSectionGroup
+                  required: false
+                  schema:
+                      type: string
+                  example: vanilla
+                - description: Expand associated records using one or more valid field names.
+                  in: query
+                  name: expand
+                  required: false
+                  schema:
+                      items:
+                        enum:
+                          - universalTargets
+                          - universalSources
+                          - siteSections
+                        type: string
+                      type: array
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/FullKnowledgeBaseSchema"
+                                type: array
+                    description: Success
+            tags:
+                - Knowledge Bases
+            summary: List knowledge bases.
+        post:
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/FullKnowledgeBaseSchema"
+                    description: Success
+            tags:
+                - Knowledge Bases
+            requestBody:
+                $ref: "#/components/requestBodies/KnowledgeBasePost"
+            summary: Create a new knowledge base.
+    "/knowledge-bases/{id}":
+        delete:
+            parameters:
+                - description: |
+                      <p>Knowledge base ID.</p>
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+            tags:
+                - Knowledge Bases
+            summary: Delete a knowledge base.
+        get:
+            parameters:
+                - description: Knowledge base ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
+                  example: fr
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/FullKnowledgeBaseSchema"
+                    description: Success
+            tags:
+                - Knowledge Bases
+            summary: Get a single knowledge base.
+        patch:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/FullKnowledgeBaseSchema"
+                    description: Success
+            tags:
+                - Knowledge Bases
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/KnowledgeBasePost"
+                required: true
+            summary: Update an existing knowledge base.
+    "/knowledge-bases/{id}/edit":
+        get:
+            parameters:
+                - description: Knowledge base ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Expand associated records using one or more valid field names.
+                  in: query
+                  name: expand
+                  required: false
+                  schema:
+                    items:
+                        enum:
+                            - universalTargets
+                            - universalSources
+                            - siteSections
+                        type: string
+                    type: array
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    description:
+                                        description: Description for the knowledge base.
+                                        maxLength: 255
+                                        type: string
+                                    icon:
+                                        description: Full URL to the icon of knowledge base.
+                                        type: string
+                                    knowledgeBaseID:
+                                        description: Unique knowledge base ID.
+                                        type: integer
+                                    name:
+                                        description: Name for the knowledge base.
+                                        maxLength: 255
+                                        type: string
+                                    sortArticles:
+                                        description: Sort order for articles of the knowledge base.
+                                        enum:
+                                            - manual
+                                            - name
+                                            - dateInserted
+                                            - dateInsertedDesc
+                                        nullable: true
+                                        type: string
+                                    sourceLocale:
+                                        description: sourceLocale of knowledge base.
+                                        type: string
+                                    viewType:
+                                        type: string
+                                        default: guide
+                                        description: Sort order for articles of the knowledge base.
+                                        enum:
+                                            - guide
+                                            - help
+                                        nullable: true
+                                required:
+                                    - knowledgeBaseID
+                                    - name
+                                    - description
+                                    - viewType
+                                    - icon
+                                    - sortArticles
+                                    - sourceLocale
+                                type: object
+                    description: Success
+            tags:
+                - Knowledge Bases
+            summary: Get a knowledge base for editing.
+components:
+    requestBodies:
+        KnowledgeBasePost:
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/KnowledgeBasePost"
+            required: true
+    schemas:
+        KnowledgeBasePost:
+            properties:
+                description:
+                    description: Description for the knowledge base.
+                    maxLength: 255
+                    type: string
+                icon:
+                    description: Full URL to the icon of knowledge base.
+                    type: string
+                isUniversal:
+                    description: Is this knowledge-base universal
+                    type: boolean
+                name:
+                    description: Name for the knowledge base.
+                    maxLength: 255
+                    type: string
+                sortArticles:
+                    description: Sort order for articles of the knowledge base.
+                    enum:
                         - manual
                         - name
                         - dateInserted
                         - dateInsertedDesc
-                      nullable: true
-                      type: string
-                    bannerImage:
-                      description: Full URL to a banner background image of the knowledge base.
-                      maxLength: 255
-                      type: string
-                      nullable: true
-                    bannerContentImage:
-                      description: Full URL to a banner content image of the knowledge base.
-                      maxLength: 255
-                      type: string
-                      nullable: true
-                    sourceLocale:
-                      description: sourceLocale of knowledge base.
-                      type: string
-                    updateUserID:
-                      description: Unique ID of the last user to update the knowledge base.
-                      type: integer
-                    urlCode:
-                      description: Full URL to the knowledge base.
-                      type: string
-                    viewType:
-                      type: string
-                      default: guide
-                      description: Sort order for articles of the knowledge base.
-                      enum:
+                    nullable: true
+                    type: string
+                sourceLocale:
+                    description: sourceLocale of knowledge base.
+                    type: string
+                urlCode:
+                    description: Full URL to the knowledge base.
+                    type: string
+                universalTargetIDs:
+                    description: The target knowledge-bases ID's.
+                    items:
+                        type: integer
+                    type: array
+                viewType:
+                    type: string
+                    default: guide
+                    description: Sort order for articles of the knowledge base.
+                    enum:
                         - guide
                         - help
-                      nullable: true
-                    customPermissionRequired:
-                      type: boolean
-                      description: Knowledge base has custom permission settings.
-                      default: false
-                  required:
-                    - knowledgeBaseID
-                    - name
-                    - description
-                    - sortArticles
-                    - insertUserID
-                    - dateInserted
-                    - updateUserID
-                    - dateUpdated
-                    - countArticles
-                    - countCategories
-                    - urlCode
-                    - icon
-                    - sourceLocale
-                    - viewType
-                    - rootCategoryID
-                  type: object
-                type: array
-          description: Success
-      tags:
-        - Knowledge Bases
-      summary: List knowledge bases.
-    post:
-      responses:
-        "201":
-          content:
-            "application/json":
-              schema:
-                properties:
-                  countArticles:
-                    description: Total articles in the knowledge base.
-                    type: integer
-                  countCategories:
-                    description: Total categories in the knowledge base.
-                    type: integer
-                  dateInserted:
-                    description: When the knowledge base was created.
-                    format: date-time
-                    type: string
-                  dateUpdated:
-                    description: When the knowledge base was last updated.
-                    format: date-time
-                    type: string
-                  description:
-                    description: Description for the knowledge base.
-                    maxLength: 255
-                    type: string
-                  icon:
-                    description: Full URL to the icon of knowledge base.
-                    type: string
-                  insertUserID:
-                    description: >-
-                      Unique ID of the user who originally created the knowledge
-                      base.
-                    type: integer
-                  knowledgeBaseID:
-                    description: Unique knowledge base ID.
-                    type: integer
-                  name:
-                    description: Name for the knowledge base.
-                    maxLength: 255
-                    type: string
-                  rootCategoryID:
-                    description: Root knowledge category ID of knowledge base.
-                    type: integer
-                  sortArticles:
-                    description: Sort order for articles of the knowledge base.
-                    enum:
-                      - manual
-                      - name
-                      - dateInserted
-                      - dateInsertedDesc
                     nullable: true
-                    type: string
-                  sourceLocale:
-                    description: sourceLocale of knowledge base.
-                    type: string
-                  updateUserID:
-                    description: Unique ID of the last user to update the knowledge base.
-                    type: integer
-                  urlCode:
-                    description: Full URL to the knowledge base.
-                    type: string
-                  viewType:
-                    type: string
-                    default: guide
-                    description: Sort order for articles of the knowledge base.
-                    enum:
-                      - guide
-                      - help
-                    nullable: true
-                  customPermissionRequired:
-                    type: boolean
-                    description: Knowledge base has custom permission settings.
-                    default: false
-                required:
-                  - knowledgeBaseID
-                  - name
-                  - description
-                  - sortArticles
-                  - insertUserID
-                  - dateInserted
-                  - updateUserID
-                  - dateUpdated
-                  - countArticles
-                  - countCategories
-                  - urlCode
-                  - icon
-                  - sourceLocale
-                  - viewType
-                  - rootCategoryID
-                type: object
-          description: Success
-      tags:
-        - Knowledge Bases
-      requestBody:
-        $ref: "#/components/requestBodies/KnowledgeBasePost"
-      summary: Create a new knowledge base.
-  "/knowledge-bases/{id}":
-    delete:
-      parameters:
-        - description: |
-            <p>Knowledge base ID.</p>
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        "204":
-          description: Success
-      tags:
-        - Knowledge Bases
-      summary: Delete a knowledge base.
-    get:
-      parameters:
-        - description: Knowledge base ID.
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-        - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
-          in: query
-          name: locale
-          required: false
-          schema:
-            type: string
-          example: fr
-      responses:
-        "200":
-          content:
-            "application/json":
-              schema:
-                properties:
-                  countArticles:
-                    description: Total articles in the knowledge base.
-                    type: integer
-                  countCategories:
-                    description: Total categories in the knowledge base.
-                    type: integer
-                  dateInserted:
-                    description: When the knowledge base was created.
-                    format: date-time
-                    type: string
-                  dateUpdated:
-                    description: When the knowledge base was last updated.
-                    format: date-time
-                    type: string
-                  description:
-                    description: Description for the knowledge base.
-                    maxLength: 255
-                    type: string
-                  icon:
-                    description: Full URL to the icon of knowledge base.
-                    type: string
-                  insertUserID:
-                    description: >-
-                      Unique ID of the user who originally created the knowledge
-                      base.
-                    type: integer
-                  knowledgeBaseID:
-                    description: Unique knowledge base ID.
-                    type: integer
-                  name:
-                    description: Name for the knowledge base.
-                    maxLength: 255
-                    type: string
-                  rootCategoryID:
-                    description: Root knowledge category ID of knowledge base.
-                    type: integer
-                  sortArticles:
-                    description: Sort order for articles of the knowledge base.
-                    enum:
-                      - manual
-                      - name
-                      - dateInserted
-                      - dateInsertedDesc
-                    nullable: true
-                    type: string
-                  sourceLocale:
-                    description: sourceLocale of knowledge base.
-                    type: string
-                  updateUserID:
-                    description: Unique ID of the last user to update the knowledge base.
-                    type: integer
-                  urlCode:
-                    description: Full URL to the knowledge base.
-                    type: string
-                  viewType:
-                    type: string
-                    default: guide
-                    description: Sort order for articles of the knowledge base.
-                    enum:
-                      - guide
-                      - help
-                    nullable: true
-                  customPermissionRequired:
-                    type: boolean
-                    description: Knowledge base has custom permission settings.
-                    default: false
-                required:
-                  - knowledgeBaseID
-                  - name
-                  - description
-                  - sortArticles
-                  - insertUserID
-                  - dateInserted
-                  - updateUserID
-                  - dateUpdated
-                  - countArticles
-                  - countCategories
-                  - urlCode
-                  - icon
-                  - sourceLocale
-                  - viewType
-                  - rootCategoryID
-                type: object
-          description: Success
-      tags:
-        - Knowledge Bases
-      summary: Get a single knowledge base.
-    patch:
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          content:
-            "application/json":
-              schema:
-                properties:
-                  countArticles:
+            required:
+                - name
+                - description
+                - urlCode
+                - viewType
+            type: object
+        FullKnowledgeBaseSchema:
+            properties:
+                countArticles:
                     description: Total articles in the knowledge base.
                     type: integer
                   countCategories:
