@@ -204,6 +204,7 @@ trait KnowledgeBasesApiSchemes {
                 Schema::parse([
                         "id:i" => "Knowledge base ID.",
                         "locale?",
+                        "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections", "universalTargets", "universalSources"]),
                     ])->addValidator('locale', [$this->localeApi, 'validateLocale']),
                 $type
             );

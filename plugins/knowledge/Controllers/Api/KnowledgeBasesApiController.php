@@ -91,12 +91,26 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $query = $in->validate($query);
         $out = $this->schema($this->fullSchema(), "out");
 
+        $expandUniversalTargets = $this->isExpandField("universalTargets", $query["expand"]);
+        $expandUniversalSources = $this->isExpandField("universalSources", $query["expand"]);
+        $expandSiteSections = $this->isExpandField('siteSections', $query['expand']);
+        unset($query["expand"]);
+
+
         $row = $this->knowledgeBaseByID($id);
         if (isset($query['locale'])) {
             $row['locale'] = $query['locale'];
             $rows = $this->translateProperties([$row], $query['locale']);
             $row = reset($rows);
         }
+
+        if ($expandUniversalTargets){
+            $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
+        }
+        if ($expandUniversalSources){
+            $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
+        }
+
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
@@ -435,7 +449,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $prevUniversalSourceState = 0;
 
         if (array_key_exists('isUniversalSource', $prevState) ) {
-            $prevUniversalSourceState = ($prevState['isUniversalSource'] === 1) ? true : false ;
+            $prevUniversalSourceState = ($prevState['isUniversalSource'] === 1) ? true : false;
         }
 
         if (array_key_exists('isUniversalSource', $body)) {
@@ -444,8 +458,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         } elseif ($prevUniversalSourceState) {
             $isUniversal = $prevUniversalSourceState;
         }
-
-
+        
         $universalTargetIDs = $body['universalTargetIDs'] ?? null;
 
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
@@ -456,14 +469,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
             );
         }
 
-        // If the universalSource flag has been change update according to the new status.
+        // Update if knowledgeUniversalSource table
+        // If the status has changed from previous Status
         if ($isUniversal !== $prevUniversalSourceState){
-            // switch to a universal from not
             if ($isUniversal && $universalTargetIDs) {
                 $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
             }
 
-            // switch from universal to not and delete records from knowledgeUniversalSource table.
             if (!$isUniversal && $prevState['isUniversalSource']) {
                 $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
             }
@@ -472,11 +484,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
 
             // Check if KB status changed: deleted vs published
-            if (isset($body['status']) && ($body['status'] !== $prevState['status'])
-                || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
-                // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
-                $this->knowledgeBaseModel->resetSphinxCounters();
-            }
+        if (isset($body['status']) && ($body['status'] !== $prevState['status'])
+            || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
+            // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
+            $this->knowledgeBaseModel->resetSphinxCounters();
+        }
 
         $row = $this->knowledgeBaseByID($id);
         $row = $this->normalizeOutput($row);
@@ -551,6 +563,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->schema([], "out");
 
         $row = $this->knowledgeBaseByID($id);
+
+        if ($row["isUniversalSource"]) {
+            $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
+        } else {
+            $this->knowledgeUniversalSourceModel->delete(["targetKnowledgeBaseID" => $id]);
+        }
 
         if ($row["countArticles"] < 1 && $row["countCategories"] <= 1) {
             $this->knowledgeBaseModel->delete(["knowledgeBaseID" => $row["knowledgeBaseID"]]);

@@ -489,31 +489,29 @@ MESSAGE
      * @param array $data
      * @param ValidationField $validation
      * @param int|null $recordID
-     * @return bool
      */
     public function validateIsUniversalSource(array $data, ValidationField $validation, int $recordID = null) {
         // make sure that if we have universal targetID's that the universalSource status is set correctly
         if  (($data["universalTargetIDs"] ?? null) && !$recordID) {
-            if (!$data["isUniversalSource"] ?? null) {
+            if (array_key_exists("isUniversalSource", $data) && !$data["isUniversalSource"]) {
                 $validation->getValidation()->addError(
                     $validation->getName(),
                     "Invalid universal source status, isUniversalSource parameter must be set to true if target KB's are passed."
-                )
-                ;
+                );
             }
         } elseif (($data["universalTargetIDs"] ?? null) && $recordID) {
-            if (($data["isUniversalSource"] ?? null)) {
+            if (array_key_exists("isUniversalSource", $data)) {
                 $isUniversalKB = $data["isUniversalSource"];
-            } else{
+            } else {
                 $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $recordID]);
                 $isUniversalKB = $knowledgeBase["isUniversalSource"];
             }
+
             if (!$isUniversalKB) {
                 $validation->getValidation()->addError(
                     $validation->getName(),
                     "Invalid universal source status,Knowledge-Base universal status must be set to true if target KB's are passed."
-                )
-                ;
+                );
             }
         }
         // Make sure that the none of the universal target ID's are currently set to Universal Sources.
@@ -525,15 +523,13 @@ MESSAGE
                         $validation->getValidation()->addError(
                             "universalTargetIDs",
                             "Universal Target Knowledge-Base can't be an existing universal knowledge-base"
-                        )
-                        ;
+                        );
                     }
                 } catch (NoResultsException $e) {
                     $validation->getValidation()->addError(
                         "universalTargetIDs",
                         "Invalid universalTargetID, one or more target ID's are invalid."
-                    )
-                    ;
+                    );
                 }
             }
         }

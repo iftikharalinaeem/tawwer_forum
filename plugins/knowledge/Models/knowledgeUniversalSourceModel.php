@@ -68,7 +68,7 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                 if ($name === "universalTargets") {
                     $allSourceTargets = $this->get(["sourceKnowledgeBaseID" => $row["knowledgeBaseID"]]);
                     foreach ($allSourceTargets as $sourceTarget) {
-                        $ids = $sourceTarget["targetKnowledgeBaseID"];
+                        $ids[] = $sourceTarget["targetKnowledgeBaseID"];
                     }
                 } elseif ($name === "universalSources") {
                     $allSourceTargets = $this->get(["targetKnowledgeBaseID" => $row["knowledgeBaseID"]]);
