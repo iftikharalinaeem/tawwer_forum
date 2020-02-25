@@ -316,7 +316,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param array $viewers
      * @param array $editors
      */
-    public function  saveCustomPermissions(int $knowledgeBaseID, array $viewers = [], array $editors = []) {
+    public function saveCustomPermissions(int $knowledgeBaseID, array $viewers = [], array $editors = []) {
         $roles = array_unique($viewers + $editors);
         $permissions =  [];
         foreach ($roles as $roleID) {
