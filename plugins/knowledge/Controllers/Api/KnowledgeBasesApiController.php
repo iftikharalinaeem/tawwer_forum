@@ -482,7 +482,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
-        $body['customPermissionRequired'] = $body['customPermissionRequired'] !== false ? 1 : 0;
+        $body['customPermissionRequired'] = ($body['customPermissionRequired'] ?? false) !== false ? 1 : 0;
 
         $prevState = $this->knowledgeBaseByID($id);
 
