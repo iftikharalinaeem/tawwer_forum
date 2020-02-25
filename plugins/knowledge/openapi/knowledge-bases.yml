@@ -275,229 +275,181 @@ components:
                 countArticles:
                     description: Total articles in the knowledge base.
                     type: integer
-                  countCategories:
+                countCategories:
                     description: Total categories in the knowledge base.
                     type: integer
-                  dateInserted:
+                dateInserted:
                     description: When the knowledge base was created.
                     format: date-time
                     type: string
-                  dateUpdated:
+                dateUpdated:
                     description: When the knowledge base was last updated.
                     format: date-time
                     type: string
-                  description:
+                description:
                     description: Description for the knowledge base.
                     maxLength: 255
                     type: string
-                  icon:
+                icon:
                     description: Full URL to the icon of knowledge base.
                     type: string
-                  insertUserID:
+                insertUserID:
                     description: >-
-                      Unique ID of the user who originally created the knowledge
-                      base.
+                        Unique ID of the user who originally created the knowledge-base.
                     type: integer
-                  knowledgeBaseID:
+                isUniversalSource:
+                    description: Is this knowledge-base universal
+                    type: boolean
+                knowledgeBaseID:
                     description: Unique knowledge base ID.
                     type: integer
-                  name:
+                name:
                     description: Name for the knowledge base.
                     maxLength: 255
                     type: string
-                  rootCategoryID:
+                rootCategoryID:
                     description: Root knowledge category ID of knowledge base.
                     type: integer
-                  sortArticles:
+                siteSectionGroup:
+                    description: Site section group. Ex. subcommunity product key,
+                    type: string
+                    default: vanilla
+                siteSections:
+                    items:
+                       $ref: "#/components/schemas/SiteSections"
+                    type: array
+                sortArticles:
                     description: Sort order for articles of the knowledge base.
                     enum:
-                      - manual
-                      - name
-                      - dateInserted
-                      - dateInsertedDesc
+                        - manual
+                        - name
+                        - dateInserted
+                        - dateInsertedDesc
                     nullable: true
                     type: string
-                  sourceLocale:
+                sourceLocale:
                     description: sourceLocale of knowledge base.
                     type: string
-                  updateUserID:
+                updateUserID:
                     description: Unique ID of the last user to update the knowledge base.
                     type: integer
-                  urlCode:
+                universalTargetIDs:
+                    description: The target knowledge-bases ID's.
+                    items:
+                        type: integer
+                    type: array
+                universalTargets:
+                    description: Fragments of target knowledge-bases
+                    items:
+                        $ref: "#/components/schemas/KnowledgeBaseFragment"
+                    type: array
+                universaluniversalSources:
+                    description: Fragments of source knowledge-bases
+                    items:
+                        $ref: "#/components/schemas/KnowledgeBaseFragment"
+                    type: array
+                urlCode:
                     description: Full URL to the knowledge base.
                     type: string
-                  viewType:
+                viewType:
                     type: string
                     default: guide
                     description: Sort order for articles of the knowledge base.
                     enum:
-                      - guide
-                      - help
+                        - guide
+                        - help
                     nullable: true
-                  customPermissionRequired:
-                    type: boolean
-                    description: Knowledge base has custom permission settings.
-                    default: false
-                required:
-                  - knowledgeBaseID
-                  - name
-                  - description
-                  - sortArticles
-                  - insertUserID
-                  - dateInserted
-                  - updateUserID
-                  - dateUpdated
-                  - countArticles
-                  - countCategories
-                  - urlCode
-                  - icon
-                  - sourceLocale
-                  - viewType
-                  - rootCategoryID
-                type: object
-          description: Success
-      tags:
-        - Knowledge Bases
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/KnowledgeBasePost"
-        required: true
-      summary: Update an existing knowledge base.
-  "/knowledge-bases/{id}/edit":
-    get:
-      parameters:
-        - description: Knowledge base ID.
-          in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          content:
-            "application/json":
-              schema:
-                properties:
-                  description:
-                    description: Description for the knowledge base.
-                    maxLength: 255
-                    type: string
-                  icon:
+            required:
+                - knowledgeBaseID
+                - name
+                - description
+                - sortArticles
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - countArticles
+                - countCategories
+                - urlCode
+                - icon
+                - sourceLocale
+                - viewType
+                - rootCategoryID
+            type: object
+        KnowledgeBaseFragment:
+            properties:
+                icon:
                     description: Full URL to the icon of knowledge base.
                     type: string
-                  knowledgeBaseID:
-                    description: Unique knowledge base ID.
-                    type: integer
-                  name:
+                name:
                     description: Name for the knowledge base.
                     maxLength: 255
                     type: string
-                  sortArticles:
+                knowledgeBaseID:
+                    description: Unique knowledge base ID.
+                    type: integer
+                siteSectionGroup:
+                    description: Site section group. Ex. subcommunity product key,
+                    type: string
+                    default: vanilla
+                sortArticles:
                     description: Sort order for articles of the knowledge base.
                     enum:
-                      - manual
-                      - name
-                      - dateInserted
-                      - dateInsertedDesc
+                        - manual
+                        - name
+                        - dateInserted
+                        - dateInsertedDesc
                     nullable: true
                     type: string
-                  sourceLocale:
-                    description: sourceLocale of knowledge base.
+                urlCode:
+                    description: Full URL to the knowledge base.
                     type: string
-                  viewType:
+                viewType:
                     type: string
                     default: guide
                     description: Sort order for articles of the knowledge base.
                     enum:
-                      - guide
-                      - help
+                        - guide
+                        - help
                     nullable: true
-                required:
-                  - knowledgeBaseID
-                  - name
-                  - description
-                  - viewType
-                  - icon
-                  - sortArticles
-                  - sourceLocale
-                type: object
-          description: Success
-      tags:
-        - Knowledge Bases
-      summary: Get a knowledge base for editing.
-components:
-  requestBodies:
-    KnowledgeBasePost:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/KnowledgeBasePost"
-      required: true
-  schemas:
-    KnowledgeBasePost:
-      properties:
-        description:
-          description: Description for the knowledge base.
-          maxLength: 255
-          type: string
-        icon:
-          description: Full URL to the icon of knowledge base.
-          type: string
-        name:
-          description: Name for the knowledge base.
-          maxLength: 255
-          type: string
-        sortArticles:
-          description: Sort order for articles of the knowledge base.
-          enum:
-            - manual
-            - name
-            - dateInserted
-            - dateInsertedDesc
-          nullable: true
-          type: string
-        sourceLocale:
-          description: sourceLocale of knowledge base.
-          type: string
-        urlCode:
-          description: Full URL to the knowledge base.
-          type: string
-        viewType:
-          type: string
-          default: guide
-          description: Sort order for articles of the knowledge base.
-          enum:
-            - guide
-            - help
-          nullable: true
-        customPermissionRequired:
-          type: boolean
-          description: Knowledge base has custom permission settings.
-          default: false
-          nullable: true
-        viewers:
-          type: array
-          description: >
-            List of role id which should have permission to view knowledge base content.
-            <br />Applicable only when customPermissionRequired is true
-          items:
-            type: integer
-          nullable: true
-          default: []
-        editors:
-          type: array
-          description: >
-            List of role id which should have permission to edit knowledge base content.
-            <br />Applicable only when customPermissionRequired is true
-          items:
-            type: integer
-          nullable: true
-          default: []
-      required:
-        - name
-        - description
-        - urlCode
-        - viewType
-      type: object
+            required:
+                - knowledgeBaseID
+                - name
+                - viewType
+                - urlCode
+                - siteSectionGroup
+            type: object
+        SiteSections:
+            properties:
+                basePath:
+                    description: The site section slug.
+                    type: string
+                contentLocale:
+                    description: The language of the content in this site section.
+                    type: string
+                siteSectionGroup:
+                    description: Site section group. Ex. subcommunity product key,
+                    type: string
+                sectionID:
+                    description: ID of the site section,
+                    type: integer
+                name:
+                    description: name of the site section,
+                    type: string
+                app:
+                    items:
+                        knowledgebase:
+                            description: Is knowledge available in this site section.
+                            type: boolean
+                        forum:
+                            description: Is forum available in this site section.
+                            type: boolean
+                    type: object
+            required:
+                - basePath
+                - contentLocale
+                - siteSectionGroup
+                - sectionID
+                - name
+                - app
+            type: object
