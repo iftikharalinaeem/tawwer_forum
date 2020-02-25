@@ -33,6 +33,8 @@ export interface IKbFormState {
     viewType: KbViewType;
     sourceLocale: string | null;
     sortArticles: KnowledgeBaseSortMode;
+    hasCustomPermissions: boolean;
+    isUniversalSource: boolean;
 }
 export interface IKnowledgeBasesState {
     knowledgeBasesByID: ILoadable<{
@@ -70,6 +72,8 @@ export const INITIAL_KB_FORM: IKbFormState = {
     viewType: KbViewType.GUIDE,
     sortArticles: KnowledgeBaseSortMode.MANUAL,
     sourceLocale: getCurrentLocale(),
+    hasCustomPermissions: false,
+    isUniversalSource: false,
 };
 
 export interface ISiteSection {
@@ -132,6 +136,8 @@ export interface IKnowledgeBase {
     defaultArticleID: number | null;
     siteSectionGroup: string | null;
     siteSections: ISiteSection[];
+    hasCustomPermissions: boolean;
+    isUniversalSource: boolean;
 }
 
 /**

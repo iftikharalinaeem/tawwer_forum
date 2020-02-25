@@ -37,7 +37,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         'sortArticles',
         'sourceLocale',
         'urlCode',
-        'siteSectionGroup'
+        'siteSectionGroup',
     ];
 
     /**
