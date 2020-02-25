@@ -468,7 +468,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             }
         } elseif ($prevState['isUniversalSource'] && !$isUniversal) {
             $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
-
         }
 
         // Check if KB status changed: deleted vs published

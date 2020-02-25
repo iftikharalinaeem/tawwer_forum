@@ -55,8 +55,8 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
      * Validate that universal target kb exists and is not a universal source.
      *
      * @param int $id
-     * @throws ClientException
-     * @throws NoResultsException
+     * @throws ClientException If universalSource status is mis-configured.
+     * @throws NoResultsException  If no knowledge-base is found.
      */
     protected function validateTargetKBUniversalSource(int $id) {
         try {
@@ -65,7 +65,7 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                 throw new ClientException("Invalid universalTargetID, one or more target ID's are invalid.");
             }
         } catch (NoResultsException $e) {
-            throw new NoResultsException(  "Invalid universalTargetID, one or more target ID's are invalid.");
+            throw new NoResultsException("Invalid universalTargetID, one or more target ID's are invalid.");
         }
     }
 
@@ -106,7 +106,6 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                                 "url" => $this->knowledgeBaseModel->url($knowledgeBase),
                                 "siteSectionGroup" => $knowledgeBase["siteSectionGroup"] ?? null,
                             ];
-
                         }
                     } catch (NoResultsException $e) {
                         logException($e);
