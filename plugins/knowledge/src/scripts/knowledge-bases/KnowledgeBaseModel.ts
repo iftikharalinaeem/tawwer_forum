@@ -136,6 +136,8 @@ export interface IKnowledgeBase {
     defaultArticleID: number | null;
     siteSectionGroup: string | null;
     siteSections: ISiteSection[];
+    hasCustomPermissions: boolean;
+    isUniversalSource: boolean;
 }
 
 /**
