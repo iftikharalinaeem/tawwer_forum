@@ -346,6 +346,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
             ->column("defaultArticleID", "int", ['Null' => true])
+            ->column("isUniversalSource", "tinyint(1)", 0)
             ->column(
                 "status",
                 KnowledgeBaseModel::getAllStatuses(),
@@ -353,6 +354,13 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 'index'
             )
             ->set();
+
+        $this->database->structure()
+            ->table("knowledgeUniversalSource")
+            ->column("sourceKnowledgeBaseID", "int", null, 'unique.universalPair')
+            ->column("targetKnowledgeBaseID", "int", null, 'unique.universalPair')
+            ->set();
+
 
         // Update knowledge baese when missing sourceLocale
         /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */

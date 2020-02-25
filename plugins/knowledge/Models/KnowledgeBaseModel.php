@@ -460,7 +460,6 @@ MESSAGE
             throw new \InvalidArgumentException("A guide must be manually sorted.");
         }
     }
-
     /**
      * Validate potential sortArticle value for a KB.
      * This method is intended to be applied as a custom validator on a {@see \Garden\Schema\Schema} instance.
@@ -470,6 +469,7 @@ MESSAGE
      * @param integer $recordID
      */
     public function validateSortArticles(array $data, ValidationField $validation, int $recordID = null) {
+
         if (!array_key_exists("sortArticles", $data) && !array_key_exists("viewType", $data)) {
             // Avoid additional validation if neither relevant field is detected.
             return true;
@@ -483,6 +483,38 @@ MESSAGE
         }
 
         return true;
+    }
+
+    /**
+     * Validate if isUniversal status is set correctly.
+     *
+     * @param array $data
+     * @param ValidationField $validation
+     * @param int|null $recordID
+     */
+    public function validateIsUniversalSource(array $data, ValidationField $validation, int $recordID = null) {
+        if (($data["universalTargetIDs"] ?? null) && !$recordID) {
+            if (array_key_exists("isUniversalSource", $data) && !$data["isUniversalSource"]) {
+                $validation->getValidation()->addError(
+                    $validation->getName(),
+                    "Invalid universal source status, isUniversalSource parameter must be set to true if target KB's are passed."
+                );
+            }
+        } elseif (($data["universalTargetIDs"] ?? null) && $recordID) {
+            if (array_key_exists("isUniversalSource", $data)) {
+                $isUniversalKB = $data["isUniversalSource"];
+            } else {
+                $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $recordID]);
+                $isUniversalKB = $knowledgeBase["isUniversalSource"];
+            }
+
+            if (!$isUniversalKB) {
+                $validation->getValidation()->addError(
+                    $validation->getName(),
+                    "Invalid universal source status, isUniversalSource parameter must be set to true if target KB's are passed."
+                );
+            }
+        }
     }
 
     /**
@@ -557,4 +589,5 @@ MESSAGE
         }
         return $valid;
     }
+
 }

@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\Schema\Schema;
+use phpDocumentor\Reflection\Types\Boolean;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionSchema;
@@ -24,6 +25,9 @@ trait KnowledgeBasesApiSchemes {
 
     /** @var Schema */
     private $getKnowledgeBaseSchema;
+
+    /** @var Schema */
+    private $knowledgeBaseFragmentSchema;
 
     /**
      * Get a schema representing all available fields for a knowledge base.
@@ -127,7 +131,38 @@ trait KnowledgeBasesApiSchemes {
                 'default' => DefaultSiteSection::DEFAULT_SECTION_GROUP
             ],
             "siteSections:a?" => new SiteSectionSchema(),
+            "isUniversalSource:b?" => [
+                "description" => "Is this Knowledge-Base Universal",
+                "type" => "boolean",
+                "default" => false,
+                "allowNull" =>  false,
+            ],
+            "universalTargetIDs:a?",
+            "universalSourceIDs:a?",
+            "universalTargets?" =>[':a' => $this->knowledgeBaseFragmentSchema()],
+            "universalSources?" => [':a' => $this->knowledgeBaseFragmentSchema()],
         ]);
+    }
+
+    /**
+     * Simplified knowledge-base schema.
+     *
+     * @param string $type
+     * @return Schema
+     */
+    public function knowledgeBaseFragmentSchema(string $type = ""): Schema {
+        if ($this->knowledgeBaseFragmentSchema === null) {
+            $this->knowledgeBaseFragmentSchema = Schema::parse([
+                "knowledgeBaseID",
+                "name",
+                "icon?",
+                "sortArticles?",
+                "viewType",
+                "urlCode",
+                "siteSectionGroup",
+            ], $type);
+        }
+        return $this->knowledgeBaseFragmentSchema;
     }
 
     /**
@@ -151,6 +186,8 @@ trait KnowledgeBasesApiSchemes {
                     "sortArticles?",
                     "status?",
                     "urlCode",
+                    "isUniversalSource:b?",
+                    "universalTargetIDs:a?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );
@@ -171,6 +208,7 @@ trait KnowledgeBasesApiSchemes {
                 Schema::parse([
                         "id:i" => "Knowledge base ID.",
                         "locale?",
+                        "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["siteSections", "universalTargets", "universalSources"]),
                     ])->addValidator('locale', [$this->localeApi, 'validateLocale']),
                 $type
             );
