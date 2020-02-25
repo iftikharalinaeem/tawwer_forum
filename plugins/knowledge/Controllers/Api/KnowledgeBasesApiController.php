@@ -331,7 +331,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
         $this->permissionModel->saveAll($permissions, ['JunctionID' => $knowledgeBaseID, 'JunctionTable' => 'knowledgeBase']);
     }
-  
+
+    /**
+     * Invoke universal source validation into schema
      *
      * @param Schema $schema
      * @param integer $recordID
