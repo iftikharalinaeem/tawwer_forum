@@ -110,7 +110,7 @@ class KnowledgeBasesUniversalContentTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test POST /knowledge-bases withnvalid isUniversal status.
+     * Test POST /knowledge-bases with invalid isUniversal status.
      *
      * @depends testData
      */
