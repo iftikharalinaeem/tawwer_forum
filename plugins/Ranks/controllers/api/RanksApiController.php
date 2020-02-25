@@ -410,7 +410,7 @@ class RanksApiController extends AbstractApiController {
      * @return array
      */
     public function patch($id, array $body) {
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Settings.Manage', 'Garden.Users.Edit']);
 
         $in = $this->schema($this->postSchema(), 'in')
             ->setDescription('Edit a rank.')

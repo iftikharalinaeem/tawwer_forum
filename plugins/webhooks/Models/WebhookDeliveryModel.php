@@ -8,7 +8,6 @@ namespace Vanilla\Webhooks\Models;
 
 use Vanilla\Models\PipelineModel;
 use Vanilla\Database\Operation;
-use Vanilla\Webhooks\Processors\NormalizeDataProcessor;
 
 /**
  * Provides data management capabilities for webhook delivery information.
@@ -29,11 +28,5 @@ class WebhookDeliveryModel extends PipelineModel {
             ->setInsertFields(["dateInserted"])
             ->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
-
-        $normalizeProcessor = new NormalizeDataProcessor();
-        $normalizeProcessor
-            ->addSerializedField("requestHeaders")
-            ->addSerializedField("responseHeaders");
-        $this->addPipelineProcessor($normalizeProcessor);
     }
 }

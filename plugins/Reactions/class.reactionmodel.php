@@ -1543,10 +1543,10 @@ class ReactionModel extends Gdn_Model {
      */
     public function save($formPostValues, $settings = false) {
         $primaryKeyValue = val($this->PrimaryKey, $formPostValues);
-        if (!$primaryKeyValue) {
+        $isFormValid = $this->validate($formPostValues);
+        if (!$primaryKeyValue || !$isFormValid) {
             return false;
         }
-
         $reaction = self::reactionTypes($primaryKeyValue);
         if ($reaction) {
             // Preserve non modified attribute data

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -26,6 +26,17 @@ class WebhookConfig {
      * @param array $webhook Webhook row.
      */
     public function __construct(array $webhook) {
+        $requiredKeys = ["secret", "url", "webhookID"];
+        $missingKeys = [];
+        foreach ($requiredKeys as $key) {
+            if (!array_key_exists($key, $webhook)) {
+                $missingKeys[] = $key;
+            }
+        }
+        if (!empty($missingKeys)) {
+            throw new \InvalidArgumentException("Invalid webhook row. Missing keys: ".implode(", ", $missingKeys));
+        }
+
         $this
             ->setWebhookID($webhook["webhookID"])
             ->setSecret($webhook["secret"])

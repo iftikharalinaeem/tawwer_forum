@@ -16,6 +16,7 @@
 
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
+use Vanilla\Contracts\LocaleInterface;
 
 /**
  * Class ReactionsPlugin
@@ -44,6 +45,9 @@ class ReactionsPlugin extends Gdn_Plugin {
     /** @var UserModel */
     private $userModel;
 
+    /** @var LocaleInterface */
+    private $locale;
+
     /**
      * ReactionsPlugin constructor.
      *
@@ -51,17 +55,21 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param CommentModel $commentModel
      * @param ReactionModel $reactionModel
      * @param UserModel $userModel
+     * @param LocaleInterface $locale
      */
     public function __construct(
-            DiscussionModel $discussionModel,
-            CommentModel $commentModel,
-            ReactionModel $reactionModel,
-            UserModel $userModel) {
+        DiscussionModel $discussionModel,
+        CommentModel $commentModel,
+        ReactionModel $reactionModel,
+        UserModel $userModel,
+        LocaleInterface $locale
+    ) {
 
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->reactionModel = $reactionModel;
         $this->userModel = $userModel;
+        $this->locale = $locale;
 
         parent::__construct();
     }
@@ -569,6 +577,10 @@ class ReactionsPlugin extends Gdn_Plugin {
             array_walk($result, function(&$row) use ($attributes, $schema) {
                 $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
+                // This is added so we don't get 422 errors when reaction name is empty.
+                foreach ($summary as &$reaction) {
+                    $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('None');
+                }
                 $summary = $schema->validate($summary);
                 $row['reactions'] = $summary;
             });

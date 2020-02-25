@@ -42,8 +42,8 @@ export const themeEditorClasses = useThemeCache(() => {
             $nest: {
                 "&&&": {
                     display: "flex",
-                }
-            }
+                },
+            },
         },
         mediaQueries.oneColumnDown({
             display: "block",
