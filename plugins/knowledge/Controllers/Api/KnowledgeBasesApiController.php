@@ -17,6 +17,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use LocalesApiController;
+use PermissionModel;
 
 /**
  * Endpoint for the knowledge base resource.
@@ -43,6 +44,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var LocalesApiController $localeApi */
     private $localeApi;
 
+    /** @var PermissionModel $permissionModel */
+    private $permissionModel;
+
+    /** @var array $allAllowed All knowledge base id allowed  */
+    private $allAllowed = [];
+
     /**
      * KnowledgeBaseApiController constructor.
      *
@@ -52,6 +59,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
      * @param LocalesApiController $localeApi
+     * @param PermissionModel $permissionModel
      */
     public function __construct(
         KnowledgeBaseModel $knowledgeBaseModel,
@@ -59,7 +67,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        LocalesApiController $localeApi
+        LocalesApiController $localeApi,
+        PermissionModel $permissionModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
@@ -67,6 +76,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
         $this->localeApi = $localeApi;
+        $this->permissionModel = $permissionModel;
+        $this->allAllowed = $this->knowledgeBaseModel->getAllowedKnowledgeBases();
     }
 
     /**
@@ -223,7 +234,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
      */
     public function post(array $body): array {
         $this->permission("Garden.Settings.Manage");
-
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->addValidator("siteSectionGroup", [$this->knowledgeBaseModel, "validateSiteSectionGroup"])
             ->setDescription("Create a new knowledge base.")
@@ -232,6 +242,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->applySortTypeValidator($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
+
+        $body['customPermissionRequired'] = $body['customPermissionRequired'] !== false ? 1 : 0;
         $knowledgeBaseID = $this->knowledgeBaseModel->insert($body);
 
         $knowledgeCategoryID = $this->knowledgeCategoryModel->insert([
@@ -239,13 +251,44 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'knowledgeBaseID' => $knowledgeBaseID,
             'parentID' => -1,
         ]);
-        $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
+        $update = ['rootCategoryID' => $knowledgeCategoryID];
+        if ($body['customPermissionRequired'] ?? false) {
+            $update['permissionKnowledgeBaseID'] = $knowledgeBaseID;
+        }
+        $this->knowledgeBaseModel->update($update, ['knowledgeBaseID' => $knowledgeBaseID]);
+
+        if ($body['customPermissionRequired'] ?? false) {
+            $this->saveCustomPermissions($knowledgeBaseID, $body['viewers'] ?? [], $body['editors'] ?? []);
+        }
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
         return $result;
+    }
+
+    /**
+     * Save custom permissions
+     *
+     * @param int $knowledgeBaseID
+     * @param array $viewers
+     * @param array $editors
+     */
+    public function  saveCustomPermissions(int $knowledgeBaseID, array $viewers = [], array $editors = []) {
+        $roles = array_unique($viewers + $editors);
+        $permissions =  [];
+        foreach ($roles as $roleID) {
+            $permissions[] = [
+                'RoleID' => $roleID,
+                'JunctionTable' => 'knowledgeBase',
+                'JunctionColumn' => 'permissionKnowledgeBaseID',
+                'JunctionID' => $knowledgeBaseID,
+                'knowledge.kb.view' => array_search($roleID, $viewers) === false ? 0 : 1,
+                'knowledge.articles.add' => array_search($roleID, $editors) === false ? 0 : 1
+            ];
+        }
+        $this->permissionModel->saveAll($permissions, ['JunctionID' => $knowledgeBaseID, 'JunctionTable' => 'knowledgeBase']);
     }
 
     /**
@@ -382,8 +425,23 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
+        $body['customPermissionRequired'] = $body['customPermissionRequired'] !== false ? 1 : 0;
 
         $prevState = $this->knowledgeBaseByID($id);
+        if ((isset($body['customPermissionRequired']) && $prevState['customPermissionRequired'] !== $body['customPermissionRequired'])
+            || (isset($body['customPermissionRequired']) && $body['customPermissionRequired'] && (isset($body['viewers']) || isset($body['editors'])))
+        ) {
+            if ($body['customPermissionRequired'] === 1) {
+                $body['permissionKnowledgeBaseID'] = $id;
+                $viewers = $body['viewers'] ?? [];
+                $editors = $body['editors'] ?? [];
+            } else {
+                $body['permissionKnowledgeBaseID'] = -1;
+                $viewers = [];
+                $editors = [];
+            }
+            $this->saveCustomPermissions($id, $viewers, $editors);
+        }
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
         if (isset($body['name']) && $prevState['name'] !== $body['name']) {
             $this->knowledgeCategoryModel->update(

@@ -122,6 +122,11 @@ trait KnowledgeBasesApiSchemes {
                 'description' => "Knowledge base status.",
                 'enum' => KnowledgeBaseModel::getAllStatuses(),
             ],
+            "customPermissionRequired:b" => [
+                'description' => "Custom permission required.",
+                'default' => false,
+            ],
+            "viewers:a?",
             "siteSectionGroup:s" => [
                 'description' => "Site section group. Ex: subcommunity product key",
                 'default' => DefaultSiteSection::DEFAULT_SECTION_GROUP
@@ -151,6 +156,9 @@ trait KnowledgeBasesApiSchemes {
                     "sortArticles?",
                     "status?",
                     "urlCode",
+                    "customPermissionRequired?",
+                    "viewers?",
+                    "editors?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );

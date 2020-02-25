@@ -16,6 +16,7 @@ use Garden\Schema\Validation;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
+use PermissionModel;
 
 /**
  * A model for managing knowledge bases.
@@ -51,6 +52,9 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var PermissionModel $permissionModel */
+    private $permissionModel;
+
     /** @var TranslationProviderInterface */
     private $translation;
 
@@ -64,12 +68,14 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     public function __construct(
         Gdn_Session $session,
         SiteSectionModel $siteSectionModel,
-        TranslationModel $translationModel
+        TranslationModel $translationModel,
+        PermissionModel $permissionModel
     ) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
+        $this->permissionModel = $permissionModel;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -537,6 +543,30 @@ MESSAGE
             }
         }
         return $slug;
+    }
+
+    /**
+     * Get list of all kb user has permission to view
+     *
+     * @return array
+     */
+    public function getAllowedKnowledgeBases(): array {
+        $res = array_column($this->get(['customPermissionRequired' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
+        $restricted = $this->get(['customPermissionRequired' => 1], ['select' => ['knowledgeBaseID']]);
+        foreach ($restricted as $row) {
+            $userPermissions = $this->permissionModel->getUserPermissions(
+                $this->session->UserID,
+                'knowledge.kb.view',
+                self::RECORD_TYPE,
+                'permissionKnowledgeBaseID',
+                'knowledgeBaseID',
+                $row['knowledgeBaseID']
+            );
+            if ($userPermissions[0]['knowledge.kb.view'] ?? false) {
+                $res[] = $row['knowledgeBaseID'];
+            }
+        }
+        return $res;
     }
 
     /**

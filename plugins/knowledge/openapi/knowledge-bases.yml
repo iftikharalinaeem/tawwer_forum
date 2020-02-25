@@ -114,6 +114,10 @@ paths:
                         - guide
                         - help
                       nullable: true
+                    customPermissionRequired:
+                      type: boolean
+                      description: Knowledge base has custom permission settings.
+                      default: false
                   required:
                     - knowledgeBaseID
                     - name
@@ -205,6 +209,10 @@ paths:
                       - guide
                       - help
                     nullable: true
+                  customPermissionRequired:
+                    type: boolean
+                    description: Knowledge base has custom permission settings.
+                    default: false
                 required:
                   - knowledgeBaseID
                   - name
@@ -327,6 +335,10 @@ paths:
                       - guide
                       - help
                     nullable: true
+                  customPermissionRequired:
+                    type: boolean
+                    description: Knowledge base has custom permission settings.
+                    default: false
                 required:
                   - knowledgeBaseID
                   - name
@@ -423,6 +435,10 @@ paths:
                       - guide
                       - help
                     nullable: true
+                  customPermissionRequired:
+                    type: boolean
+                    description: Knowledge base has custom permission settings.
+                    default: false
                 required:
                   - knowledgeBaseID
                   - name
@@ -557,6 +573,29 @@ components:
             - guide
             - help
           nullable: true
+        customPermissionRequired:
+          type: boolean
+          description: Knowledge base has custom permission settings.
+          default: false
+          nullable: true
+        viewers:
+          type: array
+          description: >
+            List of role id which should have permission to view knowledge base content.
+            <br />Applicable only when customPermissionRequired is true
+          items:
+            type: integer
+          nullable: true
+          default: []
+        editors:
+          type: array
+          description: >
+            List of role id which should have permission to edit knowledge base content.
+            <br />Applicable only when customPermissionRequired is true
+          items:
+            type: integer
+          nullable: true
+          default: []
       required:
         - name
         - description

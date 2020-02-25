@@ -346,6 +346,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
             ->column("defaultArticleID", "int", ['Null' => true])
+            ->column("customPermissionRequired", "int", ['Null' => false, 'Default' => 0])
+            ->column("permissionKnowledgeBaseID", "int", ['Null' => false, 'Default' => -1])
+            ->column("sort", "int", true)
             ->column(
                 "status",
                 KnowledgeBaseModel::getAllStatuses(),
@@ -353,6 +356,17 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 'index'
             )
             ->set();
+
+        $permissionModel = \Gdn::permissionModel();
+        $permissionModel->define(
+            [
+                'knowledge.kb.view' => 0,
+                'knowledge.articles.add' => 0,
+            ],
+            'tinyint',
+            'knowledgeBase',
+            'permissionKnowledgeBaseID'
+        );
 
         // Update knowledge baese when missing sourceLocale
         /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
