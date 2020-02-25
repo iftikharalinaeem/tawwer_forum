@@ -104,10 +104,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $row = reset($rows);
         }
 
-        if ($expandUniversalTargets){
+        if ($expandUniversalTargets) {
             $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
         }
-        if ($expandUniversalSources){
+        if ($expandUniversalSources) {
             $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
         }
 
@@ -206,10 +206,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
             if (isset($translateLocale)) {
                 $row['locale'] = $translateLocale;
             }
-            if ($expandUniversalTargets){
+            if ($expandUniversalTargets) {
                 $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
             }
-            if ($expandUniversalSources){
+            if ($expandUniversalSources) {
                 $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
             }
             return $this->normalizeOutput($row);
@@ -282,7 +282,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         ]);
         $this->knowledgeBaseModel->update(['rootCategoryID' => $knowledgeCategoryID], ['knowledgeBaseID' => $knowledgeBaseID]);
 
-        $this->knowledgeUniversalSourceModel->setUniversalContent($body , $knowledgeBaseID);
+        $this->knowledgeUniversalSourceModel->setUniversalContent($body, $knowledgeBaseID);
 
         $row = $this->knowledgeBaseByID($knowledgeBaseID);
         $row = $this->normalizeOutput($row);
@@ -305,8 +305,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
         );
     }
 
-
-
     /**
      * Get a knowledge base for editing.
      *
@@ -328,9 +326,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'sortArticles',
             'sourceLocale',
             'urlCode',
+            'isUniversalSource?',
+            'universalTargetIDs?',
         ])->add($this->fullSchema()), "out");
 
+
         $row = $this->knowledgeBaseByID($id);
+        $row = $this->normalizeOutput($row);
         $result = $out->validate($row);
 
         return $result;
@@ -448,7 +450,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $isUniversal = 0;
         $prevUniversalSourceState = 0;
 
-        if (array_key_exists('isUniversalSource', $prevState) ) {
+        if (array_key_exists('isUniversalSource', $prevState)) {
             $prevUniversalSourceState = ($prevState['isUniversalSource'] === 1) ? true : false;
         }
 
@@ -471,7 +473,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         // Update if knowledgeUniversalSource table
         // If the status has changed from previous Status
-        if ($isUniversal !== $prevUniversalSourceState){
+        if ($isUniversal !== $prevUniversalSourceState) {
             if ($isUniversal && $universalTargetIDs) {
                 $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
             }
@@ -483,7 +485,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
         }
 
-            // Check if KB status changed: deleted vs published
+        // Check if KB status changed: deleted vs published
         if (isset($body['status']) && ($body['status'] !== $prevState['status'])
             || (isset($body['siteSectionGroup']) && $prevState['siteSectionGroup'] !== $body['siteSectionGroup'])) {
             // If status or siteSectionGroup changed we need to reset Sphinx counters and reindex
@@ -647,7 +649,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 $record["universalSourceIDs"] = $sourceKbIDs;
                 $record["universalTargetIDs"] = [];
             }
-
         }
         $record['url'] = $this->knowledgeBaseModel->url($record);
         $this->expandSiteSections($record);

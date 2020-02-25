@@ -486,13 +486,15 @@ MESSAGE
     }
 
     /**
+     * Validate if isUniversal status is set correctly.
+     *
      * @param array $data
      * @param ValidationField $validation
      * @param int|null $recordID
      */
     public function validateIsUniversalSource(array $data, ValidationField $validation, int $recordID = null) {
         // make sure that if we have universal targetID's that the universalSource status is set correctly
-        if  (($data["universalTargetIDs"] ?? null) && !$recordID) {
+        if (($data["universalTargetIDs"] ?? null) && !$recordID) {
             if (array_key_exists("isUniversalSource", $data) && !$data["isUniversalSource"]) {
                 $validation->getValidation()->addError(
                     $validation->getName(),
@@ -516,7 +518,7 @@ MESSAGE
         }
         // Make sure that the none of the universal target ID's are currently set to Universal Sources.
         if ($data["universalTargetIDs"] ?? null) {
-            foreach ($data["universalTargetIDs"] as $targetkB ) {
+            foreach ($data["universalTargetIDs"] as $targetkB) {
                 try {
                     $knowledgeBase = $this->selectSingle(["knowledgeBaseID" => $targetkB , "status" => self::STATUS_PUBLISHED]);
                     if ($knowledgeBase["isUniversalSource"] ?? null) {

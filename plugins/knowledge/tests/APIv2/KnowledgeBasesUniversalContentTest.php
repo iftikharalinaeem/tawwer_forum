@@ -27,10 +27,11 @@ class KnowledgeBasesUniversalContentTest extends AbstractAPIv2Test {
     public static function setupBeforeClass(): void {
         self::$addons = ["vanilla", "knowledge"];
         parent::setupBeforeClass();
-
     }
 
     /**
+     * Provide knowledge-base record.
+     *
      * @param bool $isUniversalSource
      * @param array $targetIDs
      * @return array
@@ -341,17 +342,17 @@ class KnowledgeBasesUniversalContentTest extends AbstractAPIv2Test {
         $this->assertEquals(1, count($response["universalSources"]));
     }
 
-
     /**
-     * @param $isUniversal
-     * @param $id
+     * Set a knowledge-bases isUniversal status.
+     *
+     * @param bool $isUniversal
+     * @param int $id
      */
-    protected function setKBIsUniversal($isUniversal, $id): void {
+    protected function setKBIsUniversal(bool $isUniversal, int $id): void {
         $isUniversal = $isUniversal ? 1 : 0;
 
         /** @var KnowledgeBaseModel $knowledgeBaseModel */
         $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
         $knowledgeBaseModel->update(["isUniversalSource" => $isUniversal], ["knowledgeBaseID" => $id]);
     }
-
 }

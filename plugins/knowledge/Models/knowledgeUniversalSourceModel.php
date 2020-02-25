@@ -30,6 +30,8 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Set the source and target knowledge-bases.
+     *
      * @param array $body
      * @param int $id
      */
@@ -49,6 +51,8 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Expand knowledge-base fragments for source and target knowledge-bases.
+     *
      * @param array $rows
      * @param string $name
      */
@@ -59,7 +63,6 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
         }
         reset($rows);
         $single = is_string(key($rows));
-
 
         $populate = function (array &$row, $name) {
             if ($row["knowledgeBaseID"] ?? null) {
@@ -94,7 +97,6 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
             }
         };
 
-
         if ($single) {
             $populate($rows, $name);
         } else {
@@ -103,5 +105,4 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
             }
         }
     }
-
 }
