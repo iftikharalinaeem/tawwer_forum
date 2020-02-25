@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
@@ -14,34 +14,30 @@ interface IProps {
     discussionID: number;
 }
 
-interface IState {
-    unlinkStatus: LoadStatus;
-}
+export function UnlinkDiscussionModal(props: IProps) {
+    const { discussionID } = props;
+    const [unlinkStatus, setUnlinkStatus] = useState(LoadStatus.PENDING);
+    const [isVisible, setIsVisible] = useState(true);
 
-export class UnlinkDiscussionModal extends React.Component<IProps, IState> {
-    public state: IState = {
-        unlinkStatus: LoadStatus.PENDING,
-    };
-
-    public render() {
-        return (
-            <ModalConfirm
-                isVisible={true}
-                title={t("Remove Article Link")}
-                onConfirm={this.handleConfirm}
-                isConfirmLoading={this.state.unlinkStatus === LoadStatus.LOADING}
-                confirmTitle={t("Remove Link")}
-            >
-                <Translate source="This will remove the link to the article, but will not remove the article itself." />
-            </ModalConfirm>
-        );
-    }
-
-    private handleConfirm = async () => {
-        this.setState({ unlinkStatus: LoadStatus.LOADING });
-        await apiv2.delete(`/discussions/${this.props.discussionID}/canonical-url`);
-        this.setState({ unlinkStatus: LoadStatus.SUCCESS });
+    const handleConfirm = async () => {
+        setUnlinkStatus(LoadStatus.LOADING);
+        await apiv2.delete(`/discussions/${discussionID}/canonical-url`);
+        setUnlinkStatus(LoadStatus.SUCCESS);
+        setIsVisible(false);
         // Refresh the page.
         window.location.href = window.location.href;
     };
+
+    return (
+        <ModalConfirm
+            isVisible={isVisible}
+            onCancel={() => setIsVisible(false)}
+            title={t("Remove Article Link")}
+            onConfirm={handleConfirm}
+            isConfirmLoading={unlinkStatus === LoadStatus.LOADING}
+            confirmTitle={t("Remove Link")}
+        >
+            <Translate source="This will remove the link to the article, but will not remove the article itself." />
+        </ModalConfirm>
+    );
 }

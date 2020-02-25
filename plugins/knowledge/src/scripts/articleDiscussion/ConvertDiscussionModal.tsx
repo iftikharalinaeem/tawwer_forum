@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import Translate from "@library/content/Translate";
@@ -14,6 +14,7 @@ interface IProps {
 }
 
 export function ConvertDiscussionModal(props: IProps) {
+    const [isVisible, setIsVisible] = useState(true);
     const navigateToDraft = () => {
         const url = makeEditorUrl({ discussionID: props.discussionID });
         window.location.href = url;
@@ -21,7 +22,8 @@ export function ConvertDiscussionModal(props: IProps) {
 
     return (
         <ModalConfirm
-            isVisible={true}
+            isVisible={isVisible}
+            onCancel={() => setIsVisible(false)}
             title={t("Convert to Article")}
             onConfirm={navigateToDraft}
             confirmTitle={t("Create Article")}
