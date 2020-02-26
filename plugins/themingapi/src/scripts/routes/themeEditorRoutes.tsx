@@ -30,6 +30,6 @@ export const ThemePreviewRoute = new RouteHandler(
     (data?: undefined) => "theme/theme-settings/preview",
 );
 
-export function getThemeRoute() {
+export function getThemeRoutes() {
     return [ThemePreviewRoute.route, ThemeEditorRoute.route];
 }

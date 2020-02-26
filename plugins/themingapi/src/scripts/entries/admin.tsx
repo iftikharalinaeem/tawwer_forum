@@ -9,7 +9,7 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 import { themeEditorReducer } from "@themingapi/theme/themeEditorReducer";
 import { themeSettingsReducer } from "@library/theming/themeSettingsReducer";
 import { Router } from "@library/Router";
-import { ThemeEditorRoute, ThemePreviewRoute, getThemeRoute } from "@themingapi/routes/themeEditorRoutes";
+import { getThemeRoutes } from "@themingapi/routes/themeEditorRoutes";
 
 registerReducer("themeEditor", themeEditorReducer);
 
