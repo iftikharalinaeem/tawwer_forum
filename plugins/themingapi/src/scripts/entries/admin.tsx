@@ -16,4 +16,4 @@ registerReducer("themeEditor", themeEditorReducer);
 registerReducer("themeSettings", themeSettingsReducer);
 addComponent("theming-ui-manage", ManageThemingPage);
 
-Router.addRoutes(getThemeRoute());
+Router.addRoutes(getThemeRoutes());
