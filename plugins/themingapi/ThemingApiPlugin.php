@@ -124,7 +124,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->primaryKey("themeID")
             ->column("name", "varchar(64)", false, ["index"])
             ->column("current", "tinyint(1)", 0, ["index"])
-            ->column("parentTheme", "varchar(32)", 0 )
+            ->column("parentTheme", "varchar(32)", 0)
             ->column("parentVersion", "varchar(32)", 0)
             ->column("insertUserID", "int", false)
             ->column("updateUserID", "int", false)

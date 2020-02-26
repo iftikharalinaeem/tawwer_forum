@@ -7,6 +7,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { color, percent, calc } from "csx";
 import { colorOut, unit, absolutePosition } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
+import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNavStyles";
 
 export const themeEditorVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("themeEditor");
@@ -52,15 +53,15 @@ export const themeEditorClasses = useThemeCache(() => {
         "frame",
         {
             width: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
-
             flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
-            overflow: "auto",
+            height: percent(100),
         },
 
         mediaQueries.oneColumnDown({
             width: percent(100),
         }),
     );
+
     const styleOptions = style(
         "styleOptions",
         {
@@ -80,5 +81,3 @@ export const themeEditorClasses = useThemeCache(() => {
         styleOptions,
     };
 });
-
-export default themeEditorClasses;
