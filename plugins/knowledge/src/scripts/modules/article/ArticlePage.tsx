@@ -91,7 +91,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                     currentNavCategory={this.props.currentNavCategory}
                     messages={this.renderMessages()}
                     articlelocales={articlelocales?.data ?? null}
-                    relatedArticles={relatedArticles?.data ?? null}
+                    relatedArticles={relatedArticles?.error ? [] : relatedArticles?.data ?? null}
                     featured={article.data.featured}
                 />
             </DocumentTitle>

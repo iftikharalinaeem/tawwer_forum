@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers\Pages;
 
+use Exception;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
@@ -15,6 +16,7 @@ use Vanilla\Knowledge\Models\ArticleJsonLD;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
+use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
  * Class for rendering the /kb/articles/:id-:slug page.
@@ -95,20 +97,30 @@ class ArticlePage extends KbPage {
             ['articleID' => $articleID]
         ));
 
-        $relatedArticlesResponse = $this->articlesApi->get_articlesRelated($articleID, [
-            'locale' => $currentLocale,
-            'limit' => ArticleModel::RELATED_ARTICLES_LIMIT,
-            'minimumArticles' => ArticleModel::RELATED_ARTICLES_LIMIT,
-        ]);
-        $relatedArticlesResponse = Data::box($relatedArticlesResponse);
+        try {
+            $relatedArticlesResponse = $this->articlesApi->get_articlesRelated($articleID, [
+                'locale' => $currentLocale,
+                'limit' => ArticleModel::RELATED_ARTICLES_LIMIT,
+                'minimumArticles' => ArticleModel::RELATED_ARTICLES_LIMIT,
+            ]);
+            $relatedArticlesResponse = Data::box($relatedArticlesResponse);
 
 
-        // Preload the data for the frontend.
-        $this->addReduxAction(new ReduxAction(
-            ActionConstants::GET_RELATED_ARTICLES,
-            $relatedArticlesResponse,
-            ['articleID' => $articleID]
-        ));
+            // Preload the data for the frontend.
+            $this->addReduxAction(new ReduxAction(
+                ActionConstants::GET_RELATED_ARTICLES,
+                $relatedArticlesResponse,
+                ['articleID' => $articleID]
+            ));
+        } catch (Exception $e) {
+            // Preload the data for the frontend.
+            $this->addReduxAction(new ReduxAction(
+                ActionConstants::GET_RELATED_ARTICLES_FAILED,
+                Data::box(['error' => ['message' => $e->getMessage()], 'params' => ['articleID' => $articleID]]),
+                null,
+                true
+            ));
+        }
     }
 
     /**
