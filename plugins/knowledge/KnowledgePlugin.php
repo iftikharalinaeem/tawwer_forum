@@ -27,6 +27,7 @@ use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
 use Vanilla\Site\SiteSectionModel;
+use PermissionModel;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -48,6 +49,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var SiteSectionModel $siteSectionModel */
     private $siteSectionModel;
 
+    /** @var PermissionModel $permissionModel */
+    private $permissionModel;
+
     /**
      * KnowledgePlugin constructor.
      *
@@ -56,13 +60,15 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param \Gdn_Request $request
      * @param KnowledgeBaseModel $kbModel
      * @param SiteSectionModel $siteSectionModel
+     * @param PermissionModel $permissionModel
      */
     public function __construct(
         \Gdn_Database $database,
         SessionInterface $session,
         \Gdn_Request $request,
         KnowledgeBaseModel $kbModel,
-        SiteSectionModel $siteSectionModel
+        SiteSectionModel $siteSectionModel,
+        PermissionModel $permissionModel
     ) {
         parent::__construct();
         $this->database = $database;
@@ -70,6 +76,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->request = $request;
         $this->kbModel = $kbModel;
         $this->siteSectionModel = $siteSectionModel;
+        $this->permissionModel = $permissionModel;
     }
 
     /**
@@ -358,8 +365,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             )
             ->set();
 
-        $permissionModel = \Gdn::permissionModel();
-        $permissionModel->define(
+        $this->permissionModel->define(
             [
                 'knowledge.kb.view' => 0,
                 'knowledge.articles.add' => 0,
