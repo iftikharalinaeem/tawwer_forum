@@ -11,6 +11,8 @@ use Garden\Schema\Schema;
 use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeUniversalSourceModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -166,6 +168,13 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var KnowledgeUniversalSourceModel */
+    private $knowledgeUniversalSourceModel;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
+
+
     /**
      * DI.
      *
@@ -177,6 +186,8 @@ class KnowledgeApiController extends AbstractApiController {
      * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
      * @param SiteSectionModel $siteSectionModel
+     * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -186,7 +197,9 @@ class KnowledgeApiController extends AbstractApiController {
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
         BreadcrumbModel $breadcrumbModel,
-        SiteSectionModel $siteSectionModel
+        SiteSectionModel $siteSectionModel,
+        KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -196,6 +209,8 @@ class KnowledgeApiController extends AbstractApiController {
         $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->siteSectionModel = $siteSectionModel;
+        $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
     }
 
     /**
@@ -357,9 +372,14 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
         if (isset($this->query['knowledgeBaseID'])) {
+            $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(["targetKnowledgeBaseID"=> $this->query['knowledgeBaseID']]);
+            if ($knowledgeUniversalContent) {
+                $knowledgeBaseIDs = array_column($knowledgeUniversalContent, "sourceKnowledgeBaseID");
+            }
+            $knowledgeBaseIDs[] = $this->query['knowledgeBaseID'];
             $knowledgeCategories = array_column(
                 $this->knowledgeCategoryModel->get(
-                    ['knowledgeBaseID' => $this->query['knowledgeBaseID']],
+                    ['knowledgeBaseID' => $knowledgeBaseIDs],
                     ['select' => ['knowledgeCategoryID']]
                 ),
                 'knowledgeCategoryID'
@@ -382,6 +402,7 @@ class KnowledgeApiController extends AbstractApiController {
             $siteSection = $this->siteSectionModel->getCurrentSiteSection();
             $this->sphinx->setFilterString('locale', $siteSection->getContentLocale());
         }
+
         if (isset($this->query['siteSectionGroup'])) {
             $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
