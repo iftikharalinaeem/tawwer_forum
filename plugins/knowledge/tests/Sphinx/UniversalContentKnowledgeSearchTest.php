@@ -1,9 +1,11 @@
 <?php
 /**
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
@@ -35,6 +37,9 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
 
     /** @var array $testData Data prepared for tests */
     protected static $sourceKBs;
+    
+    /** @var array addons */
+    protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
 
    /**
     * Prepare knowledge base data for tests and reindex Sphinx indexes.
@@ -80,10 +85,7 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
      * @depends testData
      */
     public function testSearchByKnowledgeBaseWithContent() {
-        $article = $this->articleRecord(
-            self::$targetKBs[1]["rootCategoryID"],
-            "Article in non Universal category"
-        );
+        $article = $this->articleRecord(self::$targetKBs[1]["rootCategoryID"], "Article in non Universal category");
 
         self::sphinxReindex();
 
@@ -111,8 +113,7 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
     public function testSearchKnowledgeBaseWithDifferentSiteSection() {
         $this->api()->patch(
             $this->baseUrl . '/' .self::$sourceKBs[2]["knowledgeBaseID"],
-            ["siteSectionGroup" =>  "mockSiteSectionGroup-1" ]
-        );
+            ["siteSectionGroup" =>  "mockSiteSectionGroup-1" ]);
         $params = [
             'knowledgeBaseID' => self::$targetKBIDs[1]
         ];
@@ -169,6 +170,7 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
      * @return array
      */
     private function knowledgeBaseRecord(bool $isUniversalSource = false, array $targetIDs = []) {
+        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
         $params = [
             "siteSectionGroup" => "vanilla",
             "isUniversalSource" => $isUniversalSource,
