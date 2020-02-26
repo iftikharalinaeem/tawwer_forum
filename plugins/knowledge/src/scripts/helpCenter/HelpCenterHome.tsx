@@ -68,10 +68,6 @@ export function HelpCenterHome(props: IProps) {
         return <KbErrorPage error={props.error} />;
     }
 
-    if (articleList.error) {
-        return <KbErrorPage error={articleList.error} />;
-    }
-
     if (knowledgeBase.countArticles === 0) {
         return (
             <KbErrorPage

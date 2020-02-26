@@ -57,10 +57,6 @@ const HomePage = (props: IProps) => {
         return <KbErrorPage error={loadable.error}></KbErrorPage>;
     }
 
-    if (articleList.error) {
-        return <KbErrorPage error={loadable.error}></KbErrorPage>;
-    }
-
     if (knowledgeBases.length === 1) {
         const { urlCode } = knowledgeBases[0];
         return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;

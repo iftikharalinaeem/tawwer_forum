@@ -22,7 +22,9 @@ abstract class ActionConstants {
     const GET_ARTICLE_RESPONSE = "@@article/GET_ARTICLE_DONE";
     const GET_ARTICLE_ERROR = "@@article/GET_ARTICLE_FAILED";
     const GET_RELATED_ARTICLES = "@@article/GET_RELATED_ARTICLES_DONE";
+    const GET_RELATED_ARTICLES_FAILED = "@@article/GET_RELATED_ARTICLES_FAILED";
     const GET_ARTICLE_LIST = "@@article/GET_ARTICLE_LIST_DONE";
+    const GET_ARTICLE_LIST_FAILED = "@@article/GET_ARTICLE_LIST_FAILED";
 
     // Editor
     const GET_EDITOR_ARTICLE_RESPONSE = "@@articleEditor/GET_ARTICLE_RESPONSE";
