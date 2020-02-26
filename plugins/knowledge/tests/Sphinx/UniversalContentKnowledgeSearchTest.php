@@ -37,7 +37,7 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
 
     /** @var array $testData Data prepared for tests */
     protected static $sourceKBs;
-    
+
     /** @var array addons */
     protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
 
@@ -113,7 +113,8 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
     public function testSearchKnowledgeBaseWithDifferentSiteSection() {
         $this->api()->patch(
             $this->baseUrl . '/' .self::$sourceKBs[2]["knowledgeBaseID"],
-            ["siteSectionGroup" =>  "mockSiteSectionGroup-1" ]);
+            ["siteSectionGroup" =>  "mockSiteSectionGroup-1"]
+        );
         $params = [
             'knowledgeBaseID' => self::$targetKBIDs[1]
         ];
