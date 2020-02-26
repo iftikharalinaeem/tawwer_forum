@@ -174,7 +174,6 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
-
     /**
      * DI.
      *
