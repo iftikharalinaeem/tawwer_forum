@@ -126,8 +126,8 @@ trait KnowledgeBasesApiSchemes {
                 'description' => "Knowledge base status.",
                 'enum' => KnowledgeBaseModel::getAllStatuses(),
             ],
-            "customPermissionRequired:b" => [
-                'description' => "Custom permission required.",
+            "hasCustomPermission:b" => [
+                'description' => "Knowledge base has custom permission.",
                 'default' => false,
             ],
             "viewers:a?",
@@ -191,7 +191,7 @@ trait KnowledgeBasesApiSchemes {
                     "sortArticles?",
                     "status?",
                     "urlCode",
-                    "customPermissionRequired?",
+                    "hasCustomPermission?",
                     "viewers?",
                     "editors?",
                     "isUniversalSource:b?",

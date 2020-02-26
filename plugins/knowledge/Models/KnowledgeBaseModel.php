@@ -583,8 +583,8 @@ MESSAGE
      * @return array
      */
     public function getAllowedKnowledgeBases(): array {
-        $res = array_column($this->get(['customPermissionRequired' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
-        $restricted = $this->get(['customPermissionRequired' => 1], ['select' => ['knowledgeBaseID']]);
+        $res = array_column($this->get(['hasCustomPermission' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
+        $restricted = $this->get(['hasCustomPermission' => 1], ['select' => ['knowledgeBaseID']]);
         foreach ($restricted as $row) {
             $userPermissions = $this->permissionModel->getUserPermissions(
                 $this->session->UserID,

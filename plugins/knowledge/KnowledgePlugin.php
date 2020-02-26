@@ -346,7 +346,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("countCategories", "int", "0")
             ->column("rootCategoryID", "int", ['Null' => false, 'Default' => -1])
             ->column("defaultArticleID", "int", ['Null' => true])
-            ->column("customPermissionRequired", "int", ['Null' => false, 'Default' => 0])
+            ->column("hasCustomPermission", "int", ['Null' => false, 'Default' => 0])
             ->column("permissionKnowledgeBaseID", "int", ['Null' => false, 'Default' => -1])
             ->column("sort", "int", true)
             ->column("isUniversalSource", "tinyint(1)", 0)

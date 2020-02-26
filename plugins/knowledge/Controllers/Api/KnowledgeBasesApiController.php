@@ -51,6 +51,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var PermissionModel $permissionModel */
     private $permissionModel;
 
+    /** @var \RoleModel $roleModel */
+    private $roleModel;
+
     /** @var array $allAllowed All knowledge base id allowed  */
     private $allAllowed = [];
 
@@ -64,6 +67,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param TranslationModel $translationModel
      * @param LocalesApiController $localeApi
      * @param PermissionModel $permissionModel
+     * @param \RoleModel $roleModel
      * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
      */
     public function __construct(
@@ -74,6 +78,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         TranslationModel $translationModel,
         LocalesApiController $localeApi,
         PermissionModel $permissionModel,
+        \RoleModel $roleModel,
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
@@ -83,6 +88,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->translation = $translationModel->getContentTranslationProvider();
         $this->localeApi = $localeApi;
         $this->permissionModel = $permissionModel;
+        $this->roleModel = $roleModel;
         $this->allAllowed = $this->knowledgeBaseModel->getAllowedKnowledgeBases();
         $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
     }
@@ -270,6 +276,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->permission("Garden.Settings.Manage");
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->addValidator("siteSectionGroup", [$this->knowledgeBaseModel, "validateSiteSectionGroup"])
+            ->addValidator("viewers", [$this, "validateRoleID"])
+            ->addValidator("editors", [$this, "validateRoleID"])
             ->setDescription("Create a new knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in);
@@ -278,7 +286,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
 
-        $body['customPermissionRequired'] = $body['customPermissionRequired'] !== false ? 1 : 0;
+        $body['hasCustomPermission'] = $body['hasCustomPermission'] !== false ? 1 : 0;
 
         if (array_key_exists('isUniversalSource', $body)) {
             $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
@@ -291,12 +299,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'parentID' => -1,
         ]);
         $update = ['rootCategoryID' => $knowledgeCategoryID];
-        if ($body['customPermissionRequired'] ?? false) {
+        if ($body['hasCustomPermission'] ?? false) {
             $update['permissionKnowledgeBaseID'] = $knowledgeBaseID;
         }
         $this->knowledgeBaseModel->update($update, ['knowledgeBaseID' => $knowledgeBaseID]);
 
-        if ($body['customPermissionRequired'] ?? false) {
+        if ($body['hasCustomPermission'] ?? false) {
             $this->saveCustomPermissions($knowledgeBaseID, $body['viewers'] ?? [], $body['editors'] ?? []);
         }
 
@@ -307,6 +315,28 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $result = $out->validate($row);
 
         return $result;
+    }
+
+    /**
+     * Validator for 'viewers' and 'editors' field
+     *
+     * @param array $roleIDs
+     * @param ValidationField $validationField
+     * @return bool
+     */
+    public function validateRoleID(array $roleIDs, \Garden\Schema\ValidationField $validationField): bool {
+        $roles = array_column($this->roleModel::roles(), 'RoleID');
+        $valid = true;
+        foreach ($roleIDs as $roleID) {
+            if (!in_array($roleID, $roles)) {
+                $validationField->getValidation()->addError(
+                    $validationField->getName(),
+                    "Invalid role id: ".$roleID
+                );
+                $valid = false;
+            }
+        }
+        return $valid;
     }
 
     /**
@@ -473,6 +503,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeBasePostSchema())
             ->addValidator("siteSectionGroup", [$this->knowledgeBaseModel, "validateSiteSectionGroup"])
+            ->addValidator("viewers", [$this, "validateRoleID"])
+            ->addValidator("editors", [$this, "validateRoleID"])
             ->setDescription("Update an existing knowledge base.")
         ;
         $in = $this->applyUrlCodeValidator($in, $id);
@@ -486,10 +518,10 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         $prevState = $this->knowledgeBaseByID($id);
 
-        if ((isset($body['customPermissionRequired']) && $prevState['customPermissionRequired'] !== $body['customPermissionRequired'])
-            || (isset($body['customPermissionRequired']) && $body['customPermissionRequired'] && (isset($body['viewers']) || isset($body['editors'])))
+        if ((isset($body['hasCustomPermission']) && $prevState['hasCustomPermission'] !== $body['hasCustomPermission'])
+            || (isset($body['hasCustomPermission']) && $body['hasCustomPermission'] && (isset($body['viewers']) || isset($body['editors'])))
         ) {
-            if ($body['customPermissionRequired'] === 1) {
+            if ($body['hasCustomPermission'] === 1) {
                 $body['permissionKnowledgeBaseID'] = $id;
                 $viewers = $body['viewers'] ?? [];
                 $editors = $body['editors'] ?? [];
