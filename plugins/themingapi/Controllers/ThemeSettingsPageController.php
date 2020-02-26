@@ -58,7 +58,6 @@ class ThemeSettingsPageController extends PageDispatchController {
     /**
      * Render out the /theme/theme-settings/preview.
      *
-     * @param int $id
      * @return \Garden\Web\Data
      */
     public function get_preview() {
