@@ -200,11 +200,17 @@ class EventListModule extends Gdn_Module {
       * @return array A data array representing an event item in an event list.
       */
      protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-          $timeZone = Gdn::session()->getTimeZone();
-          $dateStarts = new DateTime($event['DateStarts'], $timeZone);
-          if (Gdn::session()->isValid() && $hourOffset = Gdn::session()->User->HourOffset) {
-                $dateStarts->modify("{$hourOffset} hours");
+          if (Gdn::session()->isValid() && method_exists(Gdn::session(), 'getTimeZone')) {
+              $timeZone = Gdn::session()->getTimeZone();
+          } else {
+              $timeZone = new DateTimeZone('UTC');
           }
+
+          $dateStarts = new DateTime($event['DateStarts'], $timeZone);
+          $timestamp = Gdn_Format::toTimestamp($event['DateStarts']);
+          $offTimestamp = $timestamp + $dateStarts->getOffset();
+          $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
+          $startTime = strftime($timeFormat, $offTimestamp);
 
           $item['id'] = val('EventID', $event);
           $item['dateTile'] = true;
@@ -216,8 +222,6 @@ class EventListModule extends Gdn_Module {
           $item['url'] = eventUrl($event);
           $item['metaCssClass'] = '';
           $item['cssClass'] = 'Event event js-event';
-
-          $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
           $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
           $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
 

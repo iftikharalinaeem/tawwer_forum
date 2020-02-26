@@ -43,8 +43,9 @@
 
       var dateTimeStr = '';
       if (dateStr && !isNaN(Date.parse(dateStr+' '+timeStr))) {
-         var dt = new Date(dateStr+' '+timeStr);
-         dateTimeStr = dt.toISOString();
+          var dt = new Date(dateStr+' '+timeStr);
+          dateTimeStr = dt.toISOString();
+         //dateTimeStr = new Date(dateStr+' '+timeStr);
       }
       console.log(dateTimeStr);
       $('input[type="hidden"]', $picker).val(dateTimeStr);
@@ -56,6 +57,8 @@
          syncDate.apply(this);
       });
    });
+
+   syncDate();
 })(window, jQuery);
 
 jQuery(document).ready(function($) {
@@ -154,6 +157,9 @@ jQuery(document).ready(function($) {
          var FormParent = TimePicker.closest('.P');
          var DatePicker = FormParent.find('.DatePicker');
          var EventTime = FormParent.closest('.EventTime');
+
+         // Set TimePicker data-empty
+         TimePicker.data('empty', TimePicker.val());
 
          // See if we need to enable 'Times' mode
          if (TimePicker.attr('id').match(/TimeStarts/)) {
