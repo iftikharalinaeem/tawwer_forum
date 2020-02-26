@@ -1,6 +1,5 @@
 <?php
 /**
- * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -8,16 +7,14 @@
 use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
-use VanillaTests\APIv2\AbstractAPIv2Test;
-use Vanilla\Knowledge\Models\KnowledgeBaseModel;
-use Garden\Web\Exception\ServerException;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Class UniversalContentKnowledgeSearchTest
  */
-class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
+class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
@@ -103,10 +100,10 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
      * @depends testData
      */
     public function testSearchByKnowledgeBaseWithContent() {
-        $article = $this->api()->post(
-            $this->kbArticlesUrl,
-            $this->articleRecord(self::$targetKBs[1]["rootCategoryID"], "Article in non Universal category")
-        )->getBody();
+        $article = $this->articleRecord(
+            self::$targetKBs[1]["rootCategoryID"],
+            "Article in non Universal category"
+        );
 
         self::sphinxReindex();
 
@@ -132,7 +129,10 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
      * @depends testData
      */
     public function testSearchKnowledgeBaseWithDifferentSiteSection() {
-        $this->api()->patch($this->baseUrl . '/' .self::$sourceKBs[2]["knowledgeBaseID"], ["siteSectionGroup" =>  "mockSiteSectionGroup-1" ]);
+        $this->api()->patch(
+            $this->baseUrl . '/' .self::$sourceKBs[2]["knowledgeBaseID"],
+            ["siteSectionGroup" =>  "mockSiteSectionGroup-1" ]
+        );
         $params = [
             'knowledgeBaseID' => self::$targetKBIDs[1]
         ];
@@ -152,13 +152,18 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
      * @depends testData
      */
     public function testSearchKnowledgeBaseWithLocale() {
-        $article = $this->api()->post(
-            $this->kbArticlesUrl,
-            $this->articleRecord(self::$sourceKBs[2]["rootCategoryID"], "Article to be translated in Universal")
-        )->getBody();
+        $article = $this->articleRecord(
+            self::$sourceKBs[2]["rootCategoryID"],
+            "Article to be translated in Universal"
+        );
+        $record = [
+            'name' => 'Article to be translated in Universal KB fr',
+            'body' => json_encode([["insert" => "Hello World"]]),
+            'format' => 'rich',
+            'locale' => 'fr',
+            'knowledgeCategoryID' => self::$sourceKBs[2]["rootCategoryID"],
+        ];
 
-        $record = $this->articleRecord(self::$targetKBs[2]["rootCategoryID"], "Universal content article french article");
-        $record["locale"] = "fr";
 
         $this->api()->patch($this->kbArticlesUrl . '/' . $article['articleID'], $record);
         self::sphinxReindex();
@@ -173,7 +178,7 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
         $results = $response->getBody();
         $articleNames = array_column($results, "name");
         $this->assertEquals(1, count($results));
-        $this->assertEquals(["Universal content article french article"], $articleNames);
+        $this->assertEquals(["Article to be translated in Universal KB fr"], $articleNames);
     }
 
     /**
@@ -184,20 +189,13 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
      * @return array
      */
     private function knowledgeBaseRecord(bool $isUniversalSource = false, array $targetIDs = []) {
-        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
-        return $record = [
-            'name' => 'Test Knowledge Base',
-            'description' => 'Test Knowledge Base ' . $salt,
-            'viewType' => 'guide',
-            'icon' => '',
-            'bannerImage' => '',
-            'sortArticles' => 'manual',
-            'sourceLocale' => 'en',
-            'urlCode' => 'test-knowledge-base' . $salt,
+        $params = [
             "siteSectionGroup" => "vanilla",
             "isUniversalSource" => $isUniversalSource,
-            "universalTargetIDs" => $targetIDs
-        ];
+            "universalTargetIDs" => $targetIDs,
+            ];
+
+        return $this->createKnowledgeBase($params);
     }
 
     /**
@@ -210,12 +208,13 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
      */
     private function articleRecord(int $categoryID, string $name = 'default name') {
         $helloWorldBody = json_encode([["insert" => "Hello World"]]);
-        return $record =  [
+        $params = [
             "knowledgeCategoryID" => $categoryID,
             "name" => $name,
             "body" => $helloWorldBody,
             "format" => "rich",
         ];
+        return $this->createArticle($params);
     }
 
     /**
@@ -224,27 +223,16 @@ class UniversalContentKnowledgeSearchTest extends AbstractAPIv2Test {
     protected function prepareData() {
         // Create some target kb's
         for ($i = 0; $i < 4; $i++) {
-            $knowledgeBase = $this->api()->post(
-                $this->baseUrl,
-                $this->knowledgeBaseRecord(false)
-            )->getBody();
-
+            $knowledgeBase = $this->knowledgeBaseRecord(false);
             self::$targetKBs[] = $knowledgeBase;
             self::$targetKBIDs[] =  $knowledgeBase["knowledgeBaseID"];
         }
 
         // Create some target kb's
         for ($i = 0; $i <= 2; $i++) {
-            $knowledgeBase = $this->api()->post('knowledge-bases',
-                $this->knowledgeBaseRecord(true, self::$targetKBIDs)
-            )->getBody();
-
+            $knowledgeBase = $this->knowledgeBaseRecord(true, self::$targetKBIDs);
             $name = "Universal content article " . $i;
-            $article = $this->api()->post(
-                $this->kbArticlesUrl,
-                $this->articleRecord($knowledgeBase["rootCategoryID"], $name)
-            )->getBody();
-
+            $article = $this->articleRecord($knowledgeBase["rootCategoryID"], $name);
             self::$articleNames[] = $article["name"];
             self::$sourceKBs[] =  $knowledgeBase;
         }
