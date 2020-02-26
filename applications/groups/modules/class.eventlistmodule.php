@@ -200,22 +200,13 @@ class EventListModule extends Gdn_Module {
       * @return array A data array representing an event item in an event list.
       */
      protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-          if (Gdn::session()->isValid() && method_exists(Gdn::session(), 'getTimeZone')) {
-              $timeZone = Gdn::session()->getTimeZone();
-          } else {
-              $timeZone = new DateTimeZone('UTC');
-          }
-
-          $dateStarts = new DateTime($event['DateStarts'], $timeZone);
-          $timestamp = Gdn_Format::toTimestamp($event['DateStarts']);
-          $offTimestamp = $timestamp + $dateStarts->getOffset();
-          $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
-          $startTime = strftime($timeFormat, $offTimestamp);
+          $dateStarts = EventController::formatEventDate($event['DateStarts']);
+          $dateStartsTimeStamp = new DateTime($dateStarts[3]);
 
           $item['id'] = val('EventID', $event);
           $item['dateTile'] = true;
-          $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp() + $dateStarts->getOffset());
-          $item['dayTile'] = $dateStarts->format('j');
+          $item['monthTile'] = strftime('%b', $dateStartsTimeStamp->getTimestamp() + $dateStartsTimeStamp->getOffset());
+          $item['dayTile'] = $dateStartsTimeStamp->format('j');
           $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
           $item['textCssClass'] = 'EventDescription';
           $item['heading'] = Gdn_Format::text(val('Name', $event));
@@ -223,7 +214,7 @@ class EventListModule extends Gdn_Module {
           $item['metaCssClass'] = '';
           $item['cssClass'] = 'Event event js-event';
           $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
-          $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
+          $item['meta']['date']['text'] = $dateStartsTimeStamp->format("F j, Y").' '.$dateStarts[1];
 
           if ($withOptions) {
                 $item['options'] = $this->getEventOptions($event);
@@ -232,7 +223,7 @@ class EventListModule extends Gdn_Module {
                 $item['buttonDropdown'] = $this->getEventDropdown($event);
           }
           if ($layout == 'table') {
-                $this->getEventTableItem($item, $event, $dateStarts);
+                $this->getEventTableItem($item, $event, $dateStartsTimeStamp);
           }
           return $item;
      }

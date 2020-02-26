@@ -520,7 +520,7 @@ class EventController extends Gdn_Controller {
      * @param string $dateString
      * @return array
      */
-    private function formatEventDate($dateString, $from = true) {
+    public static function formatEventDate($dateString, $from = true) {
         if (!$dateString) {
             return ['', '', '', ''];
         }
