@@ -371,7 +371,11 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
         if (isset($this->query['knowledgeBaseID'])) {
-            $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(["targetKnowledgeBaseID"=> $this->query['knowledgeBaseID']]);
+            $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(
+                [
+                    "targetKnowledgeBaseID" => $this->query['knowledgeBaseID']
+                ]
+            );
             if ($knowledgeUniversalContent) {
                 $knowledgeBaseIDs = array_column($knowledgeUniversalContent, "sourceKnowledgeBaseID");
             }
