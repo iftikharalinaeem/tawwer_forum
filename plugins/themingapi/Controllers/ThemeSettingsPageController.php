@@ -69,6 +69,4 @@ class ThemeSettingsPageController extends PageDispatchController {
         ;
         return $response;
     }
-
-
 }
