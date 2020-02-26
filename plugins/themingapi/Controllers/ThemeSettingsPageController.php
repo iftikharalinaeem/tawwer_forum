@@ -68,10 +68,8 @@ class ThemeSettingsPageController extends PageDispatchController {
             ->requiresSession("/theme/theme-settings/preview")
             ->render()
         ;
-        //$response->setMeta(ContentSecurityPolicyMiddleware::SCRIPT_BYPASS, true);
         return $response;
     }
 
 
 }
-
