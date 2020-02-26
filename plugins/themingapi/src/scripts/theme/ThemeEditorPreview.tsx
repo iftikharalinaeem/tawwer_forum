@@ -20,9 +20,8 @@ export default function ThemeStylePreview() {
     document.body.classList.add(classes.contentContainer);
     return (
         <BrowserRouter>
-            <TitleBar disablePointerEvent={true} />
-
-            <Banner title="Welcome To Your Theme" disablePointerEvent={true} />
+            <TitleBar />
+            <Banner title="Welcome To Your Theme" />
             <Container fullGutter>
                 <div className={classes.content}>
                     <Paragraph className={classes.description}>
