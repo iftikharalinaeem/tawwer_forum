@@ -9,25 +9,22 @@ import { colorOut, unit, absolutePosition } from "@vanilla/library/src/scripts/s
 import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
 import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNavStyles";
 
-export const themeEditorVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("themeEditor");
-    const colors = makeThemeVars("colors", {
-        bg: color("#f5f6f7"),
-    });
-
-    const frame = makeThemeVars("frame", {
+// Intentionally not overwritable.
+export const themeEditorVariables = () => {
+    const frame = {
         width: 100,
-    });
-    const styleOptions = makeThemeVars("styleOptions", {
+    };
+
+    const styleOptions = {
         width: 376,
-    });
+    };
 
     return {
-        colors,
         frame,
         styleOptions,
     };
-});
+};
+
 export const themeEditorClasses = useThemeCache(() => {
     const vars = themeEditorVariables();
     const style = styleFactory("themeEditor");
@@ -65,7 +62,6 @@ export const themeEditorClasses = useThemeCache(() => {
     const styleOptions = style(
         "styleOptions",
         {
-            backgroundColor: colorOut(vars.colors.bg),
             boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
             width: unit(vars.styleOptions.width),
             flexBasis: unit(vars.styleOptions.width),
