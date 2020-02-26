@@ -132,7 +132,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
         ;
         $container->rule(TranslationProviderInterface::class)
             ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
-
     }
 
     /**

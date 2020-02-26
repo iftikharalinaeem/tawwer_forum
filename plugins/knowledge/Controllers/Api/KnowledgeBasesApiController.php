@@ -102,7 +102,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id, array $query = []): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
         $in = $this->schema($this->idParamSchema(), 'in');
         $query['id'] = $id;
         $query = $in->validate($query);
@@ -145,7 +145,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user did not have proper permission to view the resource.
      */
     public function get_byUrlCode(array $query) {
-        $this->permission('knowledge.kb.view');
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         // Schema
         $in = $this->schema(Schema::parse([
@@ -156,7 +156,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         // Data fetching
         $urlCode = $query['urlCode'];
-        $row = $this->knowledgeBaseModel->get(['urlCode' => $urlCode])[0] ?? null;
+        $row = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateWhereWithPermissions(['urlCode' => $urlCode]))[0] ?? null;
         if (!$row) {
             throw new NotFoundException('KnowledgeBase');
         }
@@ -174,7 +174,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query = []): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema([
             "status" => [
@@ -204,7 +204,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $translateLocale = $query['locale'] ?? null;
         unset($query['locale']);
 
-        $rows = $this->knowledgeBaseModel->get($query);
+        $rows = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateWhereWithPermissions($query));
         if (isset($translateLocale)) {
             $rows = $this->translateProperties($rows, $translateLocale);
         }
@@ -355,8 +355,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 'JunctionTable' => 'knowledgeBase',
                 'JunctionColumn' => 'permissionKnowledgeBaseID',
                 'JunctionID' => $knowledgeBaseID,
-                'knowledge.kb.view' => array_search($roleID, $viewers) === false ? 0 : 1,
-                'knowledge.articles.add' => array_search($roleID, $editors) === false ? 0 : 1
+                knowledgeBaseModel::VIEW_PERMISSION => array_search($roleID, $viewers) === false ? 0 : 1,
+                knowledgeBaseModel::EDIT_PERMISSION => array_search($roleID, $editors) === false ? 0 : 1
             ];
         }
         $this->permissionModel->saveAll($permissions, ['JunctionID' => $knowledgeBaseID, 'JunctionTable' => 'knowledgeBase']);
@@ -414,7 +414,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationTree(int $id, array $query = []): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
@@ -437,7 +437,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationFlat(int $id, array $query = []): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
@@ -461,7 +461,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function patch_navigationFlat(int $id, array $body = []): array {
-        $this->permission("knowledge.articles.add");
+        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
         $this->idParamSchema();
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([
@@ -514,7 +514,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
-        $body['customPermissionRequired'] = ($body['customPermissionRequired'] ?? false) !== false ? 1 : 0;
+        $body['hasCustomPermission'] = ($body['hasCustomPermission'] ?? false) !== false ? 1 : 0;
 
         $prevState = $this->knowledgeBaseByID($id);
 
@@ -664,13 +664,15 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true, bool $checkOnly = false): array {
         try {
             if ($includeDeleted) {
-                $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
+                $result = $this->knowledgeBaseModel->selectSingle(
+                    $this->knowledgeBaseModel->updateWhereWithPermissions(["knowledgeBaseID" => $knowledgeBaseID])
+                );
             } else {
                 $result = $this->knowledgeBaseModel->selectSingle(
-                    [
+                    $this->knowledgeBaseModel->updateWhereWithPermissions([
                         "knowledgeBaseID" => $knowledgeBaseID,
                         'status' => KnowledgeBaseModel::STATUS_PUBLISHED
-                    ]
+                    ])
                 );
             }
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {

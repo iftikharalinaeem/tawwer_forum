@@ -182,6 +182,8 @@ trait ArticlesApiHelper {
     private function retrieveRow(int $id, array $query = []): array {
         $article = $this->articleModel->selectSingle(["articleID" => $id]);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($article["knowledgeCategoryID"]);
+        $this->knowledgeBaseModel->checkViewPermission($knowledgeBase['knowledgeBaseID']);
+
         $options = [];
         $where = [];
 
@@ -209,7 +211,7 @@ trait ArticlesApiHelper {
 
         if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
             // Deleted articles have a special permission check.
-            $this->permission('knowledge.articles.add');
+            $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
         }
 
         return $record;

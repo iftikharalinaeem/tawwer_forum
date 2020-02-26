@@ -26,6 +26,12 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     const RECORD_TYPE = "knowledgeBase";
     const RECORD_ID_FIELD = "knowledgeBaseID";
 
+    const VIEW = 'view';
+    const EDIT = 'edit';
+
+    const VIEW_PERMISSION = 'knowledge.kb.view';
+    const EDIT_PERMISSION = 'knowledge.articles.add';
+
     const TYPE_GUIDE = 'guide';
     const TYPE_HELP = 'help';
     const SPHINX_ARTICLES_COUNTER_ID = 5;
@@ -58,12 +64,19 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var TranslationProviderInterface */
     private $translation;
 
+    /** @var array $allAllowed All knowledge base id allowed  */
+    private $allAllowed;
+
+    /** @var array $editAllowed Knowledge base id allowed to edit */
+    private $editAllowed;
+
     /**
      * KnowledgeBaseModel constructor.
      *
      * @param Gdn_Session $session
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
+     * @param PermissionModel $permissionModel
      */
     public function __construct(
         Gdn_Session $session,
@@ -97,6 +110,52 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         return $writeSchema;
     }
 
+    /**
+     * Update where clause with only allowed kb id list
+     *
+     * @param array $where
+     * @param string $prefix
+     * @return array
+     */
+    public function updateWhereWithPermissions(array $where, string $prefix = ''): array {
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            $allowedKBs = $this->getAllowedKnowledgeBases();
+            if (array_key_exists($prefix.'knowledgeBaseID', $where)) {
+                $where[$prefix.'knowledgeBaseID'] = array_intersect((array)$where[$prefix.'knowledgeBaseID'], $allowedKBs);
+            } else {
+                $where[$prefix.'knowledgeBaseID'] = $allowedKBs;
+            }
+        }
+        return $where;
+    }
+
+    /**
+     * Check if current user has EDIT permission for KB
+     *
+     * @param int $knowledgeBaseID
+     * @throws NotFoundException If user has no permission to edit content simulate 'not found'.
+     */
+    public function checkEditPermission(int $knowledgeBaseID) {
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::EDIT))) {
+                throw new NotFoundException("Knowledge");
+            }
+        }
+    }
+
+    /**
+     * Check if current user has VIEW permission for KB
+     *
+     * @param int $knowledgeBaseID
+     * @throws NotFoundException If user has no permission to view content simulate 'not found'.
+     */
+    public function checkViewPermission(int $knowledgeBaseID) {
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::VIEW))) {
+                throw new NotFoundException("Knowledge");
+            }
+        }
+    }
     /**
      * Generate a URL to the provided knowledge base row.
      *
@@ -533,10 +592,10 @@ MESSAGE
     public function checkKnowledgeBasePublished(int $knowledgeBaseID): array {
         try {
             $kb = $this->selectSingle(
-                [
-                    "knowledgeBaseID" => $knowledgeBaseID,
-                    'status' => KnowledgeBaseModel::STATUS_PUBLISHED
-                ]
+                $this->updateWhereWithPermissions([
+                        "knowledgeBaseID" => $knowledgeBaseID,
+                        'status' => KnowledgeBaseModel::STATUS_PUBLISHED
+                ])
             );
             return $kb;
         } catch (NoResultsException $e) {
@@ -580,25 +639,32 @@ MESSAGE
     /**
      * Get list of all kb user has permission to view
      *
+     * @param string $mode Permission to check. Enum: 'view', 'edit'
+     *        'view' -> 'knowledge.kb.view', 'edit' -> 'knowledge.articles.add'
      * @return array
      */
-    public function getAllowedKnowledgeBases(): array {
-        $res = array_column($this->get(['hasCustomPermission' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
-        $restricted = $this->get(['hasCustomPermission' => 1], ['select' => ['knowledgeBaseID']]);
-        foreach ($restricted as $row) {
-            $userPermissions = $this->permissionModel->getUserPermissions(
-                $this->session->UserID,
-                'knowledge.kb.view',
-                self::RECORD_TYPE,
-                'permissionKnowledgeBaseID',
-                'knowledgeBaseID',
-                $row['knowledgeBaseID']
-            );
-            if ($userPermissions[0]['knowledge.kb.view'] ?? false) {
-                $res[] = $row['knowledgeBaseID'];
+    public function getAllowedKnowledgeBases(string $mode = self::VIEW): array {
+        $dataKey = ($mode === self::VIEW) ? 'allAllowed' : 'editAllowed';
+        $permissionKey = ($mode === self::VIEW) ? self::VIEW_PERMISSION : self::EDIT_PERMISSION;
+        if (is_null($this->{$dataKey})) {
+            $res = array_column($this->get(['hasCustomPermission' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
+            $restricted = $this->get(['hasCustomPermission' => 1], ['select' => ['knowledgeBaseID']]);
+            foreach ($restricted as $row) {
+                $userPermissions = $this->permissionModel->getUserPermissions(
+                    $this->session->UserID,
+                    $permissionKey,
+                    self::RECORD_TYPE,
+                    'permissionKnowledgeBaseID',
+                    'knowledgeBaseID',
+                    $row['knowledgeBaseID']
+                );
+                if ($userPermissions[0][$permissionKey] ?? false) {
+                    $res[] = $row['knowledgeBaseID'];
+                }
             }
+            $this->{$dataKey} = $res;
         }
-        return $res;
+        return $this->{$dataKey};
     }
 
     /**
@@ -619,5 +685,4 @@ MESSAGE
         }
         return $valid;
     }
-
 }

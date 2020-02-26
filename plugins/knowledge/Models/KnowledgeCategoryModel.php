@@ -197,7 +197,9 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
                 ['name']
             )[0];
         }
-        $result['locale'] = $locale ?? $this->knowledgeBaseModel->selectSingle(['knowledgeBaseID' => $result['knowledgeBaseID']])['sourceLocale']; //$this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $result['locale'] = $locale ?? $this->knowledgeBaseModel->selectSingle(
+            ['knowledgeBaseID' => $result['knowledgeBaseID']]
+        )['sourceLocale'];
 
         // Normalize the fragment.
         $result['url'] = $this->url($result);

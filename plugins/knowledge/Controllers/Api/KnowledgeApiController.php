@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -238,7 +239,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function get_search(array $query = []): \Garden\Web\Data {
-        $this->permission("knowledge.kb.view");
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema($this->inputSchema(), "in");
 
@@ -336,7 +337,7 @@ class KnowledgeApiController extends AbstractApiController {
         $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
             if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
-                $this->permission("knowledge.articles.add");
+                $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
             };
             $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
             $statuses = array_map(

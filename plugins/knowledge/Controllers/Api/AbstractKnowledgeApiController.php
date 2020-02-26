@@ -6,6 +6,8 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+
 /**
  * Base controller class for API endpoints in the Knowledge addon.
  */
@@ -18,6 +20,6 @@ abstract class AbstractKnowledgeApiController extends \AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user does not have access to edit the article.
      */
     protected function editPermission(int $insertUserID) {
-        $this->permission("knowledge.articles.add");
+        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
     }
 }

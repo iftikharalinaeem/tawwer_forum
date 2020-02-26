@@ -17,6 +17,7 @@ use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Formats;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * API controller for managing the article revisions resource.
@@ -202,7 +203,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @throws \Vanilla\Exception\PermissionException If the current user does not have sufficient permissions.
      */
     public function get($id): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $this->idParamSchema()->setDescription("Get an article revision.");
         $out = $this->articleRevisionSchema("out");

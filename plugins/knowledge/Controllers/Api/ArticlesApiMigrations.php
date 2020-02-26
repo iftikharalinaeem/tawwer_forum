@@ -10,6 +10,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * API controller migration related endpoints
@@ -21,7 +22,7 @@ trait ArticlesApiMigration {
      * @param array $query Request query.
      */
     public function index_fromDiscussion(array $query) {
-        $this->permission("knowledge.articles.add");
+        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema([
             "discussionID" => [
@@ -48,7 +49,7 @@ trait ArticlesApiMigration {
 
      */
     public function put_aliases(int $id, array $body): array {
-        $this->permission("knowledge.articles.add");
+        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -113,7 +114,7 @@ trait ArticlesApiMigration {
 
      */
     public function get_aliases(int $id): array {
-        $this->permission("knowledge.articles.add");
+        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema();
         $in = $this->schema([], "in")->setDescription("Get article aliases.");
@@ -140,7 +141,7 @@ trait ArticlesApiMigration {
 
      */
     public function get_byAlias(array $query): array {
-        $this->permission("knowledge.kb.view");
+        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema([
             "alias" => [
