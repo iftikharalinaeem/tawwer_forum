@@ -4,9 +4,9 @@
  * @license Proprietary
  */
 
-use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
@@ -15,6 +15,8 @@ use VanillaTests\Knowledge\Utils\KbApiTestCase;
  * Class UniversalContentKnowledgeSearchTest
  */
 class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
+
+    use SphinxTestTrait;
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
@@ -33,28 +35,6 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
 
     /** @var array $testData Data prepared for tests */
     protected static $sourceKBs;
-
-    /** @var array $dockerResponse Stdout log saved when try to reindex Sphinx indexes */
-    protected static $dockerResponse;
-
-    /** @var Schema */
-    protected static $searchResultSchema;
-
-   /** @var bool */
-    protected static $sphinxReindexed;
-
-    protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
-
-    /**
-     * Call sphinx server port to trigger reindexing
-     */
-    public static function sphinxReindex() {
-         $sphinxHost = c('Plugins.Sphinx.Server');
-         exec('curl '.$sphinxHost.':9399', $dockerResponse);
-         self::$dockerResponse = $dockerResponse;
-         self::$sphinxReindexed = ('Sphinx reindexed.' === end($dockerResponse));
-         sleep(1);
-    }
 
    /**
     * Prepare knowledge base data for tests and reindex Sphinx indexes.
