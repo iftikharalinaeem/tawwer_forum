@@ -111,18 +111,6 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
             [`&& #page`]: {
                 overflow: "auto",
             },
-            [`& .${titleBarClasses().logoContainer}`]: {
-                pointerEvents: "none",
-            },
-            [`& .${dropDownClasses().action}`]: {
-                pointerEvents: "none",
-            },
-            [`& .${titleBarNavClasses().link}`]: {
-                pointerEvents: "none",
-            },
-            [`& .${bannerClasses().searchButton}`]: {
-                pointerEvents: "none",
-            },
         },
     });
 
