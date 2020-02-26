@@ -8,6 +8,7 @@
 namespace Vanilla\Knowledge\Controllers\Pages;
 
 use Garden\Web\Data;
+use Vanilla\Site\DefaultSiteSection;
 
 /**
  * Class for rendering the /kb/:urlCode page.
@@ -50,11 +51,15 @@ class HomePage extends KbPage {
         }
 
         $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-        $this->preloadArticleList([
+        $params = [
             'featured' => true,
-            'siteSectionGroup' => $siteSection->getSectionGroup(),
             'locale' => $siteSection->getContentLocale(),
-        ]);
+        ];
+        if (!($siteSection instanceof DefaultSiteSection)) {
+            $params['siteSectionGroup'] = $siteSection->getSectionGroup();
+        }
+
+        $this->preloadArticleList($params);
         return parent::render();
     }
 }

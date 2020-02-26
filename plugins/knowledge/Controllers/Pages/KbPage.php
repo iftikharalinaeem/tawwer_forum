@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Controllers\Pages;
 
+use Exception;
 use Garden\EventManager;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
@@ -251,12 +252,24 @@ abstract class KbPage extends ThemedPage {
      * @param array $params Parameters to pass to the search endpoint.
      */
     protected function preloadArticleList(array $params) {
-        $result = $this->rootApi->get_search($params);
+        try {
+            $result = $this->rootApi->get_search($params);
 
-        $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, Data::box([
-            'body' => $result,
-            'pagination' => $result->getMeta('paging')
-        ]), $params));
+            $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, Data::box([
+                'body' => $result,
+                'pagination' => $result->getMeta('paging')
+            ]), $params));
+        } catch (Exception $e) {
+            $this->addReduxAction(new ReduxAction(
+                ActionConstants::GET_ARTICLE_LIST_FAILED,
+                Data::box([
+                    'error' => ['message' => $e->getMessage()],
+                    'params' => $params
+                ]),
+                null,
+                true
+            ));
+        }
     }
 
     /**
