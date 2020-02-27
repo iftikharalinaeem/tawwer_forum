@@ -43,8 +43,8 @@
 
       var dateTimeStr = '';
       if (dateStr && !isNaN(Date.parse(dateStr+' '+timeStr))) {
-          var dt = new Date(dateStr+' '+timeStr);
-          dateTimeStr = dt.toISOString();
+         var dt = new Date(dateStr+' '+timeStr);
+         dateTimeStr = dt.toISOString();
       }
       console.log(dateTimeStr);
       $('input[type="hidden"]', $picker).val(dateTimeStr);
