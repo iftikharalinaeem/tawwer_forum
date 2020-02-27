@@ -9,11 +9,11 @@ import TitleBar from "@library/headers/TitleBar";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import Container from "@library/layout/components/Container";
 import Paragraph from "@vanilla/library/src/scripts/layout/Paragraph";
-import { themeEditorPreviewClasses } from "./themeEditorPreviewStyles";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
+import themeEditorPreviewClasses from "./themeEditorPreviewStyles";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");

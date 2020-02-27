@@ -5,6 +5,7 @@
 
 import React from "react";
 import { themeEditorClasses } from "./themeEditorStyles";
+import ThemeBuilderForm from "./ThemeBuilderForm";
 
 export interface IProps {}
 
@@ -20,7 +21,9 @@ export default function ThemeEditor(props: IProps) {
                     scrolling="yes"
                 ></iframe>
             </div>
-            <div className={classes.styleOptions}></div>
+            <div className={classes.styleOptions}>
+                <ThemeBuilderForm />
+            </div>
         </div>
     );
 }
