@@ -113,7 +113,7 @@ class PreModeratedCategoryPlugin extends Gdn_Plugin {
             $args['IsValid'] = false;
             $args['InvalidReturnType'] = UNAPPROVED;
 
-            LogModel::insert('Pending', 'Discussion', $discussion);
+            LogModel::insert('Pending', 'Comment', $comment);
         }
     }
 
