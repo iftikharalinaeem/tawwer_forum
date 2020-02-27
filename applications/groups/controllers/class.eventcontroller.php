@@ -26,6 +26,18 @@ class EventController extends Gdn_Controller {
     /** @var GroupModel */
     protected $GroupModel;
 
+    /** @var \EventModel */
+    private $eventModel;
+
+    /**
+     * EventController constructor.
+     * @param EventModel $eventModel
+     */
+    public function __construct(\EventModel $eventModel) {
+        $this->eventModel = $eventModel;
+        parent::__construct();
+    }
+
     /**
      * Include JS, CSS, and modules used by all methods.
      *
@@ -93,8 +105,7 @@ class EventController extends Gdn_Controller {
 
         // Lookup event
         if ($eventID) {
-            $eventModel = new EventModel();
-            $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+            $event = $this->eventModel->getID($eventID, DATASET_TYPE_ARRAY);
             if (!$event) throw notFoundException('Event');
 
             $this->applyFormatCompatibility($event, 'Body', 'Format');
@@ -147,9 +158,7 @@ class EventController extends Gdn_Controller {
 
         // TODO: Event create permission
 
-
-        $EventModel = new EventModel();
-        $this->Form->setModel($EventModel);
+        $this->Form->setModel($this->eventModel);
         if ($this->Form->isPostBack()) {
             $EventData = $this->Form->formValues();
 
@@ -164,7 +173,7 @@ class EventController extends Gdn_Controller {
             if ($EventID = $this->Form->save()) {
                 $EventData['EventID'] = $EventID;
                 if (val('GroupID',$EventData, false)) {
-                    $EventModel->inviteGroup($EventID, $GroupID);
+                    $this->eventModel->inviteGroup($EventID, $GroupID);
                 }
 
                 $this->informMessage(formatString(t("New event created for <b>'{Name}'</b>"), $EventData));
@@ -197,8 +206,7 @@ class EventController extends Gdn_Controller {
         $this->addBreadcrumb($this->title());
         $this->Form->setData($Event);
 
-        $EventModel = new EventModel();
-        $this->Form->setModel($EventModel);
+        $this->Form->setModel($this->eventModel);
         if ($this->Form->isPostBack()) {
             $EventData = $this->Form->formValues();
 
@@ -213,7 +221,7 @@ class EventController extends Gdn_Controller {
             if ($EventID = $this->Form->save()) {
                 $EventData['EventID'] = $EventID;
                 if ($GroupID = val('GroupID',$EventData, false)) {
-                    $EventModel->inviteGroup($EventID, $GroupID);
+                    $this->eventModel->inviteGroup($EventID, $GroupID);
                 }
 
                 $this->informMessage(formatString(t("<b>'{Name}'</b> has been updated"), $EventData));
@@ -239,15 +247,14 @@ class EventController extends Gdn_Controller {
      */
     public function event($EventID) {
         // Lookup event
-        $EventModel = new EventModel();
-        $Event = $EventModel->getID($EventID, DATASET_TYPE_ARRAY);
+        $Event = $this->eventModel->getID($EventID, DATASET_TYPE_ARRAY);
         if (!$Event) {
             throw notFoundException('Event');
         }
         $ViewEvent = false;
 
         // Check our invite status
-        $InvitedToEvent = $EventModel->isInvited(Gdn::session()->UserID, $EventID);
+        $InvitedToEvent = $this->eventModel->isInvited(Gdn::session()->UserID, $EventID);
 
         // Lookup group, if there is one
         $GroupID = val('GroupID', $Event, false);
@@ -308,7 +315,7 @@ class EventController extends Gdn_Controller {
         }
 
         // Invited
-        $Invited = $EventModel->invited($EventID);
+        $Invited = $this->eventModel->invited($EventID);
         $this->setData('Invited', $Invited);
 
         // Pull in group functions
@@ -334,8 +341,7 @@ class EventController extends Gdn_Controller {
         }
 
         if ($this->Form->authenticatedPostBack()) {
-            $eventModel = new EventModel();
-            $deleted = $eventModel->delete(['EventID' => $eventID]);
+            $deleted = $this->eventModel->delete(['EventID' => $eventID]);
 
             if ($deleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $event));
@@ -371,15 +377,14 @@ class EventController extends Gdn_Controller {
         $attending = $this->Form->getFormValue('Attending');
 
         // Lookup event
-        $eventModel = new EventModel();
-        $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+        $event = $this->eventModel->getID($eventID, DATASET_TYPE_ARRAY);
         if (!$event) {
             throw notFoundException('Event');
         }
         $attendEvent = false;
 
         // Check our invite status
-        $invitedToEvent = $eventModel->isInvited(Gdn::session()->UserID, $eventID);
+        $invitedToEvent = $this->eventModel->isInvited(Gdn::session()->UserID, $eventID);
 
         // Lookup group, if there is one
         $groupID = val('GroupID', $event, false);
@@ -415,7 +420,7 @@ class EventController extends Gdn_Controller {
             throw forbiddenException('attend this event');
         }
         $eventName = val('Name', $event, t('this event'));
-        $eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
+        $this->eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
 
         $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), htmlspecialchars($eventName), t($attending)));
         $this->jsonTarget('#EventAttendees', $this->attendees($eventID));
@@ -429,8 +434,7 @@ class EventController extends Gdn_Controller {
      * @return string
      */
     protected function attendees($eventID) {
-        $eventModel = new EventModel();
-        $invited = $eventModel->invited($eventID);
+        $invited = $this->eventModel->invited($eventID);
         $this->setData('Invited', $invited);
 
         $attendeesView = $this->fetchView('attendees', 'event', 'groups');
@@ -485,8 +489,8 @@ class EventController extends Gdn_Controller {
      * @return string Returns the formatted dates.
      */
     public function formatEventDates($start, $end) {
-        $fromParts = $this->formatEventDate($start);
-        $toParts = $this->formatEventDate($end);
+        $fromParts = $this->eventModel::formatEventDate($start);
+        $toParts = $this->eventModel::formatEventDate($end);
 
         $fromStr = $fromParts[0];
         $toStr = $toParts[0];
@@ -512,41 +516,7 @@ class EventController extends Gdn_Controller {
         }
     }
 
-    /**
-     * Format a date using the current timezone.
-     *
-     * This is sort of a stop-gap until the **Gdn_Format::*** methods.
-     *
-     * @param string $dateString
-     * @return array
-     */
-    public static function formatEventDate($dateString, $from = true) {
-        if (!$dateString) {
-            return ['', '', '', ''];
-        }
-        if (method_exists(Gdn::session(), 'getTimeZone')) {
-            $tz = Gdn::session()->getTimeZone();
-        } else {
-            $tz = new DateTimeZone('UTC');
-        }
 
-        $timestamp = Gdn_Format::toTimestamp($dateString);
-        if (!$timestamp) {
-            return [false, false, false, false];
-        }
-
-        $dt = new DateTime('@'.$timestamp);
-        $dt->setTimezone($tz);
-
-        $offTimestamp = $timestamp + $dt->getOffset();
-
-        $dateFormat = '%A, %B %e, %G';
-        $dateStr = strftime($dateFormat, $offTimestamp);
-        $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
-        $timeStr = strftime($timeFormat, $offTimestamp);
-
-        return [$dateStr, $timeStr, $dt->format('H:i'), $dt->format('c')];
-    }
 
     /**
      * Verify a user can access a group.
