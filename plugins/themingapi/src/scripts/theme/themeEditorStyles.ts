@@ -11,16 +11,22 @@ import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNav
 
 // Intentionally not overwritable.
 export const themeEditorVariables = () => {
-    const frame = {
+    const frameContainer = {
         width: 100,
     };
 
     const styleOptions = {
         width: 376,
+        mobile: {
+            margin: {
+                top: 12
+            }
+        },
+        borderRaduis: 6
     };
 
     return {
-        frame,
+        frameContainer,
         styleOptions,
     };
 };
@@ -37,20 +43,24 @@ export const themeEditorClasses = useThemeCache(() => {
             width: percent(100),
             height: percent(100),
             $nest: {
-                "&&&": {
+                "&&": {
                     display: "flex",
                 },
             },
         },
         mediaQueries.oneColumnDown({
-            display: "block",
+            $nest: {
+                "&&": {
+                    display: "block",
+                }
+            }
         }),
     );
-    const frame = style(
-        "frame",
+    const frameContainer = style(
+        "frameContainer",
         {
-            width: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
-            flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
+            width: calc(`${percent(vars.frameContainer.width)} - ${unit(vars.styleOptions.width)}`),
+            flexBasis: calc(`${percent(vars.frameContainer.width)} - ${unit(vars.styleOptions.width)}`),
             height: percent(100),
         },
 
@@ -58,6 +68,10 @@ export const themeEditorClasses = useThemeCache(() => {
             width: percent(100),
         }),
     );
+
+    const frame = style("frame", {
+        border: "none"
+    });
 
     const styleOptions = style(
         "styleOptions",
@@ -68,12 +82,16 @@ export const themeEditorClasses = useThemeCache(() => {
         },
         mediaQueries.oneColumnDown({
             width: percent(100),
+            marginTop: unit(vars.styleOptions.mobile.margin.top),
+            borderRadius: unit(vars.styleOptions.borderRaduis),
+            border: "solid 1px #dadada"
         }),
     );
 
     return {
-        frame,
+        frameContainer,
         wrapper,
         styleOptions,
+        frame
     };
 });

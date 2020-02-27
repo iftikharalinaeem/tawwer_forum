@@ -113,7 +113,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             {
                 label: t("Styles"),
                 panelData: "style",
-                contents: <ThemeEditor />,
+                contents: <ThemeEditor themeID={themeID} variables={theme.data?.assets.variables} />,
             },
             {
                 label: t("Header"),
