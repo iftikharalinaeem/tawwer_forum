@@ -6,14 +6,8 @@
 import { unit, paddings } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { FontSizeProperty, HeightProperty, MarginProperty, PaddingProperty, WidthProperty } from "csstype";
+import { FontSizeProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
-import { TileAlignment } from "@vanilla/library/src/scripts/features/tiles/Tiles";
-import { titleBarClasses } from "@vanilla/library/src/scripts/headers/titleBarStyles";
-import titleBarNavClasses from "@vanilla/library/src/scripts/headers/titleBarNavStyles";
-import { searchBarVariables, searchBarClasses } from "@vanilla/library/src/scripts/features/search/searchBarStyles";
-import { bannerClasses } from "@vanilla/library/src/scripts/banner/bannerStyles";
-import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
