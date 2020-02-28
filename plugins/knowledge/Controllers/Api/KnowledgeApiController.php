@@ -133,7 +133,7 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var array */
     private $query = [];
 
-    /** @var \SphinxClient */
+    /** @var SphinxClient */
     private $sphinx = null;
 
     /** @var string */
