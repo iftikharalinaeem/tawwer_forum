@@ -50,7 +50,6 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const [themeName, setThemeName] = useState("");
     let themeID = props.match.params.id;
     const classes = themeEditorPageClasses();
-
     const DEFAULT_THEME = "theme-foundation";
 
     const getTemplateName = () => {
@@ -113,7 +112,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             {
                 label: t("Styles"),
                 panelData: "style",
-                contents: <ThemeEditor themeID={themeID} variables={theme.data?.assets.variables} />,
+                contents: <ThemeEditor themeID={themeID} variables={theme.data.assets.variables} />,
             },
             {
                 label: t("Header"),

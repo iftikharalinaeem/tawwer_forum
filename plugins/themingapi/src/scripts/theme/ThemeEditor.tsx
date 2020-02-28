@@ -6,11 +6,11 @@
 import React from "react";
 import { themeEditorClasses } from "./themeEditorStyles";
 import ThemeBuilderForm from "./ThemeBuilderForm";
-import { IThemeVariables } from "./themeEditorReducer";
+import { IThemeEditorVariables, IThemeVariables } from "./themeEditorReducer";
 
 export interface IProps {
     themeID: string | number;
-    variables: IThemeVariables;
+    variables?: IThemeVariables;
 }
 
 export default function ThemeEditor(props: IProps) {
@@ -26,7 +26,7 @@ export default function ThemeEditor(props: IProps) {
                 ></iframe>
             </div>
             <div className={classes.styleOptions}>
-                <ThemeBuilderForm />
+                <ThemeBuilderForm variables={props.variables} />
             </div>
         </div>
     );

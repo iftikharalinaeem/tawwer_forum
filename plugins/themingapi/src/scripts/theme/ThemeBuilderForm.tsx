@@ -4,27 +4,44 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo } from "react";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { Form, FormikProvider, useFormik } from "formik";
-import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
+import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { Form, FormikProvider, useFormik } from "formik";
+import React, { useState } from "react";
+import { useThemeActions } from "./ThemeEditorActions";
+import { IThemeVariables } from "./themeEditorReducer";
 
-export interface IThemeBuilderForm {}
+export interface IThemeBuilderForm {
+    variables?: IThemeVariables;
+}
 
 export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const classes = themeBuilderClasses();
     const global = globalVariables();
+    const { updateAssets, saveTheme } = useThemeActions();
     const buttonGlobals = buttonGlobalVariables();
+    const dataString = JSON.stringify(props.variables);
+    const data = JSON.parse(dataString).data;
+    /*const handleChange = () = {
+
+    }*/
     const form = useFormik({
         initialValues: {},
-        onSubmit: values => {},
+        onSubmit: async values => {
+            await saveTheme();
+            window.location.href = formatUrl("/theme/theme-settings", true);
+        },
     });
+    const [formData, setFormData] = useState(form.values);
+
     return (
         <FormikProvider value={form}>
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
@@ -34,7 +51,17 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: global.mainColors.primary,
+                        defaultValue: ensureColorHelper(data.global.mainColors.primary),
+                        handleChange: () => {
+                            updateAssets({
+                                assets: {
+                                    variables: {
+                                        data: JSON.stringify(form.values),
+                                        type: "json",
+                                    },
+                                },
+                            });
+                        },
                     }}
                     inputBlock={{ label: t("Brand Color") }}
                 />
@@ -44,6 +71,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         colorPicker={{
                             variableID: "global.body.backgroundImage.color",
                             defaultValue: global.body.backgroundImage.color,
+                            handleChange: () => {
+                                updateAssets({
+                                    assets: {
+                                        variables: {
+                                            data: JSON.stringify(form.values),
+                                            type: "json",
+                                        },
+                                    },
+                                });
+                            },
                         }}
                         inputBlock={{ label: t("Background Color") }}
                     />
@@ -51,7 +88,17 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
-                            defaultValue: global.mainColors.fg,
+                            defaultValue: ensureColorHelper(data.global.mainColors.fg),
+                            handleChange: () => {
+                                updateAssets({
+                                    assets: {
+                                        variables: {
+                                            data: JSON.stringify(form.values),
+                                            type: "json",
+                                        },
+                                    },
+                                });
+                            },
                         }}
                         inputBlock={{ label: t("Text") }}
                     />
@@ -60,6 +107,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         colorPicker={{
                             variableID: "global.links.colors.default",
                             defaultValue: global.links.colors.default,
+                            handleChange: () => {
+                                updateAssets({
+                                    assets: {
+                                        variables: {
+                                            data: JSON.stringify(form.values),
+                                            type: "json",
+                                        },
+                                    },
+                                });
+                            },
                         }}
                         inputBlock={{ label: t("Links") }}
                     />
@@ -71,6 +128,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
                                 defaultValue: buttonGlobals.colors.primary,
+                                handleChange: () => {
+                                    updateAssets({
+                                        assets: {
+                                            variables: {
+                                                data: JSON.stringify(form.values),
+                                                type: "json",
+                                            },
+                                        },
+                                    });
+                                },
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
@@ -78,6 +145,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
                                 defaultValue: buttonGlobals.colors.primaryContrast,
+                                handleChange: () => {
+                                    updateAssets({
+                                        assets: {
+                                            variables: {
+                                                data: JSON.stringify(form.values),
+                                                type: "json",
+                                            },
+                                        },
+                                    });
+                                },
                             }}
                             inputBlock={{ label: t("Text") }}
                         />
@@ -88,6 +165,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
                                 defaultValue: buttonGlobals.colors.bg,
+                                handleChange: () => {
+                                    updateAssets({
+                                        assets: {
+                                            variables: {
+                                                data: JSON.stringify(form.values),
+                                                type: "json",
+                                            },
+                                        },
+                                    });
+                                },
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
@@ -95,6 +182,16 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
                                 defaultValue: buttonGlobals.colors.fg,
+                                handleChange: () => {
+                                    updateAssets({
+                                        assets: {
+                                            variables: {
+                                                data: JSON.stringify(form.values),
+                                                type: "json",
+                                            },
+                                        },
+                                    });
+                                },
                             }}
                             inputBlock={{ label: t("Text") }}
                         />
