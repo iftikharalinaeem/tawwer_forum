@@ -236,7 +236,7 @@ class SphinxKnowledgeCustomPermissionsTest extends AbstractAPIv2Test {
      */
     public function testSearch(array $args) {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
-        $params = ['query' => 'Lorem Ipsum'];
+        $params = ['body' => 'Lorem Ipsum'];
         $response = $this->api()->get('/knowledge/search?'.http_build_query($params));
         $getSearch = $response->getBody();
         $this->assertEquals($args['count'], count($getSearch));

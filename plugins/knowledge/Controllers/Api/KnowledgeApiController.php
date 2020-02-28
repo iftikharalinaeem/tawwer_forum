@@ -179,7 +179,7 @@ class KnowledgeApiController extends AbstractApiController {
     private $session;
 
     /** @var array $knowledgeCategories */
-    private $knowledgeCategories = [];
+    private $knowledgeCategories = null;
 
     /**
      * DI.
@@ -478,10 +478,12 @@ class KnowledgeApiController extends AbstractApiController {
             } else {
                 $filterIDs = array_intersect($this->knowledgeCategories, $knowledgeCategories);
             }
+            $this->sphinx->setFilter('knowledgeCategoryID', $filterIDs);
         } else {
-            $filterIDs = $this->knowledgeCategories;
+            if (!is_null($this->knowledgeCategories)) {
+                $this->sphinx->setFilter('knowledgeCategoryID', $this->knowledgeCategories);
+            }
         }
-        $this->sphinx->setFilter('knowledgeCategoryID', $filterIDs);
     }
 
 
