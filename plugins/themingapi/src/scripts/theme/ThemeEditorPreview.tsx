@@ -38,7 +38,7 @@ export default function ThemeStylePreview() {
             >
                 <TitleBar />
                 <Banner title="Welcome To Your Theme" />
-                <Container fullGutter>
+                <Container>
                     <div className={classes.content}>
                         <Paragraph className={classes.description}>
                             This is a style guide of your theme. It has examples of the visual elements used throught

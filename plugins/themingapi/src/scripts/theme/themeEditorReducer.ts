@@ -53,10 +53,7 @@ export interface IThemeExternalAsset {
 
 export interface IThemeVariables {
     [key: string]: string;
-}
-export interface IThemeEditorVariables {
-    data?: string;
-    type: string;
+
 }
 
 export interface ITheme {
@@ -106,7 +103,7 @@ export const INITIAL_ASSETS: IThemeAssets = {
         type: "",
         url: "",
     },
-    variables: { data: "", type: "json" },
+    variables: { data: "", type: "" },
 };
 const INITIAL_STATE: IThemeState = {
     theme: {
@@ -155,7 +152,6 @@ export const themeEditorReducer = produce(
             } else {
                 state.form.assets = INITIAL_ASSETS;
             }
-            console.log("update-->", state.form);
             return state;
         })
         .case(ThemeActions.postTheme_ACs.started, (state, payload) => {

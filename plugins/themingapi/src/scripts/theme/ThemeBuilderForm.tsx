@@ -30,9 +30,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const buttonGlobals = buttonGlobalVariables();
     const dataString = JSON.stringify(props.variables);
     const data = JSON.parse(dataString).data;
-    /*const handleChange = () = {
-
-    }*/
+    console.log("==>", props.variables);
     const form = useFormik({
         initialValues: {},
         onSubmit: async values => {
@@ -40,7 +38,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             window.location.href = formatUrl("/theme/theme-settings", true);
         },
     });
-    const [formData, setFormData] = useState(form.values);
 
     return (
         <FormikProvider value={form}>
@@ -53,11 +50,12 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         variableID: "global.mainColors.primary",
                         defaultValue: ensureColorHelper(data.global.mainColors.primary),
                         handleChange: () => {
+                            const data = JSON.stringify(form.values);
                             updateAssets({
                                 assets: {
                                     variables: {
-                                        data: JSON.stringify(form.values),
-                                        type: "json",
+                                        data: JSON.parse(JSON.stringify(form.values)),
+                                        type: "string",
                                     },
                                 },
                             });
@@ -75,8 +73,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.stringify(form.values),
-                                            type: "json",
+                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            type: "string",
                                         },
                                     },
                                 });
@@ -93,8 +91,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.stringify(form.values),
-                                            type: "json",
+                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            type: "string",
                                         },
                                     },
                                 });
@@ -111,8 +109,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.stringify(form.values),
-                                            type: "json",
+                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            type: "string",
                                         },
                                     },
                                 });
@@ -132,8 +130,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.stringify(form.values),
-                                                type: "json",
+                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                type: "string",
                                             },
                                         },
                                     });
@@ -149,8 +147,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.stringify(form.values),
-                                                type: "json",
+                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                type: "string",
                                             },
                                         },
                                     });
@@ -169,8 +167,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.stringify(form.values),
-                                                type: "json",
+                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                type: "string",
                                             },
                                         },
                                     });
@@ -186,8 +184,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.stringify(form.values),
-                                                type: "json",
+                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                type: "string",
                                             },
                                         },
                                     });
