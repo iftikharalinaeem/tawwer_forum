@@ -36,7 +36,10 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
      * @param int $id
      */
     public function setUniversalContent(array $body, int $id) {
-        if ($body["universalTargetIDs"] ?? null) {
+        if (isset($body["universalTargetIDs"])) {
+            // Clear the existing universal sources.
+            $this->delete(["sourceKnowledgeBaseID" => $id]);
+
             foreach ($body["universalTargetIDs"] as $universalTargetID) {
                 $this->validateTargetKBUniversalSource($universalTargetID);
                 $where = [

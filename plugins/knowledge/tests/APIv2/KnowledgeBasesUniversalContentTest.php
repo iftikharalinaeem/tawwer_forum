@@ -170,6 +170,17 @@ class KnowledgeBasesUniversalContentTest extends AbstractAPIv2Test {
 
         $this->assertEquals(true, $response["isUniversalSource"]);
 
+        // Patch with empty targets
+        $response =  $this->api()
+            ->patch($this->baseUrl.'/'.$kb["knowledgeBaseID"], [
+                "isUniversalSource" => true,
+                "universalTargetIDs" => []
+            ])
+            ->getBody();
+
+        $this->assertEquals(true, $response['isUniversalSource']);
+        $this->assertEquals([], $response['universalTargetIDs']);
+
         return $response;
     }
 

@@ -35,6 +35,7 @@ export interface IKbFormState {
     sortArticles: KnowledgeBaseSortMode;
     hasCustomPermissions: boolean;
     isUniversalSource: boolean;
+    universalTargetIDs: number[];
 }
 export interface IKnowledgeBasesState {
     knowledgeBasesByID: ILoadable<{
@@ -74,6 +75,7 @@ export const INITIAL_KB_FORM: IKbFormState = {
     sourceLocale: getCurrentLocale(),
     hasCustomPermissions: false,
     isUniversalSource: false,
+    universalTargetIDs: [],
 };
 
 export interface ISiteSection {
@@ -138,7 +140,14 @@ export interface IKnowledgeBase {
     siteSections: ISiteSection[];
     hasCustomPermissions: boolean;
     isUniversalSource: boolean;
+    universalTargetIDs: number[];
+    universalSources: IKnowledgeBaseFragment[];
 }
+
+type IKnowledgeBaseFragment = Pick<
+    IKnowledgeBase,
+    "knowledgeBaseID" | "name" | "url" | "icon" | "sortArticles" | "viewType" | "siteSectionGroup"
+>;
 
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
@@ -333,6 +342,49 @@ export function useKnowledgeBases(status: KnowledgeBaseStatus) {
 
     return knowledgeBasesByID;
 }
+
+export function useUniversalSources(kbID?: number): IKnowledgeBaseFragment[] {
+    const universalSources = useSelector((state: IKnowledgeAppStoreState) => {
+        if (!kbID) {
+            return [];
+        }
+        const kbData = state.knowledge.knowledgeBases.knowledgeBasesByID.data;
+        if (kbData) {
+            const sources: IKnowledgeBaseFragment[] = [];
+            for (const knowledgeBase of Object.values(kbData)) {
+                if (knowledgeBase.isUniversalSource && knowledgeBase.universalTargetIDs.includes(kbID)) {
+                    sources.push(knowledgeBase);
+                }
+            }
+            return sources;
+        } else {
+            return [];
+        }
+    });
+    return universalSources;
+}
+
+export function useAllowedUniversalTargets(kbID?: number) {
+    const knowledgeBases = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
+    if (!knowledgeBases.data) {
+        return [];
+    }
+
+    const allKBs = Object.values(knowledgeBases.data);
+
+    const allowedKBs = allKBs.filter(kb => {
+        if (kbID !== undefined && kb.knowledgeBaseID === kbID) {
+            return false;
+        }
+
+        if (kb.isUniversalSource) {
+            return false;
+        }
+        return true;
+    });
+    return allowedKBs;
+}
+
 export function useKBData() {
     return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
 }

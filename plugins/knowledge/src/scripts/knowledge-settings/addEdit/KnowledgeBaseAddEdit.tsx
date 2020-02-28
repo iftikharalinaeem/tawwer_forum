@@ -4,7 +4,7 @@
  */
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { useKBData, useUniversalSources } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { KnowledgeAddEditGeneral } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEditGeneral";
 import { KnowledgeBaseAddEditPermissions } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEditPermissions";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/addEdit/knowledgeBaseAddEditStyles";
@@ -42,6 +42,23 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const sourceLocale = form.sourceLocale;
 
     const { kbID } = props;
+    const universalSources = useUniversalSources(props.kbID);
+    const universalTargetError =
+        universalSources.length > 0 ? (
+            <>
+                <p>{t("This Knowledge Base is already displaying Universal Content from these Knowledge Bases:")}</p>
+                <p>
+                    {universalSources.map((kb, i) => (
+                        <>
+                            <strong>{kb.name}</strong>
+                            {i < universalSources.length - 1 ? "," : null}
+                        </>
+                    ))}
+                </p>
+            </>
+        ) : (
+            undefined
+        );
     useEffect(() => {
         initForm({ kbID });
     }, [kbID, initForm]);
@@ -132,6 +149,8 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         label: "Universal Content",
                                         panelData: "",
                                         contents: <KnowledgeBaseAddEditUniversal kbID={kbID} />,
+                                        warning: universalTargetError,
+                                        disabled: !!universalTargetError,
                                     },
                                 ]}
                             />
