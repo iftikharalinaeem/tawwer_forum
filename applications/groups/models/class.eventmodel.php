@@ -622,6 +622,43 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Format a date using the current timezone.
+     *
+     * This is sort of a stop-gap until the **Gdn_Format::*** methods.
+     *
+     * @param string $dateString
+     * @param bool $from
+     * @return array
+     */
+    public static function formatEventDate($dateString, $from = true) {
+        if (!$dateString) {
+            return ['', '', '', ''];
+        }
+        if (method_exists(Gdn::session(), 'getTimeZone')) {
+            $tz = Gdn::session()->getTimeZone();
+        } else {
+            $tz = new DateTimeZone('UTC');
+        }
+
+        $timestamp = Gdn_Format::toTimestamp($dateString);
+        if (!$timestamp) {
+            return [false, false, false, false];
+        }
+
+        $dt = new DateTime('@'.$timestamp);
+        $dt->setTimezone($tz);
+
+        $offTimestamp = $timestamp + $dt->getOffset();
+
+        $dateFormat = '%A, %B %e, %G';
+        $dateStr = strftime($dateFormat, $offTimestamp);
+        $timeFormat = t('Date.DefaultTimeFormat', '%l:%M%p');
+        $timeStr = strftime($timeFormat, $offTimestamp);
+
+        return [$dateStr, $timeStr, $dt->format('H:i'), $dt->format('c')];
+    }
+
+    /**
      * Delete an event.
      *
      * @param array|string $where
