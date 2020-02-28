@@ -15,13 +15,13 @@ export const themeEditorVariables = () => {
         width: 100,
     };
 
-    const styleOptions = {
+    const panel = {
         width: 376,
     };
 
     return {
         frame,
-        styleOptions,
+        panel,
     };
 };
 
@@ -49,8 +49,8 @@ export const themeEditorClasses = useThemeCache(() => {
     const frame = style(
         "frame",
         {
-            width: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
-            flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.styleOptions.width)}`),
+            width: calc(`${percent(vars.frame.width)} - ${unit(vars.panel.width)}`),
+            flexBasis: calc(`${percent(vars.frame.width)} - ${unit(vars.panel.width)}`),
             height: percent(100),
         },
 
@@ -63,8 +63,8 @@ export const themeEditorClasses = useThemeCache(() => {
         "styleOptions",
         {
             boxShadow: "0 5px 10px 0 rgba(0, 0, 0, 0.3)",
-            width: unit(vars.styleOptions.width),
-            flexBasis: unit(vars.styleOptions.width),
+            width: unit(vars.panel.width),
+            flexBasis: unit(vars.panel.width),
         },
         mediaQueries.oneColumnDown({
             width: percent(100),

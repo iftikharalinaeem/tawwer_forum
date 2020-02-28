@@ -14,10 +14,14 @@ import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
+import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
+import { themeEditorVariables } from "@themingapi/theme/themeEditorStyles";
+import { unit } from "@library/styles/styleHelpers";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
 const story = storiesOf("Theme", module);
 
-story.add("Theme Builder", () => {
+story.add("Theme Builder Form - Test Cases", () => {
     const form = useFormik({
         initialValues: {},
         onSubmit: values => {
@@ -27,20 +31,29 @@ story.add("Theme Builder", () => {
 
     return (
         <StoryContent>
-            <StoryHeading depth={1}>Theme Editor</StoryHeading>
-            <aside
-                style={{
-                    width: percent(100),
-                    maxWidth: "376px",
-                    margin: "auto",
-                    backgroundColor: "#f5f6f7",
-                    padding: "16px",
-                }}
-            >
+            <StoryHeading depth={1}>Theme Builder</StoryHeading>
+            <aside style={{}} className={themeBuilderClasses().root}>
                 <FormikProvider value={form}>
                     {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
                     <Form translate="yes">
                         <ThemeBuilderTitle />
+                        <InputNumberBlock
+                            inputNumber={{
+                                variableID: "global.something.or.other.number.test1",
+                                defaultValue: 10,
+                            }}
+                            inputBlock={{
+                                label: "Test 9 - Number!",
+                            }}
+                        />
+                        <InputNumberBlock
+                            inputNumber={{
+                                variableID: "global.something.or.other.number.test2",
+                            }}
+                            inputBlock={{
+                                label: "Test 9 - Number!",
+                            }}
+                        />
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "global.something.or.other.color.1",

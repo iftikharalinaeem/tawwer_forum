@@ -14,6 +14,7 @@ import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSec
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
 import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
 
 export interface IThemeBuilderForm {}
 
@@ -28,7 +29,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     return (
         <FormikProvider value={form}>
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
-            <Form translate={true} className={classes.root}>
+            <Form translate="yes" className={classes.root}>
                 <ThemeBuilderTitle />
 
                 <ColorPickerBlock
@@ -66,6 +67,14 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 </ThemeBuilderSection>
 
                 <ThemeBuilderSection label={t("Buttons & Inputs")}>
+                    <InputNumberBlock
+                        inputNumber={{
+                            variableID: "global.border.radius",
+                            defaultValue: globalVariables().border.radius,
+                        }}
+                        inputBlock={{ label: t("Border Radius") }}
+                    />
+
                     <ThemeBuilderSectionGroup label={t("Primary Buttons")}>
                         <ColorPickerBlock
                             colorPicker={{
