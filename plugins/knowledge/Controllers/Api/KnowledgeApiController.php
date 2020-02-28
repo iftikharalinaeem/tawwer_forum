@@ -12,6 +12,7 @@ use Garden\Sphinx\SphinxClient;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeUniversalSourceModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -171,6 +172,9 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
+    /** @var KnowledgeUniversalSourceModel */
+    private $knowledgeUniversalSourceModel;
+
     /** @var Gdn_Session $session */
     private $session;
 
@@ -183,35 +187,38 @@ class KnowledgeApiController extends AbstractApiController {
      * @param ArticleModel $articleModel
      * @param \UserModel $userModel
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
-     * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param DiscussionModel $discussionModel
      * @param CommentModel $commentModel
      * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
      * @param SiteSectionModel $siteSectionModel
+     * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param Gdn_Session $session
      */
     public function __construct(
         ArticleModel $articleModel,
         \UserModel $userModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
-        KnowledgeBaseModel $knowledgeBaseModel,
         DiscussionModel $discussionModel,
         \CommentModel $commentModel,
         \CategoryCollection $categoryCollection,
         BreadcrumbModel $breadcrumbModel,
         SiteSectionModel $siteSectionModel,
+        KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel,
+        KnowledgeBaseModel $knowledgeBaseModel,
         Gdn_Session $session
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
-        $this->knowledgeBaseModel =  $knowledgeBaseModel;
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->siteSectionModel = $siteSectionModel;
+        $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
     }
 
@@ -374,18 +381,25 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
         if (isset($this->query['knowledgeBaseID'])) {
+            $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(
+                [
+                    "targetKnowledgeBaseID" => $this->query['knowledgeBaseID']
+                ]
+            );
+            if ($knowledgeUniversalContent) {
+                $knowledgeBaseIDs = array_column($knowledgeUniversalContent, "sourceKnowledgeBaseID");
+            }
+            $knowledgeBaseIDs[] = $this->query['knowledgeBaseID'];
             $knowledgeCategories = array_column(
                 $this->knowledgeCategoryModel->get(
-                    ['knowledgeBaseID' => $this->query['knowledgeBaseID']],
+                    ['knowledgeBaseID' => $knowledgeBaseIDs],
                     ['select' => ['knowledgeCategoryID']]
                 ),
                 'knowledgeCategoryID'
             );
-            //$this->sphinx->setFilter('knowledgeCategoryID', $knowledgeCategories);
             $this->prepareKnowledgeCategoryFilter($knowledgeCategories);
         }
         if (isset($this->query['knowledgeCategoryIDs'])) {
-            //$this->sphinx->setFilter('knowledgeCategoryID', $this->query['knowledgeCategoryIDs']);
             $this->prepareKnowledgeCategoryFilter($this->query['knowledgeCategoryIDs']);
         }
         $this->setKnowledgeCategoryFilter();
