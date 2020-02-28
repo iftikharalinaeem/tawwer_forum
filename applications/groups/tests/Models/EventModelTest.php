@@ -33,11 +33,10 @@ class EventModelTest extends TestCase {
      * @dataProvider formatEventDateProvider
      */
     public function testFormatEventDate($dataString, $timezone, array $expected) {
-        $model = new EventModel();
         /** @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
         $config->set('Garden.GuestTimeZone', $timezone);
-        $result = $model::formatEventDate($dataString);
+        $result = EventModel::formatEventDate($dataString);
         $this->AssertSame($expected, $result);
     }
 
