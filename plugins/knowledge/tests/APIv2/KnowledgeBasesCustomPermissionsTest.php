@@ -144,8 +144,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $record = $this->record($kbName);
         if (!empty($viewers) || !empty($editors)) {
             $record['hasCustomPermission'] = true;
-            $record['viewers'] = $this->getRoleIDs($viewers);
-            $record['editors'] = $this->getRoleIDs($editors);
+            $record['viewRoleIDs'] = $this->getRoleIDs($viewers);
+            $record['editRoleIDs'] = $this->getRoleIDs($editors);
         }
         $res = $this->api()->post(
             $this->baseUrl,

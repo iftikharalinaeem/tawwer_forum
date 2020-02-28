@@ -304,7 +304,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->knowledgeBaseModel->update($update, ['knowledgeBaseID' => $knowledgeBaseID]);
 
         if ($body['hasCustomPermission'] ?? false) {
-            $this->saveCustomPermissions($knowledgeBaseID, $body['viewers'] ?? [], $body['editors'] ?? []);
+            $this->saveCustomPermissions($knowledgeBaseID, $body['viewRoleIDs'] ?? [], $body['editRoleIDs'] ?? []);
         }
 
         $this->knowledgeUniversalSourceModel->setUniversalContent($body, $knowledgeBaseID);
