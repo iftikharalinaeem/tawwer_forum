@@ -485,9 +485,8 @@ class EventController extends Gdn_Controller {
      * @return string Returns the formatted dates.
      */
     public function formatEventDates($start, $end) {
-        $eventModel = new EventModel();
-        $fromParts = $eventModel::formatEventDate($start);
-        $toParts = $eventModel::formatEventDate($end);
+        $fromParts = EventModel::formatEventDate($start);
+        $toParts = EventModel::formatEventDate($end);
 
         $fromStr = $fromParts[0];
         $toStr = $toParts[0];

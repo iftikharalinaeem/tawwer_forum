@@ -62,7 +62,6 @@ class EventListModule extends Gdn_Module {
           $this->withOptions = $withOptions;
           $this->setView('eventlist');
           $this->_ApplicationFolder = 'groups';
-          $this->eventModel = Gdn::getContainer()->get(\EventModel::class);
      }
 
      /**
@@ -201,7 +200,7 @@ class EventListModule extends Gdn_Module {
       * @return array A data array representing an event item in an event list.
       */
      protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-          $dateStarts = $this->eventModel::formatEventDate($event['DateStarts']);
+          $dateStarts = EventModel::formatEventDate($event['DateStarts']);
           $dateStartsDateTime = new DateTime($dateStarts[3]);
 
           $item['id'] = val('EventID', $event);

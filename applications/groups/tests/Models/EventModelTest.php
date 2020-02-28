@@ -18,6 +18,13 @@ class EventModelTest extends TestCase {
     use SiteTestTrait;
 
     /**
+     * @return array
+     */
+    public static function getAddons(): array {
+        return ['vanilla', 'groups'];
+    }
+
+    /**
      * Test formatEventDate
      *
      * @param string $dataString
@@ -35,17 +42,16 @@ class EventModelTest extends TestCase {
     }
 
     /**
-     * @return array
+     * Test formatEventDate error
      */
-    public static function getAddons(): array {
-        return ['vanilla', 'groups'];
-    }
-
     public function testInvalidFormatEventDate() {
         $this->expectError();
         EventModel::formatEventDate('dnsfids');
     }
 
+    /**
+     * @return array
+     */
     public function formatEventDateProvider(): array {
         return [
             'empty dataString' => [null, '', ['', '', '', '']],
@@ -68,5 +74,16 @@ class EventModelTest extends TestCase {
                 ]
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function tearDown(): void {
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->end();
+
+        parent::tearDown();
     }
 }
