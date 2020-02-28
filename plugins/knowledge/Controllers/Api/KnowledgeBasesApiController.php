@@ -550,9 +550,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
 
         if ($isUniversal) {
-            if ($universalTargetIDs) {
-                $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
-            }
+            $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
         } elseif ($prevState['isUniversalSource'] && !$isUniversal) {
             $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
         }
