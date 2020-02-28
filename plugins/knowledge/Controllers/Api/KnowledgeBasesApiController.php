@@ -89,7 +89,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->localeApi = $localeApi;
         $this->permissionModel = $permissionModel;
         $this->roleModel = $roleModel;
-        $this->allAllowed = $this->knowledgeBaseModel->getAllowedKnowledgeBases();
         $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
     }
 
@@ -347,7 +346,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @param array $editors
      */
     public function saveCustomPermissions(int $knowledgeBaseID, array $viewers = [], array $editors = []) {
-        $roles = array_unique($viewers + $editors);
+        $roles = array_merge($viewers, $editors);
         $permissions =  [];
         foreach ($roles as $roleID) {
             $permissions[] = [

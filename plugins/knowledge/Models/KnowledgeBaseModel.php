@@ -119,7 +119,9 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      */
     public function updateWhereWithPermissions(array $where, string $prefix = ''): array {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
-            $allowedKBs = $this->getAllowedKnowledgeBases();
+            $kbsView = $this->getAllowedKnowledgeBases(self::VIEW);
+            $kbsEdit = $this->getAllowedKnowledgeBases(self::EDIT);
+            $allowedKBs = array_unique(array_merge($kbsView, $kbsEdit));
             if (array_key_exists($prefix.'knowledgeBaseID', $where)) {
                 $where[$prefix.'knowledgeBaseID'] = array_intersect((array)$where[$prefix.'knowledgeBaseID'], $allowedKBs);
             } else {
@@ -152,7 +154,9 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     public function checkViewPermission(int $knowledgeBaseID) {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
             if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::VIEW))) {
-                throw new NotFoundException("Knowledge");
+                if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::EDIT))) {
+                    throw new NotFoundException("Knowledge");
+                }
             }
         }
     }
