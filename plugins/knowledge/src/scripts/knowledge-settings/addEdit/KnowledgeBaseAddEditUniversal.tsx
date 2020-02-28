@@ -12,6 +12,7 @@ import {
     useKnowledgeBases,
     KnowledgeBaseStatus,
     useUniversalSources,
+    useAllowedUniversalTargets,
 } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { t } from "@vanilla/i18n";
 import Translate from "@vanilla/library/src/scripts/content/Translate";
@@ -38,6 +39,9 @@ interface IProps {
 export function KnowledgeBaseAddEditUniversal(props: IProps) {
     const { form } = useKBData();
     const { updateForm } = useKnowledgeBaseActions();
+    const allowedKBs = useAllowedUniversalTargets();
+    const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
+
     return (
         <FrameBodyContainer>
             <DashboardFormGroup
@@ -59,9 +63,19 @@ export function KnowledgeBaseAddEditUniversal(props: IProps) {
                 <DashboardToggle
                     checked={form.isUniversalSource}
                     onChange={isUniversalSource => {
+                        let newTargetIDs: number[] = [];
+                        if (isUniversalSource) {
+                            if (form.universalTargetIDs.length === 0) {
+                                // Select all.
+                                newTargetIDs = allowedIDs;
+                            } else {
+                                // Otherwise restore the previous values.
+                                newTargetIDs = form.universalTargetIDs;
+                            }
+                        }
                         updateForm({
                             isUniversalSource,
-                            universalTargetIDs: isUniversalSource ? form.universalTargetIDs : [],
+                            universalTargetIDs: newTargetIDs,
                         });
                     }}
                 />
@@ -82,25 +96,10 @@ export function KnowledgeBaseAddEditUniversal(props: IProps) {
 
 function KBTableEditForm(props: { targetIDs: number[]; onTargetIDsChange: (targetIDs: number[]) => void }) {
     const { form } = useKBData();
-    const knowledgeBases = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
+    const allowedKBs = useAllowedUniversalTargets();
+    const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
     const [nameFilter, setNameFilter] = useState("");
 
-    if (!knowledgeBases.data) {
-        return <Loader />;
-    }
-
-    const allKBs = Object.values(knowledgeBases.data);
-
-    const allowedKBs = allKBs.filter(kb => {
-        if (form.knowledgeBaseID && kb.knowledgeBaseID === form.knowledgeBaseID) {
-            return false;
-        }
-
-        if (kb.isUniversalSource) {
-            return false;
-        }
-        return true;
-    });
     // Other universal sources cannot become targets.
     // We also shouldn't display ourself.
     const displayedKBs = allowedKBs.filter(kb => {
@@ -118,7 +117,6 @@ function KBTableEditForm(props: { targetIDs: number[]; onTargetIDsChange: (targe
     });
 
     const targetIDSet = new Set(props.targetIDs.slice().sort());
-    const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
     const displayedIDs = displayedKBs.map(kb => kb.knowledgeBaseID).sort();
 
     let isAllChecked = true;

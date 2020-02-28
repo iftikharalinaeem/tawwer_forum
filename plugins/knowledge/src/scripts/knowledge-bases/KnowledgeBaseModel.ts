@@ -364,6 +364,27 @@ export function useUniversalSources(kbID?: number): IKnowledgeBaseFragment[] {
     return universalSources;
 }
 
+export function useAllowedUniversalTargets(kbID?: number) {
+    const knowledgeBases = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
+    if (!knowledgeBases.data) {
+        return [];
+    }
+
+    const allKBs = Object.values(knowledgeBases.data);
+
+    const allowedKBs = allKBs.filter(kb => {
+        if (kbID !== undefined && kb.knowledgeBaseID === kbID) {
+            return false;
+        }
+
+        if (kb.isUniversalSource) {
+            return false;
+        }
+        return true;
+    });
+    return allowedKBs;
+}
+
 export function useKBData() {
     return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
 }
