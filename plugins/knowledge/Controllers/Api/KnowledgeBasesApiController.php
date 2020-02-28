@@ -514,7 +514,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body, true);
-        $body['customPermissionRequired'] = ($body['customPermissionRequired'] ?? false) !== false ? 1 : 0;
+        $body['hasCustomPermission'] = ($body['hasCustomPermission'] ?? false) !== false ? 1 : 0;
 
         $prevState = $this->knowledgeBaseByID($id);
 
@@ -538,7 +538,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         if (array_key_exists('isUniversalSource', $body)) {
             $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
         }
-        
+
         $universalTargetIDs = $body['universalTargetIDs'] ?? null;
 
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);

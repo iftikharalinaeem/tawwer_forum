@@ -163,7 +163,7 @@ trait KnowledgeBasesApiSchemes {
                 "icon?",
                 "sortArticles?",
                 "viewType",
-                "urlCode",
+                "url",
                 "siteSectionGroup",
             ], $type);
         }
