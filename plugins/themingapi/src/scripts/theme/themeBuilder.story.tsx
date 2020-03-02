@@ -16,6 +16,8 @@ import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection"
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { InputDropDownBlock } from "@vanilla/library/src/scripts/forms/themeEditor/InputDropDownBlock";
+import { ThemePresetDropDown } from "@library/forms/themeEditor/ThemePresetDropDown";
 
 const story = storiesOf("Theme", module);
 
@@ -35,6 +37,52 @@ story.add("Theme Builder Form - Test Cases", () => {
                     {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
                     <Form translate="yes">
                         <ThemeBuilderTitle />
+                        <ThemePresetDropDown />
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: "Drop Down - no default",
+                            }}
+                            inputDropDown={{
+                                variableID: "example.single.value.dropdown",
+                                options: [
+                                    {
+                                        value: "toto",
+                                        label: "toto",
+                                    },
+                                    {
+                                        value: "tata",
+                                        label: "tata",
+                                    },
+                                    {
+                                        value: "titi",
+                                        label: "titi",
+                                    },
+                                ],
+                            }}
+                        />
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: "Drop Down - with default",
+                            }}
+                            inputDropDown={{
+                                variableID: "example.single.value.dropdown.selected",
+                                defaultValue: "titi",
+                                options: [
+                                    {
+                                        value: "toto",
+                                        label: "toto",
+                                    },
+                                    {
+                                        value: "tata",
+                                        label: "tata",
+                                    },
+                                    {
+                                        value: "titi",
+                                        label: "titi",
+                                    },
+                                ],
+                            }}
+                        />
                         <InputNumberBlock
                             inputNumber={{
                                 variableID: "global.something.or.other.number.test1",

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useMemo } from "react";
+import React from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { Form, FormikProvider, useFormik } from "formik";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
@@ -13,8 +13,11 @@ import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection"
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonTypes } from "@library/forms/buttonStyles";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
+import { ThemePresetDropDown } from "@library/forms/themeEditor/ThemePresetDropDown";
+import { InputDropDownBlock } from "@library/forms/themeEditor/InputDropDownBlock";
+import { color } from "csx";
 
 export interface IThemeBuilderForm {}
 
@@ -31,7 +34,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <Form translate="yes" className={classes.root}>
                 <ThemeBuilderTitle />
-
+                <ThemePresetDropDown />
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
@@ -64,6 +67,22 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         }}
                         inputBlock={{ label: t("Links") }}
                     />
+
+                    <InputDropDownBlock
+                        inputBlock={{
+                            label: t("Font"),
+                        }}
+                        inputDropDown={{
+                            variableID: "global.fonts.families.body",
+                            options: [
+                                {
+                                    label: t("Open Sans"),
+                                    value: "Open Sans",
+                                },
+                            ],
+                            selectedIndex: 0,
+                        }}
+                    />
                 </ThemeBuilderSection>
 
                 <ThemeBuilderSection label={t("Buttons & Inputs")}>
@@ -76,6 +95,26 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     />
 
                     <ThemeBuilderSectionGroup label={t("Primary Buttons")}>
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: t("Button Style"),
+                            }}
+                            inputDropDown={{
+                                variableID: "button.primary.buttonPreset.style",
+                                options: [
+                                    {
+                                        label: t("Solid"),
+                                        value: "solid",
+                                    },
+                                    {
+                                        label: t("Outline"),
+                                        value: "outline",
+                                    },
+                                ],
+                                selectedIndex: 0,
+                            }}
+                        />
+
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
@@ -93,6 +132,25 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     </ThemeBuilderSectionGroup>
 
                     <ThemeBuilderSectionGroup label={t("Secondary Buttons")}>
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: t("Button Style"),
+                            }}
+                            inputDropDown={{
+                                variableID: "button.primary.buttonPreset.style",
+                                options: [
+                                    {
+                                        label: t("Solid"),
+                                        value: "solid",
+                                    },
+                                    {
+                                        label: t("Outline"),
+                                        value: "outline",
+                                    },
+                                ],
+                                selectedIndex: 0,
+                            }}
+                        />
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
