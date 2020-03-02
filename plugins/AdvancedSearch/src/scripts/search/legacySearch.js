@@ -84,6 +84,9 @@
                 $ac.menu.element.addClass("MenuItems MenuItems-Input");
 
                 $ac._renderItem = function(ul, item) {
+                    item.Title = window.escapeHTML(item.Title);
+                    item.Summary = window.escapeHTML(item.Summary);
+
                     return $("<li><a></a></li>")
                         .find("a")
                         .html(
