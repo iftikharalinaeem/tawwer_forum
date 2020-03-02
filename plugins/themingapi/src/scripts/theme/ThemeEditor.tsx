@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import { themeEditorClasses } from "./themeEditorStyles";
 import ThemeBuilderForm from "./ThemeBuilderForm";
 import { IThemeVariables } from "./themeEditorReducer";
+import { themeEditorClasses } from "@library/forms/themeEditor/themeEditorStyles";
 
 export interface IProps {
     themeID: string | number;

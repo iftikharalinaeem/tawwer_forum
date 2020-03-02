@@ -200,26 +200,21 @@ class EventListModule extends Gdn_Module {
       * @return array A data array representing an event item in an event list.
       */
      protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-          $timeZone = Gdn::session()->getTimeZone();
-          $dateStarts = new DateTime($event['DateStarts'], $timeZone);
-          if (Gdn::session()->isValid() && $hourOffset = Gdn::session()->User->HourOffset) {
-                $dateStarts->modify("{$hourOffset} hours");
-          }
+          $dateStarts = EventModel::formatEventDate($event['DateStarts']);
+          $dateStartsDateTime = new DateTime($dateStarts[3]);
 
           $item['id'] = val('EventID', $event);
           $item['dateTile'] = true;
-          $item['monthTile'] = strftime('%b', $dateStarts->getTimestamp() + $dateStarts->getOffset());
-          $item['dayTile'] = $dateStarts->format('j');
+          $item['monthTile'] = strftime('%b', $dateStartsDateTime->getTimestamp() + $dateStartsDateTime->getOffset());
+          $item['dayTile'] = $dateStartsDateTime->format('j');
           $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
           $item['textCssClass'] = 'EventDescription';
           $item['heading'] = Gdn_Format::text(val('Name', $event));
           $item['url'] = eventUrl($event);
           $item['metaCssClass'] = '';
           $item['cssClass'] = 'Event event js-event';
-
-          $startTime = $dateStarts->format('g:ia') == '12:00am' ? '' : ' '.$dateStarts->format('g:ia');
           $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
-          $item['meta']['date']['text'] = $dateStarts->format("F j, Y").$startTime;
+          $item['meta']['date']['text'] = $dateStartsDateTime->format("F j, Y").' '.$dateStarts[1];
 
           if ($withOptions) {
                 $item['options'] = $this->getEventOptions($event);
@@ -228,7 +223,7 @@ class EventListModule extends Gdn_Module {
                 $item['buttonDropdown'] = $this->getEventDropdown($event);
           }
           if ($layout == 'table') {
-                $this->getEventTableItem($item, $event, $dateStarts);
+                $this->getEventTableItem($item, $event, $dateStartsDateTime);
           }
           return $item;
      }

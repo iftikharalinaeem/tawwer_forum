@@ -10,21 +10,19 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { percent } from "csx";
 import { storiesOf } from "@storybook/react";
 import ThemeBuilderForm from "@themingapi/theme/ThemeBuilderForm";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
 const story = storiesOf("Theme", module);
 
-story.add("Theme Builder", () => {
+story.add("Theme Builder Form", () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Theme Editor</StoryHeading>
             <aside
                 style={{
-                    width: percent(100),
-                    maxWidth: "376px",
                     margin: "auto",
-                    backgroundColor: "#f5f6f7",
-                    padding: "16px",
                 }}
+                className={themeBuilderClasses().root}
             >
                 <ThemeBuilderForm />
             </aside>
