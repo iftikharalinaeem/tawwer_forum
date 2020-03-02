@@ -16,9 +16,7 @@ export const themeEditorPageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
 
-    const form = style("form", {
-        height: percent(100),
-    });
+
     const editIcon = style("editIcon", {
         verticalAlign: "bottom",
     });
@@ -49,7 +47,7 @@ export const themeEditorPageClasses = useThemeCache(() => {
         },
     });
     return {
-        form,
+
         editIcon,
         themeName,
         themeInput,

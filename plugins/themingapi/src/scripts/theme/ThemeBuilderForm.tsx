@@ -13,9 +13,10 @@ import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
+import { stringIsValidColor } from "@vanilla/library/src/scripts/styles/styleUtils";
 import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { Form, FormikProvider, useFormik } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
 
@@ -30,12 +31,35 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const buttonGlobals = buttonGlobalVariables();
     const dataString = JSON.stringify(props.variables);
     const data = JSON.parse(dataString).data;
-    console.log("==>", props.variables);
+    console.log("data==>", data);
+
+    /*const validate = values => {
+        const errors = {};
+
+        if (!stringIsValidColor(values.global.body.backgroundImage.color)) {
+            errors["backgroundImage"] = "Invalid Color";
+        }
+        return errors;
+    };*/
     const form = useFormik({
-        initialValues: {},
+        initialValues: {
+            // primaryColor: data.global.mainColors.primary ? data.global.mainColors.primary : global.mainColors.primary,
+            // backgroundImage: data.global.body
+            //     ? data.global.body.backgroundImage.color
+            //     : global.body.backgroundImage.color,
+            // mainFg: data.global.mainColors ? data.global.mainColors.fg : global.mainColors.fg,
+            // linkDefaultColor: data.global.links ? data.global.links.colors.default : global.links.colors.default,
+            // buttonGlobalPrimary: data.buttonGlobals ? data.buttonGlobals.colors.primary : buttonGlobals.colors.primary,
+            // buttonPrimaryContrast: data.buttonGlobals
+            //     ? data.buttonGlobals.colors.primaryContrast
+            //     : buttonGlobals.colors.primaryContrast,
+            // buttonGlobalBg: data.buttonGlobals ? data.buttonGlobals.colors.bg : buttonGlobals.colors.bg,
+            // buttonGlobalFg: data.buttonGlobals ? data.buttonGlobals.colors.fg : buttonGlobals.colors.fg,
+        },
+        // validate,
         onSubmit: async values => {
-            await saveTheme();
-            window.location.href = formatUrl("/theme/theme-settings", true);
+            //await saveTheme();
+            // window.location.href = formatUrl("/theme/theme-settings", true);
         },
     });
 
@@ -48,13 +72,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: ensureColorHelper(data.global.mainColors.primary),
+                        defaultValue: data.global.mainColors.primary
+                            ? ensureColorHelper(data.global.mainColors.primary)
+                            : global.mainColors.primary,
                         handleChange: () => {
-                            const data = JSON.stringify(form.values);
+                            const val = { ...data, ...form.values };
                             updateAssets({
                                 assets: {
                                     variables: {
-                                        data: JSON.parse(JSON.stringify(form.values)),
+                                        data: JSON.parse(JSON.stringify(val)),
                                         type: "string",
                                     },
                                 },
@@ -68,12 +94,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.body.backgroundImage.color",
-                            defaultValue: global.body.backgroundImage.color,
+                            defaultValue: data.global.body
+                                ? ensureColorHelper(data.global.body.backgroundImage.color)
+                                : global.body.backgroundImage.color,
                             handleChange: () => {
+                                const val = { ...data, ...form.values };
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            data: JSON.parse(JSON.stringify(val)),
                                             type: "string",
                                         },
                                     },
@@ -82,16 +111,22 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         }}
                         inputBlock={{ label: t("Background Color") }}
                     />
-
+                    {/* {<ErrorMessage name="backgroundImage" component="div" className="invalid-feedback" />} */}
+                    {/* {form.errors.backgroundImage ? (
+                        <div className={classes.errorMessage}>{form.errors.backgroundImage}</div>
+                    ) : null} */}
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
-                            defaultValue: ensureColorHelper(data.global.mainColors.fg),
+                            defaultValue: data.global.mainColors
+                                ? ensureColorHelper(data.global.mainColors.fg)
+                                : global.mainColors.fg,
                             handleChange: () => {
+                                const val = { ...data, ...form.values };
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            data: JSON.parse(JSON.stringify(val)),
                                             type: "string",
                                         },
                                     },
@@ -104,12 +139,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.links.colors.default",
-                            defaultValue: global.links.colors.default,
+                            defaultValue: data.global.links
+                                ? ensureColorHelper(data.global.links.colors.default)
+                                : global.links.colors.default,
                             handleChange: () => {
+                                const val = { ...data, ...form.values };
                                 updateAssets({
                                     assets: {
                                         variables: {
-                                            data: JSON.parse(JSON.stringify(form.values)),
+                                            data: JSON.parse(JSON.stringify(val)),
                                             type: "string",
                                         },
                                     },
@@ -125,12 +163,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
-                                defaultValue: buttonGlobals.colors.primary,
+                                defaultValue: data.buttonGlobals
+                                    ? ensureColorHelper(data.buttonGlobals.colors.primary)
+                                    : buttonGlobals.colors.primary,
                                 handleChange: () => {
+                                    const val = { ...data, ...form.values };
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                data: JSON.parse(JSON.stringify(val)),
                                                 type: "string",
                                             },
                                         },
@@ -142,12 +183,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
-                                defaultValue: buttonGlobals.colors.primaryContrast,
+                                defaultValue: data.buttonGlobals
+                                    ? ensureColorHelper(data.buttonGlobals.colors.primaryContrast)
+                                    : buttonGlobals.colors.primaryContrast,
                                 handleChange: () => {
+                                    const val = { ...data, ...form.values };
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                data: JSON.parse(JSON.stringify(val)),
                                                 type: "string",
                                             },
                                         },
@@ -162,12 +206,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
-                                defaultValue: buttonGlobals.colors.bg,
+                                defaultValue: data.buttonGlobals
+                                    ? ensureColorHelper(data.buttonGlobals.colors.bg)
+                                    : buttonGlobals.colors.bg,
                                 handleChange: () => {
+                                    const val = { ...data, ...form.values };
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                data: JSON.parse(JSON.stringify(val)),
                                                 type: "string",
                                             },
                                         },
@@ -179,12 +226,15 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
-                                defaultValue: buttonGlobals.colors.fg,
+                                defaultValue: data.buttonGlobals
+                                    ? ensureColorHelper(data.buttonGlobals.colors.fg)
+                                    : buttonGlobals.colors.fg,
                                 handleChange: () => {
+                                    const val = { ...data, ...form.values };
                                     updateAssets({
                                         assets: {
                                             variables: {
-                                                data: JSON.parse(JSON.stringify(form.values)),
+                                                data: JSON.parse(JSON.stringify(val)),
                                                 type: "string",
                                             },
                                         },

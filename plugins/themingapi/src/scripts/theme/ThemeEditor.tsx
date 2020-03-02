@@ -6,7 +6,7 @@
 import React from "react";
 import { themeEditorClasses } from "./themeEditorStyles";
 import ThemeBuilderForm from "./ThemeBuilderForm";
-import { IThemeEditorVariables, IThemeVariables } from "./themeEditorReducer";
+import { IThemeVariables } from "./themeEditorReducer";
 
 export interface IProps {
     themeID: string | number;

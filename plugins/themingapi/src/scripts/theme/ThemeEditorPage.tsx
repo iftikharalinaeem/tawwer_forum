@@ -28,6 +28,7 @@ import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import ThemeEditor from "./ThemeEditor";
+import { Formik } from "formik";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -182,18 +183,20 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 ),
             },
         ];
+
         content = (
-            <form className={classes.form} onSubmit={submitHandler}>
-                <ActionBar
-                    useShadow={false}
-                    callToActionTitle={t("Save")}
-                    title={<Title themeName={theme.data.name} pageType={form.pageType} />}
-                    fullWidth={true}
-                    isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                    optionsMenu={
-                        <>
-                            {/* WIP not wired up. */}
-                            {/* <DropDown
+            <>
+                <form onSubmit={submitHandler}>
+                    <ActionBar
+                        useShadow={false}
+                        callToActionTitle={t("Save")}
+                        title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                        fullWidth={true}
+                        isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
+                        optionsMenu={
+                            <>
+                                {/* WIP not wired up. */}
+                                {/* <DropDown
                                         flyoutType={FlyoutType.LIST}
                                         openDirection={DropDownOpenDirection.BELOW_LEFT}
                                     >
@@ -202,14 +205,14 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                         <DropDownItemSeparator />
                                         <DropDownItemButton name={t("Delete")} onClick={() => {}} />
                                     </DropDown> */}
-                        </>
-                    }
-                />
-
+                            </>
+                        }
+                    />
+                </form>
                 <TextEditorContextProvider>
                     <Tabs data={tabData} />
                 </TextEditorContextProvider>
-            </form>
+            </>
         );
     }
 

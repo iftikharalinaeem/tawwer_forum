@@ -19,9 +19,7 @@ export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
     document.body.classList.add(classes.contentContainer);
-    const test1 = () => {
-        return true;
-    };
+
     return (
         <MemoryRouter>
             <LinkContext.Provider

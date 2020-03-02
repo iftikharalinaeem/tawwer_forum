@@ -149,9 +149,12 @@ export const themeEditorReducer = produce(
                         ...payload.assets,
                     },
                 };
+                console.log("state-->", state.form.assets.variables);
+
             } else {
                 state.form.assets = INITIAL_ASSETS;
             }
+
             return state;
         })
         .case(ThemeActions.postTheme_ACs.started, (state, payload) => {
