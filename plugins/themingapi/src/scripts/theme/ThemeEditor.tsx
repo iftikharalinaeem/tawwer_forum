@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import { themeEditorClasses } from "./themeEditorStyles";
 import ThemeBuilderForm from "./ThemeBuilderForm";
+import { themeEditorClasses } from "@library/forms/themeEditor/themeEditorStyles";
 
 export interface IProps {}
 

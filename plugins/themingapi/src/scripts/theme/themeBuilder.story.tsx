@@ -15,8 +15,6 @@ import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
-import { themeEditorVariables } from "@themingapi/theme/themeEditorStyles";
-import { unit } from "@library/styles/styleHelpers";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 
 const story = storiesOf("Theme", module);
