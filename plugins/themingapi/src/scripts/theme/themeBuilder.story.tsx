@@ -17,7 +17,7 @@ import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSec
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
 import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import { InputDropDownBlock } from "@vanilla/library/src/scripts/forms/themeEditor/InputDropDownBlock";
-import { ThemePresetDropDown } from "@library/forms/themeEditor/ThemePresetDropDown";
+import { ThemePresetDropDown } from "@themingapi/theme/ThemePresetDropDown";
 
 const story = storiesOf("Theme", module);
 

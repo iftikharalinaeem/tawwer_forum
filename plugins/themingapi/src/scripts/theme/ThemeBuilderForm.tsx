@@ -13,15 +13,12 @@ import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection"
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
-import { buttonGlobalVariables, ButtonTypes } from "@library/forms/buttonStyles";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
-import { ThemePresetDropDown } from "@library/forms/themeEditor/ThemePresetDropDown";
 import { InputDropDownBlock } from "@library/forms/themeEditor/InputDropDownBlock";
-import { color } from "csx";
+import { ThemePresetDropDown } from "./ThemePresetDropDown";
 
-export interface IThemeBuilderForm {}
-
-export default function ThemeBuilderForm(props: IThemeBuilderForm) {
+export default function ThemeBuilderForm() {
     const classes = themeBuilderClasses();
     const global = globalVariables();
     const buttonGlobals = buttonGlobalVariables();
