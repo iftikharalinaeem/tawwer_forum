@@ -400,7 +400,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $kb = $this->knowledgeBaseModel->get(
-            $this->knowledgeBaseModel->updateWhereWithPermissions(['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']]),
+            $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']]),
             ['selects' => 'sortArticles']
         );
         $knowledgeBase = array_pop($kb);

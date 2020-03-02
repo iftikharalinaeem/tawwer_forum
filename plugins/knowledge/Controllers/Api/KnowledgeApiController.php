@@ -465,7 +465,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     private function setKnowledgeCategoryFilter() {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
-            $kbs = $this->knowledgeBaseModel->updateWhereWithPermissions([]);
+            $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
             $knowledgeCategories = array_column(
                 $this->knowledgeCategoryModel->get(
                     ['knowledgeBaseID' => $kbs['knowledgeBaseID']],

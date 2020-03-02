@@ -155,7 +155,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         // Data fetching
         $urlCode = $query['urlCode'];
-        $row = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateWhereWithPermissions(['urlCode' => $urlCode]))[0] ?? null;
+        $row = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['urlCode' => $urlCode]))[0] ?? null;
         if (!$row) {
             throw new NotFoundException('KnowledgeBase');
         }
@@ -203,7 +203,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $translateLocale = $query['locale'] ?? null;
         unset($query['locale']);
 
-        $rows = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateWhereWithPermissions($query));
+        $rows = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission($query));
         if (isset($translateLocale)) {
             $rows = $this->translateProperties($rows, $translateLocale);
         }
@@ -664,11 +664,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
         try {
             if ($includeDeleted) {
                 $result = $this->knowledgeBaseModel->selectSingle(
-                    $this->knowledgeBaseModel->updateWhereWithPermissions(["knowledgeBaseID" => $knowledgeBaseID])
+                    $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(["knowledgeBaseID" => $knowledgeBaseID])
                 );
             } else {
                 $result = $this->knowledgeBaseModel->selectSingle(
-                    $this->knowledgeBaseModel->updateWhereWithPermissions([
+                    $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([
                         "knowledgeBaseID" => $knowledgeBaseID,
                         'status' => KnowledgeBaseModel::STATUS_PUBLISHED
                     ])

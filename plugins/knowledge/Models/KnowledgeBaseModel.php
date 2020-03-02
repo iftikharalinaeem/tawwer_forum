@@ -117,7 +117,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @param string $prefix
      * @return array
      */
-    public function updateWhereWithPermissions(array $where, string $prefix = ''): array {
+    public function updateKnowledgeIDsWithCustomPermission(array $where, string $prefix = ''): array {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
             $kbsView = $this->getAllowedKnowledgeBases(self::VIEW);
             $kbsEdit = $this->getAllowedKnowledgeBases(self::EDIT);
@@ -596,7 +596,7 @@ MESSAGE
     public function checkKnowledgeBasePublished(int $knowledgeBaseID): array {
         try {
             $kb = $this->selectSingle(
-                $this->updateWhereWithPermissions([
+                $this->updateKnowledgeIDsWithCustomPermission([
                         "knowledgeBaseID" => $knowledgeBaseID,
                         'status' => KnowledgeBaseModel::STATUS_PUBLISHED
                 ])

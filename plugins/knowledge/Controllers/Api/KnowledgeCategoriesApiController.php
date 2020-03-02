@@ -196,7 +196,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $publishedKnowledgeBases = array_column(
-            $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateWhereWithPermissions(['status' => KnowledgeBaseModel::STATUS_PUBLISHED])),
+            $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['status' => KnowledgeBaseModel::STATUS_PUBLISHED])),
             'knowledgeBaseID'
         );
 
