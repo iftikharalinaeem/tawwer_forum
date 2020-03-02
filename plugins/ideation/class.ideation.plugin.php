@@ -1080,7 +1080,7 @@ EOT
         $attachment['StatusDescription'] = val('Description', $status);
         $attachment['StatusState'] = val('State', $status);
         $attachment['StatusNotes'] = $statusNotes;
-        $attachment['StatusUrl'] = url('/discussions/tagged/'.urlencode(val('StatusName', $attachment)));
+        $attachment['StatusUrl'] = url('/discussions/tagged/'.rawurlencode(val('StatusName', $attachment)));
         $attachment['DateUpdated'] = Gdn_Format::toDateTime();
 
         // Kludge. Not Null fields
