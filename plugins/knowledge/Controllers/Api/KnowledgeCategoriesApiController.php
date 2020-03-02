@@ -23,6 +23,7 @@ use LocalesApiController;
  */
 class KnowledgeCategoriesApiController extends AbstractApiController {
     use KnowledgeCategoriesApiSchemes;
+    use CheckGlobalPermissionTrait;
 
     /** @var Schema */
     private $idParamSchema;
@@ -81,7 +82,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @throws \Garden\Web\Exception\ClientException If the target knowledge category is not empty.
      */
     public function delete(int $id) {
-        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema()->setDescription("Delete a knowledge category.");
         $this->schema([], "out");
@@ -115,7 +116,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id, array $query = []): array {
-        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         /** @var Schema $in */
         $in = $this->idParamSchema()->addValidator('locale', [$this->localeApi, 'validateLocale']);
@@ -164,7 +165,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function get_edit(int $id): array {
-        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
         $this->idParamSchema();
 
         $out = $this->schema(Schema::parse([
@@ -188,7 +189,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query = []): array {
-        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema(["locale?"], 'in')
             ->addValidator('locale', [$this->localeApi, 'validateLocale']);
@@ -196,7 +197,9 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         $out = $this->schema([":a" => $this->fullSchema()], "out");
 
         $publishedKnowledgeBases = array_column(
-            $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['status' => KnowledgeBaseModel::STATUS_PUBLISHED])),
+            $this->knowledgeBaseModel->get(
+                $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['status' => KnowledgeBaseModel::STATUS_PUBLISHED])
+            ),
             'knowledgeBaseID'
         );
 
@@ -257,7 +260,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema();
         $in = $this->schema($this->knowledgeCategoryPostSchema())
@@ -341,7 +344,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
      * @return array
      */
     public function post(array $body = []): array {
-        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema($this->knowledgeCategoryPostSchema())
             ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateKBCategoriesLimit"])

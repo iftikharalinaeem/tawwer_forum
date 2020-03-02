@@ -26,6 +26,7 @@ use PermissionModel;
 class KnowledgeBasesApiController extends AbstractApiController {
     use KnowledgeBasesApiSchemes;
     use KnowledgeNavigationApiSchemes;
+    use CheckGlobalPermissionTrait;
 
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
@@ -101,7 +102,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get(int $id, array $query = []): array {
-        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $in = $this->schema($this->idParamSchema(), 'in');
         $query['id'] = $id;
         $query = $in->validate($query);
@@ -113,6 +114,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
 
         $row = $this->knowledgeBaseByID($id);
+        $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
         if (isset($query['locale'])) {
             $row['locale'] = $query['locale'];
             $rows = $this->translateProperties([$row], $query['locale']);
@@ -144,7 +146,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @throws \Vanilla\Exception\PermissionException If the user did not have proper permission to view the resource.
      */
     public function get_byUrlCode(array $query) {
-        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         // Schema
         $in = $this->schema(Schema::parse([
@@ -155,9 +157,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         // Data fetching
         $urlCode = $query['urlCode'];
-        $row = $this->knowledgeBaseModel->get($this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['urlCode' => $urlCode]))[0] ?? null;
+        $row = $this->knowledgeBaseModel->get(['urlCode' => $urlCode])[0] ?? null;
         if (!$row) {
             throw new NotFoundException('KnowledgeBase');
+        } else {
+            $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
         }
 
         $row = $this->normalizeOutput($row);
@@ -173,7 +177,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query = []): array {
-        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema([
             "status" => [
@@ -413,7 +417,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationTree(int $id, array $query = []): array {
-        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
@@ -421,6 +425,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         //check if kb exists and status is not deleted
         $kb = $this->knowledgeBaseByID($id, false);
+        $this->knowledgeBaseModel->checkViewPermission($kb['knowledgeBaseID']);
         $query['knowledgeBaseID'] = $id;
         $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
         $rows = $this->knowledgeNavigationApi->tree($query);
@@ -436,7 +441,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function get_navigationFlat(int $id, array $query = []): array {
-        $this->permission(knowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->schema($this->defaultSchema(), "in")
             ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
@@ -460,7 +465,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * @return array
      */
     public function patch_navigationFlat(int $id, array $body = []): array {
-        $this->permission(knowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $patchSchema = Schema::parse([
             ":a" => Schema::parse([
@@ -482,6 +487,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         //check if kb exists and status is not deleted
         $kb = $this->knowledgeBaseByID($id, false);
+        $this->knowledgeBaseModel->checkViewPermission($kb['knowledgeBaseID']);
 
         $navigation = $this->knowledgeNavigationApi->patchFlat($id, $body);
 
@@ -663,15 +669,13 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true, bool $checkOnly = false): array {
         try {
             if ($includeDeleted) {
-                $result = $this->knowledgeBaseModel->selectSingle(
-                    $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(["knowledgeBaseID" => $knowledgeBaseID])
-                );
+                $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);
             } else {
                 $result = $this->knowledgeBaseModel->selectSingle(
-                    $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([
+                    [
                         "knowledgeBaseID" => $knowledgeBaseID,
                         'status' => KnowledgeBaseModel::STATUS_PUBLISHED
-                    ])
+                    ]
                 );
             }
         } catch (\Vanilla\Exception\Database\NoResultsException $e) {

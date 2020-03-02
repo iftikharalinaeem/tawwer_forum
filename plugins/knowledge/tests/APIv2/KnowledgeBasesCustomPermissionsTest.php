@@ -8,7 +8,9 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Exception\PermissionException;
 
 /**
  * Test the /api/v2/ knowledge endpoints.
@@ -171,9 +173,30 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 'Edit KB2'
             ]
         );
+        self::$content['roles']['Nothing'] = $this->api()->post(
+            '/roles',
+            [
+                'name' => 'Nothing',
+                'description' => 'Role Nothing',
+                'type' => 'member',
+                'deletable' => true,
+                'canSession' => true,
+                'personalInfo' => false,
+                'permissions' => [
+                    [
+                        'type' => 'global',
+                        'permissions' => [
+                            'kb.view' => false,
+                            'articles.add' => false
+                        ]
+                    ]
+                ]
+            ]
+        )->getBody();
 
         self::$content['users'] = $this->createUsers(
             [
+                'Nothing',
                 'View All',
                 'View Public',
                 'View KB1',
@@ -183,8 +206,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             ]
         );
 
-        self::$content['kbs']['KB1'] = $this->createKb('KB1', ['View All', 'View KB1'], ['Edit KB1']);
-        self::$content['kbs']['KB2'] = $this->createKb('KB2', ['View All', 'View KB2'], ['Edit KB2']);
+        self::$content['kbs']['KB1'] = $this->createKb('KB1', ['View All', 'View KB1', 'Nothing'], ['Edit KB1']);
+        self::$content['kbs']['KB2'] = $this->createKb('KB2', ['View All', 'View KB2'], ['Edit KB2', 'Nothing']);
         self::$content['kbs']['KB3'] = $this->createKb('KB3');
 
         //$this->api->setUserID(self::$siteInfo['adminUserID']);
@@ -196,6 +219,13 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
      */
     public function indexDataProvider() {
         return [
+            'Nothing' => [
+                [
+                    'user' => 'Nothing',
+                    'count' => ForbiddenException::class,
+                    'kbs' => []
+                ]
+            ],
             'View All' => [
                 [
                     'user' => 'View All',
@@ -267,18 +297,23 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
      */
     public function testIndex(array $args) {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
-        $getIndex = $this->api()->get($this->baseUrl)->getBody();
-        $this->assertEquals($args['count'], count($getIndex));
-        foreach ($args['kbs'] as $kbKey) {
-            $kbID = self::$content['kbs'][$kbKey]['knowledgeBaseID'];
-            $found = false;
-            foreach ($getIndex as $kb) {
-                if ($kb['knowledgeBaseID'] === $kbID) {
-                    $found = true;
-                    break;
+        if (is_string($args['count'])) {
+            $this->expectException($args['count']);
+            $getIndex = $this->api()->get($this->baseUrl)->getBody();
+        } else {
+            $getIndex = $this->api()->get($this->baseUrl)->getBody();
+            $this->assertEquals($args['count'], count($getIndex));
+            foreach ($args['kbs'] as $kbKey) {
+                $kbID = self::$content['kbs'][$kbKey]['knowledgeBaseID'];
+                $found = false;
+                foreach ($getIndex as $kb) {
+                    if ($kb['knowledgeBaseID'] === $kbID) {
+                        $found = true;
+                        break;
+                    }
                 }
+                $this->assertTrue($found, $kbID.' expected but not present in apiresponse');
             }
-            $this->assertTrue($found, $kbID.' expected but not present in apiresponse');
         }
     }
 
@@ -293,8 +328,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
         foreach ($args['kbs'] as $kbKey => $status) {
             $articleID = self::$content['kbs'][$kbKey]['patchArticle']['articleID'];
-            if ($status === 'Exception') {
-                $this->expectException(NotFoundException::class);
+            if (is_string($status)) {
+                $this->expectException($status);
                 $responseStatus = $this->api()->get('/articles/' . $articleID)->getStatusCode();
             } else {
                 $responseStatus = $this->api()->get('/articles/' . $articleID)->getStatusCode();
@@ -321,8 +356,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
         foreach ($args['kbs'] as $kbKey => $status) {
             $articleID = self::$content['kbs'][$kbKey]['patchArticle']['articleID'];
-            if ($status === 'Exception') {
-                $this->expectException(NotFoundException::class);
+            if (is_string($status)) {
+                $this->expectException($status);
                 $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
             } else {
                 $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
@@ -351,8 +386,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
         foreach ($args['kbs'] as $kbKey => $status) {
             $kbID = self::$content['kbs'][$kbKey]['knowledgeBaseID'];
-            if ($status === 'Exception') {
-                $this->expectException(NotFoundException::class);
+            if (is_string($status)) {
+                $this->expectException($status);
                 $responseStatus = $this->api()->get($this->baseUrl . '/' . $kbID)->getStatusCode();
             } else {
                 $responseStatus = $this->api()->get($this->baseUrl . '/' . $kbID)->getStatusCode();
@@ -366,6 +401,16 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
      */
     public function getKnowledgeBaseDataProvider(): array {
         return [
+            'Nothing' => [
+                [
+                    'user' => 'Nothing',
+                    'kbs' => [
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
+                        'KB3' => ForbiddenException::class,
+                    ]
+                ]
+            ],
             'View All' => [
                 [
                     'user' => 'View All',
@@ -380,8 +425,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'View Public',
                     'kbs' => [
-                        'KB1' => 'Exception',
-                        'KB2' => 'Exception',
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -391,7 +436,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                     'user' => 'View KB1',
                     'kbs' => [
                         'KB1' => 200,
-                        'KB2' => 'Exception',
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -400,7 +445,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'View KB2',
                     'kbs' => [
-                        'KB1' => 'Exception',
+                        'KB1' => ForbiddenException::class,
                         'KB2' => 200,
                         'KB3' => 200,
                     ]
@@ -422,8 +467,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             $kb = self::$content['kbs'][$kbKey];
             $kbCategoryID = $kb['patchCategory']['knowledgeCategoryID'];
             $name = $kb['patchCategory']['name'].' '.__FUNCTION__;
-            if ($status === 'Exception') {
-                $this->expectException(NotFoundException::class);
+            if (is_string($status)) {
+                $this->expectException($status);
                 $result = $this->api()->patch(
                     '/knowledge-categories/'.$kbCategoryID,
                     ['name' => $name]
@@ -446,12 +491,22 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
      */
     public function patchDataProvider(): array {
         return [
+            'Nothing' => [
+                [
+                    'user' => 'Nothing',
+                    'kbs' => [
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
+                        'KB3' => ForbiddenException::class,
+                    ]
+                ]
+            ],
             'View All' => [
                 [
                     'user' => 'View All',
                     'kbs' => [
-                        'KB1' => 'Exception',
-                        'KB2' => 'Exception',
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -460,8 +515,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'View Public',
                     'kbs' => [
-                        'KB1' => 'Exception',
-                        'KB2' => 'Exception',
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -470,8 +525,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'View KB1',
                     'kbs' => [
-                        'KB1' => 'Exception',
-                        'KB2' => 'Exception',
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -481,7 +536,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                     'user' => 'Edit KB1',
                     'kbs' => [
                         'KB1' => 200,
-                        'KB2' => 'Exception',
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -490,8 +545,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'View KB2',
                     'kbs' => [
-                        'KB1' => 'Exception',
-                        'KB2' => 'Exception',
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => ForbiddenException::class,
                         'KB3' => 200,
                     ]
                 ]
@@ -500,7 +555,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 [
                     'user' => 'Edit KB2',
                     'kbs' => [
-                        'KB1' => 'Exception',
+                        'KB1' => ForbiddenException::class,
                         'KB2' => 200,
                         'KB3' => 200,
                     ]

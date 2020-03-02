@@ -27,7 +27,7 @@ trait ArticlesApiDrafts {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function post_drafts(array $body): array {
-        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema($this->draftPostSchema(), "in")
             ->setDescription("Create a new article draft.");
@@ -115,7 +115,7 @@ trait ArticlesApiDrafts {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function get_drafts(int $draftID) {
-        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema([
             "draftID" => [
@@ -143,7 +143,7 @@ trait ArticlesApiDrafts {
      * @throws ValidationException If output validation fails.
      */
     public function index_drafts(array $query) {
-        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema([
             "articleID?" => [
@@ -204,7 +204,7 @@ trait ArticlesApiDrafts {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch_drafts(int $draftID, array $body): array {
-        $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->schema(["draftID" => "Target article draft ID."], "in");
         $in = $this->schema($this->draftPostSchema(), "in")

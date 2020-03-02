@@ -17,6 +17,8 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use PermissionModel;
+use Vanilla\Exception\PermissionException;
+use UserModel;
 
 /**
  * A model for managing knowledge bases.
@@ -61,6 +63,9 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var PermissionModel $permissionModel */
     private $permissionModel;
 
+    /** @var UserModel $userModel */
+    private $userModel;
+
     /** @var TranslationProviderInterface */
     private $translation;
 
@@ -77,18 +82,21 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
      * @param PermissionModel $permissionModel
+     * @param UserModel $userModel
      */
     public function __construct(
         Gdn_Session $session,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        PermissionModel $permissionModel
+        PermissionModel $permissionModel,
+        UserModel $userModel
     ) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
         $this->permissionModel = $permissionModel;
+        $this->userModel = $userModel;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
@@ -140,7 +148,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     public function checkEditPermission(int $knowledgeBaseID) {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
             if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::EDIT))) {
-                throw new NotFoundException("Knowledge");
+                throw new PermissionException(self::EDIT_PERMISSION);
             }
         }
     }
@@ -155,11 +163,35 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
             if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::VIEW))) {
                 if (!in_array($knowledgeBaseID, $this->getAllowedKnowledgeBases(self::EDIT))) {
-                    throw new NotFoundException("Knowledge");
+                    throw new PermissionException(self::VIEW_PERMISSION);
                 }
             }
         }
     }
+
+    /**
+     * Check global only permission
+     *
+     * @param string $permission
+     * @throws PermissionException If user hasno permission throw an PermissionException.
+     */
+    public function checkGlobalPermission(string $permission) {
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            $roles = array_column($this->userModel->getRoles($this->session->UserID)->resultArray(), 'RoleID');
+            $permissions = $this->permissionModel->getPermissions($roles, $permission, false)[0];
+            $hasPermission = false;
+            foreach ($permissions as $item) {
+                if (isset($item[$permission]) && $item[$permission] === 1) {
+                    $hasPermission = true;
+                    break;
+                }
+            }
+            if (!$hasPermission) {
+                throw new PermissionException($permission);
+            }
+        }
+    }
+
     /**
      * Generate a URL to the provided knowledge base row.
      *
@@ -596,10 +628,10 @@ MESSAGE
     public function checkKnowledgeBasePublished(int $knowledgeBaseID): array {
         try {
             $kb = $this->selectSingle(
-                $this->updateKnowledgeIDsWithCustomPermission([
+                [
                         "knowledgeBaseID" => $knowledgeBaseID,
                         'status' => KnowledgeBaseModel::STATUS_PUBLISHED
-                ])
+                ]
             );
             return $kb;
         } catch (NoResultsException $e) {

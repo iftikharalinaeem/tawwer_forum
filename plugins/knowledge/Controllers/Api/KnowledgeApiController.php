@@ -33,6 +33,7 @@ use Gdn_Session;
  */
 class KnowledgeApiController extends AbstractApiController {
     use SphinxTrait;
+    use CheckGlobalPermissionTrait;
 
     const SPHINX_DEFAULT_LIMIT = 100;
 
@@ -262,7 +263,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function get_search(array $query = []): \Garden\Web\Data {
-        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema($this->inputSchema(), "in");
 
@@ -360,7 +361,7 @@ class KnowledgeApiController extends AbstractApiController {
         $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
             if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
-                $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+                $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
             };
             $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
             $statuses = array_map(
