@@ -30,6 +30,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
  * @see https://github.com/vanilla/knowledge/issues/264
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
+    use CheckGlobalPermissionTrait;
 
     /** The maximum limit of revisions that can be re-rendered at a time. */
     const LIMIT = 1000;
@@ -203,7 +204,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @throws \Vanilla\Exception\PermissionException If the current user does not have sufficient permissions.
      */
     public function get($id): array {
-        $this->permission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $this->idParamSchema()->setDescription("Get an article revision.");
         $out = $this->articleRevisionSchema("out");
