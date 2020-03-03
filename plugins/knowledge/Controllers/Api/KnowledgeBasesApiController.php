@@ -113,19 +113,27 @@ class KnowledgeBasesApiController extends AbstractApiController {
         unset($query["expand"]);
 
 
+        $locale = $query['locale'] ?? null;
         $row = $this->knowledgeBaseByID($id);
         $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
-        if (isset($query['locale'])) {
-            $row['locale'] = $query['locale'];
-            $rows = $this->translateProperties([$row], $query['locale']);
+        
+        if ($locale) {
+            $row['locale'] = $locale;
+            $rows = $this->translateProperties([$row], $locale);
             $row = reset($rows);
         }
 
         if ($expandUniversalTargets) {
             $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
+            if (($row["universalTargets"] ?? null) && $locale) {
+                $row["universalTargets"] = $this->translateContentUniversalKBs($row["universalTargets"], $locale);
+            }
         }
         if ($expandUniversalSources) {
             $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
+            if (($row["universalSources"] ?? null) && $locale) {
+                $row["universalSources"] = $this->translateContentUniversalKBs($row["universalSources"], $locale);
+            }
         }
 
         $row = $this->normalizeOutput($row);
@@ -227,9 +235,15 @@ class KnowledgeBasesApiController extends AbstractApiController {
             }
             if ($expandUniversalTargets) {
                 $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalTargets");
+                if (($row["universalTargets"] ?? null) && $translateLocale) {
+                    $row["universalTargets"] = $this->translateContentUniversalKBs($row["universalTargets"], $translateLocale);
+                }
             }
             if ($expandUniversalSources) {
                 $this->knowledgeUniversalSourceModel->expandKnowledgeBase($row, "universalSources");
+                if (($row["universalSources"] ?? null) && $translateLocale) {
+                    $row["universalSources"] = $this->translateContentUniversalKBs($row["universalSources"], $translateLocale);
+                }
             }
             return $this->normalizeOutput($row);
         }, $rows);
@@ -543,7 +557,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         if (array_key_exists('isUniversalSource', $body)) {
             $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
         }
-        
+
         $universalTargetIDs = $body['universalTargetIDs'] ?? null;
 
         $this->knowledgeBaseModel->update($body, ["knowledgeBaseID" => $id]);
@@ -555,9 +569,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
 
         if ($isUniversal) {
-            if ($universalTargetIDs) {
-                $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
-            }
+            $this->knowledgeUniversalSourceModel->setUniversalContent($body, $id);
         } elseif ($prevState['isUniversalSource'] && !$isUniversal) {
             $this->knowledgeUniversalSourceModel->delete(["sourceKnowledgeBaseID" => $id]);
         }
@@ -722,5 +734,21 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $record['url'] = $this->knowledgeBaseModel->url($record);
         $this->expandSiteSections($record);
         return $record;
+    }
+
+    /**
+     * Translate universal-content kbs.
+     *
+     * @param array $rows
+     * @param string $locale
+     * @return array
+     */
+    private function translateContentUniversalKBs(array $rows = [], string $locale = 'en'): array {
+        $translations = [];
+        foreach ($rows as $row) {
+            $translation = $this->translateProperties([$row], $locale);
+            $translations[] = reset($translation);
+        }
+        return $translations;
     }
 }

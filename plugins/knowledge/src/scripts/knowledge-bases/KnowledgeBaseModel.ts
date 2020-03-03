@@ -10,11 +10,14 @@ import produce from "immer";
 import KnowledgeBaseActions, { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { createSelector } from "reselect";
 import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
-import { LoadStatus, ILoadable } from "@library/@types/api/core";
+import { LoadStatus, ILoadable, ILinkListData } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useDebugValue } from "react";
 import { getCurrentLocale } from "@vanilla/i18n";
 import clone from "lodash/clone";
+import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
+import { IKbCategory, IKbCategoryFragment } from "@knowledge/@types/api/kbCategory";
+import { useNavigationActions } from "@knowledge/navigation/state/NavigationActions";
 
 export interface ILoadedProduct {
     kb: IKnowledgeBase;
@@ -35,11 +38,15 @@ export interface IKbFormState {
     sortArticles: KnowledgeBaseSortMode;
     hasCustomPermissions: boolean;
     isUniversalSource: boolean;
+    universalTargetIDs: number[];
 }
 export interface IKnowledgeBasesState {
     knowledgeBasesByID: ILoadable<{
         [id: number]: IKnowledgeBase;
     }>;
+    getStatusesByID: {
+        [id: number]: ILoadable<{}>;
+    };
     form: IKbFormState;
     patchStatusesByID: {
         [kbID: number]: ILoadable<{}>;
@@ -74,6 +81,7 @@ export const INITIAL_KB_FORM: IKbFormState = {
     sourceLocale: getCurrentLocale(),
     hasCustomPermissions: false,
     isUniversalSource: false,
+    universalTargetIDs: [],
 };
 
 export interface ISiteSection {
@@ -138,7 +146,14 @@ export interface IKnowledgeBase {
     siteSections: ISiteSection[];
     hasCustomPermissions: boolean;
     isUniversalSource: boolean;
+    universalTargetIDs: number[];
+    universalSources: IKnowledgeBaseFragment[];
 }
+
+export type IKnowledgeBaseFragment = Pick<
+    IKnowledgeBase,
+    "knowledgeBaseID" | "name" | "url" | "icon" | "sortArticles" | "viewType" | "siteSectionGroup" | "description"
+>;
 
 /**
  * Model for working with actions & data related to the /api/v2/knowledge-bases endpoint.
@@ -184,6 +199,7 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
         knowledgeBasesByID: {
             status: LoadStatus.PENDING,
         },
+        getStatusesByID: {},
         form: INITIAL_KB_FORM,
         formSubmit: {
             status: LoadStatus.PENDING,
@@ -203,6 +219,58 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
      * Reducer factory for knowledge base items.
      */
     private internalReducer = reducerWithoutInitialState<IKnowledgeBasesState>()
+        // Fetching Multiple
+        .case(KnowledgeBaseActions.getAllACs.started, (state, params) => {
+            state.knowledgeBasesByID.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(KnowledgeBaseActions.getAllACs.done, (state, payload) => {
+            const normalized: { [id: number]: IKnowledgeBase } = {
+                ...(state.knowledgeBasesByID.data ?? {}), // Make sure any single selects are merged in.
+            };
+            for (const kb of payload.result) {
+                normalized[kb.knowledgeBaseID] = kb;
+                state.getStatusesByID[kb.knowledgeBaseID] = { status: LoadStatus.SUCCESS };
+            }
+            state.knowledgeBasesByID.status = LoadStatus.SUCCESS;
+            state.knowledgeBasesByID.data = normalized;
+            return state;
+        })
+        .case(KnowledgeBaseActions.getAllACs.failed, (state, action) => {
+            state.knowledgeBasesByID.error = action.error;
+            return state;
+        })
+        // Fetching One
+        .case(KnowledgeBaseActions.getSingleACs.started, (state, params) => {
+            state.getStatusesByID[params.kbID] = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(KnowledgeBaseActions.getSingleACs.done, (state, action) => {
+            const { params, result } = action;
+            state.getStatusesByID[params.kbID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            if (!state.knowledgeBasesByID.data) {
+                state.knowledgeBasesByID.data = {
+                    [params.kbID]: result,
+                };
+            } else {
+                state.knowledgeBasesByID.data[params.kbID] = result;
+            }
+            return state;
+        })
+        .case(KnowledgeBaseActions.getSingleACs.failed, (state, action) => {
+            const { params, error } = action;
+            state.getStatusesByID[params.kbID] = {
+                status: LoadStatus.ERROR,
+                error,
+            };
+            return state;
+        })
+
+        // Form
         .case(KnowledgeBaseActions.initFormAC, (state, payload) => {
             if (payload.kbID != null) {
                 const existingKB = {
@@ -228,29 +296,14 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
             };
             return state;
         })
-        .case(KnowledgeBaseActions.GET_ACS.started, state => {
-            state.knowledgeBasesByID.status = LoadStatus.LOADING;
-            return state;
-        })
-        .case(KnowledgeBaseActions.GET_ACS.done, (state, payload) => {
-            const normalized: { [id: number]: IKnowledgeBase } = {};
-            for (const kb of payload.result) {
-                normalized[kb.knowledgeBaseID] = kb;
-            }
-            state.knowledgeBasesByID.status = LoadStatus.SUCCESS;
-            state.knowledgeBasesByID.data = normalized;
-            return state;
-        })
         .case(KnowledgeBaseActions.clearErrorAC, state => {
             state.formSubmit = {
                 status: LoadStatus.PENDING,
             };
             return state;
         })
-        .case(KnowledgeBaseActions.GET_ACS.failed, (state, action) => {
-            state.knowledgeBasesByID.error = action.error;
-            return state;
-        })
+
+        // Posting back to API.
         .case(KnowledgeBaseActions.postKB_ACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
             return state;
@@ -297,6 +350,8 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
             delete state.deletesByID[kbID];
             return state;
         })
+
+        // Deletion
         .case(KnowledgeBaseActions.deleteKB_ACs.started, (state, payload) => {
             state.deletesByID[payload.kbID] = {
                 status: LoadStatus.LOADING,
@@ -320,19 +375,3 @@ export default class KnowledgeBaseModel implements ReduxReducer<IKnowledgeBasesS
 }
 
 type ReducerType = KnowledgeReducer<IKnowledgeBasesState>;
-
-export function useKnowledgeBases(status: KnowledgeBaseStatus) {
-    const { knowledgeBasesByID } = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
-    const { getAll } = useKnowledgeBaseActions();
-
-    useEffect(() => {
-        if (knowledgeBasesByID.status === LoadStatus.PENDING) {
-            getAll({ status });
-        }
-    }, [knowledgeBasesByID, getAll, status]);
-
-    return knowledgeBasesByID;
-}
-export function useKBData() {
-    return useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
-}

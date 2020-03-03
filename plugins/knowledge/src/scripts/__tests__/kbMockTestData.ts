@@ -154,6 +154,8 @@ export function dummyKnowledgeBase(overrides: Partial<IKnowledgeBase> = {}): IKn
         siteSectionGroup: "vanilla",
         siteSections: [dummySiteSection()],
         isUniversalSource: false,
+        universalSources: [],
+        universalTargetIDs: [],
         hasCustomPermissions: false,
         ...overrides,
     };
