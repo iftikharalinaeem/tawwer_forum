@@ -6,7 +6,6 @@
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import NavigationManager from "@knowledge/navigation/NavigationManager";
-import NavigationManagerMenu from "@knowledge/navigation/NavigationManagerMenu";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";

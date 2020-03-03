@@ -9,7 +9,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { NavLinksPlaceholder } from "@vanilla/library/src/scripts/navigation/NavLinksPlaceholder";
 import React from "react";
 import { useKnowledgeBase, useHelpCenterNavigation } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
-import Tiles from "@vanilla/library/src/scripts/features/tiles/Tiles";
+import Tiles, { TileAlignment } from "@vanilla/library/src/scripts/features/tiles/Tiles";
 import { t } from "@vanilla/i18n";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { tileClasses } from "@vanilla/library/src/scripts/features/tiles/tileStyles";
@@ -19,6 +19,7 @@ import classNames from "classnames";
 
 interface IProps {
     kb: IKnowledgeBase;
+    hasTopSeparator?: boolean;
 }
 
 export function UniversalKnowledgeWidget(props: IProps) {
@@ -39,14 +40,20 @@ export function UniversalKnowledgeWidget(props: IProps) {
         }
     });
 
+    const separator = (
+        <Container fullGutter narrow>
+            <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
+        </Container>
+    );
+
     return (
         <>
             {guides.length > 0 && (
                 <>
-                    <Container fullGutter narrow>
-                        <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
-                    </Container>
+                    {props.hasTopSeparator && separator}
                     <Tiles
+                        columns={guides.length === 3 ? 3 : 2}
+                        alignment={TileAlignment.LEFT}
                         emptyMessage=""
                         title={t("Guides")}
                         fallbackIcon={knowledgeBaseNoIcon(tileClasses().fallBackIcon)}
@@ -61,9 +68,19 @@ export function UniversalKnowledgeWidget(props: IProps) {
                     />
                 </>
             )}
-            {helpCenters.map(helpCenter => {
-                return <UniversalHelpCenterNav key={helpCenter.knowledgeBaseID} kbID={helpCenter.knowledgeBaseID} />;
-            })}
+            {helpCenters.length > 0 && (
+                <>
+                    {props.hasTopSeparator || guides.length > 0 ? separator : null}
+                    {helpCenters.map(helpCenter => {
+                        return (
+                            <UniversalHelpCenterNav
+                                key={helpCenter.knowledgeBaseID}
+                                kbID={helpCenter.knowledgeBaseID}
+                            />
+                        );
+                    })}
+                </>
+            )}
         </>
     );
 }

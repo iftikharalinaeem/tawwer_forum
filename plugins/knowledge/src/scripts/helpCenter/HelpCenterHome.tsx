@@ -106,7 +106,10 @@ export default function HelpCenterHome(props: IProps) {
         return <KbErrorPage error={navData.error} />;
     }
 
-    if (knowledgeBase.countArticles === 0) {
+    if (
+        (knowledgeBase.countArticles === 0 && !knowledgeBase.universalSources) ||
+        knowledgeBase.universalSources.length <= 0
+    ) {
         return (
             <KbErrorPage
                 defaultError={DefaultKbError.NO_ARTICLES}
@@ -115,6 +118,10 @@ export default function HelpCenterHome(props: IProps) {
             />
         );
     }
+
+    const hasRecommended = articleList.data && articleList.data.body.length > 0;
+    const hasNavigation =
+        navData.data.navigation.groups.length > 0 || navData.data.navigation.ungroupedItems.length > 0;
 
     return (
         <>
@@ -133,7 +140,7 @@ export default function HelpCenterHome(props: IProps) {
                 }}
                 params={widgetParams}
             />
-            <UniversalKnowledgeWidget kb={knowledgeBase} />
+            <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
         </>
     );
 }
