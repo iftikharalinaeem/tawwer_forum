@@ -55,7 +55,8 @@ export function IframeCommunicationContextProvider(props: { children: React.Reac
                 }
             };
 
-            setSendMessage(realSendMessage);
+            // Callback required because react set states will call callbacks.
+            setSendMessage(() => realSendMessage);
         }
     });
 
