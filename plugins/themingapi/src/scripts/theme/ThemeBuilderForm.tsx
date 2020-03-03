@@ -24,13 +24,20 @@ export interface IThemeBuilderForm {
     variables?: IThemeVariables;
 }
 
+interface IFormState {
+    errors: Record<string, any>;
+    [key: string]: any;
+}
+
 export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const classes = themeBuilderClasses();
     const global = globalVariables();
-    const { updateAssets, saveTheme } = useThemeActions();
+    const { updateAssets } = useThemeActions();
     const buttonGlobals = buttonGlobalVariables();
     const dataString = JSON.stringify(props.variables);
+
     const data = JSON.parse(dataString).data;
+
     function getVariableErrors(obj) {
         const result = [];
         function recursivelyFindError(o) {
@@ -52,7 +59,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     }
 
     const form = useFormik({
-        initialValues: {},
+        initialValues: {} as IFormState,
         onSubmit: () => {},
         validate: values => {
             const errorVariables = getVariableErrors(values.errors);

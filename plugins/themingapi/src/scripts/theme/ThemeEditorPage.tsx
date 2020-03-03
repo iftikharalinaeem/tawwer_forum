@@ -29,6 +29,7 @@ import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
 import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
+import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -106,6 +107,13 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     };
 
     let content: React.ReactNode;
+
+    let sendMessage;
+    const getSendMessage = (sendMessageFunction: (message: {}) => void) => {
+        sendMessage = sendMessageFunction;
+        window.sendMessage = sendMessage;
+    };
+
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
@@ -117,7 +125,14 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
             {
                 label: t("Styles"),
                 panelData: "style",
-                contents: <ThemeEditor themeID={themeID} variables={theme.data.assets.variables} />,
+
+                contents: (
+                    <ThemeEditor
+                        themeID={themeID}
+                        variables={theme.data.assets.variables}
+                        getSendMessage={getSendMessage}
+                    />
+                ),
             },
             {
                 label: t("Header"),
@@ -223,9 +238,11 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     }
 
     return (
-        <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-            {content}
-        </Modal>
+        <IframeCommunicationContextProvider>
+            <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                {content}
+            </Modal>
+        </IframeCommunicationContextProvider>
     );
 }
 

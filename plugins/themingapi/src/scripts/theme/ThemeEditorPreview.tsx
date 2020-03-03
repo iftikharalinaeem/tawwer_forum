@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { BrowserRouter, RouteComponentProps, useHistory, MemoryRouter } from "react-router-dom";
 import TitleBar from "@library/headers/TitleBar";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
@@ -14,11 +14,22 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import themeEditorPreviewClasses from "./themeEditorPreviewStyles";
+import { useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
+import { logDebug } from "@vanilla/utils";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
-    document.body.classList.add(classes.contentContainer);
+
+    useEffect(() => {
+        document.body.classList.add(classes.contentContainer);
+    });
+
+    const onFrame = useCallback(message => {
+        logDebug("Recieved message in frame", message);
+    }, []);
+
+    useOwnFrameMessages(onFrame);
 
     return (
         <MemoryRouter>
