@@ -7,12 +7,12 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { t } from "@vanilla/i18n";
 import Translate from "@vanilla/library/src/scripts/content/Translate";
 import { FrameBodyContainer } from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import React from "react";
+import { useKBData } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 
 interface IProps {
     kbID?: number;

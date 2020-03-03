@@ -32,6 +32,9 @@ import { messagesClasses } from "@library/messages/messageStyles";
 import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import Translate from "@library/content/Translate";
 import { ErrorIcon } from "@library/icons/common";
+import { ActionBar } from "@vanilla/library/src/scripts/headers/ActionBar";
+import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
+import { KnowledgeBaseRoute } from "@knowledge/routes/pageRoutes";
 
 function OrganizeCategoriesPage(props: IProps) {
     const titleID = useUniqueID("organizeCategoriesTitle");
@@ -67,6 +70,8 @@ function OrganizeCategoriesPage(props: IProps) {
         }
     }, []);
 
+    useFallbackBackUrl(knowledgeBase.data ? KnowledgeBaseRoute.url(knowledgeBase.data) : "/kb");
+
     if ([LoadStatus.LOADING, LoadStatus.PENDING].includes(knowledgeBase.status)) {
         return <Loader />;
     }
@@ -78,11 +83,10 @@ function OrganizeCategoriesPage(props: IProps) {
         <Permission permission="articles.add" fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}>
             <AnalyticsData uniqueKey="organizeCategoriesPage" />
             <FullKnowledgeModal scrollable={true} titleID={titleID}>
-                <NavigationManagerMenu />
+                <ActionBar backTitle={t("Back")} />
                 {categoriesWarning}
                 <div className={classNames(classesNavigationManager.container)}>
                     <NavigationManagerErrors knowledgeBaseID={knowledgeBase.data.knowledgeBaseID} />
-
                     <DocumentTitle title={pageTitle}>
                         <Heading
                             id={titleID}

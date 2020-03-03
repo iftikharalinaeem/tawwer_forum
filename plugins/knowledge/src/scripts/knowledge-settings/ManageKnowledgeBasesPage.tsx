@@ -5,7 +5,7 @@
 
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
-import { KnowledgeBaseStatus, useKnowledgeBases } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { KnowledgeBaseTableRow } from "@knowledge/knowledge-settings/KnowledgeBaseTableRow";
 import Loader from "@library/loaders/Loader";
 import qs from "qs";
@@ -20,6 +20,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { KnowledgeBasePatchStatusModal } from "@knowledge/knowledge-settings/KnowledgeBasePatchStatusModal";
 import { KnowledgeBasePurgeModal } from "@knowledge/knowledge-settings/KnowledgeBasePurgeModal";
+import { useKnowledgeBases } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 const { HeadItem } = DashboardTable;
 
 export function ManageKnowledgeBasesPage() {

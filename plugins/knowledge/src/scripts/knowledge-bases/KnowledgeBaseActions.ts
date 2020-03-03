@@ -27,7 +27,6 @@ interface IKknowledgeBaseParams {
 type IGetKnowledgeBaseRequest = {
     kbID: number;
 };
-
 type IDeleteKnowledgeBaseRequest = {
     kbID: number;
 };
@@ -46,7 +45,7 @@ type IDeleteKnowledgeBaseResponse = undefined;
  * Actions for working with resources from the /api/v2/knowledge-bases endpoint.
  */
 export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStoreState> {
-    public static readonly GET_ACS = actionCreator.async<IGetKnowledgeBasesRequest, IKnowledgeBase[], IApiError>(
+    public static readonly getAllACs = actionCreator.async<IGetKnowledgeBasesRequest, IKnowledgeBase[], IApiError>(
         "GET_ALL",
     );
 
@@ -57,7 +56,7 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
             ...options,
         };
 
-        const thunk = bindThunkAction(KnowledgeBaseActions.GET_ACS, async () => {
+        const thunk = bindThunkAction(KnowledgeBaseActions.getAllACs, async () => {
             const response = await this.api.get(`/knowledge-bases`, {
                 params: {
                     ...options,
@@ -84,9 +83,7 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
     public static clearDeleteStatus = actionCreator<{ kbID: number }>("CLEAR_DELETE_STATUS");
     public clearDeleteStatus = this.bindDispatch(KnowledgeBaseActions.clearDeleteStatus);
 
-    public static getKB_ACs = actionCreator.async<IGetKnowledgeBaseRequest, IGetKnowledgeBaseResponse, IApiError>(
-        "GET",
-    );
+    public static getSingleACs = actionCreator.async<IGetKnowledgeBaseRequest, IKnowledgeBase, IApiError>("GET");
     public static postKB_ACs = actionCreator.async<
         IPostKnowledgeBaseRequest,
         IPostKnowledgeBaseResponse & IKknowledgeBaseParams,
@@ -101,8 +98,8 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
         IApiError
     >("DELETE");
 
-    public getKB(options: IGetKnowledgeBaseRequest) {
-        const thunk = bindThunkAction(KnowledgeBaseActions.getKB_ACs, async () => {
+    public getSingleKB = (options: IGetKnowledgeBaseRequest) => {
+        const thunk = bindThunkAction(KnowledgeBaseActions.getSingleACs, async () => {
             const { kbID, ...rest } = options;
             const params = { ...rest, expand: "all" };
             const response = await this.api.get(`/knowledge-bases/${options.kbID}`, { params });
@@ -110,7 +107,7 @@ export default class KnowledgeBaseActions extends ReduxActions<IKnowledgeAppStor
         })(options);
 
         return this.dispatch(thunk);
-    }
+    };
     public saveKbForm = async () => {
         const { form } = this.getState().knowledge.knowledgeBases;
 

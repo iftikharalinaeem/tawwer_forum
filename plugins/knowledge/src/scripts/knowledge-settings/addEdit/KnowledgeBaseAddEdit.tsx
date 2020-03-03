@@ -4,7 +4,7 @@
  */
 import { KB_RESOURCE_NAME } from "@knowledge/constants";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { useKBData, useUniversalSources } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { useKBData, useUniversalSources } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KnowledgeAddEditGeneral } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEditGeneral";
 import { KnowledgeBaseAddEditPermissions } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEditPermissions";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/addEdit/knowledgeBaseAddEditStyles";
