@@ -32,13 +32,7 @@ export default function ThemeEditor(props: IProps) {
                 }}
                 type={"button"}
                 onClick={() => {
-                    console.log(sendMessage);
-                    if (sendMessage) {
-                        console.log("sending message");
-                        sendMessage({ hello: "world" });
-                    }
-
-                    return false;
+                    sendMessage?.({ hello: "world" });
                 }}
             >
                 Send message
