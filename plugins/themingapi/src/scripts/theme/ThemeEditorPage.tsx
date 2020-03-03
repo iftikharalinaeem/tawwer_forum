@@ -28,6 +28,7 @@ import { formatUrl } from "@library/utility/appUtils";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import ThemeEditor from "./ThemeEditor";
+import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -102,6 +103,12 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
 
     let content: React.ReactNode;
 
+    let sendMessage;
+    const getSendMessage = (sendMessageFunction: (message: {}) => void) => {
+        sendMessage = sendMessageFunction;
+        window.sendMessage = sendMessage;
+    };
+
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
@@ -113,7 +120,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
             {
                 label: t("Styles"),
                 panelData: "style",
-                contents: <ThemeEditor />,
+                contents: <ThemeEditor getSendMessage={getSendMessage} />,
             },
             {
                 label: t("Header"),
@@ -215,9 +222,11 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     }
 
     return (
-        <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-            {content}
-        </Modal>
+        <IframeCommunicationContextProvider>
+            <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                {content}
+            </Modal>
+        </IframeCommunicationContextProvider>
     );
 }
 
