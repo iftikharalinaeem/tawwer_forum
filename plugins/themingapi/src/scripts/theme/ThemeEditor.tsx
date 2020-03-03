@@ -22,21 +22,6 @@ export default function ThemeEditor(props: IProps) {
 
     return (
         <>
-            <button
-                style={{
-                    padding: "40px",
-                    background: "white",
-                    position: "relative",
-                    color: "#000",
-                    zIndex: 100000,
-                }}
-                type={"button"}
-                onClick={() => {
-                    sendMessage && sendMessage({ hello: "world" });
-                }}
-            >
-                Send message
-            </button>
             <div className={classes.wrapper}>
                 <div className={classes.frame}>
                     <iframe

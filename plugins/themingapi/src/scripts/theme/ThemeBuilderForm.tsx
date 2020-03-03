@@ -48,7 +48,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     if (o[key] === "Invalid Color") {
                         result.push(o);
                     } else {
-                        result.pop(o);
+                        result.pop();
                     }
                 }
             });
