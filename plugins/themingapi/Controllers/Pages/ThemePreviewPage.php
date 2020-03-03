@@ -7,6 +7,7 @@
 
 namespace Vanilla\Theme\Controllers\Pages;
 
+use Garden\Web\Data;
 use Vanilla\Models\ThemePreloadProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Page;
@@ -19,13 +20,18 @@ class ThemePreviewPage extends Page {
     /** @var ThemePreloadProvider */
     private $themePreloader;
 
+    /** @var \UsersApiController */
+    private $usersApi;
+
     /**
      * DI.
      *
      * @param ThemePreloadProvider $themePreloader
+     * @param \UsersApiController $usersApi
      */
-    public function __construct(ThemePreloadProvider $themePreloader) {
+    public function __construct(ThemePreloadProvider $themePreloader, \UsersApiController $usersApi) {
         $this->themePreloader = $themePreloader;
+        $this->usersApi = $usersApi;
     }
 
     /**
@@ -38,6 +44,10 @@ class ThemePreviewPage extends Page {
             ->setSeoRequired(false)
             ->blockRobots()
             ->requiresSession("/theme/theme-settings/$themeID/preview");
+
+        $me = $this->usersApi->get_me([]);
+        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
+
 
         $this->themePreloader->setForcedThemeKey($themeID);
         $this->registerReduxActionProvider($this->themePreloader);
