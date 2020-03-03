@@ -46,12 +46,20 @@ export const themeEditorPageClasses = useThemeCache(() => {
             },
         },
     });
+    const messageBar = style("messageBar", {
+        $nest: {
+            "&&& .messages-wrap": {
+                width: unit(500)
+            }
+        }
+    })
     return {
 
         editIcon,
         themeName,
         themeInput,
         inputWrapper,
+        messageBar
     };
 });
 

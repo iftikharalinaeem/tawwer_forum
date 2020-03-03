@@ -19,6 +19,7 @@ export interface IThemeAssets {
     footer?: IThemeFooter;
     javascript?: string;
     styles?: string;
+
 }
 
 export interface IPostPatchThemeAssets {
@@ -64,6 +65,7 @@ export interface ITheme {
     parentTheme: string;
     version: string;
     pageType: pageTypes;
+    errors: boolean;
 }
 
 export interface IThemeForm {
@@ -74,6 +76,7 @@ export interface IThemeForm {
     parentTheme: string;
     version: string;
     pageType: pageTypes;
+    errors: boolean;
 }
 
 export interface IThemeState {
@@ -116,6 +119,7 @@ const INITIAL_STATE: IThemeState = {
         parentTheme: "",
         version: "",
         pageType: pageTypes.NEW_THEME,
+        errors: false
     },
     formSubmit: {
         status: LoadStatus.PENDING,
