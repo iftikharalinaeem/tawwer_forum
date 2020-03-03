@@ -20,7 +20,7 @@ import {
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
-import { calc, percent, px } from "csx";
+import { calc, important, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { textInputSizingFromSpacing } from "@library/styles/styleHelpers";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
@@ -63,11 +63,8 @@ export const editorFormClasses = useThemeCache(() => {
                 backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
-                borderRadius: 0,
-                borderTop: 0,
-                borderRight: 0,
-                borderLeft: 0,
-                borderBottom: `solid transparent 2px`,
+                borderRadius: important(0),
+                border: important(`solid transparent 1px`),
                 marginBottom: unit(globalVars.spacer.size),
                 ...paddings({
                     left: 0,
@@ -77,7 +74,7 @@ export const editorFormClasses = useThemeCache(() => {
             "&:not(.focus-visible)": {
                 outline: "none",
             },
-            "&:focus": {
+            "&:focus, &.focus-visible": {
                 borderBottomColor: colorOut(globalVars.mainColors.primary),
             },
             ...placeholderStyles({
