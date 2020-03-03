@@ -44,6 +44,10 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
 
+    /** @var KnowledgeBaseModel $knowledgeBaseModel */
+    private $knowledgeBaseModel;
+
+
     /** @var Schema */
     private $articleRevisionSchema;
 
@@ -66,17 +70,20 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      * @param FormatService $formatService
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         ArticleRevisionModel $articleRevisionModel,
         ArticleModel $articleModel,
         UserModel $userModel,
-        FormatService $formatService
+        FormatService $formatService,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->formatService = $formatService;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
     }
 
     /**
