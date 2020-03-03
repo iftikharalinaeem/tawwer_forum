@@ -85,21 +85,18 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: data.global.mainColors.primary
+                        defaultValue: data.global?.mainColors?.primary
                             ? ensureColorHelper(data.global.mainColors.primary)
                             : global.mainColors.primary,
                     }}
                     inputBlock={{ label: t("Brand Color") }}
                 />
-                {/* {form.values["errors"] && (
-                    <div className={classes.error}>{form.values["errors"].mainColors.primary}</div>
-                )} */}
 
                 <ThemeBuilderSection label={"Body"}>
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.body.backgroundImage.color",
-                            defaultValue: data.global.body
+                            defaultValue: data.global?.body?.backgroundImage?.color
                                 ? ensureColorHelper(data.global.body.backgroundImage.color)
                                 : global.body.backgroundImage.color,
                         }}
@@ -109,8 +106,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
-                            defaultValue: data.global.mainColors
-                                ? ensureColorHelper(data.global.mainColors.fg)
+                            defaultValue: data.global?.mainColors?.fg
+                                ? ensureColorHelper(data.global?.mainColors?.fg)
                                 : global.mainColors.fg,
                         }}
                         inputBlock={{ label: t("Text") }}
@@ -119,7 +116,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.links.colors.default",
-                            defaultValue: data.global.links
+                            defaultValue: data.global?.links?.colors?.default
                                 ? ensureColorHelper(data.global.links.colors.default)
                                 : global.links.colors.default,
                         }}
@@ -175,7 +172,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
-                                defaultValue: data.buttonGlobals
+                                defaultValue: data.buttonGlobals?.colors?.primary
                                     ? ensureColorHelper(data.buttonGlobals.colors.primary)
                                     : buttonGlobals.colors.primary,
                             }}
@@ -184,7 +181,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
-                                defaultValue: data.buttonGlobals
+                                defaultValue: data.buttonGlobals?.colors?.primaryContrast
                                     ? ensureColorHelper(data.buttonGlobals.colors.primaryContrast)
                                     : buttonGlobals.colors.primaryContrast,
                             }}
@@ -215,7 +212,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
-                                defaultValue: data.buttonGlobals
+                                defaultValue: data.buttonGlobals?.colors?.bg
                                     ? ensureColorHelper(data.buttonGlobals.colors.bg)
                                     : buttonGlobals.colors.bg,
                             }}
@@ -224,7 +221,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
-                                defaultValue: data.buttonGlobals
+                                defaultValue: data.buttonGlobals?.colors?.fg
                                     ? ensureColorHelper(data.buttonGlobals.colors.fg)
                                     : buttonGlobals.colors.fg,
                             }}
