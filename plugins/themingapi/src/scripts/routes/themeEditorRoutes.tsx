@@ -26,8 +26,8 @@ export const ThemeEditorRoute = new RouteHandler(
 
 export const ThemePreviewRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/themePreview" */ "@themingapi/theme/ThemeEditorPreview"),
-    "/theme/theme-settings/preview",
-    (data?: undefined) => "theme/theme-settings/preview",
+    "/theme/theme-settings/:id/preview",
+    (data?: { themeID: string | number }) => `/theme/theme-settings/:id/preview`,
 );
 
 export function getThemeRoutes() {
