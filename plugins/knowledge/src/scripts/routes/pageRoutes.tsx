@@ -98,7 +98,7 @@ export const HomeAppRoute = new RouteHandler(
     (data?: undefined) => "/",
 );
 
-export const KnowledgeBasePage = new RouteHandler(
+export const KnowledgeBaseRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/knowledge-base" */ "@knowledge/pages/KnowledgeBasePage"),
     "/kb/:urlCode([\\w\\d-]+)",
     (data: { urlCode: string }) => `/kb/${data.urlCode}`,
@@ -135,7 +135,7 @@ export function getPageRoutes() {
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
         ArticleListPageRoute.route,
-        KnowledgeBasePage.route,
+        KnowledgeBaseRoute.route,
         HomeRoute.route,
         HomeAppRoute.route,
         <Route component={NotFound} key={"not found"} />,

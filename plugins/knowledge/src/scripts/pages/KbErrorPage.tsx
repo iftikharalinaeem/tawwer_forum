@@ -27,6 +27,7 @@ export class KbErrorPage extends React.Component<IProps> {
 
         return (
             <DocumentTitle title={message}>
+                <TitleBar />
                 <Container className={classes.inheritHeight}>
                     <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                         <PanelWidget className={classes.inheritHeight}>

@@ -368,7 +368,7 @@ components:
                     items:
                         $ref: "#/components/schemas/KnowledgeBaseFragment"
                     type: array
-                universaluniversalSources:
+                universalSources:
                     description: Fragments of source knowledge-bases
                     items:
                         $ref: "#/components/schemas/KnowledgeBaseFragment"

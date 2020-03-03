@@ -161,10 +161,11 @@ trait KnowledgeBasesApiSchemes {
             $this->knowledgeBaseFragmentSchema = Schema::parse([
                 "knowledgeBaseID",
                 "name",
+                "description",
                 "icon?",
                 "sortArticles?",
                 "viewType",
-                "urlCode",
+                "url",
                 "siteSectionGroup",
             ], $type);
         }
