@@ -179,9 +179,12 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
             $roles = array_column($this->userModel->getRoles($this->session->UserID)->resultArray(), 'RoleID');
             $permissions = $this->permissionModel->getPermissions($roles, $permission, false)[0];
+            if (count($roles) === 1) {
+                $permissions = [$roles[0] => $permissions];
+            }
             $hasPermission = false;
             foreach ($permissions as $item) {
-                if (isset($item[$permission]) && $item[$permission] === 1) {
+                if (isset($item[$permission]) && $item[$permission] > 0) {
                     $hasPermission = true;
                     break;
                 }

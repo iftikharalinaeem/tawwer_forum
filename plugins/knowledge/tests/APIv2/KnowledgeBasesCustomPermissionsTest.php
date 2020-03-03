@@ -52,7 +52,14 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                                 'kb.view' => true,
                                 'articles.add' => true
                             ]
+                        ],
+                        [
+                            'type' => 'global',
+                            'permissions' => [
+                                'signIn.allow' => true,
+                            ]
                         ]
+
                     ]
                 ]
             )->getBody();
@@ -69,14 +76,29 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
     protected function createUsers(array $users): array {
         $res = [];
         foreach ($users as $user) {
-            $res[$user] = $this->api()->post(
+            if (is_array($user)) {
+                $roleKeys = reset($user);
+                $userKey = key($user);
+            } else {
+                $userKey = $user;
+            }
+            if (is_string($user)) {
+                $roles = [self::$content['roles'][$user]['roleID']];
+            } else {
+                $roles= [];
+                foreach ($roleKeys as $roleKey) {
+                    $roles[] = is_string($roleKey) ? self::$content['roles'][$roleKey]['roleID'] : $roleKey;
+                }
+            }
+
+            $res[$userKey] = $this->api()->post(
                 '/users',
                 [
-                    'name' => str_replace(' ', '', $user),
-                    'email' => str_replace(' ', '', $user).'@example.com',
+                    'name' => str_replace(' ', '', $userKey),
+                    'email' => str_replace(' ', '', $userKey).'@example.com',
                     'emailConfirmed' => true,
                     'password' => 'vanilla',
-                    'roleID' => [self::$content['roles'][$user]['roleID'], 8]
+                    'roleID' => $roles
                 ]
             )->getBody();
         }
@@ -170,7 +192,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 'View KB1',
                 'Edit KB1',
                 'View KB2',
-                'Edit KB2'
+                'Edit KB2',
             ]
         );
         self::$content['roles']['Nothing'] = $this->api()->post(
@@ -202,7 +224,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                 'View KB1',
                 'Edit KB1',
                 'View KB2',
-                'Edit KB2'
+                'Edit KB2',
+                ['View All Member' => [8, 'Edit KB2', 'View All']]
             ]
         );
 
@@ -229,6 +252,13 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             'View All' => [
                 [
                     'user' => 'View All',
+                    'count' => 3,
+                    'kbs' => ['KB1', 'KB2', 'KB3']
+                ]
+            ],
+            'View All Member' => [
+                [
+                    'user' => 'View All Member',
                     'count' => 3,
                     'kbs' => ['KB1', 'KB2', 'KB3']
                 ]
@@ -350,20 +380,27 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
      *
      * @param array $args
      * @depends testPrepareData
-     * @dataProvider getArticleEditDataProvider
+     * @dataProvider patchCategoryNameSuccessProvider
      */
-    public function testGetEditArticle(array $args) {
+    public function testGetEditArticleSuccess(array $args) {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
-        foreach ($args['kbs'] as $kbKey => $status) {
-            $articleID = self::$content['kbs'][$kbKey]['patchArticle']['articleID'];
-            if (is_string($status)) {
-                $this->expectException($status);
-                $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
-            } else {
-                $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
-                $this->assertEquals($status, $responseStatus);
-            }
-        }
+        $articleID = self::$content['kbs'][$args['kb']]['patchArticle']['articleID'];
+        $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
+        $this->assertEquals(200, $responseStatus);
+    }
+
+    /**
+     * Test /articles/{id}/edit
+     *
+     * @param array $args
+     * @depends testPrepareData
+     * @dataProvider patchCategoryNameFailProvider
+     */
+    public function testGetEditArticleFail(array $args) {
+        $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
+        $articleID = self::$content['kbs'][$args['kb']]['patchArticle']['articleID'];
+        $this->expectException($args['exception']);
+        $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
     }
 
     /**
@@ -421,6 +458,16 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                     ]
                 ]
             ],
+            'View All Member' => [
+                [
+                    'user' => 'View All Member',
+                    'kbs' => [
+                        'KB1' => 200,
+                        'KB2' => 200,
+                        'KB3' => 200,
+                    ]
+                ]
+            ],
             'View Public' => [
                 [
                     'user' => 'View Public',
@@ -455,41 +502,88 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test PATCH /knowledge-categories/{id} SUCCESS scenarios only.
+     */
+    public function patchCategoryNameSuccessProvider(): array {
+        $data = self::patchData();
+        $providerData = [];
+        foreach ($data as $testCase => $arr) {
+            $args = $arr[0];
+            foreach ($args['kbs'] as $kbKey => $status) {
+                if (!is_string($status)) {
+                    $item['user'] = $args['user'];
+                    $item['kb'] = $kbKey;
+                    $providerData[$testCase . ' ' . $kbKey] = [$item];
+                }
+            }
+        }
+        return $providerData;
+    }
+
+    /**
+     * Test PATCH /knowledge-categories/{id} FAILED scenarios only
+     * @depends testPrepareData
+     */
+    public function patchCategoryNameFailProvider(): array {
+        $data = self::patchData();
+        $providerData = [];
+        foreach ($data as $testCase => $arr) {
+            $args = $arr[0];
+            foreach ($args['kbs'] as $kbKey => $status) {
+                if (is_string($status)) {
+                    $item['user'] = $args['user'];
+                    $item['kb'] = $kbKey;
+                    $item['exception'] = $status;
+                    $providerData[$testCase . ' ' . $kbKey] = [$item];
+                }
+            }
+        }
+        return $providerData;
+    }
+
+    /**
      * Test PATCH /knowledge-categories/{id}
      *
      * @param array $args
      * @depends testPrepareData
-     * @dataProvider patchDataProvider
+     * @dataProvider patchCategoryNameFailProvider
      */
-    public function testPatchCategoryName(array $args) {
+    public function testPatchCategoryNameFail(array $args) {
         $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
-        foreach ($args['kbs'] as $kbKey => $status) {
-            $kb = self::$content['kbs'][$kbKey];
-            $kbCategoryID = $kb['patchCategory']['knowledgeCategoryID'];
-            $name = $kb['patchCategory']['name'].' '.__FUNCTION__;
-            if (is_string($status)) {
-                $this->expectException($status);
-                $result = $this->api()->patch(
-                    '/knowledge-categories/'.$kbCategoryID,
-                    ['name' => $name]
-                );
-            } else {
-                $result = $this->api()->patch(
-                    '/knowledge-categories/'.$kbCategoryID,
-                    ['name' => $name]
-                );
-                $responseStatus = $result->getStatusCode();
-                $body = $result->getBody();
-                $this->assertEquals($status, $responseStatus);
-                $this->assertEquals($name, $body['name']);
-            }
-        }
+        $kb = self::$content['kbs'][$args['kb']];
+        $name = $kb['patchCategory']['name'].__FUNCTION__;
+        $this->expectException($args['exception']);
+        $result = $this->api()->patch(
+            '/knowledge-categories/'.$kb['patchCategory']['knowledgeCategoryID'],
+            ['name' => $name]
+        );
+    }
+
+    /**
+     * Test PATCH /knowledge-categories/{id}
+     *
+     * @param array $args
+     * @depends testPrepareData
+     * @dataProvider patchCategoryNameSuccessProvider
+     */
+    public function testPatchCategoryNameSuccess(array $args) {
+        $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
+        $kb = self::$content['kbs'][$args['kb']];
+        $name = $kb['patchCategory']['name'].__FUNCTION__;
+        $result = $this->api()->patch(
+            '/knowledge-categories/'.$kb['patchCategory']['knowledgeCategoryID'],
+            ['name' => $name]
+        );
+        $responseStatus = $result->getStatusCode();
+        $body = $result->getBody();
+        $this->assertEquals(200, $responseStatus);
+        $this->assertEquals($name, $body['name']);
     }
 
     /**
      * Data provider for testPatchCategoryName()
      */
-    public function patchDataProvider(): array {
+    public static function patchData(): array {
         return [
             'Nothing' => [
                 [
@@ -507,6 +601,16 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                     'kbs' => [
                         'KB1' => ForbiddenException::class,
                         'KB2' => ForbiddenException::class,
+                        'KB3' => 200,
+                    ]
+                ]
+            ],
+            'View All Member' => [
+                [
+                    'user' => 'View All Member',
+                    'kbs' => [
+                        'KB1' => ForbiddenException::class,
+                        'KB2' => 200,
                         'KB3' => 200,
                     ]
                 ]
