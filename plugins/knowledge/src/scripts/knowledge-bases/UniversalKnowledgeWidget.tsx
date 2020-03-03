@@ -13,6 +13,9 @@ import Tiles from "@vanilla/library/src/scripts/features/tiles/Tiles";
 import { t } from "@vanilla/i18n";
 import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { tileClasses } from "@vanilla/library/src/scripts/features/tiles/tileStyles";
+import Container from "@vanilla/library/src/scripts/layout/components/Container";
+import { navLinksClasses } from "@vanilla/library/src/scripts/navigation/navLinksStyles";
+import classNames from "classnames";
 
 interface IProps {
     kb: IKnowledgeBase;
@@ -39,19 +42,24 @@ export function UniversalKnowledgeWidget(props: IProps) {
     return (
         <>
             {guides.length > 0 && (
-                <Tiles
-                    emptyMessage=""
-                    title={t("Guides")}
-                    fallbackIcon={knowledgeBaseNoIcon(tileClasses().fallBackIcon)}
-                    items={guides.map(guide => {
-                        return {
-                            icon: guide.icon,
-                            name: guide.name,
-                            description: guide.description,
-                            url: guide.url,
-                        };
-                    })}
-                />
+                <>
+                    <Container fullGutter narrow>
+                        <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
+                    </Container>
+                    <Tiles
+                        emptyMessage=""
+                        title={t("Guides")}
+                        fallbackIcon={knowledgeBaseNoIcon(tileClasses().fallBackIcon)}
+                        items={guides.map(guide => {
+                            return {
+                                icon: guide.icon,
+                                name: guide.name,
+                                description: guide.description,
+                                url: guide.url,
+                            };
+                        })}
+                    />
+                </>
             )}
             {helpCenters.map(helpCenter => {
                 return <UniversalHelpCenterNav key={helpCenter.knowledgeBaseID} kbID={helpCenter.knowledgeBaseID} />;
