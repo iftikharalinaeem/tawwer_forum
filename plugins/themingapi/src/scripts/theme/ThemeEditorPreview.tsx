@@ -27,7 +27,7 @@ export default function ThemeStylePreview() {
     };
 
     const onFrame = useCallback(message => {
-        console.log("REcieved message in frame", message);
+        console.log("Recieved message in frame", message);
     }, []);
 
     useOwnFrameMessages(onFrame);

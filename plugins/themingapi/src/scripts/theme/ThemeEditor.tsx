@@ -6,11 +6,7 @@
 import React, { useEffect, useRef } from "react";
 import ThemeBuilderForm from "./ThemeBuilderForm";
 import { themeEditorClasses } from "@library/forms/themeEditor/themeEditorStyles";
-import {
-    IframeCommunicationContextProvider,
-    useIFrameCommunication,
-} from "@themingapi/theme/IframeCommunicationContext";
-import { useBannerContext } from "@library/banner/BannerContext";
+import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
 import { siteUrl } from "@library/utility/appUtils";
 
 export interface IProps {
@@ -32,7 +28,7 @@ export default function ThemeEditor(props: IProps) {
                 }}
                 type={"button"}
                 onClick={() => {
-                    sendMessage?.({ hello: "world" });
+                    sendMessage && sendMessage({ hello: "world" });
                 }}
             >
                 Send message
