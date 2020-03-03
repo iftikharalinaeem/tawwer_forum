@@ -14,8 +14,13 @@ import { color } from "csx";
 import { useUniqueID } from "@library/utility/idUtils";
 import ThemeBuilderBlock from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
+import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
 
-export const ThemePresetDropDown = () => {
+interface IThemePresetDropDown {
+    presetFg: string;
+    presetBg: string;
+}
+export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
     const options: IComboBoxOption[] = [
         {
             label: t("Light"),
@@ -35,8 +40,40 @@ export const ThemePresetDropDown = () => {
         },
     ];
 
-    let defaultValue = options[0];
+    const customOption = options.map(val => {
+        if (
+            val.data.fg.toHexString() !== props.presetFg &&
+            val.data.bg.toHexString() !== props.presetBg &&
+            val.data.fg.toHexString() !== props.presetBg && val.data.bg.toHexString() !== props.presetFg
+        ) {
+            return {
+                label: t("Custom"),
+                value: "custom",
+                data: {
+                    fg: ensureColorHelper(props.presetFg),
+                    bg: ensureColorHelper(props.presetBg),
+                },
+            };
+        } else {
+            return {
+                label: "",
+                value: "",
+                data: {
+                    fg: "",
+                    bg: "",
+                },
+            };
+        }
+    });
 
+    options.push(customOption[0]);
+
+    let defaultValue = {};
+    if (customOption.length > 0) {
+        defaultValue = options[2];
+    } else {
+        defaultValue = options[0];
+    }
     const [currentOption, setCurrentOption] = useState(defaultValue);
 
     const fgID = "global.mainColors.fg";
@@ -51,6 +88,7 @@ export const ThemePresetDropDown = () => {
             bgValueHelpers.setTouched(true);
             fgValueHelpers.setValue(option.data.fg.toHexString());
             bgValueHelpers.setValue(option.data.bg.toHexString());
+
             setCurrentOption(option as any);
         }
     };
@@ -69,6 +107,7 @@ export const ThemePresetDropDown = () => {
                     value={currentOption as any}
                     onChange={onChange}
                     isClearable={false}
+                    disabled={currentOption["value"] === "custom" ? true : false}
                 />
                 <InputHidden variableID={fgID} value={fgValue.value} />
                 <InputHidden variableID={bgID} value={bgValue.value} />
