@@ -16,7 +16,6 @@ export const themeEditorPageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
 
-
     const editIcon = style("editIcon", {
         verticalAlign: "bottom",
     });
@@ -49,17 +48,16 @@ export const themeEditorPageClasses = useThemeCache(() => {
     const messageBar = style("messageBar", {
         $nest: {
             "&&& .messages-wrap": {
-                width: unit(500)
-            }
-        }
-    })
+                width: unit(500),
+            },
+        },
+    });
     return {
-
         editIcon,
         themeName,
         themeInput,
         inputWrapper,
-        messageBar
+        messageBar,
     };
 });
 

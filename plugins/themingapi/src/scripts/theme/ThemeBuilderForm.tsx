@@ -63,6 +63,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
         onSubmit: () => {},
         validate: values => {
             const errorVariables = getVariableErrors(values.errors);
+
             const val = { ...data, ...form.values };
             updateAssets({
                 assets: {
@@ -75,6 +76,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             });
         },
     });
+    //console.log("data-->", props.variables);
+    console.log("form-->", form.values);
 
     return (
         <FormikProvider value={form}>
@@ -158,7 +161,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <InputNumberBlock
                         inputNumber={{
                             variableID: "global.border.radius",
-                            defaultValue: globalVariables().border.radius,
+                            defaultValue: data.border?.radius ? data.border.radius : globalVariables().border.radius,
                         }}
                         inputBlock={{ label: t("Border Radius") }}
                     />

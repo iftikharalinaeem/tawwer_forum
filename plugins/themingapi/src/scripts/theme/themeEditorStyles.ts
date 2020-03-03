@@ -19,10 +19,10 @@ export const themeEditorVariables = () => {
         width: 376,
         mobile: {
             margin: {
-                top: 12
-            }
+                top: 12,
+            },
         },
-        borderRaduis: 6
+        borderRaduis: 6,
     };
 
     return {
@@ -52,8 +52,8 @@ export const themeEditorClasses = useThemeCache(() => {
             $nest: {
                 "&&": {
                     display: "block",
-                }
-            }
+                },
+            },
         }),
     );
     const frameContainer = style(
@@ -70,7 +70,7 @@ export const themeEditorClasses = useThemeCache(() => {
     );
 
     const frame = style("frame", {
-        border: "none"
+        border: "none",
     });
 
     const styleOptions = style(
@@ -84,7 +84,7 @@ export const themeEditorClasses = useThemeCache(() => {
             width: percent(100),
             marginTop: unit(vars.styleOptions.mobile.margin.top),
             borderRadius: unit(vars.styleOptions.borderRaduis),
-            border: "solid 1px #dadada"
+            border: "solid 1px #dadada",
         }),
     );
 
@@ -92,6 +92,6 @@ export const themeEditorClasses = useThemeCache(() => {
         frameContainer,
         wrapper,
         styleOptions,
-        frame
+        frame,
     };
 });

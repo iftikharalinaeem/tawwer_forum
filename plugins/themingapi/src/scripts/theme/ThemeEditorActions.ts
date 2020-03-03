@@ -136,7 +136,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         };
 
         if (form.type == "themeDB" && pageType === pageTypes.EDIT_THEME) {
-
             if (themeID) {
                 return await this.patchTheme({
                     ...request,
