@@ -31,7 +31,7 @@ interface IProps {
 export function KnowledgeBaseAddEditUniversal(props: IProps) {
     const { form } = useKBData();
     const { updateForm } = useKnowledgeBaseActions();
-    const allowedKBs = useAllowedUniversalTargets();
+    const allowedKBs = useAllowedUniversalTargets(form.knowledgeBaseID);
     const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
 
     return (
@@ -88,7 +88,7 @@ export function KnowledgeBaseAddEditUniversal(props: IProps) {
 
 function KBTableEditForm(props: { targetIDs: number[]; onTargetIDsChange: (targetIDs: number[]) => void }) {
     const { form } = useKBData();
-    const allowedKBs = useAllowedUniversalTargets();
+    const allowedKBs = useAllowedUniversalTargets(form.knowledgeBaseID);
     const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
     const [nameFilter, setNameFilter] = useState("");
 

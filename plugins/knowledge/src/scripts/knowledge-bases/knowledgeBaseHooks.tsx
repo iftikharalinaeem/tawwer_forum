@@ -73,7 +73,7 @@ export function useUniversalSources(kbID?: number): IKnowledgeBaseFragment[] {
     return universalSources;
 }
 
-export function useAllowedUniversalTargets(kbID?: number) {
+export function useAllowedUniversalTargets(ownKBID?: number) {
     const knowledgeBases = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
     if (!knowledgeBases.data) {
         return [];
@@ -82,7 +82,7 @@ export function useAllowedUniversalTargets(kbID?: number) {
     const allKBs = Object.values(knowledgeBases.data);
 
     const allowedKBs = allKBs.filter(kb => {
-        if (kbID !== undefined && kb.knowledgeBaseID === kbID) {
+        if (ownKBID != undefined && kb.knowledgeBaseID === ownKBID) {
             return false;
         }
 
