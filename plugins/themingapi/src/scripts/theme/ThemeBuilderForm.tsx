@@ -4,12 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
@@ -18,12 +17,14 @@ import { Form, FormikProvider, useFormik } from "formik";
 import React from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
-
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
+import { InputDropDownBlock } from "@library/forms/themeEditor/InputDropDownBlock";
+import { ThemePresetDropDown } from "./ThemePresetDropDown";
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
 }
 
-export default function ThemeBuilderForm(props: IThemeBuilderForm, parmas) {
+export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const classes = themeBuilderClasses();
     const global = globalVariables();
     const { updateAssets, saveTheme } = useThemeActions();
@@ -73,6 +74,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm, parmas) {
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <Form translate="yes" className={classes.root}>
                 <ThemeBuilderTitle />
+                <ThemePresetDropDown />
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
@@ -116,6 +118,22 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm, parmas) {
                         }}
                         inputBlock={{ label: t("Links") }}
                     />
+
+                    <InputDropDownBlock
+                        inputBlock={{
+                            label: t("Font"),
+                        }}
+                        inputDropDown={{
+                            variableID: "global.fonts.families.body",
+                            options: [
+                                {
+                                    label: t("Open Sans"),
+                                    value: "Open Sans",
+                                },
+                            ],
+                            selectedIndex: 0,
+                        }}
+                    />
                 </ThemeBuilderSection>
                 <ThemeBuilderSection label={t("Buttons & Inputs")}>
                     <InputNumberBlock
@@ -127,6 +145,26 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm, parmas) {
                     />
 
                     <ThemeBuilderSectionGroup label={t("Primary Buttons")}>
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: t("Button Style"),
+                            }}
+                            inputDropDown={{
+                                variableID: "button.primary.buttonPreset.style",
+                                options: [
+                                    {
+                                        label: t("Solid"),
+                                        value: "solid",
+                                    },
+                                    {
+                                        label: t("Outline"),
+                                        value: "outline",
+                                    },
+                                ],
+                                selectedIndex: 0,
+                            }}
+                        />
+
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
@@ -148,6 +186,25 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm, parmas) {
                     </ThemeBuilderSectionGroup>
 
                     <ThemeBuilderSectionGroup label={t("Secondary Buttons")}>
+                        <InputDropDownBlock
+                            inputBlock={{
+                                label: t("Button Style"),
+                            }}
+                            inputDropDown={{
+                                variableID: "button.primary.buttonPreset.style",
+                                options: [
+                                    {
+                                        label: t("Solid"),
+                                        value: "solid",
+                                    },
+                                    {
+                                        label: t("Outline"),
+                                        value: "outline",
+                                    },
+                                ],
+                                selectedIndex: 0,
+                            }}
+                        />
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
