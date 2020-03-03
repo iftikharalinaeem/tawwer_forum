@@ -11,7 +11,7 @@ import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { KbViewType, KnowledgeBaseSortMode, useKBData } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { KbViewType, KnowledgeBaseSortMode } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { ConfirmLocaleChange } from "@knowledge/knowledge-settings/ConfirmLocaleChange";
 import { LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -21,6 +21,7 @@ import { t, useLocaleInfo } from "@vanilla/i18n";
 import { FrameBodyContainer } from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
+import { useKBData } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 
 interface IProps {
     kbID?: number;

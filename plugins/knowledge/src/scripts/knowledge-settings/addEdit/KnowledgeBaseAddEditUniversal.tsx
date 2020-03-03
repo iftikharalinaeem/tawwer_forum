@@ -6,31 +6,23 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
-import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import {
-    useKBData,
-    useKnowledgeBases,
-    KnowledgeBaseStatus,
-    useUniversalSources,
-    useAllowedUniversalTargets,
-} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { t } from "@vanilla/i18n";
-import Translate from "@vanilla/library/src/scripts/content/Translate";
-import { FrameBodyContainer } from "@vanilla/library/src/scripts/layout/frame/FrameBody";
-import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
-import React, { useState } from "react";
+import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
-import CheckBox from "@vanilla/library/src/scripts/forms/Checkbox";
-import Loader from "@vanilla/library/src/scripts/loaders/Loader";
-import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import isEqual from "lodash/isEqual";
-import SearchBar from "@vanilla/library/src/scripts/features/search/SearchBar";
-import { inputClasses } from "@vanilla/library/src/scripts/forms/inputStyles";
-import classNames from "classnames";
+import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
+import { useAllowedUniversalTargets, useKBData } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { knowledgeBaseAddEditClasses } from "@knowledge/knowledge-settings/addEdit/knowledgeBaseAddEditStyles";
+import { t } from "@vanilla/i18n";
+import Translate from "@vanilla/library/src/scripts/content/Translate";
+import SearchBar from "@vanilla/library/src/scripts/features/search/SearchBar";
+import CheckBox from "@vanilla/library/src/scripts/forms/Checkbox";
+import { inputClasses } from "@vanilla/library/src/scripts/forms/inputStyles";
+import { FrameBodyContainer } from "@vanilla/library/src/scripts/layout/frame/FrameBody";
+import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { normalizeString } from "@vanilla/utils";
+import classNames from "classnames";
+import React, { useState } from "react";
 
 interface IProps {
     kbID?: number;
@@ -39,7 +31,7 @@ interface IProps {
 export function KnowledgeBaseAddEditUniversal(props: IProps) {
     const { form } = useKBData();
     const { updateForm } = useKnowledgeBaseActions();
-    const allowedKBs = useAllowedUniversalTargets();
+    const allowedKBs = useAllowedUniversalTargets(form.knowledgeBaseID);
     const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
 
     return (
@@ -96,7 +88,7 @@ export function KnowledgeBaseAddEditUniversal(props: IProps) {
 
 function KBTableEditForm(props: { targetIDs: number[]; onTargetIDsChange: (targetIDs: number[]) => void }) {
     const { form } = useKBData();
-    const allowedKBs = useAllowedUniversalTargets();
+    const allowedKBs = useAllowedUniversalTargets(form.knowledgeBaseID);
     const allowedIDs = allowedKBs.map(kb => kb.knowledgeBaseID).sort();
     const [nameFilter, setNameFilter] = useState("");
 
