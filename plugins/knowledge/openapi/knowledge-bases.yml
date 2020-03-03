@@ -264,26 +264,26 @@ components:
                         - guide
                         - help
                     nullable: true
-                customPermissionRequired:
+                hasCustomPermission:
                     type: boolean
                     description: Knowledge base has custom permission settings.
                     default: false
                     nullable: true
-                viewers:
+                viewRoleIDs:
                     type: array
                     description: >
                         List of role id which should have permission to view knowledge base content.
-                        <br />Applicable only when customPermissionRequired is true
+                        <br />Applicable only when hasCustomPermission is true
                     items:
                         type: integer
                     nullable: true
                     default: []
                     example: [ 8, 16 ]
-                editors:
+                editRoleIDs:
                     type: array
                     description: >
                         List of role id which should have permission to edit knowledge base content.
-                        <br />Applicable only when customPermissionRequired is true
+                        <br />Applicable only when hasCustomPermission is true
                     items:
                         type: integer
                     nullable: true
@@ -384,7 +384,7 @@ components:
                         - guide
                         - help
                     nullable: true
-                customPermissionRequired:
+                hasCustomPermission:
                     type: boolean
                     description: Knowledge base has custom permission settings.
                     default: false

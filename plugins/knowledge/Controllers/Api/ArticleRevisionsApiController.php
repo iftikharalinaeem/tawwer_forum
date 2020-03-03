@@ -17,6 +17,7 @@ use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Formats;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
  * API controller for managing the article revisions resource.
@@ -29,6 +30,7 @@ use Vanilla\Formatting\Formats;
  * @see https://github.com/vanilla/knowledge/issues/264
  */
 class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
+    use CheckGlobalPermissionTrait;
 
     /** The maximum limit of revisions that can be re-rendered at a time. */
     const LIMIT = 1000;
@@ -41,6 +43,10 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
 
     /** @var ArticleRevisionModel */
     private $articleRevisionModel;
+
+    /** @var KnowledgeBaseModel $knowledgeBaseModel */
+    private $knowledgeBaseModel;
+
 
     /** @var Schema */
     private $articleRevisionSchema;
@@ -64,17 +70,20 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
      * @param FormatService $formatService
+     * @param KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         ArticleRevisionModel $articleRevisionModel,
         ArticleModel $articleModel,
         UserModel $userModel,
-        FormatService $formatService
+        FormatService $formatService,
+        KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
         $this->formatService = $formatService;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
     }
 
     /**
@@ -202,7 +211,7 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @throws \Vanilla\Exception\PermissionException If the current user does not have sufficient permissions.
      */
     public function get($id): array {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $this->idParamSchema()->setDescription("Get an article revision.");
         $out = $this->articleRevisionSchema("out");

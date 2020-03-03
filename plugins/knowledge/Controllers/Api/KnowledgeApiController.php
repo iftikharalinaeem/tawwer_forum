@@ -26,12 +26,14 @@ use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Utility\InstanceValidatorSchema;
 use CategoryModel;
 use Garden\Web\Exception\ServerException;
+use Gdn_Session;
 
 /**
  * Endpoint for the Knowledge resource.
  */
 class KnowledgeApiController extends AbstractApiController {
     use SphinxTrait;
+    use CheckGlobalPermissionTrait;
 
     const SPHINX_DEFAULT_LIMIT = 100;
 
@@ -153,6 +155,9 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
 
+    /** @var KnowledgeBaseModel $knowledgeBaseModel */
+    private $knowledgeBaseModel;
+
     /** @var DiscussionModel */
     private $discussionModel;
 
@@ -171,8 +176,11 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var KnowledgeUniversalSourceModel */
     private $knowledgeUniversalSourceModel;
 
-    /** @var KnowledgeBaseModel */
-    private $knowledgeBaseModel;
+    /** @var Gdn_Session $session */
+    private $session;
+
+    /** @var array $knowledgeCategories */
+    private $knowledgeCategories = null;
 
     /**
      * DI.
@@ -187,6 +195,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param SiteSectionModel $siteSectionModel
      * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -198,7 +207,8 @@ class KnowledgeApiController extends AbstractApiController {
         BreadcrumbModel $breadcrumbModel,
         SiteSectionModel $siteSectionModel,
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel,
-        KnowledgeBaseModel $knowledgeBaseModel
+        KnowledgeBaseModel $knowledgeBaseModel,
+        Gdn_Session $session
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -210,6 +220,7 @@ class KnowledgeApiController extends AbstractApiController {
         $this->siteSectionModel = $siteSectionModel;
         $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->session = $session;
     }
 
     /**
@@ -252,7 +263,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @return array
      */
     public function get_search(array $query = []): \Garden\Web\Data {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->schema($this->inputSchema(), "in");
 
@@ -350,7 +361,7 @@ class KnowledgeApiController extends AbstractApiController {
         $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
             if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
-                $this->permission("knowledge.articles.add");
+                $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
             };
             $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
             $statuses = array_map(
@@ -387,11 +398,12 @@ class KnowledgeApiController extends AbstractApiController {
                 ),
                 'knowledgeCategoryID'
             );
-            $this->sphinx->setFilter('knowledgeCategoryID', $knowledgeCategories);
+            $this->prepareKnowledgeCategoryFilter($knowledgeCategories);
         }
         if (isset($this->query['knowledgeCategoryIDs'])) {
-            $this->sphinx->setFilter('knowledgeCategoryID', $this->query['knowledgeCategoryIDs']);
+            $this->prepareKnowledgeCategoryFilter($this->query['knowledgeCategoryIDs']);
         }
+        $this->setKnowledgeCategoryFilter();
         if (isset($this->query['dateUpdated'])) {
             $range = DateFilterSphinxSchema::dateFilterRange($this->query['dateUpdated']);
             $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
@@ -405,7 +417,6 @@ class KnowledgeApiController extends AbstractApiController {
             $siteSection = $this->siteSectionModel->getCurrentSiteSection();
             $this->sphinx->setFilterString('locale', $siteSection->getContentLocale());
         }
-
         if (isset($this->query['siteSectionGroup'])) {
             $this->sphinx->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
@@ -435,6 +446,47 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
     }
+
+    /**
+     * Store selected knowledgeCategoryIDs to filter
+     *
+     * @param array $ids
+     */
+    private function prepareKnowledgeCategoryFilter(array $ids = []) {
+        if (empty($this->knowledgeCategories)) {
+            $this->knowledgeCategories = $ids;
+        } else {
+            $this->knowledgeCategories = array_intersect($ids, $this->knowledgeCategories);
+        }
+    }
+
+    /**
+     * Check selected knowledgeCategoryIDs and restrict according to the user perissions settings
+     * Apply Sphinx filter after
+     */
+    private function setKnowledgeCategoryFilter() {
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
+            $knowledgeCategories = array_column(
+                $this->knowledgeCategoryModel->get(
+                    ['knowledgeBaseID' => $kbs['knowledgeBaseID']],
+                    ['select' => ['knowledgeCategoryID']]
+                ),
+                'knowledgeCategoryID'
+            );
+            if (empty($this->knowledgeCategories)) {
+                $filterIDs = $knowledgeCategories;
+            } else {
+                $filterIDs = array_intersect($this->knowledgeCategories, $knowledgeCategories);
+            }
+            $this->sphinx->setFilter('knowledgeCategoryID', $filterIDs);
+        } else {
+            if (!is_null($this->knowledgeCategories)) {
+                $this->sphinx->setFilter('knowledgeCategoryID', $this->knowledgeCategories);
+            }
+        }
+    }
+
 
     /**
      * Get all full sphinx index names needed for current search
@@ -710,7 +762,6 @@ class KnowledgeApiController extends AbstractApiController {
                     "-dateFeatured",
                 ]
             ],
-
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,

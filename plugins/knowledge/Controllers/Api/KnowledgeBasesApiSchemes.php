@@ -130,7 +130,8 @@ trait KnowledgeBasesApiSchemes {
                 'description' => "Knowledge base has custom permission.",
                 'default' => false,
             ],
-            "viewers:a?",
+            "viewRoleIDs:a?",
+            "editRoleIDs:a?",
             "siteSectionGroup:s" => [
                 'description' => "Site section group. Ex: subcommunity product key",
                 'default' => DefaultSiteSection::DEFAULT_SECTION_GROUP
@@ -193,8 +194,8 @@ trait KnowledgeBasesApiSchemes {
                     "status?",
                     "urlCode",
                     "hasCustomPermission?",
-                    "viewers?",
-                    "editors?",
+                    "viewRoleIDs?",
+                    "editRoleIDs?",
                     "isUniversalSource:b?",
                     "universalTargetIDs:a?",
                 ])->add($this->fullSchema()),

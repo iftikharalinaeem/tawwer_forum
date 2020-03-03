@@ -50,6 +50,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     use ArticlesApiDrafts;
     use ArticlesApiMigration;
 
+    use CheckGlobalPermissionTrait;
+
     const REVISIONS_LIMIT = 10;
 
 
@@ -220,7 +222,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     public function get(int $id, array $query = []) {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $in = $this->idParamSchema()->setDescription("Get an article.");
 
@@ -266,7 +268,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     public function get_translations(int $id, array $query):array {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema()->setDescription("Get translations for an article");
 
         $in = Schema::parse([
@@ -308,7 +310,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function get_edit(int $id, array $query): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->idParamSchema()->setDescription("Get an article for editing.");
 
@@ -325,6 +327,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "locale",
         ])->add($this->fullSchema()), "out");
         $article = $this->retrieveRow($id, $query);
+        $this->knowledgeBaseModel->checkEditPermission($article['knowledgeBaseID']);
         $body = $article['body'];
         $article = $this->normalizeOutput($article);
         $article['body'] = $body;
@@ -344,7 +347,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function index(array $query = []) {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $in = $this->schema([
             "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
             "knowledgeCategoryID" => [
@@ -399,7 +402,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $kb = $this->knowledgeBaseModel->get(
-            ['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']],
+            $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']]),
             ['selects' => 'sortArticles']
         );
         $knowledgeBase = array_pop($kb);
@@ -461,7 +464,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ValidationException If the output fails to validate against the schema.
      */
     public function index_revisions(int $id, array $query = []): Data {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $this->idParamSchema()->setDescription("Get revisions from a specific article.");
         $in = Schema::parse([
@@ -483,7 +486,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]);
         $query = $in->validate($query);
         $offset = ($query['page'] - 1) * $query['limit'];
-
 
         $out = $this->schema([
             ":a" => Schema::parse([
@@ -548,7 +550,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch(int $id, array $body = []): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->articlePatchSchema("in")
             ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
@@ -586,7 +588,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function patch_status(int $id, array $body): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -627,7 +629,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function put_react(int $id, array $body): array {
-        $this->permission("knowledge.kb.view");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         if (!$this->sessionInterface->isValid()) {
             throw new ClientException('User must be signed in to post reaction.');
         }
@@ -696,7 +698,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @throws ClientException If locale is not supported.
      */
     public function post(array $body): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->articlePostSchema("in")
             ->addValidator("knowledgeCategoryID", [$this->knowledgeCategoryModel, "validateKBArticlesLimit"])
@@ -733,7 +735,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     public function put_invalidateTranslations(int $id, array $body): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->schema($this->idParamSchema(), "in");
         $in->validate(['id' => $id]);
@@ -765,7 +767,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @return array
      */
     public function put_featured(int $id, array $body) {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $this->idParamSchema();
         $in = $this->schema(Schema::parse([
@@ -790,7 +792,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     * @return array
     */
     public function get_articlesRelated(int $id, array $query): array {
-        $this->permission("knowledge.articles.add");
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
 
         $query["locale"] = $query["locale"] ?? 'en';
         $query["limit"] = $query["limit"] ?? ArticleModel::RELATED_ARTICLES_LIMIT;
