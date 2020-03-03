@@ -47,7 +47,7 @@ export function IframeCommunicationContextProvider(props: { children: React.Reac
 
             const realSendMessage = function(message: Record<string, any>) {
                 if (contentWindow) {
-                    contentWindow.postMessage(message, "*");
+                    contentWindow.postMessage(message, window.origin);
                 } else {
                     throw new Error("Unsable to find iFrame");
                 }
