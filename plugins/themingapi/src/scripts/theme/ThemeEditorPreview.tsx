@@ -15,6 +15,7 @@ import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import themeEditorPreviewClasses from "./themeEditorPreviewStyles";
 import { useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
+import { logDebug } from "@vanilla/utils";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
@@ -27,7 +28,7 @@ export default function ThemeStylePreview() {
     };
 
     const onFrame = useCallback(message => {
-        console.log("Recieved message in frame", message);
+        logDebug("Recieved message in frame", message);
     }, []);
 
     useOwnFrameMessages(onFrame);
