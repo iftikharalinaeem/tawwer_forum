@@ -50,9 +50,16 @@ function SearchForm(props: IProps) {
         [search],
     );
 
+    let knowledgeBase = form.kb || form.knowledgeBaseID;
+    let knowledgeBaseID = form.kb?.value || form.knowledgeBaseID;
+
+    let queryParam = knowledgeBase ? "kb" : "siteSectionGroup";
+    let queryValue =
+        queryParam === "kb" ? { label: form.kb?.label, value: knowledgeBaseID } : getSiteSection().sectionGroup;
+
     const queryParamDefaults = {
         ...INITIAL_SEARCH_FORM,
-        siteSectionGroup: getSiteSection().sectionGroup,
+        [queryParam]: queryValue,
     };
 
     return (
@@ -112,6 +119,18 @@ function useSearchContextValueSync() {
     const { form } = useSearchPageData();
     const { getQueryValuesForDomain, updateQueryValuesForDomain } = useSearchFilters();
     const extraValues = getQueryValuesForDomain(form.domain);
+    const { location } = useHistory();
+    const queryString = location.search;
+    const initialForm = qs.parse(queryString.replace(/^\?/, ""));
+
+    if (initialForm.knowledgeBaseID && !form.kb) {
+        form.kb = { label: "", value: initialForm.knowledgeBaseID };
+    }
+
+    if (extraValues.knowledgeBaseID || form.kb) {
+        extraValues.siteSectionGroup = undefined;
+    }
+
     useEffect(() => {
         updateForm(extraValues);
     }, [updateForm, extraValues]);
@@ -122,7 +141,6 @@ function useQueryParamSynchronization() {
     const { updateQueryValuesForDomain } = useSearchFilters();
     const { location } = useHistory();
     const queryString = location.search;
-
     /**
      * Initialize the form values from a query string.
      *

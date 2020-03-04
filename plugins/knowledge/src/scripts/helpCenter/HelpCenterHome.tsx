@@ -28,7 +28,9 @@ import { getSiteSection, t } from "@library/utility/appUtils";
 import { NavLinksPlaceholder } from "@vanilla/library/src/scripts/navigation/NavLinksPlaceholder";
 import classNames from "classnames";
 import React from "react";
-import { UniversalHelpCenterNav, UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
+import SearchContext from "@vanilla/library/src/scripts/contexts/SearchContext";
+import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
+import { UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
@@ -54,34 +56,38 @@ export default function HelpCenterHome(props: IProps) {
 
     const titleBarAndBanner = (
         <>
-            <DocumentTitle title={knowledgeBase.name}>
-                <TitleBar
-                    key={knowledgeBaseID}
-                    useMobileBackButton={!props.isOnlyKb}
-                    extraBurgerNavigation={
-                        <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
+            <SearchContext.Provider
+                value={{ searchOptionProvider: new KnowledgeSearchProvider(knowledgeBase.knowledgeBaseID) }}
+            >
+                <DocumentTitle title={knowledgeBase.name}>
+                    <TitleBar
+                        key={knowledgeBaseID}
+                        useMobileBackButton={!props.isOnlyKb}
+                        extraBurgerNavigation={
+                            <NavigationAdminLinks showDivider knowledgeBase={knowledgeBase} inHamburger />
+                        }
+                    />
+                </DocumentTitle>
+                <Banner
+                    action={
+                        <Permission permission="articles.add">
+                            <LinkAsButton
+                                to={EditorRoute.url({ knowledgeBaseID, knowledgeCategoryID: rootCategoryID })}
+                                onMouseOver={EditorRoute.preload}
+                                className={classNames("searchBar-actionButton")}
+                                baseClass={ButtonTypes.ICON}
+                                title={t("Compose")}
+                            >
+                                <ComposeIcon />
+                            </LinkAsButton>
+                        </Permission>
                     }
+                    backgroundImage={bannerImage}
+                    contentImage={bannerContentImage}
+                    title={knowledgeBase.name}
+                    description={description}
                 />
-            </DocumentTitle>
-            <Banner
-                action={
-                    <Permission permission="articles.add">
-                        <LinkAsButton
-                            to={EditorRoute.url({ knowledgeBaseID, knowledgeCategoryID: rootCategoryID })}
-                            onMouseOver={EditorRoute.preload}
-                            className={classNames("searchBar-actionButton")}
-                            baseClass={ButtonTypes.ICON}
-                            title={t("Compose")}
-                        >
-                            <ComposeIcon />
-                        </LinkAsButton>
-                    </Permission>
-                }
-                backgroundImage={bannerImage}
-                contentImage={bannerContentImage}
-                title={knowledgeBase.name}
-                description={description}
-            />
+            </SearchContext.Provider>
             {/*For Screen Readers / SEO*/}
             <ScreenReaderContent>
                 <h1>{knowledgeBase.name}</h1>
