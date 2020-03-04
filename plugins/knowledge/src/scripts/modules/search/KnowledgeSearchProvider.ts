@@ -17,6 +17,8 @@ import { PublishStatus } from "@library/@types/api/core";
 import { getCurrentLocale } from "@vanilla/i18n";
 
 export default class KnowledgeSearchProvider implements ISearchOptionProvider {
+    public constructor(private readonly knowledgeBaseID?: number | undefined) {}
+
     /**
      * Simple data loading function for the search bar/react-select.
      */
@@ -24,13 +26,16 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
         const locale = getCurrentLocale();
         const siteSection = getSiteSection();
 
+        let queryParam = this.knowledgeBaseID ? "knowledgeBaseID" : "siteSectionGroup";
+        let queryValue = queryParam === "knowledgeBaseID" ? this.knowledgeBaseID : siteSection.sectionGroup;
+
         const queryObj: ISearchRequestBody = {
             all: value,
             statuses: [PublishStatus.PUBLISHED],
             limit: 10,
             expand: ["breadcrumbs"],
             locale: locale,
-            siteSectionGroup: siteSection.sectionGroup,
+            [queryParam]: queryValue,
             ...options,
         };
         const query = qs.stringify(queryObj);
@@ -72,6 +77,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     };
 
     public makeSearchUrl(query: string): string {
-        return `/kb/search?query=${encodeURIComponent(query)}`;
+        const queryString = qs.stringify({ knowledgeBaseID: this.knowledgeBaseID, query: query });
+        return `/kb/search?${queryString}`;
     }
 }

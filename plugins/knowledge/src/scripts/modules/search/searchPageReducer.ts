@@ -43,6 +43,7 @@ export interface ISearchFormState {
     kb: IComboBoxOption | undefined;
     page: number;
     siteSectionGroup: string | null;
+    knowledgeBaseID: string | undefined;
 }
 
 export interface ISearchPageState {
@@ -64,6 +65,7 @@ export const INITIAL_SEARCH_FORM: ISearchFormState = {
     communityCategory: undefined,
     page: 1,
     siteSectionGroup: null,
+    knowledgeBaseID: undefined,
 };
 
 export const INITIAL_SEARCH_STATE: ISearchPageState = {
