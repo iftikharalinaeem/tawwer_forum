@@ -41,19 +41,20 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     function getVariableErrors(obj) {
         const result: any[] = [];
         function recursivelyFindError(o) {
-            Object.keys(o).forEach(function(key) {
-                if (typeof o[key] === "object") {
-                    recursivelyFindError(o[key]);
-                } else {
-                    if (o[key]) {
-                        // Value exists if there's an error
-                        result.push(o);
+            o &&
+                Object.keys(o).forEach(function(key) {
+                    if (typeof o[key] === "object") {
+                        recursivelyFindError(o[key]);
                     } else {
-                        // Value is undefined if no error exists
-                        result.pop();
+                        if (o[key]) {
+                            // Value exists if there's an error
+                            result.push(o);
+                        } else {
+                            // Value is undefined if no error exists
+                            result.pop();
+                        }
                     }
-                }
-            });
+                });
         }
         recursivelyFindError(obj);
         return result;
@@ -65,6 +66,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
         validate: values => {
             const errorVariables = getVariableErrors(values.errors);
             let hasError = errorVariables.length > 0;
+
             const val = { ...data, ...form.values };
             const payload = {
                 variables: {
@@ -76,6 +78,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 assets: payload,
                 errors: hasError,
             });
+            return values;
         },
     });
 

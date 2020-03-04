@@ -61,10 +61,10 @@ class ThemeSettingsPageController extends PageDispatchController {
      *
      * @return \Garden\Web\Data
      */
-    public function get_preview($id) {
+    public function get_preview($path) {
         /** @var ThemePreviewPage $page */
         $page = $this->usePage(ThemePreviewPage::class);
-        $page->initialize($id);
+        $page->initialize($path);
         return $page->render();
     }
 }

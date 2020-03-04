@@ -128,7 +128,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
 
                 contents: (
                     <ThemeEditor
-                        themeID={themeID}
+                        themeID={themeID ?? getTemplateName()}
                         variables={theme.data.assets.variables}
                         getSendMessage={getSendMessage}
                     />
@@ -212,7 +212,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         title={<Title themeName={theme.data.name} pageType={form.pageType} />}
                         fullWidth={true}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                        isCallToActionDisabled={form.errors ? true : false}
+                        isCallToActionDisabled={!!form.errors}
                         optionsMenu={
                             <>
                                 {/* WIP not wired up. */}
