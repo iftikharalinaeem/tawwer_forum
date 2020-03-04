@@ -36,7 +36,9 @@ export interface IKbFormState {
     viewType: KbViewType;
     sourceLocale: string | null;
     sortArticles: KnowledgeBaseSortMode;
-    hasCustomPermissions: boolean;
+    hasCustomPermission: boolean;
+    viewRoleIDs: number[];
+    editRoleIDs: number[];
     isUniversalSource: boolean;
     universalTargetIDs: number[];
 }

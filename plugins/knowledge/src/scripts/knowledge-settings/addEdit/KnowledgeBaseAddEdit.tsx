@@ -49,10 +49,10 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                 <p>{t("This Knowledge Base is already displaying Universal Content from these Knowledge Bases:")}</p>
                 <p>
                     {universalSources.map((kb, i) => (
-                        <>
+                        <React.Fragment key={i}>
                             <strong>{kb.name}</strong>
                             {i < universalSources.length - 1 ? "," : null}
-                        </>
+                        </React.Fragment>
                     ))}
                 </p>
             </>
