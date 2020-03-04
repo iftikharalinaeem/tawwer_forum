@@ -538,12 +538,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $prevState = $this->knowledgeBaseByID($id);
 
         if ((isset($body['hasCustomPermission']) && $prevState['hasCustomPermission'] !== $body['hasCustomPermission'])
-            || (isset($body['hasCustomPermission']) && $body['hasCustomPermission'] && (isset($body['viewers']) || isset($body['editors'])))
+            || (isset($body['hasCustomPermission']) && $body['hasCustomPermission'] && (isset($body['viewRoleIDs']) || isset($body['editRoleIDs'])))
         ) {
             if ($body['hasCustomPermission'] === 1) {
                 $body['permissionKnowledgeBaseID'] = $id;
-                $viewers = $body['viewers'] ?? [];
-                $editors = $body['editors'] ?? [];
+                $viewers = $body['viewRoleIDs'] ?? [];
+                $editors = $body['editRoleIDs'] ?? [];
             } else {
                 $body['permissionKnowledgeBaseID'] = -1;
                 $viewers = [];
@@ -733,7 +733,34 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }
         $record['url'] = $this->knowledgeBaseModel->url($record);
         $this->expandSiteSections($record);
+        $this->expandViewersAndEditors($record);
         return $record;
+    }
+
+    /**
+     * @param array $kb
+     */
+    private function expandViewersAndEditors(array &$kb) {
+        $kb['viewRoleIDs'] = [];
+        $kb['editRoleIDs'] = [];
+        if ($kb['hasCustomPermission'] ?? false) {
+            $permissions = $this->knowledgeBaseModel->getAllowedRoles(
+                'knowledgeBase',
+                $kb['knowledgeBaseID'],
+                KnowledgeBaseModel::VIEW_PERMISSION
+            );
+            if (count($permissions) > 0) {
+                $kb['viewRoleIDs'] = array_column($permissions, 'RoleID');
+            }
+            $permissions = $this->knowledgeBaseModel->getAllowedRoles(
+                'knowledgeBase',
+                $kb['knowledgeBaseID'],
+                KnowledgeBaseModel::EDIT_PERMISSION
+            );
+            if (count($permissions) > 0) {
+                $kb['editRoleIDs'] = array_column($permissions, 'RoleID');
+            }
+        }
     }
 
     /**

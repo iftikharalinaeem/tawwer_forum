@@ -196,6 +196,29 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Extension for permission model
+     *
+     * @param string $junctionTable
+     * @param int $foreignID
+     * @param string $permission
+     * @return array
+     */
+    public function getAllowedRoles(string $junctionTable, int $foreignID, string $permission): array {
+        // Generic part of query
+        $sql = $this->sql();
+        $sql->from('Permission p')
+            ->select('PermissionID', 'COUNT')
+            ->select('r.RoleID')
+            ->select('r.Name')
+            ->join('Role r', 'p.RoleID = r.RoleID')
+            ->where('JunctionTable', $junctionTable)
+            ->where('JunctionID', $foreignID)
+            ->where('`'.$permission.'` >', 0, false)
+            ->groupBy(['p.RoleID']);
+        return $sql->get()->resultArray();
+    }
+
+    /**
      * Generate a URL to the provided knowledge base row.
      *
      * @param array $knowledgeBase An knowledge base row.
