@@ -156,7 +156,9 @@ export function dummyKnowledgeBase(overrides: Partial<IKnowledgeBase> = {}): IKn
         isUniversalSource: false,
         universalSources: [],
         universalTargetIDs: [],
-        hasCustomPermissions: false,
+        hasCustomPermission: false,
+        viewRoleIDs: [],
+        editRoleIDs: [],
         ...overrides,
     };
 }

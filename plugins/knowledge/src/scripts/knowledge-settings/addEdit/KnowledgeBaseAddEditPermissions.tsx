@@ -13,6 +13,7 @@ import { FrameBodyContainer } from "@vanilla/library/src/scripts/layout/frame/Fr
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import React from "react";
 import { useKBData } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
+import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
 
 interface IProps {
     kbID?: number;
@@ -38,14 +39,41 @@ export function KnowledgeBaseAddEditPermissions(props: IProps) {
                 }
             >
                 <DashboardToggle
-                    checked={form.hasCustomPermissions}
-                    onChange={hasCustomPermissions => {
-                        updateForm({ hasCustomPermissions });
+                    checked={form.hasCustomPermission}
+                    onChange={hasCustomPermission => {
+                        updateForm({ hasCustomPermission });
                     }}
                 />
             </DashboardFormGroup>
-            <DashboardFormList isBlurred={!form.hasCustomPermissions}>
-                <div style={{ paddingTop: 24 }}>Hello Custom Permissions (Will be replaced in implementation PR)</div>
+            <DashboardFormList isBlurred={!form.hasCustomPermission}>
+                <DashboardFormGroup
+                    label={t("Viewers")}
+                    description={t("Can read and search for content in this Knowledge Base.")}
+                >
+                    <div className="input-wrap">
+                        <MultiRoleInput
+                            label={""}
+                            value={form.viewRoleIDs ?? []}
+                            onChange={viewRoleIDs => {
+                                updateForm({ viewRoleIDs });
+                            }}
+                        />
+                    </div>
+                </DashboardFormGroup>
+                <DashboardFormGroup
+                    label={t("Content Creators ")}
+                    description={t("Can add articles, organize categories and curate content.")}
+                >
+                    <div className="input-wrap">
+                        <MultiRoleInput
+                            label={""}
+                            value={form.editRoleIDs ?? []}
+                            onChange={editRoleIDs => {
+                                updateForm({ editRoleIDs });
+                            }}
+                        />
+                    </div>
+                </DashboardFormGroup>
             </DashboardFormList>
         </FrameBodyContainer>
     );
