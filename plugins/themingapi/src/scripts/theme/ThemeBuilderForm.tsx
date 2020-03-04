@@ -39,7 +39,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const data = JSON.parse(dataString).data;
 
     function getVariableErrors(obj) {
-        const result: Array<any> = [];
+        const result: any[] = [];
         function recursivelyFindError(o) {
             Object.keys(o).forEach(function(key) {
                 if (typeof o[key] === "object") {
@@ -65,13 +65,17 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
 
             const val = { ...data, ...form.values };
 
-            updateAssets({
-                assets: {
-                    variables: {
-                        data: JSON.parse(JSON.stringify(val)),
-                        type: "string",
-                    },
+            const payload = {
+                variables: {
+                    data: JSON.parse(JSON.stringify(val)),
+                    type: "string",
                 },
+            };
+
+            console.log("new values: ", payload);
+
+            updateAssets({
+                assets: payload,
                 errors: errorVariables.length > 0 ? true : false,
             });
         },
