@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import SelectOne from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -15,13 +15,14 @@ import { useUniqueID } from "@library/utility/idUtils";
 import ThemeBuilderBlock from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import isEqual from "lodash/isEqual";
 
-interface IThemePresetDropDown {
-    presetFg: string;
-    presetBg: string;
-}
-export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
-    const options: IComboBoxOption[] = [
+export const ThemePresetDropDown = () => {
+    const globalVars = globalVariables();
+    const presetFg = ensureColorHelper(globalVars.mainColors.fg);
+    const presetBg = ensureColorHelper(globalVars.mainColors.bg);
+    let options: IComboBoxOption[] = [
         {
             label: t("Light"),
             value: "light",
@@ -38,34 +39,30 @@ export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
                 bg: color("#555a62"),
             },
         },
-    ];
+    ] as IComboBoxOption[];
 
-    let defaultValue = {};
-
-    if (
-        options[0].data.fg === ensureColorHelper(props.presetFg) &&
-        options[0].data.bg === ensureColorHelper(props.presetBg)
-    ) {
-        defaultValue = options[0];
-    } else if (
-        options[1].data.fg === ensureColorHelper(props.presetFg) &&
-        options[1].data.bg === ensureColorHelper(props.presetBg)
-    ) {
-        defaultValue = options[1];
-    } else {
-        options.push({
+    const customOption: IComboBoxOption[] = [
+        {
             label: t("Custom"),
             value: "custom",
             data: {
-                fg: ensureColorHelper(props.presetFg),
-                bg: ensureColorHelper(props.presetBg),
+                fg: presetFg,
+                bg: presetBg,
             },
-        });
-        defaultValue = options[2];
+        },
+    ];
+
+    let defaultValue: IComboBoxOption = customOption[0];
+
+    if (isEqual(presetFg, options[0].data.fg) && isEqual(presetBg, options[0].data.bg)) {
+        defaultValue = options[0];
+    } else if (isEqual(presetFg, options[1].data.fg) && isEqual(presetBg, options[1].data.bg)) {
+        defaultValue = options[1];
+    } else {
+        options = customOption;
     }
 
     const [currentOption, setCurrentOption] = useState(defaultValue);
-
     const fgID = "global.mainColors.fg";
     const bgID = "global.mainColors.bg";
 
@@ -79,7 +76,7 @@ export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
             fgValueHelpers.setValue(option.data.fg.toHexString());
             bgValueHelpers.setValue(option.data.bg.toHexString());
 
-            setCurrentOption(option as any);
+            setCurrentOption(option);
         }
     };
 
@@ -94,10 +91,10 @@ export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
                     labelID={labelID}
                     inputID={inputID}
                     options={options}
-                    value={currentOption as any}
+                    value={currentOption as IComboBoxOption}
                     onChange={onChange}
                     isClearable={false}
-                    disabled={currentOption["value"] === "custom" ? true : false}
+                    disabled={options.length === 1}
                 />
                 <InputHidden variableID={fgID} value={fgValue.value} />
                 <InputHidden variableID={bgID} value={bgValue.value} />

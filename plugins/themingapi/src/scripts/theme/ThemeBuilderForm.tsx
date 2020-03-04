@@ -82,7 +82,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <Form translate="yes" className={classes.root}>
                 <ThemeBuilderTitle />
-                <ThemePresetDropDown presetFg={data.global?.mainColors?.bg} presetBg={data.global?.mainColors?.fg} />
+                <ThemePresetDropDown />
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
