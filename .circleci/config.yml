@@ -6,7 +6,7 @@ executors:
     sphinx:
         docker:
             - image: circleci/php:7.2.19-fpm-node
-            - image: dzsysop/sphinx-vanilla
+            - image: vanillaryan/sphinxsearch-vanilla-ci
               environment:
                   MYSQL_HOST: 127.0.0.1
                   MYSQL_USER: circleci
