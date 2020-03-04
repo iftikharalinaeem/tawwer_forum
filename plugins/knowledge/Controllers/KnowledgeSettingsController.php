@@ -141,8 +141,6 @@ class KnowledgeSettingsController extends SettingsController {
     /**
      * Render the /knowledge-settings/knowledge-categories page.
      *
-     * @param int|null $knowledgeBaseID
-     * @param string|null $action
      * @return void
      */
     public function knowledgeBases() {

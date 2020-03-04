@@ -74,9 +74,7 @@ const HomePage = (props: IProps) => {
             </DocumentTitle>
             <TitleBar useMobileBackButton={false} />
             <Banner title={title} />
-            <Container fullGutter>
-                <KnowledgeBaseList />
-            </Container>
+            <KnowledgeBaseList />
             <ArticlesWidget
                 title={t("Recommended Articles")}
                 maxItemCount={maxItems}

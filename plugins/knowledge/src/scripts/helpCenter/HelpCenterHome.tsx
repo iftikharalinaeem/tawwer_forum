@@ -28,9 +28,9 @@ import { getSiteSection, t } from "@library/utility/appUtils";
 import { NavLinksPlaceholder } from "@vanilla/library/src/scripts/navigation/NavLinksPlaceholder";
 import classNames from "classnames";
 import React from "react";
-import { UniversalHelpCenterNav, UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
 import SearchContext from "@vanilla/library/src/scripts/contexts/SearchContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
+import { UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;

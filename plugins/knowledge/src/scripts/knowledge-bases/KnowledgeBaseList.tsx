@@ -9,7 +9,7 @@ import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
+import { t, getSiteSection } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 
@@ -72,8 +72,14 @@ interface IProps extends ReturnType<typeof mapStateToProps>, ReturnType<typeof m
 }
 
 function mapStateToProps(state: IKnowledgeAppStoreState) {
+    const currentSiteSection = getSiteSection();
     return {
-        knowledgeBases: KnowledgeBaseModel.selectKnowledgeBases(state),
+        knowledgeBases: KnowledgeBaseModel.selectKnowledgeBases(state).filter(kb => {
+            // Make sure the site section group matches.
+            return (
+                currentSiteSection.sectionGroup === "vanilla" || kb.siteSectionGroup === currentSiteSection.sectionGroup
+            );
+        }),
         loadStatus: state.knowledge.knowledgeBases.knowledgeBasesByID.status,
     };
 }
