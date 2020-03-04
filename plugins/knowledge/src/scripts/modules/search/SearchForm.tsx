@@ -38,7 +38,7 @@ function SearchForm(props: IProps) {
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-    console.log("0", form.query);
+
     useQueryParamSynchronization();
     useSearchContextValueSync();
 
