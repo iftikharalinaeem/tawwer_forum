@@ -320,7 +320,7 @@ class BadgeController extends BadgesAppController {
      * @param string $name
      */
     public function index($badgeID = '', $name = '') {
-        $this->permission('Reputation.Badge.View');
+        $this->permission('Reputation.Badges.View');
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
