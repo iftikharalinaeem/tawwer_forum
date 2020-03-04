@@ -45,9 +45,11 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 if (typeof o[key] === "object") {
                     recursivelyFindError(o[key]);
                 } else {
-                    if (o[key] === "Invalid Color") {
+                    if (o[key]) {
+                        // Value exists if there's an error
                         result.push(o);
                     } else {
+                        // Value is undefined if no error exists
                         result.pop();
                     }
                 }
@@ -62,18 +64,14 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
         onSubmit: () => {},
         validate: values => {
             const errorVariables = getVariableErrors(values.errors);
-
             let hasError = errorVariables.length > 0;
-
             const val = { ...data, ...form.values };
-
             const payload = {
                 variables: {
                     data: JSON.parse(JSON.stringify(val)),
                     type: "string",
                 },
             };
-
             updateAssets({
                 assets: payload,
                 errors: hasError,
