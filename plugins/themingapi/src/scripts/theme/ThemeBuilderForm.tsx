@@ -14,12 +14,12 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyl
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
-import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
 import { Form, FormikProvider, useFormik } from "formik";
 import React from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
 import { ThemePresetDropDown } from "./ThemePresetDropDown";
+import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -63,6 +63,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
         validate: values => {
             const errorVariables = getVariableErrors(values.errors);
 
+            let hasError = errorVariables.length > 0;
+
             const val = { ...data, ...form.values };
 
             const payload = {
@@ -72,11 +74,9 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 },
             };
 
-            console.log("new values: ", payload);
-
             updateAssets({
                 assets: payload,
-                errors: errorVariables.length > 0 ? true : false,
+                errors: hasError,
             });
         },
     });
@@ -96,9 +96,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     }}
                     inputBlock={{ label: t("Brand Color") }}
                 />
-                {form.values.errors?.global?.mainColors?.primary && (
-                    <div className={classes.colorErrorMessage}>{form.values.errors.global.mainColors.primary}</div>
-                )}
 
                 <ThemeBuilderSection label={"Body"}>
                     <ColorPickerBlock
@@ -110,11 +107,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         }}
                         inputBlock={{ label: t("Background Color") }}
                     />
-                    {form.values.errors?.global?.body?.backgroundImage?.color && (
-                        <div className={classes.colorErrorMessage}>
-                            {form.values.errors.global.body.backgroundImage.color}
-                        </div>
-                    )}
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
@@ -124,9 +116,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         }}
                         inputBlock={{ label: t("Text") }}
                     />
-                    {form.values.errors?.global?.mainColors?.fg && (
-                        <div className={classes.colorErrorMessage}>{form.values.errors.global.mainColors.fg}</div>
-                    )}
 
                     <ColorPickerBlock
                         colorPicker={{
@@ -137,11 +126,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         }}
                         inputBlock={{ label: t("Links") }}
                     />
-                    {form.values.errors?.global?.links?.colors?.default && (
-                        <div className={classes.colorErrorMessage}>
-                            {form.values.errors.global.links.colors.default}
-                        </div>
-                    )}
 
                     <InputDropDownBlock
                         inputBlock={{
@@ -198,11 +182,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
-                        {form.values.errors?.buttonGlobals?.colors?.primary && (
-                            <div className={classes.colorErrorMessage}>
-                                {form.values.errors.buttonGlobals.colors.primary}
-                            </div>
-                        )}
+
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
@@ -212,11 +192,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             }}
                             inputBlock={{ label: t("Text") }}
                         />
-                        {form.values.errors?.buttonGlobals?.colors?.primaryContrast && (
-                            <div className={classes.colorErrorMessage}>
-                                {form.values.errors.buttonGlobals.colors.primaryContrast}
-                            </div>
-                        )}
                     </ThemeBuilderSectionGroup>
 
                     <ThemeBuilderSectionGroup label={t("Secondary Buttons")}>
@@ -248,11 +223,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             }}
                             inputBlock={{ label: t("Background") }}
                         />
-                        {form.values.errors?.buttonGlobals?.colors?.bg && (
-                            <div className={classes.colorErrorMessage}>
-                                {form.values.errors.buttonGlobals.colors.bg}
-                            </div>
-                        )}
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
@@ -262,11 +232,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                             }}
                             inputBlock={{ label: t("Text") }}
                         />
-                        {form.values.errors?.buttonGlobals?.colors?.fg && (
-                            <div className={classes.colorErrorMessage}>
-                                {form.values.errors.buttonGlobals.colors.fg}
-                            </div>
-                        )}
                     </ThemeBuilderSectionGroup>
                 </ThemeBuilderSection>
             </Form>

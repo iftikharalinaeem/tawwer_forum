@@ -14,9 +14,9 @@ import { color } from "csx";
 import { useUniqueID } from "@library/utility/idUtils";
 import ThemeBuilderBlock from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
-import { ensureColorHelper } from "@vanilla/library/src/scripts/forms/themeEditor/ColorPicker";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import isEqual from "lodash/isEqual";
+import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 
 export const ThemePresetDropDown = () => {
     const globalVars = globalVariables();
