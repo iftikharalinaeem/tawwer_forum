@@ -81,7 +81,9 @@ export const INITIAL_KB_FORM: IKbFormState = {
     viewType: KbViewType.GUIDE,
     sortArticles: KnowledgeBaseSortMode.MANUAL,
     sourceLocale: getCurrentLocale(),
-    hasCustomPermissions: false,
+    hasCustomPermission: false,
+    viewRoleIDs: [],
+    editRoleIDs: [],
     isUniversalSource: false,
     universalTargetIDs: [],
 };
@@ -146,7 +148,9 @@ export interface IKnowledgeBase {
     defaultArticleID: number | null;
     siteSectionGroup: string | null;
     siteSections: ISiteSection[];
-    hasCustomPermissions: boolean;
+    hasCustomPermission: boolean;
+    viewRoleIDs: number[];
+    editRoleIDs: number[];
     isUniversalSource: boolean;
     universalTargetIDs: number[];
     universalSources: IKnowledgeBaseFragment[];
