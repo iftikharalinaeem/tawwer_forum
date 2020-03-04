@@ -40,40 +40,30 @@ export const ThemePresetDropDown = (props: IThemePresetDropDown) => {
         },
     ];
 
-    const customOption = options.map(val => {
-        if (
-            val.data.fg.toHexString() !== props.presetFg &&
-            val.data.bg.toHexString() !== props.presetBg &&
-            val.data.fg.toHexString() !== props.presetBg && val.data.bg.toHexString() !== props.presetFg
-        ) {
-            return {
-                label: t("Custom"),
-                value: "custom",
-                data: {
-                    fg: ensureColorHelper(props.presetFg),
-                    bg: ensureColorHelper(props.presetBg),
-                },
-            };
-        } else {
-            return {
-                label: "",
-                value: "",
-                data: {
-                    fg: "",
-                    bg: "",
-                },
-            };
-        }
-    });
-
-    options.push(customOption[0]);
-
     let defaultValue = {};
-    if (customOption.length > 0) {
-        defaultValue = options[2];
-    } else {
+
+    if (
+        options[0].data.fg === ensureColorHelper(props.presetFg) &&
+        options[0].data.bg === ensureColorHelper(props.presetBg)
+    ) {
         defaultValue = options[0];
+    } else if (
+        options[1].data.fg === ensureColorHelper(props.presetFg) &&
+        options[1].data.bg === ensureColorHelper(props.presetBg)
+    ) {
+        defaultValue = options[1];
+    } else {
+        options.push({
+            label: t("Custom"),
+            value: "custom",
+            data: {
+                fg: ensureColorHelper(props.presetFg),
+                bg: ensureColorHelper(props.presetBg),
+            },
+        });
+        defaultValue = options[2];
     }
+
     const [currentOption, setCurrentOption] = useState(defaultValue);
 
     const fgID = "global.mainColors.fg";

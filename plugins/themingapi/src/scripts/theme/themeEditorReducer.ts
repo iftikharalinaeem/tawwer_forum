@@ -151,7 +151,6 @@ export const themeEditorReducer = produce(
                         ...payload.assets,
                     },
                 };
-
             } else {
                 state.form.assets = INITIAL_ASSETS;
             }

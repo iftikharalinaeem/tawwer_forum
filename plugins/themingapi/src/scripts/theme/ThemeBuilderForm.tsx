@@ -4,11 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import { buttonGlobalVariables } from "@library/forms/buttonStyles";
 import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
+import { InputDropDownBlock } from "@library/forms/themeEditor/InputDropDownBlock";
 import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
 import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
 import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
+import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
 import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
@@ -17,9 +19,8 @@ import { Form, FormikProvider, useFormik } from "formik";
 import React from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
-import { buttonGlobalVariables } from "@library/forms/buttonStyles";
-import { InputDropDownBlock } from "@library/forms/themeEditor/InputDropDownBlock";
 import { ThemePresetDropDown } from "./ThemePresetDropDown";
+
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
 }
@@ -35,11 +36,10 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const { updateAssets } = useThemeActions();
     const buttonGlobals = buttonGlobalVariables();
     const dataString = JSON.stringify(props.variables);
-
     const data = JSON.parse(dataString).data;
 
     function getVariableErrors(obj) {
-        const result = [];
+        const result: Array<any> = [];
         function recursivelyFindError(o) {
             Object.keys(o).forEach(function(key) {
                 if (typeof o[key] === "object") {
@@ -54,7 +54,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             });
         }
         recursivelyFindError(obj);
-
         return result;
     }
 
@@ -65,6 +64,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             const errorVariables = getVariableErrors(values.errors);
 
             const val = { ...data, ...form.values };
+
             updateAssets({
                 assets: {
                     variables: {
