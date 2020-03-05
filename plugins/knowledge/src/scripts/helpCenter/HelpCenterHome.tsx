@@ -112,10 +112,7 @@ export default function HelpCenterHome(props: IProps) {
         return <KbErrorPage error={navData.error} />;
     }
 
-    if (
-        (knowledgeBase.countArticles === 0 && !knowledgeBase.universalSources) ||
-        knowledgeBase.universalSources.length <= 0
-    ) {
+    if (knowledgeBase.countArticles === 0 && knowledgeBase.universalSources.length === 0) {
         return (
             <KbErrorPage
                 defaultError={DefaultKbError.NO_ARTICLES}

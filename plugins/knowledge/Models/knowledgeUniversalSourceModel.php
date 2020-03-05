@@ -95,6 +95,7 @@ class KnowledgeUniversalSourceModel extends \Vanilla\Models\PipelineModel {
                     $ids = $this->getUniversalInformation("targetKnowledgeBaseID", $row);
                 }
 
+                $row[$name] = [];
                 foreach ($ids as $id) {
                     try {
                         $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $id]);
