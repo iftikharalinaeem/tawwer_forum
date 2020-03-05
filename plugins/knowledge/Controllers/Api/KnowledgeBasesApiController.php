@@ -249,7 +249,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         }, $rows);
 
         $result = $out->validate($rows);
-        return $result;
+        return $result ?? $rows;
     }
 
     /**
@@ -694,11 +694,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             throw new NotFoundException('Knowledge Base with ID: ' . $knowledgeBaseID . ' not found!');
         }
 
-        if (!$checkOnly && $result['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
-            $result['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($knowledgeBaseID);
-        } else {
-            $result['defaultArticleID'] = null;
-        }
         return $result;
     }
 
@@ -711,9 +706,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      */
     private function normalizeOutput(array $record): array {
         if (!isset($record['defaultArticleID'])) {
-            if ($record['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
-                $record['defaultArticleID'] = $this->knowledgeNavigationApi->getDefaultArticleID($record['knowledgeBaseID']);
-            } else {
+            if ($record['viewType'] === KnowledgeBaseModel::TYPE_HELP) {
                 $record['defaultArticleID'] = null;
             }
         }

@@ -27,6 +27,8 @@ use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Knowledge\Models\DefaultArticleModel;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use PermissionModel;
 
 /**
@@ -52,6 +54,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var PermissionModel $permissionModel */
     private $permissionModel;
 
+    /** @var DefaultArticleModel $defaultArticleModel */
+    private $defaultArticleModel;
+
+    /** @var KnowledgeNavigationApiController $knowledgeNavigationApi */
+    private $knowledgeNavigationApi;
+
     /**
      * KnowledgePlugin constructor.
      *
@@ -61,6 +69,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param KnowledgeBaseModel $kbModel
      * @param SiteSectionModel $siteSectionModel
      * @param PermissionModel $permissionModel
+     * @param DefaultArticleModel $defaultArticleModel
+     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
      */
     public function __construct(
         \Gdn_Database $database,
@@ -68,7 +78,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
         \Gdn_Request $request,
         KnowledgeBaseModel $kbModel,
         SiteSectionModel $siteSectionModel,
-        PermissionModel $permissionModel
+        PermissionModel $permissionModel,
+        DefaultArticleModel $defaultArticleModel,
+        KnowledgeNavigationApiController $knowledgeNavigationApi
     ) {
         parent::__construct();
         $this->database = $database;
@@ -77,6 +89,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->kbModel = $kbModel;
         $this->siteSectionModel = $siteSectionModel;
         $this->permissionModel = $permissionModel;
+        $this->defaultArticleModel = $defaultArticleModel;
+        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
     }
 
     /**
@@ -380,11 +394,22 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("targetKnowledgeBaseID", "int", null, 'unique.universalPair')
             ->set();
 
-        // Update knowledge baese when missing sourceLocale
-        /* @var \Vanilla\Knowledge\Models\KnowledgeBaseModel $kbModel */
-        $kbNoLocales = $this->kbModel->get(['sourceLocale' => '']);
-        if (!empty($kbNoLocales)) {
-            $this->kbModel->update(['sourceLocale' => \Gdn::locale()->current()], ['sourceLocale' => '']);
+        // Update knowledge base when missing defaultArticleID (release: 2020.005)
+        // relates to: https://github.com/vanilla/knowledge/issues/1582
+        $kbs = $this->kbModel->get(
+            [
+                'viewType' => KnowledgeBaseModel::TYPE_GUIDE
+            ],
+            [
+                'select' => [KnowledgeBaseModel::RECORD_ID_FIELD, 'defaultArticleID']
+            ]
+        );
+        foreach ($kbs as $kb) {
+            if (empty($kb['defaultArticleID'])) {
+                $kbID = $kb[KnowledgeBaseModel::RECORD_ID_FIELD];
+                $defaultArticleID = $this->knowledgeNavigationApi->getDefaultArticleID($kbID);
+                $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], [KnowledgeBaseModel::RECORD_ID_FIELD => $kbID]);
+            }
         }
     }
 }
