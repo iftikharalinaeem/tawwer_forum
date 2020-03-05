@@ -19,6 +19,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\Navigation;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Knowledge\Models\DefaultArticleModel;
 
 /**
  * Endpoint for the virtual "knowledge navigation" resource.
@@ -47,6 +48,9 @@ class KnowledgeNavigationApiController extends AbstractApiController {
     /** @var TranslationProviderInterface $translation */
     private $translation;
 
+    /** @var DefaultArticleModel $defaultArticleModel */
+    private $defaultArticleModel;
+
     /**
      * KnowledgeNavigationApiController constructor.
      *
@@ -59,12 +63,14 @@ class KnowledgeNavigationApiController extends AbstractApiController {
         KnowledgeCategoryModel $knowledgeCategoryModel,
         ArticleModel $articleModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        TranslationModel $translationModel
+        TranslationModel $translationModel,
+        DefaultArticleModel $defaultArticleModel
     ) {
         $this->articleModel = $articleModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->translation = $translationModel->getContentTranslationProvider();
+        $this->defaultArticleModel = $defaultArticleModel;
     }
 
 
@@ -360,6 +366,11 @@ class KnowledgeNavigationApiController extends AbstractApiController {
             "knowledgeCategoryID",
             $this->articleModel
         );
+
+        if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $defaultArticleID = $this->getDefaultArticleID($id);
+            $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], ['knowledgeBaseID' => $id]);
+        }
 
         // Dumb update all categories until we get knowledge base support to locate the proper top-level category.
         foreach ($categories as $category) {
