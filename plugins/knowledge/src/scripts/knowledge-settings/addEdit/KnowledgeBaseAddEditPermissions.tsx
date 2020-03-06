@@ -31,7 +31,7 @@ export function KnowledgeBaseAddEditPermissions(props: IProps) {
                     <Translate
                         source="When enabled, this knowledge base will use custom permissions instead of the global defaults. <0>Read More</0>"
                         c0={text => (
-                            <SmartLink to="https://success.vanillaforums.com/kb/articles/185-per-knowledge-base-permissions/>">
+                            <SmartLink to="https://success.vanillaforums.com/kb/articles/185-per-knowledge-base-permissions">
                                 {text}
                             </SmartLink>
                         )}
