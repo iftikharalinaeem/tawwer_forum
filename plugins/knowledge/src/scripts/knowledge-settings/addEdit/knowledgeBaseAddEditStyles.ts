@@ -5,7 +5,9 @@
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { flexHelper, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { translateY } from "csx";
 
 export const knowledgeBaseAddEditClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -23,6 +25,12 @@ export const knowledgeBaseAddEditClasses = useThemeCache(() => {
     const searchContainer = style("searchContainer", {
         ...flexHelper().middleLeft(),
         justifyContent: "space-between",
+        $nest: {
+            "&&& .searchBar__placeholder": {
+                top: unit(formElementsVariables().sizing.height / 2),
+                transform: translateY("-50%"),
+            },
+        },
     });
 
     const searchMeta = style("searchMeta", {});
