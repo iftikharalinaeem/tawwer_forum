@@ -339,7 +339,6 @@ trait ArticlesApiHelper {
                 }
             }
 
-
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
                     $article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
@@ -347,6 +346,10 @@ trait ArticlesApiHelper {
                     $articleID,
                     KnowledgeCategoryModel::SORT_TYPE_ARTICLE
                 );
+                if ($prevState['knowledgeCategoryID'] !== $knowledgeCategory["knowledgeCategoryID"]) {
+                    $this->updateDefaultArticleID($prevState['knowledgeCategoryID']);
+                }
+                $this->updateDefaultArticleID($knowledgeCategory["knowledgeCategoryID"]);
             }
         } else {
             //check if knowledge category exists and knowledge base is "published"
@@ -377,11 +380,11 @@ trait ArticlesApiHelper {
                     KnowledgeCategoryModel::SORT_TYPE_ARTICLE
                 );
             }
+            $this->updateDefaultArticleID($fields['knowledgeCategoryID']);
         }
         if (!empty($article['knowledgeCategoryID'])) {
             $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
         }
-
 
         if (!empty($revision)) {
             // Grab the current published revisions from each locale, if available, to load as initial defaults.
@@ -445,5 +448,21 @@ trait ArticlesApiHelper {
         }
 
         return $articleID;
+    }
+
+    /**
+     * Update parent KB default article ID when needed
+     *
+     * @param int $knowledgeCategoryID
+     */
+    public function updateDefaultArticleID(int $knowledgeCategoryID): ?int {
+        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategoryID);
+        $defaultArticleID = null;
+        if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $kbID = $knowledgeBase['knowledgeBaseID'];
+            $defaultArticleID = $this->knowledgeNavigationApi->getDefaultArticleID($kbID);
+            $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], ['knowledgeBaseID' => $kbID]);
+        }
+        return $defaultArticleID;
     }
 }
