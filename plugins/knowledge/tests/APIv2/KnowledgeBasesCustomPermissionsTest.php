@@ -17,6 +17,8 @@ use Vanilla\Exception\PermissionException;
  */
 class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
 
+    const GUEST_ROLE_ID = 2;
+
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
 
@@ -229,8 +231,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             ]
         );
 
-        self::$content['kbs']['KB1'] = $this->createKb('KB1', ['View All', 'View KB1', 'Nothing'], ['Edit KB1']);
-        self::$content['kbs']['KB2'] = $this->createKb('KB2', ['View All', 'View KB2'], ['Edit KB2', 'Nothing']);
+        self::$content['kbs']['KB1'] = $this->createKb('KB1', ['View All', 'View KB1'], ['Edit KB1']);
+        self::$content['kbs']['KB2'] = $this->createKb('KB2', ['View All', 'View KB2'], ['Edit KB2']);
         self::$content['kbs']['KB3'] = $this->createKb('KB3');
 
         //$this->api->setUserID(self::$siteInfo['adminUserID']);
@@ -317,6 +319,70 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         ];
         return $record;
     }
+
+    /**
+     * Set our guest role to disallow viewing KBs.
+     *
+     * @param bool $canView
+     */
+    private function setupGuest(bool $canView) {
+        // Make sure our guest has view permissions
+        $this->api()->patch('/roles/' . self::GUEST_ROLE_ID, [
+            'permissions' => [
+                [
+                    'type' => 'global',
+                    'permissions' => [
+                        'kb.view' => $canView,
+                    ]
+                ]
+            ]
+        ]);
+        $this->api()->setUserID(\UserModel::GUEST_USER_ID);
+    }
+
+    /**
+     * Test a scenario where a guest has view permissions.
+     *
+     * @depends testPrepareData
+     */
+    public function testGuestCannotView() {
+        $this->setupGuest(false);
+
+        try {
+            $this->api()->get('/knowledge-bases');
+            $this->fail('Should throw exception.');
+        } catch (ForbiddenException $e) {
+            $this->assertTrue(true);
+        }
+
+        try {
+            $this->api()->get('/knowledge-bases/' .  self::$content['kbs']['KB1']['knowledgeBaseID']);
+            $this->fail('Should throw exception.');
+        } catch (ForbiddenException $e) {
+            $this->assertTrue(true);
+        }
+    }
+    /**
+     * Test a scenario where a guest has view permissions.
+     *
+     * @depends testPrepareData
+     */
+    public function testGuestCanView() {
+        $this->setupGuest(true);
+
+        // Can view the ones without custom permissions.
+        $kbs = $this->api()->get('/knowledge-bases')->getBody();
+        $this->assertCount(1, $kbs);
+
+        // Still restricted from here.
+        try {
+            $this->api()->get('/knowledge-bases/' .  self::$content['kbs']['KB1']['knowledgeBaseID']);
+            $this->fail('Should throw exception.');
+        } catch (ForbiddenException $e) {
+            $this->assertTrue(true);
+        }
+    }
+
 
     /**
      * Test /knowledge-bases

@@ -19,7 +19,7 @@ import Loader from "@library/loaders/Loader";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { Router } from "@library/Router";
 import PagesContext from "@library/routing/PagesContext";
-import React, { useCallback, useEffect, useDebugValue } from "react";
+import React, { useCallback, useDebugValue, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import PageLoader from "@library/routing/PageLoader";
@@ -77,7 +77,7 @@ function KnowledgeApp() {
                 <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
                     <NavHistoryContextProvider>
                         <Backgrounds />
-                        <PageLoader status={kbLoadable.status}>{content}</PageLoader>
+                        <PageLoader status={LoadStatus.SUCCESS}>{content}</PageLoader>
                     </NavHistoryContextProvider>
                 </SearchContext.Provider>
             </SiteNavProvider>
