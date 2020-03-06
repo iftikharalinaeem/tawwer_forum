@@ -77,7 +77,7 @@ function SearchForm(props: IProps) {
                                     placeholder={props.placeholder}
                                     onChange={newQuery => updateForm({ query: newQuery })}
                                     value={form.query}
-                                    isBigInput={true}
+                                    isLarge={true}
                                     onSearch={debouncedSearch}
                                     isLoading={results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
