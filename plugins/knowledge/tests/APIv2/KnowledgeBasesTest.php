@@ -38,6 +38,7 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         'sourceLocale',
         'urlCode',
         'siteSectionGroup',
+        'foreignID',
     ];
 
     /**
@@ -75,7 +76,8 @@ class KnowledgeBasesTest extends AbstractResourceTest {
             'sortArticles' => 'manual',
             'sourceLocale' => 'en',
             'urlCode' => self::getUniqueUrlCode(),
-            'siteSectionGroup' => DefaultSiteSection::DEFAULT_SECTION_GROUP
+            'siteSectionGroup' => DefaultSiteSection::DEFAULT_SECTION_GROUP,
+            'foreignID' => 'test-kb-foreignID-123',
         ];
         return $record;
     }

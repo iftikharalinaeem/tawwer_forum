@@ -174,6 +174,7 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             "parentID",
             "sort",
             "sortChildren",
+            "foreignID?"
         ])->add($this->fullSchema()), "out");
 
         $row = $this->knowledgeCategoryByID($id);

@@ -147,6 +147,12 @@ trait KnowledgeBasesApiSchemes {
             "universalSourceIDs:a?",
             "universalTargets?" =>[':a' => $this->knowledgeBaseFragmentSchema()],
             "universalSources?" => [':a' => $this->knowledgeBaseFragmentSchema()],
+            "foreignID?" => [
+                "description" => "Foreign ID to some external resource.",
+                "type" => "string",
+                "maxLength" => 32,
+                "allowNull" => true,
+            ],
         ]);
     }
 
@@ -198,6 +204,7 @@ trait KnowledgeBasesApiSchemes {
                     "editRoleIDs?",
                     "isUniversalSource:b?",
                     "universalTargetIDs:a?",
+                    "foreignID?",
                 ])->add($this->fullSchema()),
                 "KnowledgeBasePost"
             );

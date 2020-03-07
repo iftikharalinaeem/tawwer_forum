@@ -339,6 +339,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "body",
             "format",
             "locale",
+            "foreignID"
         ])->add($this->fullSchema()), "out");
         $article = $this->retrieveRow($id, $query);
         $this->knowledgeBaseModel->checkEditPermission($article['knowledgeBaseID']);

@@ -1200,6 +1200,11 @@ components:
                 views:
                     description: How many times the article has been viewed.
                     type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
             required:
                 - articleID
                 - knowledgeCategoryID
@@ -1260,6 +1265,11 @@ components:
                 discussionID:
                     description: Discussion ID to link article url as discussion canonical url.
                     type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
             required:
                 - knowledgeCategoryID
                 - name
@@ -1309,6 +1319,11 @@ components:
                 discussionID:
                     description: Discussion ID to link article url as discussion canonical url.
                     type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
             type: object
         ArticleSimple:
             type: object

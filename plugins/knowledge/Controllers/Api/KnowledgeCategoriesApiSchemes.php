@@ -98,6 +98,12 @@ trait KnowledgeCategoriesApiSchemes {
                 "description" => "Full URL to the knowledge category.",
                 "type" => "string",
             ],
+            "foreignID?" => [
+                "description" => "Foreign ID to some external resource.",
+                "type" => "string",
+                "maxLength" => 32,
+                "allowNull" => true,
+            ],
         ]);
     }
 
@@ -140,6 +146,7 @@ trait KnowledgeCategoriesApiSchemes {
                     "knowledgeBaseID",
                     "sort?",
                     "sortChildren?",
+                    "foreignID?"
                 ])->add($this->fullSchema()),
                 "KnowledgeCategoryPost"
             );

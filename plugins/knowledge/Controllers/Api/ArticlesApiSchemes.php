@@ -132,7 +132,8 @@ trait ArticlesApiSchemes {
                     "draftID?" => [
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon creating an article.",
-                    ]
+                    ],
+                    "foreignID?"
                 ])->add($this->fullSchema()),
                 "ArticlePost"
             );
@@ -163,6 +164,7 @@ trait ArticlesApiSchemes {
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
                     ],
+                    "foreignID?"
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );
@@ -266,7 +268,8 @@ trait ArticlesApiSchemes {
                 "featured",
                 "dateFeatured",
                 "locale",
-                "translationStatus"
+                "translationStatus",
+                "foreignID"
             ])->add($this->fullSchema()), "Article");
         }
         return $this->schema($this->articleSchema, $type);
@@ -496,6 +499,12 @@ trait ArticlesApiSchemes {
                 "allowNull" => false,
                 "description" => "Translation status of revision. Ex: up-to-date, out-of-date,",
                 "enum" => ArticleRevisionModel::getTranslationStatuses()
+            ],
+            "foreignID:s" => [
+                "description" => "Foreign ID to some external resource.",
+                "type" => "string",
+                "maxLength" => 32,
+                "allowNull" => true,
             ],
         ]);
     }
