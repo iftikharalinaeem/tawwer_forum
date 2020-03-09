@@ -8,11 +8,9 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
-use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
-use VanillaTests\Fixtures\MockSiteSectionProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Garden\Web\Exception\ClientException;
 
@@ -41,6 +39,7 @@ class ArticlesTest extends AbstractResourceTest {
         "locale",
         "name",
         "sort",
+        'foreignID'
     ];
 
     /** @var string The name of the primary key of the resource. */
@@ -121,6 +120,7 @@ class ArticlesTest extends AbstractResourceTest {
             "locale" => "en",
             "name" => "Example Article",
             "sort" => 1,
+            "foreignID" => 'test-id-001'
         ];
         return $record;
     }
@@ -740,7 +740,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
-        $this->assertEquals(20, count($articles));
+        $this->assertEquals(21, count($articles));
     }
 
     /**
@@ -764,9 +764,9 @@ class ArticlesTest extends AbstractResourceTest {
         $article = $response->getBody();
         $locales = array_count_values(array_column($article, "locale"));
 
-        $this->assertEquals(21, count($article));
+        $this->assertEquals(22, count($article));
         $this->assertEquals(2, $locales["ru"]);
-        $this->assertEquals(19, $locales["en"]);
+        $this->assertEquals(20, $locales["en"]);
     }
 
     /**

@@ -289,6 +289,11 @@ components:
                     nullable: true
                     default: []
                     example: [ 8, 16 ]
+                foreignID:
+                    description: Foriegn ID to link knowledge base to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
             required:
                 - name
                 - description
@@ -388,6 +393,11 @@ components:
                     type: boolean
                     description: Knowledge base has custom permission settings.
                     default: false
+                foreignID:
+                    description: Foriegn ID to link knowledge base to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
             required:
                 - knowledgeBaseID
                 - name
@@ -440,6 +450,11 @@ components:
                     enum:
                         - guide
                         - help
+                    nullable: true
+                foreignID:
+                    description: Foriegn ID to link knowledge base to some external resource.
+                    type: string
+                    maxLength: 32
                     nullable: true
             required:
                 - knowledgeBaseID

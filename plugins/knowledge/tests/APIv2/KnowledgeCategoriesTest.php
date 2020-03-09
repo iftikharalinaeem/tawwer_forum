@@ -29,6 +29,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         "parentID",
         "sort",
         "sortChildren",
+        "foreignID"
     ];
 
     /** @var array Fields to be checked with get/<id>/edit */
@@ -37,6 +38,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
         "parentID",
         "sort",
         "sortChildren",
+        "foreignID"
     ];
 
 
@@ -95,6 +97,7 @@ class KnowledgeCategoriesTest extends AbstractResourceTest {
             "knowledgeBaseID" => $record['knowledgeBaseID'] ?? 1,
             "sortChildren" => $record['sortChildren'] ?? "name",
             "sort" => $record['sort'] ?? 0,
+            "foreignID" => "test-foreign-id-123"
         ];
         return $record;
     }

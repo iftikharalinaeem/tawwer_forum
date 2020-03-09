@@ -58,6 +58,7 @@ class KnowledgeNavigationApiController extends AbstractApiController {
      * @param ArticleModel $articleModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param TranslationModel $translationModel
+     * @param DefaultArticleModel $defaultArticleModel
      */
     public function __construct(
         KnowledgeCategoryModel $knowledgeCategoryModel,

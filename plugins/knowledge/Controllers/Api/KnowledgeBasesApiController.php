@@ -414,7 +414,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
             'bannerImage',
             'sortArticles',
             'sourceLocale',
-            'urlCode'
+            'urlCode',
+            'foreignID?'
         ])->add($this->fullSchema()), "out");
 
         $row = $this->knowledgeBaseByID($id);
