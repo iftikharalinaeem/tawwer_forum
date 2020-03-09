@@ -26,6 +26,9 @@ import { t, TranslationPropertyType, useContentTranslator } from "@vanilla/i18n"
 import { Tabs } from "@vanilla/library/src/scripts/sectioning/Tabs";
 import classNames from "classnames";
 import React, { useEffect } from "react";
+import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
+import flatten from "lodash/flatten";
+import { notEmpty } from "@vanilla/utils";
 
 interface IProps {
     kbID?: number;
@@ -81,6 +84,22 @@ export function KnowledgeBaseAddEdit(props: IProps) {
     const titleString = isEditing ? t("Edit Knowledge Base") : t("Add Knowledge Base");
     const { Translator, shouldDisplay } = useContentTranslator();
     const kbAddEditClasses = knowledgeBaseAddEditClasses();
+
+    const allErrors = formSubmit.error?.response.data?.errors;
+
+    const universalErrors = [allErrors?.["isUniversalSource"], allErrors?.["universalTargetIDs"]].filter(notEmpty);
+    const permissionErrors = [
+        allErrors?.["hasCustomPermissions"],
+        allErrors?.["viewRoleIDs"],
+        allErrors?.["editRoleIDs"],
+    ].filter(notEmpty);
+    const generalErrors = !allErrors
+        ? []
+        : Object.values(allErrors)
+              .filter(error => {
+                  return !universalErrors.includes(error) && !permissionErrors.includes(error);
+              })
+              .filter(notEmpty);
 
     return (
         <Modal isVisible={true} size={ModalSizes.XL} exitHandler={onClose} titleID={titleID}>
@@ -139,11 +158,23 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         label: "General",
                                         panelData: "",
                                         contents: <KnowledgeAddEditGeneral kbID={kbID} />,
+                                        error:
+                                            generalErrors.length > 0 ? (
+                                                <ErrorMessages errors={flatten(generalErrors)} />
+                                            ) : (
+                                                undefined
+                                            ),
                                     },
                                     {
                                         label: "Permissions",
                                         panelData: "",
                                         contents: <KnowledgeBaseAddEditPermissions kbID={kbID} />,
+                                        error:
+                                            permissionErrors.length > 0 ? (
+                                                <ErrorMessages errors={flatten(permissionErrors).filter(notEmpty)} />
+                                            ) : (
+                                                undefined
+                                            ),
                                     },
                                     {
                                         label: "Universal Content",
@@ -151,6 +182,12 @@ export function KnowledgeBaseAddEdit(props: IProps) {
                                         contents: <KnowledgeBaseAddEditUniversal kbID={kbID} />,
                                         warning: universalTargetError,
                                         disabled: !!universalTargetError,
+                                        error:
+                                            universalErrors.length > 0 ? (
+                                                <ErrorMessages errors={flatten(universalErrors).filter(notEmpty)} />
+                                            ) : (
+                                                undefined
+                                            ),
                                     },
                                 ]}
                             />
