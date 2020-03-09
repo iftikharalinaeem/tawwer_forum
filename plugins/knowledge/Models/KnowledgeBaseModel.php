@@ -13,6 +13,7 @@ use Gdn_Session;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
+use Vanilla\Permissions;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
@@ -60,8 +61,8 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     /** @var SiteSectionModel */
     private $siteSectionModel;
 
-    /** @var PermissionModel $permissionModel */
-    private $permissionModel;
+    /** @var Permissions */
+    private $permissions;
 
     /** @var UserModel $userModel */
     private $userModel;
@@ -81,21 +82,19 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @param Gdn_Session $session
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
-     * @param PermissionModel $permissionModel
      * @param UserModel $userModel
      */
     public function __construct(
         Gdn_Session $session,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        PermissionModel $permissionModel,
         UserModel $userModel
     ) {
         parent::__construct("knowledgeBase");
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
-        $this->permissionModel = $permissionModel;
+        $this->permissions = $session->getPermissions();
         $this->userModel = $userModel;
 
         $dateProcessor = new \Vanilla\Database\Operation\CurrentDateFieldProcessor();
@@ -170,28 +169,16 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Check global only permission
+     * Check global only permission for knowledge base. There are a couple of changes to our core permission.
+     *
+     * This has slightly different behaviour than by default.
      *
      * @param string $permission
      * @throws PermissionException If user hasno permission throw an PermissionException.
      */
     public function checkGlobalPermission(string $permission) {
-        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
-            $roles = array_column($this->userModel->getRoles($this->session->UserID)->resultArray(), 'RoleID');
-            $permissions = $this->permissionModel->getPermissions($roles, $permission, false)[0];
-            if (count($roles) === 1) {
-                $permissions = [$roles[0] => $permissions];
-            }
-            $hasPermission = false;
-            foreach ($permissions as $item) {
-                if (isset($item[$permission]) && $item[$permission] > 0) {
-                    $hasPermission = true;
-                    break;
-                }
-            }
-            if (!$hasPermission) {
-                throw new PermissionException($permission);
-            }
+        if (!$this->permissions->hasAny(['Garden.Settings.Manage', $permission], null, Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE)) {
+            throw new PermissionException($permission);
         }
     }
 
@@ -708,19 +695,16 @@ MESSAGE
     public function getAllowedKnowledgeBases(string $mode = self::VIEW): array {
         $dataKey = ($mode === self::VIEW) ? 'allAllowed' : 'editAllowed';
         $permissionKey = ($mode === self::VIEW) ? self::VIEW_PERMISSION : self::EDIT_PERMISSION;
+        // Purely global permissions exist as values with integer keys.
+        // Per-resource permissions exist as sting keys (of the permission) with object values.
+        $hasPureGlobalPermission = $this->permissions->has($permissionKey, null, Permissions::CHECK_MODE_GLOBAL_ONLY);
         if (is_null($this->{$dataKey})) {
-            $res = array_column($this->get(['hasCustomPermission' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID');
-            $restricted = $this->get(['hasCustomPermission' => 1], ['select' => ['knowledgeBaseID']]);
+            $res = $hasPureGlobalPermission
+                ? array_column($this->get(['hasCustomPermission' => 0], ['select' => ['knowledgeBaseID']]), 'knowledgeBaseID')
+                : [];
+            $restricted = $this->get(['hasCustomPermission' => 1], ['select' => ['knowledgeBaseID', 'permissionKnowledgeBaseID']]);
             foreach ($restricted as $row) {
-                $userPermissions = $this->permissionModel->getUserPermissions(
-                    $this->session->UserID,
-                    $permissionKey,
-                    self::RECORD_TYPE,
-                    'permissionKnowledgeBaseID',
-                    'knowledgeBaseID',
-                    $row['knowledgeBaseID']
-                );
-                if ($userPermissions[0][$permissionKey] ?? false) {
+                if ($this->permissions->has($permissionKey, $row['permissionKnowledgeBaseID'], Permissions::CHECK_MODE_RESOURCE_ONLY)) {
                     $res[] = $row['knowledgeBaseID'];
                 }
             }

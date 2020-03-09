@@ -31,6 +31,7 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
+use Vanilla\Web\JsInterpop\ReduxErrorAction;
 use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\ThemedPage;
@@ -218,31 +219,36 @@ abstract class KbPage extends ThemedPage {
         if ($currentSection instanceof DefaultSiteSection) {
             unset($kbArgs['siteSectionGroup']);
         }
-        $this->knowledgeBases = $this->kbApi->index($kbArgs);
-        $this->addReduxAction(new ReduxAction(
-            ActionConstants::GET_ALL_KBS,
-            Data::box($this->knowledgeBases),
-            $kbArgs
-        ));
 
-        $this->addReduxAction(new ReduxAction(
-            ActionConstants::SET_LOCAL_DEPLOYMENT_KEY,
-            new Data($this->deploymentCacheBuster->value()),
-            []
-        ));
-
-        if ($this->analyticsClient !== null) {
+        try {
+            $this->knowledgeBases = $this->kbApi->index($kbArgs);
             $this->addReduxAction(new ReduxAction(
-                \Vanilla\Analytics\ActionConstants::GET_CONFIG,
-                new Data($this->analyticsClient->config()),
-                []
+                ActionConstants::GET_ALL_KBS,
+                Data::box($this->knowledgeBases),
+                $kbArgs
             ));
 
             $this->addReduxAction(new ReduxAction(
-                \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
-                new Data($this->analyticsClient->eventDefaults()),
+                ActionConstants::SET_LOCAL_DEPLOYMENT_KEY,
+                new Data($this->deploymentCacheBuster->value()),
                 []
             ));
+
+            if ($this->analyticsClient !== null) {
+                $this->addReduxAction(new ReduxAction(
+                    \Vanilla\Analytics\ActionConstants::GET_CONFIG,
+                    new Data($this->analyticsClient->config()),
+                    []
+                ));
+
+                $this->addReduxAction(new ReduxAction(
+                    \Vanilla\Analytics\ActionConstants::GET_EVENT_DEFAULTS,
+                    new Data($this->analyticsClient->eventDefaults()),
+                    []
+                ));
+            }
+        } catch (\Exception $e) {
+            $this->addReduxAction(new ReduxErrorAction($e));
         }
     }
 
