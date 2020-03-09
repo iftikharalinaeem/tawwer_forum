@@ -25,12 +25,6 @@ export const knowledgeBaseAddEditClasses = useThemeCache(() => {
     const searchContainer = style("searchContainer", {
         ...flexHelper().middleLeft(),
         justifyContent: "space-between",
-        $nest: {
-            "&&& .searchBar__placeholder": {
-                top: unit(formElementsVariables().sizing.height / 2),
-                transform: translateY("-50%"),
-            },
-        },
     });
 
     const searchMeta = style("searchMeta", {});
