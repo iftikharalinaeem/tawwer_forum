@@ -145,7 +145,11 @@ class KnowledgePlugin extends \Gdn_Plugin {
                 ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
         ;
         $container->rule(TranslationProviderInterface::class)
-            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
+            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
+            ->rule('@smart-id-middleware')
+            ->addCall('addSmartID', ['knowledgeBaseID', 'knowledge-bases', ['foreignID'], 'knowledgeBase'])
+            ->addCall('addSmartID', ['knowledgeCategoryID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
+            ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article']);
     }
 
     /**
