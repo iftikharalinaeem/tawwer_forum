@@ -24,6 +24,7 @@ import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/Dr
 import DropDownItemLink from "@vanilla/library/src/scripts/flyouts/items/DropDownItemLink";
 import DropDownItemButton from "@vanilla/library/src/scripts/flyouts/items/DropDownItemButton";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 interface IProps {
     className?: string;
@@ -140,7 +141,7 @@ export default function NavigationAdminLinks(props: IProps) {
     }
 
     return (
-        <Permission permission="articles.add">
+        <KbPermission kbID={knowledgeBase.knowledgeBaseID} permission="articles.add">
             {content}
             <NewCategoryForm
                 isVisible={modalOpen}
@@ -148,6 +149,6 @@ export default function NavigationAdminLinks(props: IProps) {
                 exitHandler={closeModal}
                 parentCategoryID={knowledgeBase.rootCategoryID}
             />
-        </Permission>
+        </KbPermission>
     );
 }

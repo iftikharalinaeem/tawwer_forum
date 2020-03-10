@@ -9,7 +9,7 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
-import Permission from "@library/features/users/Permission";
+import Permission, { PermissionMode } from "@library/features/users/Permission";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
@@ -22,9 +22,11 @@ import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
 import ArticleFeaturedMenuItem from "@knowledge/modules/article/components/ArticleFeaturedMenuItem";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
+    knowledgeBase?: IKnowledgeBase;
     buttonClassName?: string;
     device?: Devices;
 }
@@ -55,7 +57,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
         const classesDropDown = dropDownClasses();
 
         return (
-            <Permission permission="articles.add">
+            <>
                 <DropDown
                     id={this.domID}
                     name={t("Article Options")}
@@ -102,7 +104,7 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
                 </DropDown>
                 {this.renderDeleteModal()}
                 {this.renderRestoreModal()}
-            </Permission>
+            </>
         );
     }
 
