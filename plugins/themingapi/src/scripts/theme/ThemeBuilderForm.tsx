@@ -87,7 +87,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             });
 
             if (!hasError) {
-                console.log("sending", values);
                 sendMessage?.(values);
             }
         }
