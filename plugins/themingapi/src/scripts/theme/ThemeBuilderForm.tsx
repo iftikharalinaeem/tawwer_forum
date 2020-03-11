@@ -80,7 +80,6 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             });
 
             if (!hasError) {
-                console.log("updated assets. Sending message", sendMessage);
                 sendMessage?.(variables);
             }
             return values;

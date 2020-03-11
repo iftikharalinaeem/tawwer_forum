@@ -24,9 +24,7 @@ const story = storiesOf("Theme", module);
 story.add("Theme Builder Form - Test Cases", () => {
     const form = useFormik({
         initialValues: {},
-        onSubmit: values => {
-            // console.log(values);
-        },
+        onSubmit: values => {},
     });
 
     return (

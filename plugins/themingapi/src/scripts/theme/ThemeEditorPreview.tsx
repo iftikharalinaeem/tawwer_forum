@@ -34,7 +34,6 @@ export default function ThemeStylePreview() {
 
     const onFrame = useCallback(
         (messageEvent: MessageEvent) => {
-            console.log("Recieved message in frame", messageEvent);
             forceVariables(messageEvent.data);
         },
         [forceVariables],
