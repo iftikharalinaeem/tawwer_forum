@@ -9,11 +9,13 @@ executors:
             - image: vanillaryan/sphinxsearch-vanilla-ci
               environment:
                   MYSQL_HOST: 127.0.0.1
-                  MYSQL_USER: circleci
+                  MYSQL_USER: root
                   MYSQL_PASSWORD: circleci
                   MYSQL_DATABASE: vanilla_test
             - image: mysql:5.7
               environment:
+                  MYSQL_ROOT_HOST: "%"
+                  MYSQL_ROOT_PASSWORD: circleci
                   MYSQL_USER: circleci
                   MYSQL_PASSWORD: circleci
                   MYSQL_DATABASE: vanilla_test
