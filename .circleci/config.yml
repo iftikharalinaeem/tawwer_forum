@@ -10,12 +10,12 @@ executors:
               environment:
                   MYSQL_HOST: 127.0.0.1
                   MYSQL_USER: circleci
-                  MYSQL_PASSWORD: ''
+                  MYSQL_PASSWORD: circleci
                   MYSQL_DATABASE: vanilla_test
             - image: mysql:5.7
               environment:
                   MYSQL_USER: circleci
-                  MYSQL_PASSWORD: ''
+                  MYSQL_PASSWORD: circleci
                   MYSQL_DATABASE: vanilla_test
                   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
