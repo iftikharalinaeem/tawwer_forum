@@ -12,7 +12,7 @@ executors:
                   MYSQL_USER: circleci
                   MYSQL_PASSWORD: ''
                   MYSQL_DATABASE: vanilla_test
-            - image: mysql:5.7.26
+            - image: mysql:5.7
               environment:
                   MYSQL_USER: circleci
                   MYSQL_PASSWORD: ''
