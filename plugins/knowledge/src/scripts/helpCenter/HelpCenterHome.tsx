@@ -31,6 +31,7 @@ import React from "react";
 import SearchContext from "@vanilla/library/src/scripts/contexts/SearchContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
@@ -70,7 +71,7 @@ export default function HelpCenterHome(props: IProps) {
                 </DocumentTitle>
                 <Banner
                     action={
-                        <Permission permission="articles.add">
+                        <KbPermission permission="articles.add" kbID={knowledgeBaseID}>
                             <LinkAsButton
                                 to={EditorRoute.url({ knowledgeBaseID, knowledgeCategoryID: rootCategoryID })}
                                 onMouseOver={EditorRoute.preload}
@@ -80,7 +81,7 @@ export default function HelpCenterHome(props: IProps) {
                             >
                                 <ComposeIcon />
                             </LinkAsButton>
-                        </Permission>
+                        </KbPermission>
                     }
                     backgroundImage={bannerImage}
                     contentImage={bannerContentImage}

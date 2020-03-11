@@ -207,8 +207,6 @@ abstract class KbPage extends ThemedPage {
      * Add global redux actions that apply to any /kb page.
      */
     private function initSharedData() {
-        $me = $this->usersApi->get_me([]);
-        $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
         $currentSection = $this->siteSectionModel->getCurrentSiteSection();
         $kbArgs = [
@@ -221,6 +219,14 @@ abstract class KbPage extends ThemedPage {
         }
 
         try {
+            $me = $this->usersApi->get_me([]);
+            $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
+
+            $permissions = $this->usersApi->get_permissions($this->session->UserID);
+            $this->addReduxAction(
+                new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])
+            );
+
             $this->knowledgeBases = $this->kbApi->index($kbArgs);
             $this->addReduxAction(new ReduxAction(
                 ActionConstants::GET_ALL_KBS,

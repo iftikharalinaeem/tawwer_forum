@@ -22,6 +22,7 @@ import {
     parseErrorCode,
 } from "@library/errorPages/CoreErrorMessages";
 import classNames from "classnames";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 export default function KbErrorMessages(props: IKbErrorMessageProps) {
     const classes = pageErrorMessageClasses();
@@ -68,14 +69,16 @@ function parseKbErrorCode(props: IKbErrorMessageProps, errorCode?: string | numb
             return {
                 message,
                 description: knowledgeBaseID ? (
-                    <Permission permission="articles.add">{t("Create one to get started!")}</Permission>
+                    <KbPermission kbID={knowledgeBaseID} permission="articles.add">
+                        {t("Create one to get started!")}
+                    </KbPermission>
                 ) : null,
                 actionItem: knowledgeBaseID ? (
-                    <Permission permission="articles.add">
+                    <KbPermission kbID={knowledgeBaseID} permission="articles.add">
                         <EditorRoute.Link className={buttons.primary} data={{ knowledgeBaseID, knowledgeCategoryID }}>
                             {t("New Article")}
                         </EditorRoute.Link>
-                    </Permission>
+                    </KbPermission>
                 ) : null,
                 icon: <SearchErrorIcon message={message} className={classes.errorIcon} />,
             };
