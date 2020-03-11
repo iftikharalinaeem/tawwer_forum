@@ -16,8 +16,6 @@ executors:
               environment:
                   MYSQL_ROOT_HOST: "%"
                   MYSQL_ROOT_PASSWORD: circleci
-                  MYSQL_USER: circleci
-                  MYSQL_PASSWORD: circleci
                   MYSQL_DATABASE: vanilla_test
                   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
