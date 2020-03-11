@@ -32,8 +32,8 @@ export default function ThemeEditor(props: IProps) {
                         scrolling="yes"
                     ></iframe>
                 </div>
-                <div className={classes.styleOptions}>
-                    <ThemeBuilderForm variables={props.variables} />
+                <div className={classes.panel}>
+                    <ThemeBuilderForm />
                 </div>
             </div>
         </>
