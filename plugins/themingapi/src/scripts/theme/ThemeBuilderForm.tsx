@@ -15,12 +15,14 @@ import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
 import { Form, FormikProvider, useFormik } from "formik";
-import React from "react";
+import React, { useEffect } from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
 import { ThemePresetDropDown } from "./ThemePresetDropDown";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
+import { useLastValue } from "@vanilla/react-utils";
+import isEqual from "lodash/isEqual";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -62,17 +64,22 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     }
 
     const form = useFormik({
-        initialValues: {} as IFormState,
+        initialValues: { ...props.variables } as IFormState,
         onSubmit: () => {},
-        validate: values => {
+    });
+
+    const { values } = form;
+    const prevValues = useLastValue(values);
+
+    useEffect(() => {
+        if (!isEqual(prevValues, values)) {
             const errorVariables = getVariableErrors(values.errors);
             let hasError = errorVariables.length > 0;
 
-            const variables = { ...props.variables, ...form.values };
             updateAssets({
                 assets: {
                     variables: {
-                        data: variables,
+                        data: values,
                         type: "string",
                     },
                 },
@@ -80,11 +87,13 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             });
 
             if (!hasError) {
-                sendMessage?.(variables);
+                console.log("sending", values);
+                sendMessage?.(values);
             }
-            return values;
-        },
-    });
+        }
+        // return values;
+        // return values;
+    }, [values, sendMessage, updateAssets, prevValues]);
 
     return (
         <FormikProvider value={form}>
