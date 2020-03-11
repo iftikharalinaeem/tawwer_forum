@@ -20,6 +20,7 @@ import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables } from "./themeEditorReducer";
 import { ThemePresetDropDown } from "./ThemePresetDropDown";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -35,8 +36,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
     const global = globalVariables();
     const { updateAssets } = useThemeActions();
     const buttonGlobals = buttonGlobalVariables();
-    const dataString = JSON.stringify(props.variables);
-    const data = JSON.parse(dataString).data;
+    const variables = props.variables ?? {};
+    const { sendMessage } = useIFrameCommunication();
 
     function getVariableErrors(obj) {
         const result: any[] = [];
@@ -67,17 +68,21 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             const errorVariables = getVariableErrors(values.errors);
             let hasError = errorVariables.length > 0;
 
-            const val = { ...data, ...form.values };
-            const payload = {
-                variables: {
-                    data: JSON.parse(JSON.stringify(val)),
-                    type: "string",
-                },
-            };
+            const variables = { ...props.variables, ...form.values };
             updateAssets({
-                assets: payload,
+                assets: {
+                    variables: {
+                        data: variables,
+                        type: "string",
+                    },
+                },
                 errors: hasError,
             });
+
+            if (!hasError) {
+                console.log("updated assets. Sending message", sendMessage);
+                sendMessage?.(variables);
+            }
             return values;
         },
     });
@@ -91,8 +96,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                 <ColorPickerBlock
                     colorPicker={{
                         variableID: "global.mainColors.primary",
-                        defaultValue: data.global?.mainColors?.primary
-                            ? ensureColorHelper(data.global.mainColors.primary)
+                        defaultValue: variables.global?.mainColors?.primary
+                            ? ensureColorHelper(variables.global.mainColors.primary)
                             : global.mainColors.primary,
                     }}
                     inputBlock={{ label: t("Brand Color") }}
@@ -102,8 +107,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.body.backgroundImage.color",
-                            defaultValue: data.global?.body?.backgroundImage?.color
-                                ? ensureColorHelper(data.global.body.backgroundImage.color)
+                            defaultValue: variables.global?.body?.backgroundImage?.color
+                                ? ensureColorHelper(variables.global.body.backgroundImage.color)
                                 : global.body.backgroundImage.color,
                         }}
                         inputBlock={{ label: t("Background Color") }}
@@ -111,8 +116,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.mainColors.fg",
-                            defaultValue: data.global?.mainColors?.fg
-                                ? ensureColorHelper(data.global.mainColors.fg)
+                            defaultValue: variables.global?.mainColors?.fg
+                                ? ensureColorHelper(variables.global.mainColors.fg)
                                 : global.mainColors.fg,
                         }}
                         inputBlock={{ label: t("Text") }}
@@ -121,8 +126,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <ColorPickerBlock
                         colorPicker={{
                             variableID: "global.links.colors.default",
-                            defaultValue: data.global?.links?.colors?.default
-                                ? ensureColorHelper(data.global.links.colors.default)
+                            defaultValue: variables.global?.links?.colors?.default
+                                ? ensureColorHelper(variables.global.links.colors.default)
                                 : global.links.colors.default,
                         }}
                         inputBlock={{ label: t("Links") }}
@@ -148,7 +153,9 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                     <InputNumberBlock
                         inputNumber={{
                             variableID: "global.border.radius",
-                            defaultValue: data.border?.radius ? data.border.radius : globalVariables().border.radius,
+                            defaultValue: variables.border?.radius
+                                ? variables.border.radius
+                                : globalVariables().border.radius,
                         }}
                         inputBlock={{ label: t("Border Radius") }}
                     />
@@ -177,8 +184,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primary",
-                                defaultValue: data.buttonGlobals?.colors?.primary
-                                    ? ensureColorHelper(data.buttonGlobals.colors.primary)
+                                defaultValue: variables.buttonGlobals?.colors?.primary
+                                    ? ensureColorHelper(variables.buttonGlobals.colors.primary)
                                     : buttonGlobals.colors.primary,
                             }}
                             inputBlock={{ label: t("Background") }}
@@ -187,8 +194,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.primaryContrast",
-                                defaultValue: data.buttonGlobals?.colors?.primaryContrast
-                                    ? ensureColorHelper(data.buttonGlobals.colors.primaryContrast)
+                                defaultValue: variables.buttonGlobals?.colors?.primaryContrast
+                                    ? ensureColorHelper(variables.buttonGlobals.colors.primaryContrast)
                                     : buttonGlobals.colors.primaryContrast,
                             }}
                             inputBlock={{ label: t("Text") }}
@@ -218,8 +225,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.bg",
-                                defaultValue: data.buttonGlobals?.colors?.bg
-                                    ? ensureColorHelper(data.buttonGlobals.colors.bg)
+                                defaultValue: variables.buttonGlobals?.colors?.bg
+                                    ? ensureColorHelper(variables.buttonGlobals.colors.bg)
                                     : buttonGlobals.colors.bg,
                             }}
                             inputBlock={{ label: t("Background") }}
@@ -227,8 +234,8 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ColorPickerBlock
                             colorPicker={{
                                 variableID: "buttonGlobals.colors.fg",
-                                defaultValue: data.buttonGlobals?.colors?.fg
-                                    ? ensureColorHelper(data.buttonGlobals.colors.fg)
+                                defaultValue: variables.buttonGlobals?.colors?.fg
+                                    ? ensureColorHelper(variables.buttonGlobals.colors.fg)
                                     : buttonGlobals.colors.fg,
                             }}
                             inputBlock={{ label: t("Text") }}

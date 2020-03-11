@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IManageTheme, useThemesActions, PreviewStatusType } from "@library/theming/ThemesActions";
+import { IManageTheme, useThemeActions, PreviewStatusType } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
@@ -21,7 +21,7 @@ interface IProps {
 
 export function ThemeItem(props: IProps) {
     const { applyStatus, previewStatus } = useThemeSettingsState();
-    const { putCurrentTheme, putPreviewTheme } = useThemesActions();
+    const { putCurrentTheme, putPreviewTheme } = useThemeActions();
     const classes = themeItemClasses();
     const { preview } = props.theme;
     const themeID = props.theme.themeID;

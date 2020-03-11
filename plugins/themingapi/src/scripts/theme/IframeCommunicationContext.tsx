@@ -4,6 +4,7 @@
  */
 
 import React, { useContext, useState, useEffect, useRef, useDebugValue, RefObject } from "react";
+import debounce from "lodash/debounce";
 
 interface IContextValue {
     iframeRef: HTMLIFrameElement | null;
@@ -25,13 +26,25 @@ export function useIFrameCommunication() {
     return value;
 }
 type ISendMessage = (message: Record<string, any>) => void;
+type IReceiveMessage = (message: MessageEvent) => void;
 
-export function useOwnFrameMessages(onMessage: ISendMessage) {
+export function useOwnFrameMessages(onMessage: IReceiveMessage) {
     useEffect(() => {
-        window.addEventListener("message", onMessage, false);
+        const handler: IReceiveMessage = e => {
+            if (e.origin !== window.origin) {
+                return;
+            }
+
+            if (e.data?.source !== "vanilla") {
+                return;
+            }
+
+            onMessage(e);
+        };
+        window.addEventListener("message", handler, false);
 
         return () => {
-            window.removeEventListener("message", onMessage, false);
+            window.removeEventListener("message", handler, false);
         };
     }, [onMessage]);
 }
@@ -45,18 +58,18 @@ export function IframeCommunicationContextProvider(props: { children: React.Reac
             // Add event listenners
             const contentWindow = iframeRef.contentWindow;
 
-            const realSendMessage = function(message: Record<string, any>) {
+            const realSendMessage = debounce(function(message: Record<string, any>) {
                 if (contentWindow) {
-                    contentWindow.postMessage(message, window.origin);
+                    contentWindow.postMessage({ source: "vanilla", ...message }, window.origin);
                 } else {
                     throw new Error("Unsable to find iFrame");
                 }
-            };
+            }, 300);
 
             // Callback required because react set states will call callbacks.
             setSendMessage(() => realSendMessage);
         }
-    });
+    }, [iframeRef, setIFrameRef, sendMessage, setSendMessage]);
 
     return (
         <context.Provider

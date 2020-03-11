@@ -51,9 +51,7 @@ export interface IThemeExternalAsset {
     url: string;
 }
 
-export interface IThemeVariables {
-    [key: string]: string;
-}
+export type IThemeVariables = Record<string, any>;
 
 export interface ITheme {
     themeID: string | number;

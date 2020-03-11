@@ -12,7 +12,7 @@ import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import LinkAsButton from "@vanilla/library/src/scripts/routing/LinkAsButton";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import currentThemeClasses from "@vanilla/library/src/scripts/theming/currentThemeStyles";
-import { IManageTheme, ThemeType } from "@vanilla/library/src/scripts/theming/ThemesActions";
+import { IManageTheme, ThemeType } from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 interface IProps {
     currentTheme: IManageTheme;

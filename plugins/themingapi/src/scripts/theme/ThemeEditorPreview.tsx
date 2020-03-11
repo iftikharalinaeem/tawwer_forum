@@ -18,19 +18,27 @@ import { useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContex
 import { ThemeProvider } from "@vanilla/library/src/scripts/theming/ThemeProvider";
 import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import { useThemeCacheID } from "@vanilla/library/src/scripts/styles/styleUtils";
+import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
     const { id } = useParams();
+    const { cacheID } = useThemeCacheID();
+    const { forceVariables } = useThemeActions();
 
     useEffect(() => {
         document.body.classList.add(classes.contentContainer);
     });
 
-    const onFrame = useCallback(message => {
-        // console.log("Recieved message in frame", message);
-    }, []);
+    const onFrame = useCallback(
+        (messageEvent: MessageEvent) => {
+            console.log("Recieved message in frame", messageEvent);
+            forceVariables(messageEvent.data);
+        },
+        [forceVariables],
+    );
 
     useOwnFrameMessages(onFrame);
 
@@ -39,7 +47,7 @@ export default function ThemeStylePreview() {
     }
 
     return (
-        <ThemeProvider themeKey={id} errorComponent={ErrorPage}>
+        <ThemeProvider themeKey={id} key={cacheID} errorComponent={ErrorPage}>
             <MemoryRouter>
                 <LinkContext.Provider
                     value={{
