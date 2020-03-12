@@ -12,7 +12,6 @@ executors:
                   MYSQL_DATABASE: vanilla_test
             - image: mysql:5.7
               environment:
-                  MYSQL_ROOT_HOST: "%"
                   MYSQL_DATABASE: vanilla_test
                   MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
 jobs:
