@@ -59,17 +59,13 @@ export function IframeCommunicationContextProvider(props: { children: React.Reac
             // Add event listenners
             const contentWindow = iframeRef.contentWindow;
 
-            const realSendMessage = debounce(
-                function(message: Record<string, any>) {
-                    if (contentWindow) {
-                        contentWindow.postMessage({ source: "vanilla", ...message }, window.origin);
-                    } else {
-                        throw new Error("Unsable to find iFrame");
-                    }
-                },
-                300,
-                { trailing: true },
-            );
+            const realSendMessage = function(message: Record<string, any>) {
+                if (contentWindow) {
+                    contentWindow.postMessage({ source: "vanilla", ...message }, window.origin);
+                } else {
+                    throw new Error("Unsable to find iFrame");
+                }
+            };
 
             // Callback required because react set states will call callbacks.
             setSendMessage(() => realSendMessage);
