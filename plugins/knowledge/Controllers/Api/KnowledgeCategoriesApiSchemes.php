@@ -154,4 +154,20 @@ trait KnowledgeCategoriesApiSchemes {
 
         return $this->schema($this->knowledgeCategoryPostSchema, $type);
     }
+
+    /**
+     * Get a knowledge root category schema with minimal patch fields.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function knowledgeRootCategoryPatchSchema(string $type = "in"): Schema {
+        $schema = $this->schema(
+            Schema::parse([
+                "foreignID"
+            ])->add($this->fullSchema()),
+            "KnowledgeRootCategoryPatch"
+        );
+        return $this->schema($schema, $type);
+    }
 }

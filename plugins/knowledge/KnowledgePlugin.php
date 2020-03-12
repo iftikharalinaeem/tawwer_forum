@@ -30,6 +30,7 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use PermissionModel;
+use Vanilla\Web\SmartIDMiddleware;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -143,15 +144,41 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
             ->rule(\Vanilla\Menu\CounterModel::class)
                 ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
+            ->rule('@kb-smart-id-resolver')
+            ->setFactory(function (Container $dic) {
+                /* @var KnowledgeBaseSmartIDResolver $uid */
+                $uid = $dic->get(KnowledgeBaseSmartIDResolver::class);
+                return $uid;
+            })
         ;
         $container->rule(TranslationProviderInterface::class)
             ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
             ->rule('@smart-id-middleware')
             ->addCall('addSmartID', ['knowledgeBaseID', 'knowledge-bases', ['foreignID'], 'knowledgeBase'])
             ->addCall('addSmartID', ['knowledgeCategoryID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
-            ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article']);
+            ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
+            ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
+
+            ;
     }
 
+//    public function knowledgeBaseSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
+//        if ($column === 'knowledgebaseforeignid') {
+//            $column = 'foreignID';
+//        }
+//        return $sender->fetchValue('knowledgeBase', $pk, [$column => $value]);
+//    }
+//
+    public function parentSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
+        return $sender->fetchValue('knowledgeCategory', 'knowledgeCategoryID', [$column => $value]);
+    }
+//
+//    public function articleSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
+//        if ($column === 'articleforeignid') {
+//            $column = 'foreignID';
+//        }
+//        return $sender->fetchValue('article', $pk, [$column => $value]);
+//    }
     /**
      * Setup routine for the addon.
      *

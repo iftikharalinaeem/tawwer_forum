@@ -339,6 +339,38 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
     }
 
     /**
+     * Update an existing knowledge category.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    public function patch_root(int $id, array $body = []): array {
+        $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
+
+        $this->idParamSchema();
+        $in = $this->schema($this->knowledgeCategoryPostSchema())
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateKBCategoriesLimit"])
+            ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"])
+            ->setDescription("Update an existing knowledge category.");
+
+        $out = $this->schema($this->fullSchema(), "out");
+        $body = $in->validate($body, true);
+        if ($this->knowledgeBaseModel->isRootCategory($id)) {
+            $previousState = $this->knowledgeCategoryByID($id);
+            $this->knowledgeBaseModel->checkEditPermission($previousState['knowledgeBaseID']);
+            $this->knowledgeCategoryModel->update($body, ["knowledgeCategoryID" => $id]);
+
+            $row = $this->knowledgeCategoryByID($id);
+            $row = $this->normalizeOutput($row);
+            $result = $out->validate($row);
+        } else {
+            throw new \Garden\Web\Exception\ClientException("You can patch root category only.", 409);
+        }
+        return $result;
+    }
+
+    /**
      * Create a new knowledge category.
      *
      * @param array $body
@@ -352,7 +384,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
             ->addValidator("parentID", [$this->knowledgeCategoryModel, "validateParentID"])
             ->setDescription("Create a new knowledge category.");
         $out = $this->schema($this->fullSchema(), "out");
-
 
         if ($body['parentID'] !== -1) {
             $parentCategory = $this->knowledgeCategoryByID($body['parentID']);
