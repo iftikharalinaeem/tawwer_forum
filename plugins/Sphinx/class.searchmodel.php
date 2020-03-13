@@ -236,9 +236,12 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     public function advancedSearch($search, $offset = 0, $limit = 10, $clean = true) {
+        /** @var SphinxClient */
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits($offset, $limit, self::$maxResults);
-        $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
+        if (method_exists($sphinx, "setMatchMode")) {
+            $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
+        }
 
         // Filter the search into proper terms.
         if ($clean) {
@@ -344,7 +347,11 @@ class SphinxSearchModel extends \SearchModel {
 
         if ($doSearch) {
             if ($filtered && empty($query)) {
-                $sphinx->setMatchMode(SPH_MATCH_ALL);
+                if (method_exists($sphinx, "setMatchMode")) {
+                    $sphinx->setMatchMode(SPH_MATCH_ALL);
+                } else {
+                    $sphinx->setRankingMode(SPH_RANK_PROXIMITY);
+                }
             }
             $results = $this->doSearch($sphinx, $query, $indexes);
             $results['SearchTerms'] = array_unique($terms);
@@ -538,18 +545,23 @@ class SphinxSearchModel extends \SearchModel {
      * @return SphinxClient
      */
     public function sphinxClient() {
-         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
-         $sphinxPort = c('Plugins.Sphinx.Port', 9312);
+        $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
+        $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-         $this->_sphinxClient = new SphinxClient();
-         $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
+        $this->_sphinxClient = new SphinxClient();
+        $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
-         // Set some defaults.
-         $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
-         $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-         $this->_sphinxClient->setRankingMode(self::$rankingMode);
-         $this->_sphinxClient->setMaxQueryTime(5000);
-         $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
+        // Set some defaults.
+        if (method_exists($this->_sphinxClient, "setMatchMode")) {
+            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+        } else {
+            // SPH_SORT_TIME_SEGMENTS is not a valid sort mode in Sphinx 3.2.1.
+            $this->_sphinxClient->setSortMode(SPH_SORT_RELEVANCE);
+        }
+        $this->_sphinxClient->setRankingMode(self::$rankingMode);
+        $this->_sphinxClient->setMaxQueryTime(5000);
+        $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
 
         return $this->_sphinxClient;
     }
@@ -596,7 +608,7 @@ class SphinxSearchModel extends \SearchModel {
                 $mult = 1 / $maxScore;
 
                 $fullfunc = implode(' + ', $funcs);
-                $sort = "(($fullfunc) * $mult + 1) * @weight";
+                $sort = "(($fullfunc) * $mult + 1) * WEIGHT()";
                 trace($sort, 'sort');
 
                 $sphinx->setSelect("*, $sort as sort");
