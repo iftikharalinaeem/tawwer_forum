@@ -3,13 +3,12 @@
  * @license Proprietary
  */
 
-import { reducerWithInitialState } from "typescript-fsa-reducers";
-import produce from "immer";
-import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { useSelector } from "react-redux";
-import ThemeActions, { pageTypes, useThemeActions } from "./ThemeEditorActions";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
-import { INITIAL_THEMES_STATE } from "@vanilla/library/src/scripts/features/users/userModel";
+import produce from "immer";
+import { useSelector } from "react-redux";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import ThemeActions, { pageTypes } from "./ThemeEditorActions";
 
 export interface IThemeAssets {
     fonts?: { data: IThemeFont[] };
@@ -52,9 +51,7 @@ export interface IThemeExternalAsset {
     url: string;
 }
 
-export interface IThemeVariables {
-    [key: string]: string;
-}
+export type IThemeVariables = Record<string, any>;
 
 export interface ITheme {
     themeID: string | number;
@@ -64,6 +61,7 @@ export interface ITheme {
     parentTheme: string;
     version: string;
     pageType: pageTypes;
+    errors: boolean;
 }
 
 export interface IThemeForm {
@@ -74,6 +72,7 @@ export interface IThemeForm {
     parentTheme: string;
     version: string;
     pageType: pageTypes;
+    errors: boolean;
 }
 
 export interface IThemeState {
@@ -103,7 +102,7 @@ export const INITIAL_ASSETS: IThemeAssets = {
         type: "",
         url: "",
     },
-    variables: { key: "" },
+    variables: { data: "", type: "" },
 };
 const INITIAL_STATE: IThemeState = {
     theme: {
@@ -116,6 +115,7 @@ const INITIAL_STATE: IThemeState = {
         parentTheme: "",
         version: "",
         pageType: pageTypes.NEW_THEME,
+        errors: false,
     },
     formSubmit: {
         status: LoadStatus.PENDING,

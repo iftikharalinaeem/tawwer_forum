@@ -3,8 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { BrowserRouter, RouteComponentProps, useHistory, MemoryRouter } from "react-router-dom";
+import React, { useCallback, useEffect, useState } from "react";
+import { MemoryRouter, useParams } from "react-router-dom";
 import TitleBar from "@library/headers/TitleBar";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import Container from "@library/layout/components/Container";
@@ -15,75 +15,89 @@ import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import themeEditorPreviewClasses from "./themeEditorPreviewStyles";
 import { useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
-import { logDebug } from "@vanilla/utils";
+import { ThemeProvider } from "@vanilla/library/src/scripts/theming/ThemeProvider";
+import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
+import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import { useThemeCacheID } from "@vanilla/library/src/scripts/styles/styleUtils";
+import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
+    const { id } = useParams();
+    const { cacheID } = useThemeCacheID();
+    const { forceVariables } = useThemeActions();
+
     useEffect(() => {
         document.body.classList.add(classes.contentContainer);
     });
-    const test1 = () => {
-        return true;
-    };
 
-    const onFrame = useCallback(message => {
-        logDebug("Recieved message in frame", message);
-    }, []);
+    const onFrame = useCallback(
+        (messageEvent: MessageEvent) => {
+            forceVariables(messageEvent.data);
+        },
+        [forceVariables],
+    );
 
     useOwnFrameMessages(onFrame);
 
-    return (
-        <MemoryRouter>
-            <LinkContext.Provider
-                value={{
-                    linkContext: "",
-                    isDynamicNavigation: () => {
-                        return true;
-                    },
-                    pushSmartLocation: () => {},
-                    makeHref: () => {
-                        return "";
-                    },
-                }}
-            >
-                <TitleBar />
-                <Banner title="Welcome To Your Theme" />
-                <Container fullGutter>
-                    <div className={classes.content}>
-                        <Paragraph className={classes.description}>
-                            This is a style guide of your theme. It has examples of the visual elements used throught
-                            the application. You can click on the various widgets such as the menu or hero to edit their
-                            properties in the side panel. In addion to the widgets there are also global styles. To edit
-                            global styles click anywhere else on the page, such as this text.
-                        </Paragraph>
+    if (!id) {
+        return <NotFoundPage />;
+    }
 
-                        <div className={classes.buttonStyles}>
-                            <h2 className={classes.title}>Buttons</h2>
-                            <p>There are two types of buttons in the application: primary and secondary.</p>
-                            <div className={classes.styleContent}>
-                                <Button baseClass={ButtonTypes.PRIMARY}>Primary Button</Button>
-                                <Button>Secondary Button</Button>{" "}
+    return (
+        <ThemeProvider themeKey={id} key={cacheID} errorComponent={ErrorPage}>
+            <MemoryRouter>
+                <LinkContext.Provider
+                    value={{
+                        linkContext: "",
+                        isDynamicNavigation: () => {
+                            return true;
+                        },
+                        pushSmartLocation: () => {},
+                        makeHref: () => {
+                            return "";
+                        },
+                    }}
+                >
+                    <TitleBar />
+                    <Banner title="Welcome To Your Theme" />
+                    <Container>
+                        <div className={classes.content}>
+                            <Paragraph className={classes.description}>
+                                This is a style guide of your theme. It has examples of the visual elements used
+                                throught the application. You can click on the various widgets such as the menu or hero
+                                to edit their properties in the side panel. In addion to the widgets there are also
+                                global styles. To edit global styles click anywhere else on the page, such as this text.
+                            </Paragraph>
+
+                            <div className={classes.buttonStyles}>
+                                <h2 className={classes.title}>Buttons</h2>
+                                <p>There are two types of buttons in the application: primary and secondary.</p>
+                                <div className={classes.styleContent}>
+                                    <Button baseClass={ButtonTypes.PRIMARY}>Primary Button</Button>
+                                    <Button>Secondary Button</Button>{" "}
+                                </div>
+                            </div>
+                            <div className={classes.inputStyles}>
+                                <h2 className={classes.title}>Inputs</h2>
+                                <p>User inputs are based on the global background and text colors.</p>
+                                <div className={classes.styleContent}>
+                                    <InputTextBlock
+                                        inputProps={{
+                                            value: intialInputValue,
+                                            placeholder: "Text Input",
+                                            onChange: event => {
+                                                newInputValue(event.target.value);
+                                            },
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        <div className={classes.inputStyles}>
-                            <h2 className={classes.title}>Inputs</h2>
-                            <p>User inputs are based on the global background and text colors.</p>
-                            <div className={classes.styleContent}>
-                                <InputTextBlock
-                                    inputProps={{
-                                        value: intialInputValue,
-                                        placeholder: "Text Input",
-                                        onChange: event => {
-                                            newInputValue(event.target.value);
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </Container>
-            </LinkContext.Provider>
-        </MemoryRouter>
+                    </Container>
+                </LinkContext.Provider>
+            </MemoryRouter>
+        </ThemeProvider>
     );
 }

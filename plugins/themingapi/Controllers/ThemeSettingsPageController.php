@@ -10,6 +10,7 @@ namespace Vanilla\ThemingApi\Controllers;
 use Garden\Container\Container;
 
 use Vanilla\Theme\Controllers\Pages\ThemeEditorPage;
+use Vanilla\Theme\Controllers\Pages\ThemePreviewPage;
 use Vanilla\Web\ContentSecurityPolicyMiddleware;
 use Vanilla\Web\PageDispatchController;
 
@@ -60,13 +61,10 @@ class ThemeSettingsPageController extends PageDispatchController {
      *
      * @return \Garden\Web\Data
      */
-    public function get_preview() {
-        $response = $this
-            ->useSimplePage(\Gdn::translate('Theme Editor'))
-            ->blockRobots()
-            ->requiresSession("/theme/theme-settings/preview")
-            ->render()
-        ;
-        return $response;
+    public function get_preview($path) {
+        /** @var ThemePreviewPage $page */
+        $page = $this->usePage(ThemePreviewPage::class);
+        $page->initialize($path);
+        return $page->render();
     }
 }
