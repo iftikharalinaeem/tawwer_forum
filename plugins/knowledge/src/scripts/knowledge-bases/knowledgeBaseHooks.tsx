@@ -28,10 +28,13 @@ export function useKnowledgeBases(status: KnowledgeBaseStatus) {
     return knowledgeBasesByID;
 }
 
-export function useKnowledgeBase(kbID: number): ILoadable<IKnowledgeBase> {
+export function useKnowledgeBase(kbID?: number | null): ILoadable<IKnowledgeBase> {
     const { getSingleKB } = useKnowledgeBaseActions();
     const kbs = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
     const { status, error } = useSelector((state: IKnowledgeAppStoreState) => {
+        if (kbID == null) {
+            return { status: LoadStatus.PENDING };
+        }
         return (
             state.knowledge.knowledgeBases.getStatusesByID[kbID] ?? {
                 status: LoadStatus.PENDING,
@@ -40,13 +43,13 @@ export function useKnowledgeBase(kbID: number): ILoadable<IKnowledgeBase> {
     });
 
     useEffect(() => {
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
+        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status) && kbID != null) {
             void getSingleKB({ kbID });
         }
     }, [kbs, kbID, status, getSingleKB]);
 
     return {
-        data: kbs.data?.[kbID],
+        data: kbID != null ? kbs.data?.[kbID] : undefined,
         status,
         error,
     };
