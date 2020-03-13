@@ -156,12 +156,20 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->rule('@smart-id-middleware')
             ->addCall('addSmartID', ['knowledgeBaseID', 'knowledge-bases', ['foreignID'], 'knowledgeBase'])
             ->addCall('addSmartID', ['knowledgeCategoryID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
-            ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
+            ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
             ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
-
             ;
     }
 
+    /**
+     * ParentID resolver.
+     *
+     * @param SmartIDMiddleware $sender
+     * @param string $pk
+     * @param string $column
+     * @param string $value
+     * @return mixed
+     */
     public function parentSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
         return $sender->fetchValue('knowledgeCategory', 'knowledgeCategoryID', [$column => $value]);
     }
