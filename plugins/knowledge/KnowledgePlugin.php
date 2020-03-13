@@ -156,7 +156,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->rule('@smart-id-middleware')
             ->addCall('addSmartID', ['knowledgeBaseID', 'knowledge-bases', ['foreignID'], 'knowledgeBase'])
             ->addCall('addSmartID', ['knowledgeCategoryID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
-            ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
+            ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
             ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
             ;
     }
