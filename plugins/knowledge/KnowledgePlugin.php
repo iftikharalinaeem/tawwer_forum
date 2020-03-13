@@ -162,23 +162,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ;
     }
 
-//    public function knowledgeBaseSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
-//        if ($column === 'knowledgebaseforeignid') {
-//            $column = 'foreignID';
-//        }
-//        return $sender->fetchValue('knowledgeBase', $pk, [$column => $value]);
-//    }
-//
     public function parentSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
         return $sender->fetchValue('knowledgeCategory', 'knowledgeCategoryID', [$column => $value]);
     }
-//
-//    public function articleSmartIDResolver(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
-//        if ($column === 'articleforeignid') {
-//            $column = 'foreignID';
-//        }
-//        return $sender->fetchValue('article', $pk, [$column => $value]);
-//    }
+
     /**
      * Setup routine for the addon.
      *
