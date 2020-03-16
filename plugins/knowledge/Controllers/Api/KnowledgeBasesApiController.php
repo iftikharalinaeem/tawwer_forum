@@ -302,7 +302,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->applyIsUniversalSourceValidation($in);
         $out = $this->schema($this->fullSchema(), "out");
         $body = $in->validate($body);
-
         $body['hasCustomPermission'] = $body['hasCustomPermission'] !== false ? 1 : 0;
 
         if (array_key_exists('isUniversalSource', $body)) {
