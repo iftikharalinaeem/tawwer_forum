@@ -7,7 +7,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 import CurrentTheme from "@themingapi/components/CurrentTheme";
 import { ThemeItem } from "@themingapi/theming-ui-settings/ThemeItem";
-import { useThemesActions } from "@library/theming/ThemesActions";
+import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { t } from "@vanilla/i18n";
 import React, { useEffect } from "react";
@@ -20,7 +20,7 @@ import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyle
 
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
-    const actions = useThemesActions();
+    const actions = useThemeActions();
 
     useEffect(() => {
         if (themeSettingsState.themes.status === LoadStatus.PENDING) {
@@ -64,18 +64,17 @@ export default function ManageThemingPage(props) {
                             <ThemeItem key={key} theme={theme} className={classes.gridItem} />
                         ))}
 
-                        <div className={classes.gridItem}>
-                            <AddTheme
-                                onAdd={
-                                    <ThemeEditorRoute.Link data={{ newTheme: true }}>
-                                        <PlusIcon />
-                                    </ThemeEditorRoute.Link>
-                                }
-                            />
-                            <h3 className={themeItemClasses().title} aria-hidden={true}>
-                                &nbsp;
-                            </h3>
-                        </div>
+                        <AddTheme
+                            className={classes.gridItem}
+                            onAdd={
+                                <ThemeEditorRoute.Link data={{ newTheme: true }}>
+                                    <PlusIcon />
+                                </ThemeEditorRoute.Link>
+                            }
+                        />
+                        <h3 className={themeItemClasses().title} aria-hidden={true}>
+                            &nbsp;
+                        </h3>
                     </div>
                 </>
             )}

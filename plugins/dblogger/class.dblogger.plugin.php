@@ -123,7 +123,7 @@ class DbLoggerPlugin extends Gdn_Plugin {
             if (!isset($this->severityOptions[$v])) {
                 $sender->Form->addError('Invalid severity.  Valid options are: ' . $validLevelString);
             }
-            $sql->where('Level =', $v);
+            $sql->where('Level =', Logger::levelPriority($v));
             $sender->Form->setFormValue('severity', $v);
 
         }

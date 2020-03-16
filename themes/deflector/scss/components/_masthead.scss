@@ -46,6 +46,15 @@
     }
   }
 
+  .AdvancedSearch .AdvancedSearch-Category,
+  .AdvancedSearch .AdvancedSearch-Date {
+
+    select {
+      color: #333;
+    }
+
+  }
+
   .AdvancedSearch input[type="text"] {
     padding: 0 20px;
   }

@@ -3,30 +3,33 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef, useState } from "react";
-import { BrowserRouter, RouteComponentProps, useHistory } from "react-router-dom";
-import { themeEitorClasses } from "./themeEditorStyles";
+import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
-import { useThemeActions } from "./ThemeEditorActions";
-import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { t } from "@vanilla/i18n";
-import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
-import Modal from "@vanilla/library/src/scripts/modal/Modal";
-import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
-import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Button from "@vanilla/library/src/scripts/forms/Button";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
-import classNames from "classnames";
-import { useLastValue } from "@vanilla/react-utils";
-import qs from "qs";
-import { formatUrl } from "@library/utility/appUtils";
+import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
+import { messagesClasses } from "@vanilla/library/src/scripts/messages/messageStyles";
+import Modal from "@vanilla/library/src/scripts/modal/Modal";
+import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
-import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
+import { useLastValue } from "@vanilla/react-utils";
+import classNames from "classnames";
+import qs from "qs";
+import React, { useEffect, useRef, useState } from "react";
+import { RouteComponentProps, useHistory } from "react-router-dom";
+import ThemeEditor from "./ThemeEditor";
+import { useThemeActions } from "./ThemeEditorActions";
+import { themeEditorPageClasses } from "./themeEditorPageStyles";
+import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
+import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -39,7 +42,7 @@ interface IOwnProps
         id: string;
     }> {}
 
-export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
+export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
     const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
@@ -47,6 +50,7 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
+
     let themeID = props.match.params.id;
 
     const DEFAULT_THEME = "theme-foundation";
@@ -93,12 +97,22 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                     },
                 });
             }
-            await saveTheme();
-            window.location.href = formatUrl("/theme/theme-settings", true);
+            if (form.errors) {
+                return false;
+            } else {
+                await saveTheme();
+                window.location.href = formatUrl("/theme/theme-settings", true);
+            }
         }
     };
 
     let content: React.ReactNode;
+
+    let sendMessage;
+    const getSendMessage = (sendMessageFunction: (message: {}) => void) => {
+        sendMessage = sendMessageFunction;
+        window.sendMessage = sendMessage;
+    };
 
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
@@ -108,6 +122,18 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
         content = <ErrorPage apiError={formSubmit.error} />;
     } else {
         const tabData = [
+            {
+                label: t("Styles"),
+                panelData: "style",
+
+                contents: (
+                    <ThemeEditor
+                        themeID={themeID ?? getTemplateName()}
+                        variables={theme.data.assets.variables}
+                        getSendMessage={getSendMessage}
+                    />
+                ),
+            },
             {
                 label: t("Header"),
                 panelData: "header",
@@ -176,18 +202,21 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                 ),
             },
         ];
+
         content = (
-            <form onSubmit={submitHandler}>
-                <ActionBar
-                    useShadow={false}
-                    callToActionTitle={t("Save")}
-                    title={<Title themeName={theme.data.name} pageType={form.pageType} />}
-                    fullWidth={true}
-                    isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                    optionsMenu={
-                        <>
-                            {/* WIP not wired up. */}
-                            {/* <DropDown
+            <>
+                <form onSubmit={submitHandler}>
+                    <ActionBar
+                        useShadow={false}
+                        callToActionTitle={t("Save")}
+                        title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                        fullWidth={true}
+                        isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
+                        isCallToActionDisabled={!!form.errors}
+                        optionsMenu={
+                            <>
+                                {/* WIP not wired up. */}
+                                {/* <DropDown
                                         flyoutType={FlyoutType.LIST}
                                         openDirection={DropDownOpenDirection.BELOW_LEFT}
                                     >
@@ -196,21 +225,24 @@ export default function ThemeEditorPage(props: IProps, ownProps: IOwnProps) {
                                         <DropDownItemSeparator />
                                         <DropDownItemButton name={t("Delete")} onClick={() => {}} />
                                     </DropDown> */}
-                        </>
-                    }
-                />
+                            </>
+                        }
+                    />
+                </form>
 
                 <TextEditorContextProvider>
                     <Tabs data={tabData} />
                 </TextEditorContextProvider>
-            </form>
+            </>
         );
     }
 
     return (
-        <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-            {content}
-        </Modal>
+        <IframeCommunicationContextProvider>
+            <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+                {content}
+            </Modal>
+        </IframeCommunicationContextProvider>
     );
 }
 
@@ -227,7 +259,7 @@ export const Title = (props: IThemeTitleProps) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [isDisabled, setDisabled] = useState(true);
     const [name, setName] = useState(props.themeName);
-    const classes = themeEitorClasses();
+    const classes = themeEditorPageClasses();
 
     const editThemeName = () => {
         setDisabled(false);

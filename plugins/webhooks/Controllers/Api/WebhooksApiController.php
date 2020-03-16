@@ -337,7 +337,9 @@ class WebhooksApiController extends \AbstractApiController {
                 "allowNull" => true,
                 "type" => "integer",
             ],
-            "requestHeaders",
+            "requestHeaders" => [
+                "type" => "string",
+            ],
             "responseBody" => [
                 "allowNull" => true,
                 "type" => "string",
@@ -346,7 +348,9 @@ class WebhooksApiController extends \AbstractApiController {
                 "allowNull" => true,
                 "type" => "integer",
             ],
-            "responseHeaders",
+            "responseHeaders" => [
+                "type" => "string",
+            ],
             "dateInserted" => [
                 "type" => "datetime",
             ],

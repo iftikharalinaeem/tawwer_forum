@@ -225,29 +225,48 @@ class BadgeModel extends Gdn_Model {
      * Insert or update badge data.
      *
      * @param array $data The badge we're creating or updating.
-     * @param array $settings Not used.
+     * @param array $settings If settings is not included or does not have a 'replaceAttributes' key,
+     * it will add any new attributes to the attribute array. If 'replaceAttributes' is set to false,
+     * it will overwrite the attribute array.
      * @return int|false Returns the ID of the badge or **false** on error.
      */
     public function save($data, $settings = []) {
-        // See if there is an existing badge.
-        if (val('Slug', $data) && !val('BadgeID', $data)) {
-            $existingBadge = $this->getID($data['Slug']);
-            if ($existingBadge) {
-                $different = false;
-                foreach ($data as $key => $value) {
-                    if (array_key_exists($key, $existingBadge) && $existingBadge[$key] != $value) {
-                        $different = true;
-                        break;
-                    }
-                }
-                if (!$different) {
-                    return $existingBadge['BadgeID'];
-                }
-                $data['BadgeID'] = $existingBadge['BadgeID'];
-
-            }
+        if (!is_array($settings)) {
+            $settings = [];
         }
+        $settings += [
+            'overwriteAttributes' => false,
+            ];
+
+        // See if there is an existing badge.
+        $existingBadge = null;
+        if (val('BadgeID', $data)) {
+            $existingBadge = $this->getID((int)$data['BadgeID']);
+        } elseif (val('Slug', $data)) {
+            $existingBadge = $this->getID($data['Slug']);
+        }
+
+        // The second condition of this if-statement--!val('BadgeID', $data)--was part of the function's logic
+        // before the most recent refactoring. I'm not sure why it's there and think we could get rid of it, but
+        // didn't want to touch it while refactoring to address another issue.
+        if ($existingBadge && !val('BadgeID', $data)) {
+            $different = false;
+            foreach ($data as $key => $value) {
+                if (array_key_exists($key, $existingBadge) && $existingBadge[$key] != $value) {
+                    $different = true;
+                    break;
+                }
+            }
+            if (!$different) {
+                return $existingBadge['BadgeID'];
+            }
+            $data['BadgeID'] = $existingBadge['BadgeID'];
+        }
+
         if (isset($data['Attributes']) && is_array($data['Attributes'])) {
+            if ($existingBadge && !$settings['overwriteAttributes']) {
+                $data['Attributes'] = array_replace($existingBadge['Attributes'], $data['Attributes']);
+            }
             $data['Attributes'] = dbencode($data['Attributes']);
         }
         if (!isset($data['BadgeID'])) {

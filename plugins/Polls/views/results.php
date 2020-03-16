@@ -62,7 +62,7 @@ else : // Display the poll
         </div>
         <?php
         if ($this->data('ShowForm')) {
-            echo anchor(t('Hide Results'), '#', 'js-poll-result-btn');
+            echo anchor(t('Hide Results'), '#', 'viewPollResults js-poll-result-btn');
         }
         ?>
     </div>

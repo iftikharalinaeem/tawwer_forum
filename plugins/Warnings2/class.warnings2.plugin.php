@@ -288,8 +288,9 @@ class Warnings2Plugin extends Gdn_Plugin {
             $name = htmlspecialchars($rule['Name']);
             $description = htmlspecialchars($rule['Description']);
 
-            $content .= wrap(t('Infringed rule'), 'strong') . ' ' . wrap($name, 'span', ['title' => $description]);
+            $content .= wrap(t('Infringed rule'), 'strong') . ' ' . wrap($name);
             $content .= "<br>";
+            $content .= wrap($description, 'p');
         }
         $content .= wrap(t('Moderator'), 'strong') . ' ' . userAnchor($issuer);
         $content .= "<br>";
@@ -859,6 +860,13 @@ class Warnings2Plugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
 
         $rules = $this->ruleModel->get();
+
+        if (!empty($rules)) {
+            foreach ($rules as &$rule) {
+                $rule['EditUrl'] = url('/dashboard/settings/add-edit-rule/' . $rule['RuleID']);
+                $rule['DeleteUrl'] = url('/dashboard/settings/delete-rule?ruleid=' . $rule['RuleID']);
+            }
+        }
 
         $sender->setData('Title', Gdn::translate('Rules'));
         $sender->setData('Form', new TwigFormWrapper($sender->Form));

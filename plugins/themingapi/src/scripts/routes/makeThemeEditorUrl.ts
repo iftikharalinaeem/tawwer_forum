@@ -23,6 +23,7 @@ export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<ITh
     if (!data || data.newTheme) {
         return defaultAddRoot;
     }
+
     let baseUrl = data.themeID ? `/theme/theme-settings/${data.themeID}/edit` : defaultAddRoot;
     const { templateName } = data;
 

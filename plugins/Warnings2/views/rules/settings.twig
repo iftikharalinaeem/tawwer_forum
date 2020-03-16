@@ -28,7 +28,7 @@ dashboardHeading({
                 <td class="options">
                     <div class="btn-group">
                         <a
-                            href="/dashboard/settings/add-edit-rule/{{ Rule.RuleID }}"
+                            href="{{ Rule.EditUrl }}"
                             class="btn js-modal btn-icon"
                             aria-label="{{ t('Edit') }}"
                             title="{{ t('Edit') }}"
@@ -36,7 +36,7 @@ dashboardHeading({
                             {{ dashboardSymbol({name: 'edit'}) }}
                         </a>
                         <a
-                            href="/dashboard/settings/delete-rule?ruleid={{ Rule.RuleID }}"
+                            href="{{ Rule.DeleteUrl }}"
                             class="btn js-modal-confirm btn-icon"
                             aria-label="{{ t('Delete') }}"
                             title="{{ t('Delete') }}"

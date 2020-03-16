@@ -29,7 +29,7 @@ else : // Display the poll
                 echo anchor(t('Sign in to vote!'), $authenticationUrl, $cssClass);
             }
             if (Gdn::session()->isValid()) {
-                echo anchor(t('View Results'), '#', 'js-poll-result-btn');
+                echo anchor(t('View Results'), '#', 'viewPollResults js-poll-result-btn');
             }
 
             echo $form->close();

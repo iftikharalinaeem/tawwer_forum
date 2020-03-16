@@ -241,14 +241,14 @@ class EmailRouterController extends Gdn_Controller {
                if (!empty($site['multisite'])) {
                   $Url = "https://{$site['multisite']['real']}/utility/email.json";
                } else {
-                  $Url = "http://{$site['name']}/utility/email.json";
+                  $Url = "https://{$site['name']}/utility/email.json";
                }
             } elseif ($emailDomain && preg_match('`([^+@]+)([^@]*)$`', $slug, $Matches)) {
                $ToParts = explode('.', strtolower($Matches[1]));
 //               $Args = $Matches[2];
 
                // Check for http or https.
-               $Scheme = 'http';
+               $Scheme = 'https';
                if (in_array(reset($ToParts), ['http', 'https'])) {
                   $Scheme = array_shift($ToParts);
                }
@@ -272,7 +272,7 @@ class EmailRouterController extends Gdn_Controller {
 
                      // This is a site node alias in the form: folder.alias+args@email.vanillaforums.com.
                      $UrlParts = parse_url($this->Aliases[$Part]);
-                     $Scheme = val('scheme', $UrlParts, 'http');
+                     $Scheme = val('scheme', $UrlParts, 'https');
                      $Domain = val('host', $UrlParts, 'email.vanillaforums.com');
                      $Folder = '/'.array_pop($ToParts);
                   }
@@ -566,7 +566,7 @@ class EmailRouterController extends Gdn_Controller {
     * @return string Returns the site URL.
     */
    private function getSiteUrlFromHost($host, &$found = false) {
-      $default = "http://$host";
+      $default = "https://$host";
 
       if (!class_exists('Communication')) {
          return $default;

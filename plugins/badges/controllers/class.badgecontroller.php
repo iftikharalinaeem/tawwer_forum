@@ -320,6 +320,7 @@ class BadgeController extends BadgesAppController {
      * @param string $name
      */
     public function index($badgeID = '', $name = '') {
+        $this->permission('Reputation.Badges.View');
         $this->MasterView = 'default';
         $this->addCssFile('style.css');
         $this->removeCssFile('admin.css');
@@ -349,7 +350,7 @@ class BadgeController extends BadgesAppController {
         $this->setData('Recipients', $this->UserBadgeModel->getUsers($badgeID, ['Limit' => 15])->resultArray());
         $this->setData('BadgeID', $badgeID, true);
 
-        if (val('_New', $this->UserBadge) &&  BadgeModel::isRequestable($this->Badge)) {
+        if (val('_New', $this->UserBadge) && BadgeModel::isRequestable($this->Badge)) {
             $this->addModule('RequestBadgeModule');
         }
         $this->addModule('BadgesModule');
