@@ -144,12 +144,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
 
             ->rule(\Vanilla\Menu\CounterModel::class)
                 ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
-            ->rule('@kb-smart-id-resolver')
-            ->setFactory(function (Container $dic) {
-                /* @var KnowledgeBaseSmartIDResolver $uid */
-                $uid = $dic->get(KnowledgeBaseSmartIDResolver::class);
-                return $uid;
-            })
         ;
         $container->rule(TranslationProviderInterface::class)
             ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
