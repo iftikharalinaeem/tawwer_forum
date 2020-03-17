@@ -63,17 +63,22 @@ class IdeationPlugin extends Gdn_Plugin {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
     /**
      * IdeationPlugin constructor.
      *
      * @param DiscussionModel $discussionModel
      * @param StatusModel $statusModel
      * @param UserModel $userModel
+     * @param CategoryModel $userModel
      */
-    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel) {
+    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel, CategoryModel $categoryModel) {
         $this->discussionModel = $discussionModel;
         $this->statusModel = $statusModel;
         $this->userModel = $userModel;
+        $this->categoryModel = $categoryModel;
         parent::__construct();
     }
 
@@ -293,16 +298,25 @@ EOT
         );
         if (!$sender->Form->authenticatedPostBack()) {
             $category = CategoryModel::categories($categoryID);
+
             if ($categoryID && !$this->isIdeaCategory($category)) {
-                // Don't let the ideation state of existing categories be changed.
-                return;
+                return; // Don't let the ideation state of existing categories be changed.
             }
 
-            $sender->addJsFile('ideation.js', 'plugins/ideation'); // Show/hide allowed discussions and downvote option
+            // Show/hide allowed discussions and downvote option
+            $sender->addJsFile('ideation.js', 'plugins/ideation');
 
-            if (!$categoryID) {
-                $sender->Data['_ExtendedFields']['IsIdea'] = ['Name' => 'Idea Category', 'Control' => 'CheckBox', 'Description' => t('Ideation') .'<div class="info"><a href="https://docs.vanillaforums.com/help/ideation/">' . sprintf(t('Learn more about %s'), t('ideas')) . '</a></div>'];
-            }
+            $isIdeaOptions = [];
+            if($this->isIdeaCategory($category)){ $isIdeaOptions['checked'] = 'checked'; }
+            $sender->Data['_ExtendedFields']['IsIdea'] = [
+                'Name' => 'Idea Category',
+                'Control' => 'CheckBox',
+                'Options' => $isIdeaOptions,
+                'Description' => Gdn::translate('Ideation') .
+                    '<div class="info"><a href="https://docs.vanillaforums.com/help/ideation/">' .
+                    sprintf(Gdn::translate('Learn more about %s'), Gdn::translate('ideas')) .
+                    '</a></div>'
+            ];
 
             $downVoteOptions = [];
             if ($this->isIdeaCategory($category)) {
@@ -312,6 +326,79 @@ EOT
             }
 
             $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Description' => t('Down Votes').' <div class="info">'.t('Let users vote up or down.').'</div>', 'Options' => $downVoteOptions];
+
+            //Inflate BestOfIdeationSettings
+            $category[BestOfIdeationModule::SETTINGS_COL_NAME] = (
+                (is_string($category[BestOfIdeationModule::SETTINGS_COL_NAME])
+                    ?dbdecode($category[BestOfIdeationModule::SETTINGS_COL_NAME])
+                    :[]
+                )
+            );
+
+            //Is the bestOfIdeation feature used?
+            $useBestOfIdeationOptions = [];
+            if(count($category[BestOfIdeationModule::SETTINGS_COL_NAME])>0){ $useBestOfIdeationOptions['checked'] = 'checked'; }
+            $sender->Data['_ExtendedFields']['UseBestOfIdeation'] = [
+                'Name' => 'UseBestOfIdeation',
+                'LabelCode' => Gdn::translate('Show the "Best of Ideation"'),
+                'Control' => 'CheckBox',
+                'Description' => Gdn::translate('Show the "Best of" ideas').' <div class="info">'.Gdn::translate('Will show a scoreboard of the best ideas.').'</div>',
+                'Options' => $useBestOfIdeationOptions,
+            ];
+
+            //The amount of ideas to include in this bestOfIdeation implementation?
+            $bestOfIdeationLimitOptions = [
+                'type' => "number",
+                'value' => (
+                    isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Limit'])
+                        ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Limit']
+                        :BestOfIdeationModule::DEFAULT_AMOUNT
+                ),
+                'step' => "1",
+                'min' => "1",
+                'max' => BestOfIdeationModule::MAX_AMOUNT
+            ];
+            $sender->Data['_ExtendedFields']['BestOfIdeationLimit'] = [
+                'Name' => 'BestOfIdeationSettings[Limit]',
+                'LabelCode' => Gdn::translate('How many ideas shown'),
+                'Control' => 'textbox',
+                'Description' => Gdn::translate('How many top ideas should be show in the "Best of Idea" module'),
+                'Options' => $bestOfIdeationLimitOptions,
+            ];
+
+            //The earliest date at which an idea can be considered in this bestOfIdeation implementation?
+            $bestOfIdeationDatesFromOptions = [
+                'type' => "date",
+                'value' => (
+                    isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['From'])
+                        ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['From']
+                        :''
+                ),
+            ];
+            $sender->Data['_ExtendedFields']['BestOfIdeationFrom'] = [
+                'Name' => 'BestOfIdeationSettings[Dates][From]',
+                'LabelCode' => Gdn::translate('Consider ideas added after...'),
+                'Control' => 'textbox',
+                'Description' => Gdn::translate('Show top ideas for time period ending with...'),
+                'Options' => $bestOfIdeationDatesFromOptions,
+            ];
+
+            //The latest date at which an idea can be considered in this bestOfIdeation implementation?
+            $bestOfIdeationDatesToOptions = [
+                'type' => "date",
+                'value' => (
+                isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['To'])
+                    ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['To']
+                    :''
+                ),
+            ];
+            $sender->Data['_ExtendedFields']['BestOfIdeationTo'] = [
+                'Name' => 'BestOfIdeationSettings[Dates][To]',
+                'LabelCode' => Gdn::translate('Consider ideas added before...'),
+                'Control' => 'textbox',
+                'Description' => Gdn::translate('Show top ideas for time period ending with...'),
+                'Options' => $bestOfIdeationDatesToOptions,
+            ];
 
         } else {
             if ($sender->Form->getValue('Idea_Category')) {
@@ -723,6 +810,39 @@ EOT
         $ideaCounterModule->setDiscussion($discussion);
 
         return $ideaCounterModule;
+    }
+
+    /**
+     *
+     * Returns the "Best of" module for a discussion category.
+     *
+     * @param CategoryController $category The category for which we want to display the "Best of".
+     * @return BestOfIdeationModule The categories's "Best of" module.
+     */
+    public function getBestOfIdeation(int $categoryId) {
+        $bestOfIdeationModule = new BestOfIdeationModule($categoryId);
+
+        return $bestOfIdeationModule;
+    }
+
+
+    /**
+     *
+     * Hooks to "After a category's title" is shown
+     *
+     * @param CategoriesController $sender
+     * @return string (html) corresponding to the bestOfIdeation implementation for the current category
+     */
+    public function categoriesController_AfterPageTitle_handler(CategoriesController $sender): string {
+        if(is_array($sender->Category->AllowedDiscussionTypes) &&
+            in_array('Idea', $sender->Category->AllowedDiscussionTypes)){
+
+            $categoryID = $sender->CategoryID;
+
+            $bestOfIdeation = $this->getBestOfIdeation($categoryID);
+
+            echo $bestOfIdeation->toString();
+        }
     }
 
     /**
@@ -1716,6 +1836,7 @@ EOT
      *
      * @param CategoriesController $sender
      */
+
     public function categoriesController_pageControls_handler($sender) {
         $categoryID = val('CategoryID', $sender);
         if (!$categoryID || !$this->isIdeaCategory(CategoryModel::categories($categoryID))) {
@@ -2013,10 +2134,30 @@ EOT
     }
 
     /**
+     *
+     * Hooks before saving an ideation.
+     *
      * Flushing the ideation cache on this hook to prevent people creating a new ideation category
      * not being able to see/post in it right away. See getIdeaCategoryIDs().
      */
-    public function categoryModel_beforeSaveCategory_handler() {
+    public function categoryModel_beforeSaveCategory_handler(CategoryModel &$sender, array $args) {
+        $BestOfIdeationSettings = [];
+        //Look for bestOfIdeation settings
+        if((isset($args['FormPostValues']['UseBestOfIdeation']))&&
+            ($args['FormPostValues']['UseBestOfIdeation']==1)&&
+            (isset($args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME]))){
+            $BestOfIdeationSettings = $args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME];
+
+            //If there are empty date fields, we remove them to the data to be saved.
+            foreach($BestOfIdeationSettings['Dates'] as $dateIdx=>$date){
+                if(empty($date)){
+                    unset($BestOfIdeationSettings['Dates'][$dateIdx]);
+                }
+            }
+        }
+        //The bestOfIdeation data is assembled in a single value(flattened multi-dimensional array).
+        $sender->EventArguments['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME] = dbencode($BestOfIdeationSettings);
+
         Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 }

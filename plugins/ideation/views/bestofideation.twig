@@ -1,0 +1,10 @@
+{% if IdeasDatas is not empty %}
+    <div class="PopularPosts">
+        <h1 class="H HomepageTitle">{{ SectionTitle }}</h1>
+        <ul class="DataList Discussions">
+            {{ IdeaListHtml|raw }}
+        </ul>
+    </div>
+{% else %}
+    <p>{{ t("No news found.") }}</p>
+{% endif %}

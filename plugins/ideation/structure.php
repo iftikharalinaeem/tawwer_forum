@@ -35,6 +35,12 @@ Gdn::structure()
     ->column(IdeationPlugin::CATEGORY_IDEATION_COLUMN_NAME, [IdeationPlugin::CATEGORY_TYPE_UP, IdeationPlugin::CATEGORY_TYPE_UP_AND_DOWN], true)
     ->set();
 
+//Add a varchar(200) field to the Category table that's meant to contain the configurations of the BestOfIdeation module
+Gdn::structure()
+    ->table('Category')
+    ->column(BestOfIdeationModule::SETTINGS_COL_NAME, 'varchar(200)', true)
+    ->set();
+
 // Make sure we've got the needed reactions
 $reactionModel = new ReactionModel();
 $reactionModel->defineReactionType(['UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
