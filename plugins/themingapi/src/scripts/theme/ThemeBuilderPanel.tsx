@@ -27,6 +27,9 @@ import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/Th
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
+import { ThemeBuilderSectionGlobal } from "@themingapi/theme/builderSections/ThemeBuilderSectionGlobal";
+import { ThemeBuilderSectionTitleBar } from "@themingapi/theme/builderSections/ThemeBuilderSectionTitleBar";
+import { ThemeBuilderSectionBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionBanner";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -75,41 +78,9 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
         >
             {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <div className={classes.root}>
-                <ThemeBuilderTitle />
-                <ThemeBuilderBlock label={t("Preset")}>
-                    <ThemeDropDown
-                        // This is actually an array, but the first is the real one. The rest are fallbacks.
-                        variableKey="global.options.preset"
-                        options={[
-                            { label: t("Light"), value: GlobalPreset.LIGHT },
-                            { label: t("Dark"), value: GlobalPreset.DARK },
-                        ]}
-                    ></ThemeDropDown>
-                </ThemeBuilderBlock>
-                <ThemeBuilderBlock label={t("Brand Color")}>
-                    <ThemeColorPicker variableKey={"global.mainColors.primary"} />
-                </ThemeBuilderBlock>
-                <ThemeBuilderSection label={t("Body")}>
-                    <ThemeBuilderBlock label={t("Background")}>
-                        <ThemeColorPicker variableKey="global.mainColors.bg" />
-                    </ThemeBuilderBlock>
-                    <ThemeBuilderBlock label={t("Text")}>
-                        <ThemeColorPicker variableKey="global.mainColors.fg" />
-                    </ThemeBuilderBlock>
-                    <ThemeBuilderBlock label={t("Links")}>
-                        <ThemeColorPicker variableKey="global.links.colors.default" />
-                    </ThemeBuilderBlock>
-                    <ThemeBuilderBlock label={t("Font")}>
-                        <GoogleFontDropdown />
-                    </ThemeBuilderBlock>
-                </ThemeBuilderSection>
-                <ThemeBuilderSection label={t("Buttons & Inputs")}>
-                    <ThemeBuilderBlock label={t("Border Radius")}>
-                        <ThemeInputNumber variableKey="global.border.radius" />
-                    </ThemeBuilderBlock>
-                    <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
-                    <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
-                </ThemeBuilderSection>
+                <ThemeBuilderSectionGlobal />
+                <ThemeBuilderSectionTitleBar />
+                <ThemeBuilderSectionBanner />
             </div>
         </ThemeBuilderContextProvider>
     );

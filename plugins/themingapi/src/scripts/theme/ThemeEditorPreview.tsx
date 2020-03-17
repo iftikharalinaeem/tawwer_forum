@@ -20,6 +20,7 @@ import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { useThemeCacheID } from "@vanilla/library/src/scripts/styles/styleUtils";
 import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { userContentClasses } from "@vanilla/library/src/scripts/content/userContentStyles";
 
 export default function ThemeStylePreview() {
     const [intialInputValue, newInputValue] = useState("Text Input");
@@ -62,14 +63,20 @@ export default function ThemeStylePreview() {
                 >
                     <TitleBar />
                     <Banner title="Welcome To Your Theme" />
-                    <Container>
+                    <Container narrow fullGutter>
                         <div className={classes.content}>
-                            <Paragraph className={classes.description}>
-                                This is a style guide of your theme. It has examples of the visual elements used
-                                throught the application. You can click on the various widgets such as the menu or hero
-                                to edit their properties in the side panel. In addion to the widgets there are also
-                                global styles. To edit global styles click anywhere else on the page, such as this text.
-                            </Paragraph>
+                            <div className={userContentClasses().root}>
+                                <p>
+                                    This is a style guide of your theme. It has examples of the visual elements used
+                                    throught the application. You can click on the various widgets such as the{" "}
+                                    <strong>menu</strong> or <strong>hero</strong> to edit their properties in the side
+                                    panel.
+                                </p>
+                                <p>
+                                    In additon to the widgets there are also <strong>global styles</strong>. To edit
+                                    global styles click anywhere else on the page, such as this text.
+                                </p>
+                            </div>
 
                             <div className={classes.buttonStyles}>
                                 <h2 className={classes.title}>Buttons</h2>

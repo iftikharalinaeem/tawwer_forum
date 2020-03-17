@@ -3,11 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings } from "@library/styles/styleHelpers";
+import { unit, paddings, fonts } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { FontSizeProperty } from "csstype";
 import { TLength } from "typestyle/lib/types";
+import { userContentVariables } from "@vanilla/library/src/scripts/content/userContentStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -68,11 +69,10 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         ...paddings({
             top: vars.content.padding.top,
         }),
+        ...fonts(userContentVariables().fonts),
+        lineHeight: unit(24),
     });
-    const description = style("description", {
-        fontSize: unit(vars.description.fontSize),
-        lineHeight: vars.description.lineHeight,
-    });
+    const description = style("description", {});
 
     const title = style("title", {
         marginBottom: vars.title.margin.bottom,

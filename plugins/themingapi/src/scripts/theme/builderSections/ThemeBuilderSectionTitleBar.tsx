@@ -1,0 +1,87 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import React from "react";
+import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
+import { t } from "@vanilla/i18n";
+import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
+import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
+import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
+import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
+import { BorderType } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
+import { LogoAlignment } from "@vanilla/library/src/scripts/headers/TitleBar";
+import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderCheckBox";
+
+export function ThemeBuilderSectionTitleBar() {
+    return (
+        <>
+            <ThemeBuilderTitle title={t("Title Bar")} />
+            <ThemeBuilderBlock label={t("Background Color")}>
+                <ThemeColorPicker variableKey="titleBar.colors.bg" />
+            </ThemeBuilderBlock>
+            <ThemeBuilderCheckBox label={t("Full Bleed")} variableKey="titleBar.fullBleed.enabled" />
+            <ThemeBuilderBlock label={t("Text")}>
+                <ThemeColorPicker variableKey="titleBar.colors.fg" />
+            </ThemeBuilderBlock>
+            <ThemeBuilderBlock label={t("Height")}>
+                <ThemeInputNumber min={48} max={88} step={2} variableKey="titleBar.sizing.height" />
+            </ThemeBuilderBlock>
+            <ThemeBuilderBlock label={t("Style")}>
+                <ThemeDropDown
+                    variableKey="titleBar.border.type"
+                    options={[
+                        {
+                            label: t("Borderless"),
+                            value: BorderType.NONE,
+                        },
+                        {
+                            label: t("Bordered"),
+                            value: BorderType.BORDER,
+                        },
+                        {
+                            label: t("Shadowed"),
+                            value: BorderType.SHADOW,
+                        },
+                    ]}
+                />
+            </ThemeBuilderBlock>
+            <ThemeBuilderSection label={t("Logo")}>
+                <ThemeBuilderBlock label={t("Alignment (Mobile)")}>
+                    <ThemeDropDown
+                        variableKey="titleBar.mobileLogo.justifyContent"
+                        options={[
+                            {
+                                label: t("Left Aligned"),
+                                value: LogoAlignment.LEFT,
+                            },
+                            {
+                                label: t("Center Aligned"),
+                                value: LogoAlignment.CENTER,
+                            },
+                        ]}
+                    />
+                </ThemeBuilderBlock>
+            </ThemeBuilderSection>
+            <ThemeBuilderSection label={t("Navigation")}>
+                <ThemeBuilderBlock label={t("Alignment")}>
+                    <ThemeDropDown
+                        variableKey="titleBar.navAlignment.alignment"
+                        options={[
+                            {
+                                label: t("Left Aligned"),
+                                value: "left",
+                            },
+                            {
+                                label: t("Center Aligned"),
+                                value: "center",
+                            },
+                        ]}
+                    />
+                </ThemeBuilderBlock>
+            </ThemeBuilderSection>
+        </>
+    );
+}
