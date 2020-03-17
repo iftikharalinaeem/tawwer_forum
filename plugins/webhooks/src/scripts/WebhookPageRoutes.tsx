@@ -8,9 +8,9 @@ import RouteHandler from "@vanilla/library/src/scripts/routing/RouteHandler";
 import { Route } from "react-router";
 
 export const WebhooksIndexRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/index" */ "@webhooks/PlaceholderPage"),
+    () => import(/* webpackChunkName: "pages/webhooks" */ "@webhooks/PlaceholderPage"),
     "/webhook-settings",
-    () => "/webhooks",
+    () => "/webhook-settings",
 );
 
 export const WebhooksAddEditRoute = new RouteHandler(

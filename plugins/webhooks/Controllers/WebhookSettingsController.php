@@ -17,7 +17,8 @@ class WebhookSettingsController extends SettingsController {
      */
     public function index(string $path = null) {
         $this->permission('Garden.Settings.Manage');
-
+        $this->setHighlightRoute('webhook-settings');
+        $this->title(t("Webhooks"));
         $this->render();
     }
 }
