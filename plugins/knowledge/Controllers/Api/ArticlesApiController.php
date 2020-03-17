@@ -14,6 +14,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
@@ -129,7 +130,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ReactionOwnerModel $reactionOwnerModel
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
-     * @param FormatService $formatService
+     * @param ExtendedContentFormatService $formatService
      * @param MediaModel $mediaModel
      * @param DiscussionsApiController $discussionApi
      * @param SessionInterface $sessionInterface
@@ -152,7 +153,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ReactionOwnerModel $reactionOwnerModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        FormatService $formatService,
+        ExtendedContentFormatService $formatService,
         MediaModel $mediaModel,
         DiscussionsApiController $discussionApi,
         SessionInterface $sessionInterface,
