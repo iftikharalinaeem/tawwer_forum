@@ -26,6 +26,7 @@ import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
+import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -99,11 +100,7 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
                         <ThemeColorPicker variableKey="global.links.colors.default" />
                     </ThemeBuilderBlock>
                     <ThemeBuilderBlock label={t("Font")}>
-                        <ThemeDropDown
-                            // This is actually an array, but the first is the real one. The rest are fallbacks.
-                            variableKey="global.fonts.families.body.0"
-                            options={[{ label: "Open Sans", value: "Open Sans" }]}
-                        ></ThemeDropDown>
+                        <GoogleFontDropdown />
                     </ThemeBuilderBlock>
                 </ThemeBuilderSection>
                 <ThemeBuilderSection label={t("Buttons & Inputs")}>

@@ -40,6 +40,9 @@ export const ThemeEditorTitle = (props: IProps) => {
     return (
         <li className={classes.themeName}>
             <AutoWidthInput
+                onBlur={() => {
+                    setDisabled(true);
+                }}
                 disabled={isDisabled}
                 required
                 onChange={event => {
