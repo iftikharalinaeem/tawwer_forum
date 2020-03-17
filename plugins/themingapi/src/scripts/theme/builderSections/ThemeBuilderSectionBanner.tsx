@@ -9,18 +9,52 @@ import { t } from "@vanilla/i18n";
 import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
 import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderCheckBox";
+import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
+import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
+import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
+import { SearchBarPresets } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 
 export function ThemeBuilderSectionBanner() {
     return (
         <>
             <ThemeBuilderTitle title={t("Banner")} />
-            <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="compactSearch.backgrounds.useOverlay" />
+            <ThemeBuilderBlock label={t("Background Image")}>
+                <ThemeBuilderUpload variableKey="banner.outerBackground.image" />
+            </ThemeBuilderBlock>
+            <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="banner.backgrounds.useOverlay" />
             <ThemeBuilderBlock label={t("Background Color")}>
                 <ThemeColorPicker variableKey="banner.colors.primary" />
             </ThemeBuilderBlock>
             <ThemeBuilderBlock label={t("Text")}>
                 <ThemeColorPicker variableKey="banner.colors.primaryContrast" />
             </ThemeBuilderBlock>
+            <ThemeBuilderSection label={t("Search")}>
+                <ThemeBuilderBlock label={t("Preset")}>
+                    <ThemeDropDown
+                        variableKey="banner.presets.input.preset"
+                        options={[
+                            {
+                                label: t("Borderless"),
+                                value: SearchBarPresets.NO_BORDER,
+                            },
+                            {
+                                label: t("Bordered"),
+                                value: SearchBarPresets.UNIFIED_BORDER,
+                            },
+                        ]}
+                    />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Background")}>
+                    <ThemeColorPicker variableKey="banner.searchBar.colors.bg" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Background")}>
+                    <ThemeColorPicker variableKey="banner.searchBar.colors.fg" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Border Radius")}>
+                    <ThemeInputNumber variableKey="banner.border.radius" />
+                </ThemeBuilderBlock>
+            </ThemeBuilderSection>
         </>
     );
 }

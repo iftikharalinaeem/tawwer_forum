@@ -14,6 +14,7 @@ import { BorderType } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
 import { LogoAlignment } from "@vanilla/library/src/scripts/headers/TitleBar";
 import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderCheckBox";
+import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
 
 export function ThemeBuilderSectionTitleBar() {
     return (
@@ -49,6 +50,12 @@ export function ThemeBuilderSectionTitleBar() {
                 />
             </ThemeBuilderBlock>
             <ThemeBuilderSection label={t("Logo")}>
+                <ThemeBuilderBlock label={t("Image")}>
+                    <ThemeBuilderUpload variableKey="titleBar.logo.desktop.url" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Image (Mobile)")}>
+                    <ThemeBuilderUpload variableKey="titleBar.logo.mobile.url" />
+                </ThemeBuilderBlock>
                 <ThemeBuilderBlock label={t("Alignment (Mobile)")}>
                     <ThemeDropDown
                         variableKey="titleBar.mobileLogo.justifyContent"
