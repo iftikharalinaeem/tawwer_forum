@@ -30,6 +30,7 @@ import { useThemeActions } from "./ThemeEditorActions";
 import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
 import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
+import { ThemeEditorTitle } from "@themingapi/theme/ThemeEditorTitle";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -209,7 +210,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                     <ActionBar
                         useShadow={false}
                         callToActionTitle={t("Save")}
-                        title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                        title={<ThemeEditorTitle themeName={theme.data.name} pageType={form.pageType} />}
                         fullWidth={true}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                         isCallToActionDisabled={!!form.errors}
@@ -245,55 +246,3 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
         </IframeCommunicationContextProvider>
     );
 }
-
-interface IThemeTitleProps {
-    isDisabled?: boolean;
-    updateAssets?: void;
-    setThemeName?: string;
-    themeName?: string;
-    editThemeName?: void;
-    pageType?: string;
-}
-export const Title = (props: IThemeTitleProps) => {
-    const { updateAssets } = useThemeActions();
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const [isDisabled, setDisabled] = useState(true);
-    const [name, setName] = useState(props.themeName);
-    const classes = themeEditorPageClasses();
-
-    const editThemeName = () => {
-        setDisabled(false);
-        setImmediate(() => {
-            inputRef.current?.focus();
-        });
-    };
-
-    return (
-        <li className={classes.themeName}>
-            <InputTextBlock
-                wrapClassName={classNames(classes.inputWrapper)}
-                disabled={isDisabled}
-                inputProps={{
-                    required: true,
-                    inputClassNames: classNames(classes.themeInput),
-                    onChange: event => {
-                        updateAssets({ name: event.target.value });
-                        setName(event.target.value);
-                    },
-                    disabled: isDisabled,
-                    inputRef,
-                    value: name,
-                }}
-            />
-
-            <Button
-                baseClass={ButtonTypes.ICON_COMPACT}
-                onClick={() => {
-                    editThemeName();
-                }}
-            >
-                <EditIcon className={classes.editIcon} small={true} />
-            </Button>
-        </li>
-    );
-};

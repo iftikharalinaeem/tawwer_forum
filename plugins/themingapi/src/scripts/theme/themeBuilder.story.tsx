@@ -10,14 +10,11 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { color, percent } from "csx";
 import { storiesOf } from "@storybook/react";
 import { Form, FormikProvider, useFormik } from "formik";
-import ColorPickerBlock from "@library/forms/themeEditor/ColorPickerBlock";
-import ThemeBuilderTitle from "@library/forms/themeEditor/ThemeBuilderTitle";
-import ThemeBuilderSection from "@library/forms/themeEditor/ThemeBuilderSection";
-import ThemeBuilderSectionGroup from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
-import InputNumberBlock from "@library/forms/themeEditor/InputNumberBlock";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
-import { InputDropDownBlock } from "@vanilla/library/src/scripts/forms/themeEditor/InputDropDownBlock";
+import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
 import { ThemePresetDropDown } from "@themingapi/theme/ThemePresetDropDown";
+import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
+import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
+import { ThemeBuilderSectionGroup } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSectionGroup";
 
 const story = storiesOf("Theme", module);
 

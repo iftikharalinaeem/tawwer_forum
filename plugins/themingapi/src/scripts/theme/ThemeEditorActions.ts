@@ -83,7 +83,9 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID } = options;
-            const response = await this.api.get(`/themes/${options.themeID}`);
+            const response = await this.api.get(`/themes/${options.themeID}`, {
+                params: { allowAddonVariables: false },
+            });
 
             // KLUDGE - There is currently no get_edit endpoint.
             const { assets } = response.data;

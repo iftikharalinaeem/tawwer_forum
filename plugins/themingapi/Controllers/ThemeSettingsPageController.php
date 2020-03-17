@@ -7,8 +7,6 @@
 
 namespace Vanilla\ThemingApi\Controllers;
 
-use Garden\Container\Container;
-
 use Vanilla\Theme\Controllers\Pages\ThemeEditorPage;
 use Vanilla\Theme\Controllers\Pages\ThemePreviewPage;
 use Vanilla\Web\ContentSecurityPolicyMiddleware;

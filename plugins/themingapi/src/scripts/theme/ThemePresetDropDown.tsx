@@ -8,15 +8,15 @@ import classNames from "classnames";
 import SelectOne from "@library/forms/select/SelectOne";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { useField } from "formik";
-import InputHidden from "@library/forms/themeEditor/InputHidden";
 import { t } from "@vanilla/i18n/src";
 import { color } from "csx";
 import { useUniqueID } from "@library/utility/idUtils";
-import ThemeBuilderBlock from "@library/forms/themeEditor/ThemeBuilderBlock";
-import { inputDropDownClasses } from "@library/forms/themeEditor/inputDropDownStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import isEqual from "lodash/isEqual";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
+import { InputHidden } from "@vanilla/library/src/scripts/forms/themeEditor/InputHidden";
+import { themeDropDownClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown.styles";
 
 export const ThemePresetDropDown = () => {
     const globalVars = globalVariables();
@@ -84,7 +84,7 @@ export const ThemePresetDropDown = () => {
     const labelID = useUniqueID("themePresetLabel");
 
     return (
-        <ThemeBuilderBlock label={t("Preset")} labelID={labelID} inputWrapClass={inputDropDownClasses().root}>
+        <ThemeBuilderBlock label={t("Preset")} inputWrapClass={themeDropDownClasses().root}>
             <div className={classNames("input-wrap-right")}>
                 <SelectOne
                     label={null}
