@@ -27,13 +27,13 @@ export default function PlaceHolderPage() {
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
-                <Button
-                    buttonRef={toggleButtonRef}
-                    baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                    onClick={() => console.log('Button click!')}
-                >
-                    {t("Add Webhook")}
-                </Button>
+                    <Button
+                        buttonRef={toggleButtonRef}
+                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
+                        onClick={() => console.log('Button click!')}
+                    >
+                        {t("Add Webhook")}
+                    </Button>
                 }
             />
         </BrowserRouter>
