@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit } from "@library/styles/styleHelpers";
+import { unit, colorOut } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { percent } from "csx";
@@ -26,15 +26,29 @@ export const themeEditorPageClasses = useThemeCache(() => {
         alignItems: "center",
     });
 
+    const hiddenInputMeasure = style("hiddenInputMeasure", {
+        visibility: "hidden",
+        opacity: 0,
+        position: "absolute",
+        zIndex: -100,
+        width: "auto !important",
+    });
+
     const themeInput = style("themeInput", {
         $nest: {
             "&&": {
                 padding: "0",
                 border: "0",
-                width: unit(180),
                 textAlign: "center",
+                lineHeight: unit(18),
                 fontSize: globalVars.fonts.size.medium,
                 fontWeight: globalVars.fonts.weights.semiBold,
+                borderBottom: `2px solid ${colorOut(globalVars.elementaryColors.transparent)}`,
+            },
+
+            "&&:focus": {
+                outline: "none",
+                borderBottom: `2px solid ${colorOut(globalVars.mainColors.primary)}`,
             },
         },
     });
@@ -55,6 +69,7 @@ export const themeEditorPageClasses = useThemeCache(() => {
     return {
         editIcon,
         themeName,
+        hiddenInputMeasure,
         themeInput,
         inputWrapper,
         messageBar,

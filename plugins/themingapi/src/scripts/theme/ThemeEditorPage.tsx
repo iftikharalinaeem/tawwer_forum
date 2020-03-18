@@ -7,29 +7,23 @@ import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
+import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
+import { ThemeEditorTitle } from "@themingapi/theme/ThemeEditorTitle";
 import { t } from "@vanilla/i18n";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
-import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
-import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
-import { messagesClasses } from "@vanilla/library/src/scripts/messages/messageStyles";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
-import classNames from "classnames";
 import qs from "qs";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
-import { themeEditorPageClasses } from "./themeEditorPageStyles";
 import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
-import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -209,7 +203,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                     <ActionBar
                         useShadow={false}
                         callToActionTitle={t("Save")}
-                        title={<Title themeName={theme.data.name} pageType={form.pageType} />}
+                        title={<ThemeEditorTitle themeName={theme.data.name} pageType={form.pageType} />}
                         fullWidth={true}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                         isCallToActionDisabled={!!form.errors}
@@ -245,55 +239,3 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
         </IframeCommunicationContextProvider>
     );
 }
-
-interface IThemeTitleProps {
-    isDisabled?: boolean;
-    updateAssets?: void;
-    setThemeName?: string;
-    themeName?: string;
-    editThemeName?: void;
-    pageType?: string;
-}
-export const Title = (props: IThemeTitleProps) => {
-    const { updateAssets } = useThemeActions();
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const [isDisabled, setDisabled] = useState(true);
-    const [name, setName] = useState(props.themeName);
-    const classes = themeEditorPageClasses();
-
-    const editThemeName = () => {
-        setDisabled(false);
-        setImmediate(() => {
-            inputRef.current?.focus();
-        });
-    };
-
-    return (
-        <li className={classes.themeName}>
-            <InputTextBlock
-                wrapClassName={classNames(classes.inputWrapper)}
-                disabled={isDisabled}
-                inputProps={{
-                    required: true,
-                    inputClassNames: classNames(classes.themeInput),
-                    onChange: event => {
-                        updateAssets({ name: event.target.value });
-                        setName(event.target.value);
-                    },
-                    disabled: isDisabled,
-                    inputRef,
-                    value: name,
-                }}
-            />
-
-            <Button
-                baseClass={ButtonTypes.ICON_COMPACT}
-                onClick={() => {
-                    editThemeName();
-                }}
-            >
-                <EditIcon className={classes.editIcon} small={true} />
-            </Button>
-        </li>
-    );
-};

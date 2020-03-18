@@ -48,7 +48,6 @@ class ThemePreviewPage extends Page {
         $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
-
         $this->themePreloader->setForcedThemeKey($themeID);
         $this->registerReduxActionProvider($this->themePreloader);
     }
