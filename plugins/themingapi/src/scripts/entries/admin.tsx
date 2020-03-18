@@ -17,3 +17,6 @@ registerReducer("themeSettings", themeSettingsReducer);
 addComponent("theming-ui-manage", ManageThemingPage);
 
 Router.addRoutes(getThemeRoutes());
+
+// Hide the old theme page.
+document.querySelector(".nav-link-appearance-themes")?.remove();
