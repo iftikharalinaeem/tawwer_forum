@@ -35,6 +35,7 @@ export default function CurrentTheme(props: IProps) {
                         titleBarBg={
                             preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
                         }
+                        backgroundImage={preview?.["banner.outerBackground.image"] ?? undefined}
                         titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
                         previewImage={preview?.previewImage}
                         isActiveTheme={true}

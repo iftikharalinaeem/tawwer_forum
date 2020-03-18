@@ -56,6 +56,7 @@ export function ThemeItem(props: IProps) {
                     isActiveTheme={props.theme.current}
                     onApply={() => {
                         putCurrentTheme(props.theme.themeID);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     isApplyLoading={
                         applyStatus.status === LoadStatus.LOADING && applyStatus.data?.themeID === props.theme.themeID
@@ -69,6 +70,7 @@ export function ThemeItem(props: IProps) {
                     titleBarBg={
                         preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
                     }
+                    backgroundImage={preview?.["banner.outerBackground.image"] ?? undefined}
                     titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
                     previewImage={preview?.previewImage}
                     canCopy={props.theme.type !== "themeDB"}
