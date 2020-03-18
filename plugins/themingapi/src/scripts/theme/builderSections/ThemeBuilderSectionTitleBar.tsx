@@ -23,7 +23,11 @@ export function ThemeBuilderSectionTitleBar() {
             <ThemeBuilderBlock label={t("Background Color")}>
                 <ThemeColorPicker variableKey="titleBar.colors.bg" />
             </ThemeBuilderBlock>
-            <ThemeBuilderCheckBox label={t("Full Bleed")} variableKey="titleBar.fullBleed.enabled" />
+            <ThemeBuilderCheckBox
+                label={t("Full Bleed")}
+                variableKey="titleBar.fullBleed.enabled"
+                info={t("When you select Full Bleed, your background is transparent.")}
+            />
             <ThemeBuilderBlock label={t("Text")}>
                 <ThemeColorPicker variableKey="titleBar.colors.fg" />
             </ThemeBuilderBlock>
