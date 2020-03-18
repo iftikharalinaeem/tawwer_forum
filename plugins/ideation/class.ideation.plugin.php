@@ -325,7 +325,13 @@ EOT
                 $downVoteOptions = $this->allowDownVotes($category) ? ['checked' => 'checked'] : [];
             }
 
-            $sender->Data['_ExtendedFields']['UseDownVotes'] = ['Name' => 'UseDownVotes', 'Control' => 'CheckBox', 'Description' => t('Down Votes').' <div class="info">'.t('Let users vote up or down.').'</div>', 'Options' => $downVoteOptions];
+            $sender->Data['_ExtendedFields']['UseDownVotes'] = [
+                'Name' => 'UseDownVotes',
+                'Control' => 'CheckBox',
+                'Description' => t('Down Votes').
+                    ' <div class="info">'.t('Let users vote up or down.').'</div>',
+                'Options' => $downVoteOptions
+            ];
 
             //Inflate BestOfIdeationSettings
             $category[BestOfIdeationModule::SETTINGS_COL_NAME] = (
@@ -337,12 +343,15 @@ EOT
 
             //Is the bestOfIdeation feature used?
             $useBestOfIdeationOptions = [];
-            if(count($category[BestOfIdeationModule::SETTINGS_COL_NAME])>0){ $useBestOfIdeationOptions['checked'] = 'checked'; }
+            if (count($category[BestOfIdeationModule::SETTINGS_COL_NAME])>0) {
+                $useBestOfIdeationOptions['checked'] = 'checked';
+            }
             $sender->Data['_ExtendedFields']['UseBestOfIdeation'] = [
                 'Name' => 'UseBestOfIdeation',
                 'LabelCode' => Gdn::translate('Show the "Best of Ideation"'),
                 'Control' => 'CheckBox',
-                'Description' => Gdn::translate('Show the "Best of" ideas').' <div class="info">'.Gdn::translate('Will show a scoreboard of the best ideas.').'</div>',
+                'Description' => Gdn::translate('Show the "Best of" ideas').
+                    ' <div class="info">'.Gdn::translate('Will show a scoreboard of the best ideas.').'</div>',
                 'Options' => $useBestOfIdeationOptions,
             ];
 
@@ -402,7 +411,12 @@ EOT
 
         } else {
             if ($sender->Form->getValue('Idea_Category')) {
-                $sender->Form->setFormValue(self::CATEGORY_IDEATION_COLUMN_NAME, $sender->Form->getFormValue('UseDownVotes') ? self::CATEGORY_TYPE_UP_AND_DOWN : self::CATEGORY_TYPE_UP);
+                $sender->Form->setFormValue(
+                    self::CATEGORY_IDEATION_COLUMN_NAME,
+                    $sender->Form->getFormValue('UseDownVotes')
+                        ? self::CATEGORY_TYPE_UP_AND_DOWN
+                        : self::CATEGORY_TYPE_UP
+                );
             }
         }
     }
@@ -812,31 +826,29 @@ EOT
         return $ideaCounterModule;
     }
 
+
     /**
-     *
      * Returns the "Best of" module for a discussion category.
      *
-     * @param CategoryController $category The category for which we want to display the "Best of".
+     * @param int $categoryId
      * @return BestOfIdeationModule The categories's "Best of" module.
      */
     public function getBestOfIdeation(int $categoryId) {
-        $bestOfIdeationModule = new BestOfIdeationModule($categoryId);
-
-        return $bestOfIdeationModule;
+        return new BestOfIdeationModule($categoryId);
     }
 
 
     /**
-     *
      * Hooks to "After a category's title" is shown
      *
      * @param CategoriesController $sender
      * @return string (html) corresponding to the bestOfIdeation implementation for the current category
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
-    public function categoriesController_AfterPageTitle_handler(CategoriesController $sender): string {
-        if(is_array($sender->Category->AllowedDiscussionTypes) &&
-            in_array('Idea', $sender->Category->AllowedDiscussionTypes)){
-
+    public function categoriesController_afterPageTitle_handler(CategoriesController $sender) {
+        if (is_array($sender->Category->AllowedDiscussionTypes)
+            && in_array('Idea', $sender->Category->AllowedDiscussionTypes)) {
             $categoryID = $sender->CategoryID;
 
             $bestOfIdeation = $this->getBestOfIdeation($categoryID);
@@ -2133,24 +2145,27 @@ EOT
         }
     }
 
+
     /**
-     *
      * Hooks before saving an ideation.
      *
      * Flushing the ideation cache on this hook to prevent people creating a new ideation category
      * not being able to see/post in it right away. See getIdeaCategoryIDs().
+     *
+     * @param CategoryModel $sender
+     * @param array $args
      */
     public function categoryModel_beforeSaveCategory_handler(CategoryModel &$sender, array $args) {
         $BestOfIdeationSettings = [];
         //Look for bestOfIdeation settings
-        if((isset($args['FormPostValues']['UseBestOfIdeation']))&&
-            ($args['FormPostValues']['UseBestOfIdeation']==1)&&
-            (isset($args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME]))){
+        if ((isset($args['FormPostValues']['UseBestOfIdeation'])) &&
+            ($args['FormPostValues']['UseBestOfIdeation']==1) &&
+            (isset($args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME]))) {
             $BestOfIdeationSettings = $args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME];
 
             //If there are empty date fields, we remove them to the data to be saved.
-            foreach($BestOfIdeationSettings['Dates'] as $dateIdx=>$date){
-                if(empty($date)){
+            foreach ($BestOfIdeationSettings['Dates'] as $dateIdx => $date) {
+                if (empty($date)) {
                     unset($BestOfIdeationSettings['Dates'][$dateIdx]);
                 }
             }

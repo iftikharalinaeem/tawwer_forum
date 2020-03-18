@@ -6,6 +6,8 @@
  * @license GNU GPLv2
  */
 
+use Vanilla\Web\TwigRenderTrait;
+
 /**
  * BestOfIdeation Module
  *
@@ -13,8 +15,6 @@
  * @license   Proprietary
  * @since     4.0
  */
-
-use Vanilla\Web\TwigRenderTrait;
 
 class BestOfIdeationModule extends Gdn_Module {
     use TwigRenderTrait;
@@ -92,8 +92,6 @@ class BestOfIdeationModule extends Gdn_Module {
      * ---Put the result in cache.
      *
      * @param int $categoryID
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
     public function __construct(int $categoryID) {
         $this->categoryModel = Gdn::getContainer()->get(CategoryModel::class);
@@ -104,8 +102,8 @@ class BestOfIdeationModule extends Gdn_Module {
         $this->cacheKey = get_class($this).'_'.$this->categoryID;
 
         $this->loadSettings();
-        if($this->isEnabled){
-            if(!$this->getCachedIdeas()){
+        if ($this->isEnabled) {
+            if (!$this->getCachedIdeas()) {
                 $this->loadIdeas();
                 $this->sortIdeas();
                 $this->limitIdeas();
@@ -117,18 +115,17 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Loads the BestOfIdeation settings for the current?(or specified) category
      *
      * @param int|null $categoryID
      */
     private function loadSettings(int $categoryID = null) {
-        if(is_null($categoryID)){
+        if (is_null($categoryID)) {
             $categoryID = $this->categoryID;
         }
 
         $categoryData = $this->categoryModel->getWhere(['CategoryID'=>$categoryID])->resultArray();
-        if(count($categoryData)==1) {
+        if (count($categoryData)==1) {
             $categoryData = reset($categoryData);
 
             if (isset($categoryData[BestOfIdeationModule::SETTINGS_COL_NAME])) {
@@ -144,13 +141,12 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Loads the every idea from the current category & subcategories for the current?(or specified) category.
      *
      * @param int|null $categoryID
      */
     private function loadIdeas(int $categoryID = null) {
-        if(is_null($categoryID)){
+        if (is_null($categoryID)) {
             $categoryID = $this->categoryID;
         }
 
@@ -161,8 +157,12 @@ class BestOfIdeationModule extends Gdn_Module {
             'Type'=>'Idea'
         ];
 
-        if(isset($this->dates['From'])){ $lookupParameters["DateInserted >="] = $this->dates['From']; }
-        if(isset($this->dates['To'])){ $lookupParameters["DateInserted <="] = $this->dates['To']; }
+        if (isset($this->dates['From'])) {
+            $lookupParameters["DateInserted >="] = $this->dates['From'];
+        }
+        if (isset($this->dates['To'])) {
+            $lookupParameters["DateInserted <="] = $this->dates['To'];
+        }
 
         $ideasDatas = $this->discussionModel->getWhere($lookupParameters)->resultObject();
 
@@ -170,40 +170,38 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Call for an external array sorting method so loaded ideas will be sorted from most popular to least popular.
      *
      * @param array $ideasDatas
      */
-    private function sortIdeas(array &$ideasDatas = []){
-        if(count($ideasDatas)==0){
+    private function sortIdeas(array &$ideasDatas = []) {
+        if (count($ideasDatas)==0) {
             $ideasDatas = &$this->ideasDatas;
         }
         usort($ideasDatas, ['BestOfIdeationModule','uSortDescBySortingField']);
     }
 
     /**
-     *
      * Limit the amount of ideas kept in memory to the exact amount needed.
      *
      * @param array $ideasDatas
      */
-    private function limitIdeas(array &$ideasDatas = []){
-        if(count($ideasDatas)==0){
+    private function limitIdeas(array &$ideasDatas = []) {
+        if (count($ideasDatas)==0) {
             $ideasDatas = &$this->ideasDatas;
         }
         $ideasDatas = array_slice($ideasDatas, 0, $this->limit);
     }
 
+
     /**
-     *
      * External function used by usort(see sortIdeas()).
      *
-     * @param $a
-     * @param $b
+     * @param object $a the first element to sort
+     * @param object $b the second element to sort
      * @return int
      */
-    private static function uSortDescBySortingField($a, $b){
+    private static function uSortDescBySortingField($a, $b) {
         return ($a->{BestOfIdeationModule::SORTING_FIELD} > $b->{BestOfIdeationModule::SORTING_FIELD})
             ? -1
             : (($a->{BestOfIdeationModule::SORTING_FIELD} < $b->{BestOfIdeationModule::SORTING_FIELD})
@@ -212,7 +210,6 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Will return an array of every sub-categories to the specified(inclusive) category ID.
      *
      * @param int|null $categoryID
@@ -220,13 +217,13 @@ class BestOfIdeationModule extends Gdn_Module {
      */
     private function getCategoryBranchIDs(int $categoryID = null): array {
         $categoryIDs = [];
-        if(is_null($categoryID)){
+        if (is_null($categoryID)) {
             $categoryID = $this->categoryID;
         }
 
         $branchCategories = $this->categoryModel->getSubtree($categoryID, true);
 
-        foreach($branchCategories as $branchCategoryID=>$branchCategory){
+        foreach ($branchCategories as $branchCategoryID => $branchCategory) {
             $categoryIDs[] = $branchCategoryID;
         }
 
@@ -234,7 +231,6 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Looks for pre-existing/cached bestOfIdeation Ideas. If it exists, use it.
      *
      * @return bool (true or false) upon existing cached data found.
@@ -242,7 +238,7 @@ class BestOfIdeationModule extends Gdn_Module {
     private function getCachedIdeas(): bool {
         $cachedCategoryData = $this->cache->get($this->cacheKey);
 
-        if($cachedCategoryData){
+        if ($cachedCategoryData) {
             $this->ideasDatas = $cachedCategoryData;
             return true;
         }
@@ -251,23 +247,24 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Puts the currently loaded bestOfIdeation Ideas in cache.
      *
      * @return bool true on success or false on failure.
      */
     private function setCachedIdeas() {
         return $this->cache->store(
-            $this->cacheKey, $this->ideasDatas,
+            $this->cacheKey,
+            $this->ideasDatas,
             [Gdn_Cache::FEATURE_EXPIRY => BestOfIdeationModule::CACHE_DURATION]
         );
     }
+
 
     /**
      * Return the singleton instance of this class. Should be used instead of instantiating a new BestOfIdeationModule
      * for each discussion.
      *
-     * @return BestOfIdeationModule
+     * @return BestOfIdeation|BestOfIdeationModule
      */
     public static function instance() {
         if (!isset(self::$instance)) {
@@ -277,16 +274,15 @@ class BestOfIdeationModule extends Gdn_Module {
     }
 
     /**
-     *
      * Renders the frontend part of the bestOfIdeation module.
      *
      * @return string (html) of the bestOfIdeation for the current category.
      */
     public function toString(): string {
         $ideaListHtml = '';
-        if($this->isEnabled){
+        if ($this->isEnabled) {
             ob_start();
-            foreach($this->ideasDatas as $ideaDatas){
+            foreach ($this->ideasDatas as $ideaDatas) {
                 writeDiscussion($ideaDatas, $this, Gdn::session());
             }
             $ideaListHtml.= ob_get_contents();
@@ -297,7 +293,7 @@ class BestOfIdeationModule extends Gdn_Module {
                 'IdeasDatas' => $this->ideasDatas,
                 'IdeaListHtml' => $ideaListHtml,
             ]);
-        }else{
+        } else {
             return "";
         }
     }
