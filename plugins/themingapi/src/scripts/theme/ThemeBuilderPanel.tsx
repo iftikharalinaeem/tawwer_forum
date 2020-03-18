@@ -9,12 +9,12 @@ import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEdi
 import { globalVariables, GlobalPreset } from "@library/styles/globalStyleVars";
 import { t } from "@vanilla/i18n/src";
 import { Form, FormikProvider, useFormik } from "formik";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { IThemeVariables, useThemeEditorState } from "./themeEditorReducer";
 import { ThemePresetDropDown } from "./ThemePresetDropDown";
 import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
-import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
+import { useIFrameCommunication, useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
 import { useLastValue } from "@vanilla/react-utils";
 import isEqual from "lodash/isEqual";
 import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
@@ -30,32 +30,35 @@ import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeBuilderSectionGlobal } from "@themingapi/theme/builderSections/ThemeBuilderSectionGlobal";
 import { ThemeBuilderSectionTitleBar } from "@themingapi/theme/builderSections/ThemeBuilderSectionTitleBar";
 import { ThemeBuilderSectionBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionBanner";
+import actionCreatorFactory from "typescript-fsa";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
 }
 
-interface IFormState {
-    errors: Record<string, any>;
-    [key: string]: any;
+const createAction = actionCreatorFactory("@@themeBuilderPanel");
+export const setActivePanelAC = createAction<{ panel: ActiveVariablePanel }>("setActivePanel");
+
+export enum ActiveVariablePanel {
+    GLOBAL = "global",
+    TITLE_BAR = "titleBar",
+    BANNER = "banner",
 }
 
-const buttonPresetOptions = [
-    {
-        label: t("Solid"),
-        value: "solid",
-    },
-    {
-        label: t("Outline"),
-        value: "outline",
-    },
-];
-
-export default function ThemeBuilderForm(props: IThemeBuilderForm) {
+export default function ThemeBuilderPanel() {
     const classes = themeBuilderClasses();
     const { updateAssets } = useThemeActions();
     const { sendMessage } = useIFrameCommunication();
     const variables = useThemeEditorState().form?.assets.variables?.data;
+
+    const [activePanel, setActivePanel] = useState(ActiveVariablePanel.GLOBAL);
+
+    useOwnFrameMessages(e => {
+        const { data } = e;
+        if (e.data.type === setActivePanelAC.type) {
+            setActivePanel(data.payload.panel);
+        }
+    });
 
     return (
         <ThemeBuilderContextProvider
@@ -76,11 +79,10 @@ export default function ThemeBuilderForm(props: IThemeBuilderForm) {
             }}
             rawThemeVariables={variables}
         >
-            {/* The translate shouldn't be mandatory, it's a bug in this version of Formik */}
             <div className={classes.root}>
-                <ThemeBuilderSectionGlobal />
-                <ThemeBuilderSectionTitleBar />
-                <ThemeBuilderSectionBanner />
+                {activePanel === ActiveVariablePanel.GLOBAL && <ThemeBuilderSectionGlobal />}
+                {activePanel === ActiveVariablePanel.TITLE_BAR && <ThemeBuilderSectionTitleBar />}
+                {activePanel === ActiveVariablePanel.BANNER && <ThemeBuilderSectionBanner />}
             </div>
         </ThemeBuilderContextProvider>
     );

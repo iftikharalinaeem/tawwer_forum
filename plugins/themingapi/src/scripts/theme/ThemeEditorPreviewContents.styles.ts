@@ -3,11 +3,11 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, fonts } from "@library/styles/styleHelpers";
+import { unit, paddings, fonts, colorOut } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { FontSizeProperty } from "csstype";
-import { TLength } from "typestyle/lib/types";
+import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { userContentVariables } from "@vanilla/library/src/scripts/content/userContentStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
@@ -108,6 +108,26 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         },
     });
 
+    const panelActivator = style("panelActivator", {
+        position: "relative",
+    });
+
+    const panelActivatorIndicator = style("panelActivatorIndicator", {
+        position: "absolute",
+        top: 4,
+        left: 4,
+        right: 4,
+        bottom: 4,
+        border: `1px dashed #000`,
+        // borderColor: colorOut(globalVars.mainColors.)
+        mixBlendMode: "overlay",
+        zIndex: 1000,
+        pointerEvents: "none",
+        $nest: {
+            "&:isInverted": {},
+        },
+    });
+
     return {
         content,
         description,
@@ -116,6 +136,8 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         title,
         styleContent,
         contentContainer,
+        panelActivator,
+        panelActivatorIndicator,
     };
 });
 

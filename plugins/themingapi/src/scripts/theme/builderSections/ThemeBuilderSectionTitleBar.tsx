@@ -15,8 +15,10 @@ import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEdi
 import { LogoAlignment } from "@vanilla/library/src/scripts/headers/TitleBar";
 import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderCheckBox";
 import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
+import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 
 export function ThemeBuilderSectionTitleBar() {
+    const { rawThemeVariables, setVariableValue } = useThemeBuilder();
     return (
         <>
             <ThemeBuilderTitle title={t("Title Bar")} />
@@ -57,6 +59,26 @@ export function ThemeBuilderSectionTitleBar() {
                 <ThemeBuilderBlock label={t("Image")}>
                     <ThemeBuilderUpload variableKey="titleBar.logo.desktop.url" />
                 </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Alignment")}>
+                    <ThemeDropDown
+                        variableKey="titleBar.logo.justifyContent"
+                        afterChange={value => {
+                            if (value === LogoAlignment.CENTER) {
+                                setVariableValue("titleBar.navAlignment.alignment", undefined);
+                            }
+                        }}
+                        options={[
+                            {
+                                label: t("Left Aligned"),
+                                value: LogoAlignment.LEFT,
+                            },
+                            {
+                                label: t("Center Aligned"),
+                                value: LogoAlignment.CENTER,
+                            },
+                        ]}
+                    />
+                </ThemeBuilderBlock>
                 <ThemeBuilderBlock label={t("Image (Mobile)")}>
                     <ThemeBuilderUpload variableKey="titleBar.logo.mobile.url" />
                 </ThemeBuilderBlock>
@@ -79,6 +101,7 @@ export function ThemeBuilderSectionTitleBar() {
             <ThemeBuilderSection label={t("Navigation")}>
                 <ThemeBuilderBlock label={t("Alignment")}>
                     <ThemeDropDown
+                        disabled={rawThemeVariables?.titleBar?.logo?.justifyContent === LogoAlignment.CENTER}
                         variableKey="titleBar.navAlignment.alignment"
                         options={[
                             {
