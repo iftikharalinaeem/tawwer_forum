@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit; ?>
 <?php
 $desc = '<p>'.t('Here are all of the reactions you can use on your site.').' '
-    .t('Recommendations for choosing reactions')
+    .t('Which reactions you use really depends on your community.')
     .'</p>'
     .'<ol>'
     .'<li>'.t('Don\'t use too many reactions.').'</li>'
