@@ -30,7 +30,7 @@ export default function PlaceHolderPage() {
                     <Button
                         buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        onClick={() => console.log('Button click!')}
+                        onClick={() => console.log("Button click!")}
                     >
                         {t("Add Webhook")}
                     </Button>

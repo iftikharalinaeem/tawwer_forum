@@ -27,5 +27,5 @@ export function ManageWebhooksPage() {
                 // }
             />
         </BrowserRouter>
-    )
+    );
 }
