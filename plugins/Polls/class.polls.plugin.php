@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use CivilTongueEx\Library\ContentFilter;
 use Garden\Container\Container;
 use Vanilla\Polls\Models\SearchRecordTypePoll;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
@@ -13,6 +14,19 @@ use Garden\Schema\Schema;
  * Class PollsPlugin
  */
 class PollsPlugin extends Gdn_Plugin {
+
+    /** @var \CivilTongueEx\Library\ContentFilter */
+    private $contentFilter;
+
+    /**
+     * PollsPlugin constructor.
+     * @param Container $container
+     */
+    public function __construct(\Garden\Container\Container $container) {
+        parent::__construct();
+        $this->contentFilter = $container->has(ContentFilter::class) ? $container->get(ContentFilter::class) : null;
+    }
+
     /**
      * Run once on enable.
      */
@@ -48,9 +62,14 @@ class PollsPlugin extends Gdn_Plugin {
     public function base_beforeCommentBody_handler($sender) {
         $comment = val('Comment', $sender->EventArguments);
         $pollVote = val('PollVote', $comment);
+
         if ($pollVote) {
-            $this->EventArguments['String'] = &$pollVote;
-            $this->fireEvent('FilterContent');
+            //filter $pollVote content
+            if (isset($this->contentFilter)) {
+                foreach ($pollVote as $key => $value) {
+                    $pollVote[$key] = $this->contentFilter->replace($value);
+                }
+            }
 
             echo '<div class="PollVote">';
             // Use the sort as the color indicator (it should match up)
