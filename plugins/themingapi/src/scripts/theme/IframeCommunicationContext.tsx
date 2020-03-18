@@ -3,9 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext, useState, useEffect, useRef, useDebugValue, RefObject } from "react";
-import debounce from "lodash/debounce";
-import throttle from "lodash/throttle";
+import React, { useContext, useDebugValue, useEffect, useState } from "react";
 
 interface IContextValue {
     iframeRef: HTMLIFrameElement | null;
