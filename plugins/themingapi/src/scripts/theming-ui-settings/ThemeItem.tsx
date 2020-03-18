@@ -67,9 +67,7 @@ export function ThemeItem(props: IProps) {
                     globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                     globalBg={preview?.["global.mainColors.bg"] ?? undefined}
                     globalFg={preview?.["global.mainColors.fg"] ?? undefined}
-                    titleBarBg={
-                        preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
-                    }
+                    titleBarBg={preview?.["global.mainColors.primary"] ?? undefined}
                     backgroundImage={preview?.["banner.outerBackground.image"] ?? undefined}
                     titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
                     previewImage={preview?.previewImage}
