@@ -17,6 +17,7 @@ import {
     pointerEvents,
     sticky,
     unit,
+    singleBorder,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
@@ -57,14 +58,20 @@ export const editorFormClasses = useThemeCache(() => {
 
     const title = style("title", {
         $nest: {
-            "&.inputText, &&": {
+            "&&&": {
                 ...textInputSizingFromSpacing(vars.title.fontSize, 0, formElementVars.border.width * 2),
                 color: colorOut(formElementVars.colors.fg),
                 backgroundColor: colorOut(formElementVars.colors.bg),
                 position: "relative",
                 fontWeight: globalVars.fonts.weights.semiBold,
                 borderRadius: important(0),
-                border: important(`solid transparent 1px`),
+                borderBottom: singleBorder({
+                    width: 2,
+                    color: globalVars.elementaryColors.transparent,
+                }),
+                borderTop: "none",
+                borderLeft: "none",
+                borderRight: "none",
                 marginBottom: unit(globalVars.spacer.size),
                 ...paddings({
                     left: 0,
@@ -74,7 +81,7 @@ export const editorFormClasses = useThemeCache(() => {
             "&:not(.focus-visible)": {
                 outline: "none",
             },
-            "&:focus, &.focus-visible": {
+            "&&&:focus, &&&.focus-visible": {
                 borderBottomColor: colorOut(globalVars.mainColors.primary),
             },
             ...placeholderStyles({
