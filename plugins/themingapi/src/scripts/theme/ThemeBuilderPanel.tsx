@@ -4,33 +4,16 @@
  * @license GPL-2.0-only
  */
 
-import { buttonGlobalVariables, ButtonPreset } from "@library/forms/buttonStyles";
-import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
-import { globalVariables, GlobalPreset } from "@library/styles/globalStyleVars";
-import { t } from "@vanilla/i18n/src";
-import { Form, FormikProvider, useFormik } from "formik";
-import React, { useEffect, useCallback, useState } from "react";
-import { useThemeActions } from "./ThemeEditorActions";
-import { IThemeVariables, useThemeEditorState } from "./themeEditorReducer";
-import { ThemePresetDropDown } from "./ThemePresetDropDown";
-import { ensureColorHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
-import { useIFrameCommunication, useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
-import { useLastValue } from "@vanilla/react-utils";
-import isEqual from "lodash/isEqual";
-import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
-import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
-import { ThemeBuilderSectionGroup } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSectionGroup";
-import { ThemeBuilderContextProvider } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
-import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
-import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
-import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
-import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
-import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
+import { ThemeBuilderSectionBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionBanner";
 import { ThemeBuilderSectionGlobal } from "@themingapi/theme/builderSections/ThemeBuilderSectionGlobal";
 import { ThemeBuilderSectionTitleBar } from "@themingapi/theme/builderSections/ThemeBuilderSectionTitleBar";
-import { ThemeBuilderSectionBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionBanner";
+import { useIFrameCommunication, useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
+import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
+import { ThemeBuilderContextProvider } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
+import React, { useState } from "react";
 import actionCreatorFactory from "typescript-fsa";
+import { useThemeActions } from "./ThemeEditorActions";
+import { IThemeVariables, useThemeEditorState } from "./themeEditorReducer";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
