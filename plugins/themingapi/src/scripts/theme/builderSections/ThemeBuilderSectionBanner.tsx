@@ -14,6 +14,7 @@ import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEdi
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import { SearchBarPresets } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
+import { ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 export function ThemeBuilderSectionBanner() {
     return (
@@ -45,11 +46,26 @@ export function ThemeBuilderSectionBanner() {
                         ]}
                     />
                 </ThemeBuilderBlock>
-                <ThemeBuilderBlock label={t("Background")}>
-                    <ThemeColorPicker variableKey="banner.searchBar.colors.bg" />
+                <ThemeBuilderBlock label={t("Button Type")}>
+                    <ThemeDropDown
+                        variableKey="banner.presets.button.preset"
+                        options={[
+                            {
+                                label: t("Transparent"),
+                                value: ButtonPreset.TRANSPARENT,
+                            },
+                            {
+                                label: t("Solid"),
+                                value: ButtonPreset.SOLID,
+                            },
+                        ]}
+                    />
                 </ThemeBuilderBlock>
                 <ThemeBuilderBlock label={t("Background")}>
-                    <ThemeColorPicker variableKey="banner.searchBar.colors.fg" />
+                    <ThemeColorPicker variableKey="banner.colors.bg" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Text")}>
+                    <ThemeColorPicker variableKey="banner.colors.fg" />
                 </ThemeBuilderBlock>
                 <ThemeBuilderBlock label={t("Border Radius")}>
                     <ThemeInputNumber variableKey="banner.border.radius" />

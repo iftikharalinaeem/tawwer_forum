@@ -16,6 +16,12 @@ import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationCon
 import Translate from "@vanilla/library/src/scripts/content/Translate";
 import { t } from "@vanilla/i18n";
 import { setActivePanelAC, ActiveVariablePanel } from "@themingapi/theme/ThemeBuilderPanel";
+import classNames from "classnames";
+import { ColorHelper } from "csx";
+import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import { titleBarVariables } from "@vanilla/library/src/scripts/headers/titleBarStyles";
 
 const activePanelContext = React.createContext({
     activePanel: ActiveVariablePanel.GLOBAL,
@@ -26,13 +32,17 @@ export function useActivePanelContext() {
     return useContext(activePanelContext);
 }
 
+window.lastActivePanel = ActiveVariablePanel.GLOBAL;
+
 export function ThemeEditorPreviewContents() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
     const { sendMessageOut } = useIFrameCommunication();
-    const [activePanel, _setActivePanel] = useState(ActiveVariablePanel.GLOBAL);
+    const [activePanel, _setActivePanel] = useState(window.lastActivePanel);
 
     const setActivePanel = (activePanel: ActiveVariablePanel) => {
+        // Stash on window to prevent losing data when component is reinitialized.
+        window.lastActivePanel = activePanel;
         _setActivePanel(activePanel);
         sendMessageOut?.(setActivePanelAC({ panel: activePanel }));
     };
@@ -44,15 +54,15 @@ export function ThemeEditorPreviewContents() {
                 setActivePanel,
             }}
         >
-            <PanelActivator panel={ActiveVariablePanel.TITLE_BAR}>
+            <PanelActivator panel={ActiveVariablePanel.TITLE_BAR} color={titleBarVariables().colors.fg}>
                 <TitleBar container={null} />
             </PanelActivator>
 
-            <PanelActivator panel={ActiveVariablePanel.BANNER}>
+            <PanelActivator panel={ActiveVariablePanel.BANNER} color={bannerVariables().colors.primaryContrast}>
                 <Banner title="Welcome To Your Theme" />
             </PanelActivator>
 
-            <PanelActivator panel={ActiveVariablePanel.GLOBAL}>
+            <PanelActivator panel={ActiveVariablePanel.GLOBAL} color={globalVariables().mainColors.fg}>
                 <Container narrow fullGutter>
                     <div className={classes.content}>
                         <div className={userContentClasses().root}>
@@ -140,9 +150,10 @@ export function ThemeEditorPreviewContents() {
     );
 }
 
-function PanelActivator(props: { panel: ActiveVariablePanel; children: React.ReactNode }) {
+function PanelActivator(props: { panel: ActiveVariablePanel; children: React.ReactNode; color?: ColorHelper }) {
     const { activePanel, setActivePanel } = useActivePanelContext();
     const classes = themeEditorPreviewClasses();
+    const { color } = props;
     return (
         <div
             className={classes.panelActivator}
@@ -152,7 +163,12 @@ function PanelActivator(props: { panel: ActiveVariablePanel; children: React.Rea
             }}
         >
             {props.children}
-            {props.panel === activePanel && <div className={classes.panelActivatorIndicator}></div>}
+            {props.panel === activePanel && (
+                <div
+                    className={classNames(classes.panelActivatorIndicator)}
+                    style={{ borderColor: color ? colorOut(color) : undefined }}
+                ></div>
+            )}
         </div>
     );
 }

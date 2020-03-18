@@ -118,14 +118,11 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         left: 4,
         right: 4,
         bottom: 4,
-        border: `1px dashed #000`,
-        // borderColor: colorOut(globalVars.mainColors.)
-        mixBlendMode: "overlay",
+        border: `1px dashed #fff`,
+        borderColor: colorOut(globalVars.mainColors.bg),
+        opacity: 0.85,
         zIndex: 1000,
         pointerEvents: "none",
-        $nest: {
-            "&:isInverted": {},
-        },
     });
 
     return {
