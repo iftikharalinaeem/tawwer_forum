@@ -5,6 +5,8 @@
  * @license Proprietary
  */
 
+use Garden\Web\Data;
+use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Webhooks\Models\WebhookModel;
 use Vanilla\Webhooks\Controllers\Api\WebhooksApiController;
 
@@ -38,6 +40,12 @@ class WebhookSettingsController extends SettingsController {
         $this->setHighlightRoute('webhook-settings');
         $this->title(t("Webhooks"));
         $webhooks = $this->apiController->index();
+        $this->addReduxAction(new ReduxAction(
+            "@@webhooks/GET_ALL_DONE",
+            Data::box($webhooks),
+            []
+        ));
+
         $this->setData('webhooks', $webhooks);
         $this->render();
     }

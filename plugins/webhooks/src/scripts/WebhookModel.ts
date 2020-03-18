@@ -11,9 +11,9 @@ import { getCurrentLocale } from "@vanilla/i18n";
  * Interface representing a webhook base resource.
  */
 export interface IWebhook {
-    "status": string,
-    "events": [],
-    "name": string,
-    "url": string,
-    "secret": string
-  }
+    status: string;
+    events: [];
+    name: string;
+    url: string;
+    secret: string;
+}

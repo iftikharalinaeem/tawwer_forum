@@ -18,7 +18,9 @@ export default function PlaceHolderPage() {
         // All parameters come from query so they will be strings.
         // Be sure to convert numbers/booleans/etc.
     }>();
-    
+
+    const data = state.webhooks;
+
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
     // if (!webhooks.data) {
@@ -40,6 +42,7 @@ export default function PlaceHolderPage() {
                 }
             />
             {JSON.stringify(params)}
+            {JSON.stringify(data)}
         </BrowserRouter>
     );
 }
