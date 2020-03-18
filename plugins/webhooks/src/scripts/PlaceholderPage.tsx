@@ -10,6 +10,7 @@ import { t } from "@vanilla/i18n";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
+import Loader from "@library/loaders/Loader";
 
 export default function PlaceHolderPage() {
     const params = useParams<{
@@ -17,10 +18,12 @@ export default function PlaceHolderPage() {
         // All parameters come from query so they will be strings.
         // Be sure to convert numbers/booleans/etc.
     }>();
-
+    
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
-    // Convert the params into numbers, booleans etc.
+    // if (!webhooks.data) {
+    //     return <Loader />;
+    // }
 
     return (
         <BrowserRouter>
@@ -36,6 +39,7 @@ export default function PlaceHolderPage() {
                     </Button>
                 }
             />
+            {JSON.stringify(params)}
         </BrowserRouter>
     );
 }

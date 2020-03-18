@@ -6,11 +6,12 @@
 import React, { useEffect } from "react";
 import RouteHandler from "@vanilla/library/src/scripts/routing/RouteHandler";
 import { Route } from "react-router";
+import { List } from "lodash";
 
 export const WebhooksIndexRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/webhooks" */ "@webhooks/PlaceholderPage"),
     "/webhook-settings",
-    () => "/webhook-settings",
+    (webhooks: { webhooks?: Array<Object> }) => "/webhook-settings",
 );
 
 export const WebhooksAddEditRoute = new RouteHandler(
