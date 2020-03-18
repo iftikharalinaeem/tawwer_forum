@@ -20,7 +20,7 @@ export function ThemeBuilderButtonSection(props: IProps) {
     const prefix = `button.${props.buttonType}.preset`;
     return (
         <ThemeBuilderSectionGroup label={props.label}>
-            <ThemeBuilderBlock label={t("Button Style")}>
+            <ThemeBuilderBlock label={t("Button Type")}>
                 <ThemeDropDown
                     variableKey={`${prefix}.style`}
                     options={[

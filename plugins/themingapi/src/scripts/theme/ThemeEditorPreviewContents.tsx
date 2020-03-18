@@ -59,7 +59,7 @@ export function ThemeEditorPreviewContents() {
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner title="Welcome To Your Theme" />
+                <Banner title={t("Welcome To Your Theme")} />
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.GLOBAL} color={globalVariables().mainColors.fg}>
@@ -68,10 +68,8 @@ export function ThemeEditorPreviewContents() {
                         <div className={userContentClasses().root}>
                             <p>
                                 <Translate
-                                    source={t(
-                                        "This is a style guide of your theme.",
-                                        "This is a style guide of your theme. It has examples of the visual elements used throughout the application. You can click on the various widgets such as the <0>Title Bar</0> or <1>Banner</1> to edit their properties in the side panel.",
-                                    )}
+                                    shortSource={"This is a style guide of your theme."}
+                                    source="This is a style guide of your theme. It has examples of the visual elements used throughout the application. You can click on the various widgets such as the <0>Title Bar</0> or <1>Banner</1> to edit their properties in the side panel."
                                     c0={text => (
                                         <Button
                                             baseClass={ButtonTypes.TEXT_PRIMARY}
@@ -100,10 +98,8 @@ export function ThemeEditorPreviewContents() {
                             </p>
                             <p>
                                 <Translate
-                                    source={t(
-                                        "In additon to the widgets there are also",
-                                        "In additon to the widgets there are also <0>Global Styles</0>. To edit global styles click anywhere else on the page, such as this text.",
-                                    )}
+                                    shortSource="In additon to the widgets there are also"
+                                    source="In additon to the widgets there are also <0>Global Styles</0>. To edit global styles click anywhere else on the page, such as this text."
                                     c0={text => (
                                         <Button
                                             baseClass={ButtonTypes.TEXT_PRIMARY}
@@ -121,21 +117,21 @@ export function ThemeEditorPreviewContents() {
                         </div>
 
                         <div className={classes.buttonStyles}>
-                            <h2 className={classes.title}>Buttons</h2>
-                            <p>There are two types of buttons in the application: primary and secondary.</p>
+                            <h2 className={classes.title}>{t("Buttons")}</h2>
+                            <p>{t("There are two types of buttons in the application: primary and secondary.")}</p>
                             <div className={classes.styleContent}>
-                                <Button baseClass={ButtonTypes.PRIMARY}>Primary Button</Button>
-                                <Button>Secondary Button</Button>{" "}
+                                <Button baseClass={ButtonTypes.PRIMARY}>{t("Primary Button")}</Button>
+                                <Button>{t("Secondary Button")}</Button>{" "}
                             </div>
                         </div>
                         <div className={classes.inputStyles}>
                             <h2 className={classes.title}>Inputs</h2>
-                            <p>User inputs are based on the global background and text colors.</p>
+                            <p>{t("User inputs are based on the global background and text colors.")}</p>
                             <div className={classes.styleContent}>
                                 <InputTextBlock
                                     inputProps={{
                                         value: intialInputValue,
-                                        placeholder: "Text Input",
+                                        placeholder: t("Text Input"),
                                         onChange: event => {
                                             newInputValue(event.target.value);
                                         },
