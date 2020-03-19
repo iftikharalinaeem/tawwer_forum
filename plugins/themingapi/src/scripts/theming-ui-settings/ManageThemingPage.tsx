@@ -64,17 +64,19 @@ export default function ManageThemingPage(props) {
                             <ThemeItem key={key} theme={theme} className={classes.gridItem} />
                         ))}
 
-                        <AddTheme
-                            className={classes.gridItem}
-                            onAdd={
-                                <ThemeEditorRoute.Link data={{ newTheme: true }}>
-                                    <PlusIcon />
-                                </ThemeEditorRoute.Link>
-                            }
-                        />
-                        <h3 className={themeItemClasses().title} aria-hidden={true}>
-                            &nbsp;
-                        </h3>
+                        <div className={classes.gridItem}>
+                            <AddTheme
+                                className={classes.gridItem}
+                                onAdd={
+                                    <ThemeEditorRoute.Link data={{ newTheme: true }}>
+                                        <PlusIcon />
+                                    </ThemeEditorRoute.Link>
+                                }
+                            />
+                            <h3 className={themeItemClasses().title} aria-hidden={true}>
+                                &nbsp;
+                            </h3>
+                        </div>
                     </div>
                 </>
             )}
