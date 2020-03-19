@@ -183,7 +183,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                 ),
             },
             {
-                label: t("JS"),
+                label: t("JavaScript"),
                 panelData: "js",
                 contents: (
                     <TextEditor
