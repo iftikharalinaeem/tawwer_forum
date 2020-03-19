@@ -26,12 +26,10 @@ interface IProps {
 export const ThemeEditorTitle = (props: IProps) => {
     const { updateAssets } = useThemeActions();
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const [isDisabled, setDisabled] = useState(true);
     const [name, setName] = useState(props.themeName);
     const classes = themeEditorPageClasses();
 
     const editThemeName = () => {
-        setDisabled(false);
         setImmediate(() => {
             inputRef.current?.focus();
         });
@@ -40,10 +38,6 @@ export const ThemeEditorTitle = (props: IProps) => {
     return (
         <li className={classes.themeName}>
             <AutoWidthInput
-                onBlur={() => {
-                    setDisabled(true);
-                }}
-                disabled={isDisabled}
                 required
                 onChange={event => {
                     updateAssets({ name: event.target.value });
