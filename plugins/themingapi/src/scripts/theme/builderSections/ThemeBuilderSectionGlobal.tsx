@@ -14,6 +14,8 @@ import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEdi
 import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
+import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
+import { buttonGlobalVariables } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 export function ThemeBuilderSectionGlobal() {
     return (
@@ -48,7 +50,10 @@ export function ThemeBuilderSectionGlobal() {
             </ThemeBuilderSection>
             <ThemeBuilderSection label={t("Buttons & Inputs")}>
                 <ThemeBuilderBlock label={t("Border Radius")}>
-                    <ThemeInputNumber variableKey="global.border.radius" />
+                    <ThemeInputNumber
+                        variableKey="global.border.radius"
+                        max={buttonGlobalVariables().sizing.minHeight / 2}
+                    />
                 </ThemeBuilderBlock>
                 <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
                 <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
