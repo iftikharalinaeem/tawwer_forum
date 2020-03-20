@@ -8,49 +8,44 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IWebhook } from "./WebhookModel";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { WebhookActions } from "@webhooks/WebhookActions";
+import { RoleActions } from "@dashboard/roles/RoleActions";
 
 export interface IWebhookState {
-    webhooks: ILoadable<Record<number, IWebhook>>;
+    webhooksByID: ILoadable<Record<number, IWebhook>>;
+}
+
+export interface IWebhookStoreState {
+    webhooks: IWebhookState;
 }
 
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
-    webhooks: {
+    webhooksByID: {
         status: LoadStatus.PENDING,
-        data: [],
     },
 };
 
 export const WebhookReducer = produce(
     reducerWithInitialState<IWebhookState>(INITIAL_WEBHOOK_STATE)
-        .case(WebhookActions.getWebhook_ACs.started, (state, action) => {
-            state.webhooks = {
+        .case(WebhookActions.getAllWebhookACs.started, (state, action) => {
+            state.webhooksByID = {
                 status: LoadStatus.LOADING,
             };
-            console.log("WebhookReducer started");
             return state;
         })
-        .case(WebhookActions.getWebhook_ACs.done, (state, payload) => {
-            // const webhooks: Record<number, IWebhook> = {};
-            // payload.result.forEach(webhook => {
-            //     webhooks[webhook.webhookID] = webhook;
-            // });
-            // state.webhooks = {
-            //     status: LoadStatus.SUCCESS,
-            //     data: webhooks,
-            // };
-
-            state.webhooks = {
+        .case(WebhookActions.getAllWebhookACs.done, (state, payload) => {
+            const webhooksByID: Record<number, IWebhook> = {};
+            payload.result.forEach(wehook => {
+                webhooksByID[wehook.webhookID] = wehook;
+            });
+            state.webhooksByID = {
                 status: LoadStatus.SUCCESS,
-                data: payload.result,
+                data: webhooksByID,
             };
-
-            console.log("payload.result");
-            console.log(payload.result);
             return state;
         })
-        .case(WebhookActions.getWebhook_ACs.failed, (state, action) => {
-            state.webhooks.status = LoadStatus.ERROR;
-            state.webhooks.error = action.error;
-            return state;
+        .case(RoleActions.getAllACs.failed, (nextState, action) => {
+            nextState.webhooksByID.status = LoadStatus.ERROR;
+            nextState.webhooksByID.error = action.error;
+            return nextState;
         }),
 );
