@@ -11,6 +11,25 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Loader from "@library/loaders/Loader";
+import { useWebhookActions } from "@webhooks/WebhookActions";
+import { WebhookReducer, IWebhookState } from "@webhooks/WebhookReducer";
+import { registerReducer } from "@library/redux/reducerRegistry";
+import { useSelector } from "react-redux";
+
+registerReducer("webhooks", WebhookReducer);
+
+// export function useRoles() {
+//     const { getAll } = useWebhookActions();
+//     const webhooks = useSelector((state: IWebhookStoreState) => state.webhooks.data);
+//
+//     useEffect(() => {
+//         if (data.status === LoadStatus.PENDING) {
+//             void getAll();
+//         }
+//     }, [getAll, data]);
+//
+//     return data;
+// }
 
 export default function PlaceHolderPage() {
     const params = useParams<{
@@ -19,13 +38,21 @@ export default function PlaceHolderPage() {
         // Be sure to convert numbers/booleans/etc.
     }>();
 
-    const data = state.webhooks;
+    const webhooks = useWebhookActions();
+    const webhookstest1 = webhooks.getAll();
+    const webhookstest = useSelector((state: IWebhookState) => state.webhooks);
+    console.log("webhookstest1");
+    console.log(webhookstest1);
+    console.log("webhookstest");
+    console.log(webhookstest);
+
+    const selector = useSelector((state: IWebhookState) => state.webhooks);
 
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
-    // if (!webhooks.data) {
-    //     return <Loader />;
-    // }
+    if (!webhookstest1) {
+        return <Loader />;
+    }
 
     return (
         <BrowserRouter>
@@ -42,7 +69,7 @@ export default function PlaceHolderPage() {
                 }
             />
             {JSON.stringify(params)}
-            {JSON.stringify(data)}
+            {JSON.stringify(webhookstest.data)}
         </BrowserRouter>
     );
 }

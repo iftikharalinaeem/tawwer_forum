@@ -3,17 +3,18 @@
  * @license GPL-2.0-only
  */
 
-import { useSelector } from "react-redux";
-import { useEffect } from "react";
-import { getCurrentLocale } from "@vanilla/i18n";
-
 /**
  * Interface representing a webhook base resource.
  */
 export interface IWebhook {
+    webhookID: number;
     status: string;
-    events: [];
     name: string;
+    events: [];
     url: string;
     secret: string;
+    dateInserted: string;
+    insertUserID: number;
+    dateUpdated: string;
+    updateUserID: number;
 }

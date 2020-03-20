@@ -6,8 +6,8 @@
  */
 
 use Garden\Web\Data;
+use Vanilla\Webhooks\Controllers\Api\ActionConstants;
 use Vanilla\Web\JsInterpop\ReduxAction;
-use Vanilla\Webhooks\Models\WebhookModel;
 use Vanilla\Webhooks\Controllers\Api\WebhooksApiController;
 
 /**
@@ -41,7 +41,7 @@ class WebhookSettingsController extends SettingsController {
         $this->title(t("Webhooks"));
         $webhooks = $this->apiController->index();
         $this->addReduxAction(new ReduxAction(
-            "@@webhooks/GET_ALL_DONE",
+            ActionConstants::GET_ALL_WEBHOOKS,
             Data::box($webhooks),
             []
         ));
