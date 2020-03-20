@@ -12,7 +12,7 @@ import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEd
 import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { SearchBarPresets } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import { SearchBarPresets, BannerAlignment } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
@@ -30,6 +30,21 @@ export function ThemeBuilderSectionBanner() {
             <ThemeBuilderBlock label={t("Text")}>
                 <ThemeColorPicker variableKey="banner.colors.primaryContrast" />
             </ThemeBuilderBlock>
+            <ThemeBuilderBlock label={t("Alignment")}>
+                <ThemeDropDown
+                    variableKey="banner.options.alignment"
+                    options={[
+                        {
+                            label: t("Left Aligned"),
+                            value: BannerAlignment.LEFT,
+                        },
+                        {
+                            label: t("Center Aligned"),
+                            value: BannerAlignment.CENTER,
+                        },
+                    ]}
+                />
+            </ThemeBuilderBlock>
             <ThemeBuilderSection label={t("Search")}>
                 <ThemeBuilderBlock label={t("Preset")}>
                     <ThemeDropDown
@@ -41,6 +56,10 @@ export function ThemeBuilderSectionBanner() {
                             },
                             {
                                 label: t("Bordered"),
+                                value: SearchBarPresets.BORDER,
+                            },
+                            {
+                                label: t("Bordered (Unified)"),
                                 value: SearchBarPresets.UNIFIED_BORDER,
                             },
                         ]}
@@ -57,6 +76,10 @@ export function ThemeBuilderSectionBanner() {
                             {
                                 label: t("Solid"),
                                 value: ButtonPreset.SOLID,
+                            },
+                            {
+                                label: t("Hidden"),
+                                value: ButtonPreset.HIDE,
                             },
                         ]}
                     />
