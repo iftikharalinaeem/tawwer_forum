@@ -4,7 +4,8 @@
     "version": "1.0.3",
     "url": "https://vanillaforums.com",
     "license": "GPLv3",
-    "hidden": false,
+    "hidden": true,
+    "archived": true,
     "options": {
         "styles": {
             "default": "%s_default",
