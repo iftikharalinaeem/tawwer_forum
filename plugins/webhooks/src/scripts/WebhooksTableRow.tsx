@@ -28,7 +28,7 @@ export function WebhooksTableRow(props: IProps) {
                 <DashboardMediaItem title={webhook.name} info={webhook.url}/>
             </td>
             <td>
-                <DashboardMediaItem title={webhook.status} info={webhook.status}/>
+                <DashboardMediaItem title={webhook.status} info=''/>
             </td>
             <td>
                 <DashboardTableOptions>
