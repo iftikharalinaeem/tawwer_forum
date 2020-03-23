@@ -3,14 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext, useState, useEffect, useRef, useDebugValue, RefObject } from "react";
-import debounce from "lodash/debounce";
-import throttle from "lodash/throttle";
+import React, { useContext, useDebugValue, useEffect, useState } from "react";
 
 interface IContextValue {
     iframeRef: HTMLIFrameElement | null;
     setIFrameRef: (iframe: HTMLIFrameElement) => void;
     sendMessage: ISendMessage | null;
+    sendMessageOut: ISendMessage | null;
 }
 
 const context = React.createContext<IContextValue>({
@@ -19,6 +18,7 @@ const context = React.createContext<IContextValue>({
         return;
     },
     sendMessage: () => {},
+    sendMessageOut: () => {},
 });
 
 export function useIFrameCommunication() {
@@ -72,12 +72,19 @@ export function IframeCommunicationContextProvider(props: { children: React.Reac
         }
     }, [iframeRef, setIFrameRef, sendMessage, setSendMessage]);
 
+    const sendMessageOut = parent
+        ? (message: Record<string, any>) => {
+              parent.postMessage({ source: "vanilla", ...message }, window.origin);
+          }
+        : null;
+
     return (
         <context.Provider
             value={{
                 iframeRef,
                 setIFrameRef,
                 sendMessage,
+                sendMessageOut,
             }}
         >
             {props.children}

@@ -7,10 +7,9 @@
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { percent } from "csx";
 import { storiesOf } from "@storybook/react";
-import ThemeBuilderForm from "@themingapi/theme/ThemeBuilderForm";
-import { themeBuilderClasses } from "@library/forms/themeEditor/themeBuilderStyles";
+import ThemeBuilderForm from "@themingapi/theme/ThemeBuilderPanel";
+import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
 
 const story = storiesOf("Theme", module);
 

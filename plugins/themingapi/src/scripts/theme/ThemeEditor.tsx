@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useRef } from "react";
-import ThemeBuilderForm from "./ThemeBuilderForm";
-import { IThemeVariables } from "./themeEditorReducer";
-import { themeEditorClasses } from "@library/forms/themeEditor/themeEditorStyles";
-import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
 import { siteUrl } from "@library/utility/appUtils";
+import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
+import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
+import React from "react";
+import ThemeBuilderForm from "./ThemeBuilderPanel";
+import { IThemeVariables } from "./themeEditorReducer";
 
 export interface IProps {
     themeID: string | number;
@@ -31,6 +31,8 @@ export default function ThemeEditor(props: IProps) {
                         height="100%"
                         scrolling="yes"
                     ></iframe>
+                    <div className={classes.shadowTop}></div>
+                    <div className={classes.shadowRight}></div>
                 </div>
                 <div className={classes.panel}>
                     <ThemeBuilderForm />
