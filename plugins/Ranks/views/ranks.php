@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$desc = '<p>'.t('Here are the ranks that users can achieve on your site. You can customize these ranks and even add new ones. Here are some tips.').'</p>';
+$desc = '<p>'.t('Here are the ranks that users can achieve on your site.').'</p>';
 $desc .= '<ol>';
-$desc .= '<li>'.t('You don\'t want to have too many ranks. We recommend starting with five. You can add more if your community is really large.').'</li>';
-$desc .= '<li>'.t('It\'s a good idea to have special ranks for moderators and administrators so that your community can easily see who\'s in charge.').'</li>';
+$desc .= '<li>'.t('Recommend starting with five ranks.').'</li>';
+$desc .= '<li>'.t('Recommend special ranks for admins and mods.').'</li>';
 $desc .= '<li>'.t('Be creative! Try naming your ranks after things that the community talks about.').'</li>';
 $desc .= '</ol>';
 

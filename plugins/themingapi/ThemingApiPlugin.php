@@ -109,7 +109,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
     private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
         $navCollection->addLink(
             self::NAV_SECTION,
-            t('Theming UI'),
+            t('Theme Editor'),
             '/theme/theme-settings',
             'Garden.Settings.Manage'
         );
