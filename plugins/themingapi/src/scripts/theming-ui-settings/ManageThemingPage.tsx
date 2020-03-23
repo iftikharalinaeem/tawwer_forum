@@ -49,37 +49,31 @@ export default function ManageThemingPage(props) {
                     <ThemeItem key={key} theme={templateTheme} className={classes.gridItem} />
                 ))}
             </div>
-            {themes.length > 0 && (
-                <>
-                    <div className="subheading-title">
-                        <h2 className="subheading-title">{t("Custom Themes")}</h2>
-                        <div className="subheading-description">
-                            {t(
-                                "Custom Themes are the themes you created. You can edit, rename or make a copy of them.",
-                            )}
-                        </div>
-                    </div>
-                    <div className={classes.grid}>
-                        {themes.map((theme, key) => (
-                            <ThemeItem key={key} theme={theme} className={classes.gridItem} />
-                        ))}
+            <div className="subheading-title">
+                <h2 className="subheading-title">{t("Custom Themes")}</h2>
+                <div className="subheading-description">
+                    {t("Custom Themes are the themes you created. You can edit, rename or make a copy of them.")}
+                </div>
+            </div>
+            <div className={classes.grid}>
+                {themes.map((theme, key) => (
+                    <ThemeItem key={key} theme={theme} className={classes.gridItem} />
+                ))}
 
-                        <div className={classes.gridItem}>
-                            <AddTheme
-                                className={classes.gridItem}
-                                onAdd={
-                                    <ThemeEditorRoute.Link data={{ newTheme: true }}>
-                                        <PlusIcon />
-                                    </ThemeEditorRoute.Link>
-                                }
-                            />
-                            <h3 className={themeItemClasses().title} aria-hidden={true}>
-                                &nbsp;
-                            </h3>
-                        </div>
-                    </div>
-                </>
-            )}
+                <div className={classes.gridItem}>
+                    <AddTheme
+                        className={classes.gridItem}
+                        onAdd={
+                            <ThemeEditorRoute.Link data={{ newTheme: true }}>
+                                <PlusIcon />
+                            </ThemeEditorRoute.Link>
+                        }
+                    />
+                    <h3 className={themeItemClasses().title} aria-hidden={true}>
+                        &nbsp;
+                    </h3>
+                </div>
+            </div>
         </BrowserRouter>
     );
 }
