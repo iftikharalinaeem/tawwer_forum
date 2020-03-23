@@ -8,7 +8,7 @@ import { useParams } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
-import { WebhookStatus } from "@webhooks/webhookModel";
+import { WebhookStatus } from "@webhooks/WebhookModel";
 import qs from "qs";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
@@ -51,7 +51,6 @@ export default function PlaceHolderPage() {
                     <Button
                         buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        onClick={() => console.log("Button click!")}
                     >
                         {t("Add Webhook")}
                     </Button>
