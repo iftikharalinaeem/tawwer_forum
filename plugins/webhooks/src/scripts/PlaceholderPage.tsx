@@ -66,7 +66,6 @@ export default function PlaceHolderPage() {
                 }
 
                 body={Object.values(webhooks.data)
-                    .filter(webhook => webhook.status === status)
                     .map(webhook => (
                         <WebhooksTableRow
                             key={webhook.webhookID}
