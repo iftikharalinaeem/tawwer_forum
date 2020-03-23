@@ -18,16 +18,16 @@ use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 class TranslationsTests extends AbstractAPIv2Test {
 
     /**
-     * {@inheritdoc}
-     */
-    public function setup() {
+ * {@inheritdoc}
+ */
+    public function setup(): void {
         parent::setUp();
     }
 
     /**
      * Setup routine, run before the test class is instantiated.
      */
-    public static function setupBeforeClass() {
+    public static function setupBeforeClass(): void {
         self::$addons = ['translationsApi', 'vanilla'];
         parent::setUpBeforeClass();
         /** @var Gdn_Configuration $config */
