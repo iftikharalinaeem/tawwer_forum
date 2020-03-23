@@ -17,9 +17,9 @@ interface IProps {
 export function SubcommunityThemeFormGroup(props: IProps) {
     const { formFieldName, initialValue } = props;
 
-    const [value, setValue] = useState(initialValue && typeof initialValue !== "boolean" ? initialValue : null);
+    const [value, setValue] = useState(initialValue && typeof initialValue !== "boolean" ? initialValue : "");
 
-    const setTheme = (selectedTheme: string | number | null) => {
+    const setTheme = (selectedTheme: string | number) => {
         setValue(selectedTheme);
     };
 
