@@ -19,15 +19,11 @@ export function SubcommunityThemeFormGroup(props: IProps) {
 
     const [value, setValue] = useState(initialValue && typeof initialValue !== "boolean" ? initialValue : "");
 
-    const setTheme = (selectedTheme: string | number) => {
-        setValue(selectedTheme);
-    };
-
     return (
         <>
             <DashboardFormGroup label={t("Themes")} description={"Select a theme to be applied to this subcommunity."}>
                 <input name={formFieldName} type="hidden" value={value != null ? value : ""} />
-                <ThemeChooserInput initialValue={value} onChange={setTheme} value={value} />
+                <ThemeChooserInput initialValue={value} onChange={setValue} value={value} />
             </DashboardFormGroup>
         </>
     );
