@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
@@ -18,9 +18,10 @@ import Loader from "@library/loaders/Loader";
 import { useWebhooks } from "@webhooks/WebhookHooks";
 import { WebhookReducer } from "@webhooks/WebhookReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import {DashboardTable} from "@dashboard/tables/DashboardTable";
-import { useWebhookActions } from "@webhooks/WebhookActions";
+import { DashboardTable } from "@dashboard/tables/DashboardTable";
 const { HeadItem } = DashboardTable;
+import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
+import { LoadStatus } from "@library/@types/api/core";
 
 registerReducer("webhooks", WebhookReducer);
 
@@ -39,6 +40,7 @@ export default function PlaceHolderPage() {
 
     const webhooks = useWebhooks();
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
+
     if (!webhooks.data) {
         return <Loader />;
     }
@@ -48,10 +50,7 @@ export default function PlaceHolderPage() {
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
-                    <Button
-                        buttonRef={toggleButtonRef}
-                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                    >
+                    <Button buttonRef={toggleButtonRef} baseClass={ButtonTypes.DASHBOARD_PRIMARY}>
                         {t("Add Webhook")}
                     </Button>
                 }
@@ -64,34 +63,35 @@ export default function PlaceHolderPage() {
                         <HeadItem size={TableColumnSize.XS}>Options</HeadItem>
                     </tr>
                 }
-
-                body={Object.values(webhooks.data)
-                    .map(webhook => (
-                        <WebhooksTableRow
-                            key={webhook.webhookID}
-                            webhook={webhook}
-                            forStatus={status}
-                            onEditClick={
-                                status === WebhookStatus.ACTIVE
-                                    ? () => {
-                                        setEditingID(webhook.webhookID);
-                                        setIsFormOpen(true);
-                                    }
-                                    : undefined
-                            }
-                            onPurgeClick={
-                                status === WebhookStatus.DISABLED
-                                    ? () => {
-                                        setPurgeID(webhook.webhookID);
-                                    }
-                                    : undefined
-                            }
-                            onStatusChangeClick={() => {
-                                setStatusChangeID(webhook.webhookID);
-                            }}
-                        />
-                    ))}
+                body={Object.values(webhooks.data).map(webhook => (
+                    <WebhooksTableRow
+                        key={webhook.webhookID}
+                        webhook={webhook}
+                        forStatus={status}
+                        onEditClick={
+                            status === WebhookStatus.ACTIVE
+                                ? () => {
+                                      setEditingID(webhook.webhookID);
+                                      setIsFormOpen(true);
+                                  }
+                                : undefined
+                        }
+                        onPurgeClick={
+                            status === WebhookStatus.DISABLED
+                                ? () => {
+                                      setPurgeID(webhook.webhookID);
+                                  }
+                                : undefined
+                        }
+                        onStatusChangeClick={() => {
+                            setStatusChangeID(webhook.webhookID);
+                        }}
+                    />
+                ))}
             />
+            {webhooks.status === LoadStatus.SUCCESS &&
+                webhooks.data !== undefined &&
+                Object.entries(webhooks.data).length === 0 && <EmptyWebhooksResults />}
         </BrowserRouter>
     );
 }

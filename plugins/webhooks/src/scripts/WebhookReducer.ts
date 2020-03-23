@@ -11,7 +11,9 @@ import { WebhookActions } from "@webhooks/WebhookActions";
 import { RoleActions } from "@dashboard/roles/RoleActions";
 
 export interface IWebhookState {
-    webhooksByID: ILoadable<Record<number, IWebhook>>;
+    webhooksByID: ILoadable<{
+        [id: number]: IWebhook;
+    }>;
 }
 
 export interface IWebhookStoreState {
