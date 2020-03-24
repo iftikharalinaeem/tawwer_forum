@@ -22,6 +22,7 @@ use Garden\Schema\Schema;
  *  1.6.3   Natsort OnlineUsers before rendering
  *  1.6.4   Some tweaks to the css.
  *  1.7
+ *  1.7.1   Add configuration to show active users for the entire website
  *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2003 Vanilla Forums, Inc
@@ -126,7 +127,7 @@ class OnlinePlugin extends Gdn_Plugin {
     const DEFAULT_STYLE = 'pictures';
     const DEFAULT_LOCATION = 'every';
     const DEFAULT_HIDE = 'true';
-    const DEFAULT_LOCATION_DEPENDENCY = 'true';
+    const DEFAULT_CHECK_ENTIRE_SITE = 'true';
 
     public function __construct(UserModel $userModel = null) {
         parent::__construct();
@@ -507,11 +508,9 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     public static function whereAmI($resolvedPath = null, $resolvedArgs = null) {
         $location = 'limbo';
-
-        if (Gdn::config('Plugins.Online.LocationDependency', self::DEFAULT_LOCATION_DEPENDENCY)) {
+        if (Gdn::config('Plugins.Online.EntireSite', self::DEFAULT_CHECK_ENTIRE_SITE)) {
             return $location;
         }
-
         $wildLocations = [
             'vanilla/categories/index' => 'category',
             'vanilla/discussion/index' => 'discussion',
@@ -1087,7 +1086,7 @@ class OnlinePlugin extends Gdn_Plugin {
             'Plugins.Online.Style' => self::DEFAULT_STYLE,
             'Plugins.Online.HideForGuests' => self::DEFAULT_HIDE,
             'Plugins.Online.PruneDelay' => self::DEFAULT_PRUNE_DELAY,
-            'Plugins.Online.LocationDependency' => self::DEFAULT_LOCATION_DEPENDENCY
+            'Plugins.Online.EntireSite' => self::DEFAULT_CHECK_ENTIRE_SITE
         ];
 
         $saved = false;
