@@ -30,4 +30,6 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
             ['name' => 'Knowledge Base']
         ]
     )
+    ->rule(TranslationProviderInterface::class)
+    ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
 ;
