@@ -18,6 +18,7 @@ var ideation = {
             } else {
                 $('#Form_UseDownVotes').parents('.form-group').hide();
                 $('#Form_UseBestOfIdeation').iCheck('uncheck').parents('.form-group').hide();
+                $('[id^="Form_BestOfIdeation"]').parents('.form-group').hide();
             }
         }
 
@@ -25,11 +26,14 @@ var ideation = {
         adjustIdeationOptions();
 
         // Hide/Show DownVotes depending on choice on IdeaCategory
-        $('#Form_IdeaCategory').on('change', function() { adjustIdeationOptions(); });
+        $('#Form_IdeaCategory').on('change', function() {
+            adjustIdeationOptions();
+        });
 
         // Hide/Show BestOfIdeationFields depending on choice on UseBestOfIdeation
-        $('#Form_UseBestOfIdeation').on('change', function() { adjustIdeationOptions(); });
-
+        $('#Form_UseBestOfIdeation').on('change', function() {
+            adjustIdeationOptions();
+        });
     }
 };
 

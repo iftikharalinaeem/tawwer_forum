@@ -35,11 +35,21 @@ Gdn::structure()
     ->column(IdeationPlugin::CATEGORY_IDEATION_COLUMN_NAME, [IdeationPlugin::CATEGORY_TYPE_UP, IdeationPlugin::CATEGORY_TYPE_UP_AND_DOWN], true)
     ->set();
 
-//Add a varchar(200) field to the Category table that's meant to contain the configurations of the BestOfIdeation module
+//Ensure that a table allowing to save settings for the BestOfIdeation module exists
+Gdn::structure()->table('BestOfIdeationConfig');
+$boiConfigExists = Gdn::structure()->tableExists();
+
 Gdn::structure()
-    ->table('Category')
-    ->column(BestOfIdeationModule::SETTINGS_COL_NAME, 'varchar(200)', true)
+    ->table('BestOfIdeationConfig')
+    ->primaryKey('BoiConfigID')
+    ->column('CategoryID', 'int', false, ['unique'])
+    ->column('BestOfIdeationSettings', 'text')
     ->set();
+
+if (!$statusExists) {
+    // Add some default statuses.
+    require_once dirname(__FILE__).'/class.bestofideationmodel.php';
+}
 
 // Make sure we've got the needed reactions
 $reactionModel = new ReactionModel();

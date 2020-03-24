@@ -307,7 +307,9 @@ EOT
             $sender->addJsFile('ideation.js', 'plugins/ideation');
 
             $isIdeaOptions = [];
-            if($this->isIdeaCategory($category)){ $isIdeaOptions['checked'] = 'checked'; }
+            if ($this->isIdeaCategory($category)) {
+                $isIdeaOptions['checked'] = 'checked';
+            }
             $sender->Data['_ExtendedFields']['IsIdea'] = [
                 'Name' => 'Idea Category',
                 'Control' => 'CheckBox',
@@ -333,17 +335,13 @@ EOT
                 'Options' => $downVoteOptions
             ];
 
-            //Inflate BestOfIdeationSettings
-            $category[BestOfIdeationModule::SETTINGS_COL_NAME] = (
-                (is_string($category[BestOfIdeationModule::SETTINGS_COL_NAME])
-                    ?dbdecode($category[BestOfIdeationModule::SETTINGS_COL_NAME])
-                    :[]
-                )
-            );
+            //Obtain BestOfIdeations module's settings
+            $boiModule = new BestOfIdeationModule($categoryID);
+            $boiSettings = $boiModule->getSettings();
 
             //Is the bestOfIdeation feature used?
             $useBestOfIdeationOptions = [];
-            if (count($category[BestOfIdeationModule::SETTINGS_COL_NAME])>0) {
+            if ($boiSettings['IsEnabled']) {
                 $useBestOfIdeationOptions['checked'] = 'checked';
             }
             $sender->Data['_ExtendedFields']['UseBestOfIdeation'] = [
@@ -359,8 +357,8 @@ EOT
             $bestOfIdeationLimitOptions = [
                 'type' => "number",
                 'value' => (
-                    isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Limit'])
-                        ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Limit']
+                    isset($boiSettings['Limit'])
+                        ?$boiSettings['Limit']
                         :BestOfIdeationModule::DEFAULT_AMOUNT
                 ),
                 'step' => "1",
@@ -379,16 +377,16 @@ EOT
             $bestOfIdeationDatesFromOptions = [
                 'type' => "date",
                 'value' => (
-                    isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['From'])
-                        ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['From']
+                    isset($boiSettings['Dates']['From'])
+                        ?$boiSettings['Dates']['From']
                         :''
                 ),
             ];
             $sender->Data['_ExtendedFields']['BestOfIdeationFrom'] = [
                 'Name' => 'BestOfIdeationSettings[Dates][From]',
-                'LabelCode' => Gdn::translate('Consider ideas added after...'),
+                'LabelCode' => Gdn::translate('Consider ideas added after'),
                 'Control' => 'textbox',
-                'Description' => Gdn::translate('Show top ideas for time period ending with...'),
+                'Description' => Gdn::translate('The earliest an idea can be considered.'),
                 'Options' => $bestOfIdeationDatesFromOptions,
             ];
 
@@ -396,16 +394,16 @@ EOT
             $bestOfIdeationDatesToOptions = [
                 'type' => "date",
                 'value' => (
-                isset($category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['To'])
-                    ?$category[BestOfIdeationModule::SETTINGS_COL_NAME]['Dates']['To']
+                isset($boiSettings['Dates']['To'])
+                    ?$boiSettings['Dates']['To']
                     :''
                 ),
             ];
             $sender->Data['_ExtendedFields']['BestOfIdeationTo'] = [
                 'Name' => 'BestOfIdeationSettings[Dates][To]',
-                'LabelCode' => Gdn::translate('Consider ideas added before...'),
+                'LabelCode' => Gdn::translate('Consider ideas added before'),
                 'Control' => 'textbox',
-                'Description' => Gdn::translate('Show top ideas for time period ending with...'),
+                'Description' => Gdn::translate('The latest an idea can be considered.'),
                 'Options' => $bestOfIdeationDatesToOptions,
             ];
 
@@ -1848,7 +1846,6 @@ EOT
      *
      * @param CategoriesController $sender
      */
-
     public function categoriesController_pageControls_handler($sender) {
         $categoryID = val('CategoryID', $sender);
         if (!$categoryID || !$this->isIdeaCategory(CategoryModel::categories($categoryID))) {
@@ -2145,7 +2142,6 @@ EOT
         }
     }
 
-
     /**
      * Hooks before saving an ideation.
      *
@@ -2156,24 +2152,30 @@ EOT
      * @param array $args
      */
     public function categoryModel_beforeSaveCategory_handler(CategoryModel &$sender, array $args) {
-        $BestOfIdeationSettings = [];
-        //Look for bestOfIdeation settings
-        if ((isset($args['FormPostValues']['UseBestOfIdeation'])) &&
-            ($args['FormPostValues']['UseBestOfIdeation']==1) &&
-            (isset($args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME]))) {
-            $BestOfIdeationSettings = $args['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME];
+        Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
+    }
 
-            //If there are empty date fields, we remove them to the data to be saved.
-            foreach ($BestOfIdeationSettings['Dates'] as $dateIdx => $date) {
-                if (empty($date)) {
-                    unset($BestOfIdeationSettings['Dates'][$dateIdx]);
+    public function categoryModel_afterSaveCategory_handler(CategoryModel &$sender, array $args) {
+        if(isset($args['CategoryID'])){
+            $bestOfIdeationSettings = [];
+
+            //Look for bestOfIdeation settings
+            if ((isset($args['FormPostValues']['UseBestOfIdeation'])) &&
+                ($args['FormPostValues']['UseBestOfIdeation']==1) &&
+                (isset($args['FormPostValues'][BestOfIdeationModel::SETTINGS_COL_NAME]))) {
+                $bestOfIdeationSettings = $args['FormPostValues'][BestOfIdeationModel::SETTINGS_COL_NAME];
+
+                //If there are empty date fields, we remove them to the data to be saved.
+                foreach ($bestOfIdeationSettings['Dates'] as $dateIdx => $date) {
+                    if (empty($date)) {
+                        unset($bestOfIdeationSettings['Dates'][$dateIdx]);
+                    }
                 }
+
+                $boiModule = new BestOfIdeationModule($args['CategoryID']);
+                $boiModule->saveSettings($bestOfIdeationSettings);
             }
         }
-        //The bestOfIdeation data is assembled in a single value(flattened multi-dimensional array).
-        $sender->EventArguments['FormPostValues'][BestOfIdeationModule::SETTINGS_COL_NAME] = dbencode($BestOfIdeationSettings);
-
-        Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 }
 
