@@ -21,6 +21,15 @@ echo $this->Form->errors();
     </li>
     <li class="form-group">
         <div class="label-wrap">
+            <?php echo $this->Form->label("Check Online status everywhere?", "Plugins.Online.LocationDependency"); ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->toggle('Plugins.Online.LocationDependency');
+            ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
             <?php echo $this->Form->label("How should the list be rendered?", "Plugins.Online.Style"); ?>
         </div>
         <div class="input-wrap">

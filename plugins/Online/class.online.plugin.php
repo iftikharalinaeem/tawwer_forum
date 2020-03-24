@@ -126,6 +126,7 @@ class OnlinePlugin extends Gdn_Plugin {
     const DEFAULT_STYLE = 'pictures';
     const DEFAULT_LOCATION = 'every';
     const DEFAULT_HIDE = 'true';
+    const DEFAULT_LOCATION_DEPENDENCY = 'true';
 
     public function __construct(UserModel $userModel = null) {
         parent::__construct();
@@ -1080,7 +1081,8 @@ class OnlinePlugin extends Gdn_Plugin {
             'Plugins.Online.Location' => self::DEFAULT_LOCATION,
             'Plugins.Online.Style' => self::DEFAULT_STYLE,
             'Plugins.Online.HideForGuests' => self::DEFAULT_HIDE,
-            'Plugins.Online.PruneDelay' => self::DEFAULT_PRUNE_DELAY
+            'Plugins.Online.PruneDelay' => self::DEFAULT_PRUNE_DELAY,
+            'Plugins.Online.LocationDependency' => self::DEFAULT_LOCATION_DEPENDENCY
         ];
 
         $saved = false;
