@@ -226,12 +226,22 @@ class DbThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrent(): ?array {
-        try {
-            $theme = $this->themeModel->selectSingle(['current' => 1]);
-        } catch (NoResultsException $e) {
-            return null;
+    public function getCurrent($themeID = null): ?array {
+        if ($themeID) {
+            try {
+                $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
+            } catch (NoResultsException $e) {
+                return null;
+            }
+        } else {
+            try {
+                $theme = $this->themeModel->selectSingle(['current' => 1]);
+            } catch (NoResultsException $e) {
+                return null;
+            }
         }
+
+
 
         return $this->normalizeTheme(
             $theme,
@@ -343,6 +353,11 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getName($themeID): string {
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name']]);
         return $theme['name'];
+    }
+
+    public function getTheme($themeID) {
+        $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
+        return $theme;
     }
 
     /**
