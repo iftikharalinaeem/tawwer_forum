@@ -18,7 +18,7 @@ interface IProps {
     onStatusChangeClick: () => void;
 }
 export function WebhooksTableRow(props: IProps) {
-    const webhook = props.webhook;
+    const { webhook } = props;
 
     return (
         <tr>
