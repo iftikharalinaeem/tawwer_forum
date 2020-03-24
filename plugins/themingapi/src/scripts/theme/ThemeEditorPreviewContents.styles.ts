@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, fonts, colorOut } from "@library/styles/styleHelpers";
+import { unit, paddings, fonts, colorOut, absolutePosition } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { FontSizeProperty } from "csstype";
@@ -113,15 +113,10 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
     });
 
     const panelActivatorIndicator = style("panelActivatorIndicator", {
-        position: "absolute",
-        top: 4,
-        left: 4,
-        right: 4,
-        bottom: 4,
-        border: `1px dashed #fff`,
-        borderColor: colorOut(globalVars.mainColors.bg),
+        ...absolutePosition.fullSizeOfParent(),
+        outline: `1px dashed #fff`,
+        outlineOffset: unit(-4),
         opacity: 0.85,
-        zIndex: 1000,
         pointerEvents: "none",
     });
 
