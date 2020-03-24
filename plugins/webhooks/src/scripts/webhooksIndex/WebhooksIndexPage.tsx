@@ -26,8 +26,6 @@ import { LoadStatus } from "@library/@types/api/core";
 registerReducer("webhooks", WebhookReducer);
 
 export default function WebhooksIndexPage() {
-    const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
-    const status = initialForm.status || WebhookStatus.ACTIVE;
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
     const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
@@ -46,7 +44,7 @@ export default function WebhooksIndexPage() {
     }
 
     return (
-        <BrowserRouter>
+        <>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
@@ -92,6 +90,6 @@ export default function WebhooksIndexPage() {
             {webhooks.status === LoadStatus.SUCCESS &&
                 webhooks.data !== undefined &&
                 Object.entries(webhooks.data).length === 0 && <EmptyWebhooksResults />}
-        </BrowserRouter>
+        </>
     );
 }

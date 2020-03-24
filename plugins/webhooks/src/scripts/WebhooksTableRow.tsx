@@ -16,11 +16,9 @@ interface IProps {
     forStatus: WebhookStatus;
     onEditClick?: () => void;
     onStatusChangeClick: () => void;
-    onPurgeClick?: () => void;
 }
 export function WebhooksTableRow(props: IProps) {
     const webhook = props.webhook;
-
 
     return (
         <tr>

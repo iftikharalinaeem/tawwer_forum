@@ -28,11 +28,11 @@ class WebhookSettingsController extends SettingsController {
      * @param Gdn_Request $request
      */
     public function __construct(
-        WebhooksApiController $apiController,
+        WebhooksApiController $webhooksApiController,
         Gdn_Request $request
     ) {
         parent::__construct();
-        $this->apiController = $apiController;
+        $this->webhooksApiController = $webhooksApiController;
         $this->request = $request;
     }
 
@@ -45,14 +45,13 @@ class WebhookSettingsController extends SettingsController {
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('webhook-settings');
         $this->title(t("Webhooks"));
-        $webhooks = $this->apiController->index();
+        $webhooks = $this->webhooksApiController->index();
         $this->addReduxAction(new ReduxAction(
             ActionConstants::GET_ALL_WEBHOOKS,
             Data::box($webhooks),
             []
         ));
 
-        $this->setData('webhooks', $webhooks);
         $this->render();
     }
 }
