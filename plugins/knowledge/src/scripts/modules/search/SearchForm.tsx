@@ -90,6 +90,7 @@ function SearchForm(props: IProps) {
                                     }}
                                     disableAutocomplete={true}
                                     buttonBaseClass={ButtonTypes.PRIMARY}
+                                    needsPageTitle={true}
                                 />
                             </PanelWidget>
                             {isMobile && (
