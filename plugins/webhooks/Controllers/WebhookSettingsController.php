@@ -24,7 +24,7 @@ class WebhookSettingsController extends SettingsController {
     /**
      * WebhookSettingsController constructor.
      *
-     * @param WebhooksApiController $apiController
+     * @param WebhooksApiController $webhooksApiController
      * @param Gdn_Request $request
      */
     public function __construct(
