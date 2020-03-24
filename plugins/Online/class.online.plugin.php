@@ -507,6 +507,11 @@ class OnlinePlugin extends Gdn_Plugin {
      */
     public static function whereAmI($resolvedPath = null, $resolvedArgs = null) {
         $location = 'limbo';
+
+        if (Gdn::config('Plugins.Online.LocationDependency', self::DEFAULT_LOCATION_DEPENDENCY)) {
+            return $location;
+        }
+
         $wildLocations = [
             'vanilla/categories/index' => 'category',
             'vanilla/discussion/index' => 'discussion',
