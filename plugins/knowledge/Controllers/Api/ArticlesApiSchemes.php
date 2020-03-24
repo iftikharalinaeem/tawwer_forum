@@ -157,6 +157,7 @@ trait ArticlesApiSchemes {
                     "body?",
                     "name?",
                     "locale?",
+                    "validateLocale?",
                     "sort?",
                     "discussionID?",
                     "previousRevisionID?",
@@ -187,6 +188,7 @@ trait ArticlesApiSchemes {
                     "body",
                     "name",
                     "locale",
+                    "validateLocale?",
                     "sort?",
                     "discussionID?",
                     "previousRevisionID?",
@@ -433,6 +435,7 @@ trait ArticlesApiSchemes {
                 "bodyRendered",
                 "locale",
                 "translationStatus",
+                "validateLocale"
             ])->add($this->fullRevisionSchema()));
     }
 
@@ -567,6 +570,11 @@ trait ArticlesApiSchemes {
             "updateUser?" => $this->getUserFragmentSchema(),
             "featured:b",
             "dateFeatured?:dt",
+            "validateLocale:b?" => [
+                "description" => "Apply validation to locale.",
+                "type" => "boolean",
+                "default" => true
+            ]
         ]);
     }
 

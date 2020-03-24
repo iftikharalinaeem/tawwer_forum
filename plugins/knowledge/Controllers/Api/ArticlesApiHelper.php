@@ -292,7 +292,9 @@ trait ArticlesApiHelper {
 
             // If the locale is passed check if it is supported.
             $locale = $locale ?? $knowledgeBase["sourceLocale"];
-            $this->checkKbSupportsLocale($locale, $knowledgeBase);
+            if ($fields['validateLocale'] ?? true) {
+                $this->checkKbSupportsLocale($locale, $knowledgeBase);
+            }
 
             //check if knowledge category exists and knowledge base is "published"
             $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
