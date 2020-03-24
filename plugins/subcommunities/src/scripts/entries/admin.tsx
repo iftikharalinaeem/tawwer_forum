@@ -8,6 +8,7 @@ import { addComponent } from "@library/utility/componentRegistry";
 import { ProductIntegrationFormGroup } from "@subcommunities/forms/ProductIntegrationFormGroup";
 import { ProductSelectorFormGroup } from "@subcommunities/forms/ProductSelectorFormGroup";
 import { getMeta } from "@library/utility/appUtils";
+import { SubcommunityThemeFormGroup } from "@subcommunities/forms/SubcommunityThemeFormGroup";
 
 const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
 
@@ -25,4 +26,9 @@ if (isProductIntgrationEnabled) {
         { overwrite: true },
     );
     addComponent("ProductSelectorFormGroup", ProductSelectorFormGroup);
+    addComponent(
+        "subcommunity-theme-form-group",
+        props => <SubcommunityThemeFormGroup {...props} formFieldName="themeID" />,
+        { overwrite: true },
+    );
 }

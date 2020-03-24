@@ -64,6 +64,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             ->column('defaultController', 'varchar(30)', true)
             ->column('knowledgeBase', 'tinyint(1)', true)
             ->column('forum', 'tinyint(1)', true)
+            ->column('themeID', 'varchar(30)', true)
             ->set();
 
         Gdn::structure()
