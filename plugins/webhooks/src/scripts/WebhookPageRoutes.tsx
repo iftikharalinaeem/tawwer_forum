@@ -8,26 +8,26 @@ import RouteHandler from "@vanilla/library/src/scripts/routing/RouteHandler";
 import { Route } from "react-router";
 
 export const WebhooksIndexRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks" */ "@webhooks/PlaceholderPage"),
+    () => import(/* webpackChunkName: "pages/webhooks" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
     "/webhook-settings",
     (webhooks: { webhooks?: Object[] }) => "/webhook-settings",
 );
 
 export const WebhooksAddEditRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/addEdit" */ "@webhooks/PlaceholderPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/addEdit" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
     ["/webhook-settings/:webhookID/edit", "/webhook-settings/add"],
     (params: { webhookID?: number }) =>
         params.webhookID != null ? `/webhook-settings/${params.webhookID}/edit` : "/webhook-settings/add",
 );
 
 export const DeliveriesIndexRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/deliveries" */ "@webhooks/PlaceholderPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/deliveries" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
     ["/webhook-settings/:webhookID/deliveries", "/webhook-settings/:webhookID/deliveries/p:page(\\d+)"],
     (params: { webhookID?: number; page?: number }) => `/webhook-settings/${params.webhookID}/deliveries`,
 );
 
 export const DeliveryRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/delivery" */ "@webhooks/PlaceholderPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/delivery" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
     "/webhook-settings/deliveries/:deliveryID",
     (params: { deliveryID?: number }) => `/webhook-settings/deliveries/${params.deliveryID}`,
 );

@@ -5,7 +5,7 @@
 
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { IWebhook } from "./WebhookModel";
+import { IWebhook } from "./WebhookTypes";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { WebhookActions } from "@webhooks/WebhookActions";
 import { RoleActions } from "@dashboard/roles/RoleActions";

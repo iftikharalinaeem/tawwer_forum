@@ -8,7 +8,7 @@ import { useParams } from "react-router";
 import { BrowserRouter } from "react-router-dom";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
-import { WebhookStatus } from "@webhooks/WebhookModel";
+import { WebhookStatus } from "@webhooks/WebhookTypes";
 import qs from "qs";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
@@ -25,7 +25,7 @@ import { LoadStatus } from "@library/@types/api/core";
 
 registerReducer("webhooks", WebhookReducer);
 
-export default function PlaceHolderPage() {
+export default function WebhooksIndexPage() {
     const initialForm = qs.parse(window.location.search.replace(/^\?/, ""));
     const status = initialForm.status || WebhookStatus.ACTIVE;
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -59,7 +59,7 @@ export default function PlaceHolderPage() {
                 head={
                     <tr>
                         <HeadItem>Webhooks</HeadItem>
-                        <HeadItem>Status</HeadItem>
+                        <HeadItem size={TableColumnSize.XS}>Status</HeadItem>
                         <HeadItem size={TableColumnSize.XS}>Options</HeadItem>
                     </tr>
                 }

@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
-import { IWebhook } from "@webhooks/WebhookModel";
+import { IWebhook } from "@webhooks/WebhookTypes";
 import actionCreatorFactory from "typescript-fsa";
 import {useDispatch} from "react-redux";
 import {useMemo} from "react";
