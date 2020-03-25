@@ -16,7 +16,6 @@ import { AddTheme } from "@vanilla/library/src/scripts/theming/AddTheme";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
-import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 
@@ -109,9 +108,7 @@ export default function ManageThemingPage(props) {
                             </ThemeEditorRoute.Link>
                         }
                     />
-                    <h3 className={themeItemClasses().title} aria-hidden={true}>
-                        &nbsp;
-                    </h3>
+                    <h3 aria-hidden={true}>&nbsp;</h3>
                 </div>
             </div>
         </BrowserRouter>

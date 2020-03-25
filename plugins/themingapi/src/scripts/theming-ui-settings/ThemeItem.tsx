@@ -6,8 +6,7 @@
 import { IManageTheme, useThemeActions, PreviewStatusType } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import React, { useEffect, useState } from "react";
-import { t } from "@vanilla/i18n";
-import { themeItemClasses } from "@themingapi/theming-ui-settings/themeItemStyles";
+import { t, translate } from "@vanilla/i18n";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
@@ -15,6 +14,9 @@ import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import classNames from "classnames";
 import ModalConfirm from "@vanilla/library/src/scripts/modal/ModalConfirm";
 import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
+import { InformationIcon } from "@vanilla/library/src/scripts/icons/common";
+import { ToolTip, ToolTipIcon } from "@vanilla/library/src/scripts/toolTip/ToolTip";
+import { ThemePreviewTitle } from "@vanilla/library/src/scripts/theming/ThemePreviewTitle";
 
 interface IProps {
     theme: IManageTheme;
@@ -25,7 +27,6 @@ export function ThemeItem(props: IProps) {
     const { applyStatus, previewStatus } = useThemeSettingsState();
     const { putCurrentTheme, putPreviewTheme } = useThemeActions();
     const [showMobileWarning, setShowMobileWarning] = useState(false);
-    const classes = themeItemClasses();
     const { preview } = props.theme;
     const themeID = props.theme.themeID;
     const copyCustomTheme = props.theme.type === "themeDB" ? true : false;
@@ -74,7 +75,7 @@ export function ThemeItem(props: IProps) {
                     elementToFocusOnExit={document.body}
                 />
             )}
-            <div className={classNames(classes.item, props.className)}>
+            <div className={classNames(props.className)}>
                 <ThemePreviewCard
                     name={props.theme.name || t("Unknown Theme")}
                     isActiveTheme={props.theme.current}
@@ -106,7 +107,7 @@ export function ThemeItem(props: IProps) {
                     }}
                     canCopyCustom={copyCustomTheme}
                 />
-                <h3 className={classes.title}>{props.theme.name}</h3>
+                <ThemePreviewTitle theme={props.theme} />
             </div>
         </>
     );

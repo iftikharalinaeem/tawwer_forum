@@ -12,7 +12,8 @@ import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import LinkAsButton from "@vanilla/library/src/scripts/routing/LinkAsButton";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import currentThemeClasses from "@vanilla/library/src/scripts/theming/currentThemeStyles";
-import { IManageTheme, ThemeType } from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { IManageTheme } from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 interface IProps {
     currentTheme: IManageTheme;
@@ -42,8 +43,7 @@ export default function CurrentTheme(props: IProps) {
                     />
                 </div>
                 <CurrentThemeInfo
-                    {...currentTheme}
-                    info={currentTheme.preview.info}
+                    theme={currentTheme}
                     editButton={
                         currentTheme.type === ThemeType.DB ? (
                             <LinkAsButton

@@ -5,11 +5,10 @@
  */
 
 import qs from "qs";
-import { Store } from "redux";
 
 export interface IThemeEditorURLData {
     themeID?: string | number;
-    templateName?: string;
+    templateName?: string | number;
     newTheme?: boolean;
 }
 
@@ -18,7 +17,7 @@ export interface IThemeEditorURLData {
  *
  * @param themeID - The articleID.
  */
-export function makeThemeEditorUrl(data?: IThemeEditorURLData, store?: Store<IThemeEditorURLData>) {
+export function makeThemeEditorUrl(data?: IThemeEditorURLData) {
     const defaultAddRoot = "/theme/theme-settings/add";
     if (!data || data.newTheme) {
         return defaultAddRoot;
