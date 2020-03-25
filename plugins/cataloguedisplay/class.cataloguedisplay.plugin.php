@@ -130,7 +130,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 if ($existingImage && Gdn::request()->post('Delete')) {
                     $uploadImage->delete($existingImage);
                     if (Gdn::request()->post('Delete')) {
-                        saveToConfig(['CatalogueDisplay.PlaceHolderImage' => null]);
+                        saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
                     }
                 }
             } catch (Exception $ex) {
@@ -138,7 +138,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 throw $ex;
             }
         }
-        $placeholderImg = !c('CatalogueDisplay.PlaceHolderImage')?: img(c('CatalogueDisplay.PlaceHolderImage'));
+        $placeholderImg = !empty(c('CatalogueDisplay.PlaceHolderImage'))?img(c('CatalogueDisplay.PlaceHolderImage')):null;
         $sender->setData('PlaceholderImage', $placeholderImg);
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
