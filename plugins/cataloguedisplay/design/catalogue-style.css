@@ -1,0 +1,44 @@
+.catalogue-image-wrapper {
+    float: left;
+    display: block;
+    width: 140px;
+    margin-right: 10px;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.catalogue-image-wrapper:empty {
+    min-height: 110px;
+    min-width: 120px;
+    background-color: #eff7ff;
+    border: solid 1px #ccc;
+    border-radius: 3px;
+}
+
+.catalogue-image, .placeholder-image {
+    max-width: 140px;
+    max-height: 120px;
+}
+
+li.CatalogueRow {
+    opacity: 1 !important;
+    display: inline-block;
+    width: 100%;
+}
+
+li.CatalogueRow:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/**
+If the Discussion Photo plugin is turned on, hide the user's avatar on the catalogue page only.
+ */
+li.CatalogueRow .IndexPhoto {
+    display: none;
+}
+
+.mfp-zoom-out-cur, .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
+    cursor: pointer;
+}
