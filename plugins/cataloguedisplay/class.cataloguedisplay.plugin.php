@@ -184,7 +184,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param DiscussionsController Array $args
      */
     public function discussionsController_beforeDiscussionContent_handler($sender, $args) {
-        if (c('Vanilla.Discussions.Layout') === 'table') {
+        if (c('CatalogueDisplay.OnlyOnCategory') || c('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
         echo $this->displayCatalogueImage(val('Discussion', $args));
