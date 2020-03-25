@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -8,7 +7,7 @@ interface IProps {
     showBackLink?: boolean;
     title: string;
     actionButtons?: React.ReactNode;
-    onBack: () => void; 
+    onBack: () => void;
 }
 
 export function WebhookDashboardHeaderBlock(props: IProps) {

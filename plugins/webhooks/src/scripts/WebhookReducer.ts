@@ -9,22 +9,7 @@ import { IWebhook } from "./WebhookTypes";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { WebhookActions } from "@webhooks/WebhookActions";
 import { RoleActions } from "@dashboard/roles/RoleActions";
-
-export interface IWebhookState {
-    webhooksByID: ILoadable<{
-        [id: number]: IWebhook;
-    }>;
-}
-
-export interface IWebhookStoreState {
-    webhooks: IWebhookState;
-}
-
-export const INITIAL_WEBHOOK_STATE: IWebhookState = {
-    webhooksByID: {
-        status: LoadStatus.PENDING,
-    },
-};
+import { IWebhookState, INITIAL_WEBHOOK_STATE } from "@webhooks/WebhookTypes";
 
 export const WebhookReducer = produce(
     reducerWithInitialState<IWebhookState>(INITIAL_WEBHOOK_STATE)

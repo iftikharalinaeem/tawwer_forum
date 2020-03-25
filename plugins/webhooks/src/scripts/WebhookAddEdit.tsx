@@ -4,6 +4,11 @@
  */
 
 import React from "react";
+import { t } from "@vanilla/i18n";
+import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
+import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
+import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { useWebhookData } from "@webhooks/WebhookTypes";
 
 interface IProps {
     webhookID?: number;
@@ -11,9 +16,26 @@ interface IProps {
 }
 
 export function WebhookAddEdit(props: IProps) {
+    const { form, formSubmit } = useWebhookData();
     const onBack = () => {
         if (props.onBack) props.onBack();
     };
 
-    return <>hello from the form</>;
+    return (
+        <>
+            <form
+                onSubmit={async event => {
+                    event.preventDefault();
+                }}
+            >
+                <DashboardFormGroup label="Name">
+                    <DashboardInput
+                        inputProps={{
+                            value: form.name,
+                        }}
+                    />
+                </DashboardFormGroup>
+            </form>
+        </>
+    );
 }
