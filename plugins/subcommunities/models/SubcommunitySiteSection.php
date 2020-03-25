@@ -46,6 +46,9 @@ class SubcommunitySiteSection implements SiteSectionInterface {
     /** @var string */
     private $sectionGroup;
 
+    /** @var mixed */
+    private $themeID;
+
     /** @var ConfigurationInterface $config */
     private $config;
 
@@ -98,6 +101,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->apps[self::APP_FORUM] = ($forumApp != 1);
         $kbApp = $subcommunity[self::APP_KB] ?? false;
         $this->apps[self::APP_KB] = ($kbApp != 1);
+        $this->themeID = $subcommunity["themeID"];
     }
 
     /**
@@ -175,5 +179,12 @@ class SubcommunitySiteSection implements SiteSectionInterface {
      */
     public function getAttributes(): array {
         return $this->attributes;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSectionThemeID() {
+        return $this->themeID;
     }
 }
