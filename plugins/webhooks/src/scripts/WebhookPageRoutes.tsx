@@ -11,7 +11,7 @@ import { IWebhook } from "@webhooks/WebhookTypes";
 export const WebhooksIndexRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/webhooks" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
     "/webhook-settings",
-    (webhooks: { webhooks?: IWebhook }) => "/webhook-settings/webhooks",
+    (webhooks: { webhooks?: IWebhook }) => "/webhook-settings",
 );
 
 export const WebhooksAddEditRoute = new RouteHandler(
