@@ -726,6 +726,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $categoryCollection
                 ->setStaticCalculator($noop)
                 ->setUserCalculator($noop);
+            $categoryCollection->setCacheReadOnly(true);
         }
 
         if ($categoryID) {
