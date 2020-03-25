@@ -8,7 +8,7 @@ import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
-import { setAllLinkColors } from "@library/styles/styleHelpers";
+import { setAllLinkStateStyles } from "@library/styles/styleHelpers";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");
@@ -56,7 +56,7 @@ export const reactionClasses = useThemeCache(() => {
         marginBottom: px(8),
     });
 
-    const linkColors = setAllLinkColors();
+    const linkColors = setAllLinkStateStyles();
     const link = style("link", {
         fontWeight: vars.fonts.weights.bold,
         color: colorOut(linkColors.color),
