@@ -130,7 +130,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 if ($existingImage && Gdn::request()->post('Delete')) {
                     $uploadImage->delete($existingImage);
                     if (Gdn::request()->post('Delete')) {
-                        saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
+                        saveToConfig(['CatalogueDisplay.PlaceHolderImage' => null]);
                     }
                 }
             } catch (Exception $ex) {
@@ -138,7 +138,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 throw $ex;
             }
         }
-        $sender->setData('PlaceholderImage', c('CatalogueDisplay.PlaceHolderImage'));
+        $placeholderImg = !c('CatalogueDisplay.PlaceHolderImage')?: img(c('CatalogueDisplay.PlaceHolderImage'));
+        $sender->setData('PlaceholderImage', $placeholderImg);
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
 
@@ -220,7 +221,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
      *
      * @param  DiscussionsController Object $sender
      * @param  DiscussionsController Array $args
-     */  
+     */
     public function discussionsController_beforeDiscussionName_handler($sender, $args) {
         if (valr('Discussion.CatalogueDisplay', $args)) {
             $args['CssClass'] .= ' CatalogueRow';
