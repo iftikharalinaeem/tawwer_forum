@@ -6,14 +6,12 @@
 
 namespace Vanilla\ThemingApi;
 
-use Garden\Web\Exception\ServerException;
 use Gdn_Upload;
 use Vanilla\Addon;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeModel as ThemingModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
-use Vanilla\Models\ThemeVariablesTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn_Request;
@@ -36,7 +34,6 @@ class DbThemeProvider implements ThemeProviderInterface {
 
     const SELECT_FIELDS = ['themeID', 'parentTheme', 'name', 'current', 'dateUpdated', 'dateInserted'];
 
-    use ThemeVariablesTrait;
     /**
      * @var ThemeAssetModel
      */
@@ -66,6 +63,8 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @param ThemingModel $themeModel
      * @param ConfigurationInterface $config
      * @param Gdn_Request $request
+     * @param ThemeModelHelper $themeHelper
+     * @param FsThemeProvider $fsThemeProvider
      */
     public function __construct(
         ThemeAssetModel $themeAssetModel,
@@ -226,22 +225,12 @@ class DbThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrent($themeID = null): ?array {
-        if ($themeID) {
-            try {
-                $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
-            } catch (NoResultsException $e) {
-                return null;
-            }
-        } else {
-            try {
-                $theme = $this->themeModel->selectSingle(['current' => 1]);
-            } catch (NoResultsException $e) {
-                return null;
-            }
+    public function getCurrent(): ?array {
+        try {
+            $theme = $this->themeModel->selectSingle(['current' => 1]);
+        } catch (NoResultsException $e) {
+            return null;
         }
-
-
 
         return $this->normalizeTheme(
             $theme,
@@ -261,7 +250,7 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function sparseAsset(int $themeID, string $assetKey, string $data): array {
-        $flat = flattenArray('^|^', json_decode($this->getAssetData($themeID, $assetKey, $data), true));
+        $flat = flattenArray('^|^', json_decode($this->getAssetData($themeID, $assetKey), true));
         $assetData = flattenArray('^|^', json_decode($data, true));
         foreach ($assetData as $key => $val) {
             $flat[$key] = $val;
@@ -280,9 +269,7 @@ class DbThemeProvider implements ThemeProviderInterface {
             $content = $asset['data'];
         } catch (NoResultsException $e) {
             $content = ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
-            if ($assetKey === ThemeModel::VARIABLES) {
-                $content = $this->addAddonVariables($content);
-            } elseif ($assetKey === ThemeModel::JAVASCRIPT) {
+            if ($assetKey === ThemeModel::JAVASCRIPT) {
                 // when some asset is not defined on DB level yet
                 // lets check if parent theme template has it implemented and substitute it
                 // if we need to reset parent asset empty asset should be posted
@@ -303,13 +290,7 @@ class DbThemeProvider implements ThemeProviderInterface {
         $content = '';
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
         if (!empty($theme['parentTheme'])) {
-            $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
-            if ($filename = $parentTheme->getInfo()['assets'][$assetKey]['file'] ?? false) {
-                $filename = $parentTheme->path('/assets/'.$filename);
-                if (file_exists($filename)) {
-                    $content = file_get_contents($filename);
-                }
-            }
+            $content = $this->fsThemeProvider->getAssetData($theme['parentTheme'], $assetKey);
         }
         return $content;
     }
@@ -319,23 +300,6 @@ class DbThemeProvider implements ThemeProviderInterface {
      */
     public function deleteAsset($themeKey, string $assetKey) {
         $this->themeAssetModel->deleteAsset($themeKey, $assetKey);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getThemeViewPath($themeID): string {
-        $themeKey = $this->config->get('Garden.Theme');
-        try {
-            $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
-            if (!empty($theme['parentTheme'])) {
-                $themeKey = $theme['parentTheme'];
-            }
-        } catch (NoResultsException $e) {
-            // do nothing and default theme view folder of Garden.Theme
-        }
-
-        return $this->fsThemeProvider->getThemeViewPath($themeKey);
     }
 
     /**
@@ -353,11 +317,6 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getName($themeID): string {
         $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name']]);
         return $theme['name'];
-    }
-
-    public function getTheme($themeID) {
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
-        return $theme;
     }
 
     /**
@@ -387,11 +346,11 @@ class DbThemeProvider implements ThemeProviderInterface {
         );
 
         foreach ($primaryAssets as $assetKey => $asset) {
-            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset, $theme);
+            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset);
         }
 
-        $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css', true);
-        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js', true);
+        $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css');
+        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js');
 
         $logos = [
             "logo" => "Garden.Logo",
@@ -425,15 +384,11 @@ class DbThemeProvider implements ThemeProviderInterface {
     public function getDefaultAssets(array $theme): array {
         $assets = [];
         foreach (\Vanilla\Models\ThemeModel::ASSET_LIST as $assetKey => $assetDefinition) {
-            if ($assetKey === 'variables') {
-                $assets[$assetKey] =  $this->generateAsset($assetKey, $this->addAddonVariables($assetDefinition['default']));
-            } else {
-                $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
-            }
+            $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
         }
 
-        $assets[ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css', true);
-        $assets[ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js', true);
+        $assets[ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css');
+        $assets[ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js');
         return $assets;
     }
 
