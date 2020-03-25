@@ -21,10 +21,14 @@ import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { WebhookAddEdit } from "@webhooks/WebhookAddEdit";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
+import { useHistory, RouteComponentProps, withRouter } from 'react-router-dom';
 
 registerReducer("webhooks", WebhookReducer);
 
-export default function WebhooksIndexPage() {
+interface IOwnProps extends RouteComponentProps<{}> {
+}
+
+function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
@@ -35,6 +39,7 @@ export default function WebhooksIndexPage() {
         // All parameters come from query so they will be strings.
         // Be sure to convert numbers/booleans/etc.
     }>();
+    const history = useHistory()
 
     const webhooks = useWebhooks();
     const closeForm = () => {
@@ -47,13 +52,15 @@ export default function WebhooksIndexPage() {
     }
 
     if (isFormOpen) {
+        props.history.push("/webhook-settings/add");
         return (
             <>
+          
                 <WebhookDashboardHeaderBlock
                     title={t("Add Webhook")}
                     showBackLink={true}
                     onBack={() => {
-                        closeForm();
+                        //props.history.push("/webhook-settings/back");
                     }}
                 />
                 <WebhookAddEdit />
@@ -71,7 +78,7 @@ export default function WebhooksIndexPage() {
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
                         onClick={() => {
                             setIsFormOpen(true);
-                        }}
+                            }}
                     >
                         {t("Add Webhook")}
                     </Button>
@@ -109,3 +116,5 @@ export default function WebhooksIndexPage() {
         </>
     );
 }
+
+export default withRouter(WebhooksIndexPage);

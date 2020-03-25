@@ -27,11 +27,17 @@ export enum WebhookStatus {
     DISABLED = "disabled",
 }
 
+export enum WebhooksEventsSelect {
+    ALL = "all",
+    INDIVIDUAL = "individual",
+}
+
 export interface IWebhookState {
     webhooksByID: ILoadable<{
         [id: number]: IWebhook;
     }>;
     form: IWebhookFormState;
+    formSubmit: ILoadable<{}>;
 }
 
 export interface IWebhookFormState {
@@ -57,6 +63,9 @@ export const INITIAL_WEBHOOK_STATE: IWebhookState = {
         status: LoadStatus.PENDING,
     },
     form: INITIAL_WEBHOOK_FORM,
+    formSubmit: {
+        status: LoadStatus.PENDING,
+    },
 };
 
 export interface IWebhookStoreState {
