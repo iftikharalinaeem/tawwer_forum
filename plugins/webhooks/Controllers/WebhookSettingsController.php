@@ -16,7 +16,7 @@ use Vanilla\Webhooks\Controllers\Api\WebhooksApiController;
 class WebhookSettingsController extends SettingsController {
 
     /** @var WebhooksApiController */
-    private $apiController;
+    private $webhooksApiController;
 
     /** @var Gdn_Request */
     private $request;
@@ -24,7 +24,7 @@ class WebhookSettingsController extends SettingsController {
     /**
      * WebhookSettingsController constructor.
      *
-     * @param WebhooksApiController $apiController
+     * @param WebhooksApiController $webhooksApiController
      * @param Gdn_Request $request
      */
     public function __construct(

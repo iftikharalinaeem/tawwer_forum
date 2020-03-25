@@ -5,11 +5,9 @@
 
 import React, { useState } from "react";
 import { useParams } from "react-router";
-import { RouteComponentProps } from "react-router";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
 import { WebhookStatus } from "@webhooks/WebhookTypes";
-import qs from "qs";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
 import Button from "@library/forms/Button";
@@ -19,7 +17,6 @@ import { useWebhooks } from "@webhooks/WebhookHooks";
 import { WebhookReducer } from "@webhooks/WebhookReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
-const { HeadItem } = DashboardTable;
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { WebhookAddEdit } from "@webhooks/WebhookAddEdit";
@@ -27,9 +24,8 @@ import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlo
 
 registerReducer("webhooks", WebhookReducer);
 
-interface IProps extends RouteComponentProps<{}> {}
-
-export default function WebhooksIndexPage(props: IProps) {
+export default function WebhooksIndexPage() {
+    const { HeadItem } = DashboardTable;
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
     const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
@@ -85,27 +81,19 @@ export default function WebhooksIndexPage(props: IProps) {
                 head={
                     <tr>
                         <HeadItem>Webhooks</HeadItem>
-                        <HeadItem size={TableColumnSize.XS}>Status</HeadItem>
-                        <HeadItem size={TableColumnSize.XS}>Options</HeadItem>
+                        <HeadItem size={TableColumnSize.XS}>{t("Status")}</HeadItem>
+                        <HeadItem size={TableColumnSize.XS}>{t("Options")}</HeadItem>
                     </tr>
                 }
                 body={Object.values(webhooks.data).map(webhook => (
                     <WebhooksTableRow
                         key={webhook.webhookID}
                         webhook={webhook}
-                        forStatus={status}
                         onEditClick={
                             status === WebhookStatus.ACTIVE
                                 ? () => {
                                       setEditingID(webhook.webhookID);
                                       setIsFormOpen(true);
-                                  }
-                                : undefined
-                        }
-                        onPurgeClick={
-                            status === WebhookStatus.DISABLED
-                                ? () => {
-                                      setPurgeID(webhook.webhookID);
                                   }
                                 : undefined
                         }

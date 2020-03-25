@@ -13,7 +13,6 @@ import Button from "@library/forms/Button";
 
 interface IProps {
     webhook: IWebhook;
-    forStatus: WebhookStatus;
     onEditClick?: () => void;
     onStatusChangeClick: () => void;
 }

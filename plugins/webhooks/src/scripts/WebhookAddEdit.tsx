@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import React from "react";
 
 interface IProps {
@@ -7,8 +12,7 @@ interface IProps {
 
 export function WebhookAddEdit(props: IProps) {
     const onBack = () => {
-        alert(1);
-        props.onBack();
+        if (props.onBack) props.onBack();
     };
 
     return <>hello from the form</>;
