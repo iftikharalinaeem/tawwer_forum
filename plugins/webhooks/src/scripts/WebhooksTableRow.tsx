@@ -5,7 +5,7 @@
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import {IWebhook, WebhookStatus} from "@webhooks/WebhookTypes";
+import { IWebhook, WebhookStatus } from "@webhooks/WebhookTypes";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import React from "react";
@@ -23,10 +23,10 @@ export function WebhooksTableRow(props: IProps) {
     return (
         <tr>
             <td>
-                <DashboardMediaItem title={webhook.name} info={webhook.url}/>
+                <DashboardMediaItem title={webhook.name} info={webhook.url} />
             </td>
             <td>
-                <DashboardMediaItem title={webhook.status} info= ''/>
+                <DashboardMediaItem title={webhook.status} info="" />
             </td>
             <td>
                 <DashboardTableOptions>
@@ -36,7 +36,11 @@ export function WebhooksTableRow(props: IProps) {
                         </Button>
                     )}
                     {props.onStatusChangeClick && (
-                        <Button className="btn-icon" onClick={props.onStatusChangeClick} baseClass={ButtonTypes.ICON_COMPACT}>
+                        <Button
+                            className="btn-icon"
+                            onClick={props.onStatusChangeClick}
+                            baseClass={ButtonTypes.ICON_COMPACT}
+                        >
                             <DeleteIcon />
                         </Button>
                     )}

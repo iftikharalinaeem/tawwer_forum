@@ -6,15 +6,10 @@ interface IProps {
 }
 
 export function WebhookAddEdit(props: IProps) {
-
     const onBack = () => {
         alert(1);
         props.onBack();
     };
 
-    return (
-        <>
-            hello from the form
-        </>
-    )
+    return <>hello from the form</>;
 }

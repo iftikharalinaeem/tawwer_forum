@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { useParams } from "react-router";
-import { BrowserRouter } from "react-router-dom";
+import { RouteComponentProps } from "react-router";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
 import { WebhookStatus } from "@webhooks/WebhookTypes";
@@ -22,10 +22,14 @@ import { DashboardTable } from "@dashboard/tables/DashboardTable";
 const { HeadItem } = DashboardTable;
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
+import { WebhookAddEdit } from "@webhooks/WebhookAddEdit";
+import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
 
 registerReducer("webhooks", WebhookReducer);
 
-export default function WebhooksIndexPage() {
+interface IProps extends RouteComponentProps<{}> {}
+
+export default function WebhooksIndexPage(props: IProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
     const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
@@ -37,10 +41,28 @@ export default function WebhooksIndexPage() {
     }>();
 
     const webhooks = useWebhooks();
+    const closeForm = () => {
+        setIsFormOpen(false);
+    };
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
     if (!webhooks.data) {
         return <Loader />;
+    }
+
+    if (isFormOpen) {
+        return (
+            <>
+                <WebhookDashboardHeaderBlock
+                    title={t("Add Webhook")}
+                    showBackLink={true}
+                    onBack={() => {
+                        closeForm();
+                    }}
+                />
+                <WebhookAddEdit />
+            </>
+        );
     }
 
     return (
@@ -48,7 +70,13 @@ export default function WebhooksIndexPage() {
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
-                    <Button buttonRef={toggleButtonRef} baseClass={ButtonTypes.DASHBOARD_PRIMARY}>
+                    <Button
+                        buttonRef={toggleButtonRef}
+                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
+                        onClick={() => {
+                            setIsFormOpen(true);
+                        }}
+                    >
                         {t("Add Webhook")}
                     </Button>
                 }
