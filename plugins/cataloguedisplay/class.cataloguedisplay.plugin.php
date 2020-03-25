@@ -13,9 +13,11 @@ use Vanilla\Web\TwigRenderTrait;
  * Creates a "catalogue" style for viewing discussions.
  * This means that the first thumbnail in the Discussion is displayed when listed on the Recent Discussions or the Category page.
  */
-class CatalogueDisplayPlugin extends Gdn_Plugin{
+class CatalogueDisplayPlugin extends Gdn_Plugin {
 
     use TwigRenderTrait;
+
+    const DEFAULT_USE_ONLY_ON_CATEGORY = true;
 
     /**
      * Fires on Utility Update or when the plugin is turned on.
@@ -33,12 +35,14 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
         Gdn::structure()
             ->table('Category')
             ->column('CatalogueDisplay', 'tinyint(1)', ['Null' => false, 'Default' => 0])
-            ->set();
+            ->set()
+        ;
 
         Gdn::structure()
             ->table('Discussion')
             ->column('CatalogueDisplay', 'tinyint(1)', ['Null' => false, 'Default' => 0])
-            ->set();
+            ->set()
+        ;
     }
 
     /**
@@ -101,6 +105,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
             if ($sender->Form->getFormValue('Photo', false) === '') {
                 $sender->Form->removeFormValue('Photo');
             }
+            $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
+            Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
 
             try {
                 // Upload image
@@ -142,7 +148,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 throw $ex;
             }
         }
-        $placeholderImg = !empty(c('CatalogueDisplay.PlaceHolderImage'))?img(c('CatalogueDisplay.PlaceHolderImage')):null;
+        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::DEFAULT_USE_ONLY_ON_CATEGORY));
+        $placeholderImg = !empty(c('CatalogueDisplay.PlaceHolderImage')) ? img(c('CatalogueDisplay.PlaceHolderImage')) : null;
         $sender->setData('PlaceholderImage', $placeholderImg);
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
@@ -223,8 +230,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
     /**
      * Add the CSS class to "catalogue" displayed discussions in the discussion view.
      *
-     * @param  DiscussionsController Object $sender
-     * @param  DiscussionsController Array $args
+     * @param DiscussionsController Object $sender
+     * @param DiscussionsController Array $args
      */
     public function discussionsController_beforeDiscussionName_handler($sender, $args) {
         if (valr('Discussion.CatalogueDisplay', $args)) {
@@ -268,6 +275,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
         if (!$photo && $placeHolderUrl) {
             $photo = img($placeHolderUrl, ['class' => 'placeholder-image', 'alt' => t('Placeholder')]);
         }
+
         return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo]);
     }
 
@@ -294,6 +302,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
                 }
             }
         }
+
         // if not get the image URL using pQuery and cache the results
         return $imageUrl;
     }
