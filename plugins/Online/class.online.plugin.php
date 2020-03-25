@@ -127,7 +127,7 @@ class OnlinePlugin extends Gdn_Plugin {
     const DEFAULT_STYLE = 'pictures';
     const DEFAULT_LOCATION = 'every';
     const DEFAULT_HIDE = 'true';
-    const DEFAULT_CHECK_ENTIRE_SITE = 'true';
+    const DEFAULT_CHECK_ENTIRE_SITE = false;
 
     public function __construct(UserModel $userModel = null) {
         parent::__construct();
