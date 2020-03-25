@@ -926,7 +926,9 @@ class Warnings2Plugin extends Gdn_Plugin {
             throw notFoundException('User');
         }
         // Check to make sure the session user has a higher permission level than the user to be warned.
-        Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID);
+        if (!Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID)) {
+            throw permissionException();
+        }
 
         $sender->User = $user;
 
