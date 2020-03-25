@@ -4,6 +4,8 @@
  * @license proprietary
  */
 
+use Vanilla\Web\TwigRenderTrait;
+
 
 /**
  * Class CatalogueDisplayPlugin
@@ -12,6 +14,8 @@
  * This means that the first thumbnail in the Discussion is displayed when listed on the Recent Discussions or the Category page.
  */
 class CatalogueDisplayPlugin extends Gdn_Plugin{
+
+    use TwigRenderTrait;
 
     /**
      * Fires on Utility Update or when the plugin is turned on.
@@ -264,8 +268,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin{
         if (!$photo && $placeHolderUrl) {
             $photo = img($placeHolderUrl, ['class' => 'placeholder-image', 'alt' => t('Placeholder')]);
         }
-
-        return wrap($photo, 'div', ['class' => 'catalogue-image-wrapper']);
+        return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo]);
     }
 
     /**
