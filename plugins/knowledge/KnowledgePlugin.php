@@ -16,6 +16,7 @@ use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Models\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Web\Robots;
@@ -152,7 +153,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('addSmartID', ['knowledgeCategoryID', 'knowledge-categories', ['foreignID'], 'knowledgeCategory'])
             ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
             ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
-            ;
+        ;
+
+        $container->rule(ThemeSectionModel::class)
+            ->addCall('registerModernSection', [t('Knowledge Base')]);
     }
 
     /**

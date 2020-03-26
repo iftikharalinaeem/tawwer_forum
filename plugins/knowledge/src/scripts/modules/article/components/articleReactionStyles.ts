@@ -4,11 +4,10 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
+import { clickableItemStates, colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
-import { clickableItemStates } from "@library/styles/styleHelpers";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");

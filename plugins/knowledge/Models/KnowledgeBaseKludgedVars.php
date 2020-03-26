@@ -42,18 +42,6 @@ class KnowledgeBaseKludgedVars {
     }
 
     /**
-     * Lazily check if we can use kludge vars.
-     *
-     * We cannot DI this class because it leads to an infinite loop.
-     * Instead we will lazily fetch it.
-     *
-     * @return bool
-     */
-    private function disableKludgedVars(): bool {
-        return \Gdn::themeFeatures()->disableKludgedVars();
-    }
-
-    /**
      * Take a set of var data returned form this class, and prepare it for a Gdn_Form (or config module).
      *
      * @param array[] $varInfos
@@ -111,9 +99,6 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getGlobalColors(): array {
-        if ($this->disableKludgedVars()) {
-            return [];
-        }
         return [
             [
                 "VariableName" => "global.mainColors.primary",
@@ -154,9 +139,6 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getHeaderVars(): array {
-        if ($this->disableKludgedVars()) {
-            return [];
-        }
         return [
             [
                 "VariableName" => "titleBar.colors.bg",
@@ -287,9 +269,6 @@ class KnowledgeBaseKludgedVars {
      * @return array[]
      */
     public function getSizingVariables(): array {
-        if ($this->disableKludgedVars()) {
-            return [];
-        }
         return [
             [
                 "VariableName" => "global.middleColumn.width",
