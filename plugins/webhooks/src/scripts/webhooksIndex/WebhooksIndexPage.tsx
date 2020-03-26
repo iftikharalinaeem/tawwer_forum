@@ -51,8 +51,8 @@ function WebhooksIndexPage(props: IOwnProps) {
         return <Loader />;
     }
 
-    if (isFormOpen) {
-        props.history.push("/webhook-settings/add");
+    //if (isFormOpen) {
+        //props.history.push("/webhook-settings/add");
         return (
             <>
           
@@ -66,7 +66,7 @@ function WebhooksIndexPage(props: IOwnProps) {
                 <WebhookAddEdit />
             </>
         );
-    }
+    //}
 
     return (
         <>
@@ -78,7 +78,7 @@ function WebhooksIndexPage(props: IOwnProps) {
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
                         onClick={() => {
                             setIsFormOpen(true);
-                            }}
+                        }}
                     >
                         {t("Add Webhook")}
                     </Button>

@@ -8,7 +8,6 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IWebhook } from "./WebhookTypes";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { WebhookActions } from "@webhooks/WebhookActions";
-import { RoleActions } from "@dashboard/roles/RoleActions";
 import { IWebhookState, INITIAL_WEBHOOK_STATE } from "@webhooks/WebhookTypes";
 
 export const WebhookReducer = produce(
@@ -30,9 +29,16 @@ export const WebhookReducer = produce(
             };
             return state;
         })
-        .case(RoleActions.getAllACs.failed, (nextState, action) => {
-            nextState.webhooksByID.status = LoadStatus.ERROR;
-            nextState.webhooksByID.error = action.error;
-            return nextState;
-        }),
+        .case(WebhookActions.getAllWebhookACs.failed, (state, action) => {
+            state.webhooksByID.status = LoadStatus.ERROR;
+            state.webhooksByID.error = action.error;
+            return state;
+        })
+        .case(WebhookActions.updateFormAC, (state, payload) => {
+            state.form = {
+                ...state.form,
+                ...payload,
+            };
+            return state;
+        })
 );

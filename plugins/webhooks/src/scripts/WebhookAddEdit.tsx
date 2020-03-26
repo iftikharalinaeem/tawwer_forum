@@ -7,8 +7,8 @@ import React from "react";
 import { t } from "@vanilla/i18n";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { useWebhookActions } from "@webhooks/WebhookActions";
 import { useWebhookData, WebhooksEventsSelect } from "@webhooks/WebhookTypes";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
@@ -25,6 +25,7 @@ interface IProps {
 
 export function WebhookAddEdit(props: IProps) {
     const { form, formSubmit } = useWebhookData();
+    const { updateForm } = useWebhookActions();
     const isLoading = formSubmit.status === LoadStatus.LOADING;
     const onBack = () => {
         if (props.onBack) props.onBack();
@@ -40,6 +41,10 @@ export function WebhookAddEdit(props: IProps) {
                 <DashboardFormGroup label={t("Name")}>
                     <DashboardInput
                         inputProps={{
+                            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                const { value } = event.target;
+                                updateForm({ name: value });
+                            },
                             value: form.name,
                         }}
                     />
@@ -48,6 +53,10 @@ export function WebhookAddEdit(props: IProps) {
                     <DashboardInput
                         inputProps={{
                             placeholder: "https://",
+                            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                const { value } = event.target;
+                                updateForm({ url: value });
+                            },
                             value: form.url,
                         }}
                     />
@@ -55,6 +64,10 @@ export function WebhookAddEdit(props: IProps) {
                 <DashboardFormGroup label={t("Secret")} description={t("The Secret is used to sign each delivery.")}>
                     <DashboardInput
                         inputProps={{
+                            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                                const { value } = event.target;
+                                updateForm({ secret: value });
+                            },
                             value: form.secret,
                         }}
                     />

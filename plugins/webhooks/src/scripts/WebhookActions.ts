@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
-import { IWebhook } from "@webhooks/WebhookTypes";
+import { IWebhook, IWebhookFormState } from "@webhooks/WebhookTypes";
 import actionCreatorFactory from "typescript-fsa";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
@@ -23,6 +23,9 @@ export class WebhookActions extends ReduxActions {
         })();
         return this.dispatch(thunk);
     };
+
+    public static updateFormAC = createAction<Partial<IWebhookFormState>>("UPDATE_FORM");
+    public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
 }
 
 export function useWebhookActions() {
