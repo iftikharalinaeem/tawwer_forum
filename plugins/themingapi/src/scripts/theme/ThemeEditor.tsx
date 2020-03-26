@@ -8,7 +8,7 @@ import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationCon
 import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import React from "react";
 import ThemeBuilderForm from "./ThemeBuilderPanel";
-import { IThemeVariables } from "./themeEditorReducer";
+import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 export interface IProps {
     themeID: string | number;

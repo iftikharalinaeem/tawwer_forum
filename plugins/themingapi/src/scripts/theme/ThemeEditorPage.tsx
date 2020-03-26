@@ -23,7 +23,8 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
-import { IThemeAssets, useThemeEditorState } from "./themeEditorReducer";
+import { useThemeEditorState } from "./themeEditorReducer";
+import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 interface IProps extends IOwnProps {
     themeID: string | number;

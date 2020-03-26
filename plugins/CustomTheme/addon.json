@@ -1,7 +1,7 @@
 {
     "name": "Custom Theme",
     "description": "Allows administrators to customize the CSS & master HTML template of the currently enabled theme.",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "settingsUrl": "/settings/customtheme",
     "icon": "custom_theme.png",
     "usePopupSettings": false,

@@ -2,16 +2,40 @@
 
 // 2.1 - Added a fix so that css files are in a more unique url so it works with autostatic (which is not forum-specific).
 // 2.2 - Allow mobile style override.
+// 3.0 - Disable when shared masterview themes are enabled.
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\ThemeFeatures;
+use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
  * Class CustomThemePlugin
  */
 class CustomThemePlugin extends Gdn_Plugin {
 
+    const CONF_ENABLED = "Plugins.CustomTheme.Enabled";
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
+     * DI.
      *
+     * @param ThemeFeatures $themeFeatures
+     * @param ConfigurationInterface $config
+     */
+    public function __construct(ThemeFeatures $themeFeatures, ConfigurationInterface $config) {
+        parent::__construct();
+        $this->themeFeatures = $themeFeatures;
+        $this->config = $config;
+    }
+
+    /**
+     * Get the current revision ID from the config.
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
     public static function getRevisionID($key) {
@@ -43,6 +67,9 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @param $args
      */
     public function assetModel_generateETag_handler($sender, $args) {
+        if (!$this->canCustomizeTheme()) {
+            return;
+        }
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }
@@ -60,12 +87,16 @@ class CustomThemePlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add CSS to the page.
      *
-     *
-     * @param AssetModel $sender
-     * @return type
+     * @param LegacyAssetModel $sender
+     * @param array $args Event args.
+     * @return void
      */
-    public function assetModel_styleCss_handler($sender, $args) {
+    public function assetModel_styleCss_handler($sender, $args): void {
+        if (!$this->canCustomizeTheme()) {
+            return;
+        }
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }
@@ -152,7 +183,11 @@ class CustomThemePlugin extends Gdn_Plugin {
     /**
      * Can the current theme be customized?
      */
-    private function canCustomizeTheme() {
+    private function canCustomizeTheme(): bool {
+        if ($this->themeFeatures->useSharedMasterView()) {
+            return false;
+        }
+
         $themeInfo = Gdn::addonManager()->lookupTheme(self::getCurrentThemeKey());
         if (empty($themeInfo)) {
             return false;
@@ -184,6 +219,9 @@ class CustomThemePlugin extends Gdn_Plugin {
      * Add the theme CSS customizations.
      */
     public function base_beforeAddCss_handler($sender) {
+        if (!$this->canCustomizeTheme()) {
+            return;
+        }
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }
@@ -223,6 +261,9 @@ class CustomThemePlugin extends Gdn_Plugin {
      * @param $sender
      */
     public function base_beforeFetchMaster_handler($sender) {
+        if (!$this->canCustomizeTheme()) {
+            return;
+        }
         if (isMobile() && !c('Plugins.CustomTheme.OverrideMobile')) {
             return;
         }
@@ -369,7 +410,7 @@ class CustomThemePlugin extends Gdn_Plugin {
     public function settingsController_customTheme_create($sender) {
         $session = Gdn::session();
         $userModel = Gdn::userModel();
-        $pluginEnabled = c('Plugins.CustomTheme.Enabled', false);
+        $pluginEnabled = c('Plugins.CustomTheme.Enabled', false) && $this->canCustomizeTheme();
         $sender->permission('Garden.Settings.Manage');
         $sender->title('Customize Theme');
         $sender->setHighlightRoute('settings/customtheme');

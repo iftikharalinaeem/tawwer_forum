@@ -346,11 +346,21 @@ class DbThemeProvider implements ThemeProviderInterface {
         );
 
         foreach ($primaryAssets as $assetKey => $asset) {
-            $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset);
+            if ($asset !== null) {
+                $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset);
+            } else {
+                unset($res['assets'][$assetKey]);
+            }
         }
 
-        $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css');
-        $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js');
+        // Fix these linked assets to be links.
+        if ($res['assets'][ThemeModel::STYLES] ?? false) {
+            $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css');
+        }
+
+        if ($res["assets"][ThemeModel::JAVASCRIPT] ?? false) {
+            $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js');
+        }
 
         $logos = [
             "logo" => "Garden.Logo",
@@ -387,8 +397,6 @@ class DbThemeProvider implements ThemeProviderInterface {
             $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
         }
 
-        $assets[ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/styles.css');
-        $assets[ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/custom-theme/'.$theme['themeID'].'/javascript.js');
         return $assets;
     }
 
@@ -399,7 +407,10 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @param string $data
      * @return Asset
      */
-    private function generateAsset(string $key, string $data): ?Asset {
+    private function generateAsset(string $key, ?string $data): ?Asset {
+        if (!$data) {
+            return null;
+        }
         $type = ThemeModel::ASSET_LIST[$key]["type"];
 
         switch ($type) {
