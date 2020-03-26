@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
@@ -21,12 +21,11 @@ import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { WebhookAddEdit } from "@webhooks/WebhookAddEdit";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
-import { useHistory, RouteComponentProps, withRouter } from 'react-router-dom';
+import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
 
 registerReducer("webhooks", WebhookReducer);
 
-interface IOwnProps extends RouteComponentProps<{}> {
-}
+interface IOwnProps extends RouteComponentProps<{}> {}
 
 function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
@@ -35,15 +34,14 @@ function WebhooksIndexPage(props: IOwnProps) {
     const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
     const [purgeID, setPurgeID] = useState<number | null>(null);
     const params = useParams<{
-        // Types of the params from your route match.
-        // All parameters come from query so they will be strings.
-        // Be sure to convert numbers/booleans/etc.
+       
     }>();
-    const history = useHistory()
-
+    const history = useHistory();
+ 
     const webhooks = useWebhooks();
     const closeForm = () => {
         setIsFormOpen(false);
+        setEditingID(null);
     };
     const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
@@ -51,23 +49,41 @@ function WebhooksIndexPage(props: IOwnProps) {
         return <Loader />;
     }
 
-    //if (isFormOpen) {
-        //props.history.push("/webhook-settings/add");
+    const { webhookID } = props;
+    const isEditing = webhookID != null;
+
+    useEffect(() => {
+            if (isEditing) {
+                props.history.push(`/webhook-settings/edit/${webhookID}/edit`);
+            }
+
+        // return () => {
+        //     history.push('/webhook-settings');
+        // }
+     
+    }, [isEditing, history, webhookID]);
+
+    if (isFormOpen) {
+       // alert('here2');
         return (
             <>
-          
                 <WebhookDashboardHeaderBlock
                     title={t("Add Webhook")}
                     showBackLink={true}
                     onBack={() => {
-                        //props.history.push("/webhook-settings/back");
+                        props.history.push("/webhook-settings");
                     }}
                 />
-                <WebhookAddEdit />
+                <WebhookAddEdit 
+                webhookID={editingID ?? undefined}
+                onClose={() => {
+                    closeForm();
+                    toggleButtonRef.current?.focus();  
+                }}
+                />
             </>
         );
-    //}
-
+    }
     return (
         <>
             <DashboardHeaderBlock
@@ -76,8 +92,9 @@ function WebhooksIndexPage(props: IOwnProps) {
                     <Button
                         buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        onClick={() => {
+                        onClick={() => { 
                             setIsFormOpen(true);
+                            props.history.push('/webhook-settings/add');
                         }}
                     >
                         {t("Add Webhook")}

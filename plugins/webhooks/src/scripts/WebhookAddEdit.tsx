@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
@@ -14,9 +14,12 @@ import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
+import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
+import { useHistory } from "react-router-dom";
+import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles"; 
 
 interface IProps {
     webhookID?: number;
@@ -27,10 +30,12 @@ export function WebhookAddEdit(props: IProps) {
     const { form, formSubmit } = useWebhookData();
     const { updateForm } = useWebhookActions();
     const isLoading = formSubmit.status === LoadStatus.LOADING;
+    const webhookCSSClasses = webhookAddEditClasses();
     const onBack = () => {
         if (props.onBack) props.onBack();
     };
-
+    //const titleString = isEditing ? t("Edit Webook") : t("Add Webhook");
+    
     return (
         <>
             <form
@@ -74,45 +79,66 @@ export function WebhookAddEdit(props: IProps) {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
                     <DashboardRadioGroup
-                        value={form.events}
+                        value={WebhookEvents.ALL}
                         onChange={events => {
+                            if (events === WebhookEvents.ALL) {
+                                updateForm({ events: [WebhookEvents.ALL] });
+                            }
                             updateForm({ events: events as WebhookEvents });
                         }}
                     >
                         <DashboardRadioButton
+                            className={webhookCSSClasses.statusRadio}
                             label={"Send all events to the webhook."}
                             value={WebhookEvents.ALL}
                             name={WebhookEvents.ALL}
                             disabled={isLoading}
                         />
                         <DashboardRadioButton
+                            className={webhookCSSClasses.statusRadio}
                             label={"Select individual events."}
                             value={WebhookEvents.INDIVIDUAL}
                             name={WebhookEvents.INDIVIDUAL}
                             disabled={isLoading}
                         />
+                        <div className={webhookCSSClasses.inlinePullRight}>
+                            <DashboardCheckBox
+                                label={"Comments"}
+                                className={webhookCSSClasses.inlineCheckbox}
+                                checked={false}
+                            />
+                            <DashboardCheckBox
+                                label={"Categories"}
+                                className={webhookCSSClasses.inlineCheckbox}
+                                checked={false}
+                            />
+                            <DashboardCheckBox
+                                label={"Discussions"}
+                                className={webhookCSSClasses.inlineCheckbox}
+                                checked={false}
+                            />
+                            <DashboardCheckBox
+                                label={"Users"}
+                                className={webhookCSSClasses.inlineCheckbox}
+                                checked={false}
+                            />
+                        </div>
                     </DashboardRadioGroup>
                 </DashboardFormGroup>
-                <DashboardFormGroup 
+                <DashboardFormGroup
                     label={t("Active")}
                     description={t("Whether or not events will be delivered to this webhook.")}
                     labelType={DashboardLabelType.WIDE}
                 >
                     <DashboardToggle
-                        onChange={(isToggled) => {
-                            console.log(isToggled);
-                            updateForm({ status: (isToggled ? WebhookStatus.ACTIVE : WebhookStatus.DISABLED) });
+                        onChange={isToggled => {
+                            updateForm({ status: isToggled ? WebhookStatus.ACTIVE : WebhookStatus.DISABLED });
                         }}
-                        checked={form.status}
-                        disabled={isLoading}
+                        checked={form.status === WebhookStatus.ACTIVE ? true : false}
                     />
                 </DashboardFormGroup>
                 <div className="Buttons form-footer">
-                    <Button
-                        submit={true}
-                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        disabled={isLoading}
-                    >
+                    <Button submit={true} baseClass={ButtonTypes.DASHBOARD_PRIMARY} disabled={isLoading}>
                         {isLoading ? <ButtonLoader /> : t("Save")}
                     </Button>
                 </div>

@@ -40,5 +40,5 @@ export const WebhookReducer = produce(
                 ...payload,
             };
             return state;
-        })
+        }),
 );
