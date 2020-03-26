@@ -12,7 +12,7 @@ import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/c
 
 export interface IWebhook {
     webhookID: number;
-    status: string;
+    status: WebhookStatus;
     name: string;
     events: WebhookEvents;
     url: string;
@@ -43,7 +43,7 @@ export interface IWebhookState {
 
 export interface IWebhookFormState {
     webhookID: number;
-    status: string;
+    status: WebhookStatus;
     name: string;
     events: WebhookEvents;
     url: string;
@@ -52,7 +52,7 @@ export interface IWebhookFormState {
 
 export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
     webhookID: 0,
-    status: "",
+    status: WebhookStatus.ACTIVE,
     name: "",
     events: WebhookEvents.ALL,
     url: "",

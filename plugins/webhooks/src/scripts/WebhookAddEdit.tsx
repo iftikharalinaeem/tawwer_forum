@@ -9,7 +9,7 @@ import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { useWebhookActions } from "@webhooks/WebhookActions";
-import { useWebhookData, WebhookEvents } from "@webhooks/WebhookTypes";
+import { useWebhookData, WebhookEvents, WebhookStatus } from "@webhooks/WebhookTypes";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
@@ -99,8 +99,12 @@ export function WebhookAddEdit(props: IProps) {
                     labelType={DashboardLabelType.WIDE}
                 >
                     <DashboardToggle
-                        onChange={() => {}}
-                        checked={true}
+                        onChange={(isToggled) => {
+                            console.log(isToggled);
+                            updateForm({ status: (isToggled ? WebhookStatus.ACTIVE : WebhookStatus.DISABLED) });
+                        }}
+                        checked={form.status}
+                        disabled={isLoading}
                     />
                 </DashboardFormGroup>
                 <div className="Buttons form-footer">
