@@ -18,7 +18,6 @@ import { enableComponentTheming } from "@vanilla/library/src/scripts/utility/com
 
 // force theming, even though this is a "dashboard" page.
 enableComponentTheming();
-resetThemeCache();
 export default function ThemeEditorPreviewPage() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
