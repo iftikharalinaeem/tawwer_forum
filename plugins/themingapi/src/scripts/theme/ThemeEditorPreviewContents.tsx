@@ -160,10 +160,7 @@ function PanelActivator(props: { panel: ActiveVariablePanel; children: React.Rea
         >
             {props.children}
             {props.panel === activePanel && (
-                <div
-                    className={classNames(classes.panelActivatorIndicator)}
-                    style={{ borderColor: color ? colorOut(color) : undefined }}
-                ></div>
+                <div className={classNames(classes.panelActivatorIndicator(color ? colorOut(color) : undefined))}></div>
             )}
         </div>
     );
