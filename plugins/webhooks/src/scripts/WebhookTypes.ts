@@ -9,11 +9,12 @@ import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/c
 /**
  * Interface representing a webhook base resource.
  */
+
 export interface IWebhook {
     webhookID: number;
     status: string;
     name: string;
-    events: [];
+    events: WebhookEvents;
     url: string;
     secret: string;
     dateInserted: string;
@@ -27,8 +28,8 @@ export enum WebhookStatus {
     DISABLED = "disabled",
 }
 
-export enum WebhooksEventsSelect {
-    ALL = "all",
+export enum WebhookEvents {
+    ALL = "*",
     INDIVIDUAL = "individual",
 }
 
@@ -44,7 +45,7 @@ export interface IWebhookFormState {
     webhookID: number;
     status: string;
     name: string;
-    events: [];
+    events: WebhookEvents;
     url: string;
     secret: string;
 }
@@ -53,7 +54,7 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
     webhookID: 0,
     status: "",
     name: "",
-    events: [],
+    events: WebhookEvents.ALL,
     url: "",
     secret: "",
 };

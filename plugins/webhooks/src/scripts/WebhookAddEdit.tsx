@@ -9,7 +9,7 @@ import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { useWebhookActions } from "@webhooks/WebhookActions";
-import { useWebhookData, WebhooksEventsSelect } from "@webhooks/WebhookTypes";
+import { useWebhookData, WebhookEvents } from "@webhooks/WebhookTypes";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
@@ -76,18 +76,19 @@ export function WebhookAddEdit(props: IProps) {
                     <DashboardRadioGroup
                         value={form.events}
                         onChange={events => {
+                            updateForm({ events: events as WebhookEvents });
                         }}
                     >
                         <DashboardRadioButton
                             label={"Send all events to the webhook."}
-                            value={WebhooksEventsSelect.ALL}
-                            name={WebhooksEventsSelect.ALL}
+                            value={WebhookEvents.ALL}
+                            name={WebhookEvents.ALL}
                             disabled={isLoading}
                         />
                         <DashboardRadioButton
                             label={"Select individual events."}
-                            value={WebhooksEventsSelect.INDIVIDUAL}
-                            name={WebhooksEventsSelect.INDIVIDUAL}
+                            value={WebhookEvents.INDIVIDUAL}
+                            name={WebhookEvents.INDIVIDUAL}
                             disabled={isLoading}
                         />
                     </DashboardRadioGroup>
