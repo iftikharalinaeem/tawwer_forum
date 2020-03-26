@@ -4,7 +4,7 @@
  */
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { setAllLinkColors } from "@library/styles/styleHelpersLinks";
+import { clickableItemStates } from "@library/styles/styleHelpersLinks";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { paddings } from "@library/styles/styleHelpersSpacing";
 import { borders, unit } from "@library/styles/styleHelpers";
@@ -16,7 +16,7 @@ export const relatedArticlesClasses = useThemeCache(() => {
 
     const root = style({});
 
-    const linkColors = setAllLinkColors();
+    const linkColors = clickableItemStates();
 
     const linkList = style("linkList", {
         display: "flex",
@@ -38,7 +38,7 @@ export const relatedArticlesClasses = useThemeCache(() => {
             vertical: globalVars.gutter.half,
         }),
         color: colorOut(globalVars.mainColors.fg),
-        $nest: linkColors.nested,
+        $nest: linkColors.$nest,
     });
 
     const border = style("border", {

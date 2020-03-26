@@ -159,7 +159,7 @@ export const folderContentsClasses = useThemeCache(() => {
                 focus: {
                     backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
-                accessibleFocus: {
+                keyboardFocus: {
                     backgroundColor: colorOut(globalVars.states.hover.highlight),
                 },
                 active: {

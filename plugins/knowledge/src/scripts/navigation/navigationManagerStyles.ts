@@ -242,7 +242,7 @@ export const navigationManagerClasses = useThemeCache(() => {
             active: {
                 color: colorOut(globalVars.mainColors.primary),
             },
-            focusNotKeyboard: {
+            clickFocus: {
                 outline: 0,
             },
         }),
@@ -371,7 +371,7 @@ export const navigationManagerClasses = useThemeCache(() => {
         alignItems: "center",
         $nest: {
             ...buttonStates({
-                focusNotKeyboard: {
+                clickFocus: {
                     outline: 0,
                 },
                 allStates: {
