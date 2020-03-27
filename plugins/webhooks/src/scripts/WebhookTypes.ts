@@ -43,7 +43,6 @@ export interface IPatchWebhookRequest {
     name: string;
     url: string;
     secret: string;
-   
 }
 export interface IPostWebhookRequest {
     description: string;
@@ -85,7 +84,7 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     webhooksByID: {
         status: LoadStatus.PENDING,
-        deletesByID: ''
+        deletesByID: "",
     },
     form: INITIAL_WEBHOOK_FORM,
     formSubmit: {
@@ -97,6 +96,3 @@ export interface IWebhookStoreState {
     webhooks: IWebhookState;
 }
 
-export function useWebhookData() {
-    return useSelector((state: IWebhookStoreState) => state.webhooks);
-}

@@ -5,7 +5,15 @@
 
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
-import { IWebhook, IWebhookFormState, IPatchWebhookRequest,IPostWebhookRequest, IWebhookState, INITIAL_WEBHOOK_FORM,IWebhookStoreState } from "@webhooks/WebhookTypes";
+import {
+    IWebhook,
+    IWebhookFormState,
+    IPatchWebhookRequest,
+    IPostWebhookRequest,
+    IWebhookState,
+    INITIAL_WEBHOOK_FORM,
+    IWebhookStoreState,
+} from "@webhooks/WebhookTypes";
 import actionCreatorFactory from "typescript-fsa";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
@@ -28,9 +36,10 @@ type IPostWebhookResponse = IWebhook;
 type IPatchWebhookResponse = IWebhook;
 type IDeleteWebhookResponse = undefined;
 
-
 export class WebhookActions extends ReduxActions {
     public static readonly getAllWebhookACs = createAction.async<{}, IWebhook[], IApiError>("GET");
+    public static readonly getEditWebhookACs = createAction.async<{webhookID: number}, IWebhook[], IApiError>("GET_EDIT");
+    
     public getAll = () => {
         const thunk = bindThunkAction(WebhookActions.getAllWebhookACs, async () => {
             const response = await this.api.get(`/webhooks`, {});
@@ -39,11 +48,11 @@ export class WebhookActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public getEdit = (webhookID: number):Promise<IWebhook | null> => {
+    public getEdit = (webhookID: number): Promise<IWebhook | null> => {
         const thunk = bindThunkAction(WebhookActions.getEditWebhookACs, async () => {
             const response = await this.api.get(`/webhooks/${webhookID}/edit`, {});
             return response.data;
-        })({webhookID});
+        })({ webhookID });
         return this.dispatch(thunk);
     };
 
@@ -55,13 +64,13 @@ export class WebhookActions extends ReduxActions {
             //todo: check for errors
             this.updateForm(payload);
         }
-    }
+    };
 
     public static updateFormAC = createAction<Partial<IWebhookFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
 
-   public saveWebhookForm = async () => {
-        const form = this
+    public saveWebhookForm = async () => {
+        const form = this;
 
         if (form.name === null) {
             form.name = "";
@@ -72,13 +81,12 @@ export class WebhookActions extends ReduxActions {
         }
 
         if (form.webhookID != null) {
-           return await this.patchWebhook(form as any);
-       } else {
+            return await this.patchWebhook(form as any);
+        } else {
             return await this.postWebhook(form as any);
-       }
-        
+        }
     };
-  
+
     public patchWebhook(options: IPatchWebhookRequest) {
         const { webhookID, ...url } = options;
 
@@ -87,7 +95,7 @@ export class WebhookActions extends ReduxActions {
             return response.data;
         })(options);
 
-       return this.dispatch(thunk);
+        return this.dispatch(thunk);
     }
 }
 

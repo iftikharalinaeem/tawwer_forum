@@ -3,14 +3,15 @@
  * @license Proprietary
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import { useParams } from "react-router";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { useWebhookActions } from "@webhooks/WebhookActions";
-import { useWebhookData, EventType, WebhookStatus } from "@webhooks/WebhookTypes";
+import {EventType, WebhookStatus } from "@webhooks/WebhookTypes";
+import { useWebhookData, useWebhooks }  from "@webhooks/WebhookHooks";  
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
@@ -24,6 +25,7 @@ import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlo
 import { useHistory } from "react-router-dom";
 
 export function WebhookAddEdit() {
+    const webhooks = useWebhooks();
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm } = useWebhookActions();
     const params = useParams<{}>();
@@ -32,7 +34,7 @@ export function WebhookAddEdit() {
     const history = useHistory();
     const isLoading = formSubmit.status === LoadStatus.LOADING;
     const webhookCSSClasses = webhookAddEditClasses();
-    
+
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
         let events = JSON.parse(form.events);
         if (isChecked) {
@@ -43,6 +45,10 @@ export function WebhookAddEdit() {
 
         updateForm({ events: JSON.stringify(events) });
     };
+
+    useEffect(() => {
+        initForm(webhookID);
+    }, [webhookID, initForm]);
 
     return (
         <>

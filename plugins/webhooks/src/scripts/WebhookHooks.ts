@@ -3,11 +3,10 @@
  * @license Proprietary
  */
 
-import { WebhookStatus, IWebhook } from "@webhooks/WebhookTypes";
+import { WebhookStatus, IWebhook, IWebhookStoreState } from "@webhooks/WebhookTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { LoadStatus, ILoadable, ILinkListData } from "@vanilla/library/src/scripts/@types/api/core";
-import { IWebhookStoreState } from "@webhooks/WebhookReducer";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 
 export function useWebhooks() {
@@ -21,4 +20,10 @@ export function useWebhooks() {
     }, [getAll, webhooksByID]);
 
     return webhooksByID;
+}
+
+export function useWebhookData() {
+    const debug = useSelector((state: IWebhookStoreState) => state.webhooks);
+    //alert(debug);
+    return useSelector((state: IWebhookStoreState) => state.webhooks);
 }

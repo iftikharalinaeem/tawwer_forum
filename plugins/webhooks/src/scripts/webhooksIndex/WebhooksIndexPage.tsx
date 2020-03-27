@@ -14,14 +14,10 @@ import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Loader from "@library/loaders/Loader";
 import { useWebhooks } from "@webhooks/WebhookHooks";
-import { WebhookReducer } from "@webhooks/WebhookReducer";
-import { registerReducer } from "@library/redux/reducerRegistry";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
-
-registerReducer("webhooks", WebhookReducer);
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
@@ -51,11 +47,9 @@ function WebhooksIndexPage(props: IOwnProps) {
         <>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
+               
                 actionButtons={
-                    <LinkAsButton
-                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        to={"/webhook-settings/add"}
-                    >
+                    <LinkAsButton baseClass={ButtonTypes.DASHBOARD_PRIMARY} to={"/webhook-settings/add"}>
                         {t("Add Webhook")}
                     </LinkAsButton>
                 }
