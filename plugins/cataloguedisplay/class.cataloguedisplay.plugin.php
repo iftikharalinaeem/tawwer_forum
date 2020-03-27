@@ -18,6 +18,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
 
     const DEFAULT_USE_ONLY_ON_CATEGORY = true;
+    const DEFAULT_MASONRY_ENABLED = false;
 
     /**
      * Fires on Utility Update or when the plugin is turned on.
@@ -107,6 +108,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             }
             $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
             Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
+            $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
+            Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled.', $masonryEnabled);
 
             try {
                 // Upload image
@@ -149,6 +152,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             }
         }
         $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::DEFAULT_USE_ONLY_ON_CATEGORY));
+        $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::DEFAULT_MASONRY_ENABLED));
         $placeholderImg = !empty(c('CatalogueDisplay.PlaceHolderImage')) ? img(c('CatalogueDisplay.PlaceHolderImage')) : null;
         $sender->setData('PlaceholderImage', $placeholderImg);
         $sender->render('settings', '', 'plugins/cataloguedisplay');
@@ -267,7 +271,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $imageUrl = $this->findImageUrl($discussion);
         if ($imageUrl) {
             $imgTag = img($imageUrl, ['class' => 'catalogue-image']);
-            $photo = anchor($imgTag, $imageUrl, ['class' => 'mfp-image']);
+            $photo = anchor($imgTag, $imageUrl);
         }
 
         // If there is no image, look for the Placeholder Image saved in the config.
@@ -305,6 +309,17 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
 
         // if not get the image URL using pQuery and cache the results
         return $imageUrl;
+    }
+
+    /**
+     * @param CategoriesController $sender
+     */
+    public function categoriesController_render_before(CategoriesController $sender) {
+        if (c('CatalogueDisplay.Masonry.Enabled')) {
+            $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
+            $sender->addJsFile('masonry-categories.js', 'plugins/cataloguedisplay');
+            $sender->addCssFile('catalogue-masonry.css', 'plugins/cataloguedisplay');
+        }
     }
 }
 

@@ -1,0 +1,19 @@
+.ItemDiscussion.CatalogueRow{
+    display: inline-block;
+    width: 33.333%;
+}
+@media screen and (max-width: 767px) {
+    .ItemDiscussion.CatalogueRow{
+        display: inline-block;
+        width: 100%;
+    }
+}
+/*@media screen and (min-width: 767px) {*/
+/*    .ItemDiscussion.CatalogueRow .catalogue-image-wrapper{*/
+/*        width: initial;*/
+/*        height: initial;*/
+/*    }*/
+/*}*/
+.Discussions.masonry{
+    min-height: 200px;
+}
