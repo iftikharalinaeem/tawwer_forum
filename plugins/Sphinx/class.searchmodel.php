@@ -534,13 +534,15 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     /**
-     * @param string[] $indexNames
+     * Replace spinx index names with real names adjusted for current DB.
+     *
+     * @param string[] $indexWeights
      * @return array
      */
-    public function dbIndexNames(array $idxs) {
+    public function dbIndexNames(array $indexWeights): array {
         $indexes = [];
         $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
-        foreach ($idxs as $idxName => $weight) {
+        foreach ($indexWeights as $idxName => $weight) {
             $indexes[$prefix . $idxName] = $weight;
         }
 
@@ -600,6 +602,13 @@ class SphinxSearchModel extends \SearchModel {
         return $results['SearchResults'];
     }
 
+    /**
+     * Set soritng for Sphinx object
+     *
+     * @param $sphinx
+     * @param $terms
+     * @param $search
+     */
     public function setSort($sphinx, $terms, $search) {
         if (!isset($search['sort'])) {
             $sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000" );
