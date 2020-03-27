@@ -24,6 +24,7 @@ import { match } from "react-router";
 import { knowledgeCategoryEventFields } from "../analytics/KnowledgeAnalytics";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 /**
  * Page component for a flat category list.
@@ -94,9 +95,12 @@ export function CategoriesPage(props: IProps) {
         };
     });
 
+    const kb = props.knowledgeBase;
+
     // Render either a loading layout or a full layout.
     return (
         <DocumentTitle title={category.data.name}>
+            <Banner isContentBanner backgroundImage={kb?.bannerImage} contentImage={kb?.bannerContentImage} />
             <AnalyticsData
                 data={knowledgeCategoryEventFields(category.data)}
                 uniqueKey={category.data.knowledgeCategoryID}

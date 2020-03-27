@@ -25,6 +25,7 @@ import ScrollLock from "react-scrolllock";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -59,14 +60,19 @@ export default function NavigationLoadingLayout(props: IProps) {
         );
 
     return (
-        <Container>
-            <ScrollLock>
-                <>
-                    <TitleBar
-                        useMobileBackButton={true}
-                        isFixed={true}
-                        backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
-                    />
+        <ScrollLock>
+            <>
+                <TitleBar
+                    useMobileBackButton={true}
+                    isFixed={true}
+                    backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
+                />
+                <Banner
+                    isContentBanner
+                    backgroundImage={lastKB?.bannerImage}
+                    contentImage={lastKB?.bannerContentImage}
+                />
+                <Container>
                     <PanelLayout
                         renderLeftPanelBackground={renderPanelBackground}
                         breadcrumbs={device !== Devices.MOBILE && device !== Devices.XS && <BreadcrumbsLoader />}
@@ -117,8 +123,8 @@ export default function NavigationLoadingLayout(props: IProps) {
                             </>
                         }
                     />
-                </>
-            </ScrollLock>
-        </Container>
+                </Container>
+            </>
+        </ScrollLock>
     );
 }

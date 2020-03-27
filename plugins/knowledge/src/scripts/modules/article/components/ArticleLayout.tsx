@@ -31,6 +31,8 @@ import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/component
 import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
 
 interface IProps {
     useBackButton?: boolean;
@@ -94,21 +96,24 @@ export default function ArticleLayout(props: IProps) {
     return (
         <>
             {renderPanelBackground && <PanelBackground />}
+            <TitleBar
+                useMobileBackButton={props.useBackButton}
+                backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
+                extraBurgerNavigation={
+                    <Navigation
+                        collapsible={true}
+                        activeRecord={activeRecord}
+                        kbID={article.knowledgeBaseID}
+                        inHamburger
+                    />
+                }
+            />
+            <Banner
+                isContentBanner
+                backgroundImage={knowledgeBase.data?.bannerImage}
+                contentImage={knowledgeBase.data?.bannerContentImage}
+            />
             <Container>
-                <TitleBar
-                    useMobileBackButton={props.useBackButton}
-                    isFixed={true}
-                    backgroundColorForMobileDropdown={true} // Will be conditional, based on the settings, but it's true in the sense that it can be colored.
-                    extraBurgerNavigation={
-                        <Navigation
-                            collapsible={true}
-                            activeRecord={activeRecord}
-                            kbID={article.knowledgeBaseID}
-                            inHamburger
-                        />
-                    }
-                />
-
                 <PanelLayout
                     renderLeftPanelBackground={renderPanelBackground}
                     breadcrumbs={
