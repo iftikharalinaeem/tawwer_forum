@@ -605,13 +605,13 @@ class SphinxSearchModel extends \SearchModel {
     /**
      * Set soritng for Sphinx object
      *
-     * @param $sphinx
-     * @param $terms
-     * @param $search
+     * @param SphinxClient $sphinx
+     * @param array $terms
+     * @param array $search
      */
     public function setSort($sphinx, $terms, $search) {
         if (!isset($search['sort'])) {
-            $sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000" );
+            $sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000");
         } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
             // If there is just one search term then we really want to just sort by date.
             $sphinx->setSelect('*, (dateinserted + 1) as sort');
