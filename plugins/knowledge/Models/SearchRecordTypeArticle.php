@@ -38,6 +38,8 @@ class SearchRecordTypeArticle implements SearchRecordTypeInterface {
 
     const SPHINX_INDEX = 'KnowledgeArticle';
 
+    const SPHINX_INDEX_WEIGHT = 3;
+
     /**
      * @inheritdoc
      */

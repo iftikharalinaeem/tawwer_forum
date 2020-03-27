@@ -352,6 +352,8 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['all']) && !empty(trim($this->query['all']))) {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
+        $this->sphinx->setRankingMode(SPH_RANK_SPH04);
+        $this->sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000" );
     }
 
     /**
@@ -531,7 +533,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $keepSphinxOrder = (bool)($query['sort'] ?? false);
         if (!$keepSphinxOrder) {
-            $keepSphinxOrder = (bool)($query['featured'] ?? false);
+            $keepSphinxOrder = (bool)($query['featured'] ?? (($query['global'] ?? false) === 'true'));
         }
         $i = 0;
         if (($searchResults['total'] ?? 0) > 0) {
