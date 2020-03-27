@@ -611,7 +611,7 @@ class SphinxSearchModel extends \SearchModel {
      */
     public function setSort($sphinx, $terms, $search) {
         if (!isset($search['sort'])) {
-            $sphinx->setSelect("*, @weight + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
+            $sphinx->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
             $sphinx->setSortMode(SPH_SORT_EXTENDED, "sorter DESC");
         } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
             // If there is just one search term then we really want to just sort by date.
