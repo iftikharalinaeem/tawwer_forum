@@ -188,7 +188,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param DiscussionsController Array $args
      */
     public function discussionsController_beforeDiscussionContent_handler($sender, $args) {
-        if (c('CatalogueDisplay.OnlyOnCategory') || c('Vanilla.Discussions.Layout') === 'table') {
+        if (c('Vanilla.Discussions.Layout') === 'table') {
+            return;
+        }
+        if (c('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
         echo $this->displayCatalogueImage(val('Discussion', $args));
@@ -201,6 +204,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param DiscussionsController Array $args
      */
     public function discussionsController_BeforeDiscussionTitle_handler($sender, $args) {
+        if (c('CatalogueDisplay.OnlyOnCategory')) {
+            return;
+        }
         if (c('Vanilla.Discussions.Layout') === 'table') {
             echo $this->displayCatalogueImage(val('Discussion', $args));
         }
@@ -315,6 +321,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before(CategoriesController $sender) {
+        if (c('Vanilla.Discussions.Layout') === 'table') {
+            return;
+        }
         if (c('CatalogueDisplay.Masonry.Enabled')) {
             $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
             $sender->addJsFile('masonry-categories.js', 'plugins/cataloguedisplay');
