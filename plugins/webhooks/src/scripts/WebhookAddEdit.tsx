@@ -3,8 +3,9 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { t } from "@vanilla/i18n";
+import { useParams } from "react-router";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
@@ -20,33 +21,18 @@ import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
-import { useHistory} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
-interface IProps {
-    webhookID?: number;
-    onBack?: () => void;
-}
-
-export function WebhookAddEdit(props: IProps) {
+export function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
-    const { updateForm } = useWebhookActions();
+    const { updateForm, initForm } = useWebhookActions();
+    const params = useParams<{}>();
+    const webhookID = params.webhookID ? params.webhookID : null;
+    const [isEditing, setIsEditing] = useState(!!webhookID);
+    const history = useHistory();
     const isLoading = formSubmit.status === LoadStatus.LOADING;
     const webhookCSSClasses = webhookAddEditClasses();
-    const EventTypes = [
-        {
-            label: t("Comments"),
-            value: EventType.COMMENT,
-        },
-        {
-            label: t("Discussions"),
-            value: EventType.DISCUSSION,
-        },
-        {
-            label: t("Users"),
-            value: EventType.USER,
-        },
-    ];
-    const history = useHistory();
+    
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
         let events = JSON.parse(form.events);
         if (isChecked) {
@@ -60,6 +46,8 @@ export function WebhookAddEdit(props: IProps) {
 
     return (
         <>
+            {console.log(webhookID)}
+            {console.log(isEditing)}
             <form
                 onSubmit={async event => {
                     event.preventDefault();
@@ -67,11 +55,11 @@ export function WebhookAddEdit(props: IProps) {
                 }}
             >
                 <WebhookDashboardHeaderBlock
-                title= {'Add Webhook'}
-                showBackLink={true}
-                onBack={() => 
-                    {history.push("/webhook-settings")}
-                }
+                    title={isEditing ? t("Edit Webhook") : t("Add Webhook")}
+                    showBackLink={true}
+                    onBack={() => {
+                        history.push("/webhook-settings");
+                    }}
                 />
                 <DashboardFormGroup label={t("Name")}>
                     <DashboardInput

@@ -5,6 +5,7 @@
 
 import { useSelector } from "react-redux";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 /**
  * Interface representing a webhook base resource.
@@ -14,7 +15,7 @@ export interface IWebhook {
     webhookID: number;
     status: WebhookStatus;
     name: string;
-    events: WebhookEvents;
+    events: string;
     url: string;
     secret: string;
     dateInserted: string;
@@ -35,13 +36,32 @@ export enum EventType {
     DISCUSSION = "discussion",
     USER = "user",
 }
-
+export interface IPatchWebhookRequest {
+    webhookID: number;
+    status?: string;
+    events: string;
+    name: string;
+    url: string;
+    secret: string;
+   
+}
+export interface IPostWebhookRequest {
+    description: string;
+    status?: string;
+    events: string;
+    name: string;
+    url: string;
+    secret: string;
+}
 export interface IWebhookState {
     webhooksByID: ILoadable<{
         [id: number]: IWebhook;
     }>;
     form: IWebhookFormState;
     formSubmit: ILoadable<{}>;
+    deletesByID: {
+        [WebhookID: number]: ILoadable<{}>;
+    };
 }
 
 export interface IWebhookFormState {
@@ -65,6 +85,7 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     webhooksByID: {
         status: LoadStatus.PENDING,
+        deletesByID: ''
     },
     form: INITIAL_WEBHOOK_FORM,
     formSubmit: {

@@ -31,17 +31,14 @@ function WebhooksIndexPage(props: IOwnProps) {
     const [editingID, setEditingID] = useState<number | null>(null);
     const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
     const [purgeID, setPurgeID] = useState<number | null>(null);
-    const params = useParams<{
-       
-    }>();
+    const params = useParams<{}>();
     const history = useHistory();
- 
+
     const webhooks = useWebhooks();
     const closeForm = () => {
         setIsFormOpen(false);
         setEditingID(null);
     };
-    const toggleButtonRef = React.createRef<HTMLButtonElement>();
 
     if (!webhooks.data) {
         return <Loader />;
@@ -56,9 +53,8 @@ function WebhooksIndexPage(props: IOwnProps) {
                 title={t("Webhooks")}
                 actionButtons={
                     <LinkAsButton
-                        //buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        to={'/webhook-settings/add'}
+                        to={"/webhook-settings/add"}
                     >
                         {t("Add Webhook")}
                     </LinkAsButton>
@@ -67,7 +63,7 @@ function WebhooksIndexPage(props: IOwnProps) {
             <DashboardTable
                 head={
                     <tr>
-                        <HeadItem>Webhooks</HeadItem>
+                        <HeadItem>{t("Webhooks")}</HeadItem>
                         <HeadItem size={TableColumnSize.XS}>{t("Status")}</HeadItem>
                         <HeadItem size={TableColumnSize.XS}>{t("Options")}</HeadItem>
                     </tr>
