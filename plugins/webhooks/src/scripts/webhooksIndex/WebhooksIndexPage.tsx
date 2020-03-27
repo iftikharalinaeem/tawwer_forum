@@ -59,11 +59,6 @@ function WebhooksIndexPage(props: IOwnProps) {
                         //buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
                         to={'/webhook-settings/add'}
-                        // onMouseDown={() => { 
-                        //     setIsFormOpen(true);
-                        //     return true
-                        //     //props.history.push('/webhook-settings/add');
-                        // }}
                     >
                         {t("Add Webhook")}
                     </LinkAsButton>
