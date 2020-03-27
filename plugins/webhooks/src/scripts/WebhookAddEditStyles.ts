@@ -15,12 +15,6 @@ export const webhookAddEditClasses = useThemeCache(() => {
             vertical: globalVars.gutter.half,
             horizontal: globalVars.gutter.size * 2
         }),
-        $nest: {
-            "&&": {
-                fontWeight: globalVars.fonts.weights.normal,
-                flexBasis: "50%"
-            }
-        }
     });
 
     const inlineCheckbox = style("inlineCheckbox", {

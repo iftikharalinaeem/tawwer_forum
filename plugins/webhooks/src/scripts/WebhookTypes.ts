@@ -28,9 +28,12 @@ export enum WebhookStatus {
     DISABLED = "disabled",
 }
 
-export enum WebhookEvents {
+export enum EventType {
     ALL = "*",
     INDIVIDUAL = "individual",
+    COMMENT = "comment",
+    DISCUSSION = "discussion", 
+    USER = "user",
 }
 
 export interface IWebhookState {
@@ -45,7 +48,7 @@ export interface IWebhookFormState {
     webhookID: number;
     status: WebhookStatus;
     name: string;
-    events: WebhookEvents;
+    events: string;
     url: string;
     secret: string;
 }
@@ -54,7 +57,7 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
     webhookID: 0,
     status: WebhookStatus.ACTIVE,
     name: "",
-    events: WebhookEvents.ALL,
+    events: JSON.stringify([EventType.ALL]),
     url: "",
     secret: "",
 };
