@@ -1,19 +1,26 @@
-.ItemDiscussion.CatalogueRow{
+.ItemDiscussion.CatalogueRow {
     display: inline-block;
     width: 33.333%;
+    border: none;
+    padding: 8px;
 }
+.ItemDiscussion.CatalogueRow .MItem.LastCommentBy{
+    display: inline-grid;
+}
+
+@media screen and (min-width: 767px) {
+    .ItemDiscussion.CatalogueRow:last-child {
+        border: none;
+    }
+}
+
 @media screen and (max-width: 767px) {
-    .ItemDiscussion.CatalogueRow{
+    .ItemDiscussion.CatalogueRow {
         display: inline-block;
         width: 100%;
     }
 }
-/*@media screen and (min-width: 767px) {*/
-/*    .ItemDiscussion.CatalogueRow .catalogue-image-wrapper{*/
-/*        width: initial;*/
-/*        height: initial;*/
-/*    }*/
-/*}*/
-.Discussions.masonry{
+
+.Discussions.masonry {
     min-height: 200px;
 }
