@@ -324,15 +324,19 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['types'])) {
             $indexes = [];
+            $idxWeights = [];
             $values = [];
             /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
            foreach ($search['types'] as $recordType) {
-                $indexes[] = $recordType->getIndexName();
+                $indexes[] = $idxName = $recordType->getIndexName();
+                $idxWeights[$idxName] = $recordType->getIndexWeight();
                 $values[] = $recordType->getDType();
             }
 
             $sphinx->setFilter('dtype', $values);
             $indexes = $this->indexes($indexes);
+            $idxWeights = $this->dbIndexNames($idxWeights);
+            $sphinx->setIndexWeights($idxWeights);
         }
 
         if (isset($search['discussionid'])) {
@@ -530,6 +534,25 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     /**
+     * @param string[] $indexNames
+     * @return array
+     */
+    public function dbIndexNames(array $idxs) {
+        $indexes = [];
+        $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
+        foreach ($idxs as $idxName => $weight) {
+            $indexes[$prefix . $idxName] = $weight;
+        }
+
+        if ($this->useDeltas) {
+            foreach ($indexes as $idxName => $weight) {
+                $indexes[ $idxName . '_Delta'] = $weight;
+            }
+        }
+        return $indexes;
+    }
+
+    /**
      * Whether or not groups can be searched.
      *
      * @return bool Returns true if groups can be searched or false otherwise.
@@ -578,8 +601,10 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     public function setSort($sphinx, $terms, $search) {
-        // If there is just one search term then we really want to just sort by date.
-        if (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
+        if (!isset($search['sort'])) {
+            $sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000" );
+        } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
+            // If there is just one search term then we really want to just sort by date.
             $sphinx->setSelect('*, (dateinserted + 1) as sort');
             $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
         } else {
