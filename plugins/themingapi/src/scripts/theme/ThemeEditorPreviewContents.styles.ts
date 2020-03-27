@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, fonts, colorOut, absolutePosition } from "@library/styles/styleHelpers";
+import { unit, paddings, fonts, colorOut, absolutePosition, ColorValues } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { FontSizeProperty } from "csstype";
 import { TLength, NestedCSSProperties } from "typestyle/lib/types";
 import { userContentVariables } from "@vanilla/library/src/scripts/content/userContentStyles";
+import { color, ColorHelper } from "csx";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -112,13 +113,15 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    const panelActivatorIndicator = style("panelActivatorIndicator", {
-        ...absolutePosition.fullSizeOfParent(),
-        outline: `1px dashed #fff`,
-        outlineOffset: unit(-4),
-        opacity: 0.85,
-        pointerEvents: "none",
-    });
+    const panelActivatorIndicator = (dashColor?: ColorHelper | string) => {
+        return style("panelActivatorIndicator", {
+            ...absolutePosition.fullSizeOfParent(),
+            outline: `1px dashed ${dashColor ? colorOut(dashColor) : color("#fff")}`,
+            outlineOffset: unit(-4),
+            opacity: 0.85,
+            pointerEvents: "none",
+        });
+    };
 
     return {
         content,
