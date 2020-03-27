@@ -2,10 +2,11 @@
 
 {{ form.open({'enctype': 'multipart/form-data'}) }}
 <div class="padded">
-    <div class="padded alert alert-info">{{ t('Uplaod a placeholder image that will display when users do not have an image in their post.') }}</div>
-        {% if PlaceholderImage %}
-            <div class="padded">{{ PlaceholderImage|raw }}</div>
-        {% endif %}
+    <div
+        class="padded alert alert-info">{{ t('Uplaod a placeholder image that will display when users do not have an image in their post.') }}</div>
+    {% if PlaceholderImage %}
+        <div class="padded">{{ PlaceholderImage|raw }}</div>
+    {% endif %}
     {{ form.errors() }}
     {{ form.fileUpload('Photo') }}
 </div>
@@ -20,4 +21,4 @@
     {{ form.button('Save', {'type' : 'submit', 'class': 'btn btn-primary'}) }}
 </div>
 
-{{ form.close()}}
+{{ form.close() }}

@@ -45,7 +45,7 @@ li.CatalogueRow .IndexPhoto {
 }
 
 @media screen and (max-width: 496px) {
-    .DataTable  td.BigCount {
+    .DataTable td.BigCount {
         display: none;
     }
 }
