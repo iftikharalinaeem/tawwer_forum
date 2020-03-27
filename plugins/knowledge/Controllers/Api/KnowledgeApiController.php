@@ -533,7 +533,7 @@ class KnowledgeApiController extends AbstractApiController {
 
         $keepSphinxOrder = (bool)($query['sort'] ?? false);
         if (!$keepSphinxOrder) {
-            $keepSphinxOrder = (bool)($query['featured'] ?? (($query['global'] ?? false) === 'true'));
+            $keepSphinxOrder = (bool)($query['featured'] ?? false);
         }
         $i = 0;
         if (($searchResults['total'] ?? 0) > 0) {
