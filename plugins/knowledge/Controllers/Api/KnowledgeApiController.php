@@ -353,7 +353,7 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
         $this->sphinx->setRankingMode(SPH_RANK_SPH04);
-        $this->sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000" );
+        $this->sphinx->setSortMode(SPH_SORT_EXPR, "@weight + IF(dtype=5,2,1)*dateinserted/1000");
     }
 
     /**
