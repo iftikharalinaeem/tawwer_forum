@@ -52,7 +52,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param $sender Object
      */
     public function base_render_before($sender) {
-        if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController' || $sender->ClassName == 'DiscussionsController')) {
+        if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController'
+                || (!c('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
             // include magnific-popup before catalogue-style so that catalogue style can override styles.
             $sender->addCssFile('magnific-popup.css', 'dashboard');
             $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
