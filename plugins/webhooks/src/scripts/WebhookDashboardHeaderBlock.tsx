@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import { LeftChevronCompactIcon } from "@library/icons/common";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
 interface IProps {
     showBackLink?: boolean;
@@ -25,3 +26,4 @@ export function WebhookDashboardHeaderBlock(props: IProps) {
         </header>
     );
 }
+export default WebhookDashboardHeaderBlock;

@@ -13,13 +13,13 @@ export const webhookAddEditClasses = useThemeCache(() => {
         alignItems: "flex-end",
         ...paddings({
             vertical: globalVars.gutter.half,
-            horizontal: globalVars.gutter.size * 2
+            horizontal: globalVars.gutter.size * 2,
         }),
     });
 
     const inlineCheckbox = style("inlineCheckbox", {
         fontWeight: globalVars.fonts.weights.normal,
-        flexBasis: "50%"
+        flexBasis: "50%",
     });
 
     const statusRadio = style("statusRadio", {

@@ -32,7 +32,7 @@ export enum EventType {
     ALL = "*",
     INDIVIDUAL = "individual",
     COMMENT = "comment",
-    DISCUSSION = "discussion", 
+    DISCUSSION = "discussion",
     USER = "user",
 }
 

@@ -5,12 +5,12 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
+import LinkAsButton from "@library/routing/LinkAsButton";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
 import { WebhookStatus } from "@webhooks/WebhookTypes";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
-import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Loader from "@library/loaders/Loader";
 import { useWebhooks } from "@webhooks/WebhookHooks";
@@ -19,8 +19,6 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
-import { WebhookAddEdit } from "@webhooks/WebhookAddEdit";
-import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
 import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
 
 registerReducer("webhooks", WebhookReducer);
@@ -52,53 +50,23 @@ function WebhooksIndexPage(props: IOwnProps) {
     const { webhookID } = props;
     const isEditing = webhookID != null;
 
-    useEffect(() => {
-            if (isEditing) {
-                props.history.push(`/webhook-settings/edit/${webhookID}/edit`);
-            }
-
-        // return () => {
-        //     history.push('/webhook-settings');
-        // }
-     
-    }, [isEditing, history, webhookID]);
-
-    if (isFormOpen) {
-       // alert('here2');
-        return (
-            <>
-                <WebhookDashboardHeaderBlock
-                    title={t("Add Webhook")}
-                    showBackLink={true}
-                    onBack={() => {
-                        props.history.push("/webhook-settings");
-                    }}
-                />
-                <WebhookAddEdit 
-                webhookID={editingID ?? undefined}
-                onClose={() => {
-                    closeForm();
-                    toggleButtonRef.current?.focus();  
-                }}
-                />
-            </>
-        );
-    }
     return (
         <>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
-                    <Button
-                        buttonRef={toggleButtonRef}
+                    <LinkAsButton
+                        //buttonRef={toggleButtonRef}
                         baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        onClick={() => { 
-                            setIsFormOpen(true);
-                            props.history.push('/webhook-settings/add');
-                        }}
+                        to={'/webhook-settings/add'}
+                        // onMouseDown={() => { 
+                        //     setIsFormOpen(true);
+                        //     return true
+                        //     //props.history.push('/webhook-settings/add');
+                        // }}
                     >
                         {t("Add Webhook")}
-                    </Button>
+                    </LinkAsButton>
                 }
             />
             <DashboardTable

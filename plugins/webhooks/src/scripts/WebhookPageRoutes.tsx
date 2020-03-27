@@ -15,7 +15,7 @@ export const WebhooksIndexRoute = new RouteHandler(
 );
 
 export const WebhooksAddEditRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/addEdit" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/addEdit" */ "@webhooks/WebhookAddEdit"),
     ["/webhook-settings/:webhookID/edit", "/webhook-settings/add"],
     (params: { webhookID?: number }) =>
         params.webhookID != null ? `/webhook-settings/${params.webhookID}/edit` : "/webhook-settings/add",

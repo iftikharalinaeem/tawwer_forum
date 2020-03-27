@@ -18,7 +18,9 @@ import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles"; 
+import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
+import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
+import { useHistory} from "react-router-dom";
 
 interface IProps {
     webhookID?: number;
@@ -33,24 +35,21 @@ export function WebhookAddEdit(props: IProps) {
     const EventTypes = [
         {
             label: t("Comments"),
-            value: EventType.COMMENT
+            value: EventType.COMMENT,
         },
         {
             label: t("Discussions"),
-            value: EventType.DISCUSSION
+            value: EventType.DISCUSSION,
         },
         {
             label: t("Users"),
-            value: EventType.USER
-        }
+            value: EventType.USER,
+        },
     ];
-    const onBack = () => {
-        if (props.onBack) props.onBack();
-    };
-
-    const handleIndividualEvents = function (isChecked: boolean, event: string) {
+    const history = useHistory();
+    const handleIndividualEvents = function(isChecked: boolean, event: string) {
         let events = JSON.parse(form.events);
-        if( isChecked) {
+        if (isChecked) {
             events.push(event);
         } else {
             events.splice(events.indexOf(event, 1));
@@ -67,6 +66,13 @@ export function WebhookAddEdit(props: IProps) {
                     //void saveKbForm();
                 }}
             >
+                <WebhookDashboardHeaderBlock
+                title= {'Add Webhook'}
+                showBackLink={true}
+                onBack={() => 
+                    {history.push("/webhook-settings")}
+                }
+                />
                 <DashboardFormGroup label={t("Name")}>
                     <DashboardInput
                         inputProps={{
@@ -102,13 +108,13 @@ export function WebhookAddEdit(props: IProps) {
                     />
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
-                    <DashboardRadioGroup 
+                    <DashboardRadioGroup
                         value={JSON.parse(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
-                        onChange={(event) => {
+                        onChange={event => {
                             if (event === EventType.INDIVIDUAL) {
-                                updateForm({events: JSON.stringify([])});
+                                updateForm({ events: JSON.stringify([]) });
                             } else {
-                                updateForm({events: JSON.stringify([event])});
+                                updateForm({ events: JSON.stringify([event]) });
                             }
                         }}
                     >
@@ -132,43 +138,39 @@ export function WebhookAddEdit(props: IProps) {
                                 className={webhookCSSClasses.inlineCheckbox}
                                 checked={form.events.includes(EventType.COMMENT) ? true : false}
                                 disabled={form.events.includes(EventType.ALL) ? true : false}
-                                onChange={(isChecked) => handleIndividualEvents(isChecked, EventType.COMMENT)}
+                                onChange={isChecked => handleIndividualEvents(isChecked, EventType.COMMENT)}
                             />
                             <DashboardCheckBox
                                 label={"Discussions"}
                                 className={webhookCSSClasses.inlineCheckbox}
                                 checked={form.events.includes(EventType.DISCUSSION) ? true : false}
                                 disabled={form.events.includes(EventType.ALL) ? true : false}
-                                onChange={(isChecked) => handleIndividualEvents(isChecked, EventType.DISCUSSION)}
+                                onChange={isChecked => handleIndividualEvents(isChecked, EventType.DISCUSSION)}
                             />
                             <DashboardCheckBox
                                 label={"Users"}
                                 className={webhookCSSClasses.inlineCheckbox}
                                 checked={form.events.includes(EventType.USER) ? true : false}
                                 disabled={form.events.includes(EventType.ALL) ? true : false}
-                                onChange={(isChecked) => handleIndividualEvents(isChecked, EventType.USER)}
+                                onChange={isChecked => handleIndividualEvents(isChecked, EventType.USER)}
                             />
                         </div>
                     </DashboardRadioGroup>
                 </DashboardFormGroup>
-                <DashboardFormGroup 
+                <DashboardFormGroup
                     label={t("Active")}
                     description={t("Whether or not events will be delivered to this webhook.")}
                     labelType={DashboardLabelType.WIDE}
                 >
                     <DashboardToggle
-                        onChange={(isToggled) => {
+                        onChange={isToggled => {
                             updateForm({ status: isToggled ? WebhookStatus.ACTIVE : WebhookStatus.DISABLED });
                         }}
-                        checked={(form.status === WebhookStatus.ACTIVE ? true : false)}
+                        checked={form.status === WebhookStatus.ACTIVE ? true : false}
                     />
                 </DashboardFormGroup>
                 <div className="Buttons form-footer">
-                    <Button
-                        submit={true}
-                        baseClass={ButtonTypes.DASHBOARD_PRIMARY}
-                        disabled={isLoading}
-                    >
+                    <Button submit={true} baseClass={ButtonTypes.DASHBOARD_PRIMARY} disabled={isLoading}>
                         {isLoading ? <ButtonLoader /> : t("Save")}
                     </Button>
                 </div>
@@ -176,3 +178,4 @@ export function WebhookAddEdit(props: IProps) {
         </>
     );
 }
+export default WebhookAddEdit;
