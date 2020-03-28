@@ -19,45 +19,58 @@ import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Button from "@library/forms/Button";
+import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
 import { useHistory } from "react-router-dom";
+import Message from "@vanilla/library/src/scripts/messages/Message";
+import { getGlobalErrorMessage } from "@vanilla/library/src/scripts/apiv2";
+import { ErrorIcon } from "@vanilla/library/src/scripts/icons/common";
+import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 
 export function WebhookAddEdit() {
-    const webhooks = useWebhooks();
-    const { form, formSubmit } = useWebhookData();
-    const { updateForm, initForm } = useWebhookActions();
+    const { form } = useWebhookData();
+    const { updateForm, initForm, saveWebhookForm } = useWebhookActions();
     const params = useParams<{}>();
     const webhookID = params.webhookID ? params.webhookID : null;
     const [isEditing, setIsEditing] = useState(!!webhookID);
     const history = useHistory();
-    const isLoading = formSubmit.status === LoadStatus.LOADING;
+    const isLoading = status === LoadStatus.LOADING;
+    //const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
     const webhookCSSClasses = webhookAddEditClasses();
 
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
-        let events = JSON.parse(form.events);
+        let events = form.events;
         if (isChecked) {
             events.push(event);
         } else {
             events.splice(events.indexOf(event, 1));
         }
 
-        updateForm({ events: JSON.stringify(events) });
+        updateForm({ events: events });
     };
 
     useEffect(() => {
         initForm(webhookID);
     }, [webhookID, initForm]);
 
+    if (form.error) {
+        return <ErrorPage apiError={form.error} />;
+    }
+
+    if (isEditing && form.webhookID <= 0) {
+        return <Loader />;
+    }
+
     return (
         <>
-            {console.log(webhookID)}
-            {console.log(isEditing)}
             <form
                 onSubmit={async event => {
                     event.preventDefault();
-                    //void saveKbForm();
+                    event.stopPropagation();
+                    void saveWebhookForm(form);
                 }}
             >
                 <WebhookDashboardHeaderBlock
@@ -103,12 +116,12 @@ export function WebhookAddEdit() {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
                     <DashboardRadioGroup
-                        value={JSON.parse(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
+                        value={(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
                         onChange={event => {
                             if (event === EventType.INDIVIDUAL) {
-                                updateForm({ events: JSON.stringify([]) });
+                                updateForm({ events: [] });
                             } else {
-                                updateForm({ events: JSON.stringify([event]) });
+                                updateForm({ events: [event] });
                             }
                         }}
                     >

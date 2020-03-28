@@ -34,11 +34,39 @@ export const WebhookReducer = produce(
             state.webhooksByID.error = action.error;
             return state;
         })
+        .case(WebhookActions.getEditWebhookACs.started, (state, action) => {
+            state.form.formStatus = LoadStatus.LOADING;
+            return state;
+        })
+        .case(WebhookActions.getEditWebhookACs.done, (state, action) => {
+            state.form.formStatus = LoadStatus.SUCCESS;
+            return state;
+        })
+        .case(WebhookActions.getEditWebhookACs.failed, (state, action) => {
+            state.form.formStatus = LoadStatus.ERROR;
+            state.form.error = action.error;
+            
+            return state;
+        })
         .case(WebhookActions.updateFormAC, (state, payload) => {
             state.form = {
                 ...state.form,
                 ...payload,
             };
             return state;
-        }),
+        })
+        .case(WebhookActions.postWebhookACs.started, (state, payload) => {
+            state.formSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(WebhookActions.postWebhookACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
+            return state;
+        })
+        .case(WebhookActions.postWebhookACs.done, (state, payload) => {
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.webhooksByID.data![payload.result.webhookID] = payload.result;
+            return state;
+        })
 );

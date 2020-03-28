@@ -4,7 +4,7 @@
  */
 
 import { useSelector } from "react-redux";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus, IApiError } from "@vanilla/library/src/scripts/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 /**
@@ -12,10 +12,10 @@ import { ICoreStoreState } from "@library/redux/reducerRegistry";
  */
 
 export interface IWebhook {
-    webhookID: number;
+    webhookID: number | null;
     status: WebhookStatus;
     name: string;
-    events: string;
+    events: string[];
     url: string;
     secret: string;
     dateInserted: string;
@@ -64,19 +64,21 @@ export interface IWebhookState {
 }
 
 export interface IWebhookFormState {
-    webhookID: number;
+    webhookID: number | null;
     status: WebhookStatus;
     name: string;
-    events: string;
+    events: string[];
     url: string;
     secret: string;
+    formStatus?: string;
+    error?: IApiError;
 }
 
 export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
-    webhookID: 0,
+    webhookID: null,
     status: WebhookStatus.ACTIVE,
     name: "",
-    events: JSON.stringify([EventType.ALL]),
+    events: [EventType.ALL],
     url: "",
     secret: "",
 };
@@ -84,7 +86,7 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     webhooksByID: {
         status: LoadStatus.PENDING,
-        deletesByID: "",
+        deletesByID: '',
     },
     form: INITIAL_WEBHOOK_FORM,
     formSubmit: {
@@ -95,4 +97,6 @@ export const INITIAL_WEBHOOK_STATE: IWebhookState = {
 export interface IWebhookStoreState {
     webhooks: IWebhookState;
 }
+
+
 
