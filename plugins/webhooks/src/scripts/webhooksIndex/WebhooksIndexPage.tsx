@@ -4,11 +4,9 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
-import { WebhookStatus } from "@webhooks/WebhookTypes";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
 import { ButtonTypes } from "@library/forms/buttonStyles";
@@ -17,7 +15,7 @@ import { useWebhooks } from "@webhooks/WebhookHooks";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
-import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
+import { RouteComponentProps, withRouter } from "react-router-dom";
 import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
 
 interface IOwnProps extends RouteComponentProps<{}> {}

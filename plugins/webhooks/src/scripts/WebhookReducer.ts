@@ -6,7 +6,7 @@
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IWebhook } from "./WebhookTypes";
-import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { WebhookActions } from "@webhooks/WebhookActions";
 import { IWebhookState, INITIAL_WEBHOOK_STATE } from "@webhooks/WebhookTypes";
 
@@ -21,7 +21,9 @@ export const WebhookReducer = produce(
         .case(WebhookActions.getAllWebhookACs.done, (state, payload) => {
             const webhooksByID: Record<number, IWebhook> = {};
             payload.result.forEach(wehook => {
-                webhooksByID[wehook.webhookID] = wehook;
+                if (wehook.webhookID) {
+                    webhooksByID[wehook.webhookID] = wehook;
+                }
             });
             state.webhooksByID = {
                 status: LoadStatus.SUCCESS,
@@ -34,12 +36,9 @@ export const WebhookReducer = produce(
             state.webhooksByID.error = action.error;
             return state;
         })
+
         .case(WebhookActions.getEditWebhookACs.started, (state, action) => {
             state.form.formStatus = LoadStatus.LOADING;
-            return state;
-        })
-        .case(WebhookActions.getEditWebhookACs.done, (state, action) => {
-            state.form.formStatus = LoadStatus.SUCCESS;
             return state;
         })
         .case(WebhookActions.getEditWebhookACs.failed, (state, action) => {
@@ -48,23 +47,26 @@ export const WebhookReducer = produce(
             
             return state;
         })
+
         .case(WebhookActions.updateFormAC, (state, payload) => {
+            state.form.formStatus = LoadStatus.SUCCESS;
             state.form = {
                 ...state.form,
                 ...payload,
             };
             return state;
         })
-        .case(WebhookActions.postWebhookACs.started, (state, payload) => {
+
+        .case(WebhookActions.postFormACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
             return state;
         })
-        .case(WebhookActions.postWebhookACs.failed, (state, payload) => {
+        .case(WebhookActions.postFormACs.failed, (state, payload) => {
             state.formSubmit.status = LoadStatus.ERROR;
             state.formSubmit.error = payload.error;
             return state;
         })
-        .case(WebhookActions.postWebhookACs.done, (state, payload) => {
+        .case(WebhookActions.postFormACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
             state.webhooksByID.data![payload.result.webhookID] = payload.result;
             return state;

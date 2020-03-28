@@ -24,21 +24,18 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
 import { useHistory } from "react-router-dom";
-import Message from "@vanilla/library/src/scripts/messages/Message";
-import { getGlobalErrorMessage } from "@vanilla/library/src/scripts/apiv2";
-import { ErrorIcon } from "@vanilla/library/src/scripts/icons/common";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
-import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 
 
 export function WebhookAddEdit() {
-    const { form } = useWebhookData();
-    const { updateForm, initForm, saveWebhookForm } = useWebhookActions();
-    const params = useParams<{}>();
+    const { form, formSubmit } = useWebhookData();
+    const { updateForm, initForm, saveWebhookForm, clearError } = useWebhookActions();
+    const params = useParams<{webhookID?: number}>();
     const webhookID = params.webhookID ? params.webhookID : null;
-    const [isEditing, setIsEditing] = useState(!!webhookID);
-    const history = useHistory();
+    const isEditing = !!webhookID;
     const isLoading = status === LoadStatus.LOADING;
+    const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
+    const history = useHistory();
     const webhookCSSClasses = webhookAddEditClasses();
 
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
@@ -56,12 +53,19 @@ export function WebhookAddEdit() {
         initForm(webhookID);
     }, [webhookID, initForm]);
 
-     if (form.error) {
+    useEffect(() => {
+        if(isFormSubmitSuccessful) {
+            clearError();
+            history.push('/webhook-settings');
+        }   
+    });
+
+    if (form.error) {
         return <ErrorPage apiError={form.error} />;
     }
 
-    if (isEditing && !!form.webhookID) {
-        return <Loader />;
+    if (isLoading || (isEditing && form.formStatus !== LoadStatus.SUCCESS)) {
+        return <Loader />
     }
 
     return (

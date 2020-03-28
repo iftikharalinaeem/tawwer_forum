@@ -10,9 +10,7 @@ import {
     IWebhookFormState,
     IPatchWebhookRequest,
     IPostWebhookRequest,
-    IWebhookState,
     INITIAL_WEBHOOK_FORM,
-    IWebhookStoreState,
 } from "@webhooks/WebhookTypes";
 import actionCreatorFactory from "typescript-fsa";
 import { useDispatch } from "react-redux";
@@ -39,7 +37,7 @@ type IDeleteWebhookResponse = undefined;
 export class WebhookActions extends ReduxActions {
     public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET");
     public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook[], IApiError>("GET_EDIT");
-    public static postWebhookACs = actionCreator.async<IPostWebhookRequest, IPostWebhookResponse, IApiError>("POST");
+    public static postFormACs = actionCreator.async<IPostWebhookRequest, IPostWebhookResponse, IApiError>("POST");
     public static patchWebhook_ACs = actionCreator.async<IPatchWebhookRequest, IPatchWebhookResponse, IApiError>("PATCH");
     public static deleteWebhook_ACs = actionCreator.async<IDeleteWebhookRequest, IDeleteWebhookResponse, IApiError>("DELETE");
     
@@ -51,7 +49,7 @@ export class WebhookActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public getEdit = (webhookID: number): Promise<IWebhook | null> => {
+    public getEdit = (webhookID: number): Promise<IWebhookFormState> => {
         const thunk = bindThunkAction(WebhookActions.getEditWebhookACs, async () => {
             const response = await this.api.get(`/webhooks/${webhookID}/edit`, {});
             return response.data;
@@ -68,12 +66,14 @@ export class WebhookActions extends ReduxActions {
         }
     };
 
+    public static clearErrorAC = actionCreator("CLEAR_ERROR");
+    public clearError = this.bindDispatch(WebhookActions.clearErrorAC);
+
     public static updateFormAC = actionCreator<Partial<IWebhookFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
 
 	public saveWebhookForm = async (form: IWebhookFormState) => {
  		if (form.webhookID) {
-
             //return await this.patchWebhook(form as any);
         } else {
             return await this.postWebhook(form as any);
@@ -81,7 +81,7 @@ export class WebhookActions extends ReduxActions {
     };
     
 	public postWebhook(options: IPostWebhookRequest) {
- 		const thunk = bindThunkAction(WebhookActions.postWebhookACs, async () => {
+ 		const thunk = bindThunkAction(WebhookActions.postFormACs, async () => {
   		const response = await this.api.post(`/webhooks/`, options);
   		return response.data;
     	})(options);

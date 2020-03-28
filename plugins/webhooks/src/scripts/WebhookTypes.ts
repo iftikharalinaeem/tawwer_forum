@@ -3,14 +3,11 @@
  * @license Proprietary
  */
 
-import { useSelector } from "react-redux";
 import { ILoadable, LoadStatus, IApiError } from "@vanilla/library/src/scripts/@types/api/core";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
 
 /**
  * Interface representing a webhook base resource.
  */
-
 export interface IWebhook {
     webhookID: number | null;
     status: WebhookStatus;
