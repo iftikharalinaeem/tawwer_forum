@@ -28,6 +28,7 @@ export function WebhookDeleteModal(props: IProps) {
     const handleConfirm = async () => {
         if (webhookID !== null) {
             deleteWebhook({ webhookID: webhookID });
+            onDismiss();
         }
     };
 

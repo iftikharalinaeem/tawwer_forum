@@ -24,27 +24,19 @@ interface IOwnProps extends RouteComponentProps<{}> {}
 
 function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
-    const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
     const [deleteID, setDeleteID] = useState<number | null>(null);
     const [isDelete, setIsDelete] = useState(false);
-    const [purgeID, setPurgeID] = useState<number | null>(null);
-    const params = useParams<{}>();
-    const history = useHistory();
 
     const webhooks = useWebhooks();
-    const closeForm = () => {
-        setIsFormOpen(false);
-        setEditingID(null);
-    };
-
+  
     if (!webhooks.data) {
         return <Loader />;
     }
 
-    const { webhookID } = props;
-    const isEditing = webhookID != null;
-   
+    //const { webhookID } = props;
+    //const isEditing = webhookID != null;
+
     return (
         <>
             <DashboardHeaderBlock
@@ -55,14 +47,14 @@ function WebhooksIndexPage(props: IOwnProps) {
                     </LinkAsButton>
                 }
             />
-      {isDelete && (
-        < WebhookDeleteModal
-           webhookID={deleteID}
-           onDismiss={() => {
-            setDeleteID(null);
-           }}
-        />
-      )}
+            {isDelete && (
+                <WebhookDeleteModal
+                    webhookID={deleteID}
+                    onDismiss={() => {
+                        setDeleteID(null);
+                    }}
+                />
+            )}
             <DashboardTable
                 head={
                     <tr>
