@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
+import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
 import {
     IWebhook,
@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 import { useMemo } from "react";
 import apiv2 from "@library/apiv2";
 
-const createAction = actionCreatorFactory("@@webhooks");
+const actionCreator = actionCreatorFactory("@@webhooks");
 
 interface IWebhookParams {
     webhookID: number;
@@ -37,14 +37,14 @@ type IPatchWebhookResponse = IWebhook;
 type IDeleteWebhookResponse = undefined;
 
 export class WebhookActions extends ReduxActions {
-    public static readonly getAllWebhookACs = createAction.async<{}, IWebhook[], IApiError>("GET");
-    public static readonly getEditWebhookACs = createAction.async<{webhookID: number}, IWebhook[], IApiError>("GET_EDIT");
-    
+    public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET");
+    public static readonly getEditWebhookACs = actionCreator.async<{webhookID: number}, IWebhook[], IApiError>("GET_EDIT");
+
     public getAll = () => {
         const thunk = bindThunkAction(WebhookActions.getAllWebhookACs, async () => {
             const response = await this.api.get(`/webhooks`, {});
             return response.data;
-        })();
+        })();   
         return this.dispatch(thunk);
     };
 
@@ -66,7 +66,7 @@ export class WebhookActions extends ReduxActions {
         }
     };
 
-    public static updateFormAC = createAction<Partial<IWebhookFormState>>("UPDATE_FORM");
+    public static updateFormAC = actionCreator<Partial<IWebhookFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
 
     public saveWebhookForm = async () => {
@@ -87,6 +87,9 @@ export class WebhookActions extends ReduxActions {
         }
     };
 
+    public static patchWebhook_ACs = actionCreator.async<IPatchWebhookRequest, IPatchWebhookResponse, IApiError>(
+        "PATCH",
+    );
     public patchWebhook(options: IPatchWebhookRequest) {
         const { webhookID, ...url } = options;
 
@@ -97,6 +100,19 @@ export class WebhookActions extends ReduxActions {
 
         return this.dispatch(thunk);
     }
+    public static deleteWebhook_ACs = actionCreator.async<
+        IDeleteWebhookRequest,
+        IDeleteWebhookResponse,
+        IApiError
+    >("DELETE");
+
+    public deleteWebhook = (options: IDeleteWebhookRequest) => {
+        const apiThunk = bindThunkAction(WebhookActions.deleteWebhook_ACs, async () => {
+            const response = await this.api.delete(`/webhook/${options.webhookID}`);
+            return response.data;
+        })(options);
+        return this.dispatch(apiThunk);
+    };
 }
 
 export function useWebhookActions() {

@@ -25,7 +25,6 @@ import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlo
 import { useHistory } from "react-router-dom";
 
 export function WebhookAddEdit() {
-    const webhooks = useWebhooks();
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm } = useWebhookActions();
     const params = useParams<{}>();
@@ -43,12 +42,16 @@ export function WebhookAddEdit() {
             events.splice(events.indexOf(event, 1));
         }
 
-        updateForm({ events: JSON.stringify(events) });
+        updateForm({ events: events });
     };
 
     useEffect(() => {
         initForm(webhookID);
     }, [webhookID, initForm]);
+
+    if (isEditing && form.webhookID <= 0) {
+        return (<Loader />);
+    }
 
     return (
         <>
@@ -103,12 +106,12 @@ export function WebhookAddEdit() {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
                     <DashboardRadioGroup
-                        value={JSON.parse(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
+                        value={(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
                         onChange={event => {
                             if (event === EventType.INDIVIDUAL) {
-                                updateForm({ events: JSON.stringify([]) });
+                                updateForm({ events: [] });
                             } else {
-                                updateForm({ events: JSON.stringify([event]) });
+                                updateForm({ events: [event] });
                             }
                         }}
                     >

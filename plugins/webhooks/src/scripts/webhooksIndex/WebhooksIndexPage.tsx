@@ -25,7 +25,7 @@ function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
-    const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
+    const [deleteID, setDeleteID] = useState<number | null>(null);
     const [purgeID, setPurgeID] = useState<number | null>(null);
     const params = useParams<{}>();
     const history = useHistory();
@@ -47,7 +47,6 @@ function WebhooksIndexPage(props: IOwnProps) {
         <>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
-               
                 actionButtons={
                     <LinkAsButton baseClass={ButtonTypes.DASHBOARD_PRIMARY} to={"/webhook-settings/add"}>
                         {t("Add Webhook")}
@@ -66,16 +65,12 @@ function WebhooksIndexPage(props: IOwnProps) {
                     <WebhooksTableRow
                         key={webhook.webhookID}
                         webhook={webhook}
-                        onEditClick={
-                            status === WebhookStatus.ACTIVE
-                                ? () => {
-                                      setEditingID(webhook.webhookID);
-                                      setIsFormOpen(true);
-                                  }
-                                : undefined
-                        }
-                        onStatusChangeClick={() => {
-                            setStatusChangeID(webhook.webhookID);
+                        onEditClick={() => {
+                            setEditingID(webhook.webhookID);
+                            setIsFormOpen(true);
+                        }}
+                        onDeleteClick={() => {
+                            setDeleteID(webhook.webhookID);
                         }}
                     />
                 ))}
