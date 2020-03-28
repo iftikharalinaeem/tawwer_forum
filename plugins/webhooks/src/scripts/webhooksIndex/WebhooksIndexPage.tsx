@@ -29,7 +29,7 @@ function WebhooksIndexPage(props: IOwnProps) {
     const [isDelete, setIsDelete] = useState(false);
 
     const webhooks = useWebhooks();
-  
+
     if (!webhooks.data) {
         return <Loader />;
     }
