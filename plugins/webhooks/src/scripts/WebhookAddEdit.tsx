@@ -60,7 +60,7 @@ export function WebhookAddEdit() {
         return <ErrorPage apiError={form.error} />;
     }
 
-    if (isEditing && form.webhookID <= 0) {
+    if (isEditing && !!form.webhookID) {
         return <Loader />;
     }
 

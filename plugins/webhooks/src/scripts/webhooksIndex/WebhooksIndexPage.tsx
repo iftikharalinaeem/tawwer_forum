@@ -18,42 +18,43 @@ import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
+import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
 function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
-    const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
-    const [statusChangeID, setStatusChangeID] = useState<number | null>(null);
-    const [purgeID, setPurgeID] = useState<number | null>(null);
-    const params = useParams<{}>();
-    const history = useHistory();
+    const [deleteID, setDeleteID] = useState<number | null>(null);
+    const [isDelete, setIsDelete] = useState(false);
 
     const webhooks = useWebhooks();
-    const closeForm = () => {
-        setIsFormOpen(false);
-        setEditingID(null);
-    };
-
+  
     if (!webhooks.data) {
         return <Loader />;
     }
 
-    const { webhookID } = props;
-    const isEditing = webhookID != null;
+    //const { webhookID } = props;
+    //const isEditing = webhookID != null;
 
     return (
         <>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
-               
                 actionButtons={
                     <LinkAsButton baseClass={ButtonTypes.DASHBOARD_PRIMARY} to={"/webhook-settings/add"}>
                         {t("Add Webhook")}
                     </LinkAsButton>
                 }
             />
+            {isDelete && (
+                <WebhookDeleteModal
+                    webhookID={deleteID}
+                    onDismiss={() => {
+                        setDeleteID(null);
+                    }}
+                />
+            )}
             <DashboardTable
                 head={
                     <tr>
@@ -66,16 +67,13 @@ function WebhooksIndexPage(props: IOwnProps) {
                     <WebhooksTableRow
                         key={webhook.webhookID}
                         webhook={webhook}
-                        onEditClick={
-                            status === WebhookStatus.ACTIVE
-                                ? () => {
-                                      setEditingID(webhook.webhookID);
-                                      setIsFormOpen(true);
-                                  }
-                                : undefined
-                        }
-                        onStatusChangeClick={() => {
-                            setStatusChangeID(webhook.webhookID);
+                        onEditClick={() => {
+                            setEditingID(webhook.webhookID);
+                            setIsFormOpen(true);
+                        }}
+                        onDeleteClick={() => {
+                            setIsDelete(true);
+                            setDeleteID(webhook.webhookID);
                         }}
                     />
                 ))}

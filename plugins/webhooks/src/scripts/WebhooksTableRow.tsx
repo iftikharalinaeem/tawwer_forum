@@ -14,11 +14,10 @@ import Button from "@library/forms/Button";
 interface IProps {
     webhook: IWebhook;
     onEditClick?: () => void;
-    onStatusChangeClick: () => void;
+    onDeleteClick: () => void;
 }
 export function WebhooksTableRow(props: IProps) {
     const { webhook } = props;
-
     return (
         <tr>
             <td>
@@ -29,15 +28,17 @@ export function WebhooksTableRow(props: IProps) {
             </td>
             <td>
                 <DashboardTableOptions>
-                    {props.onEditClick && (
-                        <Button className="btn-icon" onClick={props.onEditClick} baseClass={ButtonTypes.ICON_COMPACT}>
+                        <Button 
+                            className="btn-icon" 
+                            onClick={props.onEditClick}
+                            baseClass={ButtonTypes.ICON_COMPACT}>
                             <EditIcon />
                         </Button>
                     )}
-                    {props.onStatusChangeClick && (
+                    { (
                         <Button
                             className="btn-icon"
-                            onClick={props.onStatusChangeClick}
+                            onClick={props.onDeleteClick}
                             baseClass={ButtonTypes.ICON_COMPACT}
                         >
                             <DeleteIcon />
