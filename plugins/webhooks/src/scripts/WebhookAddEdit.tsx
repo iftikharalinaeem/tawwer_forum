@@ -10,8 +10,8 @@ import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { useWebhookActions } from "@webhooks/WebhookActions";
-import {EventType, WebhookStatus } from "@webhooks/WebhookTypes";
-import { useWebhookData, useWebhooks }  from "@webhooks/WebhookHooks";  
+import { EventType, WebhookStatus } from "@webhooks/WebhookTypes";
+import { useWebhookData, useWebhooks } from "@webhooks/WebhookHooks";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
@@ -30,6 +30,7 @@ import { ErrorIcon } from "@vanilla/library/src/scripts/icons/common";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 
+
 export function WebhookAddEdit() {
     const { form } = useWebhookData();
     const { updateForm, initForm, saveWebhookForm } = useWebhookActions();
@@ -38,7 +39,6 @@ export function WebhookAddEdit() {
     const [isEditing, setIsEditing] = useState(!!webhookID);
     const history = useHistory();
     const isLoading = status === LoadStatus.LOADING;
-    //const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
     const webhookCSSClasses = webhookAddEditClasses();
 
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
@@ -56,7 +56,7 @@ export function WebhookAddEdit() {
         initForm(webhookID);
     }, [webhookID, initForm]);
 
-    if (form.error) {
+     if (form.error) {
         return <ErrorPage apiError={form.error} />;
     }
 

@@ -97,6 +97,3 @@ export const INITIAL_WEBHOOK_STATE: IWebhookState = {
 export interface IWebhookStoreState {
     webhooks: IWebhookState;
 }
-
-
-

@@ -34,9 +34,6 @@ function WebhooksIndexPage(props: IOwnProps) {
         return <Loader />;
     }
 
-    //const { webhookID } = props;
-    //const isEditing = webhookID != null;
-
     return (
         <>
             <DashboardHeaderBlock
@@ -69,7 +66,6 @@ function WebhooksIndexPage(props: IOwnProps) {
                         webhook={webhook}
                         onEditClick={() => {
                             setEditingID(webhook.webhookID);
-                            setIsFormOpen(true);
                         }}
                         onDeleteClick={() => {
                             setIsDelete(true);
