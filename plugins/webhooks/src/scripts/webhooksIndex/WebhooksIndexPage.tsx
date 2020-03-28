@@ -18,6 +18,7 @@ import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { useHistory, RouteComponentProps, withRouter } from "react-router-dom";
+import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
@@ -52,6 +53,8 @@ function WebhooksIndexPage(props: IOwnProps) {
                         {t("Add Webhook")}
                     </LinkAsButton>
                 }
+            />
+            <WebhookDeleteModal
             />
             <DashboardTable
                 head={
