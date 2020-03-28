@@ -15,7 +15,7 @@ export interface IWebhook {
     webhookID: number;
     status: WebhookStatus;
     name: string;
-    events: string[];
+    events: string;
     url: string;
     secret: string;
     dateInserted: string;
@@ -67,7 +67,7 @@ export interface IWebhookFormState {
     webhookID: number;
     status: WebhookStatus;
     name: string;
-    events: string[];
+    events: string;
     url: string;
     secret: string;
 }
