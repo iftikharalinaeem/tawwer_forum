@@ -27,6 +27,7 @@ function WebhooksIndexPage(props: IOwnProps) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingID, setEditingID] = useState<number | null>(null);
     const [deleteID, setDeleteID] = useState<number | null>(null);
+    const [isDelete, setIsDelete] = useState(false);
     const [purgeID, setPurgeID] = useState<number | null>(null);
     const params = useParams<{}>();
     const history = useHistory();
@@ -43,7 +44,7 @@ function WebhooksIndexPage(props: IOwnProps) {
 
     const { webhookID } = props;
     const isEditing = webhookID != null;
-
+   
     return (
         <>
             <DashboardHeaderBlock
@@ -54,8 +55,14 @@ function WebhooksIndexPage(props: IOwnProps) {
                     </LinkAsButton>
                 }
             />
-            <WebhookDeleteModal
-            />
+      {isDelete && (
+        < WebhookDeleteModal
+           webhookID={deleteID}
+           onDismiss={() => {
+            setDeleteID(null);
+           }}
+        />
+      )}
             <DashboardTable
                 head={
                     <tr>
@@ -73,6 +80,7 @@ function WebhooksIndexPage(props: IOwnProps) {
                             setIsFormOpen(true);
                         }}
                         onDeleteClick={() => {
+                            setIsDelete(true);
                             setDeleteID(webhook.webhookID);
                         }}
                     />

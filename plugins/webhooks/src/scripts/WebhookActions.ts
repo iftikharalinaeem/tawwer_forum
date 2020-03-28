@@ -108,7 +108,7 @@ export class WebhookActions extends ReduxActions {
 
     public deleteWebhook = (options: IDeleteWebhookRequest) => {
         const apiThunk = bindThunkAction(WebhookActions.deleteWebhook_ACs, async () => {
-            const response = await this.api.delete(`/webhook/${options.webhookID}`);
+            const response = await this.api.delete(`/webhooks/${options.webhookID}`);
             return response.data;
         })(options);
         return this.dispatch(apiThunk);
