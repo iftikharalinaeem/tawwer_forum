@@ -76,4 +76,24 @@ export const WebhookReducer = produce(
             }
             return state;
         })
+
+        .case(WebhookActions.patchFormACs.started, (state, payload) => {
+            state.formSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(WebhookActions.patchFormACs.failed, (state, payload) => {
+            state.formSubmit.status = LoadStatus.ERROR;
+            state.formSubmit.error = payload.error;
+            return state;
+        })
+        .case(WebhookActions.patchFormACs.done, (state, payload) => {
+            state.formSubmit.status = LoadStatus.SUCCESS;
+            state.webhooksByID = {
+                status: LoadStatus.SUCCESS,
+            };
+            if (payload.result.webhookID) {
+                state.webhooksByID[payload.result.webhookID] = payload.result;
+            }
+            return state;
+        })
 );

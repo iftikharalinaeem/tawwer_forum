@@ -38,7 +38,7 @@ export class WebhookActions extends ReduxActions {
     public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET");
     public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook[], IApiError>("GET_EDIT");
     public static postFormACs = actionCreator.async<IPostWebhookRequest, IPostWebhookResponse, IApiError>("POST");
-    public static patchWebhook_ACs = actionCreator.async<IPatchWebhookRequest, IPatchWebhookResponse, IApiError>("PATCH");
+    public static patchFormACs = actionCreator.async<IPatchWebhookRequest, IPatchWebhookResponse, IApiError>("PATCH");
     public static deleteWebhook_ACs = actionCreator.async<IDeleteWebhookRequest, IDeleteWebhookResponse, IApiError>("DELETE");
     
     public getAll = () => {
@@ -74,7 +74,7 @@ export class WebhookActions extends ReduxActions {
 
 	public saveWebhookForm = async (form: IWebhookFormState) => {
  		if (form.webhookID) {
-            //return await this.patchWebhook(form as any);
+            return await this.patchWebhook(form as any);
         } else {
             return await this.postWebhook(form as any);
         }
@@ -92,8 +92,8 @@ export class WebhookActions extends ReduxActions {
     public patchWebhook(options: IPatchWebhookRequest) {
         const { webhookID, ...url } = options;
 
-        const thunk = bindThunkAction(WebhookActions.patchWebhook_ACs, async () => {
-            const response = await this.api.patch(`/webhook-settings/${webhookID}`, url);
+        const thunk = bindThunkAction(WebhookActions.patchFormACs, async () => {
+            const response = await this.api.patch(`/webhooks/${webhookID}`, url);
             return response.data;
         })(options);
 
