@@ -30,7 +30,7 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 export function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm, saveWebhookForm, clearError } = useWebhookActions();
-    const params = useParams<{webhookID?: number}>();
+    const params = useParams<{webhookID?: string}>();
     const webhookID = params.webhookID ? params.webhookID : null;
     const isEditing = !!webhookID;
     const isLoading = status === LoadStatus.LOADING;
@@ -50,7 +50,7 @@ export function WebhookAddEdit() {
     };
 
     useEffect(() => {
-        initForm(webhookID);
+        initForm(webhookID? parseInt(webhookID) : undefined);
     }, [webhookID, initForm]);
 
     useEffect(() => {

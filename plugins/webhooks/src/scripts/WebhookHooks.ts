@@ -11,6 +11,7 @@ import { useWebhookActions } from "@webhooks/WebhookActions";
 
 export function useWebhooks() {
     const webhooksByID = useSelector((state: IWebhookStoreState) => state.webhooks.webhooksByID);
+    const formSubmit = useSelector((state: IWebhookStoreState) => state.webhooks.formSubmit);
     const { getAll } = useWebhookActions();
 
     useEffect(() => {
@@ -23,6 +24,5 @@ export function useWebhooks() {
 }
 
 export function useWebhookData() {
-    const debug = useSelector((state: IWebhookStoreState) => state.webhooks);
     return useSelector((state: IWebhookStoreState) => state.webhooks);
 }
