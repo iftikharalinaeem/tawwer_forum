@@ -10,6 +10,7 @@ import { ButtonTypes } from "@library/forms/buttonStyles";
 import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import React from "react";
 import Button from "@library/forms/Button";
+import { useHistory } from "react-router";
 
 interface IProps {
     webhook: IWebhook;
@@ -18,6 +19,7 @@ interface IProps {
 }
 export function WebhooksTableRow(props: IProps) {
     const { webhook } = props;
+    const history = useHistory();
     return (
         <tr>
             <td>
@@ -30,7 +32,9 @@ export function WebhooksTableRow(props: IProps) {
                 <DashboardTableOptions>
                     <Button
                         className="btn-icon"
-                        onClick={props.onEditClick}
+                        onClick={() => {
+                            history.push(`/webhook-settings/${webhook.webhookID}/edit`);
+                        }}
                         baseClass={ButtonTypes.ICON_COMPACT}>
                         <EditIcon />
                     </Button>

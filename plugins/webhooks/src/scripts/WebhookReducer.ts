@@ -68,7 +68,12 @@ export const WebhookReducer = produce(
         })
         .case(WebhookActions.postFormACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
-            state.webhooksByID.data![payload.result.webhookID] = payload.result;
+            state.webhooksByID = {
+                status: LoadStatus.SUCCESS,
+            };
+            if (payload.result.webhookID) {
+                state.webhooksByID[payload.result.webhookID] = payload.result;
+            }
             return state;
         })
 );

@@ -11,7 +11,7 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 import { EventType, WebhookStatus } from "@webhooks/WebhookTypes";
-import { useWebhookData, useWebhooks } from "@webhooks/WebhookHooks";
+import { useWebhookData } from "@webhooks/WebhookHooks";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
@@ -34,8 +34,8 @@ export function WebhookAddEdit() {
     const webhookID = params.webhookID ? params.webhookID : null;
     const isEditing = !!webhookID;
     const isLoading = status === LoadStatus.LOADING;
-    const isFormSubmitSuccessful = formSubmit.status === LoadStatus.SUCCESS;
     const history = useHistory();
+    const errors = formSubmit.error?.response.data?.errors;
     const webhookCSSClasses = webhookAddEditClasses();
 
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
@@ -54,9 +54,9 @@ export function WebhookAddEdit() {
     }, [webhookID, initForm]);
 
     useEffect(() => {
-        if(isFormSubmitSuccessful) {
+        if(formSubmit.status === LoadStatus.SUCCESS) {
             clearError();
-            history.push('/webhook-settings');
+            history.push("/webhook-settings");
         }   
     });
 
@@ -64,7 +64,7 @@ export function WebhookAddEdit() {
         return <ErrorPage apiError={form.error} />;
     }
 
-    if (isLoading || (isEditing && form.formStatus !== LoadStatus.SUCCESS)) {
+    if (isLoading || isEditing && form.formStatus !== LoadStatus.SUCCESS) {
         return <Loader />
     }
 
@@ -86,6 +86,7 @@ export function WebhookAddEdit() {
                 />
                 <DashboardFormGroup label={t("Name")}>
                     <DashboardInput
+                        errors={errors?.["name"]}
                         inputProps={{
                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                                 const { value } = event.target;
@@ -97,6 +98,7 @@ export function WebhookAddEdit() {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Delivery Url")}>
                     <DashboardInput
+                        errors={errors?.["url"]}
                         inputProps={{
                             placeholder: "https://",
                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +111,7 @@ export function WebhookAddEdit() {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Secret")} description={t("The Secret is used to sign each delivery.")}>
                     <DashboardInput
+                        errors={errors?.["secret"]}
                         inputProps={{
                             onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
                                 const { value } = event.target;
@@ -120,6 +123,7 @@ export function WebhookAddEdit() {
                 </DashboardFormGroup>
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
                     <DashboardRadioGroup
+                        errors={errors?.["events"]}
                         value={(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
                         onChange={event => {
                             if (event === EventType.INDIVIDUAL) {

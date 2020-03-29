@@ -84,8 +84,9 @@ export class WebhookActions extends ReduxActions {
  		const thunk = bindThunkAction(WebhookActions.postFormACs, async () => {
   		const response = await this.api.post(`/webhooks/`, options);
   		return response.data;
-    	})(options);
-    return this.dispatch(thunk);
+        })(options);
+        
+        return this.dispatch(thunk);
      };
 
     public patchWebhook(options: IPatchWebhookRequest) {

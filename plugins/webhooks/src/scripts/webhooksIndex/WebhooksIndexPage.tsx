@@ -11,7 +11,7 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
 import { ButtonTypes } from "@library/forms/buttonStyles";
 import Loader from "@library/loaders/Loader";
-import { useWebhooks } from "@webhooks/WebhookHooks";
+import { useWebhooks, useWebhookData } from "@webhooks/WebhookHooks";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
