@@ -9,11 +9,10 @@ import ModalSizes from "@library/modal/ModalSizes";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
-import { IWebhooksStoreState } from "@webhooks/WebhookTypes";
+import { IWebhookState } from "@webhooks/WebhookTypes";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 import { LoadStatus } from "@library/@types/api/core";
 import { WebhookStatus } from "@webhooks/WebhookTypes";
-import { IWebhookState } from "./WebhookTypes";
 
 interface IProps {
     webhookID: number | null;

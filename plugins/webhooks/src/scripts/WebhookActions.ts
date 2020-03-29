@@ -23,7 +23,11 @@ export class WebhookActions extends ReduxActions {
     public static postFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("POST");
     public static patchFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("PATCH");
     public static deleteWebhookACs = actionCreator.async<{ webhookID: number }, undefined, IApiError>("DELETE");
-    
+    public static clearErrorAC = actionCreator("CLEAR_ERROR");
+    public clearError = this.bindDispatch(WebhookActions.clearErrorAC);
+
+    public static updateFormAC = actionCreator<Partial<IWebhookFormState>>("UPDATE_FORM");
+    public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
     public getAll = () => {
         const thunk = bindThunkAction(WebhookActions.getAllWebhookACs, async () => {
             const response = await this.api.get(`/webhooks`, {});
@@ -48,12 +52,6 @@ export class WebhookActions extends ReduxActions {
             this.updateForm(payload);
         }
     };
-
-    public static clearErrorAC = actionCreator("CLEAR_ERROR");
-    public clearError = this.bindDispatch(WebhookActions.clearErrorAC);
-
-    public static updateFormAC = actionCreator<Partial<IWebhookFormState>>("UPDATE_FORM");
-    public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
 
 	public saveWebhookForm = async (form: IWebhookFormState) => {
  		if (form.webhookID) {

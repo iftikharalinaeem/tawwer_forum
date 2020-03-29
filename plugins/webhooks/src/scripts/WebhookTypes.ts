@@ -67,12 +67,12 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     webhooksByID: {
         status: LoadStatus.PENDING,
-        deletesByID: '',
     },
     form: INITIAL_WEBHOOK_FORM,
     formSubmit: {
         status: LoadStatus.PENDING,
     },
+    deletesByID: {},
 };
 
 export interface IWebhookStoreState {
