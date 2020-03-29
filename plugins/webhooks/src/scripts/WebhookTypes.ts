@@ -33,22 +33,6 @@ export enum EventType {
     DISCUSSION = "discussion",
     USER = "user",
 }
-export interface IPatchWebhookRequest {
-    webhookID: number;
-    status?: string;
-    events: string;
-    name: string;
-    url: string;
-    secret: string;
-}
-export interface IPostWebhookRequest {
-    description: string;
-    status?: string;
-    events: string;
-    name: string;
-    url: string;
-    secret: string;
-}
 export interface IWebhookState {
     webhooksByID: ILoadable<{
         [id: number]: IWebhook;

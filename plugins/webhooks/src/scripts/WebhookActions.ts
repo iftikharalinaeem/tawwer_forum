@@ -8,8 +8,6 @@ import { IApiError } from "@library/@types/api/core";
 import {
     IWebhook,
     IWebhookFormState,
-    IPatchWebhookRequest,
-    IPostWebhookRequest,
     INITIAL_WEBHOOK_FORM,
 } from "@webhooks/WebhookTypes";
 import actionCreatorFactory from "typescript-fsa";
@@ -19,27 +17,12 @@ import apiv2 from "@library/apiv2";
 
 const actionCreator = actionCreatorFactory("@@webhooks");
 
-interface IWebhookParams {
-    webhookID: number;
-}
-interface IGetWebhookRequest {
-    webhookID: number;
-}
-type IDeleteWebhookRequest = {
-    webhookID: number;
-};
-
-type IGetWebhookResponse = IWebhook[];
-type IPostWebhookResponse = IWebhook;
-type IPatchWebhookResponse = IWebhook;
-type IDeleteWebhookResponse = undefined;
-
 export class WebhookActions extends ReduxActions {
-    public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET");
-    public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook[], IApiError>("GET_EDIT");
-    public static postFormACs = actionCreator.async<IPostWebhookRequest, IPostWebhookResponse, IApiError>("POST");
-    public static patchFormACs = actionCreator.async<IPatchWebhookRequest, IPatchWebhookResponse, IApiError>("PATCH");
-    public static deleteWebhook_ACs = actionCreator.async<IDeleteWebhookRequest, IDeleteWebhookResponse, IApiError>("DELETE");
+    public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET_ALL");
+    public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook, IApiError>("GET_EDIT");
+    public static postFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("POST");
+    public static patchFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("PATCH");
+    public static deleteWebhookACs = actionCreator.async<{ webhookID: number }, undefined, IApiError>("DELETE");
     
     public getAll = () => {
         const thunk = bindThunkAction(WebhookActions.getAllWebhookACs, async () => {
@@ -80,16 +63,17 @@ export class WebhookActions extends ReduxActions {
         }
     };
     
-	public postWebhook(options: IPostWebhookRequest) {
+	public postWebhook(options: IWebhook) {
  		const thunk = bindThunkAction(WebhookActions.postFormACs, async () => {
-             const response = await this.api.post(`/webhooks/`, options);
-             return response.data;
+            options.webhookID = null;
+            const response = await this.api.post(`/webhooks/`, options);
+            return response.data;
         })(options);
         
         return this.dispatch(thunk);
      };
 
-    public patchWebhook(options: IPatchWebhookRequest) {
+    public patchWebhook(options: IWebhook) {
         const { webhookID, ...url } = options;
 
         const thunk = bindThunkAction(WebhookActions.patchFormACs, async () => {
@@ -100,8 +84,8 @@ export class WebhookActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public deleteWebhook = (options: IDeleteWebhookRequest) => {
-        const apiThunk = bindThunkAction(WebhookActions.deleteWebhook_ACs, async () => {
+    public deleteWebhook = (options: { webhookID: number }) => {
+        const apiThunk = bindThunkAction(WebhookActions.deleteWebhookACs, async () => {
             const response = await this.api.delete(`/webhooks/${options.webhookID}`);
             return response.data;
         })(options);
