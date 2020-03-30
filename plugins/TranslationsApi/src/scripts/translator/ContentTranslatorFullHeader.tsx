@@ -4,7 +4,7 @@
  */
 
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
 import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { modalClasses } from "@library/modal/modalStyles";

@@ -6,7 +6,7 @@
 import React, { useState } from "react";
 import { EditorEmbedBar } from "@rich-editor/editor/EditorEmbedBar";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { registerEmbed } from "@library/embeddedContent/embedService";
 import { OpenApiEmbed, IOpenApiEmbedData } from "../embed/OpenApiEmbed";
 import { useEditor } from "@rich-editor/editor/context";
