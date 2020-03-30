@@ -8,7 +8,7 @@ import themeEditorPageClasses from "@themingapi/theme/themeEditorPageStyles";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import classNames from "classnames";
 import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import { useThemeActions } from "@themingapi/theme/ThemeEditorActions";
 import { visibility } from "@vanilla/library/src/scripts/styles/styleHelpers";
