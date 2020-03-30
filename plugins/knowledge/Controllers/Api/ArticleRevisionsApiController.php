@@ -11,6 +11,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleDraft;
@@ -69,14 +70,14 @@ class ArticleRevisionsApiController extends AbstractKnowledgeApiController {
      * @param ArticleRevisionModel $articleRevisionModel
      * @param ArticleModel $articleModel
      * @param UserModel $userModel
-     * @param FormatService $formatService
+     * @param ExtendedContentFormatService $formatService
      * @param KnowledgeBaseModel $knowledgeBaseModel
      */
     public function __construct(
         ArticleRevisionModel $articleRevisionModel,
         ArticleModel $articleModel,
         UserModel $userModel,
-        FormatService $formatService,
+        ExtendedContentFormatService $formatService,
         KnowledgeBaseModel $knowledgeBaseModel
     ) {
         $this->articleRevisionModel = $articleRevisionModel;
