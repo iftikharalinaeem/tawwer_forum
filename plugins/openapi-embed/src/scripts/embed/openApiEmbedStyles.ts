@@ -4,7 +4,7 @@
  */
 
 import { useThemeCache, variableFactory, styleFactory } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { color, ColorHelper, percent } from "csx";
+import { color, percent } from "csx";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import {
     paddings,
@@ -14,12 +14,12 @@ import {
     colorOut,
     borders,
     margins,
-    clickableItemStates,
 } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { PlaceholderType } from "@openapi-embed/embed/OpenApiEmbedPlaceholder";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { lineHeightAdjustment } from "@vanilla/library/src/scripts/styles/textUtils";
 import { keyframes } from "typestyle";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const openApiEmbedVariables = useThemeCache(() => {
     const makeVars = variableFactory("openApiEmbed");
