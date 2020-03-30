@@ -10,7 +10,7 @@ import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import CurrentThemeInfo from "@library/theming/CurrentThemeInfo";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import LinkAsButton from "@vanilla/library/src/scripts/routing/LinkAsButton";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import currentThemeClasses from "@vanilla/library/src/scripts/theming/currentThemeStyles";
 import { IManageTheme } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import { ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";

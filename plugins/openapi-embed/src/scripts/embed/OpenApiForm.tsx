@@ -11,7 +11,7 @@ import FrameHeader from "@vanilla/library/src/scripts/layout/frame/FrameHeader";
 import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import FrameFooter from "@vanilla/library/src/scripts/layout/frame/FrameFooter";
 import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { OpenApiPreview } from "@openapi-embed/embed/OpenApiPreview";
 import { frameFooterClasses } from "@vanilla/library/src/scripts/layout/frame/frameFooterStyles";
