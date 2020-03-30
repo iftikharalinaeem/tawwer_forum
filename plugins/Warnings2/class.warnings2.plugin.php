@@ -149,10 +149,20 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param EntryController $sender The Event sender.
      * @param array $args Array of arguments.
      */
-    public function entryController_checkExpiredBan_handler($sender, $args) {
+    public function base_beforeSignIn_handler($sender, $args) {
         if (isset($args['UserID'])) {
             $warningModel = new WarningModel();
             $warningModel->processWarnings($args['UserID']);
+        }
+    }
+
+    /**
+     * Process expired warning(s) after sign-in.
+     */
+    public function base_afterSignIn_handler() {
+        if (Gdn::session()->UserID) {
+            $warningModel = new WarningModel();
+            $warningModel->processWarnings(Gdn::session()->UserID);
         }
     }
 
