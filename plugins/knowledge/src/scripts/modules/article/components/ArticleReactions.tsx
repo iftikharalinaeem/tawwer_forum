@@ -21,7 +21,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api/article";
 import { CheckCompactIcon } from "@library/icons/common";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting } = props;

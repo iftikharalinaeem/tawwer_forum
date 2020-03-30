@@ -22,7 +22,7 @@ import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
 import UserContent from "@library/content/UserContent";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";

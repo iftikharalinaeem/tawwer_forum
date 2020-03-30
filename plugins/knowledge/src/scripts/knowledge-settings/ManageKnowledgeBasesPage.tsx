@@ -16,7 +16,7 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import { KnowledgeBaseAddEdit } from "@knowledge/knowledge-settings/addEdit/KnowledgeBaseAddEdit";
 import { BrowserRouter } from "react-router-dom";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { useKnowledgeBaseActions } from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { KnowledgeBasePatchStatusModal } from "@knowledge/knowledge-settings/KnowledgeBasePatchStatusModal";
 import { KnowledgeBasePurgeModal } from "@knowledge/knowledge-settings/KnowledgeBasePurgeModal";

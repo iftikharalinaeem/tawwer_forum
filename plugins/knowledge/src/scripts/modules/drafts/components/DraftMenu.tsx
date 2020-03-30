@@ -14,7 +14,7 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { connect } from "react-redux";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import classNames from "classnames";
 import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftPreviewStyles";
 

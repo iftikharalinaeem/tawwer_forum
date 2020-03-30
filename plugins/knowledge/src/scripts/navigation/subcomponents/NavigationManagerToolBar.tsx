@@ -12,7 +12,7 @@ import classNames from "classnames";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
 import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcomponents/navigationManagerToolBarStyles";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { NewFolderIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
 import { ToolTip } from "@library/toolTip/ToolTip";

@@ -17,7 +17,7 @@ import { connect } from "react-redux";
 import { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import isEqual from "lodash/isEqual";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Modal from "@library/modal/Modal";
 import uniqueId from "lodash/uniqueId";
 import AccessibleError from "@library/forms/AccessibleError";

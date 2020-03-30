@@ -24,7 +24,6 @@ import { MockStore } from "@vanilla/redux-utils";
 import { promiseTimeout } from "@vanilla/utils";
 import MockAdapter from "axios-mock-adapter";
 import { createMemoryHistory } from "history";
-import { KB_TEST_INITIAL_STATE } from "@knowledge/__tests__/initialState";
 import EditorPageModel, { IEditorPageForm } from "@knowledge/modules/editor/EditorPageModel";
 import { DeepPartial } from "redux";
 import { LoadStatus } from "@library/@types/api/core";

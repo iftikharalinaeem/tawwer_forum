@@ -17,7 +17,7 @@ import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import Banner from "@library/banner/Banner";
 import Permission from "@library/features/users/Permission";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import { ComposeIcon } from "@library/icons/common";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";

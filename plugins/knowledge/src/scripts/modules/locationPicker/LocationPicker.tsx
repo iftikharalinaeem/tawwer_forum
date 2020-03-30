@@ -11,7 +11,7 @@ import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPicke
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";

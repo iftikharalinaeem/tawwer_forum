@@ -4,11 +4,11 @@
  */
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { clickableItemStates } from "@library/styles/styleHelpersLinks";
 import { colorOut } from "@library/styles/styleHelpersColors";
 import { paddings } from "@library/styles/styleHelpersSpacing";
 import { borders, unit } from "@library/styles/styleHelpers";
 import { percent } from "csx";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const relatedArticlesClasses = useThemeCache(() => {
     const style = styleFactory("relatedArticles");

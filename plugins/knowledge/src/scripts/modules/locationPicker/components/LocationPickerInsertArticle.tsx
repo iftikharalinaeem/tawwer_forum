@@ -7,7 +7,7 @@
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
 import { locationPickerClasses } from "@knowledge/modules/locationPicker/locationPickerStyles";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import React from "react";

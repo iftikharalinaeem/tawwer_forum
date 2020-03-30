@@ -4,10 +4,11 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { clickableItemStates, colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
+import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");
@@ -58,7 +59,7 @@ export const reactionClasses = useThemeCache(() => {
     const linkColors = clickableItemStates();
     const link = style("link", {
         fontWeight: vars.fonts.weights.bold,
-        color: colorOut(linkColors.color),
+        color: colorOut(linkColors.color as string),
         $nest: linkColors.$nest,
     });
 

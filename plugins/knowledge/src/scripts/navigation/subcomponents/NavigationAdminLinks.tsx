@@ -14,7 +14,7 @@ import { siteNavAdminLinksClasses } from "@knowledge/navigation/subcomponents/na
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import NewCategoryForm from "@knowledge/modules/locationPicker/components/NewCategoryForm";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { NewFolderIcon } from "@library/icons/common";
 import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
 import { ToolTip } from "@library/toolTip/ToolTip";

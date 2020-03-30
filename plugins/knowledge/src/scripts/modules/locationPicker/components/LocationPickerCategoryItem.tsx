@@ -11,7 +11,7 @@ import classNames from "classnames";
 import React from "react";
 import { knowledgeBaseItem } from "@knowledge/icons/common";
 import { folderContentsClasses } from "@knowledge/modules/locationPicker/folderContentsStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { CategoryIcon, CheckCompactIcon, RightChevronIcon } from "@library/icons/common";
 
 interface IProps {
