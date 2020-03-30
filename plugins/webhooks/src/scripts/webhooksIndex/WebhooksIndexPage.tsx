@@ -11,7 +11,6 @@ import { WebhookStatus } from "@webhooks/WebhookTypes";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { WebhooksTableRow } from "@webhooks/WebhooksTableRow";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
 import Loader from "@library/loaders/Loader";
 import { useWebhooks } from "@webhooks/WebhookHooks";
 import { WebhookReducer } from "@webhooks/WebhookReducer";
@@ -19,6 +18,7 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 registerReducer("webhooks", WebhookReducer);
 
