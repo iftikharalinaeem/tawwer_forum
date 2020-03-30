@@ -38,15 +38,12 @@ export function WebhooksTableRow(props: IProps) {
                         baseClass={ButtonTypes.ICON_COMPACT}>
                         <EditIcon />
                     </Button>
-                    )}
-                    {
                     <Button 
                         className="btn-icon"
                         onClick={props.onDeleteClick}
                         baseClass={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>
-                    }
                 </DashboardTableOptions>
             </td>
         </tr>
