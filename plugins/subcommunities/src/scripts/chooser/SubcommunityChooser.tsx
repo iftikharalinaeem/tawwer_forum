@@ -27,8 +27,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocaleInfo, t } from "@vanilla/i18n";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
-import { useSubcommunityActions } from "@subcommunities/subcommunities/SubcommunityActions";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 type SectionName = "locale" | "product";
 
