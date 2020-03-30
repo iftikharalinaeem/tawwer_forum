@@ -13,7 +13,7 @@ import { useFocusWatcher } from "@vanilla/react-utils";
 import { TextInput } from "@library/forms/TextInput";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { PlusCircleIcon, EditIcon, DeleteIcon } from "@library/icons/common";
 import { ProductDeleteErrorModal } from "@subcommunities/products/ProductDeleteErrorModal";
 import ButtonLoader from "@library/loaders/ButtonLoader";

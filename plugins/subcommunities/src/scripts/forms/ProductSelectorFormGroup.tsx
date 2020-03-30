@@ -8,7 +8,7 @@ import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import Translate from "@library/content/Translate";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
 import { ProductManager } from "@subcommunities/products/ProductManager";
 import { useProducts } from "@subcommunities/products/productSelectors";

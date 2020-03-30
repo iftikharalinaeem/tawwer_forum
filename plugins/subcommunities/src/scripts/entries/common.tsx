@@ -13,7 +13,7 @@ import {
 import { ProductActions } from "@subcommunities/products/ProductActions";
 import multiSiteReducer from "@subcommunities/state/reducer";
 import { addHamburgerNavGroup } from "@vanilla/library/src/scripts/flyouts/Hamburger";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 import { Devices, useDevice } from "@vanilla/library/src/scripts/layout/DeviceContext";
 import { addComponent } from "@vanilla/library/src/scripts/utility/componentRegistry";

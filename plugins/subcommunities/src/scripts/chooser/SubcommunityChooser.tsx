@@ -5,7 +5,7 @@
 
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DownTriangleIcon, GlobeIcon } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Frame from "@library/layout/frame/Frame";
@@ -27,8 +27,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocaleInfo, t } from "@vanilla/i18n";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
-import { useSubcommunityActions } from "@subcommunities/subcommunities/SubcommunityActions";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 type SectionName = "locale" | "product";
 
