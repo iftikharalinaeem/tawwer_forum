@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import React from "react";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/ButtonTypes";
 import { LeftChevronCompactIcon } from "@library/icons/common";
-import LinkAsButton from "@library/routing/LinkAsButton";
 
 interface IProps {
     showBackLink?: boolean;

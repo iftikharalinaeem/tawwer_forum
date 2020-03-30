@@ -3,14 +3,13 @@
  * @license Proprietary
  */
 
-import React, { useEffect, useCallback, useDebugValue } from "react";
+import React, { useEffect } from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IWebhookState } from "@webhooks/WebhookTypes";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 import { LoadStatus } from "@library/@types/api/core";
-
 
 interface IProps {
     webhookID: number | null;

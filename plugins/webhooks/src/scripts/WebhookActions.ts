@@ -16,17 +16,11 @@ import { useMemo } from "react";
 import apiv2 from "@library/apiv2";
 
 const actionCreator = actionCreatorFactory("@@webhooks");
-interface IWebhookParams {
-    webhookID: string;
-}
-
-type IGetWebhookRequest = {
-    webhookID: number;
-};
 type IDeleteWebhookRequest = {
     webhookID: number;
 };
 type IDeleteWebhookResponse = undefined;
+
 export class WebhookActions extends ReduxActions {
     public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET_ALL");
     public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook, IApiError>("GET_EDIT");

@@ -1,9 +1,13 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { unit, paddings, margins } from "@library/styles/styleHelpers";
+import { paddings } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 
 export const webhookAddEditClasses = useThemeCache(() => {
-    const makeVars = variableFactory("webhookAddEdit");
     const globalVars = globalVariables();
     const style = styleFactory("webhookAddEdit");
 

@@ -5,8 +5,8 @@
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import { IWebhook, WebhookStatus } from "@webhooks/WebhookTypes";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { IWebhook } from "@webhooks/WebhookTypes";
+import { ButtonTypes } from "@library/forms/ButtonTypes";
 import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import React from "react";
 import Button from "@library/forms/Button";

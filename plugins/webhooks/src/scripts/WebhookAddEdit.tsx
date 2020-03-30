@@ -17,7 +17,7 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/ButtonTypes";
 import Button from "@library/forms/Button";
 import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";

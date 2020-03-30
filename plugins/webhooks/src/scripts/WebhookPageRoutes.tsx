@@ -3,9 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect } from "react";
 import RouteHandler from "@vanilla/library/src/scripts/routing/RouteHandler";
-import { Route } from "react-router";
 import { IWebhook } from "@webhooks/WebhookTypes";
 
 export const WebhooksIndexRoute = new RouteHandler(
