@@ -24,8 +24,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label("Show active users for the entire site", "Plugins.Online.EntireSite"); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->toggle('Plugins.Online.EntireSite');
-            ?>
+            <?php echo $this->Form->toggle('Plugins.Online.EntireSite'); ?>
         </div>
     </li>
     <li class="form-group">
