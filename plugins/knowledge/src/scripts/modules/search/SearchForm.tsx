@@ -28,6 +28,7 @@ import * as React from "react";
 import { useEffect, useCallback } from "react";
 import { useHistory } from "react-router";
 import { useSearchFilters } from "@library/contexts/SearchFilterContext";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
@@ -65,6 +66,7 @@ function SearchForm(props: IProps) {
     return (
         <DocumentTitle title={form.query ? form.query : t("Search Results")}>
             <TitleBar title={t("Search")} />
+            <Banner isContentBanner />
             <Container>
                 <QueryString value={form} defaults={queryParamDefaults} />
                 <PanelLayout

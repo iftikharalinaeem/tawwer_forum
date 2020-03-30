@@ -18,6 +18,8 @@ import FeaturedArticleLayout from "@knowledge/modules/article/components/Feature
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import { t } from "@vanilla/i18n/src";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
+import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 export default function ArticleListPage() {
     const siteSection = getSiteSection();
@@ -39,8 +41,15 @@ export default function ArticleListPage() {
 
     let queryString = query.knowledgeBaseID ? `&knowledgBaseID=${query.knowledgeBaseID}` : "";
     queryString = query.recommended ? queryString + `&recommended=${query.recommended}` : queryString + "";
+    const knowledgeBase = useKnowledgeBase(query.knowledgeBaseID);
 
-    if (articles.status === LoadStatus.PENDING || articles.status === LoadStatus.LOADING) {
+    const hasKB = !!query.knowledgeBaseID;
+
+    if (
+        articles.status === LoadStatus.PENDING ||
+        articles.status === LoadStatus.LOADING ||
+        (hasKB && [LoadStatus.PENDING, LoadStatus.LOADING].includes(knowledgeBase.status))
+    ) {
         return <Loader />;
     }
 
@@ -51,6 +60,10 @@ export default function ArticleListPage() {
 
     if (!articles.data) {
         return <KbErrorPage defaultError={DefaultKbError.NO_ARTICLES} />;
+    }
+
+    if (knowledgeBase.error) {
+        return <KbErrorPage error={knowledgeBase.error} />;
     }
 
     const articleResults = articles.data.body.map((article: ISearchResult) => {
@@ -70,6 +83,11 @@ export default function ArticleListPage() {
 
     return (
         <DocumentTitle title={title}>
+            <Banner
+                isContentBanner
+                backgroundImage={knowledgeBase.data?.bannerImage}
+                contentImage={knowledgeBase.data?.bannerContentImage}
+            />
             <FeaturedArticleLayout
                 results={articleResults}
                 pages={articles.data.pagination}
