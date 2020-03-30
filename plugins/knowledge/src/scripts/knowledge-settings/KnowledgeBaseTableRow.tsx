@@ -7,7 +7,7 @@ import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
 import { IKnowledgeBase, KnowledgeBaseStatus } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";

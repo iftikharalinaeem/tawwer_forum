@@ -11,7 +11,7 @@ import { article, folderClosed, folderOpen } from "@knowledge/navigation/navigat
 import classNames from "classnames";
 import React from "react";
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
 
 interface IProps {

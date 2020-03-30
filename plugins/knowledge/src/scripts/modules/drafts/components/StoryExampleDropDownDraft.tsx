@@ -7,7 +7,7 @@
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeviceProvider, Devices, useDevice } from "@library/layout/DeviceContext";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import { t } from "@library/utility/appUtils";

@@ -9,7 +9,7 @@ import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import DateTime from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";

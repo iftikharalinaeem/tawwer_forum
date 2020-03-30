@@ -24,7 +24,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
-import { ButtonTypes } from "@library/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";

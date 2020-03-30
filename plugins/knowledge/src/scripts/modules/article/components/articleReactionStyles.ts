@@ -8,6 +8,8 @@ import { clickableItemStates, colorOut, flexHelper, unit } from "@library/styles
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");
