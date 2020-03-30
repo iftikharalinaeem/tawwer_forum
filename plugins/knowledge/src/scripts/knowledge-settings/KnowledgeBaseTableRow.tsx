@@ -16,6 +16,8 @@ import { t, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import Button from "@library/forms/Button";
 import { iconClasses } from "@library/icons/iconClasses";
+import { useKnowledgeBases } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
+import { CollapsableContent } from "@vanilla/library/src/scripts/content/CollapsableContent";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
@@ -24,11 +26,27 @@ interface IProps {
     onStatusChangeClick: () => void;
     onPurgeClick?: () => void;
 }
+
+function useOnlyKbInSiteSection(kb: IKnowledgeBase) {
+    const kbs = useKnowledgeBases(KnowledgeBaseStatus.PUBLISHED);
+    if (!kbs.data) {
+        return false;
+    }
+
+    const siteSectionGroup = kb.siteSectionGroup;
+    const matchingKBs = Object.values(kbs.data).filter(kb => {
+        return kb.siteSectionGroup === siteSectionGroup;
+    });
+
+    return matchingKBs.length === 1;
+}
+
 export function KnowledgeBaseTableRow(props: IProps) {
     const kb = props.knowledgeBase;
 
     const siteSectionLocales = kb.siteSections.map(siteSection => siteSection.contentLocale);
     const hasConflictingSourceLocale = !siteSectionLocales.includes(kb.sourceLocale);
+    const isOnlyInSectionGroup = useOnlyKbInSiteSection(kb);
 
     return (
         <tr>
@@ -37,16 +55,22 @@ export function KnowledgeBaseTableRow(props: IProps) {
             </td>
             <td>
                 {kb.siteSections.length > 0 ? (
-                    kb.siteSections.map(section => {
-                        const sectionBase = section.basePath.replace("/", "");
-                        const fullUrlCode = `${sectionBase ? "/" + sectionBase : ""}/kb/${kb.urlCode.replace("/", "")}`;
-                        return (
-                            <React.Fragment key={section.sectionID}>
-                                <a href={getMeta("context.host") + fullUrlCode}>{fullUrlCode}</a>
-                                <br />
-                            </React.Fragment>
-                        );
-                    })
+                    <CollapsableContent isExpandedDefault={false} maxHeight={100} allowsCssOverrides>
+                        {kb.siteSections.map(section => {
+                            const sectionBase = section.basePath.replace("/", "");
+                            let urlCode = `${sectionBase ? "/" + sectionBase : ""}/kb`;
+                            const fullUrlCode = urlCode + kb.urlCode;
+                            if (!isOnlyInSectionGroup) {
+                                urlCode = urlCode;
+                            }
+                            return (
+                                <React.Fragment key={section.sectionID}>
+                                    <a href={getMeta("context.host") + fullUrlCode}>{urlCode}</a>
+                                    <br />
+                                </React.Fragment>
+                            );
+                        })}
+                    </CollapsableContent>
                 ) : (
                     <ToolTip label={"This knowledge base is not accesssible due to a multisite configuration issue."}>
                         <ToolTipIcon>

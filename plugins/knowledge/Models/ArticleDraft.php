@@ -7,6 +7,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 
@@ -22,7 +23,7 @@ class ArticleDraft {
      *
      * @param FormatService $formatService Blot formatService
      */
-    public function __construct(FormatService $formatService) {
+    public function __construct(ExtendedContentFormatService $formatService) {
         $this->formatService = $formatService;
     }
 
