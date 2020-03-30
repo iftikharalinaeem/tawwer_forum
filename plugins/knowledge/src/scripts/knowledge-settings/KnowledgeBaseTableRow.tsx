@@ -11,7 +11,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { getMeta } from "@library/utility/appUtils";
+import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { t, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import Button from "@library/forms/Button";
@@ -65,7 +65,7 @@ export function KnowledgeBaseTableRow(props: IProps) {
                             }
                             return (
                                 <React.Fragment key={section.sectionID}>
-                                    <a href={getMeta("context.host") + fullUrlCode}>{urlCode}</a>
+                                    <a href={siteUrl(urlCode)}>{urlCode}</a>
                                     <br />
                                 </React.Fragment>
                             );
