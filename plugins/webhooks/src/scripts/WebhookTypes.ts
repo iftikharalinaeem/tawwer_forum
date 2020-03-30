@@ -74,7 +74,3 @@ export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     },
     deletesByID: {},
 };
-
-export interface IWebhookStoreState {
-    webhooks: IWebhookState;
-}

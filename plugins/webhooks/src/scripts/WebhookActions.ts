@@ -16,15 +16,27 @@ import { useMemo } from "react";
 import apiv2 from "@library/apiv2";
 
 const actionCreator = actionCreatorFactory("@@webhooks");
+interface IWebhookParams {
+    webhookID: string;
+}
 
+type IGetWebhookRequest = {
+    webhookID: number;
+};
+type IDeleteWebhookRequest = {
+    webhookID: number;
+};
+type IDeleteWebhookResponse = undefined;
 export class WebhookActions extends ReduxActions {
     public static readonly getAllWebhookACs = actionCreator.async<{}, IWebhook[], IApiError>("GET_ALL");
     public static readonly getEditWebhookACs = actionCreator.async<{ webhookID: number }, IWebhook, IApiError>("GET_EDIT");
     public static postFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("POST");
     public static patchFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("PATCH");
-    public static deleteWebhookACs = actionCreator.async<{ webhookID: number }, undefined, IApiError>("DELETE");
+    public static deleteWebhook_ACs = actionCreator.async<IDeleteWebhookRequest, IDeleteWebhookResponse, IApiError>("DELETE");
     public static clearErrorAC = actionCreator("CLEAR_ERROR");
     public clearError = this.bindDispatch(WebhookActions.clearErrorAC);
+    public static clearDeleteStatus = actionCreator<{ webhookID: number }>("CLEAR_DELETE_STATUS");
+    public clearDeleteStatus = this.bindDispatch(WebhookActions.clearDeleteStatus);
 
     public static updateFormAC = actionCreator<Partial<IWebhookFormState>>("UPDATE_FORM");
     public updateForm = this.bindDispatch(WebhookActions.updateFormAC);
@@ -83,7 +95,7 @@ export class WebhookActions extends ReduxActions {
     };
 
     public deleteWebhook = (options: { webhookID: number }) => {
-        const apiThunk = bindThunkAction(WebhookActions.deleteWebhookACs, async () => {
+        const apiThunk = bindThunkAction(WebhookActions.deleteWebhook_ACs, async () => {
             const response = await this.api.delete(`/webhooks/${options.webhookID}`);
             return response.data;
         })(options);

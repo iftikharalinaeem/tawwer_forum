@@ -96,4 +96,30 @@ export const WebhookReducer = produce(
             }
             return state;
         })
+        .case(WebhookActions.clearDeleteStatus, (state, { webhookID }) => {
+            delete state.deletesByID[webhookID];
+            return state;
+        })
+
+        // Deletion
+        .case(WebhookActions.deleteWebhook_ACs.started, (state, payload) => {
+            state.deletesByID[payload.webhookID] = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(WebhookActions.deleteWebhook_ACs.done, (state, payload) => {
+            delete  state.webhooksByID.data![payload.params.webhookID];
+            state.deletesByID[payload.params.webhookID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(WebhookActions.deleteWebhook_ACs.failed, (state, payload) => {
+            state.deletesByID[payload.params.webhookID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
 );

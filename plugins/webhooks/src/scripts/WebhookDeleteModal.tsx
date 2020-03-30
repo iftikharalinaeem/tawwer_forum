@@ -4,15 +4,13 @@
  */
 
 import React, { useEffect, useCallback, useDebugValue } from "react";
-import Modal from "@library/modal/Modal";
-import ModalSizes from "@library/modal/ModalSizes";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { IWebhookState } from "@webhooks/WebhookTypes";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 import { LoadStatus } from "@library/@types/api/core";
-import { WebhookStatus } from "@webhooks/WebhookTypes";
+
 
 interface IProps {
     webhookID: number | null;
@@ -60,7 +58,7 @@ function useDeleteStatus(webhookID: number | null) {
     return (
         useSelector((state: IWebhookState) => {
             return webhookID !== null
-                ? state.deletesByID
+                ? state.webhooksByID
                 : webhookID;
         }) ?? defaultStatus
     );
