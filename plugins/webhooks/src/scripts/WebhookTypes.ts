@@ -33,6 +33,11 @@ export enum EventType {
     DISCUSSION = "discussion",
     USER = "user",
 }
+
+export interface IWebhookStore {
+    webhooks: IWebhookState;
+}
+
 export interface IWebhookState {
     webhooksByID: ILoadable<{
         [id: number]: IWebhook;

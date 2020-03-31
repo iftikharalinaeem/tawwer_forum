@@ -3,14 +3,14 @@
  * @license Proprietary
  */
 
-import { IWebhookState } from "@webhooks/WebhookTypes";
+import { IWebhookStore } from "@webhooks/WebhookTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 
 export function useWebhooks() {
-    const webhooksByID = useSelector((state: IWebhookState) => state.webhooks.webhooksByID);
+    const webhooksByID = useSelector((state: IWebhookStore) => state.webhooks.webhooksByID);
     const { getAll } = useWebhookActions();
 
     useEffect(() => {
@@ -23,5 +23,5 @@ export function useWebhooks() {
 }
 
 export function useWebhookData() {
-    return useSelector((state: IWebhookState) => state.webhooks);
+    return useSelector((state: IWebhookStore) => state.webhooks);
 }
