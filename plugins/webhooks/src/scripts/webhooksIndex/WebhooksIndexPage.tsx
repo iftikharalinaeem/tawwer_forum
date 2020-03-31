@@ -17,6 +17,7 @@ import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
+import { IWebhook } from "@webhooks/WebhookTypes";
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
@@ -58,16 +59,21 @@ function WebhooksIndexPage(props: IOwnProps) {
                         <HeadItem size={TableColumnSize.XS}>{t("Options")}</HeadItem>
                     </tr>
                 }
-                body={Object.values(webhooks.data).map(webhook => (
+                body={Object.values(webhooks.data).map((webhook: IWebhook) => (
                     <WebhooksTableRow
                         key ={webhook.webhookID}
                         webhook={webhook}
                         onEditClick={() => {
-                            setEditingID(webhook.webhookID);
+                            if (webhook.webhookID) {
+                                setEditingID(webhook.webhookID);
+                            }
                         }}
                         onDeleteClick={() => {
                             setIsDelete(true);
-                            setDeleteID(webhook.webhookID);
+                            if (webhook.webhookID) {
+                                setIsDelete(true);
+                                setDeleteID(webhook.webhookID);
+                            }
                         }}
                     />
                 ))}
