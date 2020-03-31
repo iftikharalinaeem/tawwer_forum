@@ -34,7 +34,6 @@ export enum EventType {
     USER = "user",
 }
 export interface IWebhookState {
-    webhooks: ILoadable<{}>;
     webhooksByID: ILoadable<{
         [id: number]: IWebhook;
     }>;
@@ -68,9 +67,6 @@ export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
 };
 
 export const INITIAL_WEBHOOK_STATE: IWebhookState = {
-    webhooks: {
-        status: LoadStatus.PENDING,
-    },
     webhooksByID: {
         status: LoadStatus.PENDING,
     },

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IWebhook, IWebhookState } from "@webhooks/WebhookTypes";
+import { IWebhookState } from "@webhooks/WebhookTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
