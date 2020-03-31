@@ -9,7 +9,7 @@ import { ILoadable, LoadStatus, IApiError } from "@vanilla/library/src/scripts/@
  * Interface representing a webhook base resource.
  */
 export interface IWebhook {
-    webhookID: number | null;
+    webhookID?: number;
     status: WebhookStatus;
     name: string;
     events: string[];
@@ -45,7 +45,7 @@ export interface IWebhookState {
 }
 
 export interface IWebhookFormState {
-    webhookID: number | null;
+    webhookID?: number;
     status: WebhookStatus;
     name: string;
     events: string[];
@@ -56,7 +56,6 @@ export interface IWebhookFormState {
 }
 
 export const INITIAL_WEBHOOK_FORM: IWebhookFormState = {
-    webhookID: null,
     status: WebhookStatus.ACTIVE,
     name: "",
     events: [EventType.ALL],

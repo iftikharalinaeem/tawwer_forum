@@ -3,15 +3,14 @@
  * @license Proprietary
  */
 
-import { IWebhookState } from "@webhooks/WebhookTypes";
+import { IWebhook, IWebhookState } from "@webhooks/WebhookTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 
-export function useWebhooks() {
+export function useWebhooks(): IWebhook {
     const webhooksByID = useSelector((state: IWebhookState) => state.webhooks.webhooksByID);
-    const formSubmit = useSelector((state: IWebhookState) => state.webhooks.formSubmit);
     const { getAll } = useWebhookActions();
 
     useEffect(() => {

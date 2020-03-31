@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import { useParams } from "react-router";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
