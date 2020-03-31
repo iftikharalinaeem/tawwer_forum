@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import { useParams } from "react-router";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
@@ -29,8 +29,9 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 
 export function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
-    const { updateForm, initForm, saveWebhookForm, clearError } = useWebhookActions();
+    const { updateForm, initForm, saveWebhookForm, clearError, clearForm } = useWebhookActions();
     const params = useParams<{webhookID?: string}>();
+    const [submittedWebhookID, setSubmittedWebhookID] = useState<number | null>(null);
     const webhookID = params.webhookID ? params.webhookID : null;
     const isEditing = !!webhookID;
     const isLoading = status === LoadStatus.LOADING;
@@ -54,11 +55,12 @@ export function WebhookAddEdit() {
     }, [webhookID, initForm]);
 
     useEffect(() => {
-        if(formSubmit.status === LoadStatus.SUCCESS) {
+        if(formSubmit.status === LoadStatus.SUCCESS && submittedWebhookID) {
+            clearForm({webhookID: submittedWebhookID});
             clearError();
             history.push("/webhook-settings");
         }   
-    });
+    },[clearError, formSubmit, clearForm, submittedWebhookID]);
 
     if (form.error) {
         return <ErrorPage apiError={form.error} />;
@@ -74,7 +76,8 @@ export function WebhookAddEdit() {
                 onSubmit={async event => {
                     event.preventDefault();
                     event.stopPropagation();
-                    void saveWebhookForm(form);
+                    const submittedWebhook = await saveWebhookForm(form);
+                    setSubmittedWebhookID(submittedWebhook.webhookID);
                 }}
             >
                 <WebhookDashboardHeaderBlock

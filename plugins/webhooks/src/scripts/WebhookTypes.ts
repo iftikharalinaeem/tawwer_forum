@@ -39,6 +39,9 @@ export interface IWebhookState {
     }>;
     form: IWebhookFormState;
     formSubmit: ILoadable<{}>;
+    formSubmitByID: {
+        [webhookID: number]: ILoadable<{}>;
+    };
     deletesByID: {
         [WebhookID: number]: ILoadable<{}>;
     };
@@ -71,5 +74,6 @@ export const INITIAL_WEBHOOK_STATE: IWebhookState = {
     formSubmit: {
         status: LoadStatus.PENDING,
     },
+    formSubmitByID: {},
     deletesByID: {},
 };

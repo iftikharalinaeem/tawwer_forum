@@ -12,10 +12,17 @@ import { IWebhookState, INITIAL_WEBHOOK_STATE } from "@webhooks/WebhookTypes";
 
 export const WebhookReducer = produce(
     reducerWithInitialState<IWebhookState>(INITIAL_WEBHOOK_STATE)
+
+        // GET
         .case(WebhookActions.getAllWebhookACs.started, (state, action) => {
             state.webhooksByID = {
                 status: LoadStatus.LOADING,
             };
+            return state;
+        })
+        .case(WebhookActions.getAllWebhookACs.failed, (state, action) => {
+            state.webhooksByID.status = LoadStatus.ERROR;
+            state.webhooksByID.error = action.error;
             return state;
         })
         .case(WebhookActions.getAllWebhookACs.done, (state, payload) => {
@@ -31,12 +38,8 @@ export const WebhookReducer = produce(
             };
             return state;
         })
-        .case(WebhookActions.getAllWebhookACs.failed, (state, action) => {
-            state.webhooksByID.status = LoadStatus.ERROR;
-            state.webhooksByID.error = action.error;
-            return state;
-        })
 
+        // GET_EDIT
         .case(WebhookActions.getEditWebhookACs.started, (state, action) => {
             state.form.formStatus = LoadStatus.LOADING;
             return state;
@@ -57,6 +60,7 @@ export const WebhookReducer = produce(
             return state;
         })
 
+        // POST
         .case(WebhookActions.postFormACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
             return state;
@@ -68,15 +72,26 @@ export const WebhookReducer = produce(
         })
         .case(WebhookActions.postFormACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
-            state.webhooksByID = {
-                status: LoadStatus.SUCCESS,
-            };
             if (payload.result.webhookID) {
-                state.webhooksByID[payload.result.webhookID] = payload.result;
+                state.webhooksByID.data![payload.result.webhookID] = payload.result;
+                state.formSubmitByID[payload.result.webhookID] = {
+                    status: LoadStatus.SUCCESS,
+                };
             }
             return state;
         })
+        .case(WebhookActions.clearFormAC, (state, { webhookID }) => {
+            delete state.formSubmitByID[webhookID];
+            return state;
+        })
+        .case(WebhookActions.clearErrorAC, state => {
+            state.formSubmit = {
+                status: LoadStatus.PENDING,
+            };
+            return state;
+        })
 
+        // PATCH
         .case(WebhookActions.patchFormACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
             return state;
@@ -88,30 +103,19 @@ export const WebhookReducer = produce(
         })
         .case(WebhookActions.patchFormACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
-            state.webhooksByID = {
-                status: LoadStatus.SUCCESS,
-            };
             if (payload.result.webhookID) {
-                state.webhooksByID[payload.result.webhookID] = payload.result;
+                state.webhooksByID.data![payload.result.webhookID] = payload.result;
+                state.formSubmitByID[payload.result.webhookID] = {
+                    status: LoadStatus.SUCCESS,
+                };
             }
             return state;
         })
-        .case(WebhookActions.clearDeleteStatus, (state, { webhookID }) => {
-            delete state.deletesByID[webhookID];
-            return state;
-        })
 
-        // Deletion
+        // DELETE
         .case(WebhookActions.deleteWebhookACs.started, (state, payload) => {
             state.deletesByID[payload.webhookID] = {
                 status: LoadStatus.LOADING,
-            };
-            return state;
-        })
-        .case(WebhookActions.deleteWebhookACs.done, (state, payload) => {
-            delete  state.webhooksByID.data![payload.params.webhookID];
-            state.deletesByID[payload.params.webhookID] = {
-                status: LoadStatus.SUCCESS,
             };
             return state;
         })
@@ -120,6 +124,17 @@ export const WebhookReducer = produce(
                 status: LoadStatus.ERROR,
                 error: payload.error,
             };
+            return state;
+        })
+        .case(WebhookActions.deleteWebhookACs.done, (state, payload) => {
+            delete state.webhooksByID.data![payload.params.webhookID];
+            state.deletesByID[payload.params.webhookID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(WebhookActions.clearDeleteStatus, (state, { webhookID }) => {
+            delete state.deletesByID[webhookID];
             return state;
         })
 );
