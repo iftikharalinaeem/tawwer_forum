@@ -167,7 +167,9 @@ trait ArticlesApiSchemes {
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon updating an article.",
                     ],
-                    "foreignID?"
+                    "foreignID?",
+                    "dateInserted?",
+                    "dateUpdated?"
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );

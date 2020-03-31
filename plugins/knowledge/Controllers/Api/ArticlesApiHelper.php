@@ -362,7 +362,7 @@ trait ArticlesApiHelper {
                 );
             }
 
-            $this->articleModel->update($article, ["articleID" => $articleID]);
+            $this->articleModel->update($article, ["articleID" => $articleID], $this->getOperationMode());
 
             if ($moveToAnotherCategory) {
                 if (!empty($prevState['knowledgeCategoryID'])) {
@@ -456,7 +456,7 @@ trait ArticlesApiHelper {
                 $revision["status"] = "published";
                 $this->articleRevisionModel->insert($revision, $this->getOperationMode());
             } else {
-                $articleRevisionID = $this->articleRevisionModel->insert($revision);
+                $articleRevisionID = $this->articleRevisionModel->insert($revision, $this->getOperationMode());
                 $this->articleRevisionModel->publish($articleRevisionID);
             }
 

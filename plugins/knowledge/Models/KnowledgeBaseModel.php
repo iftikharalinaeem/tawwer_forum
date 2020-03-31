@@ -177,7 +177,10 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @throws PermissionException If user hasno permission throw an PermissionException.
      */
     public function checkGlobalPermission(string $permission) {
-        if (!$this->permissions->hasAny(['Garden.Settings.Manage', $permission], null, Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE)) {
+        if (!$this->permissions->hasAny(
+            ['Garden.Settings.Manage', 'knowledge.articles.manage', $permission],
+            null,
+            Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE)) {
             throw new PermissionException($permission);
         }
     }
