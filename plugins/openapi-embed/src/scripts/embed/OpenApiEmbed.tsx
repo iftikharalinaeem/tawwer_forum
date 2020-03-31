@@ -8,7 +8,7 @@ import { OpenApiEmbedPlaceholder } from "@openapi-embed/embed/OpenApiEmbedPlaceh
 import { EmbedContainer, EmbedContainerSize } from "@vanilla/library/src/scripts/embeddedContent/EmbedContainer";
 import { EmbedContent } from "@vanilla/library/src/scripts/embeddedContent/EmbedContent";
 import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
 import React, { useState, useMemo } from "react";
 import { OpenApiForm } from "@openapi-embed/embed/OpenApiForm";

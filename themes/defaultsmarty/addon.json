@@ -2,7 +2,7 @@
     "name": "Compatibility 2011",
     "description": "An older version of the default theme for backwards-compatibility.",
     "version": "2.0a",
-    "hidden": false,
+    "hidden": true,
     "options": {
         "description": "This theme has <font color=\"red\">7 color</font> options. Find out more on <a href=\"http://www.vanillaforums.com/blog/help-tutorials/how-to-use-theme-options\">Theme Options</a>.",
         "styles": {

@@ -2,7 +2,6 @@
     "name": "Theme Editor",
     "description": "Provides an API & UI to manage theme resources and create custom themes.",
     "version": "1.0",
-    "priority": 1000,
     "key": "themingapi",
     "type": "addon",
     "authors": [

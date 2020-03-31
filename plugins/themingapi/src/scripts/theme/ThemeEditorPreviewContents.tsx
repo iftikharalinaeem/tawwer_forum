@@ -8,7 +8,7 @@ import Container from "@library/layout/components/Container";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import { userContentClasses } from "@vanilla/library/src/scripts/content/userContentStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import React, { useEffect, useState, useContext } from "react";
 import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
@@ -160,10 +160,7 @@ function PanelActivator(props: { panel: ActiveVariablePanel; children: React.Rea
         >
             {props.children}
             {props.panel === activePanel && (
-                <div
-                    className={classNames(classes.panelActivatorIndicator)}
-                    style={{ borderColor: color ? colorOut(color) : undefined }}
-                ></div>
+                <div className={classNames(classes.panelActivatorIndicator(color ? colorOut(color) : undefined))}></div>
             )}
         </div>
     );

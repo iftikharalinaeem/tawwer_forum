@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
-import { ITheme, IPostPatchThemeAssets, IThemeForm, IThemeEditorStoreState } from "./themeEditorReducer";
+import { IThemeForm, IThemeEditorStoreState } from "./themeEditorReducer";
 import { IApiError } from "@library/@types/api/core";
 import { useDispatch } from "react-redux";
 import apiv2 from "@library/apiv2";
@@ -13,6 +13,7 @@ import { useMemo } from "react";
 import { History } from "history";
 import qs from "qs";
 import { t } from "@vanilla/i18n/src";
+import { ITheme, IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -21,6 +22,7 @@ interface IGetThemeParams {
 type IGetThemeResponse = ITheme;
 type IPostThemeResponse = ITheme;
 type IPatchThemeResponse = ITheme;
+export type IPostPatchThemeAssets = Partial<IThemeAssets>;
 
 export interface IPostThemeRequest {
     name: string;

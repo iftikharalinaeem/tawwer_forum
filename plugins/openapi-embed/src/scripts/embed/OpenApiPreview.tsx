@@ -14,7 +14,7 @@ import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import FrameFooter from "@vanilla/library/src/scripts/layout/frame/FrameFooter";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { frameFooterClasses } from "@vanilla/library/src/scripts/layout/frame/frameFooterStyles";
-import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
 
 interface IProps {

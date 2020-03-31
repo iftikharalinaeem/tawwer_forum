@@ -13,7 +13,8 @@ import { ThemeBuilderContextProvider } from "@vanilla/library/src/scripts/forms/
 import React, { useState } from "react";
 import actionCreatorFactory from "typescript-fsa";
 import { useThemeActions } from "./ThemeEditorActions";
-import { IThemeVariables, useThemeEditorState } from "./themeEditorReducer";
+import { useThemeEditorState } from "./themeEditorReducer";
+import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;

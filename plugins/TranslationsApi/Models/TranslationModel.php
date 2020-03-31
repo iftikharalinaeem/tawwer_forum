@@ -100,9 +100,10 @@ class TranslationModel extends PipelineModel {
      * @throws ClientException
      */
     protected function validateLocale(string $locale, string $sourceLocale) {
-        $availableLocales = $this->localesApiController->index();
-        $availableLocales = array_column($availableLocales, 'localeKey');
-        $valid = in_array($locale, $availableLocales);
+        $locales = $this->localesApiController->index();
+        $availableLocales = array_column($locales, 'localeKey');
+        $availableRegionalLocales = array_column($locales, 'regionalKey');
+        $valid = in_array($locale, $availableLocales) || in_array($locale, $availableRegionalLocales);
 
         if (!$valid) {
             throw new ClientException("Locale '". $locale . "' is not available");
