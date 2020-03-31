@@ -1,20 +1,16 @@
 <?php
 /**
- * A plugin that shows a category's customizable "leaderboard of ideas"
+ * BestOfIdeation Module
+ * A module that shows a category's customizable "leaderboard of ideas"
  *
+ * @author    David Barbier <david.barbier@vanillaforums.com>
  * @copyright 2008-2020 Vanilla Forums, Inc.
  * @license Proprietary
+ * @since     4.0
  */
 
 use Vanilla\Web\TwigRenderTrait;
 
-/**
- * BestOfIdeation Module
- *
- * @author    David Barbier <david.barbier@vanillaforums.com>
- * @license   Proprietary
- * @since     4.0
- */
 class BestOfIdeationModule extends Gdn_Module {
     use TwigRenderTrait;
 
@@ -85,7 +81,6 @@ class BestOfIdeationModule extends Gdn_Module {
      * ---Put the result in cache.
      *
      * @param int $categoryID
-
      */
     public function __construct(int $categoryID) {
         try {
@@ -97,8 +92,6 @@ class BestOfIdeationModule extends Gdn_Module {
             echo 'Exception: ' . $exception->getMessage();
             die();
         }
-
-
 
         $this->categoryID = $categoryID;
         $this->cacheKey = get_class($this) . '_' . $this->categoryID;
@@ -122,7 +115,7 @@ class BestOfIdeationModule extends Gdn_Module {
         $catBOISettings = $this->bestOfIdeationModel->loadConfiguration($this->categoryID);
 
         if (!empty($catBOISettings)) {
-            $this->isEnabled = true;
+            $this->isEnabled = $catBOISettings['IsEnabled'];
             $this->dates = $catBOISettings['Dates'];
             $this->limit = $catBOISettings['Limit'];
         }
@@ -135,7 +128,6 @@ class BestOfIdeationModule extends Gdn_Module {
     public function saveSettings(array $settings) {
         $this->bestOfIdeationModel->saveConfiguration($this->categoryID, $settings);
     }
-
 
     /**
      * @return array

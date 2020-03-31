@@ -36,9 +36,10 @@ class BestOfIdeationModel extends PipelineModel {
      * @param array $settings an array of the settings to save.
      */
     public function saveConfiguration(int $categoryID, array $settings) {
-        //We try to update the record for a CategoryID. If it can't  be done, we try to insert.
         try {
-            if (!$this->update(['BestOfIdeationSettings' => dbencode($settings)], ['CategoryID' => $categoryID])) {
+            if ($this->get(['CategoryID' => $categoryID])) {
+                $this->update(['BestOfIdeationSettings' => dbencode($settings)], ['CategoryID' => $categoryID]);
+            } else {
                 $this->insert(['CategoryID' => $categoryID, 'BestOfIdeationSettings' => dbencode($settings)]);
             }
         } catch (Exception $exception) {
@@ -54,18 +55,36 @@ class BestOfIdeationModel extends PipelineModel {
      * @return array
      */
     public function loadConfiguration(int $categoryID): array {
+        $configuration = [];
+
         $catBOIDatas = $this->get(['categoryID'=>$categoryID]);
 
-        if (count($catBOIDatas)==1) {
+        if (count($catBOIDatas) == 1) {
             $catBOIDatas = reset($catBOIDatas);
 
             if (isset($catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME])) {
                 $catBOISettings = dbdecode($catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME]);
                 if (is_array($catBOISettings)) {
-                    return $catBOISettings;
+                    $configuration = [
+                        'IsEnabled' => true,
+                        'Dates' => $catBOISettings['Dates'],
+                        'Limit' => $catBOISettings['Limit']
+                    ];
                 }
             }
         }
-        return [];
+
+        return $configuration;
+    }
+
+    /**
+     * Delete the BestOfIdeation settings based on categoryID
+     *
+     * @param int $categoryID the categoryID for which we want to delete the BEstOfIdeation settings.
+     * @return bool
+     * @throws Exception If an error is encountered while performing the query.
+     */
+    public function deleteConfiguration(int $categoryID): bool {
+        return $this->delete(['categoryID'=>$categoryID]);
     }
 }

@@ -66,19 +66,30 @@ class IdeationPlugin extends Gdn_Plugin {
     /** @var CategoryModel */
     private $categoryModel;
 
+    /** @var BestOfIdeationModel */
+    private $bestOfIdeationModel;
+
     /**
      * IdeationPlugin constructor.
      *
      * @param DiscussionModel $discussionModel
      * @param StatusModel $statusModel
      * @param UserModel $userModel
-     * @param CategoryModel $userModel
+     * @param CategoryModel $categoryModel
+     * @param BestOfIdeationModel $bestOfIdeationModel
      */
-    public function __construct(DiscussionModel $discussionModel, StatusModel $statusModel, UserModel $userModel, CategoryModel $categoryModel) {
+    public function __construct(
+        DiscussionModel $discussionModel,
+        StatusModel $statusModel,
+        UserModel $userModel,
+        CategoryModel $categoryModel,
+        BestOfIdeationModel $bestOfIdeationModel
+    ) {
         $this->discussionModel = $discussionModel;
         $this->statusModel = $statusModel;
         $this->userModel = $userModel;
         $this->categoryModel = $categoryModel;
+        $this->bestOfIdeationModel = $bestOfIdeationModel;
         parent::__construct();
     }
 
@@ -336,8 +347,7 @@ EOT
             ];
 
             //Obtain BestOfIdeations module's settings
-            $boiModule = new BestOfIdeationModule($categoryID);
-            $boiSettings = $boiModule->getSettings();
+            $boiSettings = $this->bestOfIdeationModel->loadConfiguration($categoryID);
 
             //Is the bestOfIdeation feature used?
             $useBestOfIdeationOptions = [];
@@ -2155,8 +2165,14 @@ EOT
         Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 
+    /**
+     * Saves BestOfIdeation settings after a category has been saved.
+     *
+     * @param CategoryModel $sender
+     * @param array $args
+     */
     public function categoryModel_afterSaveCategory_handler(CategoryModel &$sender, array $args) {
-        if(isset($args['CategoryID'])){
+        if (isset($args['CategoryID'])) {
             $bestOfIdeationSettings = [];
 
             //Look for bestOfIdeation settings
@@ -2172,10 +2188,21 @@ EOT
                     }
                 }
 
-                $boiModule = new BestOfIdeationModule($args['CategoryID']);
-                $boiModule->saveSettings($bestOfIdeationSettings);
+                //Save BestOfIdeation settings.
+                $this->bestOfIdeationModel->saveConfiguration($args['CategoryID'], $bestOfIdeationSettings);
             }
         }
+    }
+
+    /**
+     * Delete the BestOfIdeation settings upon a category deletion.
+     *
+     * @param CategoryModel $sender
+     * @param array $args
+     * @throws Exception If an error is encountered while performing the query.
+     */
+    public function categoryModel_afterDeleteCategory(CategoryModel &$sender, array $args) {
+        $this->bestOfIdeationModel->deleteConfiguration($args['CategoryID']);
     }
 }
 
@@ -2184,7 +2211,6 @@ EOT
  * -------------------
  * Set apart so they can be overridden.
  */
-
 
 if (!function_exists('getReactionButtonHtml')) {
     /**
