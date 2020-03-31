@@ -57,7 +57,7 @@ function KnowledgeBaseList(props: IProps) {
             title={t("Choose a subcommunity")}
             titleLevel={1}
             hiddenTitle={true}
-            items={knowledgeBases}
+            items={knowledgeBases.filter(kb => !kb.isUniversalSource)}
             emptyMessage={t("No knowledge bases found.")}
             fallbackIcon={knowledgeBaseNoIcon(classes.fallBackIcon)}
             className={className}
