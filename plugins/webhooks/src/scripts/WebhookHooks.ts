@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 
-export function useWebhooks(): IWebhook {
+export function useWebhooks() {
     const webhooksByID = useSelector((state: IWebhookState) => state.webhooks.webhooksByID);
     const { getAll } = useWebhookActions();
 
