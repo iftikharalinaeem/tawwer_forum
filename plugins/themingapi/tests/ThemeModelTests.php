@@ -205,7 +205,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
      */
     public function testGetThemeAssetDataDBfail() {
         $assetData = self::$themeModel->getAssetData(1000, 'header');
-        $this->assertEquals('', $assetData );
+        $this->assertEquals('', $assetData);
     }
 
     /**
