@@ -17,7 +17,7 @@ import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
-import { ButtonTypes } from "@library/forms/ButtonTypes";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
 import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
@@ -60,7 +60,7 @@ export function WebhookAddEdit() {
             clearError();
             history.push("/webhook-settings");
         }   
-    },[clearError, formSubmit, clearForm, submittedWebhookID]);
+    },[clearError, formSubmit, clearForm, submittedWebhookID, history]);
 
     if (form.error) {
         return <ErrorPage apiError={form.error} />;
