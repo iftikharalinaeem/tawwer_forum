@@ -83,10 +83,9 @@ class ThemeModelTests extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'notheme');
         self::$config->set('Garden.CurrentTheme', 'z');
 
-        $this->expectWarning();
         $theme = self::$themeModel->getCurrentTheme();
 
-        $this->assertEquals('theme-foundation', $theme['themeID']);
+        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
     }
 
     /**
@@ -134,10 +133,9 @@ class ThemeModelTests extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', '10000');
         self::$config->set('Garden.CurrentTheme', '10000');
 
-        $this->expectWarning();
         $theme = self::$themeModel->getCurrentTheme();
 
-        $this->assertEquals('theme-foundation', $theme['themeID']);
+        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
     }
 
     /**
@@ -163,6 +161,73 @@ class ThemeModelTests extends AbstractAPIv2Test {
 
         $this->assertEquals('keystone', $themeAddon->getKey());
     }
+
+    /**
+     * test getCurrentThemeAddon with invalid themes.
+     */
+    public function testGetCurrentThemeAddonFsThemeFail() {
+        self::$config->set('Garden.Theme', 'zzzzzzz');
+        self::$config->set('Garden.CurrentTheme', 'zzz');
+
+        $themeAddon = self::$themeModel->getCurrentThemeAddon();
+
+        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $themeAddon->getKey());
+    }
+
+    /**
+     * Test Getting a theme's master key.
+     */
+    public function testGetMasterThemeKey() {
+        $masterKey = self::$themeModel->getMasterThemeKey(1);
+        $this->assertEquals('theme-foundation', $masterKey);
+    }
+
+    /**
+     * Test Getting a theme's master key with invalid id.
+     */
+    public function testGetMasterThemeKeyNonExistentTheme() {
+        $masterKey = self::$themeModel->getMasterThemeKey(100000);
+        $this->assertEquals('theme-foundation', $masterKey);
+    }
+
+    /**
+     * Test Getting a theme's master key with invalid key.
+     */
+    public function testGetMasterThemeKeyNonExistentThemeFs() {
+        $masterKey = self::$themeModel->getMasterThemeKey('zz');
+        $this->assertEquals('theme-foundation', $masterKey);
+    }
+
+    /**
+     * Test getting a theme's asset data.
+     */
+    public function testGetThemeAssetDataDB() {
+        $assetData = self::$themeModel->getAssetData(1, 'header');
+        $this->assertEquals('<header>First DB Theme</header>', $assetData );
+    }
+
+    /**
+     * Test getting a theme's asset data.
+     */
+    public function testGetThemeAssetDataFS() {
+        $assetData = self::$themeModel->getAssetData('keystone', 'variables_classic');
+        $variable = '{
+    "global": {
+        "mainColors": {
+            "primary": "#008cba"
+        }
+    },
+    "titleBar": {
+        "colors": {
+            "bg": "#333",
+            "fg": "#fff"
+        }
+    }
+}
+';
+        $this->assertEquals($variable, $assetData );
+    }
+
 
     /**
      * Test getCurrentTheme with Garden.CurrentTheme set.

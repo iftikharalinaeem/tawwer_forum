@@ -109,6 +109,22 @@ class DbThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * Check if a theme exists.
+     *
+     * @param $themeKey
+     * @return bool
+     */
+    public function themeExists($themeKey): bool {
+        $themeExists = true;
+        try {
+            $this->themeModel->selectSingle(['themeID' => $themeKey]);
+        } catch (NoResultsException $e) {
+           $themeExists = false;
+        }
+        return $themeExists;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getAllThemes(): array {
@@ -306,7 +322,11 @@ class DbThemeProvider implements ThemeProviderInterface {
      * @inheritdoc
      */
     public function getMasterThemeKey($themeID): string {
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+        try {
+            $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+        } catch (NoResultsException $e) {
+            $theme['parentTheme'] = ThemeModel::FALLBACK_THEME_KEY;
+        }
         $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
         return $parentTheme->getKey();
     }
