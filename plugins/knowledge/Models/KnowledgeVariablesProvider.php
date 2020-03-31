@@ -7,12 +7,13 @@
 namespace Vanilla\Knowledge\Models;
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Theme\KludgedVariablesProviderInterface;
 use Vanilla\Theme\VariablesProviderInterface;
 
 /**
  * Provide theme variables specific to the Knowledge addon.
  */
-class KnowledgeVariablesProvider implements VariablesProviderInterface {
+class KnowledgeVariablesProvider implements KludgedVariablesProviderInterface {
 
     /** @var KnowledgeBaseKludgedVars */
     private $kludgedVars;
