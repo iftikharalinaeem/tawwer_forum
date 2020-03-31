@@ -111,7 +111,7 @@ class DbThemeProvider implements ThemeProviderInterface {
     /**
      * Check if a theme exists.
      *
-     * @param $themeKey
+     * @param string| int $themeKey
      * @return bool
      */
     public function themeExists($themeKey): bool {
@@ -119,7 +119,7 @@ class DbThemeProvider implements ThemeProviderInterface {
         try {
             $this->themeModel->selectSingle(['themeID' => $themeKey]);
         } catch (NoResultsException $e) {
-           $themeExists = false;
+            $themeExists = false;
         }
         return $themeExists;
     }

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 use Vanilla\Models\ThemeModel;
 use Vanilla\Models\ThemeModelHelper;
@@ -6,7 +10,9 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSiteSection;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
-
+/**
+ * Class ThemeModelTests
+ */
 class ThemeModelTests extends AbstractAPIv2Test {
 
     protected static $addons = ['vanilla', 'themingapi'];
@@ -127,7 +133,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 
     /**
-     * test getCurrentThemeAddon with a DB Theme.
+     * Test getCurrentThemeAddon with a DB Theme.
      */
     public function testGetCurrentThemeAddonDbTheme() {
         self::$config->set('Garden.Theme', 'theme-foundation');
@@ -139,7 +145,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 
     /**
-     * test getCurrentThemeAddon with a DB Theme.
+     * Test getCurrentThemeAddon with a DB Theme.
      */
     public function testGetCurrentThemeAddonFsTheme() {
         self::$config->set('Garden.Theme', 'theme-foundation');
@@ -151,7 +157,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 
     /**
-     * test getCurrentThemeAddon with invalid themes.
+     * Test getCurrentThemeAddon with invalid themes.
      */
     public function testGetCurrentThemeAddonFsThemeFail() {
         self::$config->set('Garden.Theme', 'zzzzzzz');
@@ -191,7 +197,15 @@ class ThemeModelTests extends AbstractAPIv2Test {
      */
     public function testGetThemeAssetDataDB() {
         $assetData = self::$themeModel->getAssetData(1, 'header');
-        $this->assertEquals('<header>First DB Theme</header>', $assetData );
+        $this->assertEquals('<header>First DB Theme</header>', $assetData);
+    }
+
+    /**
+     * Test getting a theme's asset data.
+     */
+    public function testGetThemeAssetDataDBfail() {
+        $assetData = self::$themeModel->getAssetData(1000, 'header');
+        $this->assertEquals('', $assetData );
     }
 
     /**
@@ -213,9 +227,8 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 }
 ';
-        $this->assertEquals($variable, $assetData );
+        $this->assertEquals($variable, $assetData);
     }
-
 
     /**
      * Test getCurrentTheme with Garden.CurrentTheme set.
@@ -264,7 +277,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
      * @param string $name
      * @param string $themeID
      */
-    private function setCurrentSiteSection($name = 'site-section', $themeID = 'theme-foundation' ): void {
+    private function setCurrentSiteSection($name = 'site-section', $themeID = 'theme-foundation'): void {
         $mockSiteSection = new MockSiteSection(
             $name,
             'en',
