@@ -158,9 +158,9 @@ class UserBadgeModelTest extends TestCase {
      */
     protected function getBadgeID($badge) {
         if (is_string($badge)) {
-            $badge = $this->badgeModel->getID($badge, DATASET_TYPE_ARRAY);
-            $this->assertNotFalse($badge);
-            $badgeID = (int)$badge['BadgeID'];
+            $row = $this->badgeModel->getID($badge, DATASET_TYPE_ARRAY);
+            $this->assertNotFalse($row);
+            $badgeID = (int)$row['BadgeID'];
         } elseif (is_array($badge)) {
             $badgeID = $badge['BadgeID'];
         } else {
