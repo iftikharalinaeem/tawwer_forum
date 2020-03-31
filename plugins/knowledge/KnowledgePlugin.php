@@ -63,9 +63,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var KnowledgeNavigationApiController $knowledgeNavigationApi */
     private $knowledgeNavigationApi;
 
-    /** @var ThemeFeatures */
-    private $themeFeatures;
-
     /**
      * KnowledgePlugin constructor.
      *
@@ -77,7 +74,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param PermissionModel $permissionModel
      * @param DefaultArticleModel $defaultArticleModel
      * @param KnowledgeNavigationApiController $knowledgeNavigationApi
-     * @param ThemeFeatures $themeFeatures
      */
     public function __construct(
         \Gdn_Database $database,
@@ -87,8 +83,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
         SiteSectionModel $siteSectionModel,
         PermissionModel $permissionModel,
         DefaultArticleModel $defaultArticleModel,
-        KnowledgeNavigationApiController $knowledgeNavigationApi,
-        ThemeFeatures $themeFeatures
+        KnowledgeNavigationApiController $knowledgeNavigationApi
     ) {
         parent::__construct();
         $this->database = $database;
@@ -99,7 +94,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->permissionModel = $permissionModel;
         $this->defaultArticleModel = $defaultArticleModel;
         $this->knowledgeNavigationApi = $knowledgeNavigationApi;
-        $this->themeFeatures = $themeFeatures;
     }
 
     /**
@@ -214,7 +208,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addItem(self::NAV_SECTION, t('Knowledge'), 'Garden.Settings.Manage')
             ->addLink(self::NAV_SECTION, t('Knowledge Bases'), '/knowledge-settings/knowledge-bases', 'Garden.Settings.Manage');
 
-        if (!$this->themeFeatures->disableKludgedVars()) {
+        // CANNOT be DIed or it causes initializes the features too early.
+        if (!\Gdn::themeFeatures()->disableKludgedVars()) {
             $navCollection->addLink(self::NAV_SECTION, t('General Appearance'), '/knowledge-settings/general-appearance', 'Garden.Settings.Manage');
         }
     }
