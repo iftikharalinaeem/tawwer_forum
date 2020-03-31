@@ -127,18 +127,6 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 
     /**
-     * Test getCurrentTheme no valid DBThemes set in config.
-     */
-    public function testGetCurrentThemeFallBackDBTheme() {
-        self::$config->set('Garden.Theme', '10000');
-        self::$config->set('Garden.CurrentTheme', '10000');
-
-        $theme = self::$themeModel->getCurrentTheme();
-
-        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
-    }
-
-    /**
      * test getCurrentThemeAddon with a DB Theme.
      */
     public function testGetCurrentThemeAddonDbTheme() {
