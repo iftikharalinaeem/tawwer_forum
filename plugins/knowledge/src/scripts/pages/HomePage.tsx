@@ -57,8 +57,9 @@ const HomePage = (props: IProps) => {
         return <KbErrorPage error={loadable.error}></KbErrorPage>;
     }
 
-    if (knowledgeBases.length === 1) {
-        const { urlCode } = knowledgeBases[0];
+    const nonUniversalKBs = knowledgeBases.filter(kb => !kb.isUniversalSource);
+    if (nonUniversalKBs.length === 1) {
+        const { urlCode } = nonUniversalKBs[0];
         return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;
     }
 
