@@ -26,11 +26,10 @@ import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlo
 import { useHistory } from "react-router-dom";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 
-
 export function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm, saveWebhookForm, clearError, clearForm } = useWebhookActions();
-    const params = useParams<{webhookID?: string}>();
+    const params = useParams<{ webhookID?: string }>();
     const [submittedWebhookID, setSubmittedWebhookID] = useState<number | null>(null);
     const webhookID = params.webhookID ? params.webhookID : null;
     const isEditing = !!webhookID;
@@ -51,23 +50,23 @@ export function WebhookAddEdit() {
     };
 
     useEffect(() => {
-        initForm(webhookID? parseInt(webhookID) : undefined);
+        initForm(webhookID ? parseInt(webhookID) : undefined);
     }, [webhookID, initForm]);
 
     useEffect(() => {
-        if(formSubmit.status === LoadStatus.SUCCESS && submittedWebhookID) {
-            clearForm({webhookID: submittedWebhookID});
+        if (formSubmit.status === LoadStatus.SUCCESS && submittedWebhookID) {
+            clearForm({ webhookID: submittedWebhookID });
             clearError();
             history.push("/webhook-settings");
-        }   
-    },[clearError, formSubmit, clearForm, submittedWebhookID, history]);
+        }
+    }, [clearError, formSubmit, clearForm, submittedWebhookID, history]);
 
     if (form.error) {
         return <ErrorPage apiError={form.error} />;
     }
 
-    if (isLoading || isEditing && form.formStatus !== LoadStatus.SUCCESS) {
-        return <Loader />
+    if (isLoading || (isEditing && form.formStatus !== LoadStatus.SUCCESS)) {
+        return <Loader />;
     }
 
     return (
@@ -127,7 +126,7 @@ export function WebhookAddEdit() {
                 <DashboardFormGroup label={t("Which events should trigger this webhook?")}>
                     <DashboardRadioGroup
                         errors={errors?.["events"]}
-                        value={(form.events).includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
+                        value={form.events.includes(EventType.ALL) ? EventType.ALL : EventType.INDIVIDUAL}
                         onChange={event => {
                             if (event === EventType.INDIVIDUAL) {
                                 updateForm({ events: [] });

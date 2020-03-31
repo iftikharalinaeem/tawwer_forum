@@ -12,7 +12,6 @@ import { IWebhookState, INITIAL_WEBHOOK_STATE } from "@webhooks/WebhookTypes";
 
 export const WebhookReducer = produce(
     reducerWithInitialState<IWebhookState>(INITIAL_WEBHOOK_STATE)
-
         // GET
         .case(WebhookActions.getAllWebhookACs.started, (state, action) => {
             state.webhooksByID = {
@@ -47,7 +46,7 @@ export const WebhookReducer = produce(
         .case(WebhookActions.getEditWebhookACs.failed, (state, action) => {
             state.form.formStatus = LoadStatus.ERROR;
             state.form.error = action.error;
-            
+
             return state;
         })
 
@@ -136,5 +135,5 @@ export const WebhookReducer = produce(
         .case(WebhookActions.clearDeleteStatus, (state, { webhookID }) => {
             delete state.deletesByID[webhookID];
             return state;
-        })
+        }),
 );

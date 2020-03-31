@@ -35,13 +35,11 @@ export function WebhooksTableRow(props: IProps) {
                         onClick={() => {
                             history.push(`/webhook-settings/${webhook.webhookID}/edit`);
                         }}
-                        baseClass={ButtonTypes.ICON_COMPACT}>
+                        baseClass={ButtonTypes.ICON_COMPACT}
+                    >
                         <EditIcon />
                     </Button>
-                    <Button 
-                        className="btn-icon"
-                        onClick={props.onDeleteClick}
-                        baseClass={ButtonTypes.ICON_COMPACT}>
+                    <Button className="btn-icon" onClick={props.onDeleteClick} baseClass={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>
                 </DashboardTableOptions>

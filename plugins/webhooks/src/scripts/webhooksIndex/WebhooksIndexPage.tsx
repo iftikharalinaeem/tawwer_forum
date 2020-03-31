@@ -61,7 +61,7 @@ function WebhooksIndexPage(props: IOwnProps) {
                 }
                 body={Object.values(webhooks.data).map((webhook: IWebhook) => (
                     <WebhooksTableRow
-                        key ={webhook.webhookID}
+                        key={webhook.webhookID}
                         webhook={webhook}
                         onEditClick={() => {
                             if (webhook.webhookID) {

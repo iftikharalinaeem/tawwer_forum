@@ -56,9 +56,7 @@ function useDeleteStatus(webhookID: number | null) {
 
     return (
         useSelector((state: IWebhookState) => {
-            return webhookID !== null
-                ? state.webhooksByID
-                : webhookID;
+            return webhookID !== null ? state.webhooksByID : webhookID;
         }) ?? defaultStatus
     );
 }
