@@ -26,7 +26,7 @@ export function SubcommunityThemeFormGroup(props: IProps) {
                 label={t("Themes")}
                 description={
                     <Translate
-                        source="Choose a theme for this subcommunity.  <0>Read More</0>"
+                        source="Choose a theme for this subcommunity.  <0>Read more</0>"
                         c0={text => (
                             <a href="https://success.vanillaforums.com/kb/articles/205-per-subcommunity-themes">
                                 {text}
