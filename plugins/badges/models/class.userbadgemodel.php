@@ -97,13 +97,15 @@ class UserBadgeModel extends Gdn_Model {
             return t($name);
         }
 
-        if (strpos($name, $threshold) !== false) {
-            $code = str_replace($threshold, '%s', $name);
+        $formattedThreshold = preg_replace('\,', '', $threshold);
 
-            if ($threshold == 1) {
-                return plural($threshold, $code, $code.'s');
+        if (strpos($name, $formattedThreshold) !== false) {
+            $code = str_replace($formattedThreshold, '%s', $name);
+
+            if ($formattedThreshold == 1) {
+                return plural($formattedThreshold, $code, $code.'s');
             } else {
-                return plural($threshold, rtrim($code, 's'), $code);
+                return plural($formattedThreshold, rtrim($code, 's'), $code);
             }
         } else {
             return t($name);
