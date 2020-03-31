@@ -133,7 +133,9 @@ trait ArticlesApiSchemes {
                         "type" => "integer",
                         "description" => "Unique ID of a draft to remove upon creating an article.",
                     ],
-                    "foreignID?"
+                    "foreignID?",
+                    "dateInserted?",
+                    "dateUpdated?"
                 ])->add($this->fullSchema()),
                 "ArticlePost"
             );
@@ -566,6 +568,7 @@ trait ArticlesApiSchemes {
             ],
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
+            "dateUpdated:dt" => "When the article was updated.",
             "insertUser?" => $this->getUserFragmentSchema(),
             "updateUser?" => $this->getUserFragmentSchema(),
             "featured:b",

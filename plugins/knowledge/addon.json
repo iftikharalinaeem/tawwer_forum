@@ -27,6 +27,7 @@
     },
     "registerPermissions": {
         "knowledge.kb.view": "Garden.Activity.View",
-        "knowledge.articles.add": "Garden.Community.Manage"
+        "knowledge.articles.add": "Garden.Community.Manage",
+        "knowledge.articles.manage": "Garden.Community.Manage"
     }
 }
