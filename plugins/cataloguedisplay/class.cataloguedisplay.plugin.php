@@ -31,7 +31,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param EventManager $eventManager
      */
     public function __construct(EventManager $eventManager) {
-        parent::__construct();;
+        parent::__construct();
         $this->eventManager = $eventManager;
     }
 
@@ -39,7 +39,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * Fires on Utility Update or when the plugin is turned on.
      *
      * @return void
-     * @throws Exception
+     * @throws Exception If table and columns structure failed
      */
     public function setup() {
         $this->structure();
@@ -48,7 +48,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add columns to Category and Discussion tables to designate when we display a Discussion as a "catalogue".
      *
-     * @throws Exception
+     * @throws Exception If table and columns structure failed
      */
     public function structure() {
         Gdn::structure()
@@ -67,7 +67,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add CSS to handle the thumbnail in the list view, JS to handle the popoup.
      *
-     * @param $sender Object
+     * @param Gdn_Controller $sender
      */
     public function base_render_before($sender) {
         if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController'
@@ -107,9 +107,16 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     public function settingsController_addEditCategory_handler(SettingsController $sender, $args) {
         $warningText = '';
         if (c('Garden.InputFormatter') === 'Text' || c('Garden.MobileInputFormatter') === 'Text') {
-            $warningText = ' <em>You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.</em>';
+            $warningText = ' <em>'.Gdn::translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
         }
-        $sender->Data['_ExtendedFields']['CatalogueDisplay'] = ['Name' => 'CatalogueDisplay', 'Label' => 'Catalogue Style', 'Control' => 'Toggle', 'Description' => '<div class="Warning">Each discussion will show an uploaded image on the Discussions page instead of the author information. This only applies to catagories with "Discussions" as the "Display As".'.$warningText.'</div>'];
+        $description = Gdn::translate('Each discussion will show an uploaded image on the Discussions page instead of the author information. '
+            .'This only applies to categories with "Discussions" as the "Display As.');
+        $sender->Data['_ExtendedFields']['CatalogueDisplay'] = [
+            'Name' => 'CatalogueDisplay',
+            'Label' => 'Catalogue Style',
+            'Control' => 'Toggle',
+            'Description' => '<div class="Warning">'.$description.$warningText.'</div>',
+        ];
     }
 
     /**
