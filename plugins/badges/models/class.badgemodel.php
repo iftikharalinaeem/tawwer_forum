@@ -8,6 +8,7 @@
  * Badge handling.
  */
 class BadgeModel extends Gdn_Model {
+    const TYPE_MANUAL = 'Manual';
 
     /**
      * Class constructor. Defines the related database table name.
@@ -214,7 +215,7 @@ class BadgeModel extends Gdn_Model {
 
         // Non-manual badge types cannot be requested.
         $type = val('Type', $data);
-        if ($type == 'Manual' || is_null($type)) {
+        if ($type == self::TYPE_MANUAL || is_null($type)) {
             return true;
         } else {
             return false;

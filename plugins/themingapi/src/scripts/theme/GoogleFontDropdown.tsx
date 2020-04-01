@@ -13,7 +13,7 @@ export function GoogleFontDropdown() {
     return (
         <ThemeDropDown
             // This is actually an array, but the first is the real one. The rest are fallbacks.
-            variableKey="global.fonts.families.body.0"
+            variableKey="global.fonts.googleFontFamily"
             afterChange={value => {
                 setVariableValue("global.fonts.forceGoogleFont", !!value);
             }}
