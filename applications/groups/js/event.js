@@ -56,6 +56,8 @@
          syncDate.apply(this);
       });
    });
+
+   syncDate();
 })(window, jQuery);
 
 jQuery(document).ready(function($) {
@@ -154,6 +156,9 @@ jQuery(document).ready(function($) {
          var FormParent = TimePicker.closest('.P');
          var DatePicker = FormParent.find('.DatePicker');
          var EventTime = FormParent.closest('.EventTime');
+
+         // Set TimePicker data-empty
+         TimePicker.data('empty', TimePicker.val());
 
          // See if we need to enable 'Times' mode
          if (TimePicker.attr('id').match(/TimeStarts/)) {

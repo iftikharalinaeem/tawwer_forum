@@ -13,6 +13,7 @@ use Garden\Schema\Schema;
  * Class PollsPlugin
  */
 class PollsPlugin extends Gdn_Plugin {
+
     /**
      * Run once on enable.
      */
@@ -48,8 +49,9 @@ class PollsPlugin extends Gdn_Plugin {
     public function base_beforeCommentBody_handler($sender) {
         $comment = val('Comment', $sender->EventArguments);
         $pollVote = val('PollVote', $comment);
+
         if ($pollVote) {
-            $this->EventArguments['String'] = &$pollVote;
+            $this->EventArguments['String'] = &$pollVote['Body'];
             $this->fireEvent('FilterContent');
 
             echo '<div class="PollVote">';

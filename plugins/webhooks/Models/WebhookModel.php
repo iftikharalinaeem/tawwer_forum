@@ -75,7 +75,7 @@ class WebhookModel extends PipelineModel {
      */
     public function getActive(bool $useCache = true): array {
         if ($useCache) {
-            $result = $this->cache->get(self::ACTIVE_CACHE_KEY, null);
+            $result = $this->cache->get(self::ACTIVE_CACHE_KEY);
             if ($result === CacheInterface::CACHEOP_FAILURE || !is_array($result)) {
                 $result = $this->get(["status" => WebhookModel::STATUS_ACTIVE]);
                 $this->cache->store(self::ACTIVE_CACHE_KEY, $result);

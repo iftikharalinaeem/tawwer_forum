@@ -3,77 +3,23 @@
  * @license Proprietary
  */
 
-import { reducerWithInitialState } from "typescript-fsa-reducers";
-import produce from "immer";
-import { LoadStatus, ILoadable } from "@library/@types/api/core";
-import { useSelector } from "react-redux";
-import ThemeActions, { pageTypes, useThemeActions } from "./ThemeEditorActions";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegistry";
-import { INITIAL_THEMES_STATE } from "@vanilla/library/src/scripts/features/users/userModel";
-
-export interface IThemeAssets {
-    fonts?: { data: IThemeFont[] };
-    logo?: IThemeExternalAsset;
-    mobileLogo?: IThemeExternalAsset;
-    variables?: IThemeVariables;
-    header?: IThemeHeader;
-    footer?: IThemeFooter;
-    javascript?: string;
-    styles?: string;
-}
-
-export interface IPostPatchThemeAssets {
-    fonts?: { data: IThemeFont[] };
-    logo?: IThemeExternalAsset;
-    mobileLogo?: IThemeExternalAsset;
-    variables?: IThemeVariables;
-    header?: IThemeHeader;
-    footer?: IThemeFooter;
-    javascript?: string;
-    styles?: string;
-}
-
-export interface IThemeHeader {
-    data?: string;
-    type: string;
-}
-export interface IThemeFooter {
-    data?: string;
-    type: string;
-}
-export interface IThemeFont {
-    name: string;
-    url: string;
-    fallbacks: string[];
-}
+import produce from "immer";
+import { useSelector } from "react-redux";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import ThemeActions, { pageTypes } from "./ThemeEditorActions";
+import { ITheme, IThemeAssets, ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 export interface IThemeExternalAsset {
     type: string;
     url: string;
 }
 
-export interface IThemeVariables {
-    [key: string]: string;
-}
-
-export interface ITheme {
-    themeID: string | number;
-    name: string;
-    type: string;
-    assets: IThemeAssets;
-    parentTheme: string;
-    version: string;
-    pageType: pageTypes;
-}
-
-export interface IThemeForm {
+export interface IThemeForm extends Omit<ITheme, "themeID" | "features" | "preview"> {
     themeID?: number | string;
-    name: string;
-    type: string;
-    assets: IThemeAssets;
-    parentTheme: string;
-    version: string;
     pageType: pageTypes;
+    errors: boolean;
 }
 
 export interface IThemeState {
@@ -103,19 +49,21 @@ export const INITIAL_ASSETS: IThemeAssets = {
         type: "",
         url: "",
     },
-    variables: { key: "" },
+    variables: { data: "", type: "" },
 };
 const INITIAL_STATE: IThemeState = {
     theme: {
         status: LoadStatus.PENDING,
     },
     form: {
+        current: false,
         name: "",
-        type: "themeDB",
+        type: ThemeType.DB,
         assets: INITIAL_ASSETS,
         parentTheme: "",
         version: "",
         pageType: pageTypes.NEW_THEME,
+        errors: false,
     },
     formSubmit: {
         status: LoadStatus.PENDING,
@@ -136,7 +84,10 @@ export const themeEditorReducer = produce(
         .case(ThemeActions.getTheme_ACs.done, (state, payload) => {
             state.theme.status = LoadStatus.SUCCESS;
             state.theme.data = payload.result;
-            state.form = payload.result;
+            state.form = {
+                ...state.form,
+                ...payload.result,
+            };
             return state;
         })
         .case(ThemeActions.updateAssetsAC, (state, payload) => {

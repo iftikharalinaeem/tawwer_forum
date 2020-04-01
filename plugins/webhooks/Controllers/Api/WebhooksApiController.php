@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Webhooks;
+namespace Vanilla\Webhooks\Controllers\Api;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;

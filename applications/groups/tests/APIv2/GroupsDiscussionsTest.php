@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
 
 /**
  * Test the /api/v2/discussions with groups
@@ -206,9 +207,6 @@ class GroupsDiscussionsTest extends DiscussionsTest {
      * Test /discussion/:id endpoint with a secret group and non member.
      */
     public function testFailSecretGroupDiscussionID() {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('You need the Vanilla.Discussions.View permission to do that.');
-
         $secretGroupID = self::$secretGroups[0]['groupID'];
         $secretDiscussionID = $this->createDiscussion($secretGroupID);
 
@@ -218,6 +216,17 @@ class GroupsDiscussionsTest extends DiscussionsTest {
         $session->start(self::$userIDs[1], false, false);
 
         $indexUrl = $this->indexUrl();
-        $this->api()->get($indexUrl.'/'.$secretDiscussionID);
+
+        try {
+            $this->api()->get($indexUrl.'/'.$secretDiscussionID);
+        } catch (ForbiddenException $e) {
+            $this->assertSame(
+                "You need the Vanilla.Discussions.View permission to do that.",
+                $e->getDescription()
+            );
+            return;
+        }
+
+        $this->fail("Permission error not encountered.");
     }
 }

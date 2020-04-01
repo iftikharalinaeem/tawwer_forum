@@ -7,9 +7,8 @@
 
 namespace Vanilla\ThemingApi\Controllers;
 
-use Garden\Container\Container;
-
 use Vanilla\Theme\Controllers\Pages\ThemeEditorPage;
+use Vanilla\Theme\Controllers\Pages\ThemePreviewPage;
 use Vanilla\Web\ContentSecurityPolicyMiddleware;
 use Vanilla\Web\PageDispatchController;
 
@@ -55,5 +54,16 @@ class ThemeSettingsPageController extends PageDispatchController {
         return $response;
     }
 
-}
+    /**
+     * Render out the /theme/theme-settings/preview.
+     *
+     * @return \Garden\Web\Data
+     */
+    public function get_preview(string $id) {
+        /** @var ThemePreviewPage $page */
+        $page = $this->usePage(ThemePreviewPage::class);
 
+        $page->initialize($id);
+        return $page->render();
+    }
+}
