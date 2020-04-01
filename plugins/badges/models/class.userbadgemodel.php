@@ -97,7 +97,6 @@ class UserBadgeModel extends Gdn_Model {
             return t($name);
         }
 
-//        $formattedThreshold = preg_replace('/\,/', '', $threshold);
         $formattedThreshold = number_format($threshold);
 
         if (strpos($name, $formattedThreshold) !== false || strpos($name, $threshold) !==false) {
