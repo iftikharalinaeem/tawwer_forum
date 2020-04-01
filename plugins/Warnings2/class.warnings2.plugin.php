@@ -932,8 +932,14 @@ class Warnings2Plugin extends Gdn_Plugin {
             throw notFoundException('User');
         }
         // Check to make sure the session user has a higher permission level than the user to be warned.
-        $userPermissions = $sender->userModel->getPermissions($userID);
-
+        $userPermissions = $this->userModel->getPermissions($userID);
+        $rankCompare = $this->session->getPermissions()->compareRankTo($userPermissions);
+        if ($rankCompare < 0) {
+            throw forbiddenException('@'.t('You are not allowed to warn a user with higher permissions than you.'));
+        }
+        if ($rankCompare === 0) {
+            throw forbiddenException('@'.t('You are not allowed to warn a user with the same permission level as you.'));
+        }
 
         $sender->User = $user;
 
