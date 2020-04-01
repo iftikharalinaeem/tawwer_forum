@@ -382,4 +382,3 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         }
     }
 }
-
