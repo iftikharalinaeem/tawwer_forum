@@ -99,7 +99,7 @@ class UserBadgeModel extends Gdn_Model {
 
         $formattedThreshold = number_format($threshold);
 
-        if (strpos($name, $formattedThreshold) !== false || strpos($name, $threshold) !==false) {
+        if (strpos($name, $formattedThreshold) !== false || strpos($name, $threshold) !== false) {
             $code = strpos($name, $formattedThreshold) !== false ? str_replace($formattedThreshold, '%s', $name) :
                 str_replace($threshold, '%s', $name);
             if ($threshold == 1) {
