@@ -124,9 +124,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 $sender->Form->removeFormValue('Photo');
             }
             $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
-            Gdn::config()->Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
+            Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
-            Gdn::config()->Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
+            Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
 
             try {
                 // Upload image
