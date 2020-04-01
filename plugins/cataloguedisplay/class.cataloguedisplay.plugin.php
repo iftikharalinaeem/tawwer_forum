@@ -124,9 +124,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 $sender->Form->removeFormValue('Photo');
             }
             $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
-            Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
+            Gdn::config()->Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
-            Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
+            Gdn::config()->Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
 
             try {
                 // Upload image
@@ -154,13 +154,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                         c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100)),
                         c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100))
                     );
-                    saveToConfig(['CatalogueDisplay.PlaceHolderImage' => val('Url', $props)]);
+                    Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => val('Url', $props)]);
                 }
 
                 if ($existingImage && Gdn::request()->post('Delete')) {
                     $uploadImage->delete($existingImage);
                     if (Gdn::request()->post('Delete')) {
-                        saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
+                        Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
                     }
                 }
             } catch (Exception $ex) {
