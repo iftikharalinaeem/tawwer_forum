@@ -4,8 +4,7 @@
             $(".placeholder-image", this).animate({ opacity: 1 });
             this.masonry({
                 itemSelector: ".Item.ItemDiscussion",
-                animate: true,
-                glutter: 10
+                animate: true
             });
         });
     });
