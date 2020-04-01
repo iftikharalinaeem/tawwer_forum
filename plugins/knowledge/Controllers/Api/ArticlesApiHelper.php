@@ -9,7 +9,9 @@ namespace Vanilla\Knowledge\Controllers\Api;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
@@ -260,6 +262,33 @@ trait ArticlesApiHelper {
     }
 
     /**
+     * Get db operation mode for pipeline model (force || default).
+     *
+     * @return string
+     */
+    private function getOperationMode(): string {
+        try {
+            $this->permission('knowledge.articles.manage');
+            $mode = Operation::MODE_IMPORT;
+        } catch (PermissionException $e) {
+            $mode = Operation::MODE_DEFAULT;
+        }
+        return $mode;
+    }
+
+    /**
+     * Get filed name list for article revision record
+     *
+     * @return array
+     */
+    private function getRevisionFields(): array {
+        $fields = ["body" => true, "format" => true, "locale" => true, "name" => true];
+        if ($this->getOperationMode() === Operation::MODE_IMPORT) {
+            $fields['dateInserted'] = true;
+        }
+        return $fields;
+    }
+    /**
      * Separate article and revision fields from request input and save to the proper resources.
      *
      * @param array $fields
@@ -269,7 +298,7 @@ trait ArticlesApiHelper {
      * @throws NoResultsException If the article could not be found.
      */
     private function save(array $fields, int $articleID = null): int {
-        $revisionFields = ["body" => true, "format" => true, "locale" => true, "name" => true];
+        $revisionFields = $this->getRevisionFields();
 
         $article = array_diff_key($fields, $revisionFields);
         $revision = array_intersect_key($fields, $revisionFields);
@@ -333,7 +362,7 @@ trait ArticlesApiHelper {
                 );
             }
 
-            $this->articleModel->update($article, ["articleID" => $articleID]);
+            $this->articleModel->update($article, ["articleID" => $articleID], $this->getOperationMode());
 
             if ($moveToAnotherCategory) {
                 if (!empty($prevState['knowledgeCategoryID'])) {
@@ -373,7 +402,7 @@ trait ArticlesApiHelper {
                     $updateSorts = false;
                 }
             }
-            $articleID = $this->articleModel->insert($fields);
+            $articleID = $this->articleModel->insert($fields, $this->getOperationMode());
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
                     $fields['knowledgeCategoryID'],
@@ -425,9 +454,9 @@ trait ArticlesApiHelper {
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
-                $this->articleRevisionModel->insert($revision);
+                $this->articleRevisionModel->insert($revision, $this->getOperationMode());
             } else {
-                $articleRevisionID = $this->articleRevisionModel->insert($revision);
+                $articleRevisionID = $this->articleRevisionModel->insert($revision, $this->getOperationMode());
                 $this->articleRevisionModel->publish($articleRevisionID);
             }
 
