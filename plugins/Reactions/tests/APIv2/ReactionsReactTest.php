@@ -112,7 +112,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     public function testDeleteCommentReaction() {
         $type = 'Like';
 
-        $user = $this->createTestUser(rand(1, 100));
+        $user = $this->createReactionsTestUser(rand(1, 100));
         $userID = (int)$user['userID'];
         $this->api()->setUserID($userID);
 
@@ -192,7 +192,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
     public function testDeleteDiscussionReaction() {
         $type = 'Like';
 
-        $user = $this->createTestUser(rand(1, 100));
+        $user = $this->createReactionsTestUser(rand(1, 100));
         $userID = (int)$user['userID'];
         $this->api()->setUserID($userID);
 
@@ -330,7 +330,7 @@ class ReactionsReactTest extends AbstractAPIv2Test {
      *
      * @return array $user newly created user.
      */
-    protected function createTestUser(int $uid): array {
+    protected function createReactionsTestUser(int $uid): array {
         // Create a new user for this test. It will receive the default member role.
         $username = substr(__FUNCTION__, 0, 20);
         $user = $this->api()->post('users', [
