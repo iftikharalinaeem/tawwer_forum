@@ -356,6 +356,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Implement masonry script and css
+     *
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before(CategoriesController $sender) {
