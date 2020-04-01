@@ -7,7 +7,6 @@
 use Garden\EventManager;
 use Vanilla\Web\TwigRenderTrait;
 
-
 /**
  * Class CatalogueDisplayPlugin
  *
@@ -26,6 +25,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     private $eventManager;
 
+    /**
+     * CatalogueDisplayPlugin constructor.
+     *
+     * @param EventManager $eventManager
+     */
     public function __construct(EventManager $eventManager) {
         parent::__construct();;
         $this->eventManager = $eventManager;
@@ -34,7 +38,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Fires on Utility Update or when the plugin is turned on.
      *
-     * @return bool|void
+     * @return void
      * @throws Exception
      */
     public function setup() {
@@ -81,8 +85,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * When editing a category, if there are discussions in the category, update them to add or remove the "catalogue" style.
      *
-     * @param CategoryModel Object $sender
-     * @param CategoryModel Array $args
+     * @param CategoryModel $sender
+     * @param CategoryModel $args
      */
     public function categoryModel_beforeSaveCategory_handler(CategoryModel $sender, $args) {
         $formPostValues = val('FormPostValues', $args);
@@ -97,8 +101,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add a toggle to the Add/Edit Category in the dashboard to designate this category as a "catalogue" style.
      *
-     * @param SettingsController Object $sender
-     * @param SettingsController Array $args
+     * @param SettingsController $sender
+     * @param array $args
      */
     public function settingsController_addEditCategory_handler(SettingsController $sender, $args) {
         $warningText = '';
@@ -190,10 +194,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * When saving a discussion, remove the thumbnail URL stored in cache if there is one.
      *
-     * @param PostController Object $sender
-     * @param PostController Array $args
+     * @param PostController $sender
+     * @param array $args
      */
-    public function postController_afterDiscussionSave_handler($sender, $args) {
+    public function postController_afterDiscussionSave_handler(PostController $sender, $args) {
         $cacheKey = 'catalogueDisplay.thumbnailURL.'.valr('Discussion.DiscussionID', $args);
         Gdn::cache()->remove($cacheKey);
     }
@@ -201,10 +205,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
      *
-     * @param DiscussionController Object $sender
-     * @param DiscussionsController Array $args
+     * @param DiscussionController $sender
+     * @param array $args
      */
-    public function discussionsController_beforeDiscussionContent_handler($sender, $args) {
+    public function discussionsController_beforeDiscussionContent_handler(DiscussionController $sender, $args) {
         if (c('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
@@ -217,10 +221,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is table, echo out the thumbnail (or placeholder).
      *
-     * @param DiscussionController Object $sender
-     * @param DiscussionsController Array $args
+     * @param DiscussionController $sender
+     * @param array $args
      */
-    public function discussionsController_BeforeDiscussionTitle_handler($sender, $args) {
+    public function discussionsController_beforeDiscussionTitle_handler(DiscussionController $sender, $args) {
         if (c('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
@@ -232,10 +236,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
      *
-     * @param CategoriesController Object $sender
-     * @param CategoriesController Array $args
+     * @param CategoriesController $sender
+     * @param array $args
      */
-    public function categoriesController_beforeDiscussionContent_handler($sender, $args) {
+    public function categoriesController_beforeDiscussionContent_handler(CategoriesController $sender, $args) {
         if (c('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
@@ -248,7 +252,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      * @param array $args
      */
-    public function categoriesController_BeforeDiscussionTitle_handler(CategoriesController $sender, $args) {
+    public function categoriesController_beforeDiscussionTitle_handler(CategoriesController $sender, $args) {
         if (c('Vanilla.Discussions.Layout') === 'table') {
             echo $this->displayCatalogueImage(val('Discussion', $args));
         }
