@@ -39,6 +39,9 @@ class Warnings2Plugin extends Gdn_Plugin {
     /** @var UserNoteModel $userNoteModel */
     private $userNoteModel;
 
+    /** @var Gdn_Session $session */
+    private $session;
+
     /**
      * @var bool Whether or not to restrict the viewing of warnings on posts.
      */
@@ -56,6 +59,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param EmbedService $embedService
      * @param \RuleModel $ruleModel
      * @param UserNoteModel $userNoteModel
+     * @param Gdn_Session $session
      */
     public function __construct(
         \DiscussionModel $discussionModel,
@@ -64,7 +68,8 @@ class Warnings2Plugin extends Gdn_Plugin {
         FormatService $formatService,
         EmbedService $embedService,
         RuleModel $ruleModel,
-        UserNoteModel $userNoteModel
+        UserNoteModel $userNoteModel,
+        Gdn_Session $session
     ) {
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
@@ -75,6 +80,7 @@ class Warnings2Plugin extends Gdn_Plugin {
         $this->userNoteModel = $userModel;
         parent::__construct();
 
+        $this->session = $session;
         $this->fireEvent('Init');
     }
 
@@ -921,14 +927,13 @@ class Warnings2Plugin extends Gdn_Plugin {
     ) {
         $sender->permission(['Garden.Moderation.Manage', 'Moderation.Warnings.Add'], false);
 
-        $user = Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
         if (!$user) {
             throw notFoundException('User');
         }
         // Check to make sure the session user has a higher permission level than the user to be warned.
-        if (!Gdn::session()->hasHigherPermissionLevel('Garden.Moderation.Manage', $userID)) {
-            throw permissionException();
-        }
+        $userPermissions = $sender->userModel->getPermissions($userID);
+
 
         $sender->User = $user;
 
