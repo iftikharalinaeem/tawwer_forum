@@ -284,7 +284,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 $imgAttributes['class'] = 'catalogue-image';
             }
             $imgTag = img($imageUrl, $imgAttributes);
-            $photo = anchor($imgTag, $imageUrl);
+            $photo = anchor($imgTag, discussionUrl($discussion));
         }
 
         // If there is no image, look for the Placeholder Image saved in the config.
