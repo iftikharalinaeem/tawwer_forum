@@ -39,7 +39,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * Fires on Utility Update or when the plugin is turned on.
      *
      * @return void
-     * @throws Exception If table and columns structure failed
+     * @throws Exception If table and columns structure failed.
      */
     public function setup() {
         $this->structure();
@@ -48,7 +48,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add columns to Category and Discussion tables to designate when we display a Discussion as a "catalogue".
      *
-     * @throws Exception If table and columns structure failed
+     * @throws Exception If table and columns structure failed.
      */
     public function structure() {
         Gdn::structure()
@@ -124,13 +124,12 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      * @param array $args
-     * @throws Exception
+     * @throws Gdn_UserException If User has not the right permissions.
      */
     public function settingsController_catalogueDisplay_create(SettingsController $sender, $args) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', Gdn::translate('Upload Placeholder Image'));
         if ($sender->Form->authenticatedPostBack() === true) {
-
             if ($sender->Form->getFormValue('Photo', false) === '') {
                 $sender->Form->removeFormValue('Photo');
             }
