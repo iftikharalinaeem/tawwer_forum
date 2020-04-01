@@ -102,7 +102,7 @@ class WebhookModel extends PipelineModel {
     /**
      * {@inheritDoc}
      */
-    public function insert(array $set) {
+    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
         $set = $this->prepareWrite($set);
         $result = parent::insert($set);
         $this->cache->remove(self::ACTIVE_CACHE_KEY);
@@ -128,7 +128,7 @@ class WebhookModel extends PipelineModel {
     /**
      * {@inheritDoc}
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         $set = $this->prepareWrite($set);
         $result = parent::update($set, $where);
         $this->cache->remove(self::ACTIVE_CACHE_KEY);

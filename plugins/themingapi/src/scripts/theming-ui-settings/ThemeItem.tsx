@@ -80,7 +80,7 @@ export function ThemeItem(props: IProps) {
                     name={props.theme.name || t("Unknown Theme")}
                     isActiveTheme={props.theme.current}
                     onApply={() => {
-                        if (getMeta("ui.themeKey") !== getMeta("ui.mobileThemeKey")) {
+                        if (getMeta("ui.desktopThemeKey") !== getMeta("ui.mobileThemeKey")) {
                             setShowMobileWarning(true);
                         } else {
                             applyTheme();
