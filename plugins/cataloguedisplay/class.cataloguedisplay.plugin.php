@@ -33,6 +33,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
 
     /**
      * Fires on Utility Update or when the plugin is turned on.
+     *
+     * @return bool|void
+     * @throws Exception
      */
     public function setup() {
         $this->structure();
@@ -81,7 +84,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoryModel Object $sender
      * @param CategoryModel Array $args
      */
-    public function categoryModel_beforeSaveCategory_handler($sender, $args) {
+    public function categoryModel_beforeSaveCategory_handler(CategoryModel $sender, $args) {
         $formPostValues = val('FormPostValues', $args);
         $categoryID = val('CategoryID', $args);
         $insert = val('CategoryID', $args) > 0 ? false : true;
@@ -97,7 +100,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param SettingsController Object $sender
      * @param SettingsController Array $args
      */
-    public function settingsController_addEditCategory_handler($sender, $args) {
+    public function settingsController_addEditCategory_handler(SettingsController $sender, $args) {
         $warningText = '';
         if (c('Garden.InputFormatter') === 'Text' || c('Garden.MobileInputFormatter') === 'Text') {
             $warningText = ' <em>You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.</em>';
@@ -108,11 +111,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Create a form in the Dashboard for uploading, deleting and replacing a Placeholder thumbnail.
      *
-     * @param SettingsController Object $sender
-     * @param SettingsController Array $args
+     * @param SettingsController $sender
+     * @param array $args
      * @throws Exception
      */
-    public function settingsController_catalogueDisplay_create($sender, $args) {
+    public function settingsController_catalogueDisplay_create(SettingsController $sender, $args) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', t('Upload Placeholder Image'));
         if ($sender->Form->authenticatedPostBack() === true) {
@@ -175,10 +178,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * When a discussion is being created in a category that is "catalogue" style, add the "CatalogueDisplay" to the discussion row.
      *
-     * @param DiscussionModel Object $sender
-     * @param DiscussionModel Array $args
+     * @param DiscussionModel $sender
+     * @param array $args
      */
-    public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
+    public function discussionModel_beforeSaveDiscussion_handler(DiscussionModel $sender, $args) {
         $categoryModel = new CategoryModel();
         $category = $categoryModel->getWhere(['CategoryID' => valr('FormPostValues.CategoryID', $args), 'CatalogueDisplay' => 1])->firstRow();
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
@@ -242,10 +245,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is table, echo out the thumbnail (or placeholder).
      *
-     * @param CategoriesController Object $sender
-     * @param CategoriesController Array $args
+     * @param CategoriesController $sender
+     * @param array $args
      */
-    public function categoriesController_BeforeDiscussionTitle_handler($sender, $args) {
+    public function categoriesController_BeforeDiscussionTitle_handler(CategoriesController $sender, $args) {
         if (c('Vanilla.Discussions.Layout') === 'table') {
             echo $this->displayCatalogueImage(val('Discussion', $args));
         }
@@ -254,10 +257,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add the CSS class to "catalogue" displayed discussions in the discussion view.
      *
-     * @param DiscussionsController Object $sender
-     * @param DiscussionsController Array $args
+     * @param DiscussionsController $sender
+     * @param array $args
      */
-    public function discussionsController_beforeDiscussionName_handler($sender, $args) {
+    public function discussionsController_beforeDiscussionName_handler(DiscussionsController $sender, $args) {
         if (valr('Discussion.CatalogueDisplay', $args)) {
             $args['CssClass'] .= ' CatalogueRow';
         }
@@ -266,10 +269,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add the CSS class to "catalogue" displayed discussions in the categories view.
      *
-     * @param CategoriesController Object $sender
-     * @param CategoriesController Array $args
+     * @param CategoriesController $sender
+     * @param array $args
      */
-    public function categoriesController_beforeDiscussionName_handler($sender, $args) {
+    public function categoriesController_beforeDiscussionName_handler(CategoriesController $sender, $args) {
         if (valr('Discussion.CatalogueDisplay', $args)) {
             $args['CssClass'] .= ' CatalogueRow';
         }
@@ -332,7 +335,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @return mixed|string URI of the first image in the Discussion.
      */
     public function findImageUrl($discussion) {
-        $imageUrl = '';
         // Get the image URL from cache.
         $cacheKey = 'catalogueDisplay.thumbnailURL.'.val('DiscussionID', $discussion);
         $imageUrl = Gdn::cache()->get($cacheKey);
