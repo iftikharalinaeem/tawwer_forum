@@ -269,9 +269,9 @@ trait ArticlesApiHelper {
     private function getOperationMode(): string {
         try {
             $this->permission('knowledge.articles.manage');
-            $mode = Operation::MODE_DEFAULT;
+            $mode = Operation::MODE_IMPORT;
         } catch (PermissionException $e) {
-            $mode = Operation::MODE_FORCE;
+            $mode = Operation::MODE_DEFAULT;
         }
         return $mode;
     }
@@ -283,7 +283,7 @@ trait ArticlesApiHelper {
      */
     private function getRevisionFields(): array {
         $fields = ["body" => true, "format" => true, "locale" => true, "name" => true];
-        if ($this->getOperationMode() === Operation::MODE_DEFAULT) {
+        if ($this->getOperationMode() === Operation::MODE_IMPORT) {
             $fields['dateInserted'] = true;
         }
         return $fields;
