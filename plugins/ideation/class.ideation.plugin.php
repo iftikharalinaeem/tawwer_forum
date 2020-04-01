@@ -368,8 +368,8 @@ EOT
                 'type' => "number",
                 'value' => (
                     isset($boiSettings['Limit'])
-                        ?$boiSettings['Limit']
-                        :BestOfIdeationModule::DEFAULT_AMOUNT
+                        ? $boiSettings['Limit']
+                        : BestOfIdeationModule::DEFAULT_AMOUNT
                 ),
                 'step' => "1",
                 'min' => "1",
@@ -388,8 +388,8 @@ EOT
                 'type' => "date",
                 'value' => (
                     isset($boiSettings['Dates']['From'])
-                        ?$boiSettings['Dates']['From']
-                        :''
+                        ? $boiSettings['Dates']['From']
+                        : ''
                 ),
             ];
             $sender->Data['_ExtendedFields']['BestOfIdeationFrom'] = [
@@ -405,8 +405,8 @@ EOT
                 'type' => "date",
                 'value' => (
                 isset($boiSettings['Dates']['To'])
-                    ?$boiSettings['Dates']['To']
-                    :''
+                    ? $boiSettings['Dates']['To']
+                    : ''
                 ),
             ];
             $sender->Data['_ExtendedFields']['BestOfIdeationTo'] = [
@@ -834,7 +834,6 @@ EOT
         return $ideaCounterModule;
     }
 
-
     /**
      * Returns the "Best of" module for a discussion category.
      *
@@ -845,14 +844,11 @@ EOT
         return new BestOfIdeationModule($categoryId);
     }
 
-
     /**
      * Hooks to "After a category's title" is shown
      *
      * @param CategoriesController $sender
      * @return string (html) corresponding to the bestOfIdeation implementation for the current category
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
     public function categoriesController_afterPageTitle_handler(CategoriesController $sender) {
         if (is_array($sender->Category->AllowedDiscussionTypes)
@@ -2171,7 +2167,7 @@ EOT
      * @param CategoryModel $sender
      * @param array $args
      */
-    public function categoryModel_afterSaveCategory_handler(CategoryModel &$sender, array $args) {
+    public function categoryModel_afterSaveCategory_handler(CategoryModel $sender, array $args) {
         if (isset($args['CategoryID'])) {
             $bestOfIdeationSettings = [];
 
@@ -2201,7 +2197,7 @@ EOT
      * @param array $args
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function categoryModel_afterDeleteCategory(CategoryModel &$sender, array $args) {
+    public function categoryModel_afterDeleteCategory(CategoryModel $sender, array $args) {
         $this->bestOfIdeationModel->deleteConfiguration($args['CategoryID']);
     }
 }

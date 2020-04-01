@@ -1,20 +1,18 @@
 <?php
 /**
- * Simple model to handle bestOfIdeation data.
+ * BestOfIdeation Model
  *
  * @author David Barbier <david.barbier@vanillaforums.com>
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
+ * @since     4.0
+ *
  */
 
 use \Vanilla\Models\PipelineModel;
 
 /**
- * BestOfIdeation Model
- *
- * @author    David Barbier <david.barbier@vanillaforums.com>
- * @license   Proprietary
- * @since     4.0
+ * Class BestOfIdeationModel
  */
 class BestOfIdeationModel extends PipelineModel {
     /**
@@ -57,7 +55,7 @@ class BestOfIdeationModel extends PipelineModel {
     public function loadConfiguration(int $categoryID): array {
         $configuration = [];
 
-        $catBOIDatas = $this->get(['categoryID'=>$categoryID]);
+        $catBOIDatas = $this->get(['categoryID' => $categoryID]);
 
         if (count($catBOIDatas) == 1) {
             $catBOIDatas = reset($catBOIDatas);
@@ -85,6 +83,6 @@ class BestOfIdeationModel extends PipelineModel {
      * @throws Exception If an error is encountered while performing the query.
      */
     public function deleteConfiguration(int $categoryID): bool {
-        return $this->delete(['categoryID'=>$categoryID]);
+        return $this->delete(['categoryID' => $categoryID]);
     }
 }

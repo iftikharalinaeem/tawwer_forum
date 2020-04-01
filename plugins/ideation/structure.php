@@ -37,8 +37,6 @@ Gdn::structure()
 
 //Ensure that a table allowing to save settings for the BestOfIdeation module exists
 Gdn::structure()->table('BestOfIdeationConfig');
-$boiConfigExists = Gdn::structure()->tableExists();
-
 Gdn::structure()
     ->table('BestOfIdeationConfig')
     ->primaryKey('BoiConfigID')
@@ -46,16 +44,30 @@ Gdn::structure()
     ->column('BestOfIdeationSettings', 'text')
     ->set();
 
-if (!$statusExists) {
-    // Add some default statuses.
-    require_once dirname(__FILE__).'/class.bestofideationmodel.php';
-}
-
 // Make sure we've got the needed reactions
 $reactionModel = new ReactionModel();
-$reactionModel->defineReactionType(['UrlCode' => 'Down', 'Name' => 'Vote Down', 'Sort' => 7, 'Class' => 'Negative', 'IncrementColumn' => 'Score', 'IncrementValue' => -1, 'Points' => 0,
-    'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."]);
-$reactionModel->defineReactionType(['UrlCode' => 'Up', 'Name' => 'Vote Up', 'Sort' => 8, 'Class' => 'Positive', 'IncrementColumn' => 'Score', 'Points' => 1,
-    'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."]);
+$reactionModel->defineReactionType(
+    [
+        'UrlCode' => 'Down',
+        'Name' => 'Vote Down',
+        'Sort' => 7,
+        'Class' => 'Negative',
+        'IncrementColumn' => 'Score',
+        'IncrementValue' => -1,
+        'Points' => 0,
+        'Description' => "A down vote is a general disapproval of a post. Enough down votes will bury a post."
+    ]
+);
+$reactionModel->defineReactionType(
+    [
+        'UrlCode' => 'Up',
+        'Name' => 'Vote Up',
+        'Sort' => 8,
+        'Class' => 'Positive',
+        'IncrementColumn' => 'Score',
+        'Points' => 1,
+        'Description' => "An up vote is a general approval of a post. Enough up votes will promote a post."
+    ]
+);
 
 saveToConfig('Garden.AttachmentsEnabled', true);

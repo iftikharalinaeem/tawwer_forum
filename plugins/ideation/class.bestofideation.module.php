@@ -1,6 +1,5 @@
 <?php
 /**
- * BestOfIdeation Module
  * A module that shows a category's customizable "leaderboard of ideas"
  *
  * @author    David Barbier <david.barbier@vanillaforums.com>
@@ -11,6 +10,9 @@
 
 use Vanilla\Web\TwigRenderTrait;
 
+/**
+ * Class BestOfIdeationModule
+ */
 class BestOfIdeationModule extends Gdn_Module {
     use TwigRenderTrait;
 
