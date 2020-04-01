@@ -180,8 +180,8 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         if (!$this->permissions->hasAny(
             ['Garden.Settings.Manage', 'knowledge.articles.manage', $permission],
             null,
-            Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE)
-        ) {
+            Permissions::CHECK_MODE_GLOBAL_OR_RESOURCE
+        )) {
             throw new PermissionException($permission);
         }
     }
