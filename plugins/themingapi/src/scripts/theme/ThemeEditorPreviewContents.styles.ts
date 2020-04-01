@@ -120,6 +120,7 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
             outlineOffset: unit(-4),
             opacity: 0.85,
             pointerEvents: "none",
+            zIndex: 10000,
         });
     };
 

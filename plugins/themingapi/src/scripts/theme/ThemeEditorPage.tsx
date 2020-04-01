@@ -25,6 +25,7 @@ import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
+import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -45,6 +46,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
+    bodyCSS();
 
     let themeID = props.match.params.id;
 

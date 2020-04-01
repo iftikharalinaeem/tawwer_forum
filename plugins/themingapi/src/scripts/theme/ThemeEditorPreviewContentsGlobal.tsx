@@ -3,57 +3,29 @@
  * @license GPL-2.0-only
  */
 
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
+import { PanelActivator, useActivePanelContext, ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
+import { t } from "@vanilla/i18n";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import { bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import Translate from "@vanilla/library/src/scripts/content/Translate";
 import { userContentClasses } from "@vanilla/library/src/scripts/content/userContentStyles";
 import Button from "@vanilla/library/src/scripts/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
-import React, { useEffect, useState, useContext } from "react";
-import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
-import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
-import Translate from "@vanilla/library/src/scripts/content/Translate";
-import { t } from "@vanilla/i18n";
-import { setActivePanelAC, ActiveVariablePanel } from "@themingapi/theme/ThemeBuilderPanel";
-import classNames from "classnames";
-import { ColorHelper } from "csx";
-import { colorOut } from "@vanilla/library/src/scripts/styles/styleHelpers";
-import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { titleBarVariables } from "@vanilla/library/src/scripts/headers/titleBarStyles";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import React, { useState } from "react";
+import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
 
-const activePanelContext = React.createContext({
-    activePanel: ActiveVariablePanel.GLOBAL,
-    setActivePanel: (activePanel: ActiveVariablePanel) => {},
-});
-
-export function useActivePanelContext() {
-    return useContext(activePanelContext);
-}
-
-window.lastActivePanel = ActiveVariablePanel.GLOBAL;
-
-export function ThemeEditorPreviewContents() {
+export function ThemeEditorPreviewContentsGlobal() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
-    const { sendMessageOut } = useIFrameCommunication();
-    const [activePanel, _setActivePanel] = useState(window.lastActivePanel);
-
-    const setActivePanel = (activePanel: ActiveVariablePanel) => {
-        // Stash on window to prevent losing data when component is reinitialized.
-        window.lastActivePanel = activePanel;
-        _setActivePanel(activePanel);
-        sendMessageOut?.(setActivePanelAC({ panel: activePanel }));
-    };
+    const { setActivePanel } = useActivePanelContext();
 
     return (
-        <activePanelContext.Provider
-            value={{
-                activePanel,
-                setActivePanel,
-            }}
-        >
+        <>
             <PanelActivator panel={ActiveVariablePanel.TITLE_BAR} color={titleBarVariables().colors.fg}>
                 <TitleBar container={null} />
             </PanelActivator>
@@ -142,26 +114,6 @@ export function ThemeEditorPreviewContents() {
                     </div>
                 </Container>
             </PanelActivator>
-        </activePanelContext.Provider>
-    );
-}
-
-function PanelActivator(props: { panel: ActiveVariablePanel; children: React.ReactNode; color?: ColorHelper }) {
-    const { activePanel, setActivePanel } = useActivePanelContext();
-    const classes = themeEditorPreviewClasses();
-    const { color } = props;
-    return (
-        <div
-            className={classes.panelActivator}
-            onClick={e => {
-                e.stopPropagation();
-                setActivePanel(props.panel);
-            }}
-        >
-            {props.children}
-            {props.panel === activePanel && (
-                <div className={classNames(classes.panelActivatorIndicator(color ? colorOut(color) : undefined))}></div>
-            )}
-        </div>
+        </>
     );
 }

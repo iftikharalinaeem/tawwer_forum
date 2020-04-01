@@ -15,11 +15,13 @@ import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/Th
 import { SearchBarPresets, BannerAlignment } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
+import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
 
 export function ThemeBuilderSectionBanner() {
     return (
         <>
-            <ThemeBuilderTitle title={t("Banner")} />
+            <ActivePanelChooser titlePanel={ActiveVariablePanel.BANNER} />
             <ThemeBuilderBlock label={t("Background Image")}>
                 <ThemeBuilderUpload variableKey="banner.outerBackground.image" />
             </ThemeBuilderBlock>

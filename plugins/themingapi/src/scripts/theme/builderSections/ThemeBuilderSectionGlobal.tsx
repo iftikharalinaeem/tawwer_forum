@@ -16,11 +16,13 @@ import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
 import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { buttonGlobalVariables } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
+import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
 
 export function ThemeBuilderSectionGlobal() {
     return (
         <>
-            <ThemeBuilderTitle title={t("Global Styles")} />
+            <ActivePanelChooser titlePanel={ActiveVariablePanel.GLOBAL} />
             <ThemeBuilderBlock label={t("Preset")}>
                 <ThemeDropDown
                     // This is actually an array, but the first is the real one. The rest are fallbacks.
