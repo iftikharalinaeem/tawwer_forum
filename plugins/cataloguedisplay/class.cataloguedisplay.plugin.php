@@ -56,7 +56,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 || (!c('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
             // include magnific-popup before catalogue-style so that catalogue style can override styles.
             $sender->addCssFile('magnific-popup.css', 'dashboard');
-            $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
+            if (!c('CatalogueDisplay.Masonry.Enabled')) {
+                $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
+            }
             $sender->addJsFile('magnific-popup.min.js');
             $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.c('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
         }
@@ -110,7 +112,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
             Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
-            Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled.', $masonryEnabled);
+            Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
 
             try {
                 // Upload image
@@ -277,7 +279,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         // First extract image URL from inside the body.
         $imageUrl = $this->findImageUrl($discussion);
         if ($imageUrl) {
-            $imgTag = img($imageUrl, ['class' => 'catalogue-image']);
+            $imgAttributes = [];
+            if (!c('CatalogueDisplay.Masonry.Enabled')) {
+                $imgAttributes['class'] = 'catalogue-image';
+            }
+            $imgTag = img($imageUrl, $imgAttributes);
             $photo = anchor($imgTag, $imageUrl);
         }
 
@@ -287,7 +293,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             $photo = img($placeHolderUrl, ['class' => 'placeholder-image', 'alt' => t('Placeholder')]);
         }
 
-        return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo]);
+        $cssClassWrapper = [];
+        if (!c('CatalogueDisplay.Masonry.Enabled')) {
+            $cssClassWrapper[] = 'catalogue-image-wrapper';
+        }
+
+        return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo,
+            'cssClassWrapper' => $cssClassWrapper]);
     }
 
     /**
