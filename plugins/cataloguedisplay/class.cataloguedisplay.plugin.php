@@ -4,6 +4,7 @@
  * @license proprietary
  */
 
+use Garden\EventManager;
 use Vanilla\Web\TwigRenderTrait;
 
 
@@ -19,6 +20,16 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
 
     const DEFAULT_USE_ONLY_ON_CATEGORY = true;
     const DEFAULT_MASONRY_ENABLED = false;
+
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    public function __construct(EventManager $eventManager) {
+        parent::__construct();;
+        $this->eventManager = $eventManager;
+    }
 
     /**
      * Fires on Utility Update or when the plugin is turned on.
@@ -275,27 +286,39 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             return;
         }
         $photo = '';
+        $imgTag = null;
+        $cssClassWrapper = [];
+        $imgAttributes = [];
+        $catalogueImgURL = discussionUrl($discussion);
+        if (!c('CatalogueDisplay.Masonry.Enabled')) {
+            $cssClassWrapper[] = 'catalogue-image-wrapper';
+        }
+        if (!c('CatalogueDisplay.Masonry.Enabled')) {
+            $imgAttributes['class'] = 'catalogue-image';
+        }
+        $eventArguments['Discussion'] = $discussion;
+        $eventArguments['catalogueImgURL'] = &$catalogueImgURL;
+        $eventArguments['cssClassWrapper'] = &$cssClassWrapper;
+        $eventArguments['imgAttributes'] = &$imgAttributes;
+        $this->eventManager->fire('beforeCatalogueDisplay', $eventArguments);
 
         // First extract image URL from inside the body.
         $imageUrl = $this->findImageUrl($discussion);
         if ($imageUrl) {
-            $imgAttributes = [];
-            if (!c('CatalogueDisplay.Masonry.Enabled')) {
-                $imgAttributes['class'] = 'catalogue-image';
-            }
             $imgTag = img($imageUrl, $imgAttributes);
-            $photo = anchor($imgTag, discussionUrl($discussion));
         }
 
         // If there is no image, look for the Placeholder Image saved in the config.
         $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
-        if (!$photo && $placeHolderUrl) {
-            $photo = img($placeHolderUrl, ['class' => 'placeholder-image', 'alt' => t('Placeholder')]);
+        if (!$imgTag && $placeHolderUrl) {
+            $imgAttributes['class'] = 'placeholder-image';
+            $imgAttributes['alt'] = t('Placeholder');
+            $imgTag = img($placeHolderUrl, $imgAttributes);
         }
 
-        $cssClassWrapper = [];
-        if (!c('CatalogueDisplay.Masonry.Enabled')) {
-            $cssClassWrapper[] = 'catalogue-image-wrapper';
+        // Apply url to  img
+        if ($imgTag) {
+            $photo = anchor($imgTag, $catalogueImgURL);
         }
 
         return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo,
