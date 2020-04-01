@@ -5,6 +5,10 @@
     padding: 8px;
 }
 
+li.CatalogueRow img{
+    width: 100%;
+}
+
 .ItemDiscussion.CatalogueRow .MItem.LastCommentBy {
     display: inline-grid;
 }
@@ -20,8 +24,4 @@
         display: inline-block;
         width: 100%;
     }
-}
-
-.Discussions.masonry {
-    min-height: 200px;
 }
