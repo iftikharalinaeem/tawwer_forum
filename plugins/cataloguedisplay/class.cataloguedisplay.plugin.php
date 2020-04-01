@@ -117,7 +117,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function settingsController_catalogueDisplay_create(SettingsController $sender, $args) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Title', t('Upload Placeholder Image'));
+        $sender->setData('Title', Gdn::translate('Upload Placeholder Image'));
         if ($sender->Form->authenticatedPostBack() === true) {
 
             if ($sender->Form->getFormValue('Photo', false) === '') {
@@ -315,7 +315,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
         if (!$imgTag && $placeHolderUrl) {
             $imgAttributes['class'] = 'placeholder-image';
-            $imgAttributes['alt'] = t('Placeholder');
+            $imgAttributes['alt'] = Gdn::translate('Placeholder');
             $imgTag = img($placeHolderUrl, $imgAttributes);
         }
 
