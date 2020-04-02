@@ -11,24 +11,16 @@ export const webhookAddEditClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("webhookAddEdit");
 
-    const inlinePullRight = style("inlinePullRight", {
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "flex-end",
+    const pullRight = style("pullRight", {
         ...paddings({
             vertical: globalVars.gutter.half,
             horizontal: globalVars.gutter.size * 2,
         }),
     });
 
-    const inlineCheckbox = style("inlineCheckbox", {
-        fontWeight: globalVars.fonts.weights.normal,
-        flexBasis: "50%",
-    });
-
-    const statusRadio = style("statusRadio", {
+    const eventRadio = style("eventRadio", {
         fontWeight: globalVars.fonts.weights.normal,
     });
 
-    return { inlinePullRight, inlineCheckbox, statusRadio };
+    return { pullRight, eventRadio };
 });

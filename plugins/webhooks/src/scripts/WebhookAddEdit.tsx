@@ -22,6 +22,7 @@ import Button from "@library/forms/Button";
 import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
+import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
 import { useHistory } from "react-router-dom";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
@@ -37,6 +38,7 @@ export function WebhookAddEdit() {
     const history = useHistory();
     const errors = formSubmit.error?.response.data?.errors;
     const webhookCSSClasses = webhookAddEditClasses();
+    const checkRadioCSSClasses = checkRadioClasses();
 
     const handleIndividualEvents = function(isChecked: boolean, event: string) {
         let events = form.events;
@@ -138,39 +140,39 @@ export function WebhookAddEdit() {
                         }}
                     >
                         <DashboardRadioButton
-                            className={webhookCSSClasses.statusRadio}
+                            className={webhookCSSClasses.eventRadio}
                             label={"Send all events to the webhook."}
                             value={EventType.ALL}
                             name={EventType.ALL}
                             disabled={isLoading}
                         />
                         <DashboardRadioButton
-                            className={webhookCSSClasses.statusRadio}
+                            className={webhookCSSClasses.eventRadio}
                             label={"Select individual events."}
                             value={EventType.INDIVIDUAL}
                             name={EventType.INDIVIDUAL}
                             disabled={isLoading}
                         />
-                        <div className={webhookCSSClasses.inlinePullRight}>
+                        <div className={`${checkRadioCSSClasses.grid} ${webhookCSSClasses.pullRight}`}>
                             <DashboardCheckBox
                                 label={"Comments"}
-                                className={webhookCSSClasses.inlineCheckbox}
-                                checked={form.events.includes(EventType.COMMENT) ? true : false}
-                                disabled={form.events.includes(EventType.ALL) ? true : false}
+                                className={webhookCSSClasses.eventRadio}
+                                checked={form.events.includes(EventType.COMMENT)}
+                                disabled={form.events.includes(EventType.ALL)}
                                 onChange={isChecked => handleIndividualEvents(isChecked, EventType.COMMENT)}
                             />
                             <DashboardCheckBox
                                 label={"Discussions"}
-                                className={webhookCSSClasses.inlineCheckbox}
-                                checked={form.events.includes(EventType.DISCUSSION) ? true : false}
-                                disabled={form.events.includes(EventType.ALL) ? true : false}
+                                className={webhookCSSClasses.eventRadio}
+                                checked={form.events.includes(EventType.DISCUSSION)}
+                                disabled={form.events.includes(EventType.ALL)}
                                 onChange={isChecked => handleIndividualEvents(isChecked, EventType.DISCUSSION)}
                             />
                             <DashboardCheckBox
                                 label={"Users"}
-                                className={webhookCSSClasses.inlineCheckbox}
-                                checked={form.events.includes(EventType.USER) ? true : false}
-                                disabled={form.events.includes(EventType.ALL) ? true : false}
+                                className={webhookCSSClasses.eventRadio}
+                                checked={form.events.includes(EventType.USER)}
+                                disabled={form.events.includes(EventType.ALL)}
                                 onChange={isChecked => handleIndividualEvents(isChecked, EventType.USER)}
                             />
                         </div>
@@ -185,7 +187,7 @@ export function WebhookAddEdit() {
                         onChange={isToggled => {
                             updateForm({ status: isToggled ? WebhookStatus.ACTIVE : WebhookStatus.DISABLED });
                         }}
-                        checked={form.status === WebhookStatus.ACTIVE ? true : false}
+                        checked={form.status === WebhookStatus.ACTIVE}
                     />
                 </DashboardFormGroup>
                 <div className="Buttons form-footer">
