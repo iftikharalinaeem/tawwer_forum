@@ -680,7 +680,7 @@ class GroupModel extends Gdn_Model {
             // Send a message for the invite.
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
-                
+
                 $groupPrivacy = $group['Privacy'] ?? null;
                 $groupURL = ($groupPrivacy == 'Secret') ? '/groups' : groupUrl($group);
 
@@ -1349,6 +1349,12 @@ class GroupModel extends Gdn_Model {
                 $data['Visibility'] = 'Public';
                 $data['Registration'] = 'Public';
                 break;
+            case 'secret':
+                $data['Visibility'] = 'Members';
+                $data['Registration'] = 'Invite';
+                break;
+            case '':
+                throw forbiddenException('@'.t('You must choose a Privacy level for your group.'));
         }
 
         // Define the primary key in this model's table.
