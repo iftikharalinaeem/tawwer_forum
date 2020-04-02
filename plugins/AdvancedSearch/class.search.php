@@ -130,15 +130,7 @@ class Search {
             }
 
             $categoryID = array_intersect((array)$categoryID, $categoryIDs);
-
-            if (empty($categoryID)) {
-                $search['cat'] = false;
-            } elseif (empty($search['title']) && empty($search['author']) && empty($search['tags']) && empty($search['date'])) {
-                $doSearch = false;
-            } else {
-                $search['cat'] = $categoryID;
-                $doSearch = true;
-            }
+            $search['cat'] = empty($categoryID) ? false : $categoryID;
         } else {
             $search['cat'] = $categoryIDs;
             unset($search['subcategories']);
