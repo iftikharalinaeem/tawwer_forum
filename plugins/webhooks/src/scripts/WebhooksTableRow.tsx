@@ -11,6 +11,7 @@ import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
 import React from "react";
 import Button from "@library/forms/Button";
 import { useHistory } from "react-router";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
 interface IProps {
     webhook: IWebhook;
@@ -30,15 +31,12 @@ export function WebhooksTableRow(props: IProps) {
             </td>
             <td>
                 <DashboardTableOptions>
-                    <Button
-                        className="btn-icon"
-                        onClick={() => {
-                            history.push(`/webhook-settings/${webhook.webhookID}/edit`);
-                        }}
+                    <LinkAsButton
                         baseClass={ButtonTypes.ICON_COMPACT}
+                        to={`/webhook-settings/${webhook.webhookID}/edit`}
                     >
                         <EditIcon />
-                    </Button>
+                    </LinkAsButton>
                     <Button className="btn-icon" onClick={props.onDeleteClick} baseClass={ButtonTypes.ICON_COMPACT}>
                         <DeleteIcon />
                     </Button>

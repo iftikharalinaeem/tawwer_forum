@@ -3,13 +3,13 @@
  * @license Proprietary
  */
 
-import { IWebhookStore } from "@webhooks/WebhookTypes";
+import { IWebhook, IWebhookStore } from "@webhooks/WebhookTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useWebhookActions } from "@webhooks/WebhookActions";
 
-export function useWebhooks() {
+export function useWebhooks(): ILoadable<{ [id: number]: IWebhook }> {
     const webhooksByID = useSelector((state: IWebhookStore) => state.webhooks.webhooksByID);
     const { getAll } = useWebhookActions();
 

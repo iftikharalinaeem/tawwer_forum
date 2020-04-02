@@ -12,7 +12,7 @@ export interface IWebhook {
     webhookID?: number;
     status: WebhookStatus;
     name: string;
-    events: string[];
+    events: EventType[];
     url: string;
     secret: string;
     dateInserted: string;

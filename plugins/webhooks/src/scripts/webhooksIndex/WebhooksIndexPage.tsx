@@ -15,7 +15,7 @@ import { useWebhooks } from "@webhooks/WebhookHooks";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { EmptyWebhooksResults } from "@webhooks/EmptyWebhooksResults";
 import { LoadStatus } from "@library/@types/api/core";
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
 import { IWebhook } from "@webhooks/WebhookTypes";
 
@@ -85,4 +85,4 @@ function WebhooksIndexPage(props: IOwnProps) {
     );
 }
 
-export default withRouter(WebhooksIndexPage);
+export default WebhooksIndexPage;

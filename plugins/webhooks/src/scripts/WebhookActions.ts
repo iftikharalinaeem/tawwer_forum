@@ -68,15 +68,15 @@ export class WebhookActions extends ReduxActions {
         }
     };
 
-    public saveWebhookForm = async (form: IWebhookFormState) => {
+    public saveWebhookForm = async (form: IWebhookFormState): Promise<IWebhook> => {
         if (form.webhookID) {
-            return await this.patchWebhook(form as any);
+            return await this.patchWebhook(form);
         } else {
-            return await this.postWebhook(form as any);
+            return await this.postWebhook(form);
         }
     };
 
-    public postWebhook(options: IWebhook) {
+    public postWebhook(options: Partial<IWebhook>): Promise<IWebhook> {
         const thunk = bindThunkAction(WebhookActions.postFormACs, async () => {
             const response = await this.api.post(`/webhooks/`, options);
             return response.data;
@@ -85,13 +85,16 @@ export class WebhookActions extends ReduxActions {
         return this.dispatch(thunk);
     }
 
-    public patchWebhook(options: IWebhook) {
+    public patchWebhook(options: Partial<IWebhook>): Promise<IWebhook> {
         const { webhookID, ...url } = options;
 
-        const thunk = bindThunkAction(WebhookActions.patchFormACs, async () => {
-            const response = await this.api.patch(`/webhooks/${webhookID}`, url);
-            return response.data;
-        })(options);
+        const thunk = bindThunkAction(
+            WebhookActions.patchFormACs,
+            async (): IWebhook => {
+                const response = await this.api.patch(`/webhooks/${webhookID}`, url);
+                return response.data;
+            },
+        )(options);
 
         return this.dispatch(thunk);
     }
