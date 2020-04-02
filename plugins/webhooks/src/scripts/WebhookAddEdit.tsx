@@ -23,11 +23,11 @@ import Loader from "@library/loaders/Loader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { webhookAddEditClasses } from "@webhooks/WebhookAddEditStyles";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
-import { WebhookDashboardHeaderBlock } from "@webhooks/WebhookDashboardHeaderBlock";
+import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { useHistory } from "react-router-dom";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 
-export function WebhookAddEdit() {
+function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm, saveWebhookForm, clearError, clearForm } = useWebhookActions();
     const params = useParams<{ webhookID?: string }>();
@@ -83,10 +83,10 @@ export function WebhookAddEdit() {
                     }
                 }}
             >
-                <WebhookDashboardHeaderBlock
+                <DashboardHeaderBlock
                     title={isEditing ? t("Edit Webhook") : t("Add Webhook")}
                     showBackLink={true}
-                    onBack={() => {
+                    onBackClick={() => {
                         history.push("/webhook-settings");
                     }}
                 />

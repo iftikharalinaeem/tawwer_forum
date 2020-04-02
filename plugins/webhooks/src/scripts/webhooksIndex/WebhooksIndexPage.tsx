@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { t } from "@vanilla/i18n";
@@ -21,7 +21,7 @@ import { IWebhook } from "@webhooks/WebhookTypes";
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
-function WebhooksIndexPage(props: IOwnProps) {
+export default function WebhooksIndexPage(props: IOwnProps) {
     const { HeadItem } = DashboardTable;
     const [editingID, setEditingID] = useState<number | null>(null);
     const [deleteID, setDeleteID] = useState<number | null>(null);
@@ -84,5 +84,3 @@ function WebhooksIndexPage(props: IOwnProps) {
         </>
     );
 }
-
-export default WebhooksIndexPage;
