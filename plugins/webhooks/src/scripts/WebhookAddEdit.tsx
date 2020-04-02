@@ -30,7 +30,7 @@ export function WebhookAddEdit() {
     const { form, formSubmit } = useWebhookData();
     const { updateForm, initForm, saveWebhookForm, clearError, clearForm } = useWebhookActions();
     const params = useParams<{ webhookID?: string }>();
-    const [submittedWebhookID, setSubmittedWebhookID] = useState<number | null>(null);
+    const [submittedWebhookID, setSubmittedWebhookID] = useState<null | number>(null);
     const webhookID = params.webhookID ? params.webhookID : null;
     const isEditing = !!webhookID;
     const isLoading = status === LoadStatus.LOADING;
@@ -76,7 +76,9 @@ export function WebhookAddEdit() {
                     event.preventDefault();
                     event.stopPropagation();
                     const submittedWebhook = await saveWebhookForm(form);
-                    setSubmittedWebhookID(submittedWebhook.webhookID);
+                    if (submittedWebhook.webhookID) {
+                        setSubmittedWebhookID(submittedWebhook.webhookID);
+                    }
                 }}
             >
                 <WebhookDashboardHeaderBlock

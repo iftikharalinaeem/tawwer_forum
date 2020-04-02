@@ -24,9 +24,9 @@ export class WebhookActions extends ReduxActions {
         "GET_EDIT",
     );
 
-    public static postFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("POST");
+    public static postFormACs = actionCreator.async<IWebhookFormState, IWebhook, IApiError>("POST");
 
-    public static patchFormACs = actionCreator.async<IWebhook, IWebhook, IApiError>("PATCH");
+    public static patchFormACs = actionCreator.async<IWebhookFormState, IWebhook, IApiError>("PATCH");
 
     public static clearErrorAC = actionCreator("CLEAR_ERROR");
     public clearError = this.bindDispatch(WebhookActions.clearErrorAC);
@@ -76,7 +76,7 @@ export class WebhookActions extends ReduxActions {
         }
     };
 
-    public postWebhook(options: Partial<IWebhook>): Promise<IWebhook> {
+    public postWebhook(options: IWebhookFormState): Promise<IWebhook> {
         const thunk = bindThunkAction(WebhookActions.postFormACs, async () => {
             const response = await this.api.post(`/webhooks/`, options);
             return response.data;
@@ -85,16 +85,13 @@ export class WebhookActions extends ReduxActions {
         return this.dispatch(thunk);
     }
 
-    public patchWebhook(options: Partial<IWebhook>): Promise<IWebhook> {
+    public patchWebhook(options: IWebhookFormState): Promise<IWebhook> {
         const { webhookID, ...url } = options;
 
-        const thunk = bindThunkAction(
-            WebhookActions.patchFormACs,
-            async (): IWebhook => {
-                const response = await this.api.patch(`/webhooks/${webhookID}`, url);
-                return response.data;
-            },
-        )(options);
+        const thunk = bindThunkAction(WebhookActions.patchFormACs, async () => {
+            const response = await this.api.patch(`/webhooks/${webhookID}`, url);
+            return response.data;
+        })(options);
 
         return this.dispatch(thunk);
     }
