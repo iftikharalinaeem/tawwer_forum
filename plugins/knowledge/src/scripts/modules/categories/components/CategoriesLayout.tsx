@@ -65,8 +65,8 @@ export default function CategoriesLayout(props: IProps) {
             />
         );
 
-    return (
-        <Container>
+    const titleBar =
+        results.length > 0 ? (
             <TitleBar
                 extraBurgerNavigation={
                     <Navigation
@@ -78,6 +78,13 @@ export default function CategoriesLayout(props: IProps) {
                 }
                 useMobileBackButton={true}
             />
+        ) : (
+            <></>
+        );
+
+    return (
+        <Container>
+            {titleBar}
             <PanelLayout
                 breadcrumbs={
                     (device === Devices.XS || device === Devices.MOBILE) && category.breadcrumbs
