@@ -58,7 +58,7 @@ const HomePage = (props: IProps) => {
     }
 
     const nonUniversalKBs = knowledgeBases.filter(kb => !kb.isUniversalSource);
-    if (nonUniversalKBs.length === 1 || knowledgeBases.length === 0) {
+    if (nonUniversalKBs.length === 1 || knowledgeBases.length === 1) {
         // If we have just 1 universal source we don't want to pretend it doesn't exist.
         const { urlCode } = nonUniversalKBs[0] ?? knowledgeBases[0];
         return <KnowledgeBasePage {...props} isOnlyKb match={{ ...props.match, params: { urlCode } }} />;
