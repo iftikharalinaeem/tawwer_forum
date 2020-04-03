@@ -9,6 +9,7 @@
  *
  */
 
+use \Vanilla\Database\Operation\JsonFieldProcessor;
 use \Vanilla\Models\PipelineModel;
 
 /**
@@ -25,6 +26,10 @@ class BestOfIdeationModel extends PipelineModel {
      */
     public function __construct() {
         parent::__construct('BestOfIdeationConfig');
+
+        $jsonProcessor = new JsonFieldProcessor();
+        $jsonProcessor->setFields([BestOfIdeationModel::SETTINGS_COL_NAME]);
+        $this->addPipelineProcessor($jsonProcessor);
     }
 
     /**
@@ -32,17 +37,13 @@ class BestOfIdeationModel extends PipelineModel {
      *
      * @param int $categoryID the CategoryID for which we want to save the settings.
      * @param array $settings an array of the settings to save.
+     * @throws Exception If an error is encountered while performing the query.
      */
     public function saveConfiguration(int $categoryID, array $settings) {
-        try {
-            if ($this->get(['CategoryID' => $categoryID])) {
-                $this->update(['BestOfIdeationSettings' => dbencode($settings)], ['CategoryID' => $categoryID]);
-            } else {
-                $this->insert(['CategoryID' => $categoryID, 'BestOfIdeationSettings' => dbencode($settings)]);
-            }
-        } catch (Exception $exception) {
-            echo 'Exception: ' . $exception->getMessage();
-            die();
+        if ($this->get(['CategoryID' => $categoryID])) {
+            $this->update(['BestOfIdeationSettings' => $settings], ['CategoryID' => $categoryID]);
+        } else {
+            $this->insert(['CategoryID' => $categoryID, 'BestOfIdeationSettings' => $settings]);
         }
     }
 
@@ -52,7 +53,7 @@ class BestOfIdeationModel extends PipelineModel {
      * @param int $categoryID
      * @return array
      */
-    public function loadConfiguration(int $categoryID): array {
+    public function getConfigurationByCategoryId(int $categoryID): array {
         $configuration = [];
 
         $catBOIDatas = $this->get(['categoryID' => $categoryID]);
@@ -61,7 +62,7 @@ class BestOfIdeationModel extends PipelineModel {
             $catBOIDatas = reset($catBOIDatas);
 
             if (isset($catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME])) {
-                $catBOISettings = dbdecode($catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME]);
+                $catBOISettings = $catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME];
                 if (is_array($catBOISettings)) {
                     $configuration = [
                         'IsEnabled' => true,

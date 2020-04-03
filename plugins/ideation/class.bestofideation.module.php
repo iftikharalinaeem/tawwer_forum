@@ -85,15 +85,10 @@ class BestOfIdeationModule extends Gdn_Module {
      * @param int $categoryID
      */
     public function __construct(int $categoryID) {
-        try {
-            $this->discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
-            $this->bestOfIdeationModel = Gdn::getContainer()->get(BestOfIdeationModel::class);
-            $this->cache = Gdn::getContainer()->get(Gdn_Cache::class);
-            $this->locale = Gdn::getContainer()->get(Gdn_Locale::class);
-        } catch (Exception $exception) {
-            echo 'Exception: ' . $exception->getMessage();
-            die();
-        }
+        $this->discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+        $this->bestOfIdeationModel = Gdn::getContainer()->get(BestOfIdeationModel::class);
+        $this->cache = Gdn::getContainer()->get(Gdn_Cache::class);
+        $this->locale = Gdn::getContainer()->get(Gdn_Locale::class);
 
         $this->categoryID = $categoryID;
         $this->cacheKey = get_class($this) . '_' . $this->categoryID;
@@ -114,7 +109,7 @@ class BestOfIdeationModule extends Gdn_Module {
      *
      */
     private function loadSettings() {
-        $catBOISettings = $this->bestOfIdeationModel->loadConfiguration($this->categoryID);
+        $catBOISettings = $this->bestOfIdeationModel->getConfigurationByCategoryId($this->categoryID);
 
         if (!empty($catBOISettings)) {
             $this->isEnabled = $catBOISettings['IsEnabled'];
@@ -125,7 +120,9 @@ class BestOfIdeationModule extends Gdn_Module {
 
     /**
      * Saves the BestOfIdeation settings for the current category
+     *
      * @param array $settings
+     * @throws Exception If an error is encountered while performing the query.
      */
     public function saveSettings(array $settings) {
         $this->bestOfIdeationModel->saveConfiguration($this->categoryID, $settings);

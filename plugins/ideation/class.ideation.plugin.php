@@ -347,7 +347,7 @@ EOT
             ];
 
             //Obtain BestOfIdeations module's settings
-            $boiSettings = $this->bestOfIdeationModel->loadConfiguration($categoryID);
+            $boiSettings = $this->bestOfIdeationModel->getConfigurationByCategoryId($categoryID);
 
             //Is the bestOfIdeation feature used?
             $useBestOfIdeationOptions = [];
@@ -2153,11 +2153,8 @@ EOT
      *
      * Flushing the ideation cache on this hook to prevent people creating a new ideation category
      * not being able to see/post in it right away. See getIdeaCategoryIDs().
-     *
-     * @param CategoryModel $sender
-     * @param array $args
      */
-    public function categoryModel_beforeSaveCategory_handler(CategoryModel &$sender, array $args) {
+    public function categoryModel_beforeSaveCategory_handler() {
         Gdn::cache()->remove(self::IDEATION_CACHE_KEY);
     }
 
