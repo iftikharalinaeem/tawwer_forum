@@ -1345,15 +1345,14 @@ class GroupModel extends Gdn_Model {
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Approval';
                 break;
-            case 'public':
-            case '':
-                $data['Visibility'] = 'Public';
-                $data['Registration'] = 'Public';
-                break;
             case 'secret':
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Invite';
                 break;
+            case 'public':
+            default:
+                $data['Visibility'] = 'Public';
+                $data['Registration'] = 'Public';
         }
 
         // Define the primary key in this model's table.
