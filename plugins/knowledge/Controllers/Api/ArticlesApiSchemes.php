@@ -558,7 +558,10 @@ trait ArticlesApiSchemes {
             "outline:a?" => Schema::parse([
                 'ref:s' => 'Heading blot reference id. Ex: #title',
                 'level:i' => 'Heading level',
-                'text:s' => 'Heading text line',
+                'text:s' => [
+                    'type' => 'string',
+                    'minLength' => 0
+                ],
             ]),
             "seoImage:s?" => [
                 "allowNull" => true,
