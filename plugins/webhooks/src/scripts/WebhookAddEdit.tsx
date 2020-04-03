@@ -147,7 +147,7 @@ function WebhookAddEdit() {
                             name={EventType.INDIVIDUAL}
                             disabled={isLoading}
                         />
-                        <div className={`${checkRadioCSSClasses.group} ${webhookCSSClasses.pullRight}`}>
+                        <div className={`${checkRadioCSSClasses.grid} ${webhookCSSClasses.pullRight}`}>
                             <DashboardCheckBox
                                 label={"Comments"}
                                 className={webhookCSSClasses.eventRadio}
