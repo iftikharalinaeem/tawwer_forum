@@ -6,6 +6,8 @@
 
 namespace Vanilla\Webhooks;
 
+use DashboardController;
+
 /**
  * Class WebhooksPlugin
  */
@@ -62,5 +64,18 @@ class WebhooksPlugin extends \Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime", true)
             ->set();
+    }
+
+    /**
+     * Event handler for adding navigation items into the dashboard.
+     *
+     * @param \Gdn_Pluggable $sender
+     *
+     * @return void
+     */
+    public function base_getAppSettingsMenuItems_handler($sender) {
+        /* @var \NestedCollectionAdapter */
+        $menu = $sender->EventArguments['SideMenu'];
+        $menu->addLink('Site Settings', t('Webhooks'), '/webhook-settings', 'Garden.Settings.Manage');
     }
 }

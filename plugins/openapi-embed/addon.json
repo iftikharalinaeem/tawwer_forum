@@ -1,0 +1,20 @@
+{
+    "key": "openapi-embed",
+    "name": "OpenAPI Embed",
+    "description": "Adds an OpenAPI embed to Rich Editor",
+    "version": "1.0.0",
+    "mobileFriendly": true,
+    "license": "GPL-2.0-only",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam@charrondev.com",
+            "homepage": "https://github.com/charrondev"
+        }
+    ],
+    "icon": "openapi-embed.png",
+    "require": {
+        "vanilla": ">=4.0"
+    }
+}

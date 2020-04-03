@@ -150,6 +150,9 @@ class TranslationsApiController extends AbstractApiController {
         $path = substr($path, 1);
 
         $in = $this->getTranslationsSchema("in");
+        if ($query['validateLocale'] ?? true) {
+            $in->addValidator('locale', [$this->localeApi, 'validateLocale']);
+        }
 
         $query["resourceUrlCode"] = $path;
         $query = $in->validate($query);
@@ -264,7 +267,12 @@ class TranslationsApiController extends AbstractApiController {
                     "minimum" => 1,
                     "maximum" => 100,
                 ],
-            ]))->addValidator('locale', [$this->localeApi, 'validateLocale']);
+                "validateLocale:b?" => [
+                    "description" => "Apply validation to locale.",
+                    "type" => "boolean",
+                    "default" => true
+                ]
+            ]));
         }
         return $this->schema($this->getResourceSchema, $type);
     }
@@ -327,6 +335,7 @@ class TranslationsApiController extends AbstractApiController {
                 "translationPropertyKey:s",
                 "locale:s",
                 "translation:s",
+                "dateUpdated:dt",
             ]));
         }
         return $this->schema($this->translationSchema, $type);

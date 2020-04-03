@@ -236,9 +236,12 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     public function advancedSearch($search, $offset = 0, $limit = 10, $clean = true) {
+        /** @var SphinxClient */
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits($offset, $limit, self::$maxResults);
-        $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
+        if (method_exists($sphinx, "setMatchMode")) {
+            $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
+        }
 
         // Filter the search into proper terms.
         if ($clean) {
@@ -321,15 +324,19 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['types'])) {
             $indexes = [];
+            $idxWeights = [];
             $values = [];
             /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
            foreach ($search['types'] as $recordType) {
-                $indexes[] = $recordType->getIndexName();
+                $indexes[] = $idxName = $recordType->getIndexName();
+                $idxWeights[$idxName] = $recordType->getIndexWeight();
                 $values[] = $recordType->getDType();
             }
 
             $sphinx->setFilter('dtype', $values);
             $indexes = $this->indexes($indexes);
+            $idxWeights = $this->dbIndexNames($idxWeights);
+            $sphinx->setIndexWeights($idxWeights);
         }
 
         if (isset($search['discussionid'])) {
@@ -344,7 +351,11 @@ class SphinxSearchModel extends \SearchModel {
 
         if ($doSearch) {
             if ($filtered && empty($query)) {
-                $sphinx->setMatchMode(SPH_MATCH_ALL);
+                if (method_exists($sphinx, "setMatchMode")) {
+                    $sphinx->setMatchMode(SPH_MATCH_ALL);
+                } else {
+                    $sphinx->setRankingMode(SPH_RANK_PROXIMITY);
+                }
             }
             $results = $this->doSearch($sphinx, $query, $indexes);
             $results['SearchTerms'] = array_unique($terms);
@@ -523,6 +534,27 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     /**
+     * Replace spinx index names with real names adjusted for current DB.
+     *
+     * @param string[] $indexWeights
+     * @return array
+     */
+    public function dbIndexNames(array $indexWeights): array {
+        $indexes = [];
+        $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
+        foreach ($indexWeights as $idxName => $weight) {
+            $indexes[$prefix . $idxName] = $weight;
+        }
+
+        if ($this->useDeltas) {
+            foreach ($indexes as $idxName => $weight) {
+                $indexes[ $idxName . '_Delta'] = $weight;
+            }
+        }
+        return $indexes;
+    }
+
+    /**
      * Whether or not groups can be searched.
      *
      * @return bool Returns true if groups can be searched or false otherwise.
@@ -538,18 +570,23 @@ class SphinxSearchModel extends \SearchModel {
      * @return SphinxClient
      */
     public function sphinxClient() {
-         $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
-         $sphinxPort = c('Plugins.Sphinx.Port', 9312);
+        $sphinxHost = c('Plugins.Sphinx.Server', c('Database.Host', 'localhost'));
+        $sphinxPort = c('Plugins.Sphinx.Port', 9312);
 
-         $this->_sphinxClient = new SphinxClient();
-         $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
+        $this->_sphinxClient = new SphinxClient();
+        $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
-         // Set some defaults.
-         $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
-         $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-         $this->_sphinxClient->setRankingMode(self::$rankingMode);
-         $this->_sphinxClient->setMaxQueryTime(5000);
-         $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
+        // Set some defaults.
+        if (method_exists($this->_sphinxClient, "setMatchMode")) {
+            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
+        } else {
+            // SPH_SORT_TIME_SEGMENTS is not a valid sort mode in Sphinx 3.2.1.
+            $this->_sphinxClient->setSortMode(SPH_SORT_RELEVANCE);
+        }
+        $this->_sphinxClient->setRankingMode(self::$rankingMode);
+        $this->_sphinxClient->setMaxQueryTime(5000);
+        $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
 
         return $this->_sphinxClient;
     }
@@ -565,9 +602,19 @@ class SphinxSearchModel extends \SearchModel {
         return $results['SearchResults'];
     }
 
+    /**
+     * Set soritng for Sphinx object
+     *
+     * @param SphinxClient $sphinx
+     * @param array $terms
+     * @param array $search
+     */
     public function setSort($sphinx, $terms, $search) {
-        // If there is just one search term then we really want to just sort by date.
-        if (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
+        if (!isset($search['sort'])) {
+            $sphinx->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
+            $sphinx->setSortMode(SPH_SORT_EXTENDED, "sorter DESC");
+        } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
+            // If there is just one search term then we really want to just sort by date.
             $sphinx->setSelect('*, (dateinserted + 1) as sort');
             $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
         } else {
@@ -596,7 +643,7 @@ class SphinxSearchModel extends \SearchModel {
                 $mult = 1 / $maxScore;
 
                 $fullfunc = implode(' + ', $funcs);
-                $sort = "(($fullfunc) * $mult + 1) * @weight";
+                $sort = "(($fullfunc) * $mult + 1) * WEIGHT()";
                 trace($sort, 'sort');
 
                 $sphinx->setSelect("*, $sort as sort");

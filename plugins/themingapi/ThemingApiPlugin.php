@@ -89,30 +89,22 @@ class ThemingApiPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Event handler for adding navigation items into the dashboard.
+     * Add the new Themes menu item.
      *
-     * @param \Gdn_Pluggable $sender
-     *
-     * @return void
+     * @param \DashboardNavModule $nav The menu to add the module to.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        /* @var \NestedCollectionAdapter */
-        $menu = $sender->EventArguments['SideMenu'];
-        $this->createDashboardMenus($menu);
-    }
-
-    /**
-     * Construct the Theming UI dashboard menu items.
-     *
-     * @param \NestedCollectionAdapter $navCollection
-     */
-    private function createDashboardMenus(\NestedCollectionAdapter $navCollection) {
-        $navCollection->addLink(
-            self::NAV_SECTION,
-            t('Theming UI'),
-            '/theme/theme-settings',
-            'Garden.Settings.Manage'
-        );
+    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
+        if ($this->session->checkPermission('Garden.Settings.Manage')) {
+            $nav->addLinkToSection(
+                'settings',
+                t('Themes'),
+                '/theme/theme-settings',
+                'appearance.theme-settings',
+                '',
+                ['after' => 'banner'],
+                ['badge' => t('New')]
+            );
+        }
     }
 
     /**
@@ -124,7 +116,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->primaryKey("themeID")
             ->column("name", "varchar(64)", false, ["index"])
             ->column("current", "tinyint(1)", 0, ["index"])
-            ->column("parentTheme", "varchar(32)", 0 )
+            ->column("parentTheme", "varchar(32)", 0)
             ->column("parentVersion", "varchar(32)", 0)
             ->column("insertUserID", "int", false)
             ->column("updateUserID", "int", false)
@@ -137,7 +129,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->primaryKey("assetID")
             ->column("themeID", "int", false, ["index", "index.record"])
             ->column("assetKey", "varchar(32)", false, ["index", "index.record"])
-            ->column("data", "text", false)
+            ->column("data", "mediumtext", false)
             ->column("insertUserID", "int", false, ["index"])
             ->column("updateUserID", "int", false, ["index"])
             ->column("dateInserted", "datetime")

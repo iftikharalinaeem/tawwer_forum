@@ -9,7 +9,7 @@ import { t } from "@vanilla/i18n";
 import { useSelector } from "react-redux";
 import { LoadStatus } from "@library/@types/api/core";
 import { IThemesStoreState } from "@library/theming/themeSettingsReducer";
-import { useThemesActions } from "@library/theming/ThemesActions";
+import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 interface IProps {
     themeID: number | string;
@@ -20,7 +20,7 @@ interface IProps {
 
 export function ThemeDeleteModal(props: IProps) {
     const { themeID, onDismiss, elementToFocusOnExit } = props;
-    const { deleteTheme } = useThemesActions();
+    const { deleteTheme } = useThemeActions();
     const { status } = useDeleteStatus(props.themeID);
 
     const handleConfirm = async () => {

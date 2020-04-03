@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Vanilla\Formatting\Formats\TextFormat;
 /**
  * Class RankModel
  */
@@ -111,6 +112,7 @@ class RankModel extends Gdn_Model {
                 'NotifyUserID' => $userID,
                 'HeadlineFormat' => t('Ranks.NotificationFormat', 'Congratulations! You\'ve been promoted to {Data.Name,plaintext}.'),
                 'Story' => val('Body', $rank),
+                'Format' => TextFormat::FORMAT_KEY,
                 'RecordType' => 'Rank',
                 'RecordID' => $rankID,
                 'Route' => "/profile",
