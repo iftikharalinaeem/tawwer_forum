@@ -4,6 +4,7 @@ use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Ideation Plugin
@@ -43,6 +44,9 @@ class IdeationPlugin extends Gdn_Plugin {
      * Ideation cache key.
      */
     const IDEATION_CACHE_KEY = 'ideaCategoryIDs';
+
+    /** @var string BEST_OF_IDEATION_FEATURE Best of ideation feature flag. */
+    private const BEST_OF_IDEATION_FEATURE = 'BestOfIdeation';
 
     /**
      * @var int The tag ID of the upvote reaction.
@@ -346,77 +350,78 @@ EOT
                 'Options' => $downVoteOptions
             ];
 
-            //Obtain BestOfIdeations module's settings
-            $boiSettings = $this->bestOfIdeationModel->getConfigurationByCategoryId($categoryID);
+            if (FeatureFlagHelper::featureEnabled(self::BEST_OF_IDEATION_FEATURE)) {
+                //Obtain BestOfIdeations module's settings
+                $boiSettings = $this->bestOfIdeationModel->getConfigurationByCategoryId($categoryID);
 
-            //Is the bestOfIdeation feature used?
-            $useBestOfIdeationOptions = [];
-            if ($boiSettings['IsEnabled']) {
-                $useBestOfIdeationOptions['checked'] = 'checked';
-            }
-            $sender->Data['_ExtendedFields']['UseBestOfIdeation'] = [
-                'Name' => 'UseBestOfIdeation',
-                'LabelCode' => Gdn::translate('Show the "Best of Ideation"'),
-                'Control' => 'CheckBox',
-                'Description' => Gdn::translate('Show the "Best of" ideas').
-                    ' <div class="info">'.Gdn::translate('Will show a scoreboard of the best ideas.').'</div>',
-                'Options' => $useBestOfIdeationOptions,
-            ];
+                //Is the bestOfIdeation feature used?
+                $useBestOfIdeationOptions = [];
+                if ($boiSettings['IsEnabled']) {
+                    $useBestOfIdeationOptions['checked'] = 'checked';
+                }
+                $sender->Data['_ExtendedFields']['UseBestOfIdeation'] = [
+                    'Name' => 'UseBestOfIdeation',
+                    'LabelCode' => Gdn::translate('Show the "Best of Ideation"'),
+                    'Control' => 'CheckBox',
+                    'Description' => Gdn::translate('Show the "Best of" ideas').
+                        ' <div class="info">'.Gdn::translate('Will show a scoreboard of the best ideas.').'</div>',
+                    'Options' => $useBestOfIdeationOptions,
+                ];
 
-            //The amount of ideas to include in this bestOfIdeation implementation?
-            $bestOfIdeationLimitOptions = [
-                'type' => "number",
-                'value' => (
+                //The amount of ideas to include in this bestOfIdeation implementation?
+                $bestOfIdeationLimitOptions = [
+                    'type' => "number",
+                    'value' => (
                     isset($boiSettings['Limit'])
                         ? $boiSettings['Limit']
                         : BestOfIdeationModule::DEFAULT_AMOUNT
-                ),
-                'step' => "1",
-                'min' => "1",
-                'max' => BestOfIdeationModule::MAX_AMOUNT
-            ];
-            $sender->Data['_ExtendedFields']['BestOfIdeationLimit'] = [
-                'Name' => 'BestOfIdeationSettings[Limit]',
-                'LabelCode' => Gdn::translate('How many ideas shown'),
-                'Control' => 'textbox',
-                'Description' => Gdn::translate('How many top ideas should be show in the "Best of Idea" module'),
-                'Options' => $bestOfIdeationLimitOptions,
-            ];
+                    ),
+                    'step' => "1",
+                    'min' => "1",
+                    'max' => BestOfIdeationModule::MAX_AMOUNT
+                ];
+                $sender->Data['_ExtendedFields']['BestOfIdeationLimit'] = [
+                    'Name' => 'BestOfIdeationSettings[Limit]',
+                    'LabelCode' => Gdn::translate('How many ideas shown'),
+                    'Control' => 'textbox',
+                    'Description' => Gdn::translate('How many top ideas should be show in the "Best of Idea" module'),
+                    'Options' => $bestOfIdeationLimitOptions,
+                ];
 
-            //The earliest date at which an idea can be considered in this bestOfIdeation implementation?
-            $bestOfIdeationDatesFromOptions = [
-                'type' => "date",
-                'value' => (
+                //The earliest date at which an idea can be considered in this bestOfIdeation implementation?
+                $bestOfIdeationDatesFromOptions = [
+                    'type' => "date",
+                    'value' => (
                     isset($boiSettings['Dates']['From'])
                         ? $boiSettings['Dates']['From']
                         : ''
-                ),
-            ];
-            $sender->Data['_ExtendedFields']['BestOfIdeationFrom'] = [
-                'Name' => 'BestOfIdeationSettings[Dates][From]',
-                'LabelCode' => Gdn::translate('Consider ideas added after'),
-                'Control' => 'textbox',
-                'Description' => Gdn::translate('The earliest an idea can be considered.'),
-                'Options' => $bestOfIdeationDatesFromOptions,
-            ];
+                    ),
+                ];
+                $sender->Data['_ExtendedFields']['BestOfIdeationFrom'] = [
+                    'Name' => 'BestOfIdeationSettings[Dates][From]',
+                    'LabelCode' => Gdn::translate('Consider ideas added after'),
+                    'Control' => 'textbox',
+                    'Description' => Gdn::translate('The earliest an idea can be considered.'),
+                    'Options' => $bestOfIdeationDatesFromOptions,
+                ];
 
-            //The latest date at which an idea can be considered in this bestOfIdeation implementation?
-            $bestOfIdeationDatesToOptions = [
-                'type' => "date",
-                'value' => (
-                isset($boiSettings['Dates']['To'])
-                    ? $boiSettings['Dates']['To']
-                    : ''
-                ),
-            ];
-            $sender->Data['_ExtendedFields']['BestOfIdeationTo'] = [
-                'Name' => 'BestOfIdeationSettings[Dates][To]',
-                'LabelCode' => Gdn::translate('Consider ideas added before'),
-                'Control' => 'textbox',
-                'Description' => Gdn::translate('The latest an idea can be considered.'),
-                'Options' => $bestOfIdeationDatesToOptions,
-            ];
-
+                //The latest date at which an idea can be considered in this bestOfIdeation implementation?
+                $bestOfIdeationDatesToOptions = [
+                    'type' => "date",
+                    'value' => (
+                    isset($boiSettings['Dates']['To'])
+                        ? $boiSettings['Dates']['To']
+                        : ''
+                    ),
+                ];
+                $sender->Data['_ExtendedFields']['BestOfIdeationTo'] = [
+                    'Name' => 'BestOfIdeationSettings[Dates][To]',
+                    'LabelCode' => Gdn::translate('Consider ideas added before'),
+                    'Control' => 'textbox',
+                    'Description' => Gdn::translate('The latest an idea can be considered.'),
+                    'Options' => $bestOfIdeationDatesToOptions,
+                ];
+            }
         } else {
             if ($sender->Form->getValue('Idea_Category')) {
                 $sender->Form->setFormValue(
@@ -848,16 +853,17 @@ EOT
      * Hooks to "After a category's title" is shown
      *
      * @param CategoriesController $sender
-     * @return string (html) corresponding to the bestOfIdeation implementation for the current category
      */
     public function categoriesController_afterPageTitle_handler(CategoriesController $sender) {
-        if (is_array($sender->Category->AllowedDiscussionTypes)
-            && in_array('Idea', $sender->Category->AllowedDiscussionTypes)) {
-            $categoryID = $sender->CategoryID;
+        if (FeatureFlagHelper::featureEnabled(self::BEST_OF_IDEATION_FEATURE)) {
+            if (is_array($sender->Category->AllowedDiscussionTypes)
+                && in_array('Idea', $sender->Category->AllowedDiscussionTypes)) {
+                $categoryID = $sender->CategoryID;
 
-            $bestOfIdeation = $this->getBestOfIdeation($categoryID);
+                $bestOfIdeation = $this->getBestOfIdeation($categoryID);
 
-            echo $bestOfIdeation->toString();
+                echo $bestOfIdeation->toString();
+            }
         }
     }
 
