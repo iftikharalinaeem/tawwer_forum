@@ -83,13 +83,7 @@ function WebhookAddEdit() {
                     }
                 }}
             >
-                <DashboardHeaderBlock
-                    title={isEditing ? t("Edit Webhook") : t("Add Webhook")}
-                    showBackLink={true}
-                    onBackClick={() => {
-                        history.push("/webhook-settings");
-                    }}
-                />
+                <DashboardHeaderBlock title={isEditing ? t("Edit Webhook") : t("Add Webhook")} showBackLink={true} />
                 <DashboardFormGroup label={t("Name")}>
                     <DashboardInput
                         errors={errors?.["name"]}
@@ -153,7 +147,7 @@ function WebhookAddEdit() {
                             name={EventType.INDIVIDUAL}
                             disabled={isLoading}
                         />
-                        <div className={`${checkRadioCSSClasses.grid} ${webhookCSSClasses.pullRight}`}>
+                        <div className={`${checkRadioCSSClasses.group} ${webhookCSSClasses.pullRight}`}>
                             <DashboardCheckBox
                                 label={"Comments"}
                                 className={webhookCSSClasses.eventRadio}
