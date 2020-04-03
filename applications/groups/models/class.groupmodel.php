@@ -1346,6 +1346,7 @@ class GroupModel extends Gdn_Model {
                 $data['Registration'] = 'Approval';
                 break;
             case 'public':
+            case '':
                 $data['Visibility'] = 'Public';
                 $data['Registration'] = 'Public';
                 break;
@@ -1353,8 +1354,6 @@ class GroupModel extends Gdn_Model {
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Invite';
                 break;
-            case '':
-                throw forbiddenException('@'.t('You must choose a Privacy level for your group.'));
         }
 
         // Define the primary key in this model's table.
