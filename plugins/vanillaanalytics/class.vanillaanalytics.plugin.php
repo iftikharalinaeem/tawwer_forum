@@ -66,22 +66,6 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Adds items to dashboard menu.
-     *
-     * @param object $sender DashboardController.
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        if (c('VanillaAnalytics.DisableDashboard', false)) {
-            return;
-        }
-
-        $sectionModel = new AnalyticsSection();
-        $analyticsDashboardModel = new AnalyticsDashboard();
-
-        Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
-    }
-
-    /**
      * Update the container configuration.
      *
      * @param Container $container
@@ -117,7 +101,6 @@ class VanillaAnalyticsPlugin extends Gdn_Plugin {
         $sectionModel = new AnalyticsSection();
         $analyticsDashboardModel = new AnalyticsDashboard();
 
-        Logger::event('analytics_menu', Logger::INFO, 'Sections', $sectionModel->getDefaults());
         $nav->addGroupToSection('Analytics', t('Analytics'), 'analytics');
 
         $nav->addLinkToSectionIf(
