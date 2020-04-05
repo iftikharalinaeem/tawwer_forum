@@ -1339,28 +1339,32 @@ class GroupModel extends Gdn_Model {
             }
         }
 
-        // Set the visibility and registration based on the privacy.
-        switch (strtolower(val('Privacy', $data))) {
-            case 'private':
-                $data['Visibility'] = 'Members';
-                $data['Registration'] = 'Approval';
-                break;
-            case 'secret':
-                $data['Visibility'] = 'Members';
-                $data['Registration'] = 'Invite';
-                break;
-            case 'public':
-            default:
-                $data['Visibility'] = 'Public';
-                $data['Registration'] = 'Public';
-        }
-
         // Define the primary key in this model's table.
         $this->defineSchema();
 
         // See if a primary key value was posted and decide how to save
         $primaryKeyVal = val($this->PrimaryKey, $data, false);
         $insert = $primaryKeyVal == false ? true : false;
+
+        // Set the visibility and registration based on the privacy. If no option is chosen and this is a new group,
+        // use the public settings.
+        $privacy = strtolower(val('Privacy', $data));
+        switch (true) {
+            case ($privacy === 'private'):
+                $data['Visibility'] = 'Members';
+                $data['Registration'] = 'Approval';
+                break;
+            case ($privacy === 'secret'):
+                $data['Visibility'] = 'Members';
+                $data['Registration'] = 'Invite';
+                break;
+            case ($privacy === 'public'):
+            case ($insert === true):
+                $data['Visibility'] = 'Public';
+                $data['Registration'] = 'Public';
+                break;
+        }
+
         if ($insert) {
             if (!isset($data['CategoryID'])) {
                 $categories = self::getGroupCategoryIDs();
