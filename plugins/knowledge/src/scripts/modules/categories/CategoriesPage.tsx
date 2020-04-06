@@ -84,7 +84,6 @@ export function CategoriesPage(props: IProps) {
     ) {
         return <NavigationLoadingLayout activeRecord={activeRecord} />;
     }
-
     const articleResults = articles.data.map((article: IArticleFragment) => {
         return {
             name: article.name || "",
@@ -94,7 +93,6 @@ export function CategoriesPage(props: IProps) {
             location: [],
         };
     });
-
     const kb = props.knowledgeBase;
 
     // Render either a loading layout or a full layout.

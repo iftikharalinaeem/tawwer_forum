@@ -28,7 +28,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
-import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import KbErrorMessages, { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 
 interface IProps {
     category: IKbCategory;
@@ -57,8 +57,7 @@ export default function CategoriesLayout(props: IProps) {
                 <SimplePager url={category.url + "/p:page:"} pages={pages} />
             </>
         ) : (
-            <KbErrorPage
-                className={inheritHeightClass()}
+            <KbErrorMessages
                 defaultError={DefaultKbError.CATEGORY_NO_ARTICLES}
                 knowledgeBaseID={category.knowledgeBaseID}
                 knowledgeCategoryID={category.knowledgeCategoryID}
