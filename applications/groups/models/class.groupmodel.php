@@ -1359,7 +1359,7 @@ class GroupModel extends Gdn_Model {
                 $data['Registration'] = 'Invite';
                 break;
             case ($privacy === 'public'):
-            case ($insert === true):
+            case $insert:
                 $data['Visibility'] = 'Public';
                 $data['Registration'] = 'Public';
                 break;
