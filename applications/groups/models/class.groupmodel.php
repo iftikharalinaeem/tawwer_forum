@@ -1349,20 +1349,21 @@ class GroupModel extends Gdn_Model {
         // Set the visibility and registration based on the privacy. If no option is chosen and this is a new group,
         // use the public settings.
         $privacy = strtolower(val('Privacy', $data));
-        switch (true) {
-            case ($privacy === 'private'):
+        switch ($privacy) {
+            case 'private':
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Approval';
                 break;
-            case ($privacy === 'secret'):
+            case 'secret':
                 $data['Visibility'] = 'Members';
                 $data['Registration'] = 'Invite';
                 break;
-            case ($privacy === 'public'):
-            case $insert:
-                $data['Visibility'] = 'Public';
-                $data['Registration'] = 'Public';
-                break;
+            case 'public':
+            default:
+                if ($insert || !empty($privacy)) {
+                    $data['Visibility'] = 'Public';
+                    $data['Registration'] = 'Public';
+                }
         }
 
         if ($insert) {
