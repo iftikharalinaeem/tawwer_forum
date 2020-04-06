@@ -7,12 +7,16 @@ import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
 import { IWebhook } from "@webhooks/WebhookTypes";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { DeleteIcon, EditIcon, WarningIcon } from "@library/icons/common";
+import { DeleteIcon, EditIcon } from "@library/icons/common";
 import React from "react";
 import Button from "@library/forms/Button";
 import { useHistory } from "react-router";
 import LinkAsButton from "@library/routing/LinkAsButton";
-
+import {
+    RevisionStatusPublishedIcon,
+    RevisionStatusPendingIcon,
+    RevisionStatusDraftIcon,
+} from "@library/icons/revision";
 interface IProps {
     webhook: IWebhook;
     onEditClick?: () => void;
@@ -31,6 +35,12 @@ export function WebhooksTableRow(props: IProps) {
             </td>
             <td>
                 <DashboardTableOptions>
+                    <LinkAsButton
+                        baseClass={ButtonTypes.ICON_COMPACT}
+                        to={`/webhook-settings/${webhook.webhookID}/deliveries/`}
+                    >
+                        <RevisionStatusPendingIcon />
+                    </LinkAsButton>
                     <LinkAsButton
                         baseClass={ButtonTypes.ICON_COMPACT}
                         to={`/webhook-settings/${webhook.webhookID}/edit`}
