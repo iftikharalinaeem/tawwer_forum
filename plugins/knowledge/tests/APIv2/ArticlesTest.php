@@ -39,7 +39,8 @@ class ArticlesTest extends AbstractResourceTest {
         "locale",
         "name",
         "sort",
-        'foreignID'
+        'foreignID',
+        'status'
     ];
 
     /** @var string The name of the primary key of the resource. */
@@ -120,7 +121,8 @@ class ArticlesTest extends AbstractResourceTest {
             "locale" => "en",
             "name" => "Example Article",
             "sort" => 1,
-            "foreignID" => 'test-id-001'
+            "foreignID" => 'test-id-001',
+            "status" => 'published'
         ];
         return $record;
     }
@@ -309,6 +311,32 @@ class ArticlesTest extends AbstractResourceTest {
                 'body' => $patchRow['body']
             ]
         );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function testGetEdit($record = null) {
+        if ($record === null) {
+            $record = $this->record();
+            $row = $this->testPost($record);
+        } else {
+            $row = $record;
+        }
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}/edit"
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+        $expected = arrayTranslate($record, $this->editFields);
+        $actual = $record = $r->getBody();
+        unset($expected['dateUpdated']);
+        unset($actual['dateUpdated']);
+        $this->assertRowsEqual($expected, $actual);
+        $this->assertCamelCase($record);
+
+        return $record;
     }
 
     /**
@@ -740,7 +768,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
-        $this->assertEquals(21, count($articles));
+        $this->assertEquals(23, count($articles));
     }
 
     /**
@@ -764,9 +792,9 @@ class ArticlesTest extends AbstractResourceTest {
         $article = $response->getBody();
         $locales = array_count_values(array_column($article, "locale"));
 
-        $this->assertEquals(22, count($article));
+        $this->assertEquals(24, count($article));
         $this->assertEquals(2, $locales["ru"]);
-        $this->assertEquals(20, $locales["en"]);
+        $this->assertEquals(22, $locales["en"]);
     }
 
     /**
@@ -957,5 +985,44 @@ class ArticlesTest extends AbstractResourceTest {
         }
 
         return  $article["articleID"];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function testPatchFull() {
+        $row = $this->testGetEdit();
+        $newRow = $this->modifyRow($row);
+
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            $newRow
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+        $expected = $newRow;
+        $actual = $record = $r->getBody();
+        unset($expected['dateUpdated']);
+        unset($actual['dateUpdated']);
+        $this->assertRowsEqual($expected, $actual);
+
+        return $record;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function testGetEditFields() {
+        $row = $this->testGetEdit();
+
+        unset($row[$this->pk]);
+        unset($row['dateUpdated']);
+        $rowFields = array_keys($row);
+        sort($rowFields);
+
+        $patchFields = $this->patchFields;
+        sort($patchFields);
+        unset($patchFields['dateUpdated']);
+        $this->assertEquals($patchFields, $rowFields);
     }
 }
