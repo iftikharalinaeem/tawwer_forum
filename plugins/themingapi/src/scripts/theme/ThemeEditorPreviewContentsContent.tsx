@@ -3,21 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { PanelActivator, useActivePanelContext, ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
+import { ActiveVariablePanel, PanelActivator, useActivePanelContext } from "@themingapi/theme/ActivePanelContext";
 import { t } from "@vanilla/i18n";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import { bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
-import Translate from "@vanilla/library/src/scripts/content/Translate";
 import { userContentClasses } from "@vanilla/library/src/scripts/content/userContentStyles";
-import Button from "@vanilla/library/src/scripts/forms/Button";
 import { titleBarVariables } from "@vanilla/library/src/scripts/headers/titleBarStyles";
-import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import React, { useState } from "react";
+import React from "react";
 import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
-import UserContent from "@vanilla/library/src/scripts/content/UserContent";
+import { contentBannerVariables } from "@vanilla/library/src/scripts/banner/contentBannerStyles";
+import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { colorOut, flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { ToolTip, ToolTipIcon } from "@vanilla/library/src/scripts/toolTip/ToolTip";
+import { InformationIcon } from "@vanilla/library/src/scripts/icons/common";
 
 export function ThemeEditorPreviewContentsContent() {
     const classes = themeEditorPreviewClasses();
@@ -29,60 +29,46 @@ export function ThemeEditorPreviewContentsContent() {
                 <TitleBar container={null} />
             </PanelActivator>
 
-            <PanelActivator panel={ActiveVariablePanel.BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner isContentBanner title={t("Welcome To Your Theme")} />
-            </PanelActivator>
+            <PreviewContentBanner />
 
             <Container narrow fullGutter>
                 <div className={classes.content}>
                     <div className={userContentClasses().root}>
                         <p>
                             {t(
-                                "This is a style guide of your theme.",
-                                "This is a style guide of your theme. It has examples of the visual elements used throughout the application.",
+                                "This page represents the various content pages from the application.",
+                                "This page represents the various content pages from the application. These styles apply to discussions, articles, search pages, and some editor pages.",
                             )}
                         </p>
-                        <p>
-                            <Translate
-                                shortSource={"You can click on the various widgets such as the <0>Content Banner</0>"}
-                                source="You can click on the various widgets such as the <0>content banner</0> or <1>table</1> to edit their properties in the side panel."
-                                c0={text => (
-                                    <Button
-                                        baseClass={ButtonTypes.TEXT_PRIMARY}
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setActivePanel(ActiveVariablePanel.CONTENT_BANNER);
-                                        }}
-                                    >
-                                        {text}
-                                    </Button>
-                                )}
-                                c1={text => (
-                                    <Button
-                                        baseClass={ButtonTypes.TEXT_PRIMARY}
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setActivePanel(ActiveVariablePanel.USER_CONTENT);
-                                        }}
-                                    >
-                                        {text}
-                                    </Button>
-                                )}
-                            />
-                        </p>
-                    </div>
-
-                    <div className={classes.buttonStyles}>
-                        <h2 className={classes.title}>{t("Tables")}</h2>
-                        <p>{t("Tables may appear in articles.")}</p>
-                        <UserContent content={tableSample} />
                     </div>
                 </div>
             </Container>
         </>
     );
+}
+
+function PreviewContentBanner() {
+    const vars = contentBannerVariables();
+    const classes = themeEditorPreviewClasses();
+
+    if (vars.options.enabled) {
+        return (
+            <PanelActivator panel={ActiveVariablePanel.CONTENT_BANNER} color={bannerVariables().colors.primaryContrast}>
+                <Banner isContentBanner title={t("Welcome To Your Theme")} />
+            </PanelActivator>
+        );
+    } else {
+        return (
+            <PanelActivator
+                panel={ActiveVariablePanel.CONTENT_BANNER}
+                color={globalVariables().elementaryColors.almostBlack}
+            >
+                <div className={classes.disabledContentBanner}>
+                    <p>{t("Enable the content banner in the side panel.")}</p>
+                </div>
+            </PanelActivator>
+        );
+    }
 }
 
 const tableSample = `

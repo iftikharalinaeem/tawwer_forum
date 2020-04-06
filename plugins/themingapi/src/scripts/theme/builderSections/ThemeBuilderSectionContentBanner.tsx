@@ -12,35 +12,57 @@ import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEd
 import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import React from "react";
+import { ThemeToggle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeToggle";
+import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
+import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
+import { ThemeBuilderSectionGroup } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSectionGroup";
+import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
+import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 
 export function ThemeBuilderSectionContentBanner() {
+    const { setVariableValue } = useThemeBuilder();
+
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.CONTENT_BANNER} />
-            <ThemeBuilderCheckBox
-                label={t("Enabled")}
-                variableKey="contentBanner.options.enabled"
-                info={t("The content banner appears on pages like discussions, articles, and search.")}
-            />
-            <ThemeBuilderBlock label={t("Background Image")}>
-                <ThemeBuilderUpload variableKey="contentBanner.outerBackground.image" />
+            <ThemeBuilderBlock label="Content Banner" info={t("The content banner appears below the title bar.")}>
+                <ThemeToggle variableKey="contentBanner.options.enabled" />
             </ThemeBuilderBlock>
-            <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="contentBanner.backgrounds.useOverlay" />
-            <ThemeBuilderBlock label={t("Alignment")}>
-                <ThemeDropDown
-                    variableKey="contentBanner.options.alignment"
-                    options={[
-                        {
-                            label: t("Left Aligned"),
-                            value: BannerAlignment.LEFT,
-                        },
-                        {
-                            label: t("Center Aligned"),
-                            value: BannerAlignment.CENTER,
-                        },
-                    ]}
-                />
+            <ThemeBuilderBlock label={t("Height")}>
+                <ThemeInputNumber variableKey="contentBanner.dimensions.minHeight" max={240} />
             </ThemeBuilderBlock>
+            <ThemeBuilderBlock label={t("Height (Mobile)")}>
+                <ThemeInputNumber variableKey="contentBanner.dimensions.mobile.minHeight" max={180} />
+            </ThemeBuilderBlock>
+            <ThemeBuilderSectionGroup label={t("Background")}>
+                <ThemeBuilderBlock label={t("Color")}>
+                    <ThemeColorPicker variableKey="contentBanner.outerBackground.color" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Image")}>
+                    <ThemeBuilderUpload variableKey="contentBanner.outerBackground.image" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="contentBanner.backgrounds.useOverlay" />
+            </ThemeBuilderSectionGroup>
+            <ThemeBuilderSection label={t("Logo")}>
+                <ThemeBuilderBlock label={t("Image")}>
+                    <ThemeBuilderUpload variableKey="contentBanner.logo.image" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Alignment")}>
+                    <ThemeDropDown
+                        variableKey="contentBanner.options.alignment"
+                        options={[
+                            {
+                                label: t("Left Aligned"),
+                                value: BannerAlignment.LEFT,
+                            },
+                            {
+                                label: t("Center Aligned"),
+                                value: BannerAlignment.CENTER,
+                            },
+                        ]}
+                    />
+                </ThemeBuilderBlock>
+            </ThemeBuilderSection>
         </>
     );
 }

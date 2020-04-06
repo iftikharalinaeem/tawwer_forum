@@ -20,6 +20,7 @@ import {
     useActivePanelContext,
 } from "@themingapi/theme/ActivePanelContext";
 import { ThemeBuilderSectionContentBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionContentBanner";
+import { ErrorBoundary } from "@vanilla/library/src/scripts/errorPages/ErrorBoundary";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -32,30 +33,32 @@ export default function ThemeBuilderPanel() {
     const variables = useThemeEditorState().form?.assets.variables?.data;
 
     return (
-        <ThemeBuilderContextProvider
-            onChange={(newVariables, hasError) => {
-                updateAssets({
-                    assets: {
-                        variables: {
-                            data: newVariables,
-                            type: "string",
+        <ErrorBoundary>
+            <ThemeBuilderContextProvider
+                onChange={(newVariables, hasError) => {
+                    updateAssets({
+                        assets: {
+                            variables: {
+                                data: newVariables,
+                                type: "string",
+                            },
                         },
-                    },
-                    errors: hasError,
-                });
+                        errors: hasError,
+                    });
 
-                if (!hasError) {
-                    sendMessage?.(newVariables);
-                }
-            }}
-            rawThemeVariables={variables}
-        >
-            <div className={classes.root}>
-                <ActivePanelContextProvider>
-                    <PanelItems />
-                </ActivePanelContextProvider>
-            </div>
-        </ThemeBuilderContextProvider>
+                    if (!hasError) {
+                        sendMessage?.(newVariables);
+                    }
+                }}
+                rawThemeVariables={variables}
+            >
+                <div className={classes.root}>
+                    <ActivePanelContextProvider>
+                        <PanelItems />
+                    </ActivePanelContextProvider>
+                </div>
+            </ThemeBuilderContextProvider>
+        </ErrorBoundary>
     );
 }
 
