@@ -5,7 +5,7 @@
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { DashboardTableOptions } from "@dashboard/tables/DashboardTableOptions";
-import { IDelivery } from "@webhooks/WebhookTypes";
+import { IDeliveryFragment } from "@webhooks/WebhookTypes";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon, EditIcon } from "@library/icons/common";
 import React from "react";
@@ -16,13 +16,21 @@ import {
     RevisionStatusPendingIcon,
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
+
 interface IProps {
-    delivery: IDelivery;
-    onClick?: () => void;
+    delivery: IDeliveryFragment;
 }
+
 export function DeliveryTableRow(props: IProps) {
     const { delivery } = props;
     const history = useHistory();
+
+    const durationToSeconds = function(duration: number) {
+        var minutes = Math.floor(duration / 60000);
+        var seconds = ((duration % 60000) / 1000).toFixed(0);
+        return minutes + "." + (seconds < 10 ? "0" : "") + seconds + "s";
+    };
+
     return (
         <tr>
             <td>
@@ -33,7 +41,7 @@ export function DeliveryTableRow(props: IProps) {
             </td>
 
             <td>
-                <DashboardMediaItem title={delivery.requestDuration} />
+                <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} />
             </td>
             <td>
                 <DashboardMediaItem title={delivery.responseCode} />

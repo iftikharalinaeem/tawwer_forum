@@ -5,7 +5,7 @@
 
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { IDelivery, IDeliveryState, IDeliveryFragment, INITIAL_DELIVERY_STATE } from "./DeliveryTypes";
+import { IDeliveryState, IDeliveryFragment, INITIAL_DELIVERY_STATE } from "./DeliveryTypes";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { DeliveryActions } from "@webhooks/DeliveryActions";
 
@@ -25,9 +25,7 @@ export const DeliveryReducer = produce(
         .case(DeliveryActions.getAllDeliveryACs.done, (state, payload) => {
             const deliveriesByWebhookID: Record<number, IDeliveryFragment> = {};
             payload.result.forEach(delivery => {
-                //alert(JSON.stringify(payload, null, 4));
                 if (delivery.webhookDeliveryID) {
-                    //alert(JSON.stringify(delivery, null, 4));
                     deliveriesByWebhookID[delivery.webhookDeliveryID] = delivery;
                 }
             });
@@ -36,6 +34,5 @@ export const DeliveryReducer = produce(
                 data: deliveriesByWebhookID,
             };
             return state;
-        })
-    );
-        
+        }),
+);

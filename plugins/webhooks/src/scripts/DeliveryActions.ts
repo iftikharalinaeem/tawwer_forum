@@ -11,18 +11,21 @@ import { useDispatch } from "react-redux";
 import { useMemo } from "react";
 import apiv2 from "@library/apiv2";
 
-const actionCreator = actionCreatorFactory("@@webhooks");
+const actionCreator = actionCreatorFactory("@@deliveries");
 
 export class DeliveryActions extends ReduxActions {
-    public static readonly getAllDeliveryACs = actionCreator.async<{ webhookID: number }, IDeliveryFragment[], IApiError>("GET_ALL");
+    public static readonly getAllDeliveryACs = actionCreator.async<
+        { webhookID: number },
+        IDeliveryFragment[],
+        IApiError
+    >("GET_ALL");
 
     public getAll = (webhookID: number) => {
         const thunk = bindThunkAction(DeliveryActions.getAllDeliveryACs, async () => {
-            alert("1");
             const response = await this.api.get(`/webhooks/${webhookID}/deliveries`, {});
-            console.log(response);
             return response.data;
         })();
+
         return this.dispatch(thunk);
     };
 }
@@ -32,4 +35,3 @@ export function useDeliveryActions() {
     const actions = useMemo(() => new DeliveryActions(dispatch, apiv2), [dispatch]);
     return actions;
 }
-

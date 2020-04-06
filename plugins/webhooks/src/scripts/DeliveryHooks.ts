@@ -9,16 +9,15 @@ import { useSelector } from "react-redux";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useDeliveryActions } from "@webhooks/DeliveryActions";
 
-export function useDeliveries(): ILoadable<{ [id: number]: IDeliveryFragment }> {
+export function useDeliveries(webhookID?: number): ILoadable<{ [id: number]: IDeliveryFragment }> {
     const deliveriesByWebhookID = useSelector((state: IDeliveryStore) => state.deliveries.deliveriesByWebhookID);
-    //alert(JSON.stringify(deliveriesByWebhookID, null, 4));
     const { getAll } = useDeliveryActions();
 
     useEffect(() => {
-        if (deliveriesByWebhookID.status === LoadStatus.PENDING) {
-            void getAll();
+        if (deliveriesByWebhookID.status === LoadStatus.PENDING && webhookID) {
+            void getAll(webhookID);
         }
-    }, [getAll, deliveriesByWebhookID]);
+    }, [getAll, deliveriesByWebhookID, webhookID]);
 
     return deliveriesByWebhookID;
 }
