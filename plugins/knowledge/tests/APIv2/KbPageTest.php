@@ -64,7 +64,8 @@ class KbPageTest extends AbstractAPIv2Test {
             [
                 'Destination' => 'discussions',
                 'Type' => 'Internal'
-            ]
+            ],
+            'keystone'
         );
         $section2 = new MockSiteSection(
             "ssg2_siteSectionName_en",
@@ -75,7 +76,8 @@ class KbPageTest extends AbstractAPIv2Test {
             [
                 'Destination' => 'discussions',
                 'Type' => 'Internal'
-            ]
+            ],
+            'keystone'
         );
 
         // Insert a knowledge base in $section1's group.
