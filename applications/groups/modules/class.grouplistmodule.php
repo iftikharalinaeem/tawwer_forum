@@ -98,6 +98,7 @@ class GroupListModule extends Gdn_Module {
 
         $groupModel = new GroupModel();
         foreach ($groups as $group) {
+            // Don't display secret groups unless the user is a member.
             if (!($group['Registration'] === 'Invite' && !$groupModel->checkPermission('Member', val('GroupID', $group)))) {
                 $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
             }
