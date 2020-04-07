@@ -9,8 +9,6 @@ import { useParams } from "react-router";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import Loader from "@library/loaders/Loader";
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
-import { useHistory } from "react-router-dom";
-import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { DashboardTable } from "@dashboard/tables/DashboardTable";
 import { useDeliveries } from "@webhooks/DeliveryHooks";
 import { EmptyDeliveriesResults } from "../EmptyDeliveriesResults";
@@ -19,12 +17,9 @@ import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
 
 export default function DeliveryIndex() {
-    const isLoading = status === LoadStatus.LOADING;
-    const history = useHistory();
     const params = useParams<{ webhookID?: string }>();
     const { HeadItem } = DashboardTable;
-
-    const deliveries = useDeliveries(!!parseInt(params.webhookID) ? parseInt(params.webhookID) : null);
+    const deliveries = useDeliveries(parseInt(params.webhookID) ?? null);
 
     if (!deliveries.data) {
         return <Loader />;

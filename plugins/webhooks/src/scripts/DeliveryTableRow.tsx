@@ -4,7 +4,7 @@
  */
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
-import { IDeliveryFragment } from "@webhooks/WebhookTypes";
+import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import React from "react";
 import { RightChevronIcon } from "@library/icons/common";
 import { useHistory } from "react-router";
@@ -24,28 +24,23 @@ export function DeliveryTableRow(props: IProps) {
     const { delivery } = props;
     const history = useHistory();
     const durationToSeconds = function(duration: number) {
-        var seconds = (duration / 1000);
+        let seconds = (duration / 1000);
         return seconds + "s";
     };
 
     return (
         <tr>
             <td>
-                {/* <Link to={"/test"} className={"test"}> */}
-                    <DashboardMediaItem title={delivery.webhookDeliveryID} />
-                {/* </Link> */}
-                {/* <Button baseClass={ButtonTypes.ICON} onClick={history}>
-                    <RightChevronIcon centred={true} />
-                </Button> */}
+                <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
             </td>
             <td>
-                <DashboardMediaItem title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")} />
+                <DashboardMediaItem title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")} info="" />
             </td>
             <td>
-                <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} />
+                <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} info="" />
             </td>
             <td>
-                <DashboardMediaItem title={delivery.responseCode} />
+                <DashboardMediaItem title={delivery.responseCode} info="" />
             </td>
         </tr>
     );
