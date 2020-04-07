@@ -14,7 +14,7 @@ interface IProps {
 
 export function DeliveryTableRow(props: IProps) {
     const { delivery } = props;
-    const durationToSeconds = function (duration: number) {
+    const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
