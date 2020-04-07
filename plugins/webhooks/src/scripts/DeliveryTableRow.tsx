@@ -6,14 +6,7 @@
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import React from "react";
-import { RightChevronIcon } from "@library/icons/common";
-import { useHistory } from "react-router";
 import moment from "moment";
-import {
-    RevisionStatusPublishedIcon,
-    RevisionStatusPendingIcon,
-    RevisionStatusDraftIcon,
-} from "@library/icons/revision";
 
 interface IProps {
     delivery: IDeliveryFragment;

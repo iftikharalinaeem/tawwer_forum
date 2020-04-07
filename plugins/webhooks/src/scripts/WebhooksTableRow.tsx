@@ -36,12 +36,14 @@ export function WebhooksTableRow(props: IProps) {
             <td>
                 <DashboardTableOptions>
                     <LinkAsButton
+                        className="btn-icon"
                         baseClass={ButtonTypes.ICON_COMPACT}
                         to={`/webhook-settings/${webhook.webhookID}/deliveries/`}
                     >
                         <RevisionStatusPendingIcon />
                     </LinkAsButton>
                     <LinkAsButton
+                        className="btn-icon"
                         baseClass={ButtonTypes.ICON_COMPACT}
                         to={`/webhook-settings/${webhook.webhookID}/edit`}
                     >

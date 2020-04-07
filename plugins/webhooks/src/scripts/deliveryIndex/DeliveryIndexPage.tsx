@@ -15,19 +15,38 @@ import { EmptyDeliveriesResults } from "../EmptyDeliveriesResults";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
+import { useHistory } from "react-router-dom";
+import { useDeliveryActions } from "@webhooks/DeliveryActions";
+import { useDeliveryData } from "@webhooks/DeliveryHooks";
 
 export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
+    const { getAll } = useDeliveryActions();
     const { HeadItem } = DashboardTable;
-    const deliveries = useDeliveries(parseInt(params.webhookID) ?? null);
+    const { deliveriesByWebhookID } = useDeliveryData();
+    const history = useHistory();
+    const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
 
-    if (!deliveries.data) {
+    useEffect(() => {
+        if (isLoading === LoadStatus.PENDING && !!parseInt(params.webhookID)) {
+            getAll(parseInt(params.webhookID));
+        }
+    }, [getAll, params]);
+
+    if (!deliveriesByWebhookID.data) {
         return <Loader />;
     }
 
     return (
         <>
-            <DashboardHeaderBlock title={t("Recent Deliveries")} showBackLink={true} />
+            <DashboardHeaderBlock
+                title={t("Recent Deliveries")}
+                showBackLink={true}
+                onBackClick={() => {
+                    setIsLoading(LoadStatus.PENDING);
+                    history.push("/webhook-settings");
+                }}
+            />
             <DashboardTable
                 head={
                     <tr>
@@ -37,14 +56,14 @@ export default function DeliveryIndex() {
                         <HeadItem size={TableColumnSize.XS}>{t("Status")}</HeadItem>
                     </tr>
                 }
-                body={Object.values(deliveries.data).map((delivery: IDeliveryFragment) => (
+                body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment) => (
                     <DeliveryTableRow key={delivery.webhookDeliveryID} delivery={delivery} />
                 ))}
             />
 
-            {deliveries.status === LoadStatus.SUCCESS &&
-                deliveries.data !== undefined &&
-                Object.entries(deliveries.data).length === 0 && <EmptyDeliveriesResults />}
+            {deliveriesByWebhookID.status === LoadStatus.SUCCESS &&
+                deliveriesByWebhookID.data !== undefined &&
+                Object.entries(deliveriesByWebhookID.data).length === 0 && <EmptyDeliveriesResults />}
         </>
     );
 }
