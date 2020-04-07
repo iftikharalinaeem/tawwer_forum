@@ -28,10 +28,10 @@ export default function DeliveryIndex() {
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
 
     useEffect(() => {
-        if (isLoading === LoadStatus.PENDING && !!parseInt(params.webhookID)) {
+        if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
             getAll(parseInt(params.webhookID));
         }
-    }, [getAll, params]);
+    }, [getAll, params, isLoading]);
 
     if (!deliveriesByWebhookID.data) {
         return <Loader />;
