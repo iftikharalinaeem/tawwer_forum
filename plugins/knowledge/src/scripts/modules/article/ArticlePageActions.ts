@@ -62,15 +62,25 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         }
     };
 
+    private loadArticlesInThisKnowledgeCategory = async id => {
+        await this.articleActions.getArticleList({
+            categoryIDs: [id],
+            locale: getCurrentLocale(),
+            limit: 10,
+        });
+    };
+
     public init = async (articleID: number) => {
         const promises = [
-            this.takeArticleFromCacheOrRequest(articleID).then(article => {
+            await this.takeArticleFromCacheOrRequest(articleID).then(article => {
                 if (article) {
                     const kbID = article.knowledgeBaseID;
                     void this.navigationActions.getNavigationFlat(kbID);
+                    this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
                 }
                 return article;
             }),
+
             this.articleActions.fetchLocales({ articleID }),
             this.articleActions.getRelatedArticles({
                 articleID: articleID,
@@ -79,6 +89,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         ];
 
         const [article] = await Promise.all(promises);
+
         return article;
     };
 }
