@@ -76,4 +76,4 @@ $ActivityModel->defineType('Badge');
 if ($updateStatuses) {
     $SQL->update('UserBadge', ['Status' => 'pending'], ['Declined' => 0, 'DateCompleted is null' => null, 'DateRequested is not null' => null, 'Status' => null])->put();
 }
-require_once(dirname(__FILE__).'/defaultbadges.php');
+require __DIR__.'/defaultbadges.php';

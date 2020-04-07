@@ -1,7 +1,7 @@
 {
     "name": "Ideation",
     "description": "Let users vote on discussions in a Idea category",
-    "version": "1.1",
+    "version": "1.2",
     "license": "Proprietary",
     "icon": "ideation.png",
     "key": "ideation",
@@ -11,6 +11,10 @@
         {
             "name": "Becky Van Bussel",
             "email": "becky@vanillaforums.com"
+        },
+        {
+            "name": "David Barbier",
+            "email": "david.barbier@vanillaforums.com"
         }
     ],
     "require": {
