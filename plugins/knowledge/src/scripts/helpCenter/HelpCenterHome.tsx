@@ -131,7 +131,7 @@ export default function HelpCenterHome(props: IProps) {
         <>
             {titleBarAndBanner}
             <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-            <HelpCenterNavigation data={navData.data.navigation} rootCategoryUrl={navData.data.rootCategoryUrl} />)
+            <HelpCenterNavigation data={navData.data.navigation} rootCategoryUrl={navData.data.rootCategoryUrl} />
             <ArticlesWidget
                 title={t("Featured Articles", "Recommended Articles")}
                 maxItemCount={4}
