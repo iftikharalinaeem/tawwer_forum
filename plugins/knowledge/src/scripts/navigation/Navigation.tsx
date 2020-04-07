@@ -21,9 +21,8 @@ import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/
 import { getCurrentLocale } from "@vanilla/i18n";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
-import {article} from "@knowledge/navigation/navigationManagerIcons";
 import {useArticleList} from "@knowledge/modules/article/ArticleModel";
-import qs from "qs";
+
 /**
  * Data connect navigation component for knowledge base.
  */
@@ -51,18 +50,44 @@ export function Navigation(props: IProps) {
     if (props.activeRecord.recordType === KbRecordType.ARTICLE) {
         let knowledgeCategoryID = 66;
         const queryParams = {
-            categoryIDs: [knowledgeCategoryID],
+            knowledgeCategoryID: 66, // need a way to find kbcategoryID.
             siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
             locale: getSiteSection().contentLocale,
             limit: 10,
         };
-
         const articleList = useArticleList(queryParams, true);
-        console.log('articleList', articleList);
+
+        if (articleList.data?.body) {
+            const articlesInThisCategory = articleList.data.body.map((article)=> {
+                return{
+                    name: article.name,
+                    url: article.url,
+                    recordID: article.recordID,
+                    parentID: 66,
+                    sort: null,
+                    recordType: 'article',
+                    children: [],
+                }
+            });
+            
+
+            const navTreeItems:INavigationTreeItem[] = [
+                {
+                    name: "Category Name",
+                    url: "https://dev.vanilla.localhost/kb/categories/",
+                    parentID: 66,
+                    recordID: 1,
+                    sort: null,
+                    recordType: "category",
+                    children: articlesInThisCategory
+                }
+                ];
+
+         //   navItems.data.push(navTreeItems);
+
+        }
+
     }
-
-
-        //
         /**
          * Fetch navigation data when the component is mounted.
          */
@@ -90,6 +115,7 @@ export function Navigation(props: IProps) {
         const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
         const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
         const title = hasTitle ? t("Subcategories") : undefined;
+
 
         if (props.inHamburger) {
             const adminLinks = (

@@ -63,11 +63,15 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
     };
 
     private loadArticlesInThisKnowledgeCategory = async id => {
-        await this.articleActions.getArticleList({
-            categoryIDs: [id],
-            locale: getCurrentLocale(),
-            limit: 10,
-        });
+        await this.articleActions.getArticleList(
+            {
+                knowledgeCategoryID: 66,
+                locale: getCurrentLocale(),
+                limit: 10,
+            },
+            false,
+            true,
+        );
     };
 
     public init = async (articleID: number) => {
@@ -76,7 +80,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
                 if (article) {
                     const kbID = article.knowledgeBaseID;
                     void this.navigationActions.getNavigationFlat(kbID);
-                    this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
+                    // this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
                 }
                 return article;
             }),

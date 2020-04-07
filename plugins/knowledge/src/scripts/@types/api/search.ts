@@ -37,6 +37,7 @@ export interface ISearchRequestBody {
     insertUserIDs?: number[];
     updateUserIDs?: number[];
     knowledgeBaseID?: number;
+    knowledgeCategoryID?: number; // should be converted to categoryID's if using /knowledge/search
     statuses?: PublishStatus[];
     expand?: string[];
     page?: number;
