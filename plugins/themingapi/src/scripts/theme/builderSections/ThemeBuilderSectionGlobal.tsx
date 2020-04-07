@@ -49,9 +49,9 @@ export function ThemeBuilderSectionGlobal() {
                 </ThemeBuilderBlock>
             </ThemeBuilderSection>
             <ThemeBuilderSection label={t("Buttons & Inputs")}>
-                <ThemeBuilderBlock label={t("Border Radius")}>
+                <ThemeBuilderBlock label={t("Button Border Radius")}>
                     <ThemeInputNumber
-                        variableKey="global.border.radius"
+                        variableKey="global.borderType.formElements.buttons.radius"
                         max={buttonGlobalVariables().sizing.minHeight / 2}
                     />
                 </ThemeBuilderBlock>

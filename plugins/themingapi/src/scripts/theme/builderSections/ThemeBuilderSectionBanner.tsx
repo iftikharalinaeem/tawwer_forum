@@ -12,9 +12,9 @@ import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEd
 import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { SearchBarPresets, BannerAlignment } from "@vanilla/library/src/scripts/banner/bannerStyles";
+import { SearchBarPresets, BannerAlignment, bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
-import { ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { buttonGlobalVariables, ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 export function ThemeBuilderSectionBanner() {
     return (
@@ -91,7 +91,10 @@ export function ThemeBuilderSectionBanner() {
                     <ThemeColorPicker variableKey="banner.colors.fg" />
                 </ThemeBuilderBlock>
                 <ThemeBuilderBlock label={t("Border Radius")}>
-                    <ThemeInputNumber variableKey="banner.border.radius" />
+                    <ThemeInputNumber
+                        variableKey="banner.border.radius"
+                        max={bannerVariables().searchBar.sizing.height / 2}
+                    />
                 </ThemeBuilderBlock>
             </ThemeBuilderSection>
         </>
