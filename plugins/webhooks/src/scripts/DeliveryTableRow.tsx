@@ -40,7 +40,7 @@ export function DeliveryTableRow(props: IProps) {
                 <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} info="" />
             </td>
             <td>
-                <DashboardMediaItem title={delivery.responseCode} info="" />
+                <DashboardMediaItem title={String(delivery.responseCode)} info="" />
             </td>
         </tr>
     );
