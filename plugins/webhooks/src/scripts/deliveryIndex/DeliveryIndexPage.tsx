@@ -17,7 +17,7 @@ import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
 
 export default function DeliveryIndex() {
-    const params = useParams<{ webhookID?: number }>();
+    const params = useParams<{ webhookID?: string }>();
     const { HeadItem } = DashboardTable;
     const deliveries = useDeliveries(parseInt(params.webhookID) ?? null);
 
@@ -41,6 +41,7 @@ export default function DeliveryIndex() {
                     <DeliveryTableRow key={delivery.webhookDeliveryID} delivery={delivery} />
                 ))}
             />
+
             {deliveries.status === LoadStatus.SUCCESS &&
                 deliveries.data !== undefined &&
                 Object.entries(deliveries.data).length === 0 && <EmptyDeliveriesResults />}

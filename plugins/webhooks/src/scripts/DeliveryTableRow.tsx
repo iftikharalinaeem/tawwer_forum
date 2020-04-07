@@ -15,26 +15,26 @@ import {
     RevisionStatusDraftIcon,
 } from "@library/icons/revision";
 
-
 interface IProps {
     delivery: IDeliveryFragment;
 }
 
 export function DeliveryTableRow(props: IProps) {
     const { delivery } = props;
-    const history = useHistory();
-    const durationToSeconds = function(duration: number) {
-        let seconds = (duration / 1000);
+    const durationToSeconds = function (duration: number) {
+        let seconds = duration / 1000;
         return seconds + "s";
     };
-
     return (
         <tr>
             <td>
                 <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
             </td>
             <td>
-                <DashboardMediaItem title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")} info="" />
+                <DashboardMediaItem
+                    title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
+                    info=""
+                />
             </td>
             <td>
                 <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} info="" />

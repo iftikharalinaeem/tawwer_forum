@@ -16,18 +16,18 @@ export interface IDeliveryState {
 }
 
 export interface IDeliveryFragment {
-	webhookDeliveryID: string;
-	webhookID: number;
-	requestDuration: number;
-	responseCode: number;
-	dateInserted: string;
+    webhookDeliveryID: string;
+    webhookID: number;
+    requestDuration: number;
+    responseCode: number;
+    dateInserted: string;
 }
 
 export interface IDelivery extends IDeliveryFragment {
-	requestBody: string;
-	requestHeaders: Record<string, string>;
-	responseBody: string;
-	responseHeaders: Record<string, string>;
+    requestBody: string;
+    requestHeaders: Record<string, string>;
+    responseBody: string;
+    responseHeaders: Record<string, string>;
 }
 
 export const INITIAL_DELIVERY_STATE: IDeliveryState = {
