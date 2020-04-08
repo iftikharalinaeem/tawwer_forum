@@ -91,7 +91,6 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         ];
 
         const [article] = await Promise.all(promises);
-
         return article;
     };
 }

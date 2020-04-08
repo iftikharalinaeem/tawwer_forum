@@ -112,6 +112,20 @@ class ArticlePage extends KbPage {
                 $relatedArticlesResponse,
                 ['articleID' => $articleID]
             ));
+
+            $articlesInThisCategory = $this->articlesApi->index([
+                'knowledgeCategoryID' => $article['knowledgeCategoryID'],
+                'locale' => $currentLocale
+            ]);
+            $articlesInThisCategory = Data::box($articlesInThisCategory);
+
+            $this->addReduxAction(new ReduxAction(
+                ActionConstants::GET_ARTICLE_LIST,
+                $articlesInThisCategory,
+                ['articleID' => $articleID]
+            ));
+
+
         } catch (Exception $e) {
             // Preload the data for the frontend.
             $this->addReduxAction(new ReduxAction(

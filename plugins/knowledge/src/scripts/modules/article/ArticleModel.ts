@@ -366,7 +366,7 @@ export function hashArticleListParams(params: ISearchRequestBody): number {
     return hashString(JSON.stringify(ordered));
 }
 
-export function useArticleList(params: ISearchRequestBody, useGetArticles: boolean = false) {
+export function useArticleList(params: ISearchRequestBody, useArticlesGet: boolean = false) {
     const hash = hashArticleListParams(params);
     const actions = useArticleActions();
 
@@ -375,10 +375,10 @@ export function useArticleList(params: ISearchRequestBody, useGetArticles: boole
     );
 
     useEffect(() => {
-        void actions.getArticleList(params, false, useGetArticles);
+        void actions.getArticleList(params, false, useArticlesGet);
         // Deps are manually calculated into the hash. don't watch on params which may change often.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hash, actions, useGetArticles]);
+    }, [hash, actions, useArticlesGet]);
 
     return existingList;
 }

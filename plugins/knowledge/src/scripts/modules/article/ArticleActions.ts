@@ -38,9 +38,9 @@ import {
     IGetRevisionRequestBody,
     IGetRevisionResponseBody,
 } from "@knowledge/@types/api/articleRevision";
-import ArticleModel, { hashArticleListParams } from "@knowledge/modules/article/ArticleModel";
+import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
-import { IApiError, IApiResponse, LoadStatus, PublishStatus } from "@library/@types/api/core";
+import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import ReduxActions, { ActionsUnion, bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import actionCreatorFactory from "typescript-fsa";
