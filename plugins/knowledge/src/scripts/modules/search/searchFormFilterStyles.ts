@@ -7,6 +7,8 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { margins, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const searchFormFilterVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -41,6 +43,8 @@ export const searchFormFilterClasses = useThemeCache(() => {
             top: unit(24),
         }),
     });
+
+    cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
 
     return {
         root,
