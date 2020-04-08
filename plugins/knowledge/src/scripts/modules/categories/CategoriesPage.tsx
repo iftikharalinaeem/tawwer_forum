@@ -76,7 +76,6 @@ export function CategoriesPage(props: IProps) {
     // Handle loading statuses
     const activeRecord = { recordID: id!, recordType: KbRecordType.CATEGORY };
 
-
     if (
         category.status === LoadStatus.LOADING ||
         articles.status === LoadStatus.LOADING ||

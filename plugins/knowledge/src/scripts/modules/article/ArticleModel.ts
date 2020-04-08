@@ -375,7 +375,7 @@ export function useArticleList(params: ISearchRequestBody, useGetArticles: boole
     );
 
     useEffect(() => {
-            void actions.getArticleList(params, false, useGetArticles);
+        void actions.getArticleList(params, false, useGetArticles);
         // Deps are manually calculated into the hash. don't watch on params which may change often.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hash, actions, useGetArticles]);
