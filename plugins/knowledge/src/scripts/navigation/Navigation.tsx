@@ -5,17 +5,17 @@
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
 import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
-import ArticleActions, { useArticleActions } from "@knowledge/modules/article/ArticleActions";
+import ArticleActions from "@knowledge/modules/article/ArticleActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { formatUrl, getSiteSection, t } from "@library/utility/appUtils";
+import { formatUrl, getSiteSection } from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 import { ILoadable, INavigationTreeItem, LoadStatus } from "@library/@types/api/core";
 import { getCurrentLocale } from "@vanilla/i18n";
@@ -44,15 +44,8 @@ export function Navigation(props: IProps) {
     const isHelpCenter = props.knowledgeBase.data?.viewType === KbViewType.HELP;
     const isArticleInHelpCenter = props.activeRecord.recordType === "article" && isHelpCenter;
 
-    const queryParams = {
-        knowledgeCategoryID: props.knowledgeCategoryID,
-        siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
-        locale: getSiteSection().contentLocale,
-    };
-
-    const currentCategoryNav = isArticleInHelpCenter
-        ? useCurrentCategoryNav(queryParams, props.activeRecord.recordID)
-        : navItems.data;
+    const categoryNavData = useCurrentCategoryNav(props, isArticleInHelpCenter);
+    const currentCategoryNav = isArticleInHelpCenter ? categoryNavData : navItems.data;
 
     /**
      * Fetch navigation data when the component is mounted.
@@ -139,7 +132,7 @@ interface IOwnProps {
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(store: IKnowledgeAppStoreState, ownProps: IOwnProps) {
-    const { navigation, knowledgeBases, articles } = store.knowledge;
+    const { navigation, knowledgeBases } = store.knowledge;
 
     const kbsByID = knowledgeBases.knowledgeBasesByID;
     const knowledgeBase: ILoadable<IKnowledgeBase> = {
@@ -198,13 +191,23 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-function useCurrentCategoryNav(queryParams, articleID) {
+function useCurrentCategoryNav(props, isArticleInHelpCenter) {
+    if (!isArticleInHelpCenter) {
+        return null;
+    }
+
+    const queryParams = {
+        knowledgeCategoryID: props.knowledgeCategoryID,
+        siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+        locale: getSiteSection().contentLocale,
+    };
     const articles = useArticleList(queryParams, true);
     const { data, status } = articles;
     const articleList = articles.data?.body;
+
     return useMemo(() => {
         if (articleList) {
-            let currentArticle = articleList.find(article => article.recordID === articleID);
+            let currentArticle = articleList.find(article => article.recordID === props.activeRecord.recordID);
             let currentArticleIndex = currentArticle ? articleList.indexOf(currentArticle) : 1;
             const maxArticles = articleList.length > 10;
             let filteredArticles = maxArticles
@@ -223,7 +226,7 @@ function useCurrentCategoryNav(queryParams, articleID) {
                     name: article.name,
                     url: article.url,
                     recordID: article.recordID,
-                    parentID: queryParams.knowledgeCategoryID,
+                    parentID: props.knowledgeCategoryID,
                     sort: null,
                     recordType: "article",
                     children: [],
