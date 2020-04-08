@@ -101,7 +101,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         IApiError
     >("GET_ARTICLE_LIST");
 
-    public getArticleList = (params: ISearchRequestBody, force?: boolean, useArticlesGet: boolean = true) => {
+    public getArticleList = (params: ISearchRequestBody, force?: boolean, useArticlesGet: boolean = false) => {
         const uri = useArticlesGet ? "/articles" : "/knowledge/search";
 
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);

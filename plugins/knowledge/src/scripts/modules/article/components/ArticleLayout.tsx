@@ -125,7 +125,13 @@ export default function ArticleLayout(props: IProps) {
                     }
                     leftBottom={
                         <PanelWidget>
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
+                            <Navigation
+                                collapsible={true}
+                                activeRecord={activeRecord}
+                                kbID={article.knowledgeBaseID}
+                                knowledgeCategoryID={article.knowledgeCategoryID}
+                                knowledgeCategoryName={title}
+                            />
                         </PanelWidget>
                     }
                     middleTop={

@@ -4,23 +4,23 @@
  */
 
 import KnowledgeBaseActions from "@knowledge/knowledge-bases/KnowledgeBaseActions";
-import { IKnowledgeBase, KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import {IKnowledgeBase, KbViewType} from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import ArticleActions, {useArticleActions} from "@knowledge/modules/article/ArticleActions";
 import NavigationActions from "@knowledge/navigation/state/NavigationActions";
 import NavigationAdminLinks from "@knowledge/navigation/subcomponents/NavigationAdminLinks";
-import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import {KbRecordType} from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
-import { IKnowledgeAppStoreState } from "@knowledge/state/model";
+import {IKnowledgeAppStoreState} from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import {getSiteSection, t} from "@library/utility/appUtils";
+import {formatUrl, getSiteSection, t} from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
-import { IActiveRecord } from "@library/navigation/SiteNavNode";
-import React, {useCallback, useEffect, useState} from "react";
-import { connect } from "react-redux";
-import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/core";
-import { getCurrentLocale } from "@vanilla/i18n";
-import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
-import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
+import {IActiveRecord} from "@library/navigation/SiteNavNode";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
+import {connect} from "react-redux";
+import {ILoadable, INavigationTreeItem, LoadStatus} from "@library/@types/api/core";
+import {getCurrentLocale} from "@vanilla/i18n";
+import {NavigationPlaceholder} from "@knowledge/navigation/NavigationPlaceholder";
+import {DropDownPanelNav} from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
 import {useArticleList} from "@knowledge/modules/article/ArticleModel";
 
 /**
@@ -28,7 +28,7 @@ import {useArticleList} from "@knowledge/modules/article/ArticleModel";
  */
 export function Navigation(props: IProps) {
     const { navItems, knowledgeBase } = props;
-    const [article, setArticle] = useState();
+
     /**
      * Preload a navigation item from the API.
      */
@@ -41,53 +41,18 @@ export function Navigation(props: IProps) {
         [props],
     );
 
-    // useEffect(() => {
-    //     if (props.activeRecord.recordType === KbRecordType.ARTICLE) {
-    //         props.preloadArticle(props.activeRecord.recordID).then(value => setArticle(value));
-    //     }
-    // }, [props]);
+    const isHelpCenter = props.knowledgeBase.data?.viewType === KbViewType.HELP;
+    const isArticleInHelpCenter = props.activeRecord.recordType === 'article' && isHelpCenter;
 
-    if (props.activeRecord.recordType === KbRecordType.ARTICLE) {
-        let knowledgeCategoryID = 66;
-        const queryParams = {
-            knowledgeCategoryID: 66, // need a way to find kbcategoryID.
-            siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
-            locale: getSiteSection().contentLocale,
-            limit: 10,
-        };
-        const articleList = useArticleList(queryParams, true);
+    const queryParams = {
+        knowledgeCategoryID: props.knowledgeCategoryID,
+        siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+        locale: getSiteSection().contentLocale,
+        limit: 10,
+    };
 
-        if (articleList.data?.body) {
-            const articlesInThisCategory = articleList.data.body.map((article)=> {
-                return{
-                    name: article.name,
-                    url: article.url,
-                    recordID: article.recordID,
-                    parentID: 66,
-                    sort: null,
-                    recordType: 'article',
-                    children: [],
-                }
-            });
-            
+    const currentCategoryNav = (isArticleInHelpCenter) ? getCurrentCategoryNav(queryParams) : navItems.data;
 
-            const navTreeItems:INavigationTreeItem[] = [
-                {
-                    name: "Category Name",
-                    url: "https://dev.vanilla.localhost/kb/categories/",
-                    parentID: 66,
-                    recordID: 1,
-                    sort: null,
-                    recordType: "category",
-                    children: articlesInThisCategory
-                }
-                ];
-
-         //   navItems.data.push(navTreeItems);
-
-        }
-
-    }
         /**
          * Fetch navigation data when the component is mounted.
          */
@@ -107,15 +72,15 @@ export function Navigation(props: IProps) {
             !knowledgeBase.data ||
             !navItems.data ||
             knowledgeBase.status === LoadStatus.LOADING ||
-            navItems.status === LoadStatus.LOADING
+            navItems.status === LoadStatus.LOADING ||
+            !currentCategoryNav
         ) {
             return <NavigationPlaceholder />;
         }
 
-        const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
+        const hasTitle = isHelpCenter && currentCategoryNav.length > 0;
         const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
-        const title = hasTitle ? t("Subcategories") : undefined;
-
+        const title = hasTitle ? props.knowledgeCategoryName : undefined;
 
         if (props.inHamburger) {
             const adminLinks = (
@@ -126,12 +91,12 @@ export function Navigation(props: IProps) {
                 />
             );
 
-            if (navItems.data.length > 0) {
+            if (currentCategoryNav.length > 0) {
                 return (
                     <DropDownPanelNav
                         activeRecord={props.activeRecord}
                         title={title ?? knowledgeBase.data.name}
-                        navItems={navItems.data}
+                        navItems={currentCategoryNav}
                         isNestable={props.collapsible}
                         afterNavSections={adminLinks}
                     />
@@ -152,7 +117,7 @@ export function Navigation(props: IProps) {
                     onItemHover={preloadItem}
                     clickableCategoryLabels={clickableCategoryLabels}
                 >
-                    {navItems.data}
+                    {currentCategoryNav}
                 </SiteNav>
             );
         }
@@ -160,22 +125,23 @@ export function Navigation(props: IProps) {
 
 interface IOwnProps {
     activeRecord: IActiveRecord;
+    knowledgeCategoryID?: number | null;
     collapsible: boolean;
     kbID: number;
     inHamburger?: boolean;
+    knowledgeCategoryName?: string | undefined;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(store: IKnowledgeAppStoreState, ownProps: IOwnProps) {
-    const { navigation, knowledgeBases } = store.knowledge;
+    const { navigation, knowledgeBases, articles } = store.knowledge;
 
     const kbsByID = knowledgeBases.knowledgeBasesByID;
     const knowledgeBase: ILoadable<IKnowledgeBase> = {
         ...kbsByID,
         data: kbsByID.status === LoadStatus.SUCCESS && kbsByID.data ? kbsByID.data[ownProps.kbID] : undefined,
     };
-
 
     const fetchStatus = navigation.fetchStatusesByKbID[ownProps.kbID] || LoadStatus.PENDING;
 
@@ -226,6 +192,51 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
         requestKnowledgeBase: () => kbActions.getAll(),
         preloadArticle: (articleID: number) => articleActions.fetchByID({ articleID, locale: getCurrentLocale() }),
     };
+}
+
+function getCurrentCategoryNav(queryParams) {
+
+    const articleList = useArticleList(queryParams, true);
+
+    const {data, status} = articleList;
+
+    return useMemo(() => {
+        if (articleList.data?.body) {
+            const articlesInThisCategory = articleList.data.body.map((article) => {
+                return {
+                    name: article.name,
+                    url: article.url,
+                    recordID: article.recordID,
+                    parentID: 66,
+                    sort: null,
+                    recordType: 'article',
+                    children: [],
+                }
+            });
+
+            let items = articlesInThisCategory.filter((item, index) => index < 5);
+
+            items.push(
+                {
+                name: 'View All',
+                url: formatUrl('/kb/articles?knowledgeCategoryID=66&locale=en'),
+                recordID: 1,
+                parentID: 1,
+                sort: null,
+                recordType: 'link',
+                children: [],
+
+            });
+
+
+            const navTreeItems: INavigationTreeItem[] = items.map(article => {
+                return article;
+            });
+
+            return navTreeItems;
+
+        }
+    }, [data, status]);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

@@ -80,7 +80,7 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
                 if (article) {
                     const kbID = article.knowledgeBaseID;
                     void this.navigationActions.getNavigationFlat(kbID);
-                    // this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
+                    this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
                 }
                 return article;
             }),
