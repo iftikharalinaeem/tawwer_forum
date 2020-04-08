@@ -181,8 +181,12 @@ class RulesApiController extends AbstractApiController {
     public function postRuleSchema() {
         $schema = $this->schema(
             Schema::parse([
-                'name',
-                'description',
+                'name' => [
+                    'maxLength' => 255,
+                ],
+                'description' => [
+                    'maxLength' => 500,
+                ],
             ])->add($this->fullSchema()),
             'RulePost'
         );

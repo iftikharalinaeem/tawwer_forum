@@ -7,6 +7,7 @@
  * @license Proprietary
  */
 
+use Garden\Schema\Schema;
 use \Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use \Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use \Vanilla\Models\PipelineModel;
@@ -31,6 +32,19 @@ class RuleModel extends PipelineModel {
         $userProcessor = new CurrentUserFieldProcessor($session);
         $userProcessor->setInsertFields(["InsertUserID"])->setUpdateFields(["UpdateUserID"]);
         $this->addPipelineProcessor($userProcessor);
+    }
+
+    /**
+     * Configure a Garden Schema instance for write operations by the model.
+     *
+     * @param Schema $schema Schema representing the resource's database table.
+     * @return Schema Currently configured write schema.
+     */
+    protected function configureWriteSchema(Schema $schema): Schema {
+        $schema = parent::configureWriteSchema($schema);
+        $schema->setField('properties.Name.maxLength', 255);
+        $schema->setField('properties.Description.maxLength', 500);
+        return $schema;
     }
 
     /**
