@@ -51,7 +51,7 @@ export function Navigation(props: IProps) {
     };
 
     const currentCategoryNav = isArticleInHelpCenter
-        ? getCurrentCategoryNav(queryParams, props.activeRecord.recordID)
+        ? useCurrentCategoryNav(queryParams, props.activeRecord.recordID)
         : navItems.data;
 
     /**
@@ -198,7 +198,7 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-function getCurrentCategoryNav(queryParams, articleID) {
+function useCurrentCategoryNav(queryParams, articleID) {
     const articles = useArticleList(queryParams, true);
     const { data, status } = articles;
     const articleList = articles.data?.body;
