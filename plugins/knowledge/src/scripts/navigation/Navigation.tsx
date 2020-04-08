@@ -196,6 +196,7 @@ function useCurrentCategoryNav(props) {
         knowledgeCategoryID: props.knowledgeCategoryID,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
         locale: getSiteSection().contentLocale,
+        limit: 10,
     };
     const articles = useArticleList(queryParams, true);
     const { data, status } = articles;
@@ -203,21 +204,7 @@ function useCurrentCategoryNav(props) {
 
     return useMemo(() => {
         if (articleList) {
-            let currentArticle = articleList.find(article => article.recordID === props.activeRecord.recordID);
-            let currentArticleIndex = currentArticle ? articleList.indexOf(currentArticle) : 1;
-            const maxArticles = articleList.length > 10;
-            let filteredArticles = maxArticles
-                ? articleList.filter((article, index) => {
-                      let startingPoint = currentArticleIndex <= 5 ? 0 : currentArticleIndex - 5;
-                      let endingPoint = currentArticleIndex <= 5 ? 9 : currentArticleIndex + 4;
-
-                      if (index >= startingPoint && index <= endingPoint) {
-                          return article;
-                      }
-                  })
-                : articleList;
-
-            let items = filteredArticles.map(article => {
+            let items = articleList.map(article => {
                 return {
                     name: article.name,
                     url: article.url,

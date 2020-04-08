@@ -115,7 +115,10 @@ class ArticlePage extends KbPage {
 
             $articlesInThisCategory = $this->articlesApi->index([
                 'knowledgeCategoryID' => $article['knowledgeCategoryID'],
-                'locale' => $currentLocale
+                'siteSectionGroup' => $currentSiteSection->getSectionGroup(),
+                'locale' => $currentLocale,
+                'limit' => 10
+
             ]);
             $articlesInThisCategory = Data::box($articlesInThisCategory);
 

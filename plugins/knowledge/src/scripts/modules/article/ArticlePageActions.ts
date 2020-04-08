@@ -12,6 +12,7 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
 import { IArticle } from "@knowledge/@types/api/article";
+import { getSiteSection } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
@@ -66,7 +67,10 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         await this.articleActions.getArticleList(
             {
                 knowledgeCategoryID: id,
+                siteSectionGroup:
+                    getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
                 locale: getCurrentLocale(),
+                limit: 10,
             },
             false,
             true,
