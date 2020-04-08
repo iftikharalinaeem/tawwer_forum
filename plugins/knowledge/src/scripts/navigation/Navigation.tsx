@@ -44,7 +44,7 @@ export function Navigation(props: IProps) {
     const isHelpCenter = props.knowledgeBase.data?.viewType === KbViewType.HELP;
     const isArticleInHelpCenter = props.activeRecord.recordType === "article" && isHelpCenter;
 
-    const categoryNavData = useCurrentCategoryNav(props, isArticleInHelpCenter);
+    const categoryNavData = useCurrentCategoryNav(props);
     const currentCategoryNav = isArticleInHelpCenter ? categoryNavData : navItems.data;
 
     /**
@@ -191,11 +191,7 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-function useCurrentCategoryNav(props, isArticleInHelpCenter) {
-    if (!isArticleInHelpCenter) {
-        return null;
-    }
-
+function useCurrentCategoryNav(props) {
     const queryParams = {
         knowledgeCategoryID: props.knowledgeCategoryID,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
