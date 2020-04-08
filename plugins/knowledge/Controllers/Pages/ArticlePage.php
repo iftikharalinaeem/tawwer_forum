@@ -124,8 +124,7 @@ class ArticlePage extends KbPage {
                 $articlesInThisCategory,
                 ['articleID' => $articleID]
             ));
-
-
+            
         } catch (Exception $e) {
             // Preload the data for the frontend.
             $this->addReduxAction(new ReduxAction(
