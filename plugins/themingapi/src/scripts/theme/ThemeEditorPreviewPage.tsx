@@ -9,7 +9,7 @@ import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponen
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
 import { useThemeCacheID, resetThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
-import { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
+import ThemeActions, { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import { ThemeProvider } from "@vanilla/library/src/scripts/theming/ThemeProvider";
 import React, { useCallback, useEffect, useState } from "react";
 import { MemoryRouter, useParams } from "react-router-dom";
@@ -36,7 +36,9 @@ export default function ThemeEditorPreviewPage() {
 
     const onFrame = useCallback(
         (messageEvent: MessageEvent) => {
-            forceVariables(messageEvent.data);
+            if (messageEvent.data.type === ThemeActions.forceVariablesAC.type) {
+                forceVariables(messageEvent.data.payload);
+            }
         },
         [forceVariables],
     );
@@ -82,7 +84,6 @@ function ThemePreviewPages() {
         case ActiveVariablePanel.TITLE_BAR:
             return <ThemeEditorPreviewContentsGlobal />;
         case ActiveVariablePanel.CONTENT_BANNER:
-        case ActiveVariablePanel.USER_CONTENT:
             return <ThemeEditorPreviewContentsContent />;
         default:
             return <ThemeEditorPreviewContentsGlobal />;

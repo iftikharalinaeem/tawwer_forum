@@ -15,7 +15,6 @@ export enum ActiveVariablePanel {
     GLOBAL = "global",
     TITLE_BAR = "titleBar",
     BANNER = "banner",
-    USER_CONTENT = "userContent",
     CONTENT_BANNER = "contentBanner",
 }
 

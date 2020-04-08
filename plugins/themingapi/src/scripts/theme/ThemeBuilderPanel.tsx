@@ -21,6 +21,7 @@ import {
 } from "@themingapi/theme/ActivePanelContext";
 import { ThemeBuilderSectionContentBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionContentBanner";
 import { ErrorBoundary } from "@vanilla/library/src/scripts/errorPages/ErrorBoundary";
+import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -47,7 +48,8 @@ export default function ThemeBuilderPanel() {
                     });
 
                     if (!hasError) {
-                        sendMessage?.(newVariables);
+                        const forceVariablesAC = ThemeActions.forceVariablesAC(newVariables);
+                        sendMessage?.(forceVariablesAC);
                     }
                 }}
                 rawThemeVariables={variables}

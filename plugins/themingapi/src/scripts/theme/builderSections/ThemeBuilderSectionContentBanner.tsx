@@ -18,6 +18,10 @@ import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor
 import { ThemeBuilderSectionGroup } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSectionGroup";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
 import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
+import {
+    ThemeBuilderBreakpoints,
+    BreakpointViewType,
+} from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
 
 export function ThemeBuilderSectionContentBanner() {
     const { setVariableValue } = useThemeBuilder();
@@ -42,6 +46,11 @@ export function ThemeBuilderSectionContentBanner() {
                     <ThemeBuilderUpload variableKey="contentBanner.outerBackground.image" />
                 </ThemeBuilderBlock>
                 <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="contentBanner.backgrounds.useOverlay" />
+                <ThemeBuilderBreakpoints
+                    baseKey="contentBanner.outerBackground"
+                    responsiveKey="image"
+                    enabledView={BreakpointViewType.IMAGE}
+                ></ThemeBuilderBreakpoints>
             </ThemeBuilderSectionGroup>
             <ThemeBuilderSection label={t("Logo")}>
                 <ThemeBuilderBlock label={t("Image")}>
