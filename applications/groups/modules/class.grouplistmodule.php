@@ -114,7 +114,13 @@ class GroupListModule extends Gdn_Module {
         return $groupList;
     }
 
-    public function canViewSecretGroup($group) {
+    /**
+     * Checks whether a user has the permission to view a secret group.
+     *
+     * @param array $group The group array to check permissions against.
+     * @return bool Whether or not the user can view this group.
+     */
+    public function canViewSecretGroup(array $group): bool {
 
         $groupModel = new GroupModel();
 
