@@ -38,6 +38,9 @@ export function ActivePanelChooser(props: { titlePanel: ActiveVariablePanel }) {
                     <SectionItem panel={ActiveVariablePanel.TITLE_BAR} />
                     <SectionItem panel={ActiveVariablePanel.BANNER} />
                 </DropDownSection>
+                <DropDownSection title={t("Content")}>
+                    <SectionItem panel={ActiveVariablePanel.CONTENT_BANNER} />
+                </DropDownSection>
             </DropDown>
         </div>
     );
