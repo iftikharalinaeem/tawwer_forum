@@ -96,12 +96,13 @@ class GroupListModule extends Gdn_Module {
             $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
         }
 
-        $groupModel = new GroupModel();
         foreach ($groups as $group) {
             // Don't display secret groups unless the user is a member.
-            if (!($group['Registration'] === 'Invite' && !$groupModel->checkPermission('Member', val('GroupID', $group)))) {
-                $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
+            if ($group['Registration'] === 'Invite' && !$this->canViewSecretGroup($group)) {
+                continue;
             }
+
+            $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
         }
 
         if ($this->attachDiscussions && $layout == 'table') {
@@ -111,6 +112,19 @@ class GroupListModule extends Gdn_Module {
         }
 
         return $groupList;
+    }
+
+    public function canViewSecretGroup($group) {
+
+        $groupModel = new GroupModel();
+
+        if ($groupModel->checkPermission('Member', val('GroupID', $group))) {
+            return true;
+        } elseif ($groupModel->checkPermission('Join', val('GroupID', $group))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
      /**
