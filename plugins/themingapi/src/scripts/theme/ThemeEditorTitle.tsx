@@ -4,7 +4,7 @@
  */
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import themeEditorPageClasses from "@themingapi/theme/themeEditorPageStyles";
+import { themeEditorPageClasses } from "@themingapi/theme/themeEditorPageStyles";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import classNames from "classnames";
 import Button from "@vanilla/library/src/scripts/forms/Button";

@@ -16,12 +16,14 @@ import { LogoAlignment } from "@vanilla/library/src/scripts/headers/TitleBar";
 import { ThemeBuilderCheckBox } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderCheckBox";
 import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderUpload";
 import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
+import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
+import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
 
 export function ThemeBuilderSectionTitleBar() {
     const { rawThemeVariables, setVariableValue } = useThemeBuilder();
     return (
         <>
-            <ThemeBuilderTitle title={t("Title Bar")} />
+            <ActivePanelChooser titlePanel={ActiveVariablePanel.TITLE_BAR} />
             <ThemeBuilderBlock label={t("Background Color")}>
                 <ThemeColorPicker variableKey="titleBar.colors.bg" />
             </ThemeBuilderBlock>
