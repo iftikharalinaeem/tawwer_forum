@@ -103,7 +103,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
     public getArticleList = (params: ISearchRequestBody, force?: boolean, useArticlesGet: boolean = false) => {
         const uri = useArticlesGet ? "/articles" : "/knowledge/search";
-
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 
         if (!force && existingList.status !== LoadStatus.PENDING) {
@@ -111,7 +110,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         }
         const thunk = bindThunkAction(ArticleActions.getArticleListACs, async () => {
             const response = await this.api.get(uri, { params });
-
             const responseBody = useArticlesGet
                 ? response.data.map(value => {
                       return {

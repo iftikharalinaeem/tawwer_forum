@@ -48,10 +48,9 @@ export function Navigation(props: IProps) {
         knowledgeCategoryID: props.knowledgeCategoryID,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
         locale: getSiteSection().contentLocale,
-        limit: 10,
     };
 
-    const currentCategoryNav = (isArticleInHelpCenter) ? getCurrentCategoryNav(queryParams) : navItems.data;
+    const currentCategoryNav = (isArticleInHelpCenter) ? getCurrentCategoryNav(queryParams, props.activeRecord.recordID) : navItems.data;
 
         /**
          * Fetch navigation data when the component is mounted.
@@ -112,7 +111,7 @@ export function Navigation(props: IProps) {
                     collapsible={props.collapsible}
                     activeRecord={props.activeRecord}
                     bottomCTA={
-                        <NavigationAdminLinks knowledgeBase={knowledgeBase.data} showDivider={navItems.data.length > 0} />
+                        <NavigationAdminLinks knowledgeBase={knowledgeBase.data} showDivider={currentCategoryNav.length > 0} />
                     }
                     onItemHover={preloadItem}
                     clickableCategoryLabels={clickableCategoryLabels}
@@ -194,32 +193,44 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-function getCurrentCategoryNav(queryParams) {
-
-    const articleList = useArticleList(queryParams, true);
-
-    const {data, status} = articleList;
-
+function getCurrentCategoryNav(queryParams, articleID) {
+    const articles= useArticleList(queryParams, true);
+    const {data, status} = articles;
+    const articleList = articles.data?.body;
     return useMemo(() => {
-        if (articleList.data?.body) {
-            const articlesInThisCategory = articleList.data.body.map((article) => {
-                return {
-                    name: article.name,
-                    url: article.url,
-                    recordID: article.recordID,
-                    parentID: 66,
-                    sort: null,
-                    recordType: 'article',
-                    children: [],
-                }
-            });
+        if (articleList) {
 
-            let items = articlesInThisCategory.filter((item, index) => index < 5);
+            let currentArticle = articleList.find((article) => article.recordID === articleID);
+            let currentArticleIndex = (currentArticle) ? articleList.indexOf(currentArticle) : 1;
+            const maxArticles =  articleList.length > 10;
+            let filteredArticles = (maxArticles) ? articleList.filter((article, index) => {
+
+                    let startingPoint = (currentArticleIndex <= 5) ? 0 :  currentArticleIndex - 5;
+                    let endingPoint = (currentArticleIndex <= 5) ? 9 : currentArticleIndex + 4;
+
+                    if (index >= startingPoint && index <= endingPoint) {
+                        return article
+                    }
+                }) :
+                articleList;
+
+
+            let items = filteredArticles.map((article) => {
+                    return {
+                        name: article.name,
+                        url: article.url,
+                        recordID: article.recordID,
+                        parentID: queryParams.knowledgeCategoryID,
+                        sort: null,
+                        recordType: 'article',
+                        children: [],
+                    }
+            });
 
             items.push(
                 {
                 name: 'View All',
-                url: formatUrl('/kb/articles?knowledgeCategoryID=66&locale=en'),
+                url: formatUrl(`/kb/categories/${queryParams.knowledgeCategoryID}`),
                 recordID: 1,
                 parentID: 1,
                 sort: null,

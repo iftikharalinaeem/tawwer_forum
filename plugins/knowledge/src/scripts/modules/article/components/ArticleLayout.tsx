@@ -105,6 +105,8 @@ export default function ArticleLayout(props: IProps) {
                         activeRecord={activeRecord}
                         kbID={article.knowledgeBaseID}
                         inHamburger
+                        knowledgeCategoryID={article.knowledgeCategoryID}
+                        knowledgeCategoryName={title}
                     />
                 }
             />

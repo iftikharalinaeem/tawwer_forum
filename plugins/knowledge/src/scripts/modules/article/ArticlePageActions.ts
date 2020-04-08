@@ -65,9 +65,8 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
     private loadArticlesInThisKnowledgeCategory = async id => {
         await this.articleActions.getArticleList(
             {
-                knowledgeCategoryID: 66,
+                knowledgeCategoryID: id,
                 locale: getCurrentLocale(),
-                limit: 10,
             },
             false,
             true,
@@ -84,7 +83,6 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
                 }
                 return article;
             }),
-
             this.articleActions.fetchLocales({ articleID }),
             this.articleActions.getRelatedArticles({
                 articleID: articleID,
