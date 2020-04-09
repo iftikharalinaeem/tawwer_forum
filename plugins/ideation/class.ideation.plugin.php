@@ -2179,7 +2179,7 @@ EOT
                 (isset($args['FormPostValues'][BestOfIdeationModel::SETTINGS_COL_NAME]))) {
 
                 //If there are settings values for the best of ideation, we do a bit of cleanup on the data.
-                if ($args['FormPostValues']['UseBestOfIdeation']==1){
+                if ($args['FormPostValues']['UseBestOfIdeation']==1) {
                     $bestOfIdeationSettings = $args['FormPostValues'][BestOfIdeationModel::SETTINGS_COL_NAME];
 
                     //If there are empty date fields, we remove them to the data to be saved.
