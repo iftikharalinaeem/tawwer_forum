@@ -10,6 +10,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Gdn_Session;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Schema\Validation;
@@ -486,26 +487,22 @@ MESSAGE
     /**
      * Add a knowledge base.
      *
-     * @param array $set Field values to set.
-     * @return mixed ID of the inserted row.
-     * @throws Exception If an error is encountered while performing the query.
+     * @inheritdoc
      */
-    public function insert(array $set) {
+    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
+
         // Enforce restrictions on KB article sorting.
         $this->validateSortArticlesInternal($set);
 
-        return parent::insert($set);
+        return parent::insert($set, $mode);
     }
 
     /**
      * Update existing knowledge bases.
      *
-     * @param array $set Field values to set.
-     * @param array $where Conditions to restrict the update.
-     * @throws \Exception If an error is encountered while performing the query.
-     * @return bool True.
+     * @inheritdoc
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
 
         // Enforce restrictions on sorting.
@@ -513,7 +510,7 @@ MESSAGE
             $this->validateSortArticlesInternal($set, $where["knowledgeBaseID"]);
         }
 
-        return parent::update($set, $where);
+        return parent::update($set, $where, $mode);
     }
 
     /**
