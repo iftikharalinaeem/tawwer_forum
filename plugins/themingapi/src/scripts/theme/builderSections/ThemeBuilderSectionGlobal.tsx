@@ -4,7 +4,6 @@
  */
 
 import React from "react";
-import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
 import { t } from "@vanilla/i18n";
 import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
@@ -14,7 +13,6 @@ import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEdi
 import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
-import { inputVariables } from "@vanilla/library/src/scripts/forms/inputStyles";
 import { buttonGlobalVariables } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
 import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
