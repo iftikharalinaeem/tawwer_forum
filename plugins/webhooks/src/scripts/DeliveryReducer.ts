@@ -5,9 +5,10 @@
 
 import { produce } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { IDeliveryState, IDeliveryFragment, INITIAL_DELIVERY_STATE } from "./DeliveryTypes";
+import { IDeliveryState, IDeliveryFragment, INITIAL_DELIVERY_STATE, IDel } from "./DeliveryTypes";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { DeliveryActions } from "@webhooks/DeliveryActions";
+import { action } from "@storybook/addon-actions";
 
 export const DeliveryReducer = produce(
     reducerWithInitialState<IDeliveryState>(INITIAL_DELIVERY_STATE)
@@ -33,6 +34,27 @@ export const DeliveryReducer = produce(
                 status: LoadStatus.SUCCESS,
                 data: deliveriesByWebhookID,
             };
+            return state;
+        })
+
+        .case(DeliveryActions.getDeliveryByIDACs.started, (state, action) => {
+            state.deliveriesByDeliveryID = {
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(DeliveryActions.getDeliveryByIDACs.failed, (state, action) => {
+            state.deliveriesByDeliveryID.status = LoadStatus.ERROR;
+            state.deliveriesByDeliveryID.error = action.error;
+            return state;
+        })
+
+        .case(DeliveryActions.getDeliveryByIDACs.done, (state, payload) => {
+            const deliveriesByDeliveryID: Record<number, IDeliveryFragment> = {};
+            if (payload.result.webhookDeliveryID) {
+                deliveriesByDeliveryID[payload.result.webhookDeliveryID] = payload.result;
+                state.deliveriesByDeliveryID.status = LoadStatus.SUCCESS;
+            }
             return state;
         }),
 );

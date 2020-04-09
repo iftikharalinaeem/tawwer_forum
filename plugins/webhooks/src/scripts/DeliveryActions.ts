@@ -5,7 +5,7 @@
 
 import ReduxActions, { bindThunkAction } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
-import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
+import { IDelivery, IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import actionCreatorFactory from "typescript-fsa";
 import { useDispatch } from "react-redux";
 import { useMemo } from "react";
@@ -23,6 +23,21 @@ export class DeliveryActions extends ReduxActions {
     public getAll = (webhookID: number) => {
         const thunk = bindThunkAction(DeliveryActions.getAllDeliveryACs, async () => {
             const response = await this.api.get(`/webhooks/${webhookID}/deliveries`, {});
+            return response.data;
+        })();
+
+        return this.dispatch(thunk);
+    };
+
+    public static readonly getDeliveryByIDACs = actionCreator.async<
+        { webhookID: number; deliveryID: string },
+        IDelivery,
+        IApiError
+    >("GET_DELIVERIES");
+
+    public getDeliveryByID = (webhookID: number, deliveryID: string) => {
+        const thunk = bindThunkAction(DeliveryActions.getDeliveryByIDACs, async () => {
+            const response = await this.api.get(`/webhooks/${webhookID}/deliveries/${deliveryID}`, {});
             return response.data;
         })();
 

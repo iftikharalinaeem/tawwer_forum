@@ -13,6 +13,9 @@ export interface IDeliveryState {
     deliveriesByWebhookID: ILoadable<{
         [webhookID: number]: IDeliveryFragment;
     }>;
+    deliveriesByDeliveryID: ILoadable<{
+        [deliveryID: string]: IDelivery;
+    }>;
 }
 
 export interface IDeliveryFragment {
@@ -32,6 +35,9 @@ export interface IDelivery extends IDeliveryFragment {
 
 export const INITIAL_DELIVERY_STATE: IDeliveryState = {
     deliveriesByWebhookID: {
+        status: LoadStatus.PENDING,
+    },
+    deliveriesByDeliveryID: {
         status: LoadStatus.PENDING,
     },
 };

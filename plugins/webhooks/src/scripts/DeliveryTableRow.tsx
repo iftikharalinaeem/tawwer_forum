@@ -4,12 +4,17 @@
  */
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
-import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
+import { IDelivery, IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import React from "react";
 import moment from "moment";
+import { Link } from "react-router-dom";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import { RightChevronIcon } from "@library/icons/common";
 
 interface IProps {
     delivery: IDeliveryFragment;
+    onClick?: () => void;
 }
 
 export function DeliveryTableRow(props: IProps) {
@@ -18,10 +23,16 @@ export function DeliveryTableRow(props: IProps) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
+
     return (
         <tr>
             <td>
-                <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
+                <Link to={"/test"} className={"test"}>
+                    <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
+                </Link>
+                <Button baseClass={ButtonTypes.ICON} onClick={props.onClick}>
+                    <RightChevronIcon centred={true} />
+                </Button>
             </td>
             <td>
                 <DashboardMediaItem
