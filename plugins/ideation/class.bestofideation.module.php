@@ -215,7 +215,11 @@ class BestOfIdeationModule extends Gdn_Module {
     public function toString(): string {
         $componentHtml = '';
 
-        if ($this->isEnabled) {
+        if ($this->isEnabled && Gdn::controller() instanceof CategoriesController) {
+            if (!function_exists('writeDiscussions')) {
+                include Gdn::controller()->fetchViewLocation('helper_functions', 'discussions');
+            }
+
             $ideaListHtml = '';
 
             ob_start();

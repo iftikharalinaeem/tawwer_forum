@@ -858,7 +858,7 @@ EOT
         if (FeatureFlagHelper::featureEnabled(self::BEST_OF_IDEATION_FEATURE)) {
             if (is_array($sender->Category->AllowedDiscussionTypes)
                 && in_array('Idea', $sender->Category->AllowedDiscussionTypes)) {
-                $categoryID = $sender->CategoryID;
+                $categoryID = $sender->Category->CategoryID;
 
                 $bestOfIdeation = $this->getBestOfIdeation($categoryID);
 
