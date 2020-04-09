@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IDeliveryFragment, IDeliveryStore } from "@webhooks/DeliveryTypes";
+import { IDeliveryFragment, IDeliveryStore, IDelivery } from "@webhooks/DeliveryTypes";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
@@ -20,6 +20,19 @@ export function useDeliveries(webhookID?: number): ILoadable<{ [id: number]: IDe
     }, [getAll, deliveriesByWebhookID, webhookID]);
 
     return deliveriesByWebhookID;
+}
+
+export function useDelivery(webhookID?: number, deliveryID?: string): ILoadable<{ [id: number]: IDelivery }> {
+    const deliveriesByDeliveryID = useSelector((state: IDeliveryStore) => state.deliveries.deliveriesByDeliveryID);
+    const { getDeliveryByID } = useDeliveryActions();
+
+    useEffect(() => {
+        if (deliveriesByDeliveryID.status === LoadStatus.PENDING && deliveryID) {
+            void getDeliveryByID(webhookID, deliveryID);
+        }
+    }, [getDeliveryByID, deliveriesByDeliveryID, deliveryID]);
+
+    return deliveriesByDeliveryID;
 }
 
 export function useDeliveryData() {
