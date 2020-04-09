@@ -80,10 +80,12 @@ function SearchForm(props: IProps) {
                         <>
                             <PanelWidget>
                                 <PageTitle
-                                    className={classNames("searchBar-heading", classes.marginBottom)}
-                                    headingClassName={typographyClasses().pageTitle}
+                                    className={classNames("searchBar-heading")}
+                                    headingClassName={classNames(typographyClasses().subTitle)}
                                     title={"Search"}
                                     includeBackLink={true}
+                                    chevronClass={classes.subTitleChevron}
+                                    backLinkClass={classes.subTitleBackLink}
                                 />
                                 <SearchBar
                                     placeholder={props.placeholder}

@@ -17,6 +17,8 @@ export interface IPageTitle {
     className?: string;
     includeBackLink?: boolean;
     headingClassName?: string;
+    chevronClass?: string;
+    backLinkClass?: string;
 }
 
 /**
@@ -30,6 +32,7 @@ export default class PageTitle extends React.Component<IPageTitle> {
     public render() {
         const classes = pageTitleClasses();
         const classesMetas = metasClasses();
+
         return (
             <div className={classNames("pageTitleContainer", this.props.className)}>
                 <PageHeading
@@ -37,6 +40,8 @@ export default class PageTitle extends React.Component<IPageTitle> {
                     title={this.props.title}
                     includeBackLink={this.props.includeBackLink}
                     headingClassName={classNames(classes.root, this.props.headingClassName)}
+                    chevronClass={this.props.chevronClass}
+                    backLinkClass={this.props.backLinkClass}
                 />
                 {this.props.meta && (
                     <div className={classNames("pageMetas", "pageTitleContainer-metas", classesMetas.root)}>
