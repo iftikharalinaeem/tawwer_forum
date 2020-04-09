@@ -91,7 +91,7 @@ function writeUserNoteWarning($row) {
       <div class="Warning-Body userContent">
          <?php
 
-        if (val('Record', $row)) {
+        if (val('Record', $row) && ($row['Format'] !== 'Rich')) {
             $record = $row['Record'];
             echo '<div class="P">'.
                 '<b>'.t('Warned for').'</b>: '.
@@ -107,15 +107,14 @@ function writeUserNoteWarning($row) {
             }
         }
 
-        if (val('RecordBody', $row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
-        } elseif (val('Record', $row)) {
-            echo '<blockquote class="Quote">' . Gdn_Format::to($record['Body'], $record['Format'] ?? null) . '</blockquote>';
+        if ($row['Format'] !== 'Rich') {
+            if (val('RecordBody', $row)) {
+                echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
+            } elseif (val('Record', $row)) {
+                echo '<blockquote class="Quote">' . Gdn_Format::to($record['Body'], $record['Format'] ?? null) . '</blockquote>';
+            }
         }
-
-
-
-
+        
         echo $row['Body'];
 
         if (val('ModeratorNote', $row)) {
