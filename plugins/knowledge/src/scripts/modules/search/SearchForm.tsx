@@ -33,6 +33,8 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
+import { iconClasses } from "@library/icons/iconClasses";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
@@ -80,12 +82,15 @@ function SearchForm(props: IProps) {
                         <>
                             <PanelWidget>
                                 <PageTitle
-                                    className={classNames("searchBar-heading")}
+                                    className={classNames(
+                                        "searchBar-heading",
+                                        searchBarClasses().heading,
+                                        classes.smallBackLink,
+                                    )}
                                     headingClassName={classNames(typographyClasses().subTitle)}
                                     title={"Search"}
                                     includeBackLink={true}
-                                    chevronClass={classes.subTitleChevron}
-                                    backLinkClass={classes.subTitleBackLink}
+                                    chevronClass={iconClasses().chevronLeftSmallCompact}
                                 />
                                 <SearchBar
                                     placeholder={props.placeholder}
