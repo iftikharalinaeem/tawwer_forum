@@ -14,20 +14,20 @@ import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEdi
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import { SearchBarPresets, BannerAlignment, bannerVariables } from "@vanilla/library/src/scripts/banner/bannerStyles";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
-import { buttonGlobalVariables, ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ButtonPreset } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
+import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
+import { ThemeBuilderSectionGroup } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSectionGroup";
+import {
+    ThemeBuilderBreakpoints,
+    BreakpointViewType,
+} from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
 
 export function ThemeBuilderSectionBanner() {
     return (
         <>
-            <ThemeBuilderTitle title={t("Banner")} />
-            <ThemeBuilderBlock label={t("Background Image")}>
-                <ThemeBuilderUpload variableKey="banner.outerBackground.image" />
-            </ThemeBuilderBlock>
-            <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="banner.backgrounds.useOverlay" />
-            <ThemeBuilderBlock label={t("Background Color")}>
-                <ThemeColorPicker variableKey="banner.colors.primary" />
-            </ThemeBuilderBlock>
-            <ThemeBuilderBlock label={t("Text")}>
+            <ActivePanelChooser titlePanel={ActiveVariablePanel.BANNER} />
+            <ThemeBuilderBlock label={t("Text Color")}>
                 <ThemeColorPicker variableKey="banner.colors.primaryContrast" />
             </ThemeBuilderBlock>
             <ThemeBuilderBlock label={t("Alignment")}>
@@ -45,6 +45,20 @@ export function ThemeBuilderSectionBanner() {
                     ]}
                 />
             </ThemeBuilderBlock>
+            <ThemeBuilderSectionGroup label={t("Background")}>
+                <ThemeBuilderBlock label={t("Color")}>
+                    <ThemeColorPicker variableKey="banner.colors.primary" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Image")}>
+                    <ThemeBuilderUpload variableKey="banner.outerBackground.image" />
+                </ThemeBuilderBlock>
+                <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="banner.backgrounds.useOverlay" />
+                <ThemeBuilderBreakpoints
+                    baseKey="banner.outerBackground"
+                    responsiveKey="image"
+                    enabledView={BreakpointViewType.IMAGE}
+                ></ThemeBuilderBreakpoints>
+            </ThemeBuilderSectionGroup>
             <ThemeBuilderSection label={t("Search")}>
                 <ThemeBuilderBlock label={t("Preset")}>
                     <ThemeDropDown

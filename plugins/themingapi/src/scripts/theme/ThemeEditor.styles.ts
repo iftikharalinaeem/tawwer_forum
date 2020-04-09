@@ -7,7 +7,7 @@ import { themeBuilderVariables } from "@library/forms/themeEditor/ThemeBuilder.s
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
-import { absolutePosition, colorOut, fonts, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
+import { absolutePosition, colorOut, fonts, unit, flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { calc, percent } from "csx";
 
 // Intentionally not overwritable.
@@ -133,6 +133,31 @@ export const themeEditorClasses = useThemeCache(() => {
         }),
     );
 
+    const activeIndicator = style("activeIndicator", {
+        ...flexHelper().middle(),
+        marginLeft: "auto",
+        marginRight: "auto",
+    });
+
+    const activeDropdown = style("activeDropdown", {
+        left: "50%",
+        transform: "translateX(-50%)",
+        fontWeight: globalVars.fonts.weights.normal,
+    });
+
+    const activeButton = style("activeDropdown", {
+        textTransform: "uppercase",
+        marginBottom: 6,
+    });
+
+    const activeIndicatorContents = style("activeIndicatorContents", {
+        ...flexHelper().middle(),
+    });
+
+    const activeIndicatorIcon = style("activeIndicatorContents", {
+        marginLeft: 6,
+    });
+
     return {
         frame,
         wrapper,
@@ -140,5 +165,10 @@ export const themeEditorClasses = useThemeCache(() => {
         panel,
         shadowTop,
         shadowRight,
+        activeIndicator,
+        activeButton,
+        activeDropdown,
+        activeIndicatorContents,
+        activeIndicatorIcon,
     };
 });

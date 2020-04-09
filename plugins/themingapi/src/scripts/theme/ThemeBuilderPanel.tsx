@@ -10,23 +10,21 @@ import { ThemeBuilderSectionTitleBar } from "@themingapi/theme/builderSections/T
 import { useIFrameCommunication, useOwnFrameMessages } from "@themingapi/theme/IframeCommunicationContext";
 import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
 import { ThemeBuilderContextProvider } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
-import React, { useState } from "react";
-import actionCreatorFactory from "typescript-fsa";
+import React from "react";
 import { useThemeActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
+import {
+    ActivePanelContextProvider,
+    ActiveVariablePanel,
+    useActivePanelContext,
+} from "@themingapi/theme/ActivePanelContext";
+import { ThemeBuilderSectionContentBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionContentBanner";
+import { ErrorBoundary } from "@vanilla/library/src/scripts/errorPages/ErrorBoundary";
+import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
-}
-
-const createAction = actionCreatorFactory("@@themeBuilderPanel");
-export const setActivePanelAC = createAction<{ panel: ActiveVariablePanel }>("setActivePanel");
-
-export enum ActiveVariablePanel {
-    GLOBAL = "global",
-    TITLE_BAR = "titleBar",
-    BANNER = "banner",
 }
 
 export default function ThemeBuilderPanel() {
@@ -35,39 +33,48 @@ export default function ThemeBuilderPanel() {
     const { sendMessage } = useIFrameCommunication();
     const variables = useThemeEditorState().form?.assets.variables?.data;
 
-    const [activePanel, setActivePanel] = useState(ActiveVariablePanel.GLOBAL);
-
-    useOwnFrameMessages(e => {
-        const { data } = e;
-        if (e.data.type === setActivePanelAC.type) {
-            setActivePanel(data.payload.panel);
-        }
-    });
-
     return (
-        <ThemeBuilderContextProvider
-            onChange={(newVariables, hasError) => {
-                updateAssets({
-                    assets: {
-                        variables: {
-                            data: newVariables,
-                            type: "string",
+        <ErrorBoundary>
+            <ThemeBuilderContextProvider
+                onChange={(newVariables, hasError) => {
+                    updateAssets({
+                        assets: {
+                            variables: {
+                                data: newVariables,
+                                type: "string",
+                            },
                         },
-                    },
-                    errors: hasError,
-                });
+                        errors: hasError,
+                    });
 
-                if (!hasError) {
-                    sendMessage?.(newVariables);
-                }
-            }}
-            rawThemeVariables={variables}
-        >
-            <div className={classes.root}>
-                {activePanel === ActiveVariablePanel.GLOBAL && <ThemeBuilderSectionGlobal />}
-                {activePanel === ActiveVariablePanel.TITLE_BAR && <ThemeBuilderSectionTitleBar />}
-                {activePanel === ActiveVariablePanel.BANNER && <ThemeBuilderSectionBanner />}
-            </div>
-        </ThemeBuilderContextProvider>
+                    if (!hasError) {
+                        const forceVariablesAC = ThemeActions.forceVariablesAC(newVariables);
+                        sendMessage?.(forceVariablesAC);
+                    }
+                }}
+                rawThemeVariables={variables}
+            >
+                <div className={classes.root}>
+                    <ActivePanelContextProvider>
+                        <PanelItems />
+                    </ActivePanelContextProvider>
+                </div>
+            </ThemeBuilderContextProvider>
+        </ErrorBoundary>
     );
+}
+
+function PanelItems() {
+    const { activePanel } = useActivePanelContext();
+    switch (activePanel) {
+        case ActiveVariablePanel.TITLE_BAR:
+            return <ThemeBuilderSectionTitleBar />;
+        case ActiveVariablePanel.BANNER:
+            return <ThemeBuilderSectionBanner />;
+        case ActiveVariablePanel.CONTENT_BANNER:
+            return <ThemeBuilderSectionContentBanner />;
+        case ActiveVariablePanel.GLOBAL:
+        default:
+            return <ThemeBuilderSectionGlobal />;
+    }
 }
