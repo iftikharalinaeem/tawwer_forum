@@ -91,30 +91,29 @@ function writeUserNoteWarning($row) {
       <div class="Warning-Body userContent">
          <?php
 
-        if (val('Record', $row) && ($row['Format'] !== 'Rich')) {
-            $record = $row['Record'];
-            echo '<div class="P">'.
-                '<b>'.t('Warned for').'</b>: '.
-                anchor(htmlspecialchars($record['Name']), $record['Url']).
-                '</div>';
-        }
+         if (isset($row['Format']) && $row['Format'] !== 'Rich') {
+             if (val('Record', $row)) {
+                 $record = $row['Record'];
+                 echo '<div class="P">' .
+                     '<b>' . t('Warned for') . '</b>: ' .
+                     anchor(htmlspecialchars($record['Name']), $record['Url']) .
+                     '</div>';
+             }
 
-        if (isset($row['Rule']['Name'])) {
-            echo '<b>' . Gdn::translate('Infringed rule') . '</b>: ' . htmlspecialchars($row['Rule']['Name']);
+             if (val('RecordBody', $row)) {
+                 echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
+             } elseif (val('Record', $row)) {
+                 echo '<blockquote class="Quote">' . Gdn_Format::to($record['Body'], $record['Format'] ?? null) . '</blockquote>';
+             }
+         }
+         if (isset($row['Rule']['Name'])) {
+             echo '<b>' . Gdn::translate('Infringed rule') . '</b>: ' . htmlspecialchars($row['Rule']['Name']);
 
-            if (isset($row['Rule']['Description'])) {
-                echo '<div class="Meta">' . htmlspecialchars($row['Rule']['Description']) . '</div>';
-            }
-        }
+             if (isset($row['Rule']['Description'])) {
+                 echo '<div class="Meta">' . htmlspecialchars($row['Rule']['Description']) . '</div>';
+             }
+         }
 
-        if ($row['Format'] !== 'Rich') {
-            if (val('RecordBody', $row)) {
-                echo '<blockquote class="Quote">' . Gdn_Format::to($row['RecordBody'], $row['RecordFormat'] ?? null) . '</blockquote>';
-            } elseif (val('Record', $row)) {
-                echo '<blockquote class="Quote">' . Gdn_Format::to($record['Body'], $record['Format'] ?? null) . '</blockquote>';
-            }
-        }
-        
         echo $row['Body'];
 
         if (val('ModeratorNote', $row)) {
