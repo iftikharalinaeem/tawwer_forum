@@ -56,14 +56,19 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
         $locale = $row["locale"];
 
         // Remove the "published" flag from the currently-published revision.
+        $status = ["status" => null];
+        if ($mode === Operation::MODE_IMPORT && !empty($updateUserID)) {
+            $status["insertUserID"] = $updateUserID;
+        }
         $this->update(
-            ["status" => null, "insertUserID" => $updateUserID],
+            $status,
             ["articleID" => $articleID, "status" => "published", "locale" => $locale],
             $mode
         );
         // Publish this revision.
+        $status["status"] = "published";
         $this->update(
-            ["status" => "published", "insertUserID" => $updateUserID],
+            $status,
             ["articleRevisionID" => $articleRevisionID],
             $mode
         );

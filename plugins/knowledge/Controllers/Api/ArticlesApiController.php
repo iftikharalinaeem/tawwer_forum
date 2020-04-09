@@ -681,7 +681,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $fields['foreignID'] = '';
         } else {
             $fields['insertUserID'] = $body['insertUserID'] ?? $this->sessionInterface->UserID;
-            $fields['foreignID'] = $body['foreignID'];
+            $fields['foreignID'] = $body['foreignID'] ?? '';
         }
 
 
