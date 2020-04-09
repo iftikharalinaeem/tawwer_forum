@@ -63,7 +63,7 @@ class BestOfIdeationModel extends PipelineModel {
 
             if (isset($catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME])) {
                 $catBOISettings = $catBOIDatas[BestOfIdeationModel::SETTINGS_COL_NAME];
-                if (is_array($catBOISettings)) {
+                if ((is_array($catBOISettings)) && (!empty($catBOISettings))) {
                     $configuration = [
                         'IsEnabled' => true,
                         'Dates' => $catBOISettings['Dates'],
