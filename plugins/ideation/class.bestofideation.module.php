@@ -216,7 +216,7 @@ class BestOfIdeationModule extends Gdn_Module {
         $componentHtml = '';
 
         $controller = Gdn::controller();
-        if ($this->isEnabled && $controller instanceof CategoriesController) {
+        if (is_object($controller) && $controller instanceof CategoriesController && $this->isEnabled) {
             // The module can be loaded on different type of category pages. If the discussions/helper_functions.php is
             // not included, the writeDiscussion function will not be defined. Better solutions would involve deeper
             // compromises in core.
