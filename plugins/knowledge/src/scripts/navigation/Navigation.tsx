@@ -12,7 +12,7 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { formatUrl, getSiteSection } from "@library/utility/appUtils";
+import { getSiteSection } from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React, { useCallback, useEffect, useMemo } from "react";
@@ -212,17 +212,19 @@ function useCurrentCategoryNav(props) {
                     parentID: props.knowledgeCategoryID,
                     sort: null,
                     recordType: "article",
+                    isLink: false,
                     children: [],
                 };
             });
 
             items.push({
                 name: "View All",
-                url: formatUrl(`/kb/categories/${queryParams.knowledgeCategoryID}`),
+                url: `/kb/categories/${queryParams.knowledgeCategoryID}`,
                 recordID: 1,
                 parentID: 1,
                 sort: null,
                 recordType: "link",
+                isLink: true,
                 children: [],
             });
 
