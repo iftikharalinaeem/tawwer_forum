@@ -39,6 +39,7 @@ import {
     IGetRevisionResponseBody,
 } from "@knowledge/@types/api/articleRevision";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { USE_GET_ARTICLES_PARAMS } from "@knowledge/constants";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -101,7 +102,9 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         IApiError
     >("GET_ARTICLE_LIST");
 
-    public getArticleList = (params: ISearchRequestBody, force?: boolean, useArticlesGet: boolean = false) => {
+    public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
+        const useArticlesGet = JSON.stringify(Object.keys(params)) === JSON.stringify(USE_GET_ARTICLES_PARAMS);
+
         const uri = useArticlesGet ? "/articles" : "/knowledge/search";
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 

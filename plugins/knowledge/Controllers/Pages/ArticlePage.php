@@ -117,8 +117,8 @@ class ArticlePage extends KbPage {
                 'knowledgeCategoryID' => $article['knowledgeCategoryID'],
                 'siteSectionGroup' => $currentSiteSection->getSectionGroup(),
                 'locale' => $currentLocale,
+                'page' => 1,
                 'limit' => 10
-
             ]);
             $articlesInThisCategory = Data::box($articlesInThisCategory);
 

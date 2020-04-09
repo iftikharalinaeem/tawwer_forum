@@ -196,15 +196,17 @@ function useCurrentCategoryNav(props) {
         knowledgeCategoryID: props.knowledgeCategoryID,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
         locale: getSiteSection().contentLocale,
+        page: 1,
         limit: 10,
     };
-    const articles = useArticleList(queryParams, true);
+    const articles = useArticleList(queryParams);
     const { data, status } = articles;
     const articleList = articles.data?.body;
+    const articlePages = articles.data?.pagination.next;
 
     return useMemo(() => {
         if (articleList) {
-            let items = articleList.map(article => {
+            let navTreeItems: INavigationTreeItem[] = articleList.map(article => {
                 return {
                     name: article.name,
                     url: article.url,
@@ -217,20 +219,18 @@ function useCurrentCategoryNav(props) {
                 };
             });
 
-            items.push({
-                name: "View All",
-                url: `/kb/categories/${queryParams.knowledgeCategoryID}`,
-                recordID: 1,
-                parentID: 1,
-                sort: null,
-                recordType: "link",
-                isLink: true,
-                children: [],
-            });
-
-            const navTreeItems: INavigationTreeItem[] = items.map(article => {
-                return article;
-            });
+            if (articlePages) {
+                navTreeItems.push({
+                    name: "View All",
+                    url: `/kb/categories/${queryParams.knowledgeCategoryID}`,
+                    recordID: 1,
+                    parentID: 1,
+                    sort: null,
+                    recordType: "link",
+                    isLink: true,
+                    children: [],
+                });
+            }
 
             return navTreeItems;
         }

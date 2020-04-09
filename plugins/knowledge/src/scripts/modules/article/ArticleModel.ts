@@ -25,6 +25,7 @@ import { hashString } from "@vanilla/utils";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { ILinkPages, IWithPagination } from "@library/navigation/SimplePagerModel";
+import { getSiteSection } from "@library/utility/appUtils";
 
 export interface IArticleState {
     articlesByID: {
@@ -366,7 +367,7 @@ export function hashArticleListParams(params: ISearchRequestBody): number {
     return hashString(JSON.stringify(ordered));
 }
 
-export function useArticleList(params: ISearchRequestBody, useArticlesGet: boolean = false) {
+export function useArticleList(params: ISearchRequestBody) {
     const hash = hashArticleListParams(params);
     const actions = useArticleActions();
 
@@ -375,10 +376,10 @@ export function useArticleList(params: ISearchRequestBody, useArticlesGet: boole
     );
 
     useEffect(() => {
-        void actions.getArticleList(params, false, useArticlesGet);
+        void actions.getArticleList(params);
         // Deps are manually calculated into the hash. don't watch on params which may change often.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hash, actions, useArticlesGet]);
+    }, [hash, actions]);
 
     return existingList;
 }

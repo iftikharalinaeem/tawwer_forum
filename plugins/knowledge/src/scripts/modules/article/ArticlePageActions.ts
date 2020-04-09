@@ -64,17 +64,13 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
     };
 
     private loadArticlesInThisKnowledgeCategory = async id => {
-        await this.articleActions.getArticleList(
-            {
-                knowledgeCategoryID: id,
-                siteSectionGroup:
-                    getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
-                locale: getCurrentLocale(),
-                limit: 10,
-            },
-            false,
-            true,
-        );
+        await this.articleActions.getArticleList({
+            knowledgeCategoryID: id,
+            siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+            locale: getCurrentLocale(),
+            page: 1,
+            limit: 10,
+        });
     };
 
     public init = async (articleID: number) => {
