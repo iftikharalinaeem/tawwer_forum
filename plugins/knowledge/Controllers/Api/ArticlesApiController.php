@@ -13,6 +13,7 @@ use MediaModel;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
@@ -658,6 +659,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "description" => "Article 'Was it Helpful?' reaction.",
                 "enum" => ["yes", "no"],
             ],
+            "insertUserID:i?" => [
+                "description" => "User id."
+            ],
+            "foreignID:s?" => [
+                "description" => "Foreign id."
+            ],
         ], "in")->setDescription("Reaction about an article.");
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
@@ -668,11 +675,25 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        $existingReactionValue = $this->articleReactionModel->getUserReaction(
-            ArticleReactionModel::TYPE_HELPFUL,
-            $id,
-            $this->sessionInterface->UserID
-        );
+        $mode = $this->getOperationMode();
+        if ($mode === Operation::MODE_DEFAULT) {
+            $fields['insertUserID'] = $this->sessionInterface->UserID;
+            $fields['foreignID'] = '';
+        } else {
+            $fields['insertUserID'] = $body['insertUserID'] ?? $this->sessionInterface->UserID;
+            $fields['foreignID'] = $body['foreignID'];
+        }
+
+
+        if (empty($fields['foreignID'])) {
+            $existingReactionValue = $this->articleReactionModel->getUserReaction(
+                ArticleReactionModel::TYPE_HELPFUL,
+                $id,
+                $fields['insertUserID']
+            );
+        } else {
+            $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
+        }
 
         if ($existingReactionValue !== null) {
             throw new ClientException('You already reacted on this article before.');
@@ -680,7 +701,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
 
-        $this->reactionModel->insert($fields);
+        $this->reactionModel->insert($fields, $mode);
 
         $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
@@ -689,7 +710,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $newReactionValue = $this->articleReactionModel->getUserReaction(
             ArticleReactionModel::TYPE_HELPFUL,
             $id,
-            $this->sessionInterface->UserID
+            $fields['insertUserID']
         );
         $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['reactions'][]  = [
