@@ -12,6 +12,9 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RightChevronIcon } from "@library/icons/common";
 import { DeliveryDetailsCSSClasses } from "./DeliveryDetailsStyles";
+import { t } from "@vanilla/i18n";
+import { escapeHTML } from "@vanilla/dom-utils";
+import UserContent from "@vanilla/library/src/scripts/content/UserContent";
 
 interface IProps {
     delivery: IDeliveryFragment;
