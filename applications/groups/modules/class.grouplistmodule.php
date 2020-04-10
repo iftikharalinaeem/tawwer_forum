@@ -72,42 +72,66 @@ class GroupListModule extends Gdn_Module {
       * @param string $sectionId The group list's unique identifier or endpoint slug ('mine', 'popular', 'new', etc.).
       * @return array A group list data array.
       */
-     protected function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
+    protected function getGroupsInfo($layout, $groups, $heading, $emptyMessage, $cssClass, $sectionId) {
 
-          $groupList['sectionId'] = $sectionId;
-          $groupList['layout'] = $layout;
-          $groupList['emptyMessage'] = $emptyMessage;
-          $groupList['title'] = $heading;
-          $groupList['cssClass'] = $cssClass;
-          $groupList['emptyMessageCssClass'] = $cssClass.'-emptyMessage';
+        $groupList['sectionId'] = $sectionId;
+        $groupList['layout'] = $layout;
+        $groupList['emptyMessage'] = $emptyMessage;
+        $groupList['title'] = $heading;
+        $groupList['cssClass'] = $cssClass;
+        $groupList['emptyMessageCssClass'] = $cssClass.'-emptyMessage';
 
-          if ($this->showMore) {
-                $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
-                $groupList['moreUrl'] = url('/groups/browse/'.$sectionId);
-                $groupList['moreCssClass'] = 'More';
-          }
+        if ($this->showMore) {
+            $groupList['moreLink'] = sprintf(t('All %s...'), $heading);
+            $groupList['moreUrl'] = url('/groups/browse/'.$sectionId);
+            $groupList['moreCssClass'] = 'More';
+        }
 
-          if ($layout == 'table') {
-                $groupList['columns'][0]['columnLabel'] = t('Group');
-                $groupList['columns'][0]['columnCssClass'] = 'GroupName';
-                $groupList['columns'][1]['columnLabel'] = t('Members');
-                $groupList['columns'][1]['columnCssClass'] = 'BigCount CountMembers';
-                $groupList['columns'][2]['columnLabel'] = t('Discussions');
-                $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
-          }
+        if ($layout == 'table') {
+            $groupList['columns'][0]['columnLabel'] = t('Group');
+            $groupList['columns'][0]['columnCssClass'] = 'GroupName';
+            $groupList['columns'][1]['columnLabel'] = t('Members');
+            $groupList['columns'][1]['columnCssClass'] = 'BigCount CountMembers';
+            $groupList['columns'][2]['columnLabel'] = t('Discussions');
+            $groupList['columns'][2]['columnCssClass'] = 'BigCount CountDiscussions';
+        }
 
-          foreach ($groups as $group) {
-                $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
-          }
+        foreach ($groups as $group) {
+            // Don't display secret groups unless the user is a member.
+            if ($group['Registration'] === 'Invite' && !$this->canViewSecretGroup($group)) {
+                continue;
+            }
 
-          if ($this->attachDiscussions && $layout == 'table') {
-                $groupList['columns'][3]['columnLabel'] = t('Latest Post');
-                $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
-                $this->addEmpty($groupList['items'], 'lastPost');
-          }
+            $groupList['items'][] = $this->getGroupInfo($group, $layout, true, $sectionId);
+        }
 
-          return $groupList;
-     }
+        if ($this->attachDiscussions && $layout == 'table') {
+            $groupList['columns'][3]['columnLabel'] = t('Latest Post');
+            $groupList['columns'][3]['columnCssClass'] = 'BlockColumn LatestPost';
+            $this->addEmpty($groupList['items'], 'lastPost');
+        }
+
+        return $groupList;
+    }
+
+    /**
+     * Checks whether a user has the permission to view a secret group.
+     *
+     * @param array $group The group array to check permissions against.
+     * @return bool Whether or not the user can view this group.
+     */
+    public function canViewSecretGroup(array $group): bool {
+
+        $groupModel = new GroupModel();
+
+        if ($groupModel->checkPermission('Member', val('GroupID', $group))) {
+            return true;
+        } elseif ($groupModel->checkPermission('Join', val('GroupID', $group))) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
      /**
       * Adds a column type to an item row if it does not exist.
