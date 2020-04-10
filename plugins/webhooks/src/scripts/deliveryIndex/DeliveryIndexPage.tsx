@@ -61,13 +61,10 @@ export default function DeliveryIndex() {
                     <tr key={delivery.webhookDeliveryID}>
                         <DeliveryTableRow
                             delivery={delivery}
-                            //deliveryRecord={deliveryRecord}
                             buttonClicked={isClicked}
                             onClick={() => {
                                 if (delivery.webhookDeliveryID) {
                                     setIsClicked(true);
-                                    // getDeliveryByID(delivery.webhookID, delivery.webhookDeliveryID);
-                                    // setDeliveryRecord(delivery.webhookDeliveryID);
                                 }
                             }}
                         />

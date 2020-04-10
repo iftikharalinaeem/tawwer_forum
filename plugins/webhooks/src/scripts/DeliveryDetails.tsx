@@ -5,7 +5,6 @@
 
 import UserContent from "@vanilla/library/src/scripts/content/UserContent";
 import { escapeHTML } from "@vanilla/dom-utils";
-import { IDelivery } from "@webhooks/DeliveryTypes";
 import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import Loader from "@library/loaders/Loader";
@@ -37,9 +36,17 @@ export function DeliveryDetails(props: IProps) {
         if (webhookID && webhookDeliveryID) {
             getDeliveryByID(webhookID, webhookDeliveryID);
             setDeliveryRecord(deliveriesByDeliveryID.data);
-            // alert(JSON.stringify(deliveryRecord));
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID]);
+
+    const isJson = function(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    };
 
     const prettyPrintJSONString = function(paramJson) {
         let parsedString = "";
@@ -93,9 +100,9 @@ export function DeliveryDetails(props: IProps) {
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${
-                                            !!JSON.parse(requestBody)
-                                                ? escapeHTML(requestBody)
-                                                : prettyPrintJSONString(escapeHTML(requestBody))
+                                            isJson(requestBody)
+                                                ? prettyPrintJSONString(escapeHTML(requestBody))
+                                                : escapeHTML(requestBody)
                                         }</pre>`}
                                     />
                                 </div>
@@ -119,9 +126,9 @@ export function DeliveryDetails(props: IProps) {
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${
-                                            !!JSON.parse(responseBody)
-                                                ? escapeHTML(responseBody)
-                                                : prettyPrintJSONString(escapeHTML(responseBody))
+                                            isJson(requestBody)
+                                                ? prettyPrintJSONString(escapeHTML(requestBody))
+                                                : escapeHTML(requestBody)
                                         }</pre>`}
                                     />
                                 </div>
