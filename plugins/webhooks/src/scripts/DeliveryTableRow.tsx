@@ -33,7 +33,7 @@ export function DeliveryTableRow(props: IProps) {
         <td colSpan={4} className={DeliveryTableRowClasses.root}>
             <div className={DeliveryTableRowClasses.rowDelivery}>
                 <div className={DeliveryTableRowClasses.colDeliveryID}>
-                    <Button baseClass={ButtonTypes.ICON} onClick={props.onClick}>
+                    <Button baseClass={ButtonTypes.ICON} className="collapseDeliveryButton" onClick={props.onClick}>
                         <RightChevronIcon centred={true} />
                     </Button>
                     <Link to={"/test"} className={"test"}>

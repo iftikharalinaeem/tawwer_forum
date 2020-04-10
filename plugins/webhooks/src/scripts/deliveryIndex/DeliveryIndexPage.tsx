@@ -17,6 +17,7 @@ import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
 import { useHistory } from "react-router-dom";
 import { useDeliveryActions } from "@webhooks/DeliveryActions";
+import classNames from "classnames";
 
 export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
@@ -27,6 +28,7 @@ export default function DeliveryIndex() {
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
     const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
     const [isClicked, setIsClicked] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
@@ -58,13 +60,14 @@ export default function DeliveryIndex() {
                     </tr>
                 }
                 body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment) => (
-                    <tr key={delivery.webhookDeliveryID}>
+                    <tr key={delivery.webhookDeliveryID} className={classNames(isOpen ? "isOpen" : "")}>
                         <DeliveryTableRow
                             delivery={delivery}
                             buttonClicked={isClicked}
                             onClick={() => {
                                 if (delivery.webhookDeliveryID) {
                                     setIsClicked(true);
+                                    setIsOpen(true);
                                 }
                             }}
                         />

@@ -52,10 +52,24 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
         }),
     });
 
-    cssOut(`${colDeliveryID} .media-title`, {
-        ...margins({
-            bottom: 0,
-        }),
+    cssOut(".table-data tbody tr.isOpen", {
+        $nest: {
+            "&:hover, &:focus": {
+                backgroundColor: "transparent",
+            },
+        },
+    });
+
+    cssOut(".collapseDeliveryButton", {
+        transition: `transform ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
+    });
+
+    cssOut("tr.isOpen", {
+        $nest: {
+            ".collapseDeliveryButton": {
+                transform: "rotate(90deg)",
+            },
+        },
     });
 
     return { root, rowDelivery, colDeliveryID };

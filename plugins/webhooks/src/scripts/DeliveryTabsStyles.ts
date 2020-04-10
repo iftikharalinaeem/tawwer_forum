@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { paddings, singleBorder, margins, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { calc, quote, percent } from "csx";

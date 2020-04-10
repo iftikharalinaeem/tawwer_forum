@@ -6,6 +6,7 @@
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { paddings, margins, unit, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const deliveryDetailsCSSClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -26,12 +27,18 @@ export const deliveryDetailsCSSClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 ...margins({
-                    top: unit(26),
+                    top: unit(0),
                     bottom: globalVars.gutter.size,
                 }),
                 fontSize: globalVars.fonts.size.medium,
             },
         },
+    });
+
+    cssOut(`${title} + .userContent`, {
+        ...margins({
+            bottom: unit(26),
+        }),
     });
 
     return { title, root };
