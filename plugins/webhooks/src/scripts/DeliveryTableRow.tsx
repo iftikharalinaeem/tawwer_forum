@@ -4,7 +4,7 @@
  */
 
 import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
-import { IDelivery, IDeliveryFragment } from "@webhooks/DeliveryTypes";
+import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import React from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
@@ -12,6 +12,8 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RightChevronIcon } from "@library/icons/common";
 import { DeliveryDetails } from "@webhooks/DeliveryDetails";
+import { deliveryTableRowCSSClasses, deliveryTableRowCSS } from "@webhooks/DeliveryTableRowStyles";
+import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 
 interface IProps {
     delivery: IDeliveryFragment;
@@ -21,35 +23,28 @@ interface IProps {
 
 export function DeliveryTableRow(props: IProps) {
     const { delivery, buttonClicked } = props;
-
-    const durationToSeconds = function (duration: number) {
+    const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
+    const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
 
     return (
-        <td colSpan={4}>
-            <div>
-                <div>
-                    <Link to={"/test"} className={"test"}>
-                        <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
-                    </Link>
+        <td colSpan={4} className={DeliveryTableRowClasses.root}>
+            <div className={DeliveryTableRowClasses.rowDelivery}>
+                <div className={DeliveryTableRowClasses.colDeliveryID}>
                     <Button baseClass={ButtonTypes.ICON} onClick={props.onClick}>
                         <RightChevronIcon centred={true} />
                     </Button>
+                    <Link to={"/test"} className={"test"}>
+                        {delivery.webhookDeliveryID}
+                    </Link>
                 </div>
-                <div>
-                    <DashboardMediaItem
-                        title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
-                        info=""
-                    />
+                <div className={TableColumnSize.XS}>
+                    {moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
                 </div>
-                <div>
-                    <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} info="" />
-                </div>
-                <div>
-                    <DashboardMediaItem title={String(delivery.responseCode)} info="" />
-                </div>
+                <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
+                <div className={TableColumnSize.XS}>{String(delivery.responseCode)}</div>
             </div>
             {buttonClicked && (
                 <DeliveryDetails webhookDeliveryID={delivery.webhookDeliveryID} webhookID={delivery.webhookID} />

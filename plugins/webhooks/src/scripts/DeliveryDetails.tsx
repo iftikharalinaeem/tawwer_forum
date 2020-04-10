@@ -41,17 +41,17 @@ export function DeliveryDetails(props: IProps) {
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID]);
 
-    const prettyPrintJSONString = function (paramJson) {
+    const prettyPrintJSONString = function(paramJson) {
         let parsedString = "";
-        if (paramJson != "") {
-            parsedString = JSON.stringify(paramJson, null, 2);
+        if (paramJson.length !== 0) {
+            parsedString = JSON.stringify(JSON.parse(paramJson), null, 2);
         }
         return parsedString;
     };
-    const prettyPrintHTTPHeaders = function (headers) {
+    const prettyPrintHTTPHeaders = function(headers) {
         let joinedHeaders = "";
         headers = headers.split("\n");
-        const prettyHeaders = headers.map((header) => {
+        const prettyHeaders = headers.map(header => {
             return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
         });
         joinedHeaders = prettyHeaders.join("\n");
@@ -92,9 +92,11 @@ export function DeliveryDetails(props: IProps) {
                                 <div className="Request-body">
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
-                                            escapeHTML(requestBody),
-                                        )}</pre>`}
+                                        content={`<pre class="code codeBlock">${
+                                            !!JSON.parse(requestBody)
+                                                ? escapeHTML(requestBody)
+                                                : prettyPrintJSONString(escapeHTML(requestBody))
+                                        }</pre>`}
                                     />
                                 </div>
                             </>
@@ -116,9 +118,11 @@ export function DeliveryDetails(props: IProps) {
                                 <div className="Response-body">
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
-                                            escapeHTML(responseBody),
-                                        )}</pre>`}
+                                        content={`<pre class="code codeBlock">${
+                                            !!JSON.parse(responseBody)
+                                                ? escapeHTML(responseBody)
+                                                : prettyPrintJSONString(escapeHTML(responseBody))
+                                        }</pre>`}
                                     />
                                 </div>
                             </>
