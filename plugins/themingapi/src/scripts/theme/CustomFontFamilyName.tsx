@@ -20,6 +20,9 @@ export function CustomFontFamilyName() {
             inputProps={{
                 defaultValue: initialValue,
                 value: generatedValue ?? rawValue,
+                onChange: event => {
+                    setVariableValue(customFontFamilyNameKey, event.target.value);
+                },
             }}
         />
     );

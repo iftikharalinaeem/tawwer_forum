@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import {
     useThemeBuilder,
     useThemeVariableField,
@@ -12,7 +12,11 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 
 export const customFontUrlKey = "global.fonts.customFontUrl";
 
-export function CustomFontUrl() {
+interface IProps {
+    onChange: (val: string) => void;
+}
+
+export function CustomFontUrl(props: IProps) {
     const { setVariableValue } = useThemeBuilder();
     const { generatedValue, initialValue, rawValue } = useThemeVariableField(customFontUrlKey);
     return (
@@ -20,6 +24,10 @@ export function CustomFontUrl() {
             inputProps={{
                 defaultValue: initialValue,
                 value: generatedValue ?? rawValue,
+                onChange: event => {
+                    setVariableValue(customFontUrlKey, event.target.value);
+                    props.onChange(event.target.value);
+                },
             }}
         />
     );
