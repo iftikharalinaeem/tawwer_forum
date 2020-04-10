@@ -5,7 +5,10 @@
 
 import React from "react";
 import { t } from "@vanilla/i18n";
-import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
+import {
+    ThemeBuilderBlock,
+    ThemeBuilderFontBlock,
+} from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import { GlobalPreset } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
@@ -44,9 +47,7 @@ export function ThemeBuilderSectionGlobal() {
                 <ThemeBuilderBlock label={t("Links")}>
                     <ThemeColorPicker variableKey="global.links.colors.default" />
                 </ThemeBuilderBlock>
-                <ThemeBuilderBlock label={t("Font")}>
-                    <GoogleFontDropdown />
-                </ThemeBuilderBlock>
+                <ThemeBuilderFontBlock />
             </ThemeBuilderSection>
             <ThemeBuilderSection label={t("Buttons")}>
                 <ThemeBuilderBlock label={t("Border Radius")}>
