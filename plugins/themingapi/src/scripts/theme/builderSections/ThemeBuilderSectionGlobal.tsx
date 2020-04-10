@@ -5,22 +5,24 @@
 
 import React from "react";
 import { t } from "@vanilla/i18n";
-import {
-    ThemeBuilderBlock,
-    ThemeBuilderFontBlock,
-} from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
+import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { GlobalPreset } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { GlobalPreset, globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
-import { GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
+import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
 import { buttonGlobalVariables } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
 import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
+import { CustomFontURL } from "@themingapi/theme/CustomFontFamilyName";
+import { FontFamilyName } from "../FontFamilyName";
+import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 
 export function ThemeBuilderSectionGlobal() {
+    const { generatedValue, initialValue, rawValue } = useThemeVariableField(fontKey);
+    const customFont = (generatedValue ?? rawValue) === "custom";
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.GLOBAL} />
@@ -32,7 +34,7 @@ export function ThemeBuilderSectionGlobal() {
                         { label: t("Light"), value: GlobalPreset.LIGHT },
                         { label: t("Dark"), value: GlobalPreset.DARK },
                     ]}
-                ></ThemeDropDown>
+                />
             </ThemeBuilderBlock>
             <ThemeBuilderBlock label={t("Brand Color")}>
                 <ThemeColorPicker variableKey={"global.mainColors.primary"} />
@@ -47,18 +49,30 @@ export function ThemeBuilderSectionGlobal() {
                 <ThemeBuilderBlock label={t("Links")}>
                     <ThemeColorPicker variableKey="global.links.colors.default" />
                 </ThemeBuilderBlock>
-                <ThemeBuilderFontBlock />
-            </ThemeBuilderSection>
-            <ThemeBuilderSection label={t("Buttons")}>
-                <ThemeBuilderBlock label={t("Border Radius")}>
-                    <ThemeInputNumber
-                        variableKey="global.borderType.formElements.buttons.radius"
-                        max={buttonGlobalVariables().sizing.minHeight / 2}
-                    />
+                <ThemeBuilderBlock label={t("Font")}>
+                    <GoogleFontDropdown />
                 </ThemeBuilderBlock>
-                <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
-                <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
+                {customFont && (
+                    <>
+                        <ThemeBuilderBlock label={t("Font URL")} info={undefined}>
+                            <CustomFontURL />
+                        </ThemeBuilderBlock>
+                        <ThemeBuilderBlock label={t("Font Name")} info={undefined}>
+                            <FontFamilyName />
+                        </ThemeBuilderBlock>
+                    </>
+                )}
             </ThemeBuilderSection>
+
+            <ThemeBuilderBlock label={t("Border Radius")}>
+                <ThemeInputNumber
+                    variableKey="global.borderType.formElements.buttons.radius"
+                    max={buttonGlobalVariables().sizing.minHeight / 2}
+                />
+            </ThemeBuilderBlock>
+
+            <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
+            <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
         </>
     );
 }

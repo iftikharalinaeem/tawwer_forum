@@ -7,28 +7,20 @@ import React from "react";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
 import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 
-interface IProps {
-    setCustomFont: (value: boolean) => void;
-    setInitialValue?: boolean;
-}
+export const fontKey = "global.fonts.googleFontFamily";
 
-export function GoogleFontDropdown(props: IProps) {
+export function GoogleFontDropdown() {
     const { setVariableValue, rawThemeVariables } = useThemeBuilder();
-    const { setInitialValue, setCustomFont } = props;
 
-    const variableKey = "global.fonts.googleFontFamily";
     return (
         <ThemeDropDown
             // This is actually an array, but the first is the real one. The rest are fallbacks.
-            variableKey={variableKey}
-            triggerOnChangeOnInit={true}
+            variableKey={fontKey}
             afterChange={value => {
                 setVariableValue("global.fonts.forceGoogleFont", !!value);
-                console.log("after change value: ", value);
-                console.log('after value == "custom": ', value == "custom");
-                props.setCustomFont && props.setCustomFont(value == "custom");
             }}
             options={[
+                { label: "Custom Font", value: "custom" },
                 { label: "Open Sans", value: "Open Sans" },
                 { label: "Roboto", value: "Roboto" },
                 { label: "Lato", value: "Lato" },
@@ -41,8 +33,7 @@ export function GoogleFontDropdown(props: IProps) {
                 { label: "Poppins", value: "Poppins" },
                 { label: "Nunito", value: "Nunito" },
                 { label: "PT Serif", value: "PT Serif" },
-                { label: "Custom Font", value: "custom" },
             ]}
-        ></ThemeDropDown>
+        />
     );
 }
