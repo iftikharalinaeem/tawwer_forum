@@ -3,26 +3,21 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { t } from "@vanilla/i18n";
 import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeDropDown } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeDropDown";
-import { GlobalPreset, globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
+import { GlobalPreset } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
 import { ThemeBuilderSection } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderSection";
-import { fontKey, GoogleFontDropdown } from "@themingapi/theme/GoogleFontDropdown";
 import { ThemeInputNumber } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputNumber";
 import { ThemeBuilderButtonSection } from "@themingapi/theme/builderSections/ThemeBuilderButtonSection";
 import { buttonGlobalVariables } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
 import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
-import { CustomFontURL } from "@themingapi/theme/CustomFontFamilyName";
-import { FontFamilyName } from "../FontFamilyName";
-import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
+import { ThemeBuilderFontBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderFontBlock";
 
 export function ThemeBuilderSectionGlobal() {
-    const { generatedValue, initialValue, rawValue } = useThemeVariableField(fontKey);
-    const customFont = (generatedValue ?? rawValue) === "custom";
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.GLOBAL} />
@@ -49,19 +44,7 @@ export function ThemeBuilderSectionGlobal() {
                 <ThemeBuilderBlock label={t("Links")}>
                     <ThemeColorPicker variableKey="global.links.colors.default" />
                 </ThemeBuilderBlock>
-                <ThemeBuilderBlock label={t("Font")}>
-                    <GoogleFontDropdown />
-                </ThemeBuilderBlock>
-                {customFont && (
-                    <>
-                        <ThemeBuilderBlock label={t("Font URL")} info={undefined}>
-                            <CustomFontURL />
-                        </ThemeBuilderBlock>
-                        <ThemeBuilderBlock label={t("Font Name")} info={undefined}>
-                            <FontFamilyName />
-                        </ThemeBuilderBlock>
-                    </>
-                )}
+                <ThemeBuilderFontBlock />
             </ThemeBuilderSection>
 
             <ThemeBuilderBlock label={t("Border Radius")}>

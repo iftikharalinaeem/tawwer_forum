@@ -10,11 +10,11 @@ import {
 } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 import InputTextBlock from "@library/forms/InputTextBlock";
 
-export const customFontFamilyNameKey = "global.fonts.customFontFamilyName";
+export const customFontUrlKey = "global.fonts.customFontUrl";
 
-export function CustomFontFamilyName() {
+export function CustomFontUrl() {
     const { setVariableValue } = useThemeBuilder();
-    const { generatedValue, initialValue, rawValue } = useThemeVariableField(customFontFamilyNameKey);
+    const { generatedValue, initialValue, rawValue } = useThemeVariableField(customFontUrlKey);
     return (
         <InputTextBlock
             inputProps={{
