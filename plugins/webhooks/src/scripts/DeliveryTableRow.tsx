@@ -31,12 +31,12 @@ export function DeliveryTableRow(props: IProps) {
         <td colSpan={4}>
             <div>
                 <div>
-                    <Link to={"/test"} className={"test"}>
-                        <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
-                    </Link>
                     <Button baseClass={ButtonTypes.ICON} onClick={props.onClick}>
                         <RightChevronIcon centred={true} />
                     </Button>
+                    <Link to={"/test"} className={"test"}>
+                        <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
+                    </Link>
                 </div>
                 <div>
                     <DashboardMediaItem

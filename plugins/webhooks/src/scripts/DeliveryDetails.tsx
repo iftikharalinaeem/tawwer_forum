@@ -41,8 +41,8 @@ export function DeliveryDetails(props: IProps) {
 
     const prettyPrintJSONString = function (paramJson) {
         let parsedString = "";
-        if (paramJson != "") {
-            parsedString = JSON.stringify(paramJson, null, 2);
+        if (paramJson.length !== 0) {
+            parsedString = JSON.stringify(JSON.parse(paramJson), null, 2);
         }
         return parsedString;
     };
@@ -90,9 +90,11 @@ export function DeliveryDetails(props: IProps) {
                                 <div className="Request-body">
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
-                                            escapeHTML(requestBody),
-                                        )}</pre>`}
+                                        content={`<pre class="code codeBlock">${
+                                            !!JSON.parse(requestBody)
+                                                ? escapeHTML(requestBody)
+                                                : prettyPrintJSONString(escapeHTML(requestBody))
+                                        }</pre>`}
                                     />
                                 </div>
                             </>
@@ -114,9 +116,11 @@ export function DeliveryDetails(props: IProps) {
                                 <div className="Response-body">
                                     <h4 className={deliveryDetailsClasses.title}>{body}</h4>
                                     <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
-                                            escapeHTML(responseBody),
-                                        )}</pre>`}
+                                        content={`<pre class="code codeBlock">${
+                                            !!JSON.parse(requestBody)
+                                                ? escapeHTML(requestBody)
+                                                : prettyPrintJSONString(escapeHTML(requestBody))
+                                        }</pre>`}
                                     />
                                 </div>
                             </>
