@@ -11,17 +11,16 @@ import { Link } from "react-router-dom";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RightChevronIcon } from "@library/icons/common";
-import { DeliveryDetailsCSSClasses } from "./DeliveryDetailsStyles";
 import { DeliveryDetails } from "@webhooks/DeliveryDetails";
 
 interface IProps {
     delivery: IDeliveryFragment;
     onClick?: () => void;
-    deliveryRecord?: IDelivery;
+    buttonClicked?: false;
 }
 
 export function DeliveryTableRow(props: IProps) {
-    const { delivery, deliveryRecord } = props;
+    const { delivery, buttonClicked } = props;
 
     const durationToSeconds = function (duration: number) {
         let seconds = duration / 1000;
@@ -29,30 +28,32 @@ export function DeliveryTableRow(props: IProps) {
     };
 
     return (
-        <>
-            <tr>
-                <td>
+        <td colSpan={4}>
+            <div>
+                <div>
                     <Link to={"/test"} className={"test"}>
                         <DashboardMediaItem title={delivery.webhookDeliveryID} info="" />
                     </Link>
                     <Button baseClass={ButtonTypes.ICON} onClick={props.onClick}>
                         <RightChevronIcon centred={true} />
                     </Button>
-                </td>
-                <td>
+                </div>
+                <div>
                     <DashboardMediaItem
                         title={moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
                         info=""
                     />
-                </td>
-                <td>
+                </div>
+                <div>
                     <DashboardMediaItem title={durationToSeconds(delivery.requestDuration)} info="" />
-                </td>
-                <td>
+                </div>
+                <div>
                     <DashboardMediaItem title={String(delivery.responseCode)} info="" />
-                </td>
-            </tr>
-            <DeliveryDetails deliveryRecord={deliveryRecord} />
-        </>
+                </div>
+            </div>
+            {buttonClicked && (
+                <DeliveryDetails webhookDeliveryID={delivery.webhookDeliveryID} webhookID={delivery.webhookID} />
+            )}
+        </td>
     );
 }

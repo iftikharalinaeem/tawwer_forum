@@ -22,10 +22,11 @@ export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
     const { getAll, getDeliveryByID } = useDeliveryActions();
     const { HeadItem } = DashboardTable;
-    const { deliveriesByWebhookID, deliveriesByDeliveryID } = useDeliveryData();
+    const { deliveriesByWebhookID } = useDeliveryData();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
     const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
+    const [isClicked, setIsClicked] = useState(false);
 
     useEffect(() => {
         if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
@@ -57,17 +58,20 @@ export default function DeliveryIndex() {
                     </tr>
                 }
                 body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment) => (
-                    <DeliveryTableRow
-                        key={delivery.webhookDeliveryID}
-                        delivery={delivery}
-                        deliveryRecord={deliveryRecord}
-                        onClick={() => {
-                            if (delivery.webhookDeliveryID) {
-                                getDeliveryByID(delivery.webhookID, delivery.webhookDeliveryID);
-                                setDeliveryRecord(deliveriesByDeliveryID.data);
-                            }
-                        }}
-                    />
+                    <tr key={delivery.webhookDeliveryID}>
+                        <DeliveryTableRow
+                            delivery={delivery}
+                            //deliveryRecord={deliveryRecord}
+                            buttonClicked={isClicked}
+                            onClick={() => {
+                                if (delivery.webhookDeliveryID) {
+                                    setIsClicked(true);
+                                    // getDeliveryByID(delivery.webhookID, delivery.webhookDeliveryID);
+                                    // setDeliveryRecord(delivery.webhookDeliveryID);
+                                }
+                            }}
+                        />
+                    </tr>
                 ))}
             />
 

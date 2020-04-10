@@ -3,62 +3,129 @@
  * @license Proprietary
  */
 
-import { DeliveryDetailsCSSClasses } from "./DeliveryDetailsStyles";
 import UserContent from "@vanilla/library/src/scripts/content/UserContent";
 import { escapeHTML } from "@vanilla/dom-utils";
 import { IDelivery } from "@webhooks/DeliveryTypes";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
+import Loader from "@library/loaders/Loader";
+import { LoadStatus, IFieldError } from "@library/@types/api/core";
+import { deliveryDetailsCSSClasses } from "@webhooks/DeliveryDetailsStyles";
+import { Tabs } from "@library/sectioning/Tabs";
+import { useDeliveryData } from "@webhooks/DeliveryHooks";
+import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
+import { useDeliveryActions } from "./DeliveryActions";
 
 interface IProps {
-    deliveryRecord?: IDelivery;
+    webhookID?: number;
+    webhookDeliveryID?: string;
 }
 export function DeliveryDetails(props: IProps) {
-    const { deliveryRecord } = props;
-    const DeliveryDetailsClasses = DeliveryDetailsCSSClasses();
-    const prettyPrintJSONString = function (jsonString) {
-        return JSON.stringify(JSON.parse(jsonString), null, 2);
+    const { webhookID, webhookDeliveryID } = props;
+    const { deliveriesByDeliveryID } = useDeliveryData();
+    const { getDeliveryByID } = useDeliveryActions();
+    const deliveryDetailsClasses = deliveryDetailsCSSClasses();
+    const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
+    let requestBody = "";
+    let requestHeaders = "";
+    let responseBody = "";
+    let responseHeaders = "";
+    let header = "";
+    let body = "";
+
+    useEffect(() => {
+        if (webhookID && webhookDeliveryID) {
+            getDeliveryByID(webhookID, webhookDeliveryID);
+            setDeliveryRecord(deliveriesByDeliveryID.data);
+            // alert(JSON.stringify(deliveryRecord));
+        }
+    }, [getDeliveryByID, webhookDeliveryID, webhookID]);
+
+    const prettyPrintJSONString = function (paramJson) {
+        let parsedString = "";
+        if (paramJson != "") {
+            parsedString = JSON.stringify(paramJson, null, 2);
+        }
+        return parsedString;
     };
     const prettyPrintHTTPHeaders = function (headers) {
+        let joinedHeaders = "";
         headers = headers.split("\n");
         const prettyHeaders = headers.map((header) => {
             return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
         });
-        return prettyHeaders.join("\n");
+        joinedHeaders = prettyHeaders.join("\n");
+        return joinedHeaders;
     };
 
-    let requestBody =
-        '{"action":"insert","payload":{"discussion":{"discussionID":22,"type":null,"name":"Deliveries trigger!","body":"Deliveries trigger","categoryID":7,"dateInserted":{"date":"2020-04-06 19:05:04.000000","timezone_type":3,"timezone":"UTC"},"dateUpdated":null,"dateLastComment":{"date":"2020-04-06 19:05:04.000000","timezone_type":3,"timezone":"UTC"},"insertUserID":2,"insertUser":{"userID":2,"name":"Tester_McTesterson","photoUrl":"https://dev.vanilla.localhost/uploads/userpics/357/n97D458G4MZJ8.gif","dateLastActive":{"date":"2020-04-06 19:04:13.000000","timezone_type":3,"timezone":"UTC"},"label":"admin"},"lastUser":{"userID":2,"name":"Tester_McTesterson","photoUrl":"https://dev.vanilla.localhost/uploads/userpics/357/n97D458G4MZJ8.gif","dateLastActive":{"date":"2020-04-06 19:04:13.000000","timezone_type":3,"timezone":"UTC"},"label":"admin"},"pinned":false,"pinLocation":null,"closed":false,"sink":false,"countComments":0,"countViews":1,"score":null,"url":"https://dev.vanilla.localhost/discussion/22/deliveries-trigger","canonicalUrl":"https://dev.vanilla.localhost/discussion/22/deliveries-trigger","lastPost":{"discussionID":22,"name":"Deliveries trigger!","url":"https://dev.vanilla.localhost/discussion/22/deliveries-trigger","dateInserted":{"date":"2020-04-06 19:05:04.000000","timezone_type":3,"timezone":"UTC"},"insertUserID":2,"insertUser":{"userID":2,"name":"Tester_McTesterson","photoUrl":"https://dev.vanilla.localhost/uploads/userpics/357/n97D458G4MZJ8.gif","dateLastActive":{"date":"2020-04-06 19:04:13.000000","timezone_type":3,"timezone":"UTC"},"label":"admin"}}}},"sender":{"userID":2,"name":"Tester_McTesterson","photoUrl":"https://dev.vanilla.localhost/uploads/userpics/357/n97D458G4MZJ8.gif","dateLastActive":{"date":"2020-04-06 19:04:13.000000","timezone_type":3,"timezone":"UTC"},"label":"admin"},"site":{"siteID":0}}';
-    let requestHeaders =
-        'Server: nginx\nDate: Mon, 06 Apr 2020 19:05:06 GMT\nContent-Type: application/json; charset=utf-8\nContent-Length: 16\nConnection: keep-alive\nCache-Control: no-cache, no-store, must-revalidate\nPragma: no-cache\nExpires: Fri, 31 Dec 1998 12:00:00 GMT\nX-RateLimit-Limit: 300\nX-RateLimit-Reset: 899\nX-RateLimit-Remaining: 299\nETag: W/"10-oV4hJxRVSENxc/wX8+mA4/Pe4tA"\nAccess-Control-Allow-Origin: *\nAccess-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE\nAccess-Control-Allow-Headers: DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range\nAccess-Control-Expose-Headers: Content-Length,Content-Range';
+    if (deliveriesByDeliveryID.status === LoadStatus.LOADING) {
+        return <Loader />;
+    }
 
-    if (deliveryRecord) {
-        console.log(deliveryRecord);
-        console.log(deliveryRecord.requestHeaders);
-        requestBody = deliveryRecord.requestBody;
-        requestHeaders = deliveryRecord.requestHeaders;
+    if (deliveriesByDeliveryID.data) {
+        requestBody = deliveriesByDeliveryID.data.requestBody;
+        requestHeaders = deliveriesByDeliveryID.data.requestHeaders;
+        responseBody = deliveriesByDeliveryID.data.responseBody;
+        responseHeaders = deliveriesByDeliveryID.data.responseHeaders;
+        header = "Header";
+        body = "Body";
     }
 
     return (
-        <>
-            <tr>
-                <td className={DeliveryDetailsClasses.root} colSpan={4}>
-                    <div className="Response-headers">
-                        <h4 className={DeliveryDetailsClasses.title}>{t("Headers")}</h4>
-                        <UserContent
-                            content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(requestHeaders)}</pre>`}
-                        />
-                    </div>
-                    <div className="Response-body">
-                        <h4 className={DeliveryDetailsClasses.title}>{t("Body")}</h4>
-                        <UserContent
-                            content={`<pre class="code codeBlock">${prettyPrintJSONString(
-                                escapeHTML(requestBody),
-                            )}</pre>`}
-                        />
-                    </div>
-                </td>
-            </tr>
-        </>
+        <div className={deliveryDetailsClasses.root}>
+            <Tabs
+                classes={deliveryTabsCSSClasses()}
+                data={[
+                    {
+                        label: t("Request"),
+                        panelData: "requestTab",
+                        contents: (
+                            <>
+                                <div className="Request-headers">
+                                    <h4 className={deliveryDetailsClasses.title}>{header}</h4>
+                                    <UserContent
+                                        content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                            requestHeaders,
+                                        )}</pre>`}
+                                    />
+                                </div>
+                                <div className="Request-body">
+                                    <h4 className={deliveryDetailsClasses.title}>{body}</h4>
+                                    <UserContent
+                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
+                                            escapeHTML(requestBody),
+                                        )}</pre>`}
+                                    />
+                                </div>
+                            </>
+                        ),
+                    },
+                    {
+                        label: t("Response"),
+                        panelData: "responseTab",
+                        contents: (
+                            <>
+                                <div className="Response-headers">
+                                    <h4 className={deliveryDetailsClasses.title}>{header}</h4>
+                                    <UserContent
+                                        content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                            responseHeaders,
+                                        )}</pre>`}
+                                    />
+                                </div>
+                                <div className="Response-body">
+                                    <h4 className={deliveryDetailsClasses.title}>{body}</h4>
+                                    <UserContent
+                                        content={`<pre class="code codeBlock">${prettyPrintJSONString(
+                                            escapeHTML(responseBody),
+                                        )}</pre>`}
+                                    />
+                                </div>
+                            </>
+                        ),
+                    },
+                ]}
+            />
+        </div>
     );
 }
