@@ -24,7 +24,7 @@ interface IProps {
 export function DeliveryTableRow(props: IProps) {
     const { delivery, buttonClicked } = props;
     const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
-    const durationToSeconds = function(duration: number) {
+    const durationToSeconds = function (duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
@@ -46,9 +46,9 @@ export function DeliveryTableRow(props: IProps) {
                 <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
                 <div className={TableColumnSize.XS}>{String(delivery.responseCode)}</div>
             </div>
-            {buttonClicked && (
+            {/* {buttonClicked && (
                 <DeliveryDetails webhookDeliveryID={delivery.webhookDeliveryID} webhookID={delivery.webhookID} />
-            )}
+            )} */}
         </td>
     );
 }

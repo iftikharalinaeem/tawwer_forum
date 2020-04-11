@@ -18,6 +18,7 @@ import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
 import { useHistory } from "react-router-dom";
 import { useDeliveryActions } from "@webhooks/DeliveryActions";
 import classNames from "classnames";
+import { DeliveryDetails } from "@webhooks/DeliveryDetails";
 
 export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
@@ -26,7 +27,8 @@ export default function DeliveryIndex() {
     const { deliveriesByWebhookID } = useDeliveryData();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
-    const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
+    const [deliveryID, setDeliveryID] = useState<string | null>(null);
+    const [webhookID, setWebhookID] = useState<number | null>(null);
     const [isClicked, setIsClicked] = useState(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -66,6 +68,8 @@ export default function DeliveryIndex() {
                             buttonClicked={isClicked}
                             onClick={() => {
                                 if (delivery.webhookDeliveryID) {
+                                    setDeliveryID(delivery.webhookDeliveryID);
+                                    setWebhookID(delivery.webhookID);
                                     setIsClicked(true);
                                     setIsOpen(true);
                                 }
@@ -74,7 +78,7 @@ export default function DeliveryIndex() {
                     </tr>
                 ))}
             />
-
+            {isClicked && <DeliveryDetails webhookDeliveryID={deliveryID} webhookID={webhookID} />}
             {deliveriesByWebhookID.status === LoadStatus.SUCCESS &&
                 deliveriesByWebhookID.data !== undefined &&
                 Object.entries(deliveriesByWebhookID.data).length === 0 && <EmptyDeliveriesResults />}
