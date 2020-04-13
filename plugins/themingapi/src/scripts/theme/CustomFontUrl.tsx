@@ -21,10 +21,10 @@ export function CustomFontUrl(props: IProps) {
         <ThemeInputText
             varKey={"global.fonts.customFont.url"}
             debounceTime={10}
-            forceError={true}
+            forceError={props.forceError}
             validation={newValue => {
                 if (props.forceError) {
-                    return true;
+                    return false;
                 } else {
                     return newValue !== "" || urlValidation(newValue);
                 }
