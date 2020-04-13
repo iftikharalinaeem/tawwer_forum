@@ -35,6 +35,7 @@ import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { iconClasses } from "@library/icons/iconClasses";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { PageHeading } from "@library/layout/PageHeading";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
@@ -81,7 +82,7 @@ function SearchForm(props: IProps) {
                     middleTop={
                         <>
                             <PanelWidget>
-                                <PageTitle
+                                <PageHeading
                                     className={classNames(
                                         "searchBar-heading",
                                         searchBarClasses().heading,
@@ -90,7 +91,7 @@ function SearchForm(props: IProps) {
                                     headingClassName={classNames(typographyClasses().subTitle)}
                                     title={"Search"}
                                     includeBackLink={true}
-                                    chevronClass={iconClasses().chevronLeftSmallCompact}
+                                    isCompactHeading={true}
                                 />
                                 <SearchBar
                                     placeholder={props.placeholder}
