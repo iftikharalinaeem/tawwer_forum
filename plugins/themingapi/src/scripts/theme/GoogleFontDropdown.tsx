@@ -17,7 +17,7 @@ export function GoogleFontDropdown(props: { forceDefaultKey?: string; disabled?:
         <ThemeDropDown
             // This is actually an array, but the first is the real one. The rest are fallbacks.
             variableKey={fontKey}
-            forceDefaultKey={props.forceDefaultKey}
+            forceDefaultKey={forceDefaultKey}
             disabled={!!props.forceDefaultKey || disabled}
             afterChange={value => {
                 setVariableValue("global.fonts.forceGoogleFont", value === "custom" ? false : !!value);
