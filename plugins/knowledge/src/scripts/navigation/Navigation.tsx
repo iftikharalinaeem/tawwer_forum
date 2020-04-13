@@ -12,16 +12,16 @@ import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import apiv2 from "@library/apiv2";
-import { t } from "@library/utility/appUtils";
+import { getSiteSection } from "@library/utility/appUtils";
 import SiteNav from "@library/navigation/SiteNav";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { connect } from "react-redux";
-import { LoadStatus, INavigationTreeItem, ILoadable } from "@library/@types/api/core";
+import { ILoadable, INavigationTreeItem, LoadStatus } from "@library/@types/api/core";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
+import { useArticleList } from "@knowledge/modules/article/ArticleModel";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -35,11 +35,17 @@ export function Navigation(props: IProps) {
     const preloadItem = useCallback(
         (item: INavigationTreeItem) => {
             if (item.recordType === KbRecordType.ARTICLE) {
-                void props.preloadArticle(item.recordID);
+                props.preloadArticle(item.recordID);
             }
         },
         [props],
     );
+
+    const isHelpCenter = props.knowledgeBase.data?.viewType === KbViewType.HELP;
+    const isArticleInHelpCenter = props.activeRecord.recordType === "article" && isHelpCenter;
+
+    const categoryNavData = useCurrentCategoryNav(props);
+    const currentCategoryNav = isArticleInHelpCenter ? categoryNavData : navItems.data;
 
     /**
      * Fetch navigation data when the component is mounted.
@@ -60,14 +66,15 @@ export function Navigation(props: IProps) {
         !knowledgeBase.data ||
         !navItems.data ||
         knowledgeBase.status === LoadStatus.LOADING ||
-        navItems.status === LoadStatus.LOADING
+        navItems.status === LoadStatus.LOADING ||
+        !currentCategoryNav
     ) {
         return <NavigationPlaceholder />;
     }
 
-    const hasTitle = knowledgeBase.data.viewType === KbViewType.HELP && navItems.data.length > 0;
+    const hasTitle = isHelpCenter && currentCategoryNav.length > 0;
     const clickableCategoryLabels = knowledgeBase.data.viewType === KbViewType.GUIDE;
-    const title = hasTitle ? t("Subcategories") : undefined;
+    const title = hasTitle ? props.knowledgeCategoryName : undefined;
 
     if (props.inHamburger) {
         const adminLinks = (
@@ -78,12 +85,12 @@ export function Navigation(props: IProps) {
             />
         );
 
-        if (navItems.data.length > 0) {
+        if (currentCategoryNav.length > 0) {
             return (
                 <DropDownPanelNav
                     activeRecord={props.activeRecord}
                     title={title ?? knowledgeBase.data.name}
-                    navItems={navItems.data}
+                    navItems={currentCategoryNav}
                     isNestable={props.collapsible}
                     afterNavSections={adminLinks}
                 />
@@ -99,12 +106,15 @@ export function Navigation(props: IProps) {
                 collapsible={props.collapsible}
                 activeRecord={props.activeRecord}
                 bottomCTA={
-                    <NavigationAdminLinks knowledgeBase={knowledgeBase.data} showDivider={navItems.data.length > 0} />
+                    <NavigationAdminLinks
+                        knowledgeBase={knowledgeBase.data}
+                        showDivider={currentCategoryNav.length > 0}
+                    />
                 }
                 onItemHover={preloadItem}
                 clickableCategoryLabels={clickableCategoryLabels}
             >
-                {navItems.data}
+                {currentCategoryNav}
             </SiteNav>
         );
     }
@@ -112,15 +122,18 @@ export function Navigation(props: IProps) {
 
 interface IOwnProps {
     activeRecord: IActiveRecord;
+    knowledgeCategoryID?: number | null;
     collapsible: boolean;
     kbID: number;
     inHamburger?: boolean;
+    knowledgeCategoryName?: string | undefined;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
 
 function mapStateToProps(store: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     const { navigation, knowledgeBases } = store.knowledge;
+
     const kbsByID = knowledgeBases.knowledgeBasesByID;
     const knowledgeBase: ILoadable<IKnowledgeBase> = {
         ...kbsByID,
@@ -176,6 +189,52 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
         requestKnowledgeBase: () => kbActions.getAll(),
         preloadArticle: (articleID: number) => articleActions.fetchByID({ articleID, locale: getCurrentLocale() }),
     };
+}
+
+function useCurrentCategoryNav(props) {
+    const queryParams = {
+        knowledgeCategoryID: props.knowledgeCategoryID,
+        siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+        locale: getSiteSection().contentLocale,
+        page: 1,
+        limit: 10,
+    };
+    const articles = useArticleList(queryParams);
+    const { data, status } = articles;
+    const articleList = articles.data?.body;
+    const articlePages = articles.data?.pagination.next;
+
+    return useMemo(() => {
+        if (articleList) {
+            let navTreeItems: INavigationTreeItem[] = articleList.map(article => {
+                return {
+                    name: article.name,
+                    url: article.url,
+                    recordID: article.recordID,
+                    parentID: props.knowledgeCategoryID,
+                    sort: null,
+                    recordType: "article",
+                    isLink: false,
+                    children: [],
+                };
+            });
+
+            if (articlePages) {
+                navTreeItems.push({
+                    name: "View All",
+                    url: `/kb/categories/${queryParams.knowledgeCategoryID}`,
+                    recordID: 1,
+                    parentID: 1,
+                    sort: null,
+                    recordType: "link",
+                    isLink: true,
+                    children: [],
+                });
+            }
+
+            return navTreeItems;
+        }
+    }, [data, status]);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation);
