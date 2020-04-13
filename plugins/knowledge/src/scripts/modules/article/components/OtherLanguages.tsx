@@ -16,10 +16,13 @@ import classNames from "classnames";
 import * as React from "react";
 import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconClasses";
+import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 
 export interface IOtherLangaugesProps {
     articleLocaleData: IArticleLocale[];
     dateUpdated?: string;
+    knowledgeBaseID: number;
 }
 
 /**
@@ -28,36 +31,53 @@ export interface IOtherLangaugesProps {
 export default function OtherLangauges(props: IOtherLangaugesProps) {
     const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
+    const kb = useKnowledgeBase(props.knowledgeBaseID);
     const classesPanelList = panelListClasses();
 
     const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
     if (!showPicker || !currentLocale) {
         return null;
     }
-    const options: ISelectBoxItem[] = props.articleLocaleData.map((data, index) => {
-        return {
-            value: data.locale,
-            icon: data.translationStatus === "not-translated" && (
-                <ToolTip label={t("This article is not translated yet or it is out of date.")}>
-                    <ToolTipIcon>
-                        <WarningIcon className={classNames(iconClasses().errorFgColor)} />
-                    </ToolTipIcon>
-                </ToolTip>
-            ),
-            content: <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />,
-            url: data.url,
-        };
-    });
 
+    const options: ISelectBoxItem[] = props.articleLocaleData
+        .filter(data => {
+            let showArticleLocaleStatus =
+                !hasPermission("articles.add", {
+                    mode: kb.data?.hasCustomPermission ? PermissionMode.RESOURCE : PermissionMode.GLOBAL,
+                    resourceID: props.knowledgeBaseID,
+                    resourceType: "knowledgeBase",
+                }) && data.translationStatus === "not-translated";
+            if (!showArticleLocaleStatus) {
+                return data;
+            }
+        })
+        .map((data, index) => {
+            return {
+                value: data.locale,
+                icon: data.translationStatus === "not-translated" && (
+                    <ToolTip label={t("This article is not translated yet or it is out of date.")}>
+                        <ToolTipIcon>
+                            <WarningIcon className={classNames(iconClasses().errorFgColor)} />
+                        </ToolTipIcon>
+                    </ToolTip>
+                ),
+                content: <LocaleDisplayer displayLocale={data.locale} localeContent={data.locale} />,
+                url: data.url,
+                requiresPermission: "articles.add",
+                itemStatus: data.translationStatus === "not-translated",
+            };
+        });
+    const showOtherLanguages = options.length > 1;
     const activeOption = options.find(option => option.value === currentLocale);
 
-    return (
+    return showOtherLanguages ? (
         <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
             <Heading
                 title={t("Other Languages")}
                 className={classNames("panelList-title", classesPanelList.title)}
                 id={titleID}
             />
+
             <SelectBox
                 widthOfParent={true}
                 className="otherLanguages-select"
@@ -68,5 +88,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                 offsetPadding={true}
             />
         </div>
+    ) : (
+        <></>
     );
 }

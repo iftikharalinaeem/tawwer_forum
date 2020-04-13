@@ -90,7 +90,7 @@ export default function ArticleLayout(props: IProps) {
     const otherLanguagesComponent = !articlelocales ? (
         <OtherLangaugesPlaceHolder />
     ) : (
-        <OtherLanguages articleLocaleData={articlelocales} />
+        <OtherLanguages articleLocaleData={articlelocales} knowledgeBaseID={article.knowledgeBaseID} />
     );
 
     return (
