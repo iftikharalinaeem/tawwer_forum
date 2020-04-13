@@ -3,7 +3,6 @@
  * @license Proprietary
  */
 
-import { DashboardMediaItem } from "@dashboard/tables/DashboardMediaItem";
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
 import React from "react";
 import moment from "moment";
@@ -12,17 +11,17 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RightChevronIcon } from "@library/icons/common";
 import { DeliveryDetails } from "@webhooks/DeliveryDetails";
-import { deliveryTableRowCSSClasses, deliveryTableRowCSS } from "@webhooks/DeliveryTableRowStyles";
+import { deliveryTableRowCSSClasses } from "@webhooks/DeliveryTableRowStyles";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 
 interface IProps {
     delivery: IDeliveryFragment;
     onClick?: () => void;
-    buttonClicked?: false;
+    isActive: false;
 }
 
 export function DeliveryTableRow(props: IProps) {
-    const { delivery, buttonClicked } = props;
+    let { delivery, isActive } = props;
     const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
     const durationToSeconds = function (duration: number) {
         let seconds = duration / 1000;
@@ -32,6 +31,8 @@ export function DeliveryTableRow(props: IProps) {
     return (
         <td colSpan={4} className={DeliveryTableRowClasses.root}>
             <div className={DeliveryTableRowClasses.rowDelivery}>
+                {console.log("isActive")}
+                {console.log(isActive)}
                 <div className={DeliveryTableRowClasses.colDeliveryID}>
                     <Button baseClass={ButtonTypes.ICON} className="collapseDeliveryButton" onClick={props.onClick}>
                         <RightChevronIcon centred={true} />
@@ -46,9 +47,10 @@ export function DeliveryTableRow(props: IProps) {
                 <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
                 <div className={TableColumnSize.XS}>{String(delivery.responseCode)}</div>
             </div>
-            {/* {buttonClicked && (
+
+            {isActive && (
                 <DeliveryDetails webhookDeliveryID={delivery.webhookDeliveryID} webhookID={delivery.webhookID} />
-            )} */}
+            )}
         </td>
     );
 }

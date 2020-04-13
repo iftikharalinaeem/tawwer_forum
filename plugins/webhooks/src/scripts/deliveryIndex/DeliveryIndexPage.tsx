@@ -27,10 +27,8 @@ export default function DeliveryIndex() {
     const { deliveriesByWebhookID } = useDeliveryData();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
-    const [deliveryID, setDeliveryID] = useState<string | null>(null);
-    const [webhookID, setWebhookID] = useState<number | null>(null);
-    const [isClicked, setIsClicked] = useState(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState(-1);
 
     useEffect(() => {
         if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
@@ -61,24 +59,28 @@ export default function DeliveryIndex() {
                         <HeadItem size={TableColumnSize.XS}>{t("Status")}</HeadItem>
                     </tr>
                 }
-                body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment) => (
-                    <tr key={delivery.webhookDeliveryID} className={classNames(isOpen ? "isOpen" : "")}>
-                        <DeliveryTableRow
-                            delivery={delivery}
-                            buttonClicked={isClicked}
-                            onClick={() => {
-                                if (delivery.webhookDeliveryID) {
-                                    setDeliveryID(delivery.webhookDeliveryID);
-                                    setWebhookID(delivery.webhookID);
-                                    setIsClicked(true);
-                                    setIsOpen(true);
-                                }
-                            }}
-                        />
-                    </tr>
-                ))}
+                body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment, index: number) => {
+                    let isActive = activeTab === index;
+                    return (
+                        <tr
+                            key={delivery.webhookDeliveryID}
+                            className={classNames(isOpen && activeTab === index ? "isOpen" : "")}
+                        >
+                            <DeliveryTableRow
+                                delivery={delivery}
+                                isActive={activeTab === index}
+                                onClick={() => {
+                                    if (delivery.webhookDeliveryID) {
+                                        setIsOpen(true);
+                                        setActiveTab(index);
+                                    }
+                                }}
+                            />
+                        </tr>
+                    );
+                })}
             />
-            {isClicked && <DeliveryDetails webhookDeliveryID={deliveryID} webhookID={webhookID} />}
+
             {deliveriesByWebhookID.status === LoadStatus.SUCCESS &&
                 deliveriesByWebhookID.data !== undefined &&
                 Object.entries(deliveriesByWebhookID.data).length === 0 && <EmptyDeliveriesResults />}

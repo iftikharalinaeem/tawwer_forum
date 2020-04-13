@@ -39,7 +39,7 @@ export function DeliveryDetails(props: IProps) {
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID]);
 
-    const isJson = function(str) {
+    const isJson = function (str) {
         try {
             JSON.parse(str);
         } catch (e) {
@@ -48,17 +48,17 @@ export function DeliveryDetails(props: IProps) {
         return true;
     };
 
-    const prettyPrintJSONString = function(paramJson) {
+    const prettyPrintJSONString = function (paramJson) {
         let parsedString = "";
         if (paramJson.length !== 0) {
             parsedString = JSON.stringify(JSON.parse(paramJson), null, 2);
         }
         return parsedString;
     };
-    const prettyPrintHTTPHeaders = function(headers) {
+    const prettyPrintHTTPHeaders = function (headers) {
         let joinedHeaders = "";
         headers = headers.split("\n");
-        const prettyHeaders = headers.map(header => {
+        const prettyHeaders = headers.map((header) => {
             return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
         });
         joinedHeaders = prettyHeaders.join("\n");
