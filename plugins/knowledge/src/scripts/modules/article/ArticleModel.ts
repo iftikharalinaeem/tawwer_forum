@@ -25,6 +25,7 @@ import { hashString } from "@vanilla/utils";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { ILinkPages, IWithPagination } from "@library/navigation/SimplePagerModel";
+import { getSiteSection } from "@library/utility/appUtils";
 
 export interface IArticleState {
     articlesByID: {
@@ -369,6 +370,7 @@ export function hashArticleListParams(params: ISearchRequestBody): number {
 export function useArticleList(params: ISearchRequestBody) {
     const hash = hashArticleListParams(params);
     const actions = useArticleActions();
+
     const existingList = useSelector((state: IKnowledgeAppStoreState) =>
         ArticleModel.selectArticleListByParams(state, params),
     );

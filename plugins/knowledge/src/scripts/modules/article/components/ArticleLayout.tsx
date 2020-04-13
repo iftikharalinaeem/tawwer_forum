@@ -105,6 +105,8 @@ export default function ArticleLayout(props: IProps) {
                         activeRecord={activeRecord}
                         kbID={article.knowledgeBaseID}
                         inHamburger
+                        knowledgeCategoryID={article.knowledgeCategoryID}
+                        knowledgeCategoryName={title}
                     />
                 }
             />
@@ -125,7 +127,13 @@ export default function ArticleLayout(props: IProps) {
                     }
                     leftBottom={
                         <PanelWidget>
-                            <Navigation collapsible={true} activeRecord={activeRecord} kbID={article.knowledgeBaseID} />
+                            <Navigation
+                                collapsible={true}
+                                activeRecord={activeRecord}
+                                kbID={article.knowledgeBaseID}
+                                knowledgeCategoryID={article.knowledgeCategoryID}
+                                knowledgeCategoryName={title}
+                            />
                         </PanelWidget>
                     }
                     middleTop={

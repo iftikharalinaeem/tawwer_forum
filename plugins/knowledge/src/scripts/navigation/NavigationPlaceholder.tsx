@@ -14,6 +14,10 @@ export function NavigationPlaceholder() {
             <LoadingRectange height={12} width={"70%"} />
             <LoadingSpacer height={18} />
             <LoadingRectange height={12} width={"80%"} />
+            <LoadingSpacer height={18} />
+            <LoadingRectange height={12} width={"80%"} />
+            <LoadingSpacer height={18} />
+            <LoadingRectange height={12} width={"80%"} />
         </div>
     );
 }

@@ -39,6 +39,7 @@ import {
     IGetRevisionResponseBody,
 } from "@knowledge/@types/api/articleRevision";
 import ArticleModel from "@knowledge/modules/article/ArticleModel";
+import { USE_GET_ARTICLES_PARAMS } from "@knowledge/constants";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { IApiError, IApiResponse, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -102,16 +103,37 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     >("GET_ARTICLE_LIST");
 
     public getArticleList = (params: ISearchRequestBody, force?: boolean) => {
+        const useArticlesGet = JSON.stringify(Object.keys(params)) === JSON.stringify(USE_GET_ARTICLES_PARAMS);
+
+        const uri = useArticlesGet ? "/articles" : "/knowledge/search";
         const existingList = ArticleModel.selectArticleListByParams(this.getState(), params);
 
         if (!force && existingList.status !== LoadStatus.PENDING) {
             return Promise.resolve(existingList);
         }
-
         const thunk = bindThunkAction(ArticleActions.getArticleListACs, async () => {
-            const response = await this.api.get("/knowledge/search", { params });
+            const response = await this.api.get(uri, { params });
+            const responseBody = useArticlesGet
+                ? response.data.map(value => {
+                      return {
+                          name: value.name,
+                          body: "",
+                          url: value.url,
+                          insertUserID: value.insertUserID,
+                          updateUserID: value.updateUser.userID,
+                          dateInserted: value.dateInserted,
+                          dateUpdated: value.dateUpdated,
+                          knowledgeCategoryID: value.knowledgeCategoryID,
+                          status: value.status,
+                          recordID: value.articleID,
+                          recordType: "article",
+                          breadcrumbs: { name: value.name, url: value.url },
+                      };
+                  })
+                : response.data;
+
             return {
-                body: response.data,
+                body: responseBody,
                 pagination: SimplePagerModel.parseLinkHeader(response.headers["link"], "page"),
             };
         })(params);

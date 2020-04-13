@@ -12,6 +12,7 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { getCurrentLocale } from "@vanilla/i18n";
 import actionCreatorFactory from "typescript-fsa";
 import { IArticle } from "@knowledge/@types/api/article";
+import { getSiteSection } from "@library/utility/appUtils";
 
 const createAction = actionCreatorFactory("@@articlePage");
 
@@ -62,12 +63,23 @@ export default class ArticlePageActions extends ReduxActions<IKnowledgeAppStoreS
         }
     };
 
+    private loadArticlesInThisKnowledgeCategory = async id => {
+        await this.articleActions.getArticleList({
+            knowledgeCategoryID: id,
+            siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
+            locale: getCurrentLocale(),
+            page: 1,
+            limit: 10,
+        });
+    };
+
     public init = async (articleID: number) => {
         const promises = [
-            this.takeArticleFromCacheOrRequest(articleID).then(article => {
+            await this.takeArticleFromCacheOrRequest(articleID).then(article => {
                 if (article) {
                     const kbID = article.knowledgeBaseID;
                     void this.navigationActions.getNavigationFlat(kbID);
+                    this.loadArticlesInThisKnowledgeCategory(article?.knowledgeCategoryID);
                 }
                 return article;
             }),
