@@ -4,7 +4,7 @@
  */
 
 import { useThemeCache, styleFactory, variableFactory } from "@library/styles/styleUtils";
-import { paddings, singleBorder, margins, colorOut } from "@library/styles/styleHelpers";
+import { paddings, singleBorder, margins, colorOut, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { calc, quote, percent } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles";
@@ -60,13 +60,22 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
         },
     });
 
-    cssOut(".collapseDeliveryButton", {
+    cssOut(".collapseIcon", {
+        marginRight: unit(globalVars.gutter.size),
         transition: `transform ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
+    });
+
+    cssOut("tr", {
+        $nest: {
+            ".collapseDeliveryButton": {
+                width: "auto",
+            },
+        },
     });
 
     cssOut("tr.isOpen", {
         $nest: {
-            ".collapseDeliveryButton": {
+            ".collapseIcon": {
                 transform: "rotate(90deg)",
             },
         },

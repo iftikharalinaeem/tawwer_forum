@@ -16,14 +16,14 @@ import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 
 interface IProps {
     delivery: IDeliveryFragment;
-    onClick?: () => void;
-    isActive: false;
+    onClick?: (e) => void;
+    isActive: boolean;
 }
 
 export function DeliveryTableRow(props: IProps) {
     let { delivery, isActive } = props;
     const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
-    const durationToSeconds = function (duration: number) {
+    const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
@@ -31,15 +31,13 @@ export function DeliveryTableRow(props: IProps) {
     return (
         <td colSpan={4} className={DeliveryTableRowClasses.root}>
             <div className={DeliveryTableRowClasses.rowDelivery}>
-                {console.log("isActive")}
-                {console.log(isActive)}
                 <div className={DeliveryTableRowClasses.colDeliveryID}>
                     <Button baseClass={ButtonTypes.ICON} className="collapseDeliveryButton" onClick={props.onClick}>
-                        <RightChevronIcon centred={true} />
+                        <span className="collapseIcon">
+                            <RightChevronIcon centred={true} />
+                        </span>
+                        <span>{delivery.webhookDeliveryID}</span>
                     </Button>
-                    <Link to={"/test"} className={"test"}>
-                        {delivery.webhookDeliveryID}
-                    </Link>
                 </div>
                 <div className={TableColumnSize.XS}>
                     {moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
@@ -47,10 +45,11 @@ export function DeliveryTableRow(props: IProps) {
                 <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
                 <div className={TableColumnSize.XS}>{String(delivery.responseCode)}</div>
             </div>
-
-            {isActive && (
-                <DeliveryDetails webhookDeliveryID={delivery.webhookDeliveryID} webhookID={delivery.webhookID} />
-            )}
+            <DeliveryDetails
+                webhookDeliveryID={delivery.webhookDeliveryID}
+                webhookID={delivery.webhookID}
+                isActive={isActive}
+            />
         </td>
     );
 }

@@ -14,23 +14,23 @@ import { Tabs } from "@library/sectioning/Tabs";
 import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
 import { useDeliveryActions } from "./DeliveryActions";
+import classNames from "classnames";
 
 interface IProps {
     webhookID?: number;
     webhookDeliveryID?: string;
+    isActive: boolean;
 }
 export function DeliveryDetails(props: IProps) {
-    const { webhookID, webhookDeliveryID } = props;
+    const { webhookID, webhookDeliveryID, isActive } = props;
     const { deliveriesByDeliveryID } = useDeliveryData();
     const { getDeliveryByID } = useDeliveryActions();
     const deliveryDetailsClasses = deliveryDetailsCSSClasses();
     const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
-    let requestBody = "";
-    let requestHeaders = "";
-    let responseBody = "";
-    let responseHeaders = "";
-    let header = "";
-    let body = "";
+    let requestBody;
+    let requestHeaders;
+    let responseBody;
+    let responseHeaders;
 
     useEffect(() => {
         if (webhookID && webhookDeliveryID) {
@@ -39,7 +39,7 @@ export function DeliveryDetails(props: IProps) {
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID]);
 
-    const isJson = function (str) {
+    const isJson = function(str) {
         try {
             JSON.parse(str);
         } catch (e) {
@@ -48,20 +48,22 @@ export function DeliveryDetails(props: IProps) {
         return true;
     };
 
-    const prettyPrintJSONString = function (paramJson) {
+    const prettyPrintJSONString = function(paramJson) {
         let parsedString = "";
         if (paramJson.length !== 0) {
             parsedString = JSON.stringify(JSON.parse(paramJson), null, 2);
         }
         return parsedString;
     };
-    const prettyPrintHTTPHeaders = function (headers) {
+    const prettyPrintHTTPHeaders = function(headers) {
         let joinedHeaders = "";
-        headers = headers.split("\n");
-        const prettyHeaders = headers.map((header) => {
-            return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
-        });
-        joinedHeaders = prettyHeaders.join("\n");
+        if (typeof headers !== "undefined") {
+            headers = headers.split("\n");
+            const prettyHeaders = headers.map(header => {
+                return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
+            });
+            joinedHeaders = prettyHeaders.join("\n");
+        }
         return joinedHeaders;
     };
 
@@ -74,12 +76,10 @@ export function DeliveryDetails(props: IProps) {
         requestHeaders = deliveriesByDeliveryID.data.requestHeaders;
         responseBody = deliveriesByDeliveryID.data.responseBody;
         responseHeaders = deliveriesByDeliveryID.data.responseHeaders;
-        header = "Header";
-        body = "Body";
     }
 
     return (
-        <div className={deliveryDetailsClasses.root}>
+        <div className={classNames(deliveryDetailsClasses.root, isActive ? "isActive" : "")} data-collapsed={!isActive}>
             <Tabs
                 classes={deliveryTabsCSSClasses()}
                 data={[
@@ -89,7 +89,7 @@ export function DeliveryDetails(props: IProps) {
                         contents: (
                             <>
                                 <div className="Request-headers">
-                                    <h4 className={deliveryDetailsClasses.title}>{header}</h4>
+                                    <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
                                             requestHeaders,
@@ -97,7 +97,7 @@ export function DeliveryDetails(props: IProps) {
                                     />
                                 </div>
                                 <div className="Request-body">
-                                    <h4 className={deliveryDetailsClasses.title}>{body}</h4>
+                                    <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${
                                             isJson(requestBody)
@@ -115,7 +115,7 @@ export function DeliveryDetails(props: IProps) {
                         contents: (
                             <>
                                 <div className="Response-headers">
-                                    <h4 className={deliveryDetailsClasses.title}>{header}</h4>
+                                    <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
                                             responseHeaders,
@@ -123,12 +123,12 @@ export function DeliveryDetails(props: IProps) {
                                     />
                                 </div>
                                 <div className="Response-body">
-                                    <h4 className={deliveryDetailsClasses.title}>{body}</h4>
+                                    <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
                                     <UserContent
                                         content={`<pre class="code codeBlock">${
-                                            isJson(requestBody)
-                                                ? prettyPrintJSONString(escapeHTML(requestBody))
-                                                : escapeHTML(requestBody)
+                                            isJson(responseBody)
+                                                ? prettyPrintJSONString(escapeHTML(responseBody))
+                                                : escapeHTML(responseBody)
                                         }</pre>`}
                                     />
                                 </div>

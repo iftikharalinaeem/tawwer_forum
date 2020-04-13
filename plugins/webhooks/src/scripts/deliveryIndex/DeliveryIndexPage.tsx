@@ -18,16 +18,14 @@ import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
 import { useHistory } from "react-router-dom";
 import { useDeliveryActions } from "@webhooks/DeliveryActions";
 import classNames from "classnames";
-import { DeliveryDetails } from "@webhooks/DeliveryDetails";
 
 export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
-    const { getAll, getDeliveryByID } = useDeliveryActions();
+    const { getAll } = useDeliveryActions();
     const { HeadItem } = DashboardTable;
     const { deliveriesByWebhookID } = useDeliveryData();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
-    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState(-1);
 
     useEffect(() => {
@@ -64,16 +62,15 @@ export default function DeliveryIndex() {
                     return (
                         <tr
                             key={delivery.webhookDeliveryID}
-                            className={classNames(isOpen && activeTab === index ? "isOpen" : "")}
+                            data-index={index}
+                            className={classNames(isActive ? "isOpen" : "")}
                         >
                             <DeliveryTableRow
                                 delivery={delivery}
-                                isActive={activeTab === index}
-                                onClick={() => {
-                                    if (delivery.webhookDeliveryID) {
-                                        setIsOpen(true);
-                                        setActiveTab(index);
-                                    }
+                                isActive={isActive}
+                                onClick={e => {
+                                    console.log(e.target);
+                                    setActiveTab(index);
                                 }}
                             />
                         </tr>

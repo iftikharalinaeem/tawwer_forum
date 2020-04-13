@@ -4,7 +4,7 @@
  */
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { paddings, margins, unit, colorOut } from "@library/styles/styleHelpers";
+import { paddings, margins, unit, colorOut, defaultTransition } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles";
 
@@ -16,9 +16,21 @@ export const deliveryDetailsCSSClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 padding: 0,
+                height: 0,
+                overflow: "hidden",
+                willChange: "height",
+                ...defaultTransition("height"),
+            },
+            "&&.isActive": {
+                height: "auto",
             },
             "&:hover, &:focus": {
                 backgroundColor: colorOut(globalVars.mainColors.bg),
+            },
+            ".userContent": {
+                ...margins({
+                    bottom: unit(26),
+                }),
             },
         },
     });
