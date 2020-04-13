@@ -46,7 +46,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
-    bodyCSS();
 
     let themeID = props.match.params.id;
 
