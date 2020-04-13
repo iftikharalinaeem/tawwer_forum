@@ -3,32 +3,82 @@
  * @license Proprietary
  */
 
-import React, { useState } from "react";
-import {
-    useThemeBuilder,
-    useThemeVariableField,
-} from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
-import InputTextBlock from "@library/forms/InputTextBlock";
+import React from "react";
+import { isAllowedUrl } from "@library/utility/appUtils";
+import { t } from "@vanilla/i18n/src";
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 
-export const customFontUrlKey = "global.fonts.customFontUrl";
+interface IProps {}
 
-interface IProps {
-    onChange: (val: string) => void;
+function urlValidation(url: any) {
+    return url ? isAllowedUrl(url.toString()) : false;
 }
 
 export function CustomFontUrl(props: IProps) {
-    const { setVariableValue } = useThemeBuilder();
-    const { generatedValue, initialValue, rawValue } = useThemeVariableField(customFontUrlKey);
+    return (
+        <ThemeInputText
+            varKey={"global.fonts.customFont.url"}
+            debounceTime={10}
+            validation={newValue => {
+                return newValue !== "" || urlValidation(newValue);
+            }}
+            errorMessage={t("Invalid URL")}
+        />
+    );
+
+    /*
+    // const { setVariableValue } = useThemeBuilder();
+
+    const { generatedValue, initialValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField(
+        customFontUrlKey,
+    );
+
+    // const { generatedValue, initialValue } = useThemeVariableField(customFontUrlKey);
+    const [valid, setValid] = useState(false);
+
+    useEffect(() => {
+        setValid(generatedValue !== "" || urlValidation(generatedValue));
+    }, [generatedValue]);
+
+    // initial value
+    useEffect(() => {
+        setValid(generatedValue !== "" || urlValidation(initialValue));
+    }, []);
+
+    // Debounced internal function for onPickerChange.
+    // Be sure to always use it through the following ref so that we the function identitity,
+    // While still preserving the debounce.
+    // This article explains the issue being worked around here https://dmitripavlutin.com/react-hooks-stale-closures/
+    const _debounceInput = useCallback(
+        debounce(
+            (newValue: string) => {
+                setValue(newValue);
+            },
+            16,
+            { trailing: true },
+        ),
+        [],
+    );
+
     return (
         <InputTextBlock
+            errors={
+                valid
+                    ? undefined
+                    : [
+                          {
+                              message: t("Invalid URL"),
+                          },
+                      ]
+            }
             inputProps={{
                 defaultValue: initialValue,
-                value: generatedValue ?? rawValue,
+                value: generatedValue,
                 onChange: event => {
-                    setVariableValue(customFontUrlKey, event.target.value);
-                    props.onChange(event.target.value);
+                    _debounceInput(event.target.value);
                 },
             }}
         />
     );
+    */
 }

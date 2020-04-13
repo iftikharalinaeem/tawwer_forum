@@ -22,6 +22,7 @@ import {
 import { ThemeBuilderSectionContentBanner } from "@themingapi/theme/builderSections/ThemeBuilderSectionContentBanner";
 import { ErrorBoundary } from "@vanilla/library/src/scripts/errorPages/ErrorBoundary";
 import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 
 export interface IThemeBuilderForm {
     variables?: IThemeVariables;
@@ -31,7 +32,7 @@ export default function ThemeBuilderPanel() {
     const classes = themeBuilderClasses();
     const { updateAssets } = useThemeActions();
     const { sendMessage } = useIFrameCommunication();
-    const variables = useThemeEditorState().form?.assets.variables?.data;
+    const variables = useThemeEditorState()?.form?.assets.variables?.data;
 
     return (
         <ErrorBoundary>

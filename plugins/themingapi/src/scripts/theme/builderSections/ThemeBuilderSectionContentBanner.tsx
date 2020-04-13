@@ -24,8 +24,6 @@ import {
 } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
 
 export function ThemeBuilderSectionContentBanner() {
-    const { setVariableValue } = useThemeBuilder();
-
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.CONTENT_BANNER} />

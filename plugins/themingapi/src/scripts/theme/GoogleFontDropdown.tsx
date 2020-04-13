@@ -17,7 +17,7 @@ export function GoogleFontDropdown() {
             // This is actually an array, but the first is the real one. The rest are fallbacks.
             variableKey={fontKey}
             afterChange={value => {
-                setVariableValue("global.fonts.forceGoogleFont", !!value);
+                setVariableValue("global.fonts.forceGoogleFont", value === "custom" ? false : !!value);
             }}
             options={[
                 { label: "Custom Font", value: "custom" },
