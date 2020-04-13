@@ -30,6 +30,7 @@ export default class PageTitle extends React.Component<IPageTitle> {
     public render() {
         const classes = pageTitleClasses();
         const classesMetas = metasClasses();
+
         return (
             <div className={classNames("pageTitleContainer", this.props.className)}>
                 <PageHeading

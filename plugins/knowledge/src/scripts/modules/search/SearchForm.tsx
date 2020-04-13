@@ -29,6 +29,13 @@ import { useEffect, useCallback } from "react";
 import { useHistory } from "react-router";
 import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import { pageTitleClasses } from "@library/layout/pageTitleStyles";
+import classNames from "classnames";
+import { typographyClasses } from "@library/styles/typographyStyles";
+import { iconClasses } from "@library/icons/iconClasses";
+import { searchBarClasses } from "@library/features/search/searchBarStyles";
+import { PageHeading } from "@library/layout/PageHeading";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
@@ -39,7 +46,7 @@ function SearchForm(props: IProps) {
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
-
+    const classes = pageTitleClasses();
     useQueryParamSynchronization();
     useSearchContextValueSync();
 
@@ -75,6 +82,17 @@ function SearchForm(props: IProps) {
                     middleTop={
                         <>
                             <PanelWidget>
+                                <PageHeading
+                                    className={classNames(
+                                        "searchBar-heading",
+                                        searchBarClasses().heading,
+                                        classes.smallBackLink,
+                                    )}
+                                    headingClassName={classNames(typographyClasses().subTitle)}
+                                    title={"Search"}
+                                    includeBackLink={true}
+                                    isCompactHeading={true}
+                                />
                                 <SearchBar
                                     placeholder={props.placeholder}
                                     onChange={newQuery => updateForm({ query: newQuery })}
@@ -83,7 +101,6 @@ function SearchForm(props: IProps) {
                                     isLoading={results.status === LoadStatus.LOADING}
                                     optionComponent={SearchOption}
                                     triggerSearchOnClear={true}
-                                    title={t("Search")}
                                     titleAsComponent={t("Search")}
                                     handleOnKeyDown={event => {
                                         if (event.key === "Enter") {
@@ -92,7 +109,7 @@ function SearchForm(props: IProps) {
                                     }}
                                     disableAutocomplete={true}
                                     buttonBaseClass={ButtonTypes.PRIMARY}
-                                    needsPageTitle={true}
+                                    needsPageTitle={false}
                                 />
                             </PanelWidget>
                             {isMobile && (
