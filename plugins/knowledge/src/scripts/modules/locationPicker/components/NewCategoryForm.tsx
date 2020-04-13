@@ -22,6 +22,7 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
+import { LoadStatus } from "@library/@types/api/core";
 
 interface IProps {
     isVisible: boolean;
@@ -133,13 +134,22 @@ export default class NewCategoryForm extends React.Component<IProps, IState> {
             isSubmitLoading: true,
         });
 
-        await this.categoryActions.postCategory({
+        let successfulPost = await this.categoryActions.postCategory({
             name: this.state.categoryName,
             parentID: parentCategoryID,
         });
 
         if (this.props.onSuccessfulSubmit) {
             await this.props.onSuccessfulSubmit();
+        }
+
+        if (successfulPost?.data.knowledgeCategoryID) {
+            this.setState({
+                valid: false,
+                categoryName: "",
+                url: "",
+                isSubmitLoading: false,
+            });
         }
 
         this.props.exitHandler(e);
