@@ -92,7 +92,6 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                     $roles[] = is_string($roleKey) ? self::$content['roles'][$roleKey]['roleID'] : $roleKey;
                 }
             }
-
             $res[$userKey] = $this->api()->post(
                 '/users',
                 [
