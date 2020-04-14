@@ -12,10 +12,10 @@ import { LoadStatus, IFieldError } from "@library/@types/api/core";
 import { deliveryDetailsCSSClasses } from "@webhooks/DeliveryDetailsStyles";
 import { Tabs } from "@library/sectioning/Tabs";
 import { useDeliveryData } from "@webhooks/DeliveryHooks";
-import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
 import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
 import { IDelivery } from "./DeliveryTypes";
+import { TabsTypes } from "@vanilla/library/src/scripts/sectioning/tabsTypes";
 
 interface IProps {
     webhookID: number;
@@ -88,7 +88,7 @@ export function DeliveryDetails(props: IProps) {
         >
             {deliveryRecord !== undefined && (
                 <Tabs
-                    classes={deliveryTabsCSSClasses()}
+                    tabType={TabsTypes.BROWSE}
                     data={[
                         {
                             label: t("Request"),
