@@ -27,10 +27,10 @@ export function useDelivery(webhookID?: number, deliveryID?: string): ILoadable<
     const { getDeliveryByID } = useDeliveryActions();
 
     useEffect(() => {
-        if (deliveriesByDeliveryID.status === LoadStatus.PENDING && deliveryID) {
+        if (deliveriesByDeliveryID.status === LoadStatus.PENDING && deliveryID && webhookID) {
             void getDeliveryByID(webhookID, deliveryID);
         }
-    }, [getDeliveryByID, deliveriesByDeliveryID, deliveryID]);
+    }, [getDeliveryByID, deliveriesByDeliveryID, deliveryID, webhookID]);
 
     return deliveriesByDeliveryID;
 }
