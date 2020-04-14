@@ -8,7 +8,6 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { IDeliveryState, IDeliveryFragment, INITIAL_DELIVERY_STATE, IDelivery } from "./DeliveryTypes";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { DeliveryActions } from "@webhooks/DeliveryActions";
-import { action } from "@storybook/addon-actions";
 
 export const DeliveryReducer = produce(
     reducerWithInitialState<IDeliveryState>(INITIAL_DELIVERY_STATE)
@@ -38,18 +37,15 @@ export const DeliveryReducer = produce(
         })
 
         .case(DeliveryActions.getDeliveryByIDACs.started, (state, action) => {
-            console.log(action);
             state.deliveriesByDeliveryID[action.deliveryID] = {
                 status: LoadStatus.LOADING,
             };
             return state;
         })
         .case(DeliveryActions.getDeliveryByIDACs.failed, (state, action) => {
-            console.log(action);
             if (action.params) {
                 state.deliveriesByDeliveryID[action.params.deliveryID].status = LoadStatus.ERROR;
                 state.deliveriesByDeliveryID[action.params.deliveryID].error = action.error;
-                console.log(action);
             }
             return state;
         })
@@ -60,13 +56,6 @@ export const DeliveryReducer = produce(
             }
             state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].status = LoadStatus.SUCCESS;
             state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data = payload.result;
-            // if (state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data) {
-            //     state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data = payload.result;
-            // } else {
-            //     state.deliveriesByDeliveryID.data = {
-            //         [payload.result.webhookDeliveryID]: payload.result,
-            //     };
-            // }
 
             return state;
         }),

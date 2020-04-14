@@ -5,7 +5,7 @@
 
 import UserContent from "@vanilla/library/src/scripts/content/UserContent";
 import { escapeHTML } from "@vanilla/dom-utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import Loader from "@library/loaders/Loader";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";
@@ -15,6 +15,7 @@ import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
 import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
+import { IDelivery } from "./DeliveryTypes";
 
 interface IProps {
     webhookID: number;
@@ -26,16 +27,23 @@ export function DeliveryDetails(props: IProps) {
     const { deliveriesByDeliveryID } = useDeliveryData();
     const { getDeliveryByID } = useDeliveryActions();
     const deliveryDetailsClasses = deliveryDetailsCSSClasses();
-    let requestBody;
-    let requestHeaders;
-    let responseBody;
-    let responseHeaders;
+    const [deliveryRecord, setDeliveryRecord] = useState<IDelivery | undefined>(undefined);
 
     useEffect(() => {
-        if (!deliveriesByDeliveryID[webhookDeliveryID] && isActive) {
+        if (
+            isActive &&
+            (!deliveriesByDeliveryID[webhookDeliveryID] ||
+                deliveriesByDeliveryID[webhookDeliveryID].status !== LoadStatus.SUCCESS)
+        ) {
             getDeliveryByID(webhookID, webhookDeliveryID);
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID, isActive]);
+
+    useEffect(() => {
+        if (deliveriesByDeliveryID[webhookDeliveryID] && deliveriesByDeliveryID[webhookDeliveryID].data) {
+            setDeliveryRecord(deliveriesByDeliveryID[webhookDeliveryID].data);
+        }
+    }, [deliveriesByDeliveryID]);
 
     const isJson = function(str) {
         try {
@@ -46,21 +54,21 @@ export function DeliveryDetails(props: IProps) {
         return true;
     };
 
-    const prettyPrintJSONString = function(paramJson) {
+    const prettyPrintJSONString = function(paramJson?: string): string {
         let parsedString = "";
-        if (paramJson.length !== 0) {
+        if (paramJson && paramJson.length !== 0) {
             parsedString = JSON.stringify(JSON.parse(paramJson), null, 2);
         }
         return parsedString;
     };
-    const prettyPrintHTTPHeaders = function(headers) {
+    const prettyPrintHTTPHeaders = function(headers?): string {
         let joinedHeaders = "";
-        if (typeof headers !== "undefined") {
-            headers = headers.split("\n");
-            const prettyHeaders = headers.map(header => {
+        if (headers !== undefined) {
+            let arrHeaders = headers.split("\n");
+            arrHeaders = arrHeaders.map(header => {
                 return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
             });
-            joinedHeaders = prettyHeaders.join("\n");
+            joinedHeaders = arrHeaders.join("\n");
         }
         return joinedHeaders;
     };
@@ -73,75 +81,70 @@ export function DeliveryDetails(props: IProps) {
         return <Loader />;
     }
 
-    if (deliveriesByDeliveryID[webhookDeliveryID] && deliveriesByDeliveryID[webhookDeliveryID].data !== undefined) {
-        requestBody = deliveriesByDeliveryID[webhookDeliveryID].data.requestBody;
-        requestHeaders = deliveriesByDeliveryID[webhookDeliveryID].data.requestHeaders;
-        responseBody = deliveriesByDeliveryID[webhookDeliveryID].data.responseBody;
-        responseHeaders = deliveriesByDeliveryID[webhookDeliveryID].data.responseHeaders;
-    }
-
     return (
         <div
             className={classNames("deliveryDetails", deliveryDetailsClasses.root, isActive ? "isActive" : "")}
             data-collapsed={!isActive}
         >
-            <Tabs
-                classes={deliveryTabsCSSClasses()}
-                data={[
-                    {
-                        label: t("Request"),
-                        panelData: "requestTab",
-                        contents: (
-                            <>
-                                <div className="Request-headers">
-                                    <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
-                                    <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
-                                            requestHeaders,
-                                        )}</pre>`}
-                                    />
-                                </div>
-                                <div className="Request-body">
-                                    <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
-                                    <UserContent
-                                        content={`<pre class="code codeBlock">${
-                                            isJson(requestBody)
-                                                ? prettyPrintJSONString(escapeHTML(requestBody))
-                                                : escapeHTML(requestBody)
-                                        }</pre>`}
-                                    />
-                                </div>
-                            </>
-                        ),
-                    },
-                    {
-                        label: t("Response"),
-                        panelData: "responseTab",
-                        contents: (
-                            <>
-                                <div className="Response-headers">
-                                    <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
-                                    <UserContent
-                                        content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
-                                            responseHeaders,
-                                        )}</pre>`}
-                                    />
-                                </div>
-                                <div className="Response-body">
-                                    <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
-                                    <UserContent
-                                        content={`<pre class="code codeBlock">${
-                                            isJson(responseBody)
-                                                ? prettyPrintJSONString(escapeHTML(responseBody))
-                                                : escapeHTML(responseBody)
-                                        }</pre>`}
-                                    />
-                                </div>
-                            </>
-                        ),
-                    },
-                ]}
-            />
+            {deliveryRecord !== undefined && (
+                <Tabs
+                    classes={deliveryTabsCSSClasses()}
+                    data={[
+                        {
+                            label: t("Request"),
+                            panelData: "requestTab",
+                            contents: (
+                                <>
+                                    <div className="Request-headers">
+                                        <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
+                                        <UserContent
+                                            content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                                deliveryRecord.requestHeaders,
+                                            )}</pre>`}
+                                        />
+                                    </div>
+                                    <div className="Request-body">
+                                        <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
+                                        <UserContent
+                                            content={`<pre class="code codeBlock">${
+                                                isJson(deliveryRecord.requestBody)
+                                                    ? prettyPrintJSONString(escapeHTML(deliveryRecord.requestBody))
+                                                    : escapeHTML(deliveryRecord.requestBody)
+                                            }</pre>`}
+                                        />
+                                    </div>
+                                </>
+                            ),
+                        },
+                        {
+                            label: t("Response"),
+                            panelData: "responseTab",
+                            contents: (
+                                <>
+                                    <div className="Response-headers">
+                                        <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
+                                        <UserContent
+                                            content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                                deliveryRecord.responseHeaders,
+                                            )}</pre>`}
+                                        />
+                                    </div>
+                                    <div className="Response-body">
+                                        <h4 className={deliveryDetailsClasses.title}>{t("Body")}</h4>
+                                        <UserContent
+                                            content={`<pre class="code codeBlock">${
+                                                isJson(deliveryRecord.responseBody)
+                                                    ? prettyPrintJSONString(escapeHTML(deliveryRecord.responseBody))
+                                                    : escapeHTML(deliveryRecord.responseBody)
+                                            }</pre>`}
+                                        />
+                                    </div>
+                                </>
+                            ),
+                        },
+                    ]}
+                />
+            )}
         </div>
     );
 }
