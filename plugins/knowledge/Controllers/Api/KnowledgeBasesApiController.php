@@ -502,7 +502,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function patch_navigationFlat(int $id, array $body = []): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
-        $patchSchema = Schema::parse([
+        $in = Schema::parse([
             ":a" => Schema::parse([
                 "recordType",
                 "recordID",
@@ -510,8 +510,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
                 "sort",
             ])->add(Schema::parse($this->getNavFragmentSchema()))
         ]);
-        $in = $this->knowledgeNavigationModel->schema($patchSchema, "in")
-            ->setDescription("Update the navigation structure of a knowledge base, using the flat format.");
 
         // Prep the input.
         $body = $in->validate($body);
