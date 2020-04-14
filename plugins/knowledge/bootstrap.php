@@ -8,6 +8,7 @@
 use Garden\Container\Reference;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
@@ -38,6 +39,8 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
     ->rule(TranslationProviderInterface::class)
     ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
     ->rule(ArticleModel::class)
+    ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
+    ->rule(ArticleRevisionModel::class)
     ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
     ->rule(KnowledgeCategoryModel::class)
     ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
