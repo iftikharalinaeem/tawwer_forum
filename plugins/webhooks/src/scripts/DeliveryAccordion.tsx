@@ -4,7 +4,7 @@
  */
 
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import moment from "moment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
