@@ -451,13 +451,14 @@ trait ArticlesApiHelper {
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
             $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
+            $revision["insertUserID"] = $fields["updateUserID"] ?? $fields["insertUserID"] ?? null;
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
                 $this->articleRevisionModel->insert($revision, $this->getOperationMode());
             } else {
                 $articleRevisionID = $this->articleRevisionModel->insert($revision, $this->getOperationMode());
-                $this->articleRevisionModel->publish($articleRevisionID);
+                $this->articleRevisionModel->publish($articleRevisionID, $revision["insertUserID"] ?? null, $this->getOperationMode());
             }
 
             $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);

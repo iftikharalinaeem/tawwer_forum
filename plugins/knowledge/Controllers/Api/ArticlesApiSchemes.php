@@ -135,7 +135,8 @@ trait ArticlesApiSchemes {
                     ],
                     "foreignID?",
                     "dateInserted?",
-                    "dateUpdated?"
+                    "dateUpdated?",
+                    "insertUserID?",
                 ])->add($this->fullSchema()),
                 "ArticlePost"
             );
@@ -169,7 +170,9 @@ trait ArticlesApiSchemes {
                     ],
                     "foreignID?",
                     "dateInserted?",
-                    "dateUpdated?"
+                    "dateUpdated?",
+                    "insertUserID?",
+                    "updateUserID?"
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );

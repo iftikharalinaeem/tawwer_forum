@@ -404,6 +404,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
     }
 
+
     /**
      * Data provider for testGetEditArticle()
      *
@@ -668,7 +669,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             ],
         ];
     }
-
+    
     ///
     /// SORRY. Right now messing with the guest user pollutes the other test cases.
     /// As a result, I'm putting it last. Currently there is no time to debug why the pollution is occuring.

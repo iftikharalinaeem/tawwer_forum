@@ -6,7 +6,9 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Garden\Web\Exception\ClientException;
 use Gdn_Session;
+use Vanilla\Database\Operation;
 
 /**
  * A model for managing article revisions.
@@ -48,20 +50,27 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
      * @throws \Garden\Schema\ValidationException If row field updates fail validating against the schema.
      * @throws \Vanilla\Exception\Database\NoResultsException If the revision's article could not be found.
      */
-    public function publish(int $articleRevisionID) {
+    public function publish(int $articleRevisionID, int $updateUserID = null, string $mode = Operation::MODE_DEFAULT) {
         $row = $this->selectSingle(["articleRevisionID" => $articleRevisionID]);
         $articleID = $row["articleID"];
         $locale = $row["locale"];
 
         // Remove the "published" flag from the currently-published revision.
+        $status = ["status" => null];
+        if ($mode === Operation::MODE_IMPORT && !empty($updateUserID)) {
+            $status["insertUserID"] = $updateUserID;
+        }
         $this->update(
-            ["status" => null],
-            ["articleID" => $articleID, "status" => "published", "locale" => $locale]
+            $status,
+            ["articleID" => $articleID, "status" => "published", "locale" => $locale],
+            $mode
         );
         // Publish this revision.
+        $status["status"] = "published";
         $this->update(
-            ["status" => "published"],
-            ["articleRevisionID" => $articleRevisionID]
+            $status,
+            ["articleRevisionID" => $articleRevisionID],
+            $mode
         );
     }
 
