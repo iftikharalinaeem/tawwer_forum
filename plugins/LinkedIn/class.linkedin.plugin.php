@@ -9,11 +9,21 @@ use Vanilla\Web\CurlWrapper;
 /**
  * Class LinkedInPlugin
  */
-class LinkedInPlugin extends Gdn_Plugin {
+class LinkedInPlugin extends SSOAddon {
     const ProviderKey = 'LinkedIn';
+    private const AUTHENTICATION_SCHEME = 'linkedin';
 
     /// Methods ///
     protected $_AccessToken = null;
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationScheme(): string {
+        return self::AUTHENTICATION_SCHEME;
+    }
 
     /** @var SsoUtils */
     private $ssoUtils;
@@ -290,7 +300,7 @@ class LinkedInPlugin extends Gdn_Plugin {
         // Save the facebook provider type.
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
-            ['AuthenticationSchemeAlias' => 'linkedin', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
+            ['AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME, 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
             ['AuthenticationKey' => self::ProviderKey],
             true
         );

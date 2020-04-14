@@ -10,10 +10,20 @@
 /**
  * Class SamlSSOPlugin
  */
-class SamlSSOPlugin extends Gdn_Plugin {
+class SamlSSOPlugin extends SSOAddon {
 
     /**  */
     const IdentifierFormat = 'urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified';
+    private const AUTHENTICATION_SCHEME = 'saml';
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationScheme(): string {
+        return self::AUTHENTICATION_SCHEME;
+    }
 
     /**
      * Insert css file for custom styling of signin button/icon.
@@ -146,7 +156,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
-        if ($provider['AuthenticationSchemeAlias'] != 'saml') {
+        if ($provider['AuthenticationSchemeAlias'] != self::AUTHENTICATION_SCHEME) {
             return;
         }
 
@@ -247,7 +257,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
 
         // Populate the form with values from the profile so they can be saved in UserMeta.
         $formValues = array_replace($form->formValues(), $convertedProfile);
-        
+
         // Remove UserID if it is passed over SSO, it will trigger unwanted behaviour in entry/connect
         unset($formValues['UserID']);
 
@@ -273,7 +283,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
      */
     public function entryController_overrideSignOut_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
-        if ($provider['AuthenticationSchemeAlias'] != 'saml' || !$provider['SignOutUrl']) {
+        if ($provider['AuthenticationSchemeAlias'] != self::AUTHENTICATION_SCHEME || !$provider['SignOutUrl']) {
             return;
         }
 
@@ -499,7 +509,7 @@ class SamlSSOPlugin extends Gdn_Plugin {
         if ($authenticationKey !== null) {
             $where = ['AuthenticationKey' => $authenticationKey];
         } else {
-            $where = ['AuthenticationSchemeAlias' => 'saml'];
+            $where = ['AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME];
         }
 
         $dataSet = Gdn::sql()->getWhere('UserAuthenticationProvider', $where);

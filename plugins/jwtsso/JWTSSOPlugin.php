@@ -12,7 +12,7 @@ use Garden\Container\Reference;
  *
  * Plugin to authenticate users by interpreting a JSON Web Token.
  */
-class JWTSSOPlugin extends Gdn_Plugin {
+class JWTSSOPlugin extends SSOAddon {
 
     /** @var string  */
     const DEFAULT_PROVIDER_KEY = "JWTSSODefault";
@@ -76,6 +76,15 @@ class JWTSSOPlugin extends Gdn_Plugin {
 
     /** @var Gdn_Session */
     private $session;
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationScheme(): string {
+        return self::PROVIDER_SCHEME_ALIAS;
+    }
 
     /**
      * JWTSSOPlugin constructor.
