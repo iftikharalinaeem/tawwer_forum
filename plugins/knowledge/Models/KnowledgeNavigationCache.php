@@ -59,11 +59,12 @@ class KnowledgeNavigationCache {
      * Clear all known caches of navigation.
      */
     public function deleteAll() {
-        $allCacheKeys = $this->cache->get(self::CACHE_HOLDER_KEY, []);
+        $allCacheKeys = $this->cache->get(self::CACHE_HOLDER_KEY) ?: [];
 
         foreach ($allCacheKeys as $cacheKey) {
             $this->cache->remove($cacheKey);
         }
+        $this->cache->remove(self::CACHE_HOLDER_KEY);
     }
 
     /**

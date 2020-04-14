@@ -437,6 +437,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->column("targetKnowledgeBaseID", "int", null, 'unique.universalPair')
             ->set();
 
+        $this->navCache->deleteAll();
+
         // Update knowledge base when missing defaultArticleID (release: 2020.005)
         // relates to: https://github.com/vanilla/knowledge/issues/1582
         $kbs = $this->kbModel->get(

@@ -97,12 +97,18 @@ class KnowledgeNavigationModel {
         $cachedResult = $this->navCache->get($query);
 
         if ($cachedResult !== null) {
-            return $cachedResult;
+            return [
+                'cached' => true,
+                'result' => $cachedResult,
+            ];
         }
 
         $navigation = $this->buildNavigationInternal($query);
         $this->navCache->set($query, $navigation);
-        return $navigation;
+        return [
+            'cached' => false,
+            'result' => $navigation,
+        ];
     }
 
     /**
@@ -236,7 +242,7 @@ class KnowledgeNavigationModel {
             return $result;
         } else {
             $result = $this->makeNavigationTree($rootCategoryID, $categories, $articles);
-            $schema = $this->schemaWithChildren();
+            $schema = Schema::parse([":a" => $this->schemaWithChildren()]);
             $result = $schema->validate($result);
             return $result;
         }
@@ -497,7 +503,7 @@ class KnowledgeNavigationModel {
      *                  In any other cases returns null
      */
     public function getDefaultArticleID(int $knowledgeBaseID) {
-        $tree = $this->buildNavigation(new KnowledgeNavigationQuery($knowledgeBaseID, null, true));
+        $tree = $this->buildNavigation(new KnowledgeNavigationQuery($knowledgeBaseID, null, false))['result'];
         return $this->getArticleIDFromTree($tree);
     }
 

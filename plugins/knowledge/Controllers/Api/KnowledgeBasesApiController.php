@@ -10,6 +10,7 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Knowledge\Models\KnowledgeNavigationQuery;
@@ -430,9 +431,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param int $id
      * @param array $query
-     * @return array
+     * @return Data
      */
-    public function get_navigationTree(int $id, array $query = []): array {
+    public function get_navigationTree(int $id, array $query = []): Data {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->navInputSchema();
@@ -444,15 +445,18 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $query['knowledgeBaseID'] = $id;
 
         // Build output
-        $result = $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
+        $nav = $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
             $query['knowledgeBaseID'],
-            $query['locale'],
+            $query['locale'] ?? null,
             false,
-            $query['onlyTranslated']
+            $query['onlyTranslated'] ?? null
         ));
+        $result = Data::box($nav['result'] ?? []);
+        $cached = $nav['cached'];
+        $result->setHeader('X-App-Cache-Hit', $cached);
 
         // No result schema becuase it's already applied.
-        return $result ?? [];
+        return $result;
     }
 
     /**
@@ -460,9 +464,9 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param int $id
      * @param array $query
-     * @return array
+     * @return Data
      */
-    public function get_navigationFlat(int $id, array $query = []): array {
+    public function get_navigationFlat(int $id, array $query = []): Data {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
         $in = $this->navInputSchema();
@@ -473,12 +477,19 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $query['knowledgeBaseID'] = $id;
 
         // No result schema becuase it's already applied.
-        return $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
+        $nav = $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
             $query['knowledgeBaseID'],
-            $query['locale'],
+            $query['locale'] ?? null,
             true,
-            $query['onlyTranslated']
+            $query['onlyTranslated'] ?? null
         ));
+
+        $result = Data::box($nav['result']);
+        $cached = $nav['cached'];
+        $result->setHeader('X-App-Cache-Hit', $cached);
+
+        // No result schema becuase it's already applied.
+        return $result;
     }
 
     /**
