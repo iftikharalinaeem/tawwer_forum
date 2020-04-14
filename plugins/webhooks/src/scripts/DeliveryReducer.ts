@@ -53,7 +53,6 @@ export const DeliveryReducer = produce(
             const deliveriesByDeliveryID: Record<number, IDelivery> = {};
             if (payload.result.webhookDeliveryID) {
                 deliveriesByDeliveryID[payload.result.webhookDeliveryID] = payload.result;
-                //state.deliveriesByDeliveryID.status = LoadStatus.SUCCESS;
             }
             state.deliveriesByDeliveryID = {
                 status: LoadStatus.SUCCESS,
