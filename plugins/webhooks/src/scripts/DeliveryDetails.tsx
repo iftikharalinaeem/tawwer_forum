@@ -65,7 +65,7 @@ export function DeliveryDetails(props: IProps) {
         return joinedHeaders;
     };
 
-    if (deliveriesByDeliveryID.status === LoadStatus.LOADING && isActive) {
+    if (deliveriesByDeliveryID.status !== LoadStatus.SUCCESS && !deliveriesByDeliveryID.data && isActive) {
         return <Loader />;
     }
 
