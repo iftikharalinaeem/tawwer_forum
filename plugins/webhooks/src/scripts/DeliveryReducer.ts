@@ -25,7 +25,7 @@ export const DeliveryReducer = produce(
         })
         .case(DeliveryActions.getAllDeliveryACs.done, (state, payload) => {
             const deliveriesByWebhookID: Record<number, IDeliveryFragment> = {};
-            payload.result.forEach((delivery) => {
+            payload.result.forEach(delivery => {
                 if (delivery.webhookDeliveryID) {
                     deliveriesByWebhookID[delivery.webhookDeliveryID] = delivery;
                 }
