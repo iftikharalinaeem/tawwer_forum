@@ -1070,13 +1070,13 @@ class ArticlesTest extends AbstractResourceTest {
             [
                 'helpful' => 'yes',
                 'insertUserID' => $user['userID'],
-                'foreignID' => 'vanilla-test'
+                'foreignID' => 'vanilla-test-2'
             ]
         )->getBody();
 
         /** @var ReactionModel $reactionModel */
         $reactionModel = self::container()->get(ReactionModel::class);
-        $reactionsWithForeignID = $reactionModel->get(['foreignID' => 'vanilla-test']);
+        $reactionsWithForeignID = $reactionModel->get(['foreignID' => 'vanilla-test-2']);
 
         $this->assertEquals(0, count($reactionsWithForeignID));
 
