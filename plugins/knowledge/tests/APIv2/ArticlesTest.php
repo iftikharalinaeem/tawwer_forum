@@ -1101,18 +1101,17 @@ class ArticlesTest extends AbstractResourceTest {
                 'articles.manage' => ($roleType === Operation::MODE_IMPORT) ? true : false
             ],
         ];
-
         $role = $this->createUserRole($newRole);
         $user = $this->api()->post(
-                '/users',
-                [
-                    'name' => $role['name'] . 'user',
-                    'email' => $role['name'].'@example.com',
-                    'emailConfirmed' => true,
-                    'password' => 'vanilla',
-                    'roleID' => [$role['roleID']]
-                ]
-            )->getBody();
+            '/users',
+            [
+                'name' => $role['name'] . 'user',
+                'email' => $role['name'].'@example.com',
+                'emailConfirmed' => true,
+                'password' => 'vanilla',
+                'roleID' => [$role['roleID']]
+            ]
+        )->getBody();
 
         return $user;
     }
@@ -1125,29 +1124,29 @@ class ArticlesTest extends AbstractResourceTest {
      */
     protected function createUserRole(array $newRole): array {
         $role = $this->api()->post(
-                '/roles',
-                [
-                    'name' => $newRole['name'],
-                    'description' => 'Role '.$newRole['name'],
-                    'type' => 'member',
-                    'deletable' => true,
-                    'canSession' => true,
-                    'personalInfo' => false,
-                    'permissions' => [
-                        [
-                            'type' => 'global',
-                            'permissions' => $newRole['permissions']
-                        ],
-                        [
-                            'type' => 'global',
-                            'permissions' => [
-                                'signIn.allow' => true,
+            '/roles',
+            [
+                'name' => $newRole['name'],
+                'description' => 'Role '.$newRole['name'],
+                'type' => 'member',
+                'deletable' => true,
+                'canSession' => true,
+                'personalInfo' => false,
+                'permissions' => [
+                    [
+                        'type' => 'global',
+                        'permissions' => $newRole['permissions']
+                    ],
+                    [
+                        'type' => 'global',
+                        'permissions' => [
+                            'signIn.allow' => true,
                             ]
-                        ]
-
                     ]
                 ]
-            )->getBody();
+            ]
+        )->getBody();
+
         return $role;
     }
 }
