@@ -33,13 +33,13 @@ export class DeliveryActions extends ReduxActions {
         { webhookID: number; deliveryID: string },
         IDelivery,
         IApiError
-    >("GET_DELIVERIES");
+    >("GET_DELIVERY");
 
     public getDeliveryByID = (webhookID: number, deliveryID: string) => {
         const thunk = bindThunkAction(DeliveryActions.getDeliveryByIDACs, async () => {
             const response = await this.api.get(`/webhooks/${webhookID}/deliveries/${deliveryID}`, {});
             return response.data;
-        })();
+        })({ webhookID, deliveryID });
 
         return this.dispatch(thunk);
     };

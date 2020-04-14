@@ -17,8 +17,8 @@ import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
 
 interface IProps {
-    webhookID?: number;
-    webhookDeliveryID?: string;
+    webhookID: number;
+    webhookDeliveryID: string;
     isActive: boolean;
 }
 export function DeliveryDetails(props: IProps) {
@@ -32,7 +32,7 @@ export function DeliveryDetails(props: IProps) {
     let responseHeaders;
 
     useEffect(() => {
-        if (webhookID && webhookDeliveryID && isActive) {
+        if (!deliveriesByDeliveryID[webhookDeliveryID] && isActive) {
             getDeliveryByID(webhookID, webhookDeliveryID);
         }
     }, [getDeliveryByID, webhookDeliveryID, webhookID, isActive]);
@@ -65,15 +65,19 @@ export function DeliveryDetails(props: IProps) {
         return joinedHeaders;
     };
 
-    if (deliveriesByDeliveryID.status !== LoadStatus.SUCCESS && !deliveriesByDeliveryID.data && isActive) {
+    if (
+        deliveriesByDeliveryID[webhookDeliveryID] !== undefined &&
+        isActive &&
+        deliveriesByDeliveryID[webhookDeliveryID].status !== LoadStatus.SUCCESS
+    ) {
         return <Loader />;
     }
 
-    if (deliveriesByDeliveryID.data) {
-        requestBody = deliveriesByDeliveryID.data.requestBody;
-        requestHeaders = deliveriesByDeliveryID.data.requestHeaders;
-        responseBody = deliveriesByDeliveryID.data.responseBody;
-        responseHeaders = deliveriesByDeliveryID.data.responseHeaders;
+    if (deliveriesByDeliveryID[webhookDeliveryID] && deliveriesByDeliveryID[webhookDeliveryID].data !== undefined) {
+        requestBody = deliveriesByDeliveryID[webhookDeliveryID].data.requestBody;
+        requestHeaders = deliveriesByDeliveryID[webhookDeliveryID].data.requestHeaders;
+        responseBody = deliveriesByDeliveryID[webhookDeliveryID].data.responseBody;
+        responseHeaders = deliveriesByDeliveryID[webhookDeliveryID].data.responseHeaders;
     }
 
     return (

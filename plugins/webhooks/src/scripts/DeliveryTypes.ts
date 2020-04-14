@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { ILoadable, LoadStatus, IApiError } from "@vanilla/library/src/scripts/@types/api/core";
+import { ILoadable, LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 export interface IDeliveryStore {
     deliveries: IDeliveryState;
@@ -13,9 +13,9 @@ export interface IDeliveryState {
     deliveriesByWebhookID: ILoadable<{
         [webhookID: number]: IDeliveryFragment;
     }>;
-    deliveriesByDeliveryID: ILoadable<{
-        [deliveryID: string]: IDelivery;
-    }>;
+    deliveriesByDeliveryID: {
+        [deliveryID: string]: ILoadable<IDelivery>;
+    };
 }
 
 export interface IDeliveryFragment {
@@ -37,7 +37,5 @@ export const INITIAL_DELIVERY_STATE: IDeliveryState = {
     deliveriesByWebhookID: {
         status: LoadStatus.PENDING,
     },
-    deliveriesByDeliveryID: {
-        status: LoadStatus.PENDING,
-    },
+    deliveriesByDeliveryID: {},
 };

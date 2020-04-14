@@ -38,26 +38,36 @@ export const DeliveryReducer = produce(
         })
 
         .case(DeliveryActions.getDeliveryByIDACs.started, (state, action) => {
-            state.deliveriesByDeliveryID = {
+            console.log(action);
+            state.deliveriesByDeliveryID[action.deliveryID] = {
                 status: LoadStatus.LOADING,
             };
             return state;
         })
         .case(DeliveryActions.getDeliveryByIDACs.failed, (state, action) => {
-            state.deliveriesByDeliveryID.status = LoadStatus.ERROR;
-            state.deliveriesByDeliveryID.error = action.error;
+            console.log(action);
+            if (action.params) {
+                state.deliveriesByDeliveryID[action.params.deliveryID].status = LoadStatus.ERROR;
+                state.deliveriesByDeliveryID[action.params.deliveryID].error = action.error;
+                console.log(action);
+            }
             return state;
         })
-
         .case(DeliveryActions.getDeliveryByIDACs.done, (state, payload) => {
             const deliveriesByDeliveryID: Record<number, IDelivery> = {};
             if (payload.result.webhookDeliveryID) {
                 deliveriesByDeliveryID[payload.result.webhookDeliveryID] = payload.result;
             }
-            state.deliveriesByDeliveryID = {
-                status: LoadStatus.SUCCESS,
-                data: payload.result,
-            };
+            state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].status = LoadStatus.SUCCESS;
+            state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data = payload.result;
+            // if (state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data) {
+            //     state.deliveriesByDeliveryID[payload.result.webhookDeliveryID].data = payload.result;
+            // } else {
+            //     state.deliveriesByDeliveryID.data = {
+            //         [payload.result.webhookDeliveryID]: payload.result,
+            //     };
+            // }
+
             return state;
         }),
 );
