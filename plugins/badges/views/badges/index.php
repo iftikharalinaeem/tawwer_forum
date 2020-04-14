@@ -3,7 +3,7 @@
 <h1><?php echo t('All Badges'); ?></h1>
 
 <ul class="DataList Badges">
-<?php 
+<?php
 $UserModel = new UserModel();
 
 foreach ($this->data('Badges') as $Badge) :
@@ -26,7 +26,7 @@ foreach ($this->data('Badges') as $Badge) :
         </span>
         <div class="ItemContent Badge">
             <div class="Title">
-                <?php echo anchor($Badge['Name'], 'badge/'.$Badge['Slug'], 'Title'); ?>
+                <?php echo anchor(UserBadgeModel::badgeName($Badge), 'badge/'.$Badge['Slug'], 'Title'); ?>
             </div>
             <div class="Meta">
                 <?php if (val('Body', $Badge)) : ?>

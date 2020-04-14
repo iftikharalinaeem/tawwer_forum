@@ -3,13 +3,22 @@
  * @license GPL-2.0-only
  */
 
-import { unit, paddings, fonts, colorOut, absolutePosition, ColorValues } from "@library/styles/styleHelpers";
+import {
+    unit,
+    paddings,
+    fonts,
+    colorOut,
+    absolutePosition,
+    ColorValues,
+    flexHelper,
+} from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { FontSizeProperty } from "csstype";
-import { TLength, NestedCSSProperties } from "typestyle/lib/types";
+import { TLength } from "typestyle/lib/types";
 import { userContentVariables } from "@vanilla/library/src/scripts/content/userContentStyles";
 import { color, ColorHelper } from "csx";
+import { contentBannerVariables } from "@vanilla/library/src/scripts/banner/contentBannerStyles";
 
 export const themeEditorPreviewVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -113,6 +122,16 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         position: "relative",
     });
 
+    const disabledContentBanner = style("disabledContentBanner", {
+        ...flexHelper().middle(),
+        height: contentBannerVariables().dimensions.minHeight,
+        background: colorOut(globalVars.mixPrimaryAndBg(0.08)),
+    });
+
+    const disabledIcon = style("disabledIcon", {
+        marginLeft: globalVars.gutter.half,
+    });
+
     const panelActivatorIndicator = (dashColor?: ColorHelper | string) => {
         return style("panelActivatorIndicator", {
             ...absolutePosition.fullSizeOfParent(),
@@ -120,6 +139,7 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
             outlineOffset: unit(-4),
             opacity: 0.85,
             pointerEvents: "none",
+            zIndex: 10000,
         });
     };
 
@@ -133,6 +153,8 @@ export const themeEditorPreviewClasses = useThemeCache(() => {
         contentContainer,
         panelActivator,
         panelActivatorIndicator,
+        disabledContentBanner,
+        disabledIcon,
     };
 });
 

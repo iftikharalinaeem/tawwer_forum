@@ -8,7 +8,7 @@
             {{ Form.label('Name', 'Name')|raw }}
         </div>
         <div class="input-wrap">
-            {{ Form.input('Name')|raw }}
+            {{ Form.input('Name', 'text', { MaxLength: 255 })|raw }}
         </div>
     </li>
     <li class="form-group">
@@ -16,7 +16,7 @@
             {{ Form.label('Description', 'Description')|raw }}
         </div>
         <div class="input-wrap">
-            {{ Form.textBox('Description', { MultiLine: true })|raw }}
+            {{ Form.textBox('Description', { MultiLine: true, MaxLength: 500 })|raw }}
         </div>
     </li>
 </ul>

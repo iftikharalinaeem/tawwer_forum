@@ -8,6 +8,10 @@
  * Deals with associating users with badges.
  */
 class UserBadgeModel extends Gdn_Model {
+    const OPT_SYSTEM = 'system';
+    const STATUS_DECLINED = 'declined';
+    const STATUS_PENDING = 'pending';
+    const STATUS_GIVEN = 'given';
 
     /** @var bool  */
     public $NoSpam = true;
@@ -63,7 +67,7 @@ class UserBadgeModel extends Gdn_Model {
 
         // Save new event list
         setValue('Events', $userBadge['Attributes'], $events);
-        $this->save($userBadge);
+        $this->save($userBadge, [self::OPT_SYSTEM => true]);
 
         // If we've achieved threshold, give badge to user
         if ($threshold && count($events) >= $threshold) {
@@ -97,13 +101,15 @@ class UserBadgeModel extends Gdn_Model {
             return t($name);
         }
 
-        if (strpos($name, $threshold) !== false) {
-            $code = str_replace($threshold, '%s', $name);
+        $formattedThreshold = number_format($threshold);
 
+        if (strpos($name, $formattedThreshold) !== false || strpos($name, $threshold) !== false) {
+            $code = strpos($name, $formattedThreshold) !== false ? str_replace($formattedThreshold, '%s', $name) :
+                str_replace($threshold, '%s', $name);
             if ($threshold == 1) {
-                return plural($threshold, $code, $code.'s');
+                return plural($formattedThreshold, $code, $code.'s');
             } else {
-                return plural($threshold, rtrim($code, 's'), $code);
+                return plural($formattedThreshold, rtrim($code, 's'), $code);
             }
         } else {
             return t($name);
@@ -196,14 +202,14 @@ class UserBadgeModel extends Gdn_Model {
     /**
      * Decline a user's badge request.
      *
-     * @since 1.1
-     * @access public
+     * @param int $userID
+     * @param int $badgeID
      */
     public function declineRequest($userID, $badgeID) {
-        $userBadge = $this->getID($userID, $badgeID);
+        $userBadge = $this->getByUser($userID, $badgeID);
         setValue('Declined', $userBadge, 1);
-        setValue('Status', $userBadge, 'declined');
-        $this->save($userBadge);
+        setValue('Status', $userBadge, self::STATUS_DECLINED);
+        $this->save($userBadge, [self::OPT_SYSTEM => false]);
     }
 
     /**
@@ -244,6 +250,9 @@ class UserBadgeModel extends Gdn_Model {
     /**
      * Get badge data for single user/badge association.
      *
+     * @param int $userID
+     * @param int $badgeID
+     * @return array
      */
     public function getByUser($userID, $badgeID) {
         $badgeID = $this->getBadgeID($badgeID);
@@ -294,9 +303,9 @@ class UserBadgeModel extends Gdn_Model {
 
         if (is_numeric($badgeID)) {
             return $badgeID;
-        } elseif (is_array($badgeID))
+        } elseif (is_array($badgeID)) {
             return $badgeID['BadgeID'];
-        else {
+        } else {
             $badgeModel = new BadgeModel();
             $badge = $badgeModel->getID($badgeID);
 
@@ -318,7 +327,7 @@ class UserBadgeModel extends Gdn_Model {
             ->select('ub.DateRequested')
             ->from('UserBadge ub')
             ->join('Badge b', 'b.BadgeID = ub.BadgeID', 'left')
-            ->where('ub.Status', 'pending')
+            ->where('ub.Status', self::STATUS_PENDING)
             ->orderBy('ub.DateRequested', 'asc')
             ->get();
     }
@@ -330,7 +339,7 @@ class UserBadgeModel extends Gdn_Model {
      */
     public function getBadgeRequestCount() {
         return $this->getCount([
-            'Status' => 'pending'
+            'Status' => self::STATUS_PENDING,
         ]);
     }
 
@@ -371,10 +380,10 @@ class UserBadgeModel extends Gdn_Model {
      *
      * @param int $userID.
      * @param mixed $badgeID Int (id) or string (slug).
-     * @param string $reason Optional explanation of why they received the badge.
+     * @param ?string $reason Optional explanation of why they received the badge.
      * @return bool
      */
-    public function give($userID, $badgeID, $reason = '') {
+    public function give($userID, $badgeID, $reason = null) {
         if (c('Badges.Disabled')) {
             $this->Validation->addValidationResult('BadgeID', '@'.t('Badges are globally disabled.'));
 
@@ -406,11 +415,14 @@ class UserBadgeModel extends Gdn_Model {
         }
 
         $userBadge['Reason'] = $reason;
-        $userBadge['Status'] = 'given';
+        $userBadge['Status'] = self::STATUS_GIVEN;
         $userBadge['DateCompleted'] = Gdn_Format::toDateTime();
 
+        // Give the badge as the system user unless it is a manual badge or a reason was given which applies a manual award.
+        $system = $badge['Type'] !== BadgeModel::TYPE_MANUAL && $reason === null;
+        $saved = $this->save($userBadge, [self::OPT_SYSTEM => $system]);
+
         $pointsText = '';
-        $saved = $this->save($userBadge);
         if ($saved) {
             $points = $badge['Points'];
             if ($points != 0) {
@@ -560,8 +572,8 @@ class UserBadgeModel extends Gdn_Model {
             setValue('DateRequested', $userBadge, Gdn_Format::toDateTime());
             setValue('RequestReason', $userBadge, $reason);
             setValue('Declined', $userBadge, 0);
-            setValue('Status', $userBadge, 'pending');
-            $this->save($userBadge);
+            setValue('Status', $userBadge, self::STATUS_PENDING);
+            $this->save($userBadge, [self::OPT_SYSTEM => false]);
 
             // Prep activity
             $activityModel = new ActivityModel();
@@ -653,10 +665,14 @@ class UserBadgeModel extends Gdn_Model {
      * Save given user badge.
      *
      * @param array $formPostValues Values submitted via form.
-     * @param array $settings Not used.
+     * @param array $settings Settings for the save.
      * @return bool Whether save was successful.
      */
     public function save($formPostValues, $settings = []) {
+        $settings += [
+            self::OPT_SYSTEM => true, // insert as system user
+        ];
+
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -684,11 +700,10 @@ class UserBadgeModel extends Gdn_Model {
             }
 
             if ($current['_New']) {
-                $this->addInsertFields($fields);
-                $fieldExist = $this->Schema->fieldExists($this->Name, $this->InsertUserID);
-                if (!isset($fields['InsertUserID']) && $fieldExist) {
-                    $fields['InsertUserID'] = $fields['UserID'];
+                if ($settings[self::OPT_SYSTEM] || (!isset($fields[$this->InsertUserID]) && !Gdn::session()->isValid())) {
+                    $fields['InsertUserID'] = Gdn::userModel()->getSystemUserID();
                 }
+                $this->addInsertFields($fields);
                 $this->SQL->insert($this->Name, $fields);
             } else {
                 $where = [

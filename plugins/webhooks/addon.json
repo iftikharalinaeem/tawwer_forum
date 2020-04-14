@@ -5,10 +5,15 @@
     "license": "Proprietary",
     "key": "webhooks",
     "type": "addon",
+    "icon": "webhooks.png",
     "authors": [
         {
             "name": "Dani M",
             "email": "dani.m@vanillaforums.com"
+        },
+        {
+            "name": "Isis (igraziatto) Graziatto",
+            "email": "isis.g@vanillaforums.com"
         }
     ]
 }

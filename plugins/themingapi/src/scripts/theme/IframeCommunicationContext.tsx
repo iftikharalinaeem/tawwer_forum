@@ -43,11 +43,10 @@ export function useOwnFrameMessages(onMessage: IReceiveMessage) {
             onMessage(e);
         };
         window.addEventListener("message", handler, false);
-
-        return () => {
-            window.removeEventListener("message", handler, false);
-        };
-    }, [onMessage]);
+        // Bit of a workaround right now. If anything gets added here
+        // Make sure you test all variants of the message passing in both directions.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 }
 
 export function IframeCommunicationContextProvider(props: { children: React.ReactNode }) {

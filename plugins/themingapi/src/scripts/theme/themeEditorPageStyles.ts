@@ -4,15 +4,10 @@
  */
 
 import { unit, colorOut } from "@library/styles/styleHelpers";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { percent } from "csx";
 
-export const themeEditorPageVariables = useThemeCache(() => {
-    const makeThemeEditorVars = variableFactory("themeEditorPage");
-});
 export const themeEditorPageClasses = useThemeCache(() => {
-    const vars = themeEditorPageVariables();
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
 
@@ -75,5 +70,3 @@ export const themeEditorPageClasses = useThemeCache(() => {
         messageBar,
     };
 });
-
-export default themeEditorPageClasses;

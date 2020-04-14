@@ -21,6 +21,14 @@ echo $this->Form->errors();
     </li>
     <li class="form-group">
         <div class="label-wrap">
+            <?php echo $this->Form->label("Show active users for the entire site", "Plugins.Online.EntireSite"); ?>
+        </div>
+        <div class="input-wrap">
+            <?php echo $this->Form->toggle('Plugins.Online.EntireSite'); ?>
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
             <?php echo $this->Form->label("How should the list be rendered?", "Plugins.Online.Style"); ?>
         </div>
         <div class="input-wrap">
