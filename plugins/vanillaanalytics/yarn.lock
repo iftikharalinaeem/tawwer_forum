@@ -7,11 +7,6 @@
   resolved "https://registry.yarnpkg.com/@types/keen-tracking/-/keen-tracking-2.0.1.tgz#71da79fca0c17240259943674d40308755a18a73"
   integrity sha512-gaA3pgADrSwucETv6cDAZcEvZ9Nso6Bifjz8uE+8LXD1Enmufqq46dZToX00M0bveI8mb+MqHei21tcGz9bjoQ==
 
-"@vanilla/utils@*":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@vanilla/utils/-/utils-3.0.0.tgz#0da8224f3937a063b2b913883fa45dccbad6b292"
-  integrity sha512-bL2FM7KzkidR4pXk9EUZFIhJMzSWP6qDUBmXnRhpnh0XRDdWIpKFkq0dF69Ukd9nLKoISbUyF+ooQAi2l4WTKQ==
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
