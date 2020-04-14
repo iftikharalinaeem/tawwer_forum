@@ -29,13 +29,6 @@ export function DeliveryAccordion(props: IProps) {
         return seconds + "s";
     };
 
-    // const collapseAccordions = function() {
-    //     const accordions = document.querySelectorAll("DeliveryAccordion");
-    //     [...accordions].forEach(accordion => {
-    //         accordion.querySelector(".deliveryDetails").;
-    //     });
-    // };
-
     useEffect(() => {
         console.log(activeAccordion);
     }, [activeAccordion]);

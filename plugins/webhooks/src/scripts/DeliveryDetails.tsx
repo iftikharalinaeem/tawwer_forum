@@ -5,7 +5,7 @@
 
 import UserContent from "@vanilla/library/src/scripts/content/UserContent";
 import { escapeHTML } from "@vanilla/dom-utils";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { t } from "@vanilla/i18n";
 import Loader from "@library/loaders/Loader";
 import { LoadStatus, IFieldError } from "@library/@types/api/core";

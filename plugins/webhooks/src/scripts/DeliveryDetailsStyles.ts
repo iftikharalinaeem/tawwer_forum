@@ -4,7 +4,7 @@
  */
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
-import { paddings, margins, unit, colorOut, defaultTransition } from "@library/styles/styleHelpers";
+import { margins, unit, colorOut, defaultTransition } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles";
 

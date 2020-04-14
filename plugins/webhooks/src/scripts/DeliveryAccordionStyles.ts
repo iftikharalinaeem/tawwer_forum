@@ -64,7 +64,7 @@ export const DeliveryAccordionCSSClasses = useThemeCache(() => {
         }),
     });
 
-    cssOut(".table-data tbody tr.isOpen", {
+    cssOut(".table-data tbody tr", {
         $nest: {
             "&:hover, &:focus": {
                 backgroundColor: "transparent",
