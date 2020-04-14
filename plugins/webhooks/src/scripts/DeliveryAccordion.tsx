@@ -4,41 +4,60 @@
  */
 
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
-import { Link } from "react-router-dom";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { RightChevronIcon } from "@library/icons/common";
 import { DeliveryDetails } from "@webhooks/DeliveryDetails";
-import { deliveryTableRowCSSClasses } from "@webhooks/DeliveryTableRowStyles";
+import { DeliveryAccordionCSSClasses } from "@webhooks/DeliveryAccordionStyles";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import classNames from "classnames";
 
 interface IProps {
     delivery: IDeliveryFragment;
-    onClick?: (e) => void;
-    isActive: boolean;
     index: number;
 }
 
-export function DeliveryTableRow(props: IProps) {
-    let { delivery, isActive, index } = props;
-    const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
+export function DeliveryAccordion(props: IProps) {
+    let { delivery, index } = props;
+    const DeliveryTableRowClasses = DeliveryAccordionCSSClasses();
+    const [activeAccordion, setActiveAccordion] = useState<number>(-1);
+
     const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
 
+    // const collapseAccordions = function() {
+    //     const accordions = document.querySelectorAll("DeliveryAccordion");
+    //     [...accordions].forEach(accordion => {
+    //         accordion.querySelector(".deliveryDetails").;
+    //     });
+    // };
+
+    useEffect(() => {
+        console.log(activeAccordion);
+    }, [activeAccordion]);
+
     return (
-        <td colSpan={4} className={classNames("DeliveryTableRow", DeliveryTableRowClasses.root)}>
-            <div className={DeliveryTableRowClasses.rowDelivery}>
+        <>
+            <div
+                className={classNames(
+                    "DeliveryAccordion",
+                    DeliveryTableRowClasses.root,
+                    activeAccordion === index ? "isActive" : "",
+                )}
+                data-index={index}
+            >
                 <div className={DeliveryTableRowClasses.colDeliveryID}>
                     <Button
                         baseClass={ButtonTypes.ICON}
                         className="collapseDeliveryButton"
-                        onClick={props.onClick}
                         data-index={index}
+                        onClick={() => {
+                            setActiveAccordion(activeAccordion !== index ? index : -1);
+                        }}
                     >
                         <span className="collapseIcon">
                             <RightChevronIcon centred={true} />
@@ -57,8 +76,8 @@ export function DeliveryTableRow(props: IProps) {
             <DeliveryDetails
                 webhookDeliveryID={delivery.webhookDeliveryID}
                 webhookID={delivery.webhookID}
-                isActive={isActive}
+                isActive={activeAccordion === index}
             />
-        </td>
+        </>
     );
 }

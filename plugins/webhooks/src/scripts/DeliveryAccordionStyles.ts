@@ -9,13 +9,19 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { calc, quote, percent } from "csx";
 import { cssOut } from "@dashboard/compatibilityStyles";
 
-export const deliveryTableRowCSSClasses = useThemeCache(() => {
+export const DeliveryAccordionCSSClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const horizontalPadding = 18;
     const verticalPadding = globalVars.gutter.size / 2;
-    const style = styleFactory("DeliveryTableRow");
+    const style = styleFactory("DeliveryAccordion");
 
     const root = style({
+        display: "flex",
+        alignItems: "stretch",
+        width: percent(100),
+    });
+
+    const rowWrap = style("rowWrap", {
         $nest: {
             "&&": {
                 padding: 0,
@@ -33,12 +39,6 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
                 color: colorOut(globalVars.links.colors.active),
             },
         },
-    });
-
-    const rowDelivery = style("rowWrap", {
-        display: "flex",
-        alignItems: "stretch",
-        width: percent(100),
     });
 
     const colDeliveryID = style("colDeliveryID", {
@@ -77,22 +77,21 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
         transition: `transform ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
     });
 
-    cssOut("tr", {
+    cssOut(".DeliveryAccordion", {
         $nest: {
             ".collapseDeliveryButton": {
                 width: "auto",
             },
-        },
-    });
-
-    cssOut("tr.isOpen", {
-        $nest: {
-            ".collapseIcon": {
-                transform: "rotate(90deg)",
-                color: globalVars.links.colors.active,
+            "&.isActive": {
+                $nest: {
+                    ".collapseIcon": {
+                        transform: "rotate(90deg)",
+                        color: globalVars.links.colors.active,
+                    },
+                },
             },
         },
     });
 
-    return { root, rowDelivery, colDeliveryID, collapseLabel };
+    return { root, rowWrap, colDeliveryID, collapseLabel };
 });

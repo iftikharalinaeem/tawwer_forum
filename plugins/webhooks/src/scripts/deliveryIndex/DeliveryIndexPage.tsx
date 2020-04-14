@@ -14,10 +14,10 @@ import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { EmptyDeliveriesResults } from "../EmptyDeliveriesResults";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
 import { IDeliveryFragment } from "@webhooks/DeliveryTypes";
-import { DeliveryTableRow } from "@webhooks/DeliveryTableRow";
+import { DeliveryAccordion } from "@webhooks/DeliveryAccordion";
 import { useHistory } from "react-router-dom";
 import { useDeliveryActions } from "@webhooks/DeliveryActions";
-import classNames from "classnames";
+import { DeliveryAccordionCSSClasses } from "@webhooks/DeliveryAccordionStyles";
 
 export default function DeliveryIndex() {
     const params = useParams<{ webhookID?: string }>();
@@ -26,18 +26,7 @@ export default function DeliveryIndex() {
     const { deliveriesByWebhookID } = useDeliveryData();
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
-    const [activeTab, setActiveTab] = useState(-1);
-    const [cachedActiveTab, setCachedActiveTab] = useState(-1);
-
-    const getCollapseDeliveryButton = function(target): Element {
-        let collapseDeliveryButton = target.parentElement.classList.contains("collapseDeliveryButton")
-            ? target.parentElement
-            : target.firstChild.classList.contains("collapseDeliveryButton")
-            ? target.firstChild
-            : target;
-
-        return collapseDeliveryButton;
-    };
+    const DeliveryAccordionClasses = DeliveryAccordionCSSClasses();
 
     useEffect(() => {
         if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
@@ -69,21 +58,11 @@ export default function DeliveryIndex() {
                     </tr>
                 }
                 body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment, index: number) => {
-                    let isActive = activeTab === index;
-
                     return (
-                        <tr key={delivery.webhookDeliveryID} className={classNames(isActive ? "isOpen" : "")}>
-                            <DeliveryTableRow
-                                delivery={delivery}
-                                isActive={isActive}
-                                index={index}
-                                onClick={e => {
-                                    e.preventDefault();
-                                    const collapseDeliveryButton = getCollapseDeliveryButton(e.target);
-                                    isActive = collapseDeliveryButton.dataset.index !== activeTab;
-                                    setActiveTab(index);
-                                }}
-                            />
+                        <tr key={delivery.webhookDeliveryID}>
+                            <td colSpan={4} className={DeliveryAccordionClasses.rowWrap}>
+                                <DeliveryAccordion key={delivery.webhookDeliveryID} delivery={delivery} index={index} />
+                            </td>
                         </tr>
                     );
                 })}

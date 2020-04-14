@@ -15,7 +15,6 @@ import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
 import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
-import { IDeliveryState, IDelivery } from "./DeliveryTypes";
 
 interface IProps {
     webhookID?: number;
@@ -78,7 +77,10 @@ export function DeliveryDetails(props: IProps) {
     }
 
     return (
-        <div className={classNames(deliveryDetailsClasses.root, isActive ? "isActive" : "")} data-collapsed={!isActive}>
+        <div
+            className={classNames("deliveryDetails", deliveryDetailsClasses.root, isActive ? "isActive" : "")}
+            data-collapsed={!isActive}
+        >
             <Tabs
                 classes={deliveryTabsCSSClasses()}
                 data={[
