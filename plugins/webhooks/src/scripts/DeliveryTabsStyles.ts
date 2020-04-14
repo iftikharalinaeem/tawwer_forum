@@ -7,6 +7,7 @@ import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { paddings, singleBorder, margins, colorOut } from "@library/styles/styleHelpers";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { calc, quote, percent } from "csx";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const deliveryTabsCSSClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -15,20 +16,18 @@ export const deliveryTabsCSSClasses = useThemeCache(() => {
     const horizontalPadding = 18;
     const verticalPadding = globalVars.gutter.size / 2;
     const activeStyles = {
-        $nest: {
-            "&::before": {
-                content: quote(``),
-                display: "block",
-                position: "absolute",
-                ...margins({
-                    vertical: 0,
-                    horizontal: "auto",
-                }),
-                bottom: 0,
-                height: "2px",
-                backgroundColor: colorOut(globalVars.mainColors.primary),
-                width: calc(`${percent(100)} - ${horizontalPadding * 2}px`),
-            },
+        "&::before": {
+            content: quote(""),
+            display: "block",
+            position: "absolute",
+            bottom: 0,
+            ...margins({
+                vertical: 0,
+                horizontal: "auto",
+            }),
+            height: "2px",
+            backgroundColor: colorOut(globalVars.mainColors.primary),
+            width: calc(`${percent(100)} - ${horizontalPadding * 2}px`),
         },
     };
 
@@ -50,7 +49,7 @@ export const deliveryTabsCSSClasses = useThemeCache(() => {
             bottom: "-1px",
         }),
         $nest: {
-            "&:active": activeStyles,
+            "&:active": activeStyles as NestedCSSProperties,
         },
     });
 
@@ -61,7 +60,7 @@ export const deliveryTabsCSSClasses = useThemeCache(() => {
         }),
     });
 
-    const isActive = style("isActive", activeStyles);
+    const isActive = style("isActive", activeStyles as NestedCSSProperties);
 
     return { tab, tabList, panel, isActive };
 });
