@@ -491,7 +491,7 @@ trait ArticlesApiHelper {
         $defaultArticleID = null;
         if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
             $kbID = $knowledgeBase['knowledgeBaseID'];
-            $defaultArticleID = $this->knowledgeNavigationApi->getDefaultArticleID($kbID);
+            $defaultArticleID = $this->knowledgeNavigationModel->getDefaultArticleID($kbID);
             $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], ['knowledgeBaseID' => $kbID]);
         }
         return $defaultArticleID;

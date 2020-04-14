@@ -7,11 +7,10 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
-use Vanilla\Knowledge\Models\Navigation;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 
 trait KnowledgeNavigationApiSchemes {
+
     /** @var Schema */
     private $categoryNavigationFragment;
 
@@ -25,9 +24,7 @@ trait KnowledgeNavigationApiSchemes {
      */
     public function categoryNavigationFragment(): Schema {
         if ($this->categoryNavigationFragment === null) {
-            $schema = Schema::parse($this->getFragmentSchema());
-
-            $this->categoryNavigationFragment = $this->schema($schema, "CategoryNavigationFragment");
+            $this->categoryNavigationFragment = Schema::parse($this->getNavFragmentSchema());
         }
         return $this->categoryNavigationFragment;
     }
@@ -37,7 +34,7 @@ trait KnowledgeNavigationApiSchemes {
      *
      * @return array
      */
-    public function getFragmentSchema(): array {
+    public function getNavFragmentSchema(): array {
         return [
             "name" => [
                 "allowNull" => true,
@@ -67,7 +64,7 @@ trait KnowledgeNavigationApiSchemes {
             ],
             "recordType" => [
                 "description" => "Type of record represented by the navigation item.",
-                "enum" => [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE],
+                "enum" => [KnowledgeNavigationModel::RECORD_TYPE_CATEGORY, KnowledgeNavigationModel::RECORD_TYPE_ARTICLE],
                 "type" => "string",
             ]
         ];
@@ -80,7 +77,7 @@ trait KnowledgeNavigationApiSchemes {
      */
     public function schemaWithChildren() {
         if ($this->navigationTreeSchema === null) {
-            $schema = Schema::parse($this->getFragmentSchema())
+            $schema = Schema::parse($this->getNavFragmentSchema())
                 ->setID('navigationTreeSchema');
             $schema->merge(Schema::parse([
                 'children:a?' =>  $schema
@@ -93,32 +90,23 @@ trait KnowledgeNavigationApiSchemes {
     /**
      * Prepare default schema array for "in" schema
      *
-     * @return array
+     * @return Schema
      */
-    public function defaultSchema() {
-        return [
-            "knowledgeCategoryID?" => [
-                "description" => "Unique ID of a knowledge category to get navigation for. Only direct children of this category will be included.",
+    private function navInputSchema(): Schema {
+        return Schema::parse([
+            "knowledgeBaseID?" => [
+                "description" => "Unique ID of a knowledge base to get navigation for. Only items from this knowledge base will be included.",
                 "type" => "integer",
-            ],
-            "recordType?" => [
-                "default" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL,
-                "description" => "The type of record to limit navigation results to.",
-                "enum" => [
-                    KnowledgeNavigationApiController::FILTER_RECORD_TYPE_CATEGORY,
-                    KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL
-                ],
-                "type" => "string",
             ],
             "locale?" => [
                 "description" => "Locale to represent content in.",
                 "type" => "string",
             ],
             "only-translated?" => [
-                "description" => "If transalted revisions does not exist don not return related article.",
+                "description" => "If set, un-translated items will not be returned.",
                 "type" => "boolean",
                 "default" => false
             ],
-        ];
+        ]);
     }
 }

@@ -19,7 +19,6 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Controllers\Api\ActionConstants;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeBasesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\SiteMeta;
@@ -62,9 +61,6 @@ abstract class KbPage extends ThemedPage {
     /** @var KnowledgeApiController */
     protected $rootApi;
 
-    /** @var KnowledgeNavigationApiController */
-    protected $navApi;
-
     /** @var KnowledgeCategoriesApiController */
     protected $categoriesApi;
 
@@ -106,7 +102,6 @@ abstract class KbPage extends ThemedPage {
         \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeApiController $rootApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
-        KnowledgeNavigationApiController $navApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
         DeploymentCacheBuster $deploymentCacheBuster = null, // Default needed for method extensions
         AnalyticsClient $analyticsClient = null, // Default needed for method extensions
@@ -125,7 +120,6 @@ abstract class KbPage extends ThemedPage {
         $this->usersApi = $usersApi;
         $this->rootApi = $rootApi;
         $this->kbApi = $kbApi;
-        $this->navApi = $navApi;
         $this->categoriesApi = $categoriesApi;
         $this->deploymentCacheBuster = $deploymentCacheBuster;
         $this->analyticsClient = $analyticsClient;
@@ -292,7 +286,6 @@ abstract class KbPage extends ThemedPage {
     protected function preloadNavigation(int $knowledgeBaseID) {
         $options = [
             "knowledgeBaseID" => $knowledgeBaseID,
-            "recordType" => KnowledgeNavigationApiController::FILTER_RECORD_TYPE_ALL,
             "locale" => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
         ];
 

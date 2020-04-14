@@ -80,6 +80,6 @@ class KbBreadcrumbProvider implements BreadcrumbProviderInterface {
      * @inheritdoc
      */
     public static function getValidRecordTypes(): array {
-        return [Navigation::RECORD_TYPE_CATEGORY, Navigation::RECORD_TYPE_ARTICLE];
+        return [KnowledgeNavigationModel::RECORD_TYPE_CATEGORY, KnowledgeNavigationModel::RECORD_TYPE_ARTICLE];
     }
 }

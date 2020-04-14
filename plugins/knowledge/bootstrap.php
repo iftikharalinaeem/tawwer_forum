@@ -7,7 +7,12 @@
 
 use Garden\Container\Reference;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Knowledge\Models\NavigationCacheProcessor;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 
 $container = \Gdn::getContainer();
 
@@ -32,4 +37,12 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
     )
     ->rule(TranslationProviderInterface::class)
     ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
+    ->rule(ArticleModel::class)
+    ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
+    ->rule(KnowledgeCategoryModel::class)
+    ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
+    ->rule(KnowledgeBaseModel::class)
+    ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
+    ->rule(TranslationPropertyModel::class) // If the plugins not enabled it doesn't matter, since just a rule.
+    ->addCall('addPipelinePostProcessor', [new Reference(NavigationCacheProcessor::class)])
 ;

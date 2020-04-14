@@ -11,14 +11,20 @@ use Garden\Container\Reference;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Knowledge\Models\KnowledgeNavigationCache;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Knowledge\Models\NavigationCacheProcessor;
 use Vanilla\Models\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;
@@ -29,7 +35,6 @@ use Garden\Schema\Schema;
 use Vanilla\Knowledge\Models\ArticleDraftCounterProvider;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use PermissionModel;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\SmartIDMiddleware;
@@ -60,8 +65,11 @@ class KnowledgePlugin extends \Gdn_Plugin {
     /** @var DefaultArticleModel $defaultArticleModel */
     private $defaultArticleModel;
 
-    /** @var KnowledgeNavigationApiController $knowledgeNavigationApi */
-    private $knowledgeNavigationApi;
+    /** @var KnowledgeNavigationModel $knowledgeNavigationModel */
+    private $knowledgeNavigationModel;
+
+    /** @var KnowledgeNavigationCache */
+    private $navCache;
 
     /**
      * KnowledgePlugin constructor.
@@ -73,7 +81,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
      * @param SiteSectionModel $siteSectionModel
      * @param PermissionModel $permissionModel
      * @param DefaultArticleModel $defaultArticleModel
-     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
+     * @param KnowledgeNavigationModel $knowledgeNavigationModel
+     * @param KnowledgeNavigationCache $navCache
      */
     public function __construct(
         \Gdn_Database $database,
@@ -83,7 +92,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
         SiteSectionModel $siteSectionModel,
         PermissionModel $permissionModel,
         DefaultArticleModel $defaultArticleModel,
-        KnowledgeNavigationApiController $knowledgeNavigationApi
+        KnowledgeNavigationModel $knowledgeNavigationModel,
+        KnowledgeNavigationCache $navCache
     ) {
         parent::__construct();
         $this->database = $database;
@@ -93,7 +103,8 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $this->siteSectionModel = $siteSectionModel;
         $this->permissionModel = $permissionModel;
         $this->defaultArticleModel = $defaultArticleModel;
-        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
+        $this->knowledgeNavigationModel = $knowledgeNavigationModel;
+        $this->navCache = $navCache;
     }
 
     /**
@@ -439,9 +450,12 @@ class KnowledgePlugin extends \Gdn_Plugin {
         foreach ($kbs as $kb) {
             if (empty($kb['defaultArticleID'])) {
                 $kbID = $kb[KnowledgeBaseModel::RECORD_ID_FIELD];
-                $defaultArticleID = $this->knowledgeNavigationApi->getDefaultArticleID($kbID);
+                $defaultArticleID = $this->knowledgeNavigationModel->getDefaultArticleID($kbID);
                 $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], [KnowledgeBaseModel::RECORD_ID_FIELD => $kbID]);
             }
         }
+
+        // Clear the navigation cache.
+        $this->navCache->deleteAll();
     }
 }
