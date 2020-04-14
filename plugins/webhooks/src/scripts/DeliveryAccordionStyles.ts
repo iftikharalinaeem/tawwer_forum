@@ -74,7 +74,7 @@ export const DeliveryAccordionCSSClasses = useThemeCache(() => {
 
     cssOut(".collapseIcon", {
         marginRight: unit(globalVars.gutter.half),
-        transition: `transform ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
+        transition: `transform .2s ${globalVars.animation.defaultEasing}`,
     });
 
     cssOut(".DeliveryAccordion", {

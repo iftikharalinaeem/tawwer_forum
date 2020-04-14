@@ -16,13 +16,13 @@ export const deliveryDetailsCSSClasses = useThemeCache(() => {
         $nest: {
             "&&": {
                 padding: 0,
-                height: 0,
+                maxHeight: 0,
                 overflow: "hidden",
                 willChange: "height",
-                ...defaultTransition("height"),
+                transition: `max-height .2s ${globalVars.animation.defaultEasing}`,
             },
             "&&.isActive": {
-                height: "auto",
+                maxHeight: "2000px",
             },
             "&:hover, &:focus": {
                 backgroundColor: colorOut(globalVars.mainColors.bg),
