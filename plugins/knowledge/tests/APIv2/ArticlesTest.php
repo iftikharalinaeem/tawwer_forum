@@ -1030,7 +1030,6 @@ class ArticlesTest extends AbstractResourceTest {
 
     /**
      * Test /articles/{id}/react with articles.manage
-     *
      */
     public function testPutReactHelpfulWithForeignIDPass() {
         $user = $this->setupUserWithKBPermissions(Operation::MODE_IMPORT);
@@ -1059,8 +1058,7 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test /articles/{id}/react with articles.manage
-     *
+     * Test /articles/{id}/react without articles.manage
      */
     public function testPutReactHelpfulWithForeignIDFailed() {
         $user = $this->setupUserWithKBPermissions('contentViewer');
@@ -1126,7 +1124,6 @@ class ArticlesTest extends AbstractResourceTest {
      * @return array
      */
     protected function createUserRole(array $newRole): array {
-
         $role = $this->api()->post(
                 '/roles',
                 [
@@ -1151,7 +1148,6 @@ class ArticlesTest extends AbstractResourceTest {
                     ]
                 ]
             )->getBody();
-
         return $role;
     }
 }
