@@ -402,35 +402,7 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
         $this->expectException($args['exception']);
         $responseStatus = $this->api()->get('/articles/'.$articleID.'/edit')->getStatusCode();
     }
-
-    /**
-     * Test /articles/{id}/react
-     *
-     * @param array $args
-     * @depends testPrepareData
-     * @dataProvider patchCategoryNameSuccessProvider
-     */
-    public function testPutReactHelpfulWithForeignID(array $args) {
-        $userID = self::$content['users'][$args['user']]['userID'];
-        $article = self::$content['kbs'][$args['kb']]['patchArticle'];
-        $this->api()->setUserID(self::$content['users'][$args['user']]['userID']);
-        $articleID = self::$content['kbs'][$args['kb']]['patchArticle']['articleID'];
-        $body = $this->api()->put(
-            "{$this->baseUrl}/{$articleID}/react",
-            [
-                'helpful' => 'yes',
-                'insertUserID' => 1,
-                'foreignID' => 'vanilla-test'
-            ]
-        )->getBody();
-
-      //  $this->assertEquals($article['name'], $body['name']);
-        $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
-        $this->assertEquals(1, $body['reactions'][0]['yes']);
-        $this->assertEquals(0, $body['reactions'][0]['no']);
-        $this->assertEquals(1, $body['reactions'][0]['total']);
-    }
-
+    
     /**
      * Data provider for testGetEditArticle()
      *
