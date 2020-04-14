@@ -52,7 +52,8 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
                             'type' => 'global',
                             'permissions' => [
                                 'kb.view' => true,
-                                'articles.add' => true
+                                'articles.add' => true,
+                                'articles.manage' => true
                             ]
                         ],
                         [
@@ -668,6 +669,9 @@ class KnowledgeBasesCustomPermissionsTest extends AbstractAPIv2Test {
             ],
         ];
     }
+
+
+
 
     ///
     /// SORRY. Right now messing with the guest user pollutes the other test cases.
