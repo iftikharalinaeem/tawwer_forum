@@ -13,15 +13,17 @@ import { RightChevronIcon } from "@library/icons/common";
 import { DeliveryDetails } from "@webhooks/DeliveryDetails";
 import { deliveryTableRowCSSClasses } from "@webhooks/DeliveryTableRowStyles";
 import { TableColumnSize } from "@dashboard/tables/DashboardTableHeadItem";
+import classNames from "classnames";
 
 interface IProps {
     delivery: IDeliveryFragment;
     onClick?: (e) => void;
     isActive: boolean;
+    index: number;
 }
 
 export function DeliveryTableRow(props: IProps) {
-    let { delivery, isActive } = props;
+    let { delivery, isActive, index } = props;
     const DeliveryTableRowClasses = deliveryTableRowCSSClasses();
     const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
@@ -29,14 +31,21 @@ export function DeliveryTableRow(props: IProps) {
     };
 
     return (
-        <td colSpan={4} className={DeliveryTableRowClasses.root}>
+        <td colSpan={4} className={classNames("DeliveryTableRow", DeliveryTableRowClasses.root)}>
             <div className={DeliveryTableRowClasses.rowDelivery}>
                 <div className={DeliveryTableRowClasses.colDeliveryID}>
-                    <Button baseClass={ButtonTypes.ICON} className="collapseDeliveryButton" onClick={props.onClick}>
+                    <Button
+                        baseClass={ButtonTypes.ICON}
+                        className="collapseDeliveryButton"
+                        onClick={props.onClick}
+                        data-index={index}
+                    >
                         <span className="collapseIcon">
                             <RightChevronIcon centred={true} />
                         </span>
-                        <span>{delivery.webhookDeliveryID}</span>
+                        <span className={classNames("collapseLabel", DeliveryTableRowClasses.collapseLabel)}>
+                            {delivery.webhookDeliveryID}
+                        </span>
                     </Button>
                 </div>
                 <div className={TableColumnSize.XS}>

@@ -27,6 +27,17 @@ export default function DeliveryIndex() {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState<string>(LoadStatus.PENDING);
     const [activeTab, setActiveTab] = useState(-1);
+    const [cachedActiveTab, setCachedActiveTab] = useState(-1);
+
+    const getCollapseDeliveryButton = function(target): Element {
+        let collapseDeliveryButton = target.parentElement.classList.contains("collapseDeliveryButton")
+            ? target.parentElement
+            : target.firstChild.classList.contains("collapseDeliveryButton")
+            ? target.firstChild
+            : target;
+
+        return collapseDeliveryButton;
+    };
 
     useEffect(() => {
         if (isLoading === LoadStatus.PENDING && typeof params.webhookID === "string") {
@@ -59,17 +70,17 @@ export default function DeliveryIndex() {
                 }
                 body={Object.values(deliveriesByWebhookID.data).map((delivery: IDeliveryFragment, index: number) => {
                     let isActive = activeTab === index;
+
                     return (
-                        <tr
-                            key={delivery.webhookDeliveryID}
-                            data-index={index}
-                            className={classNames(isActive ? "isOpen" : "")}
-                        >
+                        <tr key={delivery.webhookDeliveryID} className={classNames(isActive ? "isOpen" : "")}>
                             <DeliveryTableRow
                                 delivery={delivery}
                                 isActive={isActive}
+                                index={index}
                                 onClick={e => {
-                                    console.log(e.target);
+                                    e.preventDefault();
+                                    const collapseDeliveryButton = getCollapseDeliveryButton(e.target);
+                                    isActive = collapseDeliveryButton.dataset.index !== activeTab;
                                     setActiveTab(index);
                                 }}
                             />

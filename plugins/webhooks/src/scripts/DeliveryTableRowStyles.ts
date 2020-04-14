@@ -23,6 +23,18 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
         },
     });
 
+    const collapseLabel = style("collapseLabel", {
+        color: colorOut(globalVars.links.colors.default),
+        $nest: {
+            "&&:not(.focus-visible)": {
+                outline: 0,
+            },
+            "&&:hover, &&:focus, &&:active": {
+                color: colorOut(globalVars.links.colors.active),
+            },
+        },
+    });
+
     const rowDelivery = style("rowWrap", {
         display: "flex",
         alignItems: "stretch",
@@ -61,7 +73,7 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
     });
 
     cssOut(".collapseIcon", {
-        marginRight: unit(globalVars.gutter.size),
+        marginRight: unit(globalVars.gutter.half),
         transition: `transform ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
     });
 
@@ -77,9 +89,10 @@ export const deliveryTableRowCSSClasses = useThemeCache(() => {
         $nest: {
             ".collapseIcon": {
                 transform: "rotate(90deg)",
+                color: globalVars.links.colors.active,
             },
         },
     });
 
-    return { root, rowDelivery, colDeliveryID };
+    return { root, rowDelivery, colDeliveryID, collapseLabel };
 });

@@ -15,6 +15,7 @@ import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { deliveryTabsCSSClasses } from "@webhooks/DeliveryTabsStyles";
 import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
+import { IDeliveryState, IDelivery } from "./DeliveryTypes";
 
 interface IProps {
     webhookID?: number;
@@ -26,18 +27,16 @@ export function DeliveryDetails(props: IProps) {
     const { deliveriesByDeliveryID } = useDeliveryData();
     const { getDeliveryByID } = useDeliveryActions();
     const deliveryDetailsClasses = deliveryDetailsCSSClasses();
-    const [deliveryRecord, setDeliveryRecord] = useState<string | null>(null);
     let requestBody;
     let requestHeaders;
     let responseBody;
     let responseHeaders;
 
     useEffect(() => {
-        if (webhookID && webhookDeliveryID) {
+        if (webhookID && webhookDeliveryID && isActive) {
             getDeliveryByID(webhookID, webhookDeliveryID);
-            setDeliveryRecord(deliveriesByDeliveryID.data);
         }
-    }, [getDeliveryByID, webhookDeliveryID, webhookID]);
+    }, [getDeliveryByID, webhookDeliveryID, webhookID, isActive]);
 
     const isJson = function(str) {
         try {
@@ -67,7 +66,7 @@ export function DeliveryDetails(props: IProps) {
         return joinedHeaders;
     };
 
-    if (deliveriesByDeliveryID.status === LoadStatus.LOADING) {
+    if (deliveriesByDeliveryID.status === LoadStatus.LOADING && isActive) {
         return <Loader />;
     }
 
