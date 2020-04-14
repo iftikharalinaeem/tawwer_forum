@@ -29,10 +29,6 @@ export function DeliveryAccordion(props: IProps) {
         return seconds + "s";
     };
 
-    useEffect(() => {
-        console.log(activeAccordion);
-    }, [activeAccordion]);
-
     return (
         <>
             <div
