@@ -124,14 +124,6 @@ class KnowledgeNavigationModel {
     private function buildNavigationInternal(KnowledgeNavigationQuery $query): array {
         $knowledgeBase = $this->knowledgeBaseByID($query->getKnowledgeBaseID());
 
-        $categories = $this->knowledgeCategoryModel->get(
-            ["knowledgeBaseID" => $query->getKnowledgeBaseID()],
-            [
-                'orderFields' => 'sort',
-                'orderDirection' => 'asc'
-            ]
-        );
-
         $dbQueryOptions = [
             'only-translated' => $query->isOnlyTranslated(),
         ];
@@ -148,13 +140,20 @@ class KnowledgeNavigationModel {
 
         $dbQueryOptions["queryLocale"] = $queryLocale;
 
-        $categoryArticles = array_column($categories, 'knowledgeCategoryID');
+        $categories = $this->knowledgeCategoryModel->get(
+            [ "knowledgeBaseID" => $query->getKnowledgeBaseID() ],
+            [
+                'orderFields' => 'sort',
+                'orderDirection' => 'asc'
+            ]
+        );
         if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $categoryIDs = array_column($categories, 'knowledgeCategoryID');
             // Guides get articles included.
             $dbWhere = array_merge(
                 $dbWhere,
                 [
-                    'a.knowledgeCategoryID' => $categoryArticles,
+                    'a.knowledgeCategoryID' => $categoryIDs,
                     'a.status' => ArticleModel::STATUS_PUBLISHED
                 ]
             );
@@ -183,9 +182,10 @@ class KnowledgeNavigationModel {
                     "orderDirection" => $orderDirection,
                 ]
             );
-
+            
+            // We have all the categories. We need to group them by common depth-1 categories.
             $articles = $this->articleModel->getTopPerCategory(
-                $categoryArticles,
+                $categories,
                 $dbWhere,
                 $dbQueryOptions
             );
@@ -201,7 +201,13 @@ class KnowledgeNavigationModel {
             }
         }
 
-        $result = $this->normalizeNavigation($categories, $articles, $query->isFlat(), KnowledgeCategoryModel::ROOT_ID, $knowledgeBase["sortArticles"]);
+        $result = $this->normalizeNavigation(
+            $categories,
+            $articles,
+            $query->isFlat(),
+            KnowledgeCategoryModel::ROOT_ID,
+            $knowledgeBase["sortArticles"]
+        );
         return $result;
     }
 

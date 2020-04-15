@@ -48,6 +48,7 @@ class CategoryPage extends KbPage {
         $articles = $this->articlesApi->index([
             "expand" => "excerpt",
             "knowledgeCategoryID" => $category['knowledgeCategoryID'],
+            "includeSubcategories" => true,
             "limit" => 10,
             "page" => $pageNumber,
         ]);

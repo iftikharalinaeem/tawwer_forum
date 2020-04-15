@@ -373,6 +373,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 "type" => "integer",
                 "minimum" => 1,
             ],
+            "includeSubcategories:b?",
             "limit" => [
                 "default" => ArticleModel::LIMIT_DEFAULT,
                 "minimum" => 1,
@@ -407,9 +408,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "offset" => $offset,
         ];
 
+        $includeSubcategories = $query['includeSubcategories'] ?? false;
         $knowledgeCategory = $this->knowledgeCategoryByID($query["knowledgeCategoryID"]);
         $paging = \Vanilla\ApiUtils::numberedPagerInfo(
-            $knowledgeCategory["articleCount"],
+            $includeSubcategories ? $knowledgeCategory['articleCountRecursive'] : $knowledgeCategory["articleCount"],
             "/api/v2/articles",
             $query,
             $in
@@ -431,8 +433,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $locale = $query["locale"] ?? $knowledgeBase["sourceLocale"];
 
+        $categoryIDs = [$query['knowledgeCategoryID']];
+        if ($includeSubcategories) {
+            $collection = $this->knowledgeCategoryModel->getCollectionForKB($knowledgeBase['knowledgeBaseID']);
+            $includedCategories = $collection->getWithChildren($query['knowledgeCategoryID']);
+            $categoryIDs = array_column($includedCategories, 'knowledgeCategoryID');
+        }
+        
         $where = [
-            "a.knowledgeCategoryID" => $query["knowledgeCategoryID"],
+            "a.knowledgeCategoryID" => $categoryIDs,
             "ar.locale" => $locale,
             "a.status" => ArticleModel::STATUS_PUBLISHED,
         ];

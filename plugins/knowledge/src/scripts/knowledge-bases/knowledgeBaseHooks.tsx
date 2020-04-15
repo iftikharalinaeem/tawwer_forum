@@ -14,6 +14,7 @@ import { useEffect, useDebugValue } from "react";
 import { LoadStatus, ILoadable, ILinkListData } from "@vanilla/library/src/scripts/@types/api/core";
 import { useNavigationActions } from "@knowledge/navigation/state/NavigationActions";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
+import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 
 export function useKnowledgeBases(status: KnowledgeBaseStatus) {
     const { knowledgeBasesByID } = useSelector((state: IKnowledgeAppStoreState) => state.knowledge.knowledgeBases);
@@ -103,7 +104,7 @@ export function useKBData() {
 
 export function useHelpCenterNavigation(
     knowledgeBaseID: number,
-): ILoadable<{ navigation: ILinkListData; rootCategoryUrl: string }> {
+): ILoadable<{ navigation: ILinkListData; rootCategory: IKbNavigationItem<KbRecordType.CATEGORY> }> {
     const { getNavigationFlat } = useNavigationActions();
     const knowledgeBase = useKnowledgeBase(knowledgeBaseID);
     const data = useSelector((state: IKnowledgeAppStoreState) => {
@@ -130,7 +131,7 @@ export function useHelpCenterNavigation(
                 status: LoadStatus.SUCCESS,
                 data: {
                     navigation,
-                    rootCategoryUrl: rootCategory.url,
+                    rootCategory,
                 },
             };
         } else {

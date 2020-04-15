@@ -32,24 +32,6 @@ class KnowledgeHelpNavigationTranslationTest extends KbApiTestCase {
     private static $content = [];
 
     /**
-     * Grab values for inserting a new knowledge category.
-     *
-     * @param array $record Record defaults
-     *
-     * @return array
-     */
-    public function kbCategoryRecord(array $record = []): array {
-        $record = [
-            "name" => $record['name'] ?? "Test Knowledge Category",
-            "parentID" => $record['parentID'] ?? -1,
-            "knowledgeBaseID" => $record['knowledgeBaseID'] ?? 1,
-            "sortChildren" => $record['sortChildren'] ?? "name",
-            "sort" => $record['sort'] ?? 0,
-        ];
-        return $record;
-    }
-
-    /**
      * Generate some content
      *
      * @param array $record
@@ -116,9 +98,10 @@ class KnowledgeHelpNavigationTranslationTest extends KbApiTestCase {
             ->getBody();
 
         for ($i = 1; $i<5; $i++) {
-            $kbCategory = $this->kbCategoryRecord();
-            $kbCategory['name'] = $i.' '.$kbCategory['name'];
-            $kbCategory = $this->api()->post($this->baseUrl, $kbCategory)->getBody();
+            $kbCategory = $this->createCategory([
+                'name' => "Test Knowledge Category",
+                'parentID' => $helpKb['rootCategoryID'],
+            ]);
 
             self::$content['article'.$i] = $article = $this->api()->post('/articles', [
                 "knowledgeCategoryID" => $cat0["knowledgeCategoryID"],
