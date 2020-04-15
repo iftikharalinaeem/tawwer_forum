@@ -10,7 +10,7 @@ import LocationPickerInsertArticle from "@knowledge/modules/locationPicker/compo
 import LocationPickerInstructions from "@knowledge/modules/locationPicker/components/LocationPickerInstructions";
 import LocationPickerActions from "@knowledge/modules/locationPicker/LocationPickerActions";
 import LocationPickerModel, { ILocationPickerRecord } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
+import NavigationModel, { IKbNavigationItem, KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import NavigationSelector from "@knowledge/navigation/state/NavigationSelector";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
@@ -82,9 +82,13 @@ class LocationContents extends React.Component<IProps> {
                 let isPassedSelectedArticle = false;
                 contents = childRecords.data.map((item, index) => {
                     const isSelected =
-                        !!selectedRecord &&
-                        item.recordType === selectedRecord.recordType &&
-                        item.recordID === selectedRecord.recordID;
+                        (!!selectedRecord &&
+                            item.recordType === selectedRecord.recordType &&
+                            item.recordID === selectedRecord.recordID) ||
+                        (navigatedRecord === null &&
+                            item.recordType === KbRecordType.KB &&
+                            selectedRecord?.parentID === NavigationModel.SYNTHETIC_ROOT.recordID &&
+                            selectedRecord.knowledgeBaseID === item.recordID);
                     const isSelectedArticle =
                         !!selectedArticle &&
                         item.recordID === selectedArticle.articleID &&

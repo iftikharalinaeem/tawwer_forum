@@ -224,9 +224,7 @@ export default class NavigationSelector {
                         }
                     }
 
-                    if (group.items.length > 0) {
-                        data.groups.push(group);
-                    }
+                    data.groups.push(group);
                     break;
                 }
             }

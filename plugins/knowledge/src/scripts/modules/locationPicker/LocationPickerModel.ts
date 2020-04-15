@@ -144,6 +144,7 @@ export interface ILocationPickerRecord {
     knowledgeBaseID: number;
     position?: number;
     articleRedirection?: boolean;
+    parentID?: number;
 }
 
 export interface ILocationPickerState {
