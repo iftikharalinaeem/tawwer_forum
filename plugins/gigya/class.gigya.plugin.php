@@ -50,7 +50,7 @@ class GigyaPlugin extends SSOAddon {
          $model = new Gdn_AuthenticationProviderModel();
          $provider = [
             'AuthenticationKey' => self::PROVIDER_KEY,
-            'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
+            'AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME,
             'Name' => c('Garden.Title'),
             'AuthenticateUrl' => 'https://socialize.gigya.com/socialize.login',
 
