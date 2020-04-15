@@ -6,8 +6,8 @@
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { borders, colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
-import { important, percent, calc, px, rgba } from "csx";
+import { borders, colorOut, margins, negativeUnit, paddings, unit } from "@library/styles/styleHelpers";
+import { important, percent, calc, px, rgba, translateY } from "csx";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonStates } from "@library/styles/styleHelpers";
 import { userSelect } from "@library/styles/styleHelpers";
@@ -15,7 +15,6 @@ import { allButtonStates } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { modalVariables } from "@library/modal/modalStyles";
-
 export const navigationManagerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const formElementVars = formElementsVariables();
@@ -137,6 +136,12 @@ export const navigationManagerClasses = useThemeCache(() => {
         maxWidth: unit(800),
         width: percent(100),
         ...margins({ horizontal: "auto" }),
+        $nest: {
+            [`& .translationIcon`]: {
+                marginTop: ".5em",
+                transform: translateY(percent(-38)),
+            },
+        },
     });
 
     const containerWidth = style("containerWidth", {
