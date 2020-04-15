@@ -9,11 +9,12 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Test GET /api/v2/knowledge-categories endpoint to return correct breadcrumbs.
  */
-class BreadcrumbsTranslationTest extends AbstractAPIv2Test {
+class BreadcrumbsTranslationTest extends KbApiTestCase {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-categories";
@@ -31,15 +32,7 @@ class BreadcrumbsTranslationTest extends AbstractAPIv2Test {
      * Generate kb and few categories.
      */
     public function testPrepareCategoryData() {
-        $result = $this->api()->post(
-            $this->translationApi,
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-        $this->assertEquals(201, $result->getStatusCode());
+        $this->assertTrue(true); // Need because an assertion is required
 
         $knowledgeBase = $this->api()->post('knowledge-bases', [
             "name" => __FUNCTION__ . " Test Knowledge Base",

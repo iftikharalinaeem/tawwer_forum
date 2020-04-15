@@ -37,7 +37,8 @@ class KnowledgeNavigationCache {
      * @return array|null
      */
     public function get(KnowledgeNavigationQuery $query): ?array {
-        $cacheResult = $this->cache->get($query->buildCacheKey());
+        $key = $query->buildCacheKey();
+        $cacheResult = $this->cache->get($key);
         return $cacheResult ?: null;
     }
 
@@ -50,7 +51,7 @@ class KnowledgeNavigationCache {
     public function set(KnowledgeNavigationQuery $query, array $nav) {
         $key = $query->buildCacheKey();
         $this->addCacheKey($key);
-        $this->cache->add($key, $nav, [
+        $this->cache->store($key, $nav, [
             \Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL,
         ]);
     }
@@ -62,7 +63,10 @@ class KnowledgeNavigationCache {
         $allCacheKeys = $this->cache->get(self::CACHE_HOLDER_KEY) ?: [];
 
         foreach ($allCacheKeys as $cacheKey) {
-            $this->cache->remove($cacheKey);
+            $result = $this->cache->remove($cacheKey);
+            if ($result === \Gdn_Cache::CACHEOP_FAILURE) {
+                trigger_error('Failed to clear KB navigation cache', E_USER_NOTICE);
+            }
         }
         $this->cache->remove(self::CACHE_HOLDER_KEY);
     }
@@ -75,6 +79,6 @@ class KnowledgeNavigationCache {
     private function addCacheKey(string $key) {
         $allCacheKeys = $this->cache->get(self::CACHE_HOLDER_KEY, []);
         $allCacheKeys[] = $key;
-        $this->cache->add(self::CACHE_HOLDER_KEY, $allCacheKeys);
+        $this->cache->store(self::CACHE_HOLDER_KEY, $allCacheKeys);
     }
 }

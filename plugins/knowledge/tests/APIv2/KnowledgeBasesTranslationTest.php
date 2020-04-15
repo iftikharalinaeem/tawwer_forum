@@ -8,11 +8,12 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Test the /api/v2/knowledge-bases endpoint.
  */
-class KnowledgeBasesTranslationTest extends AbstractAPIv2Test {
+class KnowledgeBasesTranslationTest extends KbApiTestCase {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-bases";
@@ -87,15 +88,7 @@ class KnowledgeBasesTranslationTest extends AbstractAPIv2Test {
      * Generate 2 translated knowledge bases, and 2 untranslated knowledge bases.
      */
     public function testPrepareTranslations() {
-        $result = $this->api()->post(
-            $this->translationApi,
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-        $this->assertEquals(201, $result->getStatusCode());
+        $this->assertTrue(true); // Need because an assertion is required
         for ($i = 1; $i<4; $i++) {
             $kb = $this->record('ORIGINAL ('.$i.')');
             $result = $this->api()->post(

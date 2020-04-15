@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Knowledge\Models;
 
+use Vanilla\Knowledge\KnowledgeStructure;
+use Vanilla\Site\TranslationModel;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
@@ -15,7 +17,7 @@ use VanillaTests\Knowledge\Utils\KbApiTestCase;
 class NavigationCacheTest extends KbApiTestCase {
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
-    protected static $addons = ['vanilla', 'knowledge', 'translationsapi'];
+    protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
 
     /**
      * Setup the cache.
@@ -148,20 +150,9 @@ class NavigationCacheTest extends KbApiTestCase {
      * Test that translation actions clear the cache.
      */
     public function testTranslationsCacheClear() {
-        $this->api()->post(
-            '/translations',
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-
         $kb = $this->createKnowledgeBase();
         $category = $this->createCategory(['name' => 'cat1']);
         $article = $this->createArticle(['name' => 'article1']);
-
-        $kbID = $category['knowledgeBaseID'];
 
         $this->assertNotCached($kb);
         $this->assertCached($kb);
@@ -174,5 +165,23 @@ class NavigationCacheTest extends KbApiTestCase {
             'translation' => 'translated-fr',
         ]]);
         $this->assertNotCached($kb, [], "Patching a translation resource clears the cache.");
+    }
+
+    /**
+     * Test that utility update clears the cache.
+     */
+    public function testUtilityUpdateClearCache() {
+        $kb = $this->createKnowledgeBase();
+        $category = $this->createCategory(['name' => 'cat1']);
+        $article = $this->createArticle(['name' => 'article1']);
+
+        $this->assertNotCached($kb);
+        $this->assertCached($kb);
+
+        /** @var KnowledgeStructure $plugin */
+        $structure = self::container()->get(KnowledgeStructure::class);
+        $structure->run();
+
+        $this->assertNotCached($kb);
     }
 }

@@ -239,10 +239,15 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
      * @param bool $onlyTranslated
      * @dataProvider validCounts
      */
-    public function testNavigationFlat(string $locale, int $count, $onlyTranslated) {
-
-        $query = (is_null($onlyTranslated)) ? '' : '&only-translated='.($onlyTranslated ? 'true' : 'false');
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=' . $locale.$query);
+    public function testNavigationFlat(string $locale, int $count, ?bool $onlyTranslated) {
+        $query = [
+            'locale' => $locale,
+        ];
+        if ($onlyTranslated) {
+            $query['only-translated'] = $onlyTranslated;
+        }
+        $kbID = $this->knowledgeBase['knowledgeBaseID'];
+        $response = $this->api()->get("/knowledge-bases/$kbID/navigation-flat", $query);
         $status = $response->getStatus();
         $this->assertEquals('200 OK', $status);
 

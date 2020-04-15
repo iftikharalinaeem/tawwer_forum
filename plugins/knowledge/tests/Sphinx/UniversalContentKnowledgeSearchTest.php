@@ -39,7 +39,7 @@ class UniversalContentKnowledgeSearchTest extends KbApiTestCase {
     protected static $sourceKBs;
 
     /** @var array addons */
-    protected static $addons = ['vanilla', 'sphinx', 'knowledge'];
+    protected static $addons = ['vanilla', 'translationsapi', 'sphinx', 'knowledge'];
 
    /**
     * Prepare knowledge base data for tests and reindex Sphinx indexes.

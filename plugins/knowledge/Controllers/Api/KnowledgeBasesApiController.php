@@ -117,7 +117,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
 
         $locale = $query['locale'] ?? null;
-        $row = $this->knowledgeBaseByID($id);
+        $row = $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
         
         if ($locale) {
@@ -440,7 +440,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // check if kb exists and status is not deleted
-        $this->knowledgeBaseByID($id);
+        $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($id);
         $query['knowledgeBaseID'] = $id;
 
@@ -471,8 +471,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $this->idParamSchema();
         $in = $this->navInputSchema();
         $query = $in->validate($query);
-        //check if kb exists and status is not deleted
-        $this->knowledgeBaseByID($id);
+        // check if kb exists and status is not deleted
+        $this->knowledgeBaseByID($id, false);
 
         $query['knowledgeBaseID'] = $id;
 
@@ -481,12 +481,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $query['knowledgeBaseID'],
             $query['locale'] ?? null,
             true,
-            $query['onlyTranslated'] ?? null
+            $query['only-translated'] ?? null
         ));
 
         $result = Data::box($nav['result']);
         $cached = $nav['cached'];
-        $result->setHeader('X-App-Cache-Hit', $cached);
+        $result->setHeader('X-App-Cache-Hit', $cached ? '1' : '0');
 
         // No result schema becuase it's already applied.
         return $result;
@@ -514,8 +514,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
         // Prep the input.
         $body = $in->validate($body);
 
-        //check if kb exists and status is not deleted
-        $kb = $this->knowledgeBaseByID($id);
+        // check if kb exists and status is not deleted
+        $kb = $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($kb['knowledgeBaseID']);
 
         // No result schema becuase it's already applied.
