@@ -1,5 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/**
+ * Class GigyaPlugin.
+ */
 class GigyaPlugin extends SSOAddon {
    /// Constants ///
     const PROVIDER_KEY = 'gigya';
