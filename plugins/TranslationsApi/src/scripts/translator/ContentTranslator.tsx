@@ -147,7 +147,7 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     }
 
     return (
-        <Permission permission="settings.manage">
+        <Permission permission="site.manage">
             <Button
                 className={classNames(classes.translateIcon, "translationIcon")}
                 baseClass={ButtonTypes.ICON}
