@@ -20,13 +20,13 @@ export const WebhooksAddEditRoute = new RouteHandler(
 );
 
 export const DeliveriesIndexRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/deliveries" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/deliveries" */ "@webhooks/deliveryIndex/DeliveryIndexPage"),
     ["/webhook-settings/:webhookID/deliveries", "/webhook-settings/:webhookID/deliveries/p:page(\\d+)"],
     (params: { webhookID?: number; page?: number }) => `/webhook-settings/${params.webhookID}/deliveries`,
 );
 
 export const DeliveryRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/webhooks/delivery" */ "@webhooks/webhooksIndex/WebhooksIndexPage"),
+    () => import(/* webpackChunkName: "pages/webhooks/delivery" */ "@webhooks/deliveryIndex/DeliveryIndexPage"),
     "/webhook-settings/deliveries/:deliveryID",
     (params: { deliveryID?: number }) => `/webhook-settings/deliveries/${params.deliveryID}`,
 );
