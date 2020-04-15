@@ -98,7 +98,7 @@ export function DeliveryDetails(props: IProps) {
                                     <div className="Request-headers">
                                         <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                         <UserContent
-                                            content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                            content={`<pre class="code codeBlock http">${prettyPrintHTTPHeaders(
                                                 deliveryRecord.requestHeaders,
                                             )}</pre>`}
                                         />
@@ -124,7 +124,7 @@ export function DeliveryDetails(props: IProps) {
                                     <div className="Response-headers">
                                         <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                         <UserContent
-                                            content={`<pre class="code codeBlock">${prettyPrintHTTPHeaders(
+                                            content={`<pre class="code codeBlock http">${prettyPrintHTTPHeaders(
                                                 deliveryRecord.responseHeaders,
                                             )}</pre>`}
                                         />
