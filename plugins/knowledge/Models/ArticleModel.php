@@ -380,22 +380,53 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
-     * Given a list of knowledge category IDs, get the top X articles in each.
+     * Given a list of knowledge category, get the top X articles in each.
      *
-     * @param array $knowledgeCategoryIDs
+     * @param array[] $knowledgeCategories
      * @param array $where
      * @param array $options
      *
      * @return array
      */
-    public function getTopPerCategory(array $knowledgeCategoryIDs, array $where = [], array $options = []): array {
+    public function getTopPerCategory(array $knowledgeCategories, array $where = [], array $options = []): array {
         $result = [];
+        $collection = new KnowledgeCategoryCollection($knowledgeCategories);
+        $groupedParentCategories = $collection->groupCategoriesByTopLevel();
 
-        foreach ($knowledgeCategoryIDs as $knowledgeCategoryID) {
+        // Find the root category we have.
+        $kbRootCategoryID = null;
+        foreach ($knowledgeCategories as $category) {
+            if ($category['parentID'] === KnowledgeCategoryModel::ROOT_ID) {
+                $kbRootCategoryID = $category['knowledgeCategoryID'];
+                break;
+            }
+        }
+
+        if ($kbRootCategoryID === null) {
+            // Don't do anything if we don't have a kb root category.
+            return [];
+        }
+
+        foreach ($groupedParentCategories as $categoryGroup) {
+            // Find the depth 1 category,
+            $depth1Category = null;
+            foreach ($knowledgeCategories as $category) {
+                if ($category['parentID'] === $kbRootCategoryID) {
+                    $depth1Category = $category['knowledgeCategoryID'];
+                    break;
+                }
+            }
+
+            if ($depth1Category === null) {
+                // Don't do anything if we don't have a depth 1 category.
+                return [];
+            }
+
+            $groupIDs = array_column($categoryGroup, 'knowledgeCategoryID');
             $where = array_merge(
                 $where,
                 [
-                    "a.knowledgeCategoryID" => $knowledgeCategoryID,
+                    "a.knowledgeCategoryID" => $groupIDs,
                     "a.status" => self::STATUS_PUBLISHED
                 ]
             );
@@ -403,8 +434,16 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                 $where,
                 $options
             );
-            if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
-                foreach ($rows as &$row) {
+            foreach ($rows as &$row) {
+                // Fix up the parentIDs
+                if ($row['knowledgeCategoryID'] !== $depth1Category
+                    && $row['knowledgeCategoryID'] !== KnowledgeCategoryModel::ROOT_ID
+                ) {
+                    // Stick it up into the root.
+                    $row['knowledgeCategoryID'] = $depth1Category;
+                }
+                
+                if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
                     $row['queryLocale'] = $options['queryLocale'];
                 }
             }
