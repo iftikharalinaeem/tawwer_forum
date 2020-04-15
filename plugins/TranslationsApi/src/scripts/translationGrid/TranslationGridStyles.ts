@@ -17,6 +17,7 @@ import {
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px, translate, translateY } from "csx";
 import { dropDownVariables } from "@library/flyouts/dropDownStyles";
+import { toolTipClasses } from "@library/toolTip/toolTipStyles";
 
 export const translationGridVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("translationGrid");
@@ -79,6 +80,9 @@ export const translationGridClasses = useThemeCache(() => {
     });
 
     const editIcon = style("editIcon", {
+        top: unit(
+            vars.cell.paddings.inner + Math.floor(globalVars.lineHeights.condensed * globalVars.fonts.size.medium) / 2,
+        ),
         ...margins({
             top: -4,
             left: -2,
@@ -149,6 +153,10 @@ export const translationGridClasses = useThemeCache(() => {
         $nest: {
             [`&.${isLast}`]: {
                 borderBottom: 0,
+            },
+            [`& .${toolTipClasses().noPointerTrigger}`]: {
+                minWidth: unit(34),
+                transform: translate(0, percent(-50)),
             },
         },
     });
@@ -227,9 +235,6 @@ export const translationGridClasses = useThemeCache(() => {
     const icon = style("icon", {
         position: "absolute",
         display: "block",
-        top: unit(
-            vars.cell.paddings.inner + Math.floor(globalVars.lineHeights.condensed * globalVars.fonts.size.medium) / 2,
-        ),
         left: unit((vars.cell.paddings.outer + vars.cell.paddings.inner) / 2),
         transform: translate(unit(iconOffset + 2) as string, unit(iconOffset) as string),
         $nest: {

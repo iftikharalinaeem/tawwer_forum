@@ -28,6 +28,7 @@ import { makeTranslationKey } from "./TranslationActions";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useThrowError } from "@vanilla/react-utils";
 import Permission from "@library/features/users/Permission";
+import classNames from "classnames";
 
 /**
  * Constant to represent "no existing translations".
@@ -146,9 +147,9 @@ export const ContentTranslator = (props: IContentTranslatorProps) => {
     }
 
     return (
-        <Permission permission="site.manage">
+        <Permission permission="settings.manage">
             <Button
-                className={classes.translateIcon}
+                className={classNames(classes.translateIcon, "translationIcon")}
                 baseClass={ButtonTypes.ICON}
                 onClick={() => setDisplayModal(true)}
             >
