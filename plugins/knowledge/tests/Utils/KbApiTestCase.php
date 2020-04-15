@@ -33,11 +33,11 @@ class KbApiTestCase extends AbstractAPIv2Test {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
-        self::container()->rule(TranslationProviderInterface::class)
-            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
 
         // Ensure the translation resource is created.
-        self::container()->get(TranslationModel::class);
+        /** @var TranslationModel $translationModel */
+        $translationModel = self::container()->get(TranslationModel::class);
+        $translationModel->getContentTranslationProvider()->initializeResource(self::container()->get(KnowledgeTranslationResource::class));
     }
 
     /**
