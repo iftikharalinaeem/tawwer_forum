@@ -72,7 +72,7 @@ export function ProductSearchFormFilter(props: IProps) {
     return (
         <SelectOne
             options={siteSectionGroupOptions}
-            label={"Product"}
+            label={t("Product")}
             value={value}
             placeholder={placeHolderText}
             isClearable={false}
