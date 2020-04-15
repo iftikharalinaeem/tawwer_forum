@@ -28,9 +28,9 @@ export interface IDeliveryFragment {
 
 export interface IDelivery extends IDeliveryFragment {
     requestBody: string;
-    requestHeaders: Record<string, string>;
+    requestHeaders: string;
     responseBody: string;
-    responseHeaders: Record<string, string>;
+    responseHeaders: string;
 }
 
 export const INITIAL_DELIVERY_STATE: IDeliveryState = {

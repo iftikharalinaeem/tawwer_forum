@@ -61,9 +61,9 @@ export function DeliveryDetails(props: IProps) {
         }
         return parsedString;
     };
-    const prettyPrintHTTPHeaders = function(headers?): string {
+    const prettyPrintHTTPHeaders = function(headers?: string): string {
         let joinedHeaders = "";
-        if (headers !== undefined) {
+        if (headers !== undefined && headers.length !== 0) {
             let arrHeaders = headers.split("\n");
             arrHeaders = arrHeaders.map(header => {
                 return header.replace(/[a-zA-Z-_]+:/g, "<strong>$&</strong>");
@@ -99,7 +99,7 @@ export function DeliveryDetails(props: IProps) {
                                         <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                         <UserContent
                                             content={`<pre class="code codeBlock http">${prettyPrintHTTPHeaders(
-                                                deliveryRecord.requestHeaders,
+                                                escapeHTML(deliveryRecord.requestHeaders),
                                             )}</pre>`}
                                         />
                                     </div>
@@ -125,7 +125,7 @@ export function DeliveryDetails(props: IProps) {
                                         <h4 className={deliveryDetailsClasses.title}>{t("Header")}</h4>
                                         <UserContent
                                             content={`<pre class="code codeBlock http">${prettyPrintHTTPHeaders(
-                                                deliveryRecord.responseHeaders,
+                                                escapeHTML(deliveryRecord.responseHeaders),
                                             )}</pre>`}
                                         />
                                     </div>
