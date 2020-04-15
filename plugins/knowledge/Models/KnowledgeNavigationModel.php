@@ -140,7 +140,7 @@ class KnowledgeNavigationModel {
         if ($query->isOnlyTranslated()) {
             $dbWhere['ar.locale'] = $queryLocale;
         } else {
-            $dbWhere['ar.locale'] = $queryLocale;
+            $dbWhere['ar.locale'] = $knowledgeBase['sourceLocale'];
             if (!empty($query->getLocale())) {
                 $dbQueryOptions['arl.locale'] = $query->getLocale();
             }

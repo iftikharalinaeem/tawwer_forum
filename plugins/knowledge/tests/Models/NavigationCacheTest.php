@@ -148,20 +148,9 @@ class NavigationCacheTest extends KbApiTestCase {
      * Test that translation actions clear the cache.
      */
     public function testTranslationsCacheClear() {
-        $this->api()->post(
-            '/translations',
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-
         $kb = $this->createKnowledgeBase();
         $category = $this->createCategory(['name' => 'cat1']);
         $article = $this->createArticle(['name' => 'article1']);
-
-        $kbID = $category['knowledgeBaseID'];
 
         $this->assertNotCached($kb);
         $this->assertCached($kb);

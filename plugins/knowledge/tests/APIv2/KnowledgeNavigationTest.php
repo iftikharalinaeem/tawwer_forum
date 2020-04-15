@@ -865,12 +865,11 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
 
         try {
             $statusTree = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getStatus();
-            $statusTree = 'When knowledge base is "deleted" api call should bring an exception!';
         } catch (NotFoundException $e) {
             $statusTree = $e->getCode();
         }
 
-        $this->assertEquals('404', $statusTree);
+        $this->assertEquals('404', $statusTree, 'When knowledge base is "deleted" api call should bring an exception!');
 
         try {
             $statusFlat = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat')->getStatus();
