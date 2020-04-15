@@ -150,7 +150,6 @@ class NavigationCacheTest extends KbApiTestCase {
      * Test that translation actions clear the cache.
      */
     public function testTranslationsCacheClear() {
-        $translationModel = self::container()->get(TranslationModel::class);
         $kb = $this->createKnowledgeBase();
         $category = $this->createCategory(['name' => 'cat1']);
         $article = $this->createArticle(['name' => 'article1']);

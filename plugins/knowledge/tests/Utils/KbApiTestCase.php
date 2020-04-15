@@ -12,6 +12,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Site\TranslationModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
@@ -34,6 +35,9 @@ class KbApiTestCase extends AbstractAPIv2Test {
         parent::setupBeforeClass();
         self::container()->rule(TranslationProviderInterface::class)
             ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
+
+        // Ensure the translation resource is created.
+        self::container()->get(TranslationModel::class);
     }
 
     /**
