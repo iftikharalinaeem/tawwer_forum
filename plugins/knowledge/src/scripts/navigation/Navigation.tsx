@@ -22,6 +22,7 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
 import { useArticleList } from "@knowledge/modules/article/ArticleModel";
+import { DropDownNavPanelPlaceholder } from "@knowledge/navigation/DropDownNavPanelPlaceholder";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -69,7 +70,8 @@ export function Navigation(props: IProps) {
         navItems.status === LoadStatus.LOADING ||
         !currentCategoryNav
     ) {
-        return <NavigationPlaceholder />;
+        const placeholder = props.inHamburger ? <DropDownNavPanelPlaceholder /> : <NavigationPlaceholder />;
+        return placeholder;
     }
 
     const hasTitle = isHelpCenter && currentCategoryNav.length > 0;
