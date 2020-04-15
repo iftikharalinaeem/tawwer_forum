@@ -23,6 +23,7 @@ import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlacehold
 import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/DropDownPanelNav";
 import { useArticleList } from "@knowledge/modules/article/ArticleModel";
 import { DropDownNavPanelPlaceholder } from "@knowledge/navigation/DropDownNavPanelPlaceholder";
+import {t} from "@vanilla/i18n/src";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -223,7 +224,7 @@ function useCurrentCategoryNav(knowledgeCategoryID?: number | null) {
 
             if (articlePages) {
                 navTreeItems.push({
-                    name: "View All",
+                    name: t('View All'),
                     url: `/kb/categories/${queryParams.knowledgeCategoryID}`,
                     recordID: 1,
                     parentID: 1,
