@@ -221,4 +221,3 @@ final class KnowledgeCategoryCollection {
         return $result;
     }
 }
-
