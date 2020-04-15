@@ -481,12 +481,12 @@ class KnowledgeBasesApiController extends AbstractApiController {
             $query['knowledgeBaseID'],
             $query['locale'] ?? null,
             true,
-            $query['onlyTranslated'] ?? null
+            $query['only-translated'] ?? null
         ));
 
         $result = Data::box($nav['result']);
         $cached = $nav['cached'];
-        $result->setHeader('X-App-Cache-Hit', $cached);
+        $result->setHeader('X-App-Cache-Hit', $cached ? '1' : '0');
 
         // No result schema becuase it's already applied.
         return $result;
