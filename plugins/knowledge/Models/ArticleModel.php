@@ -410,8 +410,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         foreach ($groupedParentCategories as $categoryGroup) {
             // Find the depth 1 category,
             $depth1Category = null;
-            foreach ($knowledgeCategories as $category) {
-                if ($category['parentID'] === $kbRootCategoryID) {
+            foreach ($categoryGroup as $category) {
+                if ($category['parentID'] === $kbRootCategoryID || $category['knowledgeCategoryID'] == $kbRootCategoryID) {
                     $depth1Category = $category['knowledgeCategoryID'];
                     break;
                 }
