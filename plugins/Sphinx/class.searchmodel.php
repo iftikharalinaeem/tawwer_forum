@@ -4,12 +4,9 @@
  * @license Proprietary
  */
 
-if (!defined('SPH_RANK_SPH04')) {
-    define('SPH_RANK_SPH04', 7);
-}
-
 use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Container\Container;
+use Vanilla\Adapters\SphinxClient;
 
 /**
  * Sphinx Search Model
@@ -30,7 +27,6 @@ class SphinxSearchModel extends \SearchModel {
 
     public static $maxResults = 1000;
     public static $ranker = [];
-    public static $rankingMode = SPH_RANK_SPH04; //SPH_RANK_PROXIMITY_BM25;
 
     protected $_fp = null;
 
@@ -239,9 +235,6 @@ class SphinxSearchModel extends \SearchModel {
         /** @var SphinxClient */
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits($offset, $limit, self::$maxResults);
-        if (method_exists($sphinx, "setMatchMode")) {
-            $sphinx->setMatchMode(SPH_MATCH_EXTENDED2); // Default match mode.
-        }
 
         // Filter the search into proper terms.
         if ($clean) {
@@ -576,15 +569,8 @@ class SphinxSearchModel extends \SearchModel {
         $this->_sphinxClient = new SphinxClient();
         $this->_sphinxClient->setServer($sphinxHost, $sphinxPort);
 
-        // Set some defaults.
-        if (method_exists($this->_sphinxClient, "setMatchMode")) {
-            $this->_sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
-            $this->_sphinxClient->setSortMode(SPH_SORT_TIME_SEGMENTS, 'DateInserted');
-        } else {
-            // SPH_SORT_TIME_SEGMENTS is not a valid sort mode in Sphinx 3.2.1.
-            $this->_sphinxClient->setSortMode(SPH_SORT_RELEVANCE);
-        }
-        $this->_sphinxClient->setRankingMode(self::$rankingMode);
+        $this->_sphinxClient->setSortMode(SphinxClient::SORT_RELEVANCE);
+        $this->_sphinxClient->setRankingMode(SphinxClient::RANK_SPH04);
         $this->_sphinxClient->setMaxQueryTime(5000);
         $this->_sphinxClient->setFieldWeights(['name' => 3, 'body' => 1]);
 
@@ -612,11 +598,11 @@ class SphinxSearchModel extends \SearchModel {
     public function setSort($sphinx, $terms, $search) {
         if (!isset($search['sort'])) {
             $sphinx->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-            $sphinx->setSortMode(SPH_SORT_EXTENDED, "sorter DESC");
+            $sphinx->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
         } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
             // If there is just one search term then we really want to just sort by date.
             $sphinx->setSelect('*, (dateinserted + 1) as sort');
-            $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
+            $sphinx->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
         } else {
             $funcs = [];
             foreach (self::$ranker as $field => $row) {
@@ -648,7 +634,7 @@ class SphinxSearchModel extends \SearchModel {
 
                 $sphinx->setSelect("*, $sort as sort");
 
-                $sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'sort');
+                $sphinx->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
             }
         }
     }
