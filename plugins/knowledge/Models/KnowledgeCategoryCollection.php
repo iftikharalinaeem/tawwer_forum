@@ -7,8 +7,6 @@
 
 namespace Vanilla\Knowledge\Models;
 
-use Garden\Web\Exception\ServerException;
-
 /**
  * Simple class for grouping/sorting a set of knowledge categories.
  */
@@ -39,19 +37,8 @@ final class KnowledgeCategoryCollection {
      */
     public function __construct(array $categories) {
         $this->categories = $categories;
-
-        $rootCategories = array_filter($this->categories, function (array $category) {
-            return $category['parentID'] === KnowledgeCategoryModel::ROOT_ID;
-        });
-        if (count($rootCategories) !== 1) {
-            trigger_error('There must be exactly 1 root category in a category collection', E_USER_WARNING);
-        }
-        $this->rootCategory = $rootCategories[0];
-        if (!$this->rootCategory) {
-            throw new \Exception('A category collection requires a root category');
-        }
-
         $this->categoriesByID = array_column($this->categories, null, 'knowledgeCategoryID');
+        $this->rootCategory = $this->calculateRoot();
     }
 
     /**
@@ -102,6 +89,73 @@ final class KnowledgeCategoryCollection {
     }
 
     /**
+     * Given an ID, return it, with all of it's children.
+     *
+     * @param int $categoryID
+     *
+     * @example
+     * INPUT
+     * - Cat 1
+     *   - Cat 1.1
+     *     - Cat 1.1.1
+     *   - Cat 1.2
+     * - Cat 2
+     * - Cat 3
+     *   - Cat 3.1
+     *
+     * ID - Cat 1.1
+     *
+     * OUTPUT
+     * - [ Cat 1.1, Cat 1.1.1 ]
+     *
+     * @return array
+     */
+    public function getWithChildren(int $categoryID): array {
+        $item = $this->getByID($categoryID);
+
+        if ($item === null) {
+            return [];
+        }
+
+        $result = [$item];
+        foreach ($this->categories as $category) {
+            if ($this->categoryHasParent($category['knowledgeCategoryID'], $categoryID)) {
+                $result[] = $category;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Check if a category has a particular parentID further up in the tree.
+     *
+     * @param int $categoryID
+     * @param int $parentID
+     *
+     * @return bool
+     */
+    private function categoryHasParent(int $categoryID, int $parentID): bool {
+        $category = $this->getByID($categoryID);
+        if (!$category) {
+            return false;
+        }
+
+        if ($category['parentID'] === $parentID) {
+            return true;
+        } else {
+            if ($parentID === $this->rootCategory['knowledgeCategoryID']
+                || $parentID === KnowledgeCategoryModel::ROOT_ID
+            ) {
+                return false;
+            }
+
+            // Go up to the parent.
+            return $this->categoryHasParent($category['parentID'], $parentID);
+        }
+    }
+
+    /**
      * Walk a set of category parents until a root is reached.
      *
      * @example Given the following structure
@@ -141,6 +195,30 @@ final class KnowledgeCategoryCollection {
             return null;
         }
         return $this->walkParentToRootCategory($parentID);
+    }
+
+    /**
+     * Find the common root of a collection.
+     */
+    private function calculateRoot(): array {
+        $rootCategories = [];
+
+        foreach ($this->categories as $category) {
+            // Parents with no parent in the collection.
+            $parent = $this->getByID($category['parentID']);
+            if ($parent === null) {
+                $rootCategories[] = $category;
+            }
+        }
+
+        if (count($rootCategories) !== 1) {
+            trigger_error('There must be exactly 1 root category in a category collection', E_USER_WARNING);
+        }
+        $result = $rootCategories[0] ?? null;
+        if (!$result) {
+            throw new \Exception('A category collection requires a root category');
+        }
+        return $result;
     }
 }
 

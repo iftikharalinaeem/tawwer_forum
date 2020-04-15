@@ -224,6 +224,23 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Get a collection for a knowledge base.
+     *
+     * @param int $knowledgeBaseID
+     * @return KnowledgeCategoryCollection
+     */
+    public function getCollectionForKB(int $knowledgeBaseID): KnowledgeCategoryCollection {
+        $categories = $this->get(
+            [ "knowledgeBaseID" => $knowledgeBaseID ],
+            [
+                'orderFields' => 'sort',
+                'orderDirection' => 'asc'
+            ]
+        );
+        return new KnowledgeCategoryCollection($categories);
+    }
+
+    /**
      * Given a category ID, verify its knowledge base has not met or exceeded its limit of articles, based on the root-level category.
      *
      * @param int $knowledgeCategoryID
