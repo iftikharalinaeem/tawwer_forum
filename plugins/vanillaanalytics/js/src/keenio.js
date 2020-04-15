@@ -100,6 +100,33 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
     // Defaulting to an empty object.
     var userData = {};
 
+    var extractUserData = function(cookie) {
+        if (typeof cookie !== 'object') {
+            console.log('user: default');
+            return userData;
+        }
+
+        console.log('user: cookie');
+
+        // Missing a UUID, but one is available from our cookie? Update it.
+        if (typeof cookie.uuid !== 'undefined') {
+            userData.uuid = cookie.uuid;
+        }
+
+        // Missing a session ID, but one is available from our cookie? Update it.
+        if (isGuestCollection) {
+            if (typeof cookie.secondarySessionID !== 'undefined') {
+                userData.sessionID = cookie.secondarySessionID;
+            }
+        } else if (typeof cookie.sessionID !== 'undefined') {
+            userData.sessionID = cookie.sessionID;
+        }
+
+        if (typeof cookie.pv !== 'undefined') {
+            userData.pv = cookie.pv;
+        }
+    };
+
     // eventData needs to be a valid object and contain a property of "user", which is also an object.
     if (typeof eventData === 'object' && typeof eventData.user === 'object') {
         userData = eventData.user;
@@ -109,24 +136,7 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
          */
         if (typeof Cookies === 'function') {
             var cookie = Cookies.getJSON(gdn.definition('vaCookieName'));
-
-            // Missing a UUID, but one is available from our cookie? Update it.
-            if (typeof cookie.uuid !== 'undefined') {
-                userData.uuid = cookie.uuid;
-            }
-
-            // Missing a session ID, but one is available from our cookie? Update it.
-            if (isGuestCollection) {
-                if (typeof cookie.secondarySessionID !== 'undefined') {
-                    userData.sessionID = cookie.secondarySessionID;
-                }
-              } else if (typeof cookie.sessionID !== 'undefined') {
-                  userData.sessionID = cookie.sessionID;
-              }
-
-          if (typeof cookie.pv !== 'undefined') {
-            userData.pv = cookie.pv;
-          }
+            userData = extractUserData(cookie);
         }
     }
 
