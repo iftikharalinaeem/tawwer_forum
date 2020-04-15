@@ -98,7 +98,7 @@ class EventScheduler {
      */
     public function generateJobMessage(ResourceEvent $event, WebhookConfig $webhook, string $deliveryID): array {
         $body = [
-            "action" => $event->getAction(),
+            "action" => $this->getActionFromEvent($event),
             "payload" => $event->getPayload(),
             "sender" => $this->getSender(),
             "site" => $this->site(),
@@ -123,6 +123,26 @@ class EventScheduler {
             "uri" => $webhook->getUrl(),
         ];
 
+        return $result;
+    }
+
+    /**
+     * Generate a relevant action slug to be delivered alongside the event.
+     *
+     * @param ResourceEvent $event
+     * @return string
+     */
+    private function getActionFromEvent(ResourceEvent $event): string {
+        $action = $event->getAction();
+        $class = strtolower((new \ReflectionClass($event))->getShortName());
+        $resourceBoundary = strrpos($class, "event");
+
+        if ($resourceBoundary === false || $resourceBoundary < 1) {
+            return $action;
+        }
+
+        $resource = substr($class, 0, $resourceBoundary);
+        $result = "{$resource}_{$action}";
         return $result;
     }
 
