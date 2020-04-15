@@ -31,7 +31,7 @@ export default function ThemeBuilderPanel() {
     const classes = themeBuilderClasses();
     const { updateAssets } = useThemeActions();
     const { sendMessage } = useIFrameCommunication();
-    const variables = useThemeEditorState().form?.assets.variables?.data;
+    const variables = useThemeEditorState()?.form?.assets.variables?.data;
 
     return (
         <ErrorBoundary>

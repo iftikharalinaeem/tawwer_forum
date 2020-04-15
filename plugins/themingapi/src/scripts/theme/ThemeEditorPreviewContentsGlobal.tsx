@@ -16,13 +16,21 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 import InputTextBlock from "@vanilla/library/src/scripts/forms/InputTextBlock";
 import { titleBarVariables } from "@vanilla/library/src/scripts/headers/titleBarStyles";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
+import { loadThemeFonts } from "@library/theming/loadThemeFonts";
+import { bodyCSS } from "@library/layout/bodyStyles";
 
 export function ThemeEditorPreviewContentsGlobal() {
     const [intialInputValue, newInputValue] = useState("Text Input");
     const classes = themeEditorPreviewClasses();
     const { setActivePanel } = useActivePanelContext();
+    const globals = globalVariables();
+
+    useEffect(() => {
+        loadThemeFonts();
+        bodyCSS();
+    }, [globals]);
 
     return (
         <>
