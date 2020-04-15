@@ -176,6 +176,32 @@ class ArticleReactionModel extends \Vanilla\Models\PipelineModel {
     }
 
     /**
+     * Check if reaction matching foreignID exists.
+     *
+     * @param string $foreignID
+     * @return string|null
+     */
+    public function getReactionByForeignID(string $foreignID): ?string {
+        $sql = $this->sql()
+            ->from('reaction r')
+            ->select('reactionValue')
+            ->where([
+                'foreignID' => $foreignID,
+            ])
+            ->join('reactionOwner ro', 'r.reactionOwnerID = ro.reactionOwnerID')
+            ->limit(1);
+        $res = $sql->get()->nextRow(DATASET_TYPE_ARRAY);
+        $result = $res['reactionValue'] ?? null;
+
+        if ($result === self::HELPFUL_NEGATIVE) {
+            return self::NO;
+        } elseif ($result === self::HELPFUL_POSITIVE) {
+            return self::YES;
+        }
+        return null;
+    }
+
+    /**
      * Return all possible statuses for article record/item
      *
      * @return array
