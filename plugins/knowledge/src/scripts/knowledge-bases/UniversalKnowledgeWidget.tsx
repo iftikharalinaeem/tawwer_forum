@@ -109,7 +109,8 @@ export function UniversalHelpCenterNav(props: { kbID: number }) {
             data={nav.data.navigation}
             title={kb.data.name}
             showTitle
-            rootCategoryUrl={nav.data.rootCategory.url}
+            kbID={kbID}
+            rootCategory={nav.data.rootCategory}
         />
     );
 }
