@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Database\Operation;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -13,6 +14,7 @@ use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Garden\Web\Exception\ClientException;
+use Vanilla\Models\ReactionModel;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -1024,5 +1026,127 @@ class ArticlesTest extends AbstractResourceTest {
         sort($patchFields);
         unset($patchFields['dateUpdated']);
         $this->assertEquals($patchFields, $rowFields);
+    }
+
+    /**
+     * Test /articles/{id}/react with articles.manage
+     */
+    public function testPutReactHelpfulWithForeignIDPass() {
+        $user = $this->setupUserWithKBPermissions(Operation::MODE_IMPORT);
+        $this->api()->setUserID($user['userID']);
+
+        $article = $article = $this->testPost();
+        $body = $this->api()->put(
+            "articles/{$article['articleID']}/react",
+            [
+                'helpful' => 'yes',
+                'insertUserID' => $user['userID'],
+                'foreignID' => 'vanilla-test'
+            ]
+        )->getBody();
+
+        /** @var ReactionModel $reactionModel */
+        $reactionModel = self::container()->get(ReactionModel::class);
+        $reactionsWithForeignID = $reactionModel->get(['foreignID' => 'vanilla-test']);
+
+        $this->assertEquals(1, count($reactionsWithForeignID));
+
+        $this->assertEquals($article['name'], $body['name']);
+        $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
+        $this->assertEquals(1, $body['reactions'][0]['yes']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
+     * Test /articles/{id}/react without articles.manage
+     */
+    public function testPutReactHelpfulWithForeignIDFailed() {
+        $user = $this->setupUserWithKBPermissions('contentViewer');
+        $this->api()->setUserID($user['userID']);
+
+        $article = $article = $this->testPost();
+        $body = $this->api()->put(
+            "articles/{$article['articleID']}/react",
+            [
+                'helpful' => 'yes',
+                'insertUserID' => $user['userID'],
+                'foreignID' => 'vanilla-test-2'
+            ]
+        )->getBody();
+
+        /** @var ReactionModel $reactionModel */
+        $reactionModel = self::container()->get(ReactionModel::class);
+        $reactionsWithForeignID = $reactionModel->get(['foreignID' => 'vanilla-test-2']);
+
+        $this->assertEquals(0, count($reactionsWithForeignID));
+
+        $this->assertEquals($article['name'], $body['name']);
+        $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
+        $this->assertEquals(1, $body['reactions'][0]['yes']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
+     * Setup user with kb permissions.
+     *
+     * @param string $roleType
+     * @return array
+     */
+    protected function setupUserWithKBPermissions(string $roleType): array {
+        $newRole = [
+            'name' => $roleType,
+            'permissions' => [
+                'kb.view' => true,
+                'articles.add' =>  true,
+                'articles.manage' => ($roleType === Operation::MODE_IMPORT) ? true : false
+            ],
+        ];
+        $role = $this->createUserRole($newRole);
+        $user = $this->api()->post(
+            '/users',
+            [
+                'name' => $role['name'] . 'user',
+                'email' => $role['name'].'@example.com',
+                'emailConfirmed' => true,
+                'password' => 'vanilla',
+                'roleID' => [$role['roleID']]
+            ]
+        )->getBody();
+
+        return $user;
+    }
+
+    /**
+     * Create a new role.
+     *
+     * @param array $newRole
+     * @return array
+     */
+    protected function createUserRole(array $newRole): array {
+        $role = $this->api()->post(
+            '/roles',
+            [
+                'name' => $newRole['name'],
+                'description' => 'Role '.$newRole['name'],
+                'type' => 'member',
+                'deletable' => true,
+                'canSession' => true,
+                'personalInfo' => false,
+                'permissions' => [
+                    [
+                        'type' => 'global',
+                        'permissions' => $newRole['permissions']
+                    ],
+                    [
+                        'type' => 'global',
+                        'permissions' => [
+                            'signIn.allow' => true,
+                            ]
+                    ]
+                ]
+            ]
+        )->getBody();
+
+        return $role;
     }
 }

@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Gdn_Session;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Site\SiteSectionModel;
@@ -210,19 +211,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
     /**
      * Update existing knowledge categories.
      *
-     * @param array $set Field values to set.
-     * @param array $where Conditions to restrict the update.
-     * @throws \Exception If an error is encountered while performing the query.
-     * @return bool True.
+     * @inheritdoc
      */
-    public function update(array $set, array $where): bool {
+    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
         if (array_key_exists("parentID", $set) && array_key_exists("knowledgeCategoryID", $where)) {
             if ($set["parentID"] === $where["knowledgeCategoryID"]) {
                 throw new \Garden\Web\Exception\ClientException("Cannot set the parent of a knowledge category to itself.");
             }
         }
 
-        return parent::update($set, $where);
+        return parent::update($set, $where, $mode);
     }
 
     /**
