@@ -10,7 +10,7 @@ use Exception;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 
 /**
@@ -75,7 +75,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
         foreach ($items as $item) {
             $type = $item["recordType"] ?? null;
             switch ($type) {
-                case Navigation::RECORD_TYPE_ARTICLE:
+                case KnowledgeNavigationModel::RECORD_TYPE_ARTICLE:
                     $response = $this->api()->post("articles", [
                         "name" => $item["name"],
                         "body" => '[{"insert": "Hello World"},{"insert":"\n"}]',
@@ -84,7 +84,7 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                     ]);
                     $this->articles[$item["name"]] = $response->getBody();
                     break;
-                case Navigation::RECORD_TYPE_CATEGORY:
+                case KnowledgeNavigationModel::RECORD_TYPE_CATEGORY:
                     if ($parentID === -1) {
                         $knowledgeBase = $this->api()->post("knowledge-bases", [
                             "name" => $item["name"],
@@ -135,64 +135,64 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "children" => [
                     [
                         "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                     ],
                     [
                         "name" => "Parent Category A",
                         "children" => [
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category C",
                         "children" => [
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ]);
     }
@@ -221,66 +221,66 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "children" => [
                     [
                         "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                     ],
                     [
                         "name" => "Parent Category A",
                         "children" => [
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category C",
                         "children" => [
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
 
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
 
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ];
         $actual = $this->api()->get("knowledge-bases/1/navigation-tree")->getBody();
@@ -299,79 +299,79 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 1"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category A"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category B"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category C"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 2"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 3"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 4"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category C"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category D"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category E"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 5"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
             ]
         );
@@ -385,59 +385,59 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                         "children" => [
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 1",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category C",
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ];
         $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
@@ -507,79 +507,79 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 1"]["articleID"],
                     "sort" => 1,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "sort" => 4,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category A"]["knowledgeCategoryID"],
                     "sort" => 3,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category B"]["knowledgeCategoryID"],
                     "sort" => 2,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category C"]["knowledgeCategoryID"],
                     "sort" => 1,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "sort" => 3,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 2"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 3"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 4"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category C"]["knowledgeCategoryID"],
                     "sort" => 2,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category C"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category D"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category C"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Child Category E"]["knowledgeCategoryID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category C"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 5"]["articleID"],
                     "sort" => null,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
             ]
         );
@@ -590,64 +590,64 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                 "children" => [
                     [
                         "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                     ],
                     [
                         "name" => "Parent Category C",
                         "children" => [
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category A",
                         "children" => [
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ];
         $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
@@ -738,31 +738,31 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->categories["Parent Category A"]["knowledgeCategoryID"],
                     "sort" => 1,
-                    "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                 ],
                 [
                     "parentID" => $this->categories["Root Category"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 1"]["articleID"],
                     "sort" => 2,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 4"]["articleID"],
                     "sort" => 1,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 3"]["articleID"],
                     "sort" => 2,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
                 [
                     "parentID" => $this->categories["Parent Category B"]["knowledgeCategoryID"],
                     "recordID" => $this->articles["Article 2"]["articleID"],
                     "sort" => 3,
-                    "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                    "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                 ],
             ]
         );
@@ -776,61 +776,61 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
                         "children" => [
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category C",
                         "children" => [
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ];
         $actual = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getBody();
@@ -865,12 +865,11 @@ class KnowledgeNavigationTest extends AbstractAPIv2Test {
 
         try {
             $statusTree = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-tree')->getStatus();
-            $statusTree = 'When knowledge base is "deleted" api call should bring an exception!';
         } catch (NotFoundException $e) {
             $statusTree = $e->getCode();
         }
 
-        $this->assertEquals('404', $statusTree);
+        $this->assertEquals('404', $statusTree, 'When knowledge base is "deleted" api call should bring an exception!');
 
         try {
             $statusFlat = $this->api()->get('knowledge-bases/'.$this->knowledgeBase['knowledgeBaseID'].'/navigation-flat')->getStatus();

@@ -36,6 +36,6 @@ class KbCategoryRecordType implements RecordInterface {
      * @inheritDoc
      */
     public function getRecordType(): string {
-        return Navigation::RECORD_TYPE_CATEGORY;
+        return KnowledgeNavigationModel::RECORD_TYPE_CATEGORY;
     }
 }

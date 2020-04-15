@@ -10,7 +10,10 @@ use AbstractApiController;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
+use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
+use Vanilla\Knowledge\Models\KnowledgeNavigationQuery;
 use Vanilla\Knowledge\Models\KnowledgeUniversalSourceModel;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -31,8 +34,8 @@ class KnowledgeBasesApiController extends AbstractApiController {
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
-    /** @var KnowledgeNavigationApiController */
-    private $knowledgeNavigationApi;
+    /** @var KnowledgeNavigationModel */
+    private $knowledgeNavigationModel;
 
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
@@ -62,7 +65,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      * KnowledgeBaseApiController constructor.
      *
      * @param KnowledgeBaseModel $knowledgeBaseModel
-     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
+     * @param KnowledgeNavigationModel $knowledgeNavigationModel
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
@@ -73,7 +76,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
      */
     public function __construct(
         KnowledgeBaseModel $knowledgeBaseModel,
-        KnowledgeNavigationApiController $knowledgeNavigationApi,
+        KnowledgeNavigationModel $knowledgeNavigationModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
@@ -83,7 +86,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
     ) {
         $this->knowledgeBaseModel = $knowledgeBaseModel;
-        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
+        $this->knowledgeNavigationModel = $knowledgeNavigationModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
@@ -114,7 +117,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
 
         $locale = $query['locale'] ?? null;
-        $row = $this->knowledgeBaseByID($id);
+        $row = $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
         
         if ($locale) {
@@ -424,55 +427,73 @@ class KnowledgeBasesApiController extends AbstractApiController {
     }
 
     /**
-     * Proxy GET method for KnowledgeNavigationApiController->tree.
+     * Proxy GET method for KnowledgeNavigationModel->tree.
      *
      * @param int $id
      * @param array $query
-     * @return array
+     * @return Data
      */
-    public function get_navigationTree(int $id, array $query = []): array {
+    public function get_navigationTree(int $id, array $query = []): Data {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
-        $in = $this->schema($this->defaultSchema(), "in")
-            ->setDescription("Get a navigation-friendly category hierarchy tree mode.");
+        $in = $this->navInputSchema();
         $query = $in->validate($query);
 
-        //check if kb exists and status is not deleted
-        $kb = $this->knowledgeBaseByID($id, false);
-        $this->knowledgeBaseModel->checkViewPermission($kb['knowledgeBaseID']);
+        // check if kb exists and status is not deleted
+        $this->knowledgeBaseByID($id, false);
+        $this->knowledgeBaseModel->checkViewPermission($id);
         $query['knowledgeBaseID'] = $id;
-        $out = $this->schema([":a" => $this->schemaWithChildren()], "out");
-        $rows = $this->knowledgeNavigationApi->tree($query);
-        $result = $out->validate($rows);
-        return $result ?? [];
-    }
 
-    /**
-     * Proxy GET method for KnowledgeNavigationApiController->flat.
-     *
-     * @param int $id
-     * @param array $query
-     * @return array
-     */
-    public function get_navigationFlat(int $id, array $query = []): array {
-        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
-        $this->idParamSchema();
-        $in = $this->schema($this->defaultSchema(), "in")
-            ->setDescription("Get a navigation-friendly category hierarchy flat mode.");
-        $query = $in->validate($query);
-        //check if kb exists and status is not deleted
-        $kb = $this->knowledgeBaseByID($id, false, true);
+        // Build output
+        $nav = $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
+            $query['knowledgeBaseID'],
+            $query['locale'] ?? null,
+            false,
+            $query['onlyTranslated'] ?? null
+        ));
+        $result = Data::box($nav['result'] ?? []);
+        $cached = $nav['cached'];
+        $result->setHeader('X-App-Cache-Hit', $cached);
 
-        $query['knowledgeBaseID'] = $id;
-        $out = $this->schema([":a" => $this->categoryNavigationFragment()], "out");
-        $rows = $this->knowledgeNavigationApi->flat($query);
-        $result = $out->validate($rows);
-
+        // No result schema becuase it's already applied.
         return $result;
     }
 
     /**
-     * Proxy PATCH method for KnowledgeNavigationApiController->patchFlat.
+     * Proxy GET method for KnowledgeNavigationModel->flat.
+     *
+     * @param int $id
+     * @param array $query
+     * @return Data
+     */
+    public function get_navigationFlat(int $id, array $query = []): Data {
+        $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
+        $this->idParamSchema();
+        $in = $this->navInputSchema();
+        $query = $in->validate($query);
+        // check if kb exists and status is not deleted
+        $this->knowledgeBaseByID($id, false);
+
+        $query['knowledgeBaseID'] = $id;
+
+        // No result schema becuase it's already applied.
+        $nav = $this->knowledgeNavigationModel->buildNavigation(new KnowledgeNavigationQuery(
+            $query['knowledgeBaseID'],
+            $query['locale'] ?? null,
+            true,
+            $query['only-translated'] ?? null
+        ));
+
+        $result = Data::box($nav['result']);
+        $cached = $nav['cached'];
+        $result->setHeader('X-App-Cache-Hit', $cached ? '1' : '0');
+
+        // No result schema becuase it's already applied.
+        return $result;
+    }
+
+    /**
+     * Proxy PATCH method for KnowledgeNavigationModel->patchFlat.
      *
      * @param int $id
      * @param array $body
@@ -481,31 +502,24 @@ class KnowledgeBasesApiController extends AbstractApiController {
     public function patch_navigationFlat(int $id, array $body = []): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $this->idParamSchema();
-        $patchSchema = Schema::parse([
+        $in = Schema::parse([
             ":a" => Schema::parse([
                 "recordType",
                 "recordID",
                 "parentID",
                 "sort",
-            ])->add(Schema::parse($this->knowledgeNavigationApi->getFragmentSchema()))
+            ])->add(Schema::parse($this->getNavFragmentSchema()))
         ]);
-        $in = $this->knowledgeNavigationApi->schema($patchSchema, "in")
-            ->setDescription("Update the navigation structure of a knowledge base, using the flat format.");
-        $out = $this->knowledgeNavigationApi->schema(
-            [":a" => $this->knowledgeNavigationApi->categoryNavigationFragment()],
-            "out"
-        );
 
         // Prep the input.
         $body = $in->validate($body);
 
-        //check if kb exists and status is not deleted
+        // check if kb exists and status is not deleted
         $kb = $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($kb['knowledgeBaseID']);
 
-        $navigation = $this->knowledgeNavigationApi->patchFlat($id, $body);
-
-        $result = $out->validate($navigation);
+        // No result schema becuase it's already applied.
+        $result = $this->knowledgeNavigationModel->patchFlat($id, $body);
         return $result;
     }
 
@@ -673,12 +687,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
      *
      * @param int $knowledgeBaseID
      * @param bool $includeDeleted Include "deleted" knowledgebase. Default: true (include all)
-     * @param bool $checkOnly Check only call. If TRUE there is no need to return extra data
      *
      * @return array
      * @throws NotFoundException If the knowledge base could not be found.
      */
-    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true, bool $checkOnly = false): array {
+    public function knowledgeBaseByID(int $knowledgeBaseID, bool $includeDeleted = true): array {
         try {
             if ($includeDeleted) {
                 $result = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $knowledgeBaseID]);

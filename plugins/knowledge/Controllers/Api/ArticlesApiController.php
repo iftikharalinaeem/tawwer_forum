@@ -17,11 +17,11 @@ use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
-use Vanilla\Knowledge\Controllers\Api\KnowledgeNavigationApiController;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -104,8 +104,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var DiscussionArticleModel */
     private $discussionArticleModel;
 
-    /** @var KnowledgeNavigationApiController $knowledgeNavigationApi */
-    private $knowledgeNavigationApi;
+    /** @var KnowledgeNavigationModel */
+    private $knowledgeNavigationModel;
 
     /** @var DefaultArticleModel $defaultArticleModel */
     private $defaultArticleModel;
@@ -142,7 +142,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param ArticleFeaturedModel $articleFeaturedModel
      * @param KnowledgeApiController $knowledgeApiController
      * @param DefaultArticleModel $defaultArticleModel
-     * @param KnowledgeNavigationApiController $knowledgeNavigationApi
+     * @param KnowledgeNavigationModel $knowledgeNavigationModel
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -165,7 +165,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ArticleFeaturedModel $articleFeaturedModel,
         KnowledgeApiController $knowledgeApiController,
         DefaultArticleModel $defaultArticleModel,
-        KnowledgeNavigationApiController $knowledgeNavigationApi
+        KnowledgeNavigationModel $knowledgeNavigationModel
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -184,7 +184,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->eventManager = $eventManager;
         $this->knowledgeApiController = $knowledgeApiController;
         $this->defaultArticleModel = $defaultArticleModel;
-        $this->knowledgeNavigationApi = $knowledgeNavigationApi;
+        $this->knowledgeNavigationModel = $knowledgeNavigationModel;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -398,7 +398,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $query = $in->validate($query);
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
         $includeExcerpts = $this->isExpandField("excerpt", $query["expand"]);
 
         $options = [

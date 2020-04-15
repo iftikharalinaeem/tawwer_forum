@@ -315,8 +315,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @return array
      */
     public function getExtended(array $where = [], array $options = [], array $pseudoFields = []): array {
-        if (($options['only-translated'] ?? false)
-        || empty($options['arl.locale'])) {
+        $skipTranslations = ($options['only-translated'] ?? false) || empty($options['arl.locale']);
+        if ($skipTranslations) {
             $selectColumns = ['a.*, ar.name, ar.locale, c.knowledgeBaseID'];
         } else {
             $selectColumns = [

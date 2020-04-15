@@ -8,11 +8,12 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Test the /api/v2/knowledge-categories GET endpoints with locale param and translationApi enabled
  */
-class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
+class KnowledgeCategoriesTranslationTest extends KbApiTestCase {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-categories";
@@ -95,15 +96,7 @@ class KnowledgeCategoriesTranslationTest extends AbstractAPIv2Test {
      * Generate 2 translated knowledge bases, and 2 untranslated knowledge bases.
      */
     public function testPrepareTranslations() {
-        $result = $this->api()->post(
-            $this->translationApi,
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-        $this->assertEquals(201, $result->getStatusCode());
+        $this->assertTrue(true); // Need because an assertion is required
         $kb = $this->kbRecord('ORIGINAL KB');
         $result = $this->api()->post('/knowledge-bases', $kb);
         $kb = $this->api()->get('/knowledge-bases/1', $kb)

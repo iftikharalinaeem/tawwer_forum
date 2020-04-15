@@ -11,7 +11,7 @@ use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
-use Vanilla\Knowledge\Models\Navigation;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
@@ -80,7 +80,7 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
         foreach ($items as $item) {
             $type = $item["recordType"] ?? null;
             switch ($type) {
-                case Navigation::RECORD_TYPE_ARTICLE:
+                case KnowledgeNavigationModel::RECORD_TYPE_ARTICLE:
                     $response = $this->api()->post("articles", [
                         "name" => $item["name"],
                         "body" => '[{"insert": "Hello World"},{"insert":"\n"}]',
@@ -100,7 +100,7 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
                     }
                     
                     break;
-                case Navigation::RECORD_TYPE_CATEGORY:
+                case KnowledgeNavigationModel::RECORD_TYPE_CATEGORY:
                     if ($parentID === -1) {
                         $knowledgeBase = $this->api()->post("knowledge-bases", [
                             "name" => $item["name"],
@@ -152,67 +152,67 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
                 "children" => [
                     [
                         "name" => "Article 1",
-                        "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                     ],
                     [
                         "name" => "Parent Category A",
                         "children" => [
                             [
                                 "name" => "Child Category A",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category B",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category C",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category B",
                         "children" => [
                             [
                                 "name" => "Article 2",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 3",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                             ],
                             [
                                 "name" => "Article 4",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                                 "locale" => "fr",
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                     [
                         "name" => "Parent Category C",
                         "children" => [
                             [
                                 "name" => "Article 5",
-                                "recordType" => Navigation::RECORD_TYPE_ARTICLE,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
                                 "locale" => "fr",
 
                             ],
                             [
                                 "name" => "Child Category D",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                             [
                                 "name" => "Child Category E",
-                                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                             ],
                         ],
-                        "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                        "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
                     ],
                 ],
-                "recordType" => Navigation::RECORD_TYPE_CATEGORY,
+                "recordType" => KnowledgeNavigationModel::RECORD_TYPE_CATEGORY,
             ],
         ]);
     }
@@ -239,10 +239,15 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
      * @param bool $onlyTranslated
      * @dataProvider validCounts
      */
-    public function testNavigationFlat(string $locale, int $count, $onlyTranslated) {
-
-        $query = (is_null($onlyTranslated)) ? '' : '&only-translated='.($onlyTranslated ? 'true' : 'false');
-        $response = $this->api()->get('knowledge-bases/' . $this->knowledgeBase['knowledgeBaseID'] . '/navigation-flat?locale=' . $locale.$query);
+    public function testNavigationFlat(string $locale, int $count, ?bool $onlyTranslated) {
+        $query = [
+            'locale' => $locale,
+        ];
+        if ($onlyTranslated) {
+            $query['only-translated'] = $onlyTranslated;
+        }
+        $kbID = $this->knowledgeBase['knowledgeBaseID'];
+        $response = $this->api()->get("/knowledge-bases/$kbID/navigation-flat", $query);
         $status = $response->getStatus();
         $this->assertEquals('200 OK', $status);
 

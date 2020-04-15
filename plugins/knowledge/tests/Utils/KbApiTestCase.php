@@ -7,7 +7,12 @@
 
 namespace VanillaTests\Knowledge\Utils;
 
+use Garden\Container\Reference;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Formatting\Formats\TextFormat;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Site\TranslationModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
@@ -15,13 +20,25 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
  */
 class KbApiTestCase extends AbstractAPIv2Test {
 
-    protected static $addons = ['vanilla', 'knowledge'];
+    protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
 
     /** @var int|null */
     protected $lastInsertedKbID = null;
 
     /** @var int|null */
     protected $lastInsertedCategoryID = null;
+
+    /**
+     * Ensure our translation resource is available.
+     */
+    public static function setupBeforeClass(): void {
+        parent::setupBeforeClass();
+
+        // Ensure the translation resource is created.
+        /** @var TranslationModel $translationModel */
+        $translationModel = self::container()->get(TranslationModel::class);
+        $translationModel->getContentTranslationProvider()->initializeResource(self::container()->get(KnowledgeTranslationResource::class));
+    }
 
     /**
      * Clear local info between tests.

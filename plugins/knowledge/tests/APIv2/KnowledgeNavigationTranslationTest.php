@@ -9,11 +9,12 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Test GET /api/v2/knowledge-bases/{id}/navigation-flat endpoint with locale param and translationApi enabled
  */
-class KnowledgeNavigationTranslationTest extends AbstractAPIv2Test {
+class KnowledgeNavigationTranslationTest extends KbApiTestCase {
 
     /** @var string The resource route. */
     protected $baseUrl = "/knowledge-categories";
@@ -78,15 +79,7 @@ class KnowledgeNavigationTranslationTest extends AbstractAPIv2Test {
      * Generate 2 translated knowledge bases, and 2 untranslated knowledge bases.
      */
     public function testPrepareGuideKbTranslations() {
-        $result = $this->api()->post(
-            $this->translationApi,
-            [
-                'name' => "knowledgebase",
-                'urlCode' => 'kb',
-                'sourceLocale' => 'en'
-            ]
-        );
-        $this->assertEquals(201, $result->getStatusCode());
+        $this->assertTrue(true); // Need because an assertion is required
         $guideKb = [
             'name' => 'ORIGINAL GUIDE KB',
             'description' => 'ORIGINAL GUIDE KB DESCRIPTION',
