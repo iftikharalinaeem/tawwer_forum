@@ -44,7 +44,7 @@ export function Navigation(props: IProps) {
     const isHelpCenter = props.knowledgeBase.data?.viewType === KbViewType.HELP;
     const isArticleInHelpCenter = props.activeRecord.recordType === "article" && isHelpCenter;
 
-    const categoryNavData = useCurrentCategoryNav(props);
+    const categoryNavData = useCurrentCategoryNav(props.knowledgeCategoryID);
     const currentCategoryNav = isArticleInHelpCenter ? categoryNavData : navItems.data;
 
     /**
@@ -191,27 +191,27 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
     };
 }
 
-function useCurrentCategoryNav(props) {
+function useCurrentCategoryNav(knowledgeCategoryID?: number | null) {
     const queryParams = {
-        knowledgeCategoryID: props.knowledgeCategoryID,
+        knowledgeCategoryID: knowledgeCategoryID ?? undefined,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
         locale: getSiteSection().contentLocale,
         page: 1,
         limit: 10,
     };
-    const articles = useArticleList(queryParams);
+    const articles = useArticleList(queryParams, !knowledgeCategoryID);
     const { data, status } = articles;
     const articleList = articles.data?.body;
     const articlePages = articles.data?.pagination.next;
 
     return useMemo(() => {
-        if (articleList) {
+        if (articleList && knowledgeCategoryID) {
             let navTreeItems: INavigationTreeItem[] = articleList.map(article => {
                 return {
                     name: article.name,
                     url: article.url,
                     recordID: article.recordID,
-                    parentID: props.knowledgeCategoryID,
+                    parentID: knowledgeCategoryID,
                     sort: null,
                     recordType: "article",
                     isLink: false,

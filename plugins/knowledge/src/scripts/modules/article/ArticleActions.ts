@@ -176,6 +176,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             knowledgeCategoryID,
             expand: "excerpt",
             locale: getCurrentLocale(),
+            includeSubcategories: true,
             limit,
             page,
         };
