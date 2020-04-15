@@ -15,7 +15,7 @@ import { useDeliveryData } from "@webhooks/DeliveryHooks";
 import { useDeliveryActions } from "./DeliveryActions";
 import classNames from "classnames";
 import { IDelivery } from "./DeliveryTypes";
-import { TabsTypes } from "@vanilla/library/src/scripts/sectioning/tabsTypes";
+import { TabsTypes } from "@vanilla/library/src/scripts/sectioning/TabsTypes";
 
 interface IProps {
     webhookID: number;
