@@ -84,6 +84,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
                 <FallbackBackUrlSetter url={fallbackUrl} />
                 <NavHistoryUpdater lastKbID={this.props.article.data!.knowledgeBaseID} />
                 <ArticleLayout
+                    key={articleID}
                     useBackButton={!isAbsoluteKbRoot}
                     article={article.data}
                     prevNavArticle={this.props.prevNavArticle}
