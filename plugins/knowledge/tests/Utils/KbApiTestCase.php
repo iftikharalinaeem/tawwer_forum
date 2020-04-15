@@ -20,7 +20,7 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
  */
 class KbApiTestCase extends AbstractAPIv2Test {
 
-    protected static $addons = ['vanilla', 'knowledge'];
+    protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
 
     /** @var int|null */
     protected $lastInsertedKbID = null;
