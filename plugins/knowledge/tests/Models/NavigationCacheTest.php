@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Knowledge\Models;
 
+use Vanilla\Knowledge\KnowledgeStructure;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
@@ -163,5 +164,23 @@ class NavigationCacheTest extends KbApiTestCase {
             'translation' => 'translated-fr',
         ]]);
         $this->assertNotCached($kb, [], "Patching a translation resource clears the cache.");
+    }
+
+    /**
+     * Test that utility update clears the cache.
+     */
+    public function testUtilityUpdateClearCache() {
+        $kb = $this->createKnowledgeBase();
+        $category = $this->createCategory(['name' => 'cat1']);
+        $article = $this->createArticle(['name' => 'article1']);
+
+        $this->assertNotCached($kb);
+        $this->assertCached($kb);
+
+        /** @var KnowledgeStructure $plugin */
+        $structure = self::container()->get(KnowledgeStructure::class);
+        $structure->run();
+
+        $this->assertNotCached($kb);
     }
 }
