@@ -247,4 +247,3 @@ final class KnowledgeStructure {
         $this->navCache->deleteAll();
     }
 }
-

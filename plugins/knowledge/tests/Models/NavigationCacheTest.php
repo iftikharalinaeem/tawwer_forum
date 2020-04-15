@@ -8,6 +8,7 @@
 namespace VanillaTests\Knowledge\Models;
 
 use Vanilla\Knowledge\KnowledgeStructure;
+use Vanilla\Site\TranslationModel;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
@@ -16,7 +17,7 @@ use VanillaTests\Knowledge\Utils\KbApiTestCase;
 class NavigationCacheTest extends KbApiTestCase {
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
-    protected static $addons = ['vanilla', 'knowledge', 'translationsapi'];
+    protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
 
     /**
      * Setup the cache.
@@ -149,6 +150,7 @@ class NavigationCacheTest extends KbApiTestCase {
      * Test that translation actions clear the cache.
      */
     public function testTranslationsCacheClear() {
+        $translationModel = self::container()->get(TranslationModel::class);
         $kb = $this->createKnowledgeBase();
         $category = $this->createCategory(['name' => 'cat1']);
         $article = $this->createArticle(['name' => 'article1']);
