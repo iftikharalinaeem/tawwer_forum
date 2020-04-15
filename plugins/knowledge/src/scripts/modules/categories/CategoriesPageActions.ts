@@ -32,7 +32,7 @@ export default class CategoriesPageActions extends ReduxActions {
      */
     public initForCategoryID = async (categoryID: number) => {
         this.setCategoryID(categoryID);
-        const category = await this.categoriesActions.getCategory({ id: categoryID, includeSubcategories: true });
+        const category = await this.categoriesActions.getCategory({ id: categoryID });
         if (category) {
             await this.navigationActions.getNavigationFlat(category.knowledgeBaseID);
         }
