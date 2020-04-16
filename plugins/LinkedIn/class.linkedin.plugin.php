@@ -16,15 +16,6 @@ class LinkedInPlugin extends SSOAddon {
     /// Methods ///
     protected $_AccessToken = null;
 
-    /**
-     * Get the AuthenticationSchemeAlias value.
-     *
-     * @return string The AuthenticationSchemeAlias.
-     */
-    protected function getAuthenticationScheme(): string {
-        return self::AUTHENTICATION_SCHEME;
-    }
-
     /** @var SsoUtils */
     private $ssoUtils;
 
@@ -36,6 +27,15 @@ class LinkedInPlugin extends SSOAddon {
     public function __construct(SsoUtils $ssoUtils) {
         parent::__construct();
         $this->ssoUtils = $ssoUtils;
+    }
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
     }
 
     /**
