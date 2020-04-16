@@ -7,6 +7,7 @@
 namespace Vanilla\Webhooks;
 
 use DashboardController;
+use Gdn_Session as SessionInterface;
 
 /**
  * Class WebhooksPlugin
@@ -16,14 +17,18 @@ class WebhooksPlugin extends \Gdn_Plugin {
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var SessionInterface */
+    private $session;
+
     /**
      * WebhooksPlugin constructor.
      *
      * @param \Gdn_Database $database
      */
-    public function __construct(\Gdn_Database $database) {
+    public function __construct(\Gdn_Database $database, SessionInterface $session) {
         parent::__construct();
         $this->database = $database;
+        $this->session = $session;
     }
 
     /**
@@ -67,15 +72,21 @@ class WebhooksPlugin extends \Gdn_Plugin {
     }
 
     /**
-     * Event handler for adding navigation items into the dashboard.
+     * Add the new Webhooks menu item.
      *
-     * @param \Gdn_Pluggable $sender
-     *
-     * @return void
+     * @param \DashboardNavModule $nav The menu to add the module to.
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        /* @var \NestedCollectionAdapter */
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Site Settings', t('Webhooks'), '/webhook-settings', 'Garden.Settings.Manage');
+    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
+        if ($this->session->checkPermission('Garden.Settings.Manage')) {
+            $nav->addLinkToSection(
+                'settings',
+                t('Webhooks'),
+                '/webhook-settings',
+                'site-settings.webhook-settings',
+                '',
+                [],
+                ['badge' => t('New')]
+            );
+        }
     }
 }

@@ -21,6 +21,7 @@ interface IProps {
 
 export function DeliveryAccordion(props: IProps) {
     let { delivery, index } = props;
+    let statusIsError = false;
     const DeliveryTableRowClasses = DeliveryAccordionCSSClasses();
     const [activeAccordion, setActiveAccordion] = useState<number>(-1);
 
@@ -28,6 +29,13 @@ export function DeliveryAccordion(props: IProps) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
+
+    if (delivery && delivery.responseCode) {
+        const status = Math.floor((delivery.responseCode / 100) % 10);
+        if (status === 5 || status === 4) {
+            statusIsError = true;
+        }
+    }
 
     return (
         <>
@@ -60,7 +68,9 @@ export function DeliveryAccordion(props: IProps) {
                     {moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
                 </div>
                 <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
-                <div className={TableColumnSize.XS}>{String(delivery.responseCode)}</div>
+                <div className={classNames(TableColumnSize.XS, { "col-status-error": statusIsError })}>
+                    {String(delivery.responseCode)}
+                </div>
             </div>
             <DeliveryDetails
                 webhookDeliveryID={delivery.webhookDeliveryID}
