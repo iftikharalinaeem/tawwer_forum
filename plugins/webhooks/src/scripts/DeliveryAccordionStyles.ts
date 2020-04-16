@@ -63,6 +63,9 @@ export const DeliveryAccordionCSSClasses = useThemeCache(() => {
             horizontal: horizontalPadding,
         }),
     });
+    cssOut("div.column-status", {
+        color: "red",
+    });
 
     cssOut(".table-data tbody tr", {
         $nest: {
