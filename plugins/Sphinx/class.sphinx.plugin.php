@@ -58,8 +58,6 @@ class SphinxPlugin extends Gdn_Plugin {
         $this->container = $container;
         $this->discussionModel = $discussionModel;
         $this->session = $session;
-
-        self::checkSphinxClient(c('Plugins.Sphinx.SphinxAPIDir', PATH_ROOT));
     }
 
     /**
@@ -87,38 +85,7 @@ class SphinxPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function setup() {
-        if (!self::checkSphinxClient(c('Plugins.Sphinx.SphinxAPIDir', null))) {
-            throw new Exception(
-                'Sphinx requires the sphinx client to be installed (See http://www.php.net/manual/en/book.sphinx.php). '
-                .'Alternatively you can set "Plugins.Sphinx.SphinxAPIDir" to the location of sphinxapi.php before enabling the plugin (See https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php).'
-            );
-        }
-
         $this->structure();
-    }
-
-    /**
-     * Check if a SphinxClient is available.  If not try to make it available using $apiDir.
-     *
-     * $apiPAth is a kludge that allows to use Sphinx on PHP7 the correct version without compiling the php extension yourself
-     * Source of the class https://github.com/sphinxsearch/sphinx/blob/master/api/sphinxapi.php
-     * Make sure that it matches the sphinx version you are using.
-     *
-     * @param string $apiDir Directory that contains sphinxapi.php
-     *
-     * @return bool
-     */
-    public static function checkSphinxClient($apiDir = null) {
-        if (class_exists('SphinxClient')) {
-            return true;
-        }
-
-        $sphinxClientPath = rtrim($apiDir, '/').'/sphinxapi.php';
-        if (is_readable($sphinxClientPath)) {
-            require_once($sphinxClientPath);
-        }
-
-        return class_exists('SphinxClient');
     }
 
     /**
