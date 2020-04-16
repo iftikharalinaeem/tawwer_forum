@@ -8,7 +8,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
-use Garden\Sphinx\SphinxClient;
+use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -134,7 +134,7 @@ class KnowledgeApiController extends AbstractApiController {
     /** @var array */
     private $query = [];
 
-    /** @var SphinxClient */
+    /** @var SphinxAdapter */
     private $sphinx = null;
 
     /** @var string */
@@ -352,9 +352,9 @@ class KnowledgeApiController extends AbstractApiController {
         if (isset($this->query['all']) && !empty(trim($this->query['all']))) {
             $this->sphinxQuery .= ' @(name,body) (' . $this->sphinx->escapeString($this->query['all']) . ')*';
         }
-        $this->sphinx->setRankingMode(SPH_RANK_SPH04);
+        $this->sphinx->setRankingMode(SphinxAdapter::RANK_SPH04);
         $this->sphinx->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-        $this->sphinx->setSortMode(SPH_SORT_EXTENDED, "sorter DESC");
+        $this->sphinx->setSortMode(SphinxAdapter::SORT_EXTENDED, "sorter DESC");
     }
 
     /**
@@ -426,16 +426,16 @@ class KnowledgeApiController extends AbstractApiController {
 
         if ($this->query['featured'] ?? false) {
             $this->sphinx->setFilter('featured', [1]);
-            $this->sphinx->setSortMode(SPH_SORT_ATTR_DESC, 'dateFeatured');
+            $this->sphinx->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
         }
 
         if ($this->query['sort'] ?? false) {
             $this->query['sort'] = str_replace('name', 'title', $this->query['sort']);
             $field = ltrim($this->query['sort'], '-');
             if ($field === $this->query['sort']) {
-                $this->sphinx->setSortMode(SPH_SORT_ATTR_ASC, $field);
+                $this->sphinx->setSortMode(SphinxAdapter::SORT_ATTR_ASC, $field);
             } else {
-                $this->sphinx->setSortMode(SPH_SORT_ATTR_DESC, $field);
+                $this->sphinx->setSortMode(SphinxAdapter::SORT_ATTR_DESC, $field);
             }
         }
 
