@@ -63,7 +63,7 @@ export const DeliveryAccordionCSSClasses = useThemeCache(() => {
             horizontal: horizontalPadding,
         }),
     });
-    cssOut("div.column-status", {
+    cssOut("div.col-status-error", {
         color: "red",
     });
 
