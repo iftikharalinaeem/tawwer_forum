@@ -18,6 +18,9 @@ import { LoadStatus } from "@library/@types/api/core";
 import { RouteComponentProps } from "react-router-dom";
 import { WebhookDeleteModal } from "@webhooks/WebhookDeleteModal";
 import { IWebhook } from "@webhooks/WebhookTypes";
+import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
+import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
+import { BrowserRouter } from "react-router-dom";
 
 interface IOwnProps extends RouteComponentProps<{}> {}
 
@@ -28,13 +31,23 @@ export default function WebhooksIndexPage(props: IOwnProps) {
     const [isDelete, setIsDelete] = useState(false);
 
     const webhooks = useWebhooks();
-
+    const helpAsset = (
+        <DashboardHelpAsset>
+            <h3>{t("Webhooks")}</h3>
+            <p>{t("Welcome to Vanilla's Webhooks.")}</p>
+            <h3>{t("Need More Help?")}</h3>
+            <p>
+                <SmartLink to={"https://success.vanillaforums.com/kb/webhooks"}>{t("Webhooks")}</SmartLink>
+            </p>
+        </DashboardHelpAsset>
+    );
     if (!webhooks.data) {
         return <Loader />;
     }
 
     return (
         <>
+            <BrowserRouter>{helpAsset}</BrowserRouter>
             <DashboardHeaderBlock
                 title={t("Webhooks")}
                 actionButtons={
