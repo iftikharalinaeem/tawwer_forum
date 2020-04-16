@@ -68,7 +68,7 @@ export function DeliveryAccordion(props: IProps) {
                     {moment(new Date(delivery.dateInserted)).format("YYYY-MM-DD hh:mm")}
                 </div>
                 <div className={TableColumnSize.XS}>{durationToSeconds(delivery.requestDuration)}</div>
-                <div className={classNames(TableColumnSize.XS, statusIsError ? "col-status-error" : "")}>
+                <div className={classNames(TableColumnSize.XS, { "col-status-error": statusIsError })}>
                     {String(delivery.responseCode)}
                 </div>
             </div>
