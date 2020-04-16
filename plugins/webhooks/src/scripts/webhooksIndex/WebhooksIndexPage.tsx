@@ -37,9 +37,7 @@ export default function WebhooksIndexPage(props: IOwnProps) {
             <p>{t("Welcome to Vanilla's Webhooks.")}</p>
             <h3>{t("Need More Help?")}</h3>
             <p>
-                <SmartLink to={"https://success.vanillaforums.com/kb/categories/50-features"}>
-                    {t("Webhooks")}
-                </SmartLink>
+                <SmartLink to={"https://success.vanillaforums.com/kb/articles/262-webhooks"}>{t("Webhooks")}</SmartLink>
             </p>
         </DashboardHelpAsset>
     );
