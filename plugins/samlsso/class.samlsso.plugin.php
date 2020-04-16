@@ -21,7 +21,7 @@ class SamlSSOPlugin extends SSOAddon {
      *
      * @return string The AuthenticationSchemeAlias.
      */
-    protected function getAuthenticationScheme(): string {
+    protected function getAuthenticationSchemeAlias(): string {
         return self::AUTHENTICATION_SCHEME;
     }
 

@@ -78,15 +78,6 @@ class JWTSSOPlugin extends SSOAddon {
     private $session;
 
     /**
-     * Get the AuthenticationSchemeAlias value.
-     *
-     * @return string The AuthenticationSchemeAlias.
-     */
-    protected function getAuthenticationScheme(): string {
-        return self::PROVIDER_SCHEME_ALIAS;
-    }
-
-    /**
      * JWTSSOPlugin constructor.
      *
      * @param Gdn_Session $session
@@ -102,6 +93,15 @@ class JWTSSOPlugin extends SSOAddon {
         $provider = $this->provider();
         // Use the values of the KeyMap as keys and keys as values
         $this->translatedKeys = array_flip(val('KeyMap', $provider));
+    }
+
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::PROVIDER_SCHEME_ALIAS;
     }
 
     /**
