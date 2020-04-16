@@ -25,7 +25,7 @@ export function DeliveryAccordion(props: IProps) {
     const [activeAccordion, setActiveAccordion] = useState<number>(-1);
     let classStatus = "";
 
-    const durationToSeconds = function (duration: number) {
+    const durationToSeconds = function(duration: number) {
         let seconds = duration / 1000;
         return seconds + "s";
     };
