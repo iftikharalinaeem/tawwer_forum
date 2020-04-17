@@ -5,6 +5,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Web\TwigRenderTrait;
 
 /**
@@ -32,6 +33,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var CategoryModel
      */
     private $categoryModel;
+    /**
+     * @var FormatService
+     */
+    private $formatService;
 
     /**
      * CatalogueDisplayPlugin constructor.
@@ -40,11 +45,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param DiscussionModel $discussionModel
      * @param CategoryModel $categoryModel
      */
-    public function __construct(EventManager $eventManager, DiscussionModel $discussionModel, CategoryModel $categoryModel) {
+    public function __construct(EventManager $eventManager, DiscussionModel $discussionModel,
+                                CategoryModel $categoryModel, FormatService $formatService) {
         parent::__construct();
         $this->eventManager = $eventManager;
         $this->discussionModel = $discussionModel;
         $this->categoryModel = $categoryModel;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -318,12 +325,12 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the discussion is in the "catalogue" style, get the first thumbnail and display it in the list view.
      *
-     * @param array|object $discussion Discussion row.
+     * @param object $discussion Discussion row.
      * @return null|string A photo tag, or a placeholder div to be displayed in place of a photo.
      */
     public function displayCatalogueImage($discussion) {
-        $catalogueDisplay = $discussion['CatalogueDisplay'] ?? false;
-        if ($catalogueDisplay) {
+        $catalogueDisplay = $discussion->CatalogueDisplay ?? false;
+        if (!$catalogueDisplay) {
             return;
         }
         $photo = '';
@@ -369,23 +376,19 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Takes a discussion and parses out the first image in the discussion.
      *
-     * @param array|object $discussion Discussion to have image found based on its formatting.
+     * @param object $discussion Discussion to have image found based on its formatting.
      * @return mixed|string URI of the first image in the Discussion.
      */
     public function findImageUrl($discussion) {
         // Get the image URL from cache.
-        $cacheKey = 'catalogueDisplay.thumbnailURL.'.$discussion['DiscussionID'];
+        $cacheKey = 'catalogueDisplay.thumbnailURL.'.$discussion->DiscussionID;
         $imageUrl = Gdn::cache()->get($cacheKey);
         if (!$imageUrl || $imageUrl === Gdn_Cache::CACHEOP_FAILURE) {
             // If no image URL is cached, parse it from the DOM.
-            $dom = pQuery::parseStr(Gdn_Format::to($discussion['Body'], $discussion['Format']));
-            if ($dom) {
-                if ($dom->query('img')) {
-                    // Get the image URL, store it to cache.
-                    $discussionImages = $dom->query('img');
-                    $imageUrl = $discussionImages->attr('src');
-                    Gdn::cache()->store($cacheKey, $imageUrl);
-                }
+            /** @var string|null $imageUrl First image URL from the discussion body */
+            $imageUrl = $this->formatService->parseImageUrls($discussion->Body, $discussion->Format)[0] ?? null;
+            if ($imageUrl) {
+                Gdn::cache()->store($cacheKey, $imageUrl);
             }
         }
 
