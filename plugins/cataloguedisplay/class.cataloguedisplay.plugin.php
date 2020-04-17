@@ -24,15 +24,27 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var EventManager
      */
     private $eventManager;
+    /**
+     * @var DiscussionModel
+     */
+    private $discussionModel;
+    /**
+     * @var CategoryModel
+     */
+    private $categoryModel;
 
     /**
      * CatalogueDisplayPlugin constructor.
      *
      * @param EventManager $eventManager
+     * @param DiscussionModel $discussionModel
+     * @param CategoryModel $categoryModel
      */
-    public function __construct(EventManager $eventManager) {
+    public function __construct(EventManager $eventManager, DiscussionModel $discussionModel, CategoryModel $categoryModel) {
         parent::__construct();
         $this->eventManager = $eventManager;
+        $this->discussionModel = $discussionModel;
+        $this->categoryModel = $categoryModel;
     }
 
     /**
@@ -93,8 +105,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $categoryID = val('CategoryID', $args);
         $insert = val('CategoryID', $args) > 0 ? false : true;
         if ($sender->validate($formPostValues, $insert)) {
-            $discussionModel = new DiscussionModel();
-            $discussionModel->update(['CatalogueDisplay' => val('CatalogueDisplay', $formPostValues)], ['CategoryID' => $categoryID]);
+            $this->discussionModel->update(
+                ['CatalogueDisplay' => val('CatalogueDisplay', $formPostValues)],
+                ['CategoryID' => $categoryID]
+            );
         }
     }
 
@@ -192,8 +206,12 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionModel_beforeSaveDiscussion_handler(DiscussionModel $sender, $args) {
-        $categoryModel = new CategoryModel();
-        $category = $categoryModel->getWhere(['CategoryID' => valr('FormPostValues.CategoryID', $args), 'CatalogueDisplay' => 1])->firstRow();
+        $category = $this->categoryModel->getWhere(
+            [
+                'CategoryID' => valr('FormPostValues.CategoryID', $args),
+                'CatalogueDisplay' => 1,
+            ]
+        )->firstRow();
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
     }
 
