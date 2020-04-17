@@ -193,6 +193,26 @@ class ThemeModelTests extends AbstractAPIv2Test {
     }
 
     /**
+     * Test that switching the provider properly cleans up the DB.
+     */
+    public function testProviderSwitch() {
+        $newDBTheme = $this->createDBTheme('Swapping DB theme');
+        $this->api()->put('/themes/current', ['themeID' => $newDBTheme['themeID']]);
+        /** @var \Vanilla\ThemingApi\Models\ThemeModel $dbThemeModel */
+        $dbThemeModel = self::container()->get(\Vanilla\ThemingApi\Models\ThemeModel::class);
+
+        $result = $dbThemeModel->get(['current' => 1]);
+        $this->assertCount(1, $result);
+
+        // Change theme theme.
+        self::$themeModel->setCurrentTheme('theme-foundation');
+        // Provider switched. Our DB rows should be cleaned up.
+
+        $result = $dbThemeModel->get(['current' => 1]);
+        $this->assertCount(0, $result, 'No DB rows should match.');
+    }
+
+    /**
      * Test getting a theme's asset data.
      */
     public function testGetThemeAssetDataDB() {
