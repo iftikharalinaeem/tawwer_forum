@@ -106,7 +106,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $insert = $categoryID > 0 ? false : true;
         if ($sender->validate($formPostValues, $insert)) {
             $this->discussionModel->update(
-                ['CatalogueDisplay' => val('CatalogueDisplay', $formPostValues)],
+                ['CatalogueDisplay' => $formPostValues['CatalogueDisplay']],
                 ['CategoryID' => $categoryID]
             );
         }
@@ -115,10 +115,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * Add a toggle to the Add/Edit Category in the dashboard to designate this category as a "catalogue" style.
      *
-     * @param SettingsController $sender
+     * @param VanillaSettingsController $sender
      * @param array $args
      */
-    public function settingsController_addEditCategory_handler(SettingsController $sender, $args) {
+    public function settingsController_addEditCategory_handler(VanillaSettingsController $sender, $args) {
         $warningText = '';
         if (c('Garden.InputFormatter') === 'Text' || c('Garden.MobileInputFormatter') === 'Text') {
             $warningText = ' <em>'.Gdn::translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
@@ -178,7 +178,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                         c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100)),
                         c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100))
                     );
-                    Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => val('Url', $props)]);
+                    Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $props['Url']]);
                 }
 
                 if ($existingImage && Gdn::request()->post('Delete')) {
@@ -211,7 +211,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 'CategoryID' => valr('FormPostValues.CategoryID', $args),
                 'CatalogueDisplay' => 1,
             ]
-        )->firstRow();
+        )->firstRow()
+        ;
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
     }
 
@@ -239,7 +240,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         if (c('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
-        echo $this->displayCatalogueImage(val('Discussion', $args));
+        $discussion = $args['Discussion'] ?? null;
+        if ($discussion) {
+            echo $this->displayCatalogueImage($discussion);
+        }
     }
 
     /**
@@ -249,11 +253,12 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_beforeDiscussionTitle_handler(DiscussionController $sender, $args) {
+        $discussion = $args['Discussion'] ?? null;
         if (c('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
-        if (c('Vanilla.Discussions.Layout') === 'table') {
-            echo $this->displayCatalogueImage(val('Discussion', $args));
+        if (c('Vanilla.Discussions.Layout') === 'table' && $discussion) {
+            echo $this->displayCatalogueImage($discussion);
         }
     }
 
@@ -264,10 +269,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function categoriesController_beforeDiscussionContent_handler(CategoriesController $sender, $args) {
+        $discussion = $args['Discussion'] ?? null;
         if (c('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
-        echo $this->displayCatalogueImage(val('Discussion', $args));
+        if ($discussion) {
+            echo $this->displayCatalogueImage($discussion);
+        }
     }
 
     /**
@@ -277,8 +285,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function categoriesController_beforeDiscussionTitle_handler(CategoriesController $sender, $args) {
-        if (c('Vanilla.Discussions.Layout') === 'table') {
-            echo $this->displayCatalogueImage(val('Discussion', $args));
+        $discussion = $args['Discussion'] ?? null;
+        if (c('Vanilla.Discussions.Layout') === 'table' && $discussion) {
+            echo $this->displayCatalogueImage($discussion);
         }
     }
 
@@ -313,7 +322,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @return null|string A photo tag, or a placeholder div to be displayed in place of a photo.
      */
     public function displayCatalogueImage($discussion) {
-        if (!val('CatalogueDisplay', $discussion)) {
+        $catalogueDisplay = $discussion['CatalogueDisplay'] ?? false;
+        if ($catalogueDisplay) {
             return;
         }
         $photo = '';
@@ -364,11 +374,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function findImageUrl($discussion) {
         // Get the image URL from cache.
-        $cacheKey = 'catalogueDisplay.thumbnailURL.'.val('DiscussionID', $discussion);
+        $cacheKey = 'catalogueDisplay.thumbnailURL.'.$discussion['DiscussionID'];
         $imageUrl = Gdn::cache()->get($cacheKey);
         if (!$imageUrl || $imageUrl === Gdn_Cache::CACHEOP_FAILURE) {
             // If no image URL is cached, parse it from the DOM.
-            $dom = pQuery::parseStr(Gdn_Format::to(val('Body', $discussion), val('Format', $discussion)));
+            $dom = pQuery::parseStr(Gdn_Format::to($discussion['Body'], $discussion['Format']));
             if ($dom) {
                 if ($dom->query('img')) {
                     // Get the image URL, store it to cache.
