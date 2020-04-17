@@ -26,6 +26,7 @@ import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvide
 import { HomeRoute } from "@knowledge/routes/pageRoutes";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import qs from "querystring";
 
 /**
  * Page for editing an article.
@@ -35,6 +36,18 @@ export class EditorPage extends React.Component<IProps> {
 
     public render() {
         const { article } = this.props;
+
+        const queryKbID = qs.parse(window.location.search).knowledgeBaseID ?? undefined;
+        const kbID = typeof queryKbID === "string" ? parseInt(queryKbID) : undefined;
+
+        const permissionProps =
+            kbID != null
+                ? {
+                      resourceID: kbID,
+                      resourceType: "knowledgeBase",
+                  }
+                : {};
+
         return (
             <Modal
                 isVisible={true}
@@ -47,6 +60,7 @@ export class EditorPage extends React.Component<IProps> {
                 <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 {this.renderErrorMessage()}
                 <Permission
+                    {...permissionProps}
                     permission="articles.add"
                     fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}
                 >

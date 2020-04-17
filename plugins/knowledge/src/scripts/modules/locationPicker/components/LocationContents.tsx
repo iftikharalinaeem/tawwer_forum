@@ -30,6 +30,7 @@ import { t } from "@library/utility/appUtils";
 import LocationPickerEmpty from "@knowledge/modules/locationPicker/components/LocationPickerEmpty";
 
 import LocationPickerSelectedArticle from "./LocationPickerSelectedArticle";
+import { hasPermission, PermissionMode } from "@vanilla/library/src/scripts/features/users/Permission";
 
 /**
  * Displays the contents of a particular location. Connects NavigationItemList to its data source.
@@ -299,12 +300,19 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
         !knowledgeBases.knowledgeBasesByID.data
     ) {
         const kbNavItems = KnowledgeBaseModel.selectKnowledgeBasesAsNavItems(state);
+        const permissionedNavItems = kbNavItems.filter(item => {
+            return hasPermission("articles.add", {
+                resourceID: item.knowledgeBaseID,
+                resourceType: "knowledgeBase",
+                mode: PermissionMode.RESOURCE,
+            });
+        });
 
         return {
             ...commonReturn,
             childRecords: {
                 ...knowledgeBases.knowledgeBasesByID,
-                data: kbNavItems,
+                data: permissionedNavItems,
             },
             navigatedKB: null,
         };

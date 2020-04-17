@@ -29,6 +29,7 @@ import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import KbErrorMessages, { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 interface IProps {
     category: IKbCategory;
@@ -95,15 +96,17 @@ export default function CategoriesLayout(props: IProps) {
                             headingClassName={typographyClasses().largeTitle}
                             title={category.name}
                             actions={
-                                <LinkAsButton
-                                    to={EditorRoute.url(category)}
-                                    onMouseOver={EditorRoute.preload}
-                                    className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
-                                    baseClass={ButtonTypes.ICON_COMPACT}
-                                    title={t("Compose")}
-                                >
-                                    <ComposeIcon />
-                                </LinkAsButton>
+                                <KbPermission permission="articles.add" kbID={category.knowledgeBaseID}>
+                                    <LinkAsButton
+                                        to={EditorRoute.url(category)}
+                                        onMouseOver={EditorRoute.preload}
+                                        className={classNames("searchBar-actionButton", classesSearchBar.actionButton)}
+                                        baseClass={ButtonTypes.ICON_COMPACT}
+                                        title={t("Compose")}
+                                    >
+                                        <ComposeIcon />
+                                    </LinkAsButton>
+                                </KbPermission>
                             }
                             includeBackLink={device !== Devices.MOBILE && device !== Devices.XS && props.useBackButton}
                         >

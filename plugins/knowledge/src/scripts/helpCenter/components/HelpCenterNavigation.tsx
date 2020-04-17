@@ -14,6 +14,7 @@ import Translate from "@vanilla/library/src/scripts/content/Translate";
 import Permission from "@vanilla/library/src/scripts/features/users/Permission";
 import classNames from "classnames";
 import { navLinksClasses } from "@vanilla/library/src/scripts/navigation/navLinksStyles";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 interface IProps {
     data: ILinkListData;
@@ -33,14 +34,14 @@ export default function HelpCenterNavigation(props: IProps) {
         return (
             <span>
                 {t("This category does not have any articles.")}
-                <Permission permission={"articles.add"}>
+                <KbPermission permission={"articles.add"} kbID={props.kbID}>
                     <EditorRoute.Link
                         className={classNames(innerProps.className, navLinksClasses().noItemLink)}
                         data={{ knowledgeBaseID: props.kbID, knowledgeCategoryID: innerProps.recordID }}
                     >
                         {t("Create an Article.")}
                     </EditorRoute.Link>
-                </Permission>
+                </KbPermission>
             </span>
         );
     }
