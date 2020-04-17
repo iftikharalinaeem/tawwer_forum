@@ -21,6 +21,7 @@ import {
     ActiveVariablePanel,
 } from "@themingapi/theme/ActivePanelContext";
 import { ThemeEditorPreviewContentsContent } from "@themingapi/theme/ThemeEditorPreviewContentsContent";
+import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
 
 // force theming, even though this is a "dashboard" page.
 enableComponentTheming();
@@ -78,14 +79,20 @@ export default function ThemeEditorPreviewPage() {
 function ThemePreviewPages() {
     const { activePanel } = useActivePanelContext();
 
+    let content: React.ReactNode = null;
     switch (activePanel) {
         case ActiveVariablePanel.BANNER:
         case ActiveVariablePanel.GLOBAL:
         case ActiveVariablePanel.TITLE_BAR:
-            return <ThemeEditorPreviewContentsGlobal />;
+            content = <ThemeEditorPreviewContentsGlobal />;
+            break;
         case ActiveVariablePanel.CONTENT_BANNER:
-            return <ThemeEditorPreviewContentsContent />;
+            content = <ThemeEditorPreviewContentsContent />;
+            break;
         default:
-            return <ThemeEditorPreviewContentsGlobal />;
+            content = <ThemeEditorPreviewContentsGlobal />;
+            break;
     }
+
+    return <BannerContextProvider key={activePanel}>{content}</BannerContextProvider>;
 }
