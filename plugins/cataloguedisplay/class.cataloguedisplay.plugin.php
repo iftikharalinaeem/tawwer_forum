@@ -101,9 +101,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoryModel $args
      */
     public function categoryModel_beforeSaveCategory_handler(CategoryModel $sender, $args) {
-        $formPostValues = val('FormPostValues', $args);
-        $categoryID = val('CategoryID', $args);
-        $insert = val('CategoryID', $args) > 0 ? false : true;
+        $formPostValues = $args['FormPostValues'] ?? false;
+        $categoryID = $args['CategoryID'] ?? false;
+        $insert = $categoryID > 0 ? false : true;
         if ($sender->validate($formPostValues, $insert)) {
             $this->discussionModel->update(
                 ['CatalogueDisplay' => val('CatalogueDisplay', $formPostValues)],
