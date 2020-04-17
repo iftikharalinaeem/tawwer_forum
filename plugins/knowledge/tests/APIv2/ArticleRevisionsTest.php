@@ -7,60 +7,25 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
  * Test the /api/v2/article-revisions endpoint.
  */
-class ArticleRevisionsTest extends AbstractAPIv2Test {
-
-    /** @var int */
-    private static $articleID;
-
-    /** @var int */
-    private static $knowledgeBaseID;
-
-    /** @var int */
-    private static $knowledgeCategoryID;
-
-    /**
-     * This method is called before the first test of this test class is run.
-     */
-    public static function setupBeforeClass(): void {
-        self::$addons = ["vanilla", "knowledge"];
-        parent::setupBeforeClass();
-
-        /** @var KnowledgeBaseModel $knowledgeBaseModel */
-        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
-        self::$knowledgeBaseID = $knowledgeBaseModel->insert([
-            "name" => __CLASS__,
-            "description" => "Basic knowledge base for testing.",
-            "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
-        ]);
-
-        /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
-        $knowledgeCategoryModel = self::container()->get(KnowledgeCategoryModel::class);
-        self::$knowledgeCategoryID = $knowledgeCategoryModel->insert([
-            "name" => __CLASS__,
-            "parentID" => -1,
-            "knowledgeBaseID" => self::$knowledgeBaseID,
-        ]);
-
-        /** @var ArticleModel $articleModel */
-        $articleModel = self::container()->get(ArticleModel::class);
-        self::$articleID = $articleModel->insert([
-            "knowledgeCategoryID" => self::$knowledgeCategoryID,
-            "sort" => 1,
-        ]);
-    }
+class ArticleRevisionsTest extends KbApiTestCase {
 
     /**
      * Test if a revision posted to the articles resource can be retrieved from the article-revisions endpoint.
      */
     public function testGetRevision() {
+        $this->createKnowledgeBase();
+        $initialArticle = $this->createArticle();
+        $articleID = $initialArticle['articleID'];
         $row = [
             "body" => __FUNCTION__,
             "format" => "text",
@@ -71,13 +36,13 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
 
         // Create the revision.
         $this->api()->patch(
-            "articles/" . self::$articleID,
+            "articles/" . $articleID,
             $row
         );
 
         // Use its unique name to pull the ID from the list of revisions.
         $revisionID = null;
-        $revisions = $this->api()->get("articles/" . self::$articleID . "/revisions");
+        $revisions = $this->api()->get("articles/" . $articleID . "/revisions");
 
         foreach ($revisions->getBody() as $currentRevision) {
             if ($currentRevision["name"] === $row["name"]) {
@@ -99,10 +64,15 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
      * Tests if that the article-revisions/reRender endpoint renders a selected revision.
      */
     public function testReRender() {
-        $article = $this->createArticle();
+        $this->createKnowledgeBase();
+        $article = $this->createArticle([
+            'format' => RichFormat::FORMAT_KEY,
+            'body' => '[{ "insert": "initial\n" }]'
+        ]);
 
         $where = ["articleID" => $article["articleID"]];
 
+        /** @var ArticleRevisionModel $articleRevisionModel */
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
         
         // Change body text and set the rendered content to null, to see if the rerender works.
@@ -133,6 +103,8 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
      */
     public function testReRenderOffSet() {
         $articles = [];
+
+        $this->createKnowledgeBase();
 
         // create 10 articles
         for ($i = 0; $i < 10; $i++) {
@@ -165,6 +137,8 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
      */
     public function testReRenderLimitPass() {
         $articles = [];
+
+        $this->createKnowledgeBase();
 
         // create 10 articles
         for ($i = 0; $i < 10; $i++) {
@@ -204,31 +178,5 @@ class ArticleRevisionsTest extends AbstractAPIv2Test {
             "article-revisions/re-render",
             $options
         );
-    }
-
-    /**
-     * Creates an article for testing.
-     *
-     * @return array
-     */
-    protected function createArticle(): array {
-        $bodyText = json_encode([["insert" => uniqid("Rich Article")]]);
-
-        $row = [
-            "body" => $bodyText,
-            "format" => "rich",
-            "locale" => "en",
-            "knowledgeCategoryID" => 1,
-            "name" => uniqid(__FUNCTION__, true),
-        ];
-
-        $response = $this->api()->post(
-            "/articles",
-            $row
-        );
-
-        $article = $response->getBody();
-       
-        return $article;
     }
 }

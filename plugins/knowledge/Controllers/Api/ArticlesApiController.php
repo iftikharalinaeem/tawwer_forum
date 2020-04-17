@@ -439,7 +439,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $includedCategories = $collection->getWithChildren($query['knowledgeCategoryID']);
             $categoryIDs = array_column($includedCategories, 'knowledgeCategoryID');
         }
-        
+
         $where = [
             "a.knowledgeCategoryID" => $categoryIDs,
             "ar.locale" => $locale,
@@ -586,6 +586,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
 
         $body = $in->validate($body, true);
+
+        $initialRow = $this->retrieveRow($id);
+        // Make sure we have permission of the place we're coming from.
+        $initialKnowledgeBase = $this->getKnowledgeBaseFromCategoryID($initialRow["knowledgeCategoryID"]);
+        $this->knowledgeBaseModel->checkEditPermission($initialKnowledgeBase['knowledgeBaseID']);
+
+        if (isset($body['knowledgeCategoryID'])) {
+            // Make sure we have permission of the place we're going to.
+            $newKnowledgeBase = $this->getKnowledgeBaseFromCategoryID($body['knowledgeCategoryID']);
+            $this->knowledgeBaseModel->checkEditPermission($newKnowledgeBase['knowledgeBaseID']);
+        }
 
         if (array_key_exists("locale", $body)) {
             $body = $this->validateFirstArticleRevision($id, $body);
@@ -755,6 +766,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
 
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($body["knowledgeCategoryID"]);
+        $this->knowledgeBaseModel->checkEditPermission($knowledgeBase['knowledgeBaseID']);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
 
         if (array_key_exists("locale", $body) && isset($body["locale"])) {
