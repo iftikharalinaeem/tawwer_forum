@@ -402,6 +402,9 @@ trait ArticlesApiHelper {
                     $updateSorts = false;
                 }
             }
+            if (!empty($fields["insertUserID"] ?? null)) {
+                $fields["updateUserID"] = $fields["insertUserID"];
+            }
             $articleID = $this->articleModel->insert($fields, $this->getOperationMode());
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
@@ -451,7 +454,8 @@ trait ArticlesApiHelper {
             $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
             $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
             $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
-            $revision["insertUserID"] = $fields["updateUserID"] ?? $fields["insertUserID"] ?? null;
+            $revision["insertUserID"] = $fields["insertUserID"] ?? null;
+            $revision["updateUserID"] =  $fields["updateUserID"] ?? $revision["insertUserID"] ?? null;
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
