@@ -244,6 +244,19 @@ class Reporting2Plugin extends Gdn_Plugin {
     }
 
     /**
+     * Force report discussion types to be Rich.
+     *
+     * @param $args
+     * @return string|null
+     */
+    public function discussionModel_inputFormatter_handler($args) {
+        if ($args['Type'] === 'Report') {
+            return \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY;
+        }
+        return null;
+    }
+
+    /**
      * Render the Quote html for the view.
      *
      * @param array $record The Record to create a quote from.
