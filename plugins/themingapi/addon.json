@@ -4,6 +4,7 @@
     "version": "1.0",
     "key": "themingapi",
     "type": "addon",
+    "hidden": true,
     "authors": [
         {
             "name": "Adam Charron",
