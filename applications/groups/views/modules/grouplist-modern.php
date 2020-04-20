@@ -15,7 +15,7 @@ $list = $this->data('list');
     </div>
     <ul class="media-list DataList">
         <?php foreach(val('items', $list, []) as $item) { ?>
-            <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); ?>">
+            <li id="<?php echo val('id', $item); ?>" class="Item <?php echo val('cssClass', $item); if (val('imageSource', $item)){ echo " hasPhotoWrap"; } else { echo " noPhotoWrap"; } ?>">
                 <?php if (val('imageSource', $item)) { ?>
                     <a href="<?php echo val('url', $item); ?>" class="PhotoWrap">
                         <img class="ProfilePhoto ProfilePhotoMedium <?php echo val('imageCssClass', $item); ?>" src="<?php echo val('imageSource', $item); ?>">
