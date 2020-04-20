@@ -315,10 +315,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         if (!$catalogueDisplay) {
             return;
         }
-        $photo = '';
+
         $imgTag = null;
         $cssClassWrapper = [];
-        $imgAttributes = [ 'class' => []];
+        $imgAttributes = ['class' => []];
         $catalogueImgURL = discussionUrl($discussion);
         if (!c('CatalogueDisplay.Masonry.Enabled')) {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
@@ -348,7 +348,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             'placeHolderUrl' => $catalogueImgURL,
             'placeHolderImgUrl' => $imageUrl,
             'imgAttributes' => $imgAttributes,
-            'cssClassWrapper' => $cssClassWrapper
+            'cssClassWrapper' => $cssClassWrapper,
         ]);
     }
 
