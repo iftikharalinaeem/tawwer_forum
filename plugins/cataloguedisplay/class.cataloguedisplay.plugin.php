@@ -5,6 +5,8 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Formatting\FormatConfig;
+use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Web\TwigRenderTrait;
 
@@ -37,6 +39,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var FormatService
      */
     private $formatService;
+    /**
+     * @var FormatConfig
+     */
+    private $formatConfig;
 
     /**
      * CatalogueDisplayPlugin constructor.
@@ -44,14 +50,17 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param EventManager $eventManager
      * @param DiscussionModel $discussionModel
      * @param CategoryModel $categoryModel
+     * @param FormatService $formatService
+     * @param FormatConfig $formatConfig
      */
     public function __construct(EventManager $eventManager, DiscussionModel $discussionModel,
-                                CategoryModel $categoryModel, FormatService $formatService) {
+                                CategoryModel $categoryModel, FormatService $formatService, FormatConfig $formatConfig) {
         parent::__construct();
         $this->eventManager = $eventManager;
         $this->discussionModel = $discussionModel;
         $this->categoryModel = $categoryModel;
         $this->formatService = $formatService;
+        $this->formatConfig = $formatConfig;
     }
 
     /**
@@ -127,7 +136,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function settingsController_addEditCategory_handler(VanillaSettingsController $sender, $args) {
         $warningText = '';
-        if (c('Garden.InputFormatter') === 'Text' || c('Garden.MobileInputFormatter') === 'Text') {
+        if (strcasecmp($this->formatConfig->getDefaultDesktopFormat(), TextFormat::FORMAT_KEY) === 0
+            || strcasecmp($this->formatConfig->getDefaultMobileFormat(), TextFormat::FORMAT_KEY) === 0) {
             $warningText = ' <em>'.Gdn::translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
         }
         $description = Gdn::translate('Each discussion will show an uploaded image on the Discussions page instead of the author information. '
