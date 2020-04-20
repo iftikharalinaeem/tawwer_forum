@@ -47,15 +47,17 @@ export function ThemeBuilderSectionGlobal() {
                 <ThemeBuilderFontBlock />
             </ThemeBuilderSection>
 
-            <ThemeBuilderBlock label={t("Border Radius")}>
-                <ThemeInputNumber
-                    variableKey="global.borderType.formElements.buttons.radius"
-                    max={buttonGlobalVariables().sizing.minHeight / 2}
-                />
-            </ThemeBuilderBlock>
+            <ThemeBuilderSection label={t("Buttons & Inputs")}>
+                <ThemeBuilderBlock label={t("Border Radius")}>
+                    <ThemeInputNumber
+                        variableKey="global.borderType.formElements.buttons.radius"
+                        max={buttonGlobalVariables().sizing.minHeight / 2}
+                    />
+                </ThemeBuilderBlock>
 
-            <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
-            <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
+                <ThemeBuilderButtonSection label={t("Primary Buttons")} buttonType="primary" />
+                <ThemeBuilderButtonSection label={t("Secondary Buttons")} buttonType="standard" />
+            </ThemeBuilderSection>
         </>
     );
 }
