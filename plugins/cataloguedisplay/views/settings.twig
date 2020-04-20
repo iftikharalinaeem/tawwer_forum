@@ -2,13 +2,8 @@
 
 {{ form.open({'enctype': 'multipart/form-data'}) }}
 <div class="padded">
-    <div
-        class="padded alert alert-info">{{ t('Uplaod a placeholder image that will display when users do not have an image in their post.') }}</div>
-    {% if PlaceholderImage %}
-        <div class="padded">{{ PlaceholderImage|raw }}</div>
-    {% endif %}
     {{ form.errors() }}
-    {{ form.fileUpload('Photo') }}
+    {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Uplaod a placeholder image that will display when users do not have an image in their post.')) }}
 </div>
 <div class="padded">
     {{ form.toggle('CatalogueDisplay.OnlyOnCategory', t('Display only on catogory page')) }}
@@ -17,7 +12,6 @@
     {{ form.toggle('CatalogueDisplay.Masonry.Enabled', t('Use Masonry display')) }}
 </div>
 <div class="buttons form-footer">
-    {{ form.button('Delete', {'type' : 'submit', 'class': 'btn btn-danger padded-left'}) }}
     {{ form.button('Save', {'type' : 'submit', 'class': 'btn btn-primary'}) }}
 </div>
 

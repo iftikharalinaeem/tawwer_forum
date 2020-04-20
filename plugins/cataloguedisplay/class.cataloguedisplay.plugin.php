@@ -168,51 +168,23 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
             Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
+            $existingImage = c('CatalogueDisplay.PlaceHolderImage');
+            $request = Gdn::request();
+            $tmpImageUrl = $request->post('Photo', null);
 
-            try {
-                // Upload image
-                $uploadImage = new Gdn_UploadImage();
-
-                $existingImage = c('CatalogueDisplay.PlaceHolderImage');
-
-                // Validate the upload
-                $tmpImage = $uploadImage->validateUpload('Photo', false);
-
-                if ($tmpImage) {
-                    // Generate the target image name.
-                    $targetImage = $uploadImage->generateTargetName(PATH_UPLOADS, '', true);
-                    $basename = pathinfo($targetImage, PATHINFO_BASENAME);
-
-                    // Delete any previously uploaded image.
-                    if ($existingImage) {
-                        $uploadImage->delete($existingImage);
-                    }
-
-                    // Save the uploaded image
-                    $props = $uploadImage->saveImageAs(
-                        $tmpImage,
-                        $basename,
-                        c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100)),
-                        c('CatalogueDisplay.PlaceHolderImage', c('Garden.Thumbnail.Size', 100))
-                    );
-                    Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $props['Url']]);
-                }
-
-                if ($existingImage && Gdn::request()->post('Delete')) {
-                    $uploadImage->delete($existingImage);
-                    if (Gdn::request()->post('Delete')) {
-                        Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
-                    }
-                }
-            } catch (Exception $ex) {
-                // Upload was optional so be quiet.
-                throw $ex;
+            // Update setting if we deleted the default placeholder
+            if ($existingImage && empty($tmpImageUrl)) {
+                Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => '']);
             }
+            // Update setting if we set a default placeholder
+            if (!empty($tmpImageUrl)) {
+                Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
+            }
+
         }
         $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::DEFAULT_USE_ONLY_ON_CATEGORY));
         $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::DEFAULT_MASONRY_ENABLED));
-        $placeholderImg = !empty(c('CatalogueDisplay.PlaceHolderImage')) ? img(c('CatalogueDisplay.PlaceHolderImage')) : null;
-        $sender->setData('PlaceholderImage', $placeholderImg);
+        $sender->Form->setValue('Photo', c('CatalogueDisplay.PlaceHolderImage', null));
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
 
