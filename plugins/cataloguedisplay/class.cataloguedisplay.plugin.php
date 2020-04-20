@@ -212,8 +212,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function postController_afterDiscussionSave_handler(PostController $sender, $args) {
-        $cacheKey = 'catalogueDisplay.thumbnailURL.'.valr('Discussion.DiscussionID', $args);
-        Gdn::cache()->remove($cacheKey);
+        if (isset($args['Discussion'])) {
+            // Remove the cache entry iff we deleted the post
+            $cacheKey = $this->makeThumbnailCacheKey($args['Discussion']->DiscussionID);
+            Gdn::cache()->remove($cacheKey);
+        }
     }
 
     /**
@@ -360,7 +363,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function findImageUrl($discussion) {
         // Get the image URL from cache.
-        $cacheKey = 'catalogueDisplay.thumbnailURL.'.$discussion->DiscussionID;
+        $cacheKey = $this->makeThumbnailCacheKey($discussion->DiscussionID);
         $imageUrl = Gdn::cache()->get($cacheKey);
         if (!$imageUrl || $imageUrl === Gdn_Cache::CACHEOP_FAILURE) {
             // If no image URL is cached, parse it from the DOM.
@@ -373,6 +376,17 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
 
         // if not get the image URL using pQuery and cache the results
         return $imageUrl;
+    }
+
+    /**
+     * Get a cache key from the discussion ID
+     *
+     * @param int $discussionID
+     * @return string
+     */
+    public function makeThumbnailCacheKey(int $discussionID): string {
+        // Create the image URL from cache.
+        return 'catalogueDisplay.thumbnailURL.'.$discussionID;
     }
 
     /**
