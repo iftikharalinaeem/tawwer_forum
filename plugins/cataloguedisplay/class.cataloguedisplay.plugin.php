@@ -318,41 +318,38 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $photo = '';
         $imgTag = null;
         $cssClassWrapper = [];
-        $imgAttributes = [];
+        $imgAttributes = [ 'class' => []];
         $catalogueImgURL = discussionUrl($discussion);
         if (!c('CatalogueDisplay.Masonry.Enabled')) {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
         }
         if (!c('CatalogueDisplay.Masonry.Enabled')) {
-            $imgAttributes['class'] = 'catalogue-image';
+            $imgAttributes['class'] = ['catalogue-image'];
         }
+
+        // First extract image URL from inside the body.
+        $imageUrl = $this->findImageUrl($discussion);
+
+        // If there is no image, look for the Placeholder Image saved in the config.
+        $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
+        if (!$imageUrl && $placeHolderUrl) {
+            $imgAttributes['class'][] = 'placeholder-image';
+            $imgAttributes['alt'] = Gdn::translate('Placeholder');
+            $imageUrl = $placeHolderUrl;
+        }
+
         $eventArguments['Discussion'] = $discussion;
         $eventArguments['catalogueImgURL'] = &$catalogueImgURL;
         $eventArguments['cssClassWrapper'] = &$cssClassWrapper;
         $eventArguments['imgAttributes'] = &$imgAttributes;
         $this->eventManager->fire('beforeCatalogueDisplay', $eventArguments);
 
-        // First extract image URL from inside the body.
-        $imageUrl = $this->findImageUrl($discussion);
-        if ($imageUrl) {
-            $imgTag = img($imageUrl, $imgAttributes);
-        }
-
-        // If there is no image, look for the Placeholder Image saved in the config.
-        $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
-        if (!$imgTag && $placeHolderUrl) {
-            $imgAttributes['class'] = 'placeholder-image';
-            $imgAttributes['alt'] = Gdn::translate('Placeholder');
-            $imgTag = img($placeHolderUrl, $imgAttributes);
-        }
-
-        // Apply url to  img
-        if ($imgTag) {
-            $photo = anchor($imgTag, $catalogueImgURL);
-        }
-
-        return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", ['photo' => $photo,
-            'cssClassWrapper' => $cssClassWrapper]);
+        return $this->renderTwig("/plugins/cataloguedisplay/views/catalogueImage.twig", [
+            'placeHolderUrl' => $catalogueImgURL,
+            'placeHolderImgUrl' => $imageUrl,
+            'imgAttributes' => $imgAttributes,
+            'cssClassWrapper' => $cssClassWrapper
+        ]);
     }
 
     /**
