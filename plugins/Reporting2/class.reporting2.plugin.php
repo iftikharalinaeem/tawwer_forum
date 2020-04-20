@@ -242,20 +242,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             $args['DashboardCount'] = $args['DashboardCount'];
         }
     }
-
-    /**
-     * Force report discussion types to be Rich.
-     *
-     * @param $args
-     * @return string|null
-     */
-    public function discussionModel_inputFormatter_handler($args) {
-        if ($args['Type'] === 'Report') {
-            return \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY;
-        }
-        return null;
-    }
-
+    
     /**
      * Render the Quote html for the view.
      *
