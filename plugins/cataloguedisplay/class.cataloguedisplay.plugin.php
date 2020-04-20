@@ -17,7 +17,6 @@ use Vanilla\Web\TwigRenderTrait;
  * This means that the first thumbnail in the Discussion is displayed when listed on the Recent Discussions or the Category page.
  */
 class CatalogueDisplayPlugin extends Gdn_Plugin {
-
     use TwigRenderTrait;
 
     const DEFAULT_USE_ONLY_ON_CATEGORY = true;
@@ -53,8 +52,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param FormatService $formatService
      * @param FormatConfig $formatConfig
      */
-    public function __construct(EventManager $eventManager, DiscussionModel $discussionModel,
-                                CategoryModel $categoryModel, FormatService $formatService, FormatConfig $formatConfig) {
+    public function __construct(
+        EventManager $eventManager,
+        DiscussionModel $discussionModel,
+        CategoryModel $categoryModel,
+        FormatService $formatService,
+        FormatConfig $formatConfig
+    ) {
         parent::__construct();
         $this->eventManager = $eventManager;
         $this->discussionModel = $discussionModel;
@@ -180,7 +184,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             if (!empty($tmpImageUrl)) {
                 Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
             }
-
         }
         $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::DEFAULT_USE_ONLY_ON_CATEGORY));
         $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::DEFAULT_MASONRY_ENABLED));
@@ -200,8 +203,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 'CategoryID' => valr('FormPostValues.CategoryID', $args),
                 'CatalogueDisplay' => 1,
             ]
-        )->firstRow()
-        ;
+        )->firstRow();
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
     }
 
