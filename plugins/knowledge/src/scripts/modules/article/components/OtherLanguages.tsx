@@ -15,7 +15,7 @@ import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import classNames from "classnames";
 import * as React from "react";
 import { WarningIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 

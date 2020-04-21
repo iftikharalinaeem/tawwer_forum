@@ -15,7 +15,7 @@ import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { t, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import Button from "@library/forms/Button";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { useKnowledgeBases } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { CollapsableContent } from "@vanilla/library/src/scripts/content/CollapsableContent";
 
