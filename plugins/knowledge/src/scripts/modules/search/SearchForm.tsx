@@ -33,7 +33,7 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import classNames from "classnames";
 import { typographyClasses } from "@library/styles/typographyStyles";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { PageHeading } from "@library/layout/PageHeading";
 

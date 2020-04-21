@@ -8,7 +8,7 @@ import { percent, px } from "csx";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit, flexHelper, colorOut, paddings, margins } from "@library/styles/styleHelpers";
-import { iconVariables } from "@library/icons/iconClasses";
+import { iconVariables } from "@library/icons/iconStyles";
 
 export const locationPickerClasses = useThemeCache(() => {
     const globalVars = globalVariables();

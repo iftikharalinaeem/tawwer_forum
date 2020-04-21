@@ -14,7 +14,7 @@ import { navigationManagerToolbarClasses } from "@knowledge/navigation/subcompon
 import { navigationManagerClasses } from "@knowledge/navigation/navigationManagerStyles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { NewFolderIcon } from "@library/icons/common";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import Translate from "@library/content/Translate";
 import { LocaleDisplayer } from "@vanilla/i18n";

@@ -10,7 +10,7 @@ import { debugHelper } from "@library/styles/styleHelpers";
 import { style } from "typestyle";
 import { px } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 const debug = debugHelper("knowledgeBaseIcons");
 
