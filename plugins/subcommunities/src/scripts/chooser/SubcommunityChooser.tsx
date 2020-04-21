@@ -126,7 +126,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
                                         }
                                         onClick={() => setActiveSection("locale")}
                                     >
-                                        Locales
+                                        {t("Locales")}
                                     </Button>
                                     <hr className={classes.headingDivider} />
                                 </>
@@ -136,7 +136,7 @@ export function SubcommunityChooserDropdown(props: IDropdownProps) {
                                 baseClass={activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
                                 onClick={() => setActiveSection("product")}
                             >
-                                Products
+                                {t("Products")}
                             </Button>
                         </FrameHeaderMinimal>
                     )
