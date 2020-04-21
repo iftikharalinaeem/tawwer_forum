@@ -30,13 +30,13 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import {useRouteChangePrompt} from "@vanilla/react-utils/src/UseRouteChangePrompt";
 import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
+import {useLinkContext} from "@library/routing/links/LinkContextProvider";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
     type?: string;
     name?: string;
     assets?: IThemeAssets;
-    pageState: boolean;
 }
 interface IOwnProps
     extends RouteComponentProps<{
@@ -45,14 +45,15 @@ interface IOwnProps
 
 export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme,  } = useThemeActions();
+    const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
     const { getThemeById} = actions;
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
-    const [ visibleModal, showModal ] = useState(false);
-    const [disabled, setDisabled] = useState(true);
+    const [ showUserNotificationModal, setShowUserNotificationModal ] = useState(false);
+    const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState(true);
+    const { pushSmartLocation } = useLinkContext();
     bodyCSS();
 
     let themeID = props.match.params.id;
@@ -94,7 +95,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
             if (form.errors) {
                 return false;
             } else {
-                setDisabled(true)
+                setDisableRouteChangePrompt(true)
                 const theme = await saveTheme();
                 if (theme) {
                     history.replace(makeThemeEditorUrl({ themeID: theme.themeID }));
@@ -115,30 +116,30 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
 
     const routeChangePrompt = useRouteChangePrompt(t(
         "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."
-    ), disabled);
+    ), disabledRouteChangePrompt);
 
-    const handleClick = () => {
+    const handleCancelEditingTheme = () => {
         if (isFormEdited) {
-            showModal(true);
-            setDisabled(true)
+            setShowUserNotificationModal(true);
+            setDisableRouteChangePrompt(true)
         } else {
-            setDisabled(true)
-            window.location.href = formatUrl('/theme/theme-settings', true);
+            setDisableRouteChangePrompt(true)
+            pushSmartLocation('/theme/theme-settings');
         }
     }
 
     const navigateToThemePage = () => {
-        window.location.href = formatUrl('/theme/theme-settings', true);
+        pushSmartLocation('/theme/theme-settings');
     };
 
     const closeModel = () => {
-        showModal(false);
-        setDisabled(false)
+        setShowUserNotificationModal(false);
+        setDisableRouteChangePrompt(false)
     };
 
     useEffect( () => {
         if (isFormEdited) {
-            setDisabled(false);
+            setDisableRouteChangePrompt(false);
         }
     },[isFormEdited]);
 
@@ -177,7 +178,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                                         type: "html",
                                     },
                                 },
-                                edited: true
                             });
                         }}
                     />
@@ -199,7 +199,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                                         type: "html",
                                     },
                                 },
-                                edited: true
                             });
                         }}
                     />
@@ -215,7 +214,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         onChange={(event, newValue) => {
                             updateAssets({
                                 assets: { styles: newValue },
-                                edited: true
                             });
                         }}
                     />
@@ -231,7 +229,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         onChange={(event, newValue) => {
                             updateAssets({
                                 assets: { javascript: newValue },
-                                edited: true
                             });
                         }}
                     />
@@ -241,7 +238,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
 
         content = (
             <>
-                <ModalConfirm title={t("Unsaved Changes")} onConfirm={navigateToThemePage} isVisible={visibleModal} onCancel={closeModel} confirmTitle={t("Exit")}>
+                <ModalConfirm title={t("Unsaved Changes")} onConfirm={navigateToThemePage} isVisible={showUserNotificationModal} onCancel={closeModel} confirmTitle={t("Exit")}>
                     {t(
                         "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."
                     )}
@@ -255,7 +252,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         backTitle={t("Back")}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                         isCallToActionDisabled={!!form.errors}
-                        handleCancel={handleClick}
+                        handleCancel={handleCancelEditingTheme}
                         optionsMenu={
                             <>
                                 {/* WIP not wired up. */}
@@ -283,7 +280,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     return (
         <IframeCommunicationContextProvider>
             <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-
                 {content}
             </Modal>
         </IframeCommunicationContextProvider>
