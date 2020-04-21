@@ -40,7 +40,7 @@ export const ThemeEditorTitle = (props: IProps) => {
             <AutoWidthInput
                 required
                 onChange={event => {
-                    updateAssets({ name: event.target.value });
+                    updateAssets({ name: event.target.value, edited: true });
                     setName(event.target.value);
                 }}
                 className={classNames(classes.themeInput)}

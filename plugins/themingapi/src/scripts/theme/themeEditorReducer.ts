@@ -20,6 +20,8 @@ export interface IThemeForm extends Omit<ITheme, "themeID" | "features" | "previ
     themeID?: number | string;
     pageType: pageTypes;
     errors: boolean;
+    initialLoad: boolean;
+    edited: boolean;
 }
 
 export interface IThemeState {
@@ -64,6 +66,8 @@ const INITIAL_STATE: IThemeState = {
         version: "",
         pageType: pageTypes.NEW_THEME,
         errors: false,
+        initialLoad: true,
+        edited: false,
     },
     formSubmit: {
         status: LoadStatus.PENDING,
@@ -99,6 +103,7 @@ export const themeEditorReducer = produce(
                         ...state.form.assets,
                         ...payload.assets,
                     },
+                    initialLoad: false,
                 };
             } else {
                 state.form.assets = INITIAL_ASSETS;
