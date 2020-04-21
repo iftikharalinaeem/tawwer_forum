@@ -118,9 +118,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * When editing a category, if there are discussions in the category, update them to add or remove the "catalogue" style.
      *
      * @param CategoryModel $sender
-     * @param CategoryModel $args
+     * @param array $args
      */
-    public function categoryModel_beforeSaveCategory_handler(CategoryModel $sender, $args) {
+    public function categoryModel_beforeSaveCategory_handler(CategoryModel $sender, array $args) {
         $formPostValues = $args['FormPostValues'] ?? false;
         $categoryID = $args['CategoryID'] ?? false;
         $insert = $categoryID > 0 ? false : true;
