@@ -13,7 +13,7 @@ import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { makeTranslationKey } from "../translator/TranslationActions";
-import { iconClasses } from "@library/icons/iconClasses";
+import { iconClasses } from "@library/icons/iconStyles";
 
 interface IProps {
     /** The translation property to represent */
