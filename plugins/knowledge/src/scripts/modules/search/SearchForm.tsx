@@ -113,9 +113,11 @@ function SearchForm(props: IProps) {
                                 />
                             </PanelWidget>
                             {isMobile && (
-                                <Drawer title={t("Filter Results")}>
-                                    <SearchFormFilters hideTitle={true} />
-                                </Drawer>
+                                <PanelWidget>
+                                    <Drawer title={t("Filter Results")}>
+                                        <SearchFormFilters hideTitle={true} />
+                                    </Drawer>
+                                </PanelWidget>
                             )}
                         </>
                     }
