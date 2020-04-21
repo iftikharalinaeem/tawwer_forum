@@ -15,7 +15,6 @@ import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
-import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
@@ -28,7 +27,6 @@ import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer"
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import {useRouteChangePrompt} from "@vanilla/react-utils/src/UseRouteChangePrompt";
-import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 import {useLinkContext} from "@library/routing/links/LinkContextProvider";
 
@@ -51,7 +49,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
-    const [ showUserNotificationModal, setShowUserNotificationModal ] = useState(false);
+    const [showUserNotificationModal, setShowUserNotificationModal] = useState(false);
     const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState(true);
     const { pushSmartLocation } = useLinkContext();
     bodyCSS();

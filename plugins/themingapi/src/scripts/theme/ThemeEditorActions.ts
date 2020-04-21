@@ -160,6 +160,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
                 parentVersion: form.version,
             });
         }
+        this.updateAssets({ edited: false });
 
         // Try to clear our submit status after some time.
         setTimeout(() => {
