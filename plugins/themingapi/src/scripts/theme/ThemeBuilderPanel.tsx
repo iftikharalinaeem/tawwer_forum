@@ -42,7 +42,7 @@ export default function ThemeBuilderPanel() {
                         assets: {
                             variables: {
                                 data: newVariables,
-                                type: "string",
+                                type: "json",
                             },
                         },
                         edited: !initialLoad,

@@ -33,7 +33,7 @@ if (val('items', $list)) {
                     <?php foreach (val('rows', $item) as $row) { ?>
                         <?php if (val('type', $row) == 'main') { ?>
                             <td class="Name <?php echo val('cssClass', $row); ?>">
-                                <div class="Wrap">
+                                <div class="Wrap<?php if(val('imageSource', $item)) { echo " hasPhotoWrap"; } else { echo " noPhotoWrap"; } ?>">
                                         <span class="Options">
                                             <?php if (val('options', $item)) { writeGroupOptions(val('options', $item)); } ?>
                                             <?php if (val('buttons', $item)) { ?>
@@ -115,7 +115,7 @@ if (val('items', $list)) {
                         <?php } ?>
                         <?php if (val('type', $row) == 'user') { ?>
                             <td class="BlockColumn BlockColumn-User <?php echo val('userFirstOrLast', $row); ?>User">
-                                <div class="Block Wrap">
+                                <div class="Block Wrap<?php if(val('imageSource', $item)) { echo " hasPhotoWrap"; } else { echo " noPhotoWrap"; } ?>">
                                     <?php if (val('userImageUrl', $row)) { ?>
                                         <a class="PhotoWrap PhotoWrapSmall" href="<?php echo val('userUrl', $row); ?>">
                                             <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo val('userImageUrl', $row); ?>">
@@ -140,7 +140,7 @@ if (val('items', $list)) {
                         <?php if (val('type', $row) == 'lastPost') { ?>
                             <td class="BlockColumn LatestPost">
                                 <?php if (val('title', $row)) { ?>
-                                    <div class="Block Wrap">
+                                    <div class="Block Wrap<?php if(val('imageSource', $item)) { echo " hasPhotoWrap"; } else { echo " noPhotoWrap"; } ?>">
                                         <?php if (val('imageSource', $row)) { ?>
                                             <a class="PhotoWrap PhotoWrapSmall" href="<?php echo val('imageUrl', $row); ?>">
                                                 <img class="ProfilePhoto ProfilePhotoSmall" src="<?php echo val('imageSource', $row); ?>">

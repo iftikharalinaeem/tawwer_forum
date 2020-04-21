@@ -1,16 +1,27 @@
 <?php if (!defined('APPLICATION')) exit();
 
-class GigyaPlugin extends Gdn_Plugin {
+/**
+ * Class GigyaPlugin.
+ */
+class GigyaPlugin extends SSOAddon {
    /// Constants ///
-   const PROVIDER_KEY = 'gigya';
+    const PROVIDER_KEY = 'gigya';
+    private const AUTHENTICATION_SCHEME = 'gigya';
 
+    /// Properties ///
+    protected $Provider = null;
 
-   /// Properties ///
-   protected $Provider = null;
+    protected $RedirectUrl = '/entry/connect/gigya';
 
-   protected $RedirectUrl = '/entry/connect/gigya';
-
-   /// Methods ///
+    /// Methods ///
+    /**
+     * Get the AuthenticationSchemeAlias value.
+     *
+     * @return string The AuthenticationSchemeAlias.
+     */
+    protected function getAuthenticationSchemeAlias(): string {
+        return self::AUTHENTICATION_SCHEME;
+    }
 
    static function calcSignature($baseString, $key) {
       $baseString = utf8_encode($baseString);
@@ -42,7 +53,7 @@ class GigyaPlugin extends Gdn_Plugin {
          $model = new Gdn_AuthenticationProviderModel();
          $provider = [
             'AuthenticationKey' => self::PROVIDER_KEY,
-            'AuthenticationSchemeAlias' => self::PROVIDER_KEY,
+            'AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME,
             'Name' => c('Garden.Title'),
             'AuthenticateUrl' => 'https://socialize.gigya.com/socialize.login',
 

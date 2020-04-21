@@ -8,6 +8,7 @@ namespace Vanilla\ThemingApi;
 
 use Gdn_Upload;
 use Vanilla\Addon;
+use Vanilla\Theme\ThemeProviderCleanupInterface;
 use Vanilla\Theme\ThemeProviderInterface;
 use Vanilla\Models\ThemeModel;
 use Vanilla\ThemingApi\Models\ThemeModel as ThemingModel;
@@ -30,7 +31,7 @@ use Vanilla\Models\ThemeModelHelper;
 /**
  * Class DbThemeProvider
  */
-class DbThemeProvider implements ThemeProviderInterface {
+class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInterface {
 
     const SELECT_FIELDS = ['themeID', 'parentTheme', 'name', 'current', 'dateUpdated', 'dateInserted'];
 
@@ -219,10 +220,19 @@ class DbThemeProvider implements ThemeProviderInterface {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function afterCurrentProviderChange(): void {
+        $this->themeModel->resetCurrentTheme();
+    }
+
+    /**
      * Reset current db theme when file based theme activated
+     *
+     * @deprecated
      */
     public function resetCurrent() {
-        $this->themeModel->resetCurrentTheme();
+        $this->afterCurrentProviderChange();
     }
 
     /**

@@ -38,7 +38,7 @@ export interface IPatchThemeRequest {
     assets?: Partial<IPostPatchThemeAssets>;
 }
 
-export enum pageTypes {
+export enum PageType {
     NEW_THEME = "newTheme",
     COPY = "copy",
     EDIT_THEME = "edit",
@@ -62,17 +62,20 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
 
+    public static clearSubmitAC = actionCreator("CLEAR_SUBMIT");
+    public clearSubmit = this.bindDispatch(ThemeActions.clearSubmitAC);
+
     public getThemeById = async (themeID: number | string, history: History) => {
         const query = qs.parse(history.location.search.replace(/^\?/, ""));
 
         let currentPageType = "";
 
         if (history.location.pathname === "/theme/theme-settings/add" && !query.templateName) {
-            currentPageType = pageTypes.NEW_THEME;
+            currentPageType = PageType.NEW_THEME;
         } else if (query.templateName) {
-            currentPageType = pageTypes.COPY;
+            currentPageType = PageType.COPY;
         } else {
-            currentPageType = pageTypes.EDIT_THEME;
+            currentPageType = PageType.EDIT_THEME;
         }
 
         const request = {
@@ -105,10 +108,10 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             response.data.pageType = currentPageType;
 
             switch (currentPageType) {
-                case pageTypes.NEW_THEME:
+                case PageType.NEW_THEME:
                     response.data.name = t("Untitled");
                     break;
-                case pageTypes.COPY:
+                case PageType.COPY:
                     let themeName = t("ThemeEditor.Copy", "<0/> copy");
                     themeName = themeName.replace("<0/>", `${response.data.name}`);
                     response.data.name = themeName;
@@ -126,12 +129,15 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         const { form } = this.getState().themeEditor;
         const { themeID, pageType } = this.getState().themeEditor.form;
 
-        const assets = {
+        const assets: any = {
             header: form.assets.header,
             footer: form.assets.footer,
             styles: form.assets.styles,
             javascript: form.assets.javascript,
-            variables: form.assets.variables,
+            variables: {
+                data: JSON.stringify((form.assets.variables as any).data),
+                type: "json",
+            },
         };
 
         const request = {
@@ -139,20 +145,28 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             assets: assets,
         };
 
-        if (form.type == "themeDB" && pageType === pageTypes.EDIT_THEME) {
+        let result: any;
+        if (form.type == "themeDB" && pageType === PageType.EDIT_THEME) {
             if (themeID) {
-                return await this.patchTheme({
+                result = await this.patchTheme({
                     ...request,
                     themeID,
                 });
             }
         } else {
-            return await this.postTheme({
+            result = await this.postTheme({
                 ...request,
                 parentTheme: form.type === "themeDB" ? form.parentTheme : form.themeID,
                 parentVersion: form.version,
             });
         }
+
+        // Try to clear our submit status after some time.
+        setTimeout(() => {
+            this.clearSubmit();
+        }, 10000);
+
+        return result;
     };
 
     public postTheme(options: IPostThemeRequest) {

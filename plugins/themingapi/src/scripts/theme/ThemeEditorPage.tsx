@@ -28,6 +28,8 @@ import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer"
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import {useRouteChangePrompt} from "@vanilla/react-utils/src/UseRouteChangePrompt";
+import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -89,22 +91,14 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
         event.preventDefault();
 
         if (themeID !== null) {
-            if (assets.variables) {
-                updateAssets({
-                    assets: {
-                        variables: {
-                            data: JSON.stringify(assets.variables.data),
-                            type: "json",
-                        },
-                    },
-                });
-            }
             if (form.errors) {
                 return false;
             } else {
                 setDisabled(true)
-                await saveTheme();
-                window.location.href = formatUrl("/theme/theme-settings", true);
+                const theme = await saveTheme();
+                if (theme) {
+                    history.replace(makeThemeEditorUrl({ themeID: theme.themeID }));
+                }
             }
         }
     };
@@ -255,9 +249,10 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                 <form onSubmit={submitHandler}>
                     <ActionBar
                         useShadow={false}
-                        callToActionTitle={t("Save")}
+                        callToActionTitle={formSubmit.status === LoadStatus.SUCCESS ? t("Saved") : t("Save")}
                         title={<ThemeEditorTitle themeName={theme.data.name} pageType={form.pageType} />}
                         fullWidth={true}
+                        backTitle={t("Back")}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                         isCallToActionDisabled={!!form.errors}
                         handleCancel={handleClick}

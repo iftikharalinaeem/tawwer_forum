@@ -98,7 +98,7 @@ class AutoRoleByEmailPlugin extends Gdn_Plugin {
         if (count($parts) !== 2) {
             return;
         }
-        $domain = $parts[1];
+        $domain = strtolower($parts[1]);
 
         // Any roles assigned?
         $roleModel = new RoleModel();

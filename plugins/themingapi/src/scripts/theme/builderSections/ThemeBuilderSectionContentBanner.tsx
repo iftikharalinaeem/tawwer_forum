@@ -24,6 +24,7 @@ import {
 } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
 
 export function ThemeBuilderSectionContentBanner() {
+    const { generatedThemeVariables } = useThemeBuilder();
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.CONTENT_BANNER} />
@@ -44,6 +45,13 @@ export function ThemeBuilderSectionContentBanner() {
                     <ThemeBuilderUpload variableKey="contentBanner.outerBackground.image" />
                 </ThemeBuilderBlock>
                 <ThemeBuilderCheckBox label={t("Color Overlay")} variableKey="contentBanner.backgrounds.useOverlay" />
+                {generatedThemeVariables.titleBar.fullBleed.enabled && (
+                    <ThemeBuilderCheckBox
+                        label={t("Full Bleed")}
+                        variableKey="contentBanner.options.overlayTitleBar"
+                        info={t('Configure the Content Banner to work with the "Full Bleed" Title Bar option.')}
+                    />
+                )}
                 <ThemeBuilderBreakpoints
                     baseKey="contentBanner.outerBackground"
                     responsiveKey="image"
