@@ -20,18 +20,20 @@ import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import {Prompt, RouteComponentProps, useHistory} from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
+import ModalConfirm from "@library/modal/ModalConfirm";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
     type?: string;
     name?: string;
     assets?: IThemeAssets;
+    pageState: boolean;
 }
 interface IOwnProps
     extends RouteComponentProps<{
@@ -40,12 +42,14 @@ interface IOwnProps
 
 export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme } = useThemeActions();
+    const { updateAssets, saveTheme,  } = useThemeActions();
     const actions = useThemeActions();
     const { getThemeById } = actions;
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
+    const [ visibleModal, showModal ] = useState(false);
+    const [formUpdated, setFormUpdated] = useState(false);
     bodyCSS();
 
     let themeID = props.match.params.id;
@@ -64,6 +68,8 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     }
 
     useFallbackBackUrl("/theme/theme-settings");
+
+
 
     const themeStatus = theme.status;
     const history = useHistory();
@@ -98,10 +104,12 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                 return false;
             } else {
                 await saveTheme();
+                setFormUpdated(false);
                 window.location.href = formatUrl("/theme/theme-settings", true);
             }
         }
     };
+
 
     let content: React.ReactNode;
 
@@ -110,6 +118,30 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
         sendMessage = sendMessageFunction;
         window.sendMessage = sendMessage;
     };
+
+    const handleClick = () => {
+        if (formUpdated) {
+            showModal(true);
+        } else {
+            window.location.href = formatUrl('/theme/theme-settings', true);
+        }
+    }
+
+    const navigateToThemePage = () => {
+        window.location.href = formatUrl('/theme/theme-settings', true);
+    };
+
+    const closeModel = () => {
+        showModal(false);
+    };
+
+     console.log(formUpdated)
+    // const {variableStatus} = useThemeBuilder();
+
+
+    // useEffect( () => {
+    //     setFormUpdated(true);
+    // },[variableStatus]);
 
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
@@ -147,6 +179,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                                     },
                                 },
                             });
+                            setFormUpdated(true);
                         }}
                     />
                 ),
@@ -168,6 +201,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                                     },
                                 },
                             });
+                            setFormUpdated(true);
                         }}
                     />
                 ),
@@ -181,6 +215,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         value={assets.styles}
                         onChange={(event, newValue) => {
                             updateAssets({ assets: { styles: newValue } });
+                            setFormUpdated(true);
                         }}
                     />
                 ),
@@ -194,6 +229,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         value={assets.javascript}
                         onChange={(event, newValue) => {
                             updateAssets({ assets: { javascript: newValue } });
+                            setFormUpdated(true);
                         }}
                     />
                 ),
@@ -202,7 +238,13 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
 
         content = (
             <>
+                <ModalConfirm title={t("Unsaved Changes")} onConfirm={navigateToThemePage} isVisible={visibleModal} onCancel={closeModel} confirmTitle={t("Exit")}>
+                    {t(
+                        "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."
+                    )}
+                </ModalConfirm>
                 <form onSubmit={submitHandler}>
+                    <Prompt when={true} message={location => "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."}/>
                     <ActionBar
                         useShadow={false}
                         callToActionTitle={t("Save")}
@@ -210,6 +252,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
                         fullWidth={true}
                         isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
                         isCallToActionDisabled={!!form.errors}
+                        handleCancel={handleClick}
                         optionsMenu={
                             <>
                                 {/* WIP not wired up. */}
@@ -237,6 +280,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     return (
         <IframeCommunicationContextProvider>
             <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+
                 {content}
             </Modal>
         </IframeCommunicationContextProvider>
