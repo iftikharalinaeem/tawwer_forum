@@ -18,6 +18,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut, flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { ToolTip, ToolTipIcon } from "@vanilla/library/src/scripts/toolTip/ToolTip";
 import { InformationIcon } from "@vanilla/library/src/scripts/icons/common";
+import { getMeta } from "@library/utility/appUtils";
 
 export function ThemeEditorPreviewContentsContent() {
     const classes = themeEditorPreviewClasses();

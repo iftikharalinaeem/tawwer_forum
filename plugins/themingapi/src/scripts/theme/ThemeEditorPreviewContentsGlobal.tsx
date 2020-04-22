@@ -20,6 +20,7 @@ import React, { useEffect, useState } from "react";
 import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
 import { loadThemeFonts } from "@library/theming/loadThemeFonts";
 import { bodyCSS } from "@library/layout/bodyStyles";
+import { getMeta } from "@library/utility/appUtils";
 
 export function ThemeEditorPreviewContentsGlobal() {
     const [intialInputValue, newInputValue] = useState("Text Input");
@@ -39,7 +40,7 @@ export function ThemeEditorPreviewContentsGlobal() {
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner title={bannerVariables().title.text} />
+                <Banner title={t(bannerVariables().title.text)} />
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.GLOBAL} color={globalVariables().mainColors.fg}>
