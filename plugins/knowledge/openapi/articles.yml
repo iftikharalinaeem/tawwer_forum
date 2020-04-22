@@ -668,6 +668,9 @@ paths:
                                             description: When the article was created.
                                             format: date-time
                                             type: string
+                                        featured:
+                                            description: Article featured flag.
+                                            type: boolean
                                         insertUser:
                                             $ref: "#/components/schemas/UserFragment"
                                         locale:
