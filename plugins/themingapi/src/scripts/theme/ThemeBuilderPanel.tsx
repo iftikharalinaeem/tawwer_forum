@@ -32,6 +32,7 @@ export default function ThemeBuilderPanel() {
     const { updateAssets } = useThemeActions();
     const { sendMessage } = useIFrameCommunication();
     const variables = useThemeEditorState()?.form?.assets.variables?.data;
+    const initialLoad = useThemeEditorState()?.form.initialLoad;
 
     return (
         <ErrorBoundary>
@@ -44,6 +45,7 @@ export default function ThemeBuilderPanel() {
                                 type: "json",
                             },
                         },
+                        edited: !initialLoad,
                         errors: hasError,
                     });
 
