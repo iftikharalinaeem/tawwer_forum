@@ -340,6 +340,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "name",
             "body",
             "format",
+            "featured?",
             "locale",
             "status",
             "foreignID",

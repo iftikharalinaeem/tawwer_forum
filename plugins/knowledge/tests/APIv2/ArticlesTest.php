@@ -42,7 +42,8 @@ class ArticlesTest extends AbstractResourceTest {
         "name",
         "sort",
         'foreignID',
-        'status'
+        'status',
+        'featured',
     ];
 
     /** @var string The name of the primary key of the resource. */
@@ -124,6 +125,7 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => "Example Article",
             "sort" => 1,
             "foreignID" => 'test-id-001',
+            "featured" => false,
             "status" => 'published'
         ];
         return $record;
@@ -770,7 +772,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
         $articles = $response->getBody();
-        $this->assertEquals(23, count($articles));
+        $this->assertEquals(24, count($articles));
     }
 
     /**
@@ -794,9 +796,9 @@ class ArticlesTest extends AbstractResourceTest {
         $article = $response->getBody();
         $locales = array_count_values(array_column($article, "locale"));
 
-        $this->assertEquals(24, count($article));
+        $this->assertEquals(25, count($article));
         $this->assertEquals(2, $locales["ru"]);
-        $this->assertEquals(22, $locales["en"]);
+        $this->assertEquals(23, $locales["en"]);
     }
 
     /**
