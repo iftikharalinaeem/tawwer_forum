@@ -54,7 +54,7 @@ function PreviewContentBanner() {
     if (vars.options.enabled) {
         return (
             <PanelActivator panel={ActiveVariablePanel.CONTENT_BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner isContentBanner title={t("Welcome To Your Theme")} />
+                <Banner isContentBanner title={t(bannerVariables().title.text)} />
             </PanelActivator>
         );
     } else {

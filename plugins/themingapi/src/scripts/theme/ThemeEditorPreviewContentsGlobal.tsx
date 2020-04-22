@@ -39,7 +39,7 @@ export function ThemeEditorPreviewContentsGlobal() {
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner title={t("Welcome To Your Theme")} />
+                <Banner title={bannerVariables().title.text} />
             </PanelActivator>
 
             <PanelActivator panel={ActiveVariablePanel.GLOBAL} color={globalVariables().mainColors.fg}>

@@ -22,11 +22,15 @@ import {
     ThemeBuilderBreakpoints,
     BreakpointViewType,
 } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 
 export function ThemeBuilderSectionBanner() {
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.BANNER} />
+            <ThemeBuilderBlock label={t("Banner Title")}>
+                <ThemeInputText varKey={"banner.title.text"} debounceTime={false} />
+            </ThemeBuilderBlock>
             <ThemeBuilderBlock label={t("Text Color")}>
                 <ThemeColorPicker variableKey="banner.colors.primaryContrast" />
             </ThemeBuilderBlock>
