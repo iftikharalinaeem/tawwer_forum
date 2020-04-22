@@ -108,7 +108,7 @@ class ReportModel extends Gdn_Model {
         $recordType = $data['RecordType'];
         $recordID = $data['RecordID'];
         $reportedRecord = getRecord($data['RecordType'], $data['RecordID']);
-        
+
         $reportedRecord = $this->discussionModel->fixRow($reportedRecord);
 
         if (!$reportedRecord) {
@@ -185,7 +185,8 @@ class ReportModel extends Gdn_Model {
                 'ForeignID' => $foreignID,
                 'Format' => \Vanilla\Formatting\Formats\RichFormat::FORMAT_KEY,
                 'CategoryID' => $category['CategoryID'],
-                'Attributes' => ['Report' => $reportAttributes]
+                'Attributes' => ['Report' => $reportAttributes],
+                'forcedFormat' => true,
             ];
 
             $this->EventArguments['ReportedRecordType'] = strtolower($data['RecordType']);
