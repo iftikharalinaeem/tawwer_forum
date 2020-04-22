@@ -26,7 +26,7 @@ import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import {useRouteChangePrompt} from "@vanilla/react-utils/src/UseRouteChangePrompt";
+import {useRouteChangePrompt} from "@vanilla/react-utils";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 import {useLinkContext} from "@library/routing/links/LinkContextProvider";
 
