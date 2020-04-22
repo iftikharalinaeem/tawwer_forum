@@ -19,16 +19,16 @@ import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import {RouteComponentProps, useHistory} from "react-router-dom";
+import { RouteComponentProps, useHistory } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
 import { useThemeActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import {useRouteChangePrompt} from "@vanilla/react-utils";
+import { useRouteChangePrompt } from "@vanilla/react-utils";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
-import {useLinkContext} from "@library/routing/links/LinkContextProvider";
+import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -45,7 +45,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     const titleID = useUniqueID("themeEditor");
     const { updateAssets, saveTheme } = useThemeActions();
     const actions = useThemeActions();
-    const { getThemeById} = actions;
+    const { getThemeById } = actions;
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
@@ -93,7 +93,7 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
             if (form.errors) {
                 return false;
             } else {
-                setDisableRouteChangePrompt(true)
+                setDisableRouteChangePrompt(true);
                 const theme = await saveTheme();
                 if (theme) {
                     history.replace(makeThemeEditorUrl({ themeID: theme.themeID }));
@@ -112,34 +112,37 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
         window.sendMessage = sendMessage;
     };
 
-    const routeChangePrompt = useRouteChangePrompt(t(
-        "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."
-    ), disabledRouteChangePrompt);
+    const routeChangePrompt = useRouteChangePrompt(
+        t(
+            "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting.",
+        ),
+        disabledRouteChangePrompt,
+    );
 
     const handleCancelEditingTheme = () => {
         if (isFormEdited) {
             setShowUserNotificationModal(true);
-            setDisableRouteChangePrompt(true)
+            setDisableRouteChangePrompt(true);
         } else {
-            setDisableRouteChangePrompt(true)
-            pushSmartLocation('/theme/theme-settings');
+            setDisableRouteChangePrompt(true);
+            pushSmartLocation("/theme/theme-settings");
         }
-    }
+    };
 
     const navigateToThemePage = () => {
-        pushSmartLocation('/theme/theme-settings');
+        pushSmartLocation("/theme/theme-settings");
     };
 
     const closeModel = () => {
         setShowUserNotificationModal(false);
-        setDisableRouteChangePrompt(false)
+        setDisableRouteChangePrompt(false);
     };
 
-    useEffect( () => {
+    useEffect(() => {
         if (isFormEdited) {
             setDisableRouteChangePrompt(false);
         }
-    },[isFormEdited]);
+    }, [isFormEdited]);
 
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
@@ -236,9 +239,15 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
 
         content = (
             <>
-                <ModalConfirm title={t("Unsaved Changes")} onConfirm={navigateToThemePage} isVisible={showUserNotificationModal} onCancel={closeModel} confirmTitle={t("Exit")}>
+                <ModalConfirm
+                    title={t("Unsaved Changes")}
+                    onConfirm={navigateToThemePage}
+                    isVisible={showUserNotificationModal}
+                    onCancel={closeModel}
+                    confirmTitle={t("Exit")}
+                >
                     {t(
-                        "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting."
+                        "You are leaving the theme editor without saving your changes. Make sure your updates are saved before exiting.",
                     )}
                 </ModalConfirm>
                 <form onSubmit={submitHandler}>
