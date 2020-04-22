@@ -42,7 +42,8 @@ class ArticlesTest extends AbstractResourceTest {
         "name",
         "sort",
         'foreignID',
-        'status'
+        'status',
+        'featured',
     ];
 
     /** @var string The name of the primary key of the resource. */
