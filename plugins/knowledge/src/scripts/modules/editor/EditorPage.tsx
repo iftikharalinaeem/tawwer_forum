@@ -27,6 +27,7 @@ import { HomeRoute } from "@knowledge/routes/pageRoutes";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import qs from "querystring";
+import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 
 /**
  * Page for editing an article.
@@ -48,6 +49,8 @@ export class EditorPage extends React.Component<IProps> {
                   }
                 : {};
 
+        const PermissionComponent = kbID != null ? KbPermission : Permission;
+
         return (
             <Modal
                 isVisible={true}
@@ -59,14 +62,14 @@ export class EditorPage extends React.Component<IProps> {
                 <AnalyticsData uniqueKey={this.id} />
                 <FallbackBackUrlSetter url={article?.data?.url ?? HomeRoute.url(undefined)} />
                 {this.renderErrorMessage()}
-                <Permission
+                <PermissionComponent
                     {...permissionProps}
                     permission="articles.add"
                     fallback={<KbErrorPage defaultError={DefaultKbError.PERMISSION} />}
                 >
                     {this.renderQueryString()}
                     <EditorForm titleID={this.titleID} />
-                </Permission>
+                </PermissionComponent>
             </Modal>
         );
     }

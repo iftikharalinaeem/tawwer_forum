@@ -301,11 +301,16 @@ function mapStateToProps(state: IKnowledgeAppStoreState, ownProps: IOwnProps) {
     ) {
         const kbNavItems = KnowledgeBaseModel.selectKnowledgeBasesAsNavItems(state);
         const permissionedNavItems = kbNavItems.filter(item => {
-            return hasPermission("articles.add", {
-                resourceID: item.knowledgeBaseID,
-                resourceType: "knowledgeBase",
-                mode: PermissionMode.RESOURCE,
-            });
+            const fullKB = knowledgeBases.knowledgeBasesByID.data?.[item.knowledgeBaseID];
+            if (fullKB?.hasCustomPermission) {
+                return hasPermission("articles.add", {
+                    resourceID: item.knowledgeBaseID,
+                    resourceType: "knowledgeBase",
+                    mode: PermissionMode.RESOURCE,
+                });
+            } else {
+                return true;
+            }
         });
 
         return {
