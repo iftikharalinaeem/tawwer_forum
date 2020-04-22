@@ -125,6 +125,7 @@ class ArticlesTest extends AbstractResourceTest {
             "name" => "Example Article",
             "sort" => 1,
             "foreignID" => 'test-id-001',
+            "featured" => false,
             "status" => 'published'
         ];
         return $record;
