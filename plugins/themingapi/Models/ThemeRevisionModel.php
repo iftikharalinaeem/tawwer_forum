@@ -43,7 +43,6 @@ class ThemeRevisionModel extends PipelineModel {
      * @param int $themeID
      * @param string $name
      * @return int
-     * @throws \Exception
      */
     public function create(int $themeID, string $name = ''): int {
         if (empty($name)) {

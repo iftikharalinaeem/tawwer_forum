@@ -53,7 +53,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
      * @param SessionInterface $session
      * @param Gdn_Request $request
      * @param ThemeRevisionModel $themeRevisionModel
-     * @param DbThemeModel $themeModel,
+     * @param DbThemeModel $themeModel
      */
     public function __construct(
         Gdn_Database $database,

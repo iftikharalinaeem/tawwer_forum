@@ -104,7 +104,7 @@ class ThemeModel extends PipelineModel {
         $db->select('t.themeID, t.name, t.current, t.parentTheme, t.parentVersion')
             ->select('r.insertUserID, r.insertUserID as updateUserID, r.dateInserted, r.dateInserted as dateUpdated')
             ->select('r.revisionID')
-            ->select('r.revisionID = t.revisionID', 'if(%s,1,0)','active')
+            ->select('r.revisionID = t.revisionID', 'if(%s,1,0)', 'active')
             ->from($this->getTable().' t')
             ->join('themeRevision r', 't.themeID = r.themeID')
             ->where(['t.themeID' => $themeID])
