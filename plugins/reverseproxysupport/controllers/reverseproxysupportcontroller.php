@@ -5,6 +5,8 @@
  * @license GPLv2
  */
 
+use ReverseProxy\Library\RewrittenRequest;
+
 /**
  * Class ReverseProxySupportController
  */
@@ -14,13 +16,14 @@ class ReverseProxySupportController extends Gdn_Controller {
      * Add a validate endpoint.
      */
     public function validate() {
-        $proxied = !empty($_SERVER['REVERSE_PROXY_SUPPORT_HTTP_HOST_ORIGINAL']);
+        $request = Gdn::request();
+        $proxied = ($request instanceof RewrittenRequest);
         $forwardedIP = val('HTTP_X_FORWARDED_FOR', $_SERVER);
-        $validationID = Gdn::request()->get('validationID', false);
+        $validationID = $request->get('validationID', false);
 
         $isIDValid = $validationID && $validationID === c('ReverseProxySupport.ValidationID', null);
 
-        $expectedProxyFor = Gdn::request()->get('expectedProxyFor', false);
+        $expectedProxyFor = $request->get('expectedProxyFor', false);
         $wasProperlyProxied = true;
         if ($proxied && $expectedProxyFor !== false && rtrim($expectedProxyFor, '/') !== rtrim($_SERVER['HTTP_X_PROXY_FOR'], '/')) {
             $wasProperlyProxied = false;
@@ -57,7 +60,7 @@ class ReverseProxySupportController extends Gdn_Controller {
 
         $response = json_encode($response, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
-        $callback = Gdn::request()->get('callback');
+        $callback = $request->get('callback');
         if ($callback) {
             safeHeader('Content-Type: application/javascript');
             die("$callback($response);");

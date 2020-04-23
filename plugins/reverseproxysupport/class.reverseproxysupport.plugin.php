@@ -5,21 +5,59 @@
  * @license GPLv2
  */
 
+use ReverseProxy\Library\RequestRewriter;
+use ReverseProxy\Library\RewrittenRequest;
+use Vanilla\Contracts\ConfigurationInterface;
+
 /**
  * Class ReverseProxySupportPlugin
  */
 class ReverseProxySupportPlugin extends Gdn_Plugin {
 
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var bool */
+    private $forceRedirect = false;
+
+    /** @var bool */
+    private $isDebug = false;
+
+    /** @var string */
     private $proxyRoot;
+
+    /** @var RequestRewriter */
+    private $rewriter;
+
+    /**
+     * Setup the addon.
+     *
+     * @param ConfigurationInterface $config
+     * @param Gdn_Dispatcher $dispatcher
+     * @param RequestRewriter $rewriter
+     */
+    public function __construct(ConfigurationInterface $config, RequestRewriter $rewriter) {
+        $this->config = $config;
+        $this->forceRedirect = (bool)$config->get(
+            "ReverseProxySupport.Redirect.Enabled",
+            false
+        );
+        $this->isDebug = debug();
+        $this->rewriter = $rewriter;
+
+        if ($proxyUrl = $rewriter->getProxyUrl()) {
+            ["path" => $proxyPath] = $rewriter->parseUrl($proxyUrl);
+            $this->proxyRoot = $proxyPath;
+        }
+    }
 
     /**
      * Run on plugin activation.
      */
     public function setup() {
         // Let's make sure that we do not kill a site because we are activating this plugin with old configurations.
-        saveToConfig('ReverseProxySupport.Redirect.Enabled', false);
-
-        saveToConfig('ReverseProxySupport.ValidationID', uniqid());
+        $this->config->saveToConfig('ReverseProxySupport.Redirect.Enabled', false);
+        $this->config->saveToConfig('ReverseProxySupport.ValidationID', uniqid());
     }
 
     /**
@@ -47,7 +85,10 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
         ]);
         $sender->Form->setModel($configurationModel);
 
-        $redirectInputsVisibility = $sender->Form->getFormValue('ReverseProxySupport.Redirect.Enabled', c('ReverseProxySupport.Redirect.Enabled')) ? '' : ' foggy';
+        $redirectInputsVisibility = $sender->Form->getFormValue(
+            'ReverseProxySupport.Redirect.Enabled',
+            c('ReverseProxySupport.Redirect.Enabled')
+        ) ? '' : ' foggy';
         $inputsDefinition = [
             'ReverseProxySupport.URL' => [
                 'LabelCode' => 'Proxy URL',
@@ -85,14 +126,21 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
             $url = trim($sender->Form->getFormValue('ReverseProxySupport.URL', ''));
             if ($url === '') {
                 $urlValid = true;
-            } else if ($url) {
-                $sanitizedURL = $this->filterProxyFor($url);
+            } elseif ($url) {
+                try {
+                    $sanitizedURL = $this->rewriter->sanitizeUrl($url);
+                } catch (InvalidArgumentException $e) {
+                    $sanitizedURL = false;
+                }
                 if ($sanitizedURL) {
                     $urlValid = true;
                     $sender->Form->setFormValue('ReverseProxySupport.URL', $sanitizedURL);
                 }
             } if (!$urlValid) {
-                $sender->Form->addError('The specified URL does not meet the expected specifications.', 'ReverseProxySupport.URL');
+                $sender->Form->addError(
+                    'The specified URL does not meet the expected specifications.',
+                    'ReverseProxySupport.URL'
+                );
             }
 
             // Force redirect to false since there is no proxy configured.
@@ -117,7 +165,10 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
                 }
 
                 if ($filteredIPs) {
-                    $sender->Form->setFormValue('ReverseProxySupport.Redirect.ExcludedIPs', implode("\n", $filteredIPs));
+                    $sender->Form->setFormValue(
+                        'ReverseProxySupport.Redirect.ExcludedIPs',
+                        implode("\n", $filteredIPs)
+                    );
                 } else {
                     $sender->Form->setFormValue('ReverseProxySupport.Redirect.ExcludedIPs', null);
                 }
@@ -132,155 +183,63 @@ class ReverseProxySupportPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Hook as early as possible sine we are modifying the Request object.
-     */
-    public function gdn_pluginManager_afterStart() {
-        $dic = Gdn::getContainer();
-
-        $xProxyFor = val('HTTP_X_PROXY_FOR', $_SERVER);
-        $currentHTTPHost = $_SERVER['HTTP_HOST'];
-
-        /** @var Gdn_Request $oldRequest */
-        $oldRequest = $dic->get('Request');
-        $path = $oldRequest->path();
-        $isRequestValidation = preg_match('#^reverseproxysupport/validate/?#', $path) === 1;
-
-        if ($isRequestValidation) {
-            $filteredProxyFor = $this->filterProxyFor($xProxyFor);
-            if ($filteredProxyFor) {
-                $proxyHost = parse_url($filteredProxyFor, PHP_URL_HOST);
-                $proxyPort = parse_url($filteredProxyFor, PHP_URL_PORT);
-                $proxyPath = rtrim(parse_url($filteredProxyFor, PHP_URL_PATH), '/');
-                $newHTTPHost = $proxyHost.($proxyPort ? ':'.$proxyPort : '');
-            }
-        } else {
-            $proxyURL = c('ReverseProxySupport.URL');
-            if (!$proxyURL) {
-                return;
-            }
-
-            $isValidProxyFor = $xProxyFor && $xProxyFor === $proxyURL;
-
-            $proxyHost = parse_url($proxyURL, PHP_URL_HOST);
-            $proxyPort = parse_url($proxyURL, PHP_URL_PORT);
-            $proxyPath = trim(parse_url($proxyURL, PHP_URL_PATH), '/');
-            $newHTTPHost = $proxyHost.($proxyPort ? ':'.$proxyPort : '');
-
-            // 301 redirect to the reverse proxy
-            if (!$isValidProxyFor) {
-                if (c('ReverseProxySupport.Redirect.Enabled')) {
-                    $skipRedirect = $currentHTTPHost === $newHTTPHost || $this->isExcludedIP($oldRequest->ipAddress());
-
-                    if ($skipRedirect) {
-                        return;
-                    }
-
-                    // Do not redirect block exceptions.
-                    $blockExceptions = Gdn::dispatcher()->getBlockExceptions();
-                    foreach ($blockExceptions as $blockException => $blockLevel) {
-                        if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION && preg_match($blockException, $path)) {
-                            return;
-                        }
-                    }
-
-                    $pathAndQuery = $oldRequest->pathAndQuery();
-                    redirectTo($proxyURL.'/'.$pathAndQuery, debug() ? 302 : 301, false);
-                } else {
-                    return;
-                }
-
-            }
-        }
-
-        if (!$newHTTPHost) {
-            return;
-        }
-
-        $_SERVER['REVERSE_PROXY_SUPPORT_HTTP_HOST_ORIGINAL'] = $currentHTTPHost;
-        $_SERVER['HTTP_HOST'] = $newHTTPHost;
-
-        // Create the new request object with the modified environment variables.
-        $request = Gdn_Request::create()->fromEnvironment();
-
-        if ($proxyPath !== '') {
-            $this->proxyRoot = $proxyPath;
-            $request->setAssetRoot($proxyPath);
-            $request->setRoot($proxyPath);
-        }
-
-        $this->rewrittenRequest = $request;
-
-        // Assign the new request object to the container.
-        $dic->setInstance(Gdn_Request::class, $request);
-
-        // Clear the cache of the Gdn object.
-        Gdn::setContainer($dic);
-    }
-
-    /**
      * Prevent the reverseproxysupport setting page from being blocked/redirected.
+     *
+     * @param Gdn_Dispatcher $sender
+     * @param array $args
      */
     public function base_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^settings/reverseproxysupport/?#'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
     /**
+     * Hook in early to handle redirects.
+     *
+     * @param Gdn_Dispatcher $dispatcher
+     */
+    public function gdn_dispatcher_appStartup(Gdn_Dispatcher $dispatcher) {
+        if (!$this->forceRedirect || $this->rewriter->isProxyRequest() === true) {
+            return;
+        }
+
+        $currentHTTPHost = $this->rewriter->getOriginalHost();
+        $path = $this->rewriter->getOriginalPath();
+        $proxyURL = $this->rewriter->getProxyUrl();
+        ["hostAndPort" => $proxyHostAndPort] = $this->rewriter->parseUrl($proxyURL);
+
+        $isExcludedIP = $this->rewriter->isExcludedIP($this->rewriter->getOriginalIPAddress());
+        $skipRedirect = ($currentHTTPHost === $proxyHostAndPort) || $isExcludedIP;
+
+        if ($skipRedirect) {
+            return;
+        }
+
+        // Do not redirect block exceptions.
+        $blockExceptions = $dispatcher->getBlockExceptions();
+        foreach ($blockExceptions as $blockException => $blockLevel) {
+            if ($blockLevel <= Gdn_Dispatcher::BLOCK_PERMISSION && preg_match($blockException, $path)) {
+                return;
+            }
+        }
+
+        $pathAndQuery = $this->rewriter->getOriginalPathAndQuery();
+        $responseCode = $this->isDebug ? 302 : 301;
+        redirectTo("{$proxyURL}/{$pathAndQuery}", $responseCode, false);
+    }
+
+    /**
      * Enforce asset and web root if the request was rewritten.
      */
     public function gdn_dispatcher_beforeControllerMethod_handler() {
-        if (!isset($_SERVER['REVERSE_PROXY_SUPPORT_HTTP_HOST_ORIGINAL']) || !$this->proxyRoot) {
+        $request = Gdn::request();
+
+        if (!$this->proxyRoot || !($request instanceof RewrittenRequest)) {
             return;
         }
-        $request = Gdn::request();
-        if ($request->assetRoot() !== $this->proxyRoot) {
-            $request->assetRoot($this->proxyRoot);
+
+        if ($request->getAssetRoot() !== $this->proxyRoot) {
+            $request->setAssetRoot($this->proxyRoot);
             $request->webRoot($this->proxyRoot);
         }
-    }
-
-
-    /**
-     * Filter a proxyFor url and returns it.
-     *
-     * @param $proxyFor
-     * @return bool|string Return the filtered proxyFor on success and false on failure.
-     */
-    private function filterProxyFor($proxyFor) {
-        $url = trim($proxyFor);
-        if (!$proxyFor) {
-            return false;
-        }
-
-        if (preg_match('#^(?:https?:)?//#', $url) !== 1) {
-            return false;
-        }
-
-        $port = parse_url($url, PHP_URL_PORT);
-        $scheme = parse_url($url, PHP_URL_SCHEME);
-        $paddeScheme = !$scheme ? 'http'.(val('HTTPS', $_SERVER) ? 's' : '').':' : '';
-
-        $sanitizedURL =
-            ($scheme ? $scheme.'://' : '//')
-            .parse_url($url, PHP_URL_HOST)
-            .($port ? ':'.$port : '')
-            .rtrim(parse_url($url, PHP_URL_PATH), '/')
-        ;
-
-        if (filter_var($paddeScheme.$sanitizedURL, FILTER_VALIDATE_URL, ['flags' => FILTER_FLAG_SCHEME_REQUIRED | FILTER_FLAG_HOST_REQUIRED])) {
-            return $sanitizedURL;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Check is the supplied IP is excluded by the configuration.
-     *
-     * @param $ip
-     * @return bool
-     */
-    private function isExcludedIP($ip) {
-        $excludedIPlist = explode(",\n", c('ReverseProxySupport.Redirect.ExcludedIPs', ''));
-        return in_array($ip, $excludedIPlist);
     }
 }
