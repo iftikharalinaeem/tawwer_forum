@@ -62,11 +62,26 @@ class ThemesDbTest extends AbstractAPIv2Test {
      * @depends testPostTheme
      */
     public function testPatchTheme() {
-        $response = $this->api()->patch("themes/".self::$data['newTheme']['themeID'], ['name'=>'custom theme PATCHED']);
+        $response = $this->api()->patch(
+            "themes/".self::$data['newTheme']['themeID'],
+            [
+                'name'=>'custom theme PATCHED',
+                "assets" => [
+                    "header" => [
+                        "data" => "<div><!-- HEADER PATCHED --></div>",
+                        "type" => "html"
+                    ],
+                    "footer" => [
+                        "data" => "<div><!-- FOOTER --></div>",
+                        "type" => "html"
+                    ]
+                ]
+            ]
+        );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals('custom theme PATCHED', $body['name']);
-        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
         $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
     }
 
@@ -80,5 +95,69 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
+
+        self::$data['revisions']['initial'] = $body[0];
+        self::$data['revisions']['patched'] = $body[1];
+
+        $this->assertTrue($body[1]['active']);
+        $this->assertFalse($body[0]['active']);
+
+        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID']);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(self::$data['revisions']['patched']['revisionID'], $body['revisionID']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+
+        $response = $this->api()->get(
+            "themes/".self::$data['newTheme']['themeID'],
+            ['revisionID' => self::$data['revisions']['initial']['revisionID']]
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(self::$data['revisions']['initial']['revisionID'], $body['revisionID']);
+        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+    }
+
+    /**
+     * Test GET theme revisions.
+     *
+     * @depends testThemeRevisions
+     */
+    public function testThemeRevisionRestore() {
+        $response = $this->api()->patch(
+            "themes/".self::$data['newTheme']['themeID'],
+            [
+                'revisionID' => self::$data['revisions']['initial']['revisionID']
+            ]
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+
+        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID'].'/revisions');
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(2, count($body));
+
+        $this->assertTrue($body[0]['active']);
+        $this->assertFalse($body[1]['active']);
+
+        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID']);
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(self::$data['revisions']['initial']['revisionID'], $body['revisionID']);
+        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+
+        $response = $this->api()->get(
+            "themes/".self::$data['newTheme']['themeID'],
+            ['revisionID' => self::$data['revisions']['patched']['revisionID']]
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(self::$data['revisions']['patched']['revisionID'], $body['revisionID']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
     }
 }

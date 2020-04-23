@@ -104,12 +104,15 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function getThemeWithAssets($themeKey): array {
+    public function getThemeWithAssets($themeKey, array $args = []): array {
         try {
             $theme = $this->themeModel->selectSingle(
                 ['themeID' => $themeKey],
                 ['select' => self::SELECT_FIELDS]
             );
+            if (isset($args['revisionID'])) {
+                $theme['revisionID'] = $args['revisionID'];
+            }
             $res = $this->normalizeTheme(
                 $theme,
                 $this->themeAssetModel->get(
@@ -185,7 +188,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         $themeID = $this->themeModel->insert($body);
         $revisionID = $this->themeRevisionModel->insert([
             'themeID' => $themeID,
-            'name' => 'rev 1.0'
+            'name' => 'rev 1'
         ]);
         $body['revisionID'] = $revisionID;
         $this->themeModel->update(
