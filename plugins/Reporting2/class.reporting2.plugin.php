@@ -242,7 +242,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             $args['DashboardCount'] = $args['DashboardCount'];
         }
     }
-
+    
     /**
      * Render the Quote html for the view.
      *
