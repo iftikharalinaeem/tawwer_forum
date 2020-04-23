@@ -62,6 +62,7 @@ class ThemeModel extends PipelineModel {
             ['themeID' => $themeID],
             ['select' => [
                 'themeID',
+                'revisionID',
                 'name',
                 'parentTheme',
                 'current',
@@ -78,5 +79,42 @@ class ThemeModel extends PipelineModel {
      */
     public function resetCurrentTheme() {
         $this->update(['current' => 0], ['current' => 1]);
+    }
+
+    /**
+     * Get theme active revisionID
+     *
+     * @param int $themeID
+     * @return int
+     */
+    public function getRevisionID(int $themeID): int {
+        $theme = $this->selectSingle(['themeID' => $themeID]);
+        return $theme['revisionID'];
+    }
+
+    /**
+     * Get all theme revisions
+     *
+     * @param int $themeID
+     * @return array
+     */
+    public function getRevisions(int $themeID): array {
+        $db = $this->sql();
+
+        $db->select('t.themeID, t.name, t.current, t.parentTheme, t.parentVersion')
+            ->select('r.insertUserID, r.insertUserID as updateUserID, r.dateInserted, r.dateInserted as dateUpdated')
+            ->select('r.revisionID')
+            ->select('r.revisionID = t.revisionID', 'if(%s,1,0)', 'active')
+            ->from($this->getTable().' t')
+            ->join('themeRevision r', 't.themeID = r.themeID')
+            ->where(['t.themeID' => $themeID])
+        ;
+        $revisions = $db->get()->resultArray();
+        foreach ($revisions as &$revision) {
+            foreach (['dateInserted', 'dateUpdated'] as $field) {
+                $revision[$field] = new \DateTimeImmutable($revision[$field]);
+            }
+        }
+        return $revisions;
     }
 }

@@ -14,6 +14,9 @@ use \Gdn_Database;
 use \Gdn_Plugin;
 use Gdn_Session as SessionInterface;
 use Vanilla\Models\ThemeModel;
+use Vanilla\ThemingApi\Models\ThemeModel as DbThemeModel;
+use Vanilla\ThemingApi\Models\ThemeRevisionModel;
+use Vanilla\ThemingApi\Models\ThemeAssetModel;
 
 /**
  * Primary class for the Knowledge class, mostly responsible for pluggable operations.
@@ -33,6 +36,15 @@ class ThemingApiPlugin extends Gdn_Plugin {
     /** @var SessionInterface */
     private $session;
 
+    /** @var ThemeRevisionModel $themeRevisionModel */
+    private $themeRevisionModel;
+
+    /** @var DbThemeModel $themeModel */
+    private $themeModel;
+
+    /** @var ThemeAssetModel $themeAssetModel */
+    private $themeAssetModel;
+
     /**
      * KnowledgePlugin constructor.
      *
@@ -40,18 +52,26 @@ class ThemingApiPlugin extends Gdn_Plugin {
      * @param Router $router
      * @param SessionInterface $session
      * @param Gdn_Request $request
+     * @param ThemeRevisionModel $themeRevisionModel
+     * @param DbThemeModel $themeModel
      */
     public function __construct(
         Gdn_Database $database,
         Router $router,
         SessionInterface $session,
-        Gdn_Request $request
+        Gdn_Request $request,
+        ThemeRevisionModel $themeRevisionModel,
+        DbThemeModel $themeModel,
+        ThemeAssetModel $themeAssetModel
     ) {
         parent::__construct();
         $this->database = $database;
         $this->router = $router;
         $this->session = $session;
         $this->request = $request;
+        $this->themeRevisionModel = $themeRevisionModel;
+        $this->themeModel = $themeModel;
+        $this->themeAssetModel = $themeAssetModel;
     }
 
 
@@ -118,6 +138,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->column("current", "tinyint(1)", 0, ["index"])
             ->column("parentTheme", "varchar(32)", 0)
             ->column("parentVersion", "varchar(32)", 0)
+            ->column("revisionID", "int", false)
             ->column("insertUserID", "int", false)
             ->column("updateUserID", "int", false)
             ->column("dateInserted", "datetime")
@@ -125,9 +146,19 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->set();
 
         $this->database->structure()
+            ->table("themeRevision")
+            ->primaryKey("revisionID")
+            ->column("themeID", "int", false, ["index"])
+            ->column("name", "varchar(15)", false)
+            ->column("insertUserID", "int", false)
+            ->column("dateInserted", "datetime")
+            ->set();
+
+        $this->database->structure()
             ->table("themeAsset")
             ->primaryKey("assetID")
             ->column("themeID", "int", false, ["index", "index.record"])
+            ->column("revisionID", "int", false, ["index", "index.record"])
             ->column("assetKey", "varchar(32)", false, ["index", "index.record"])
             ->column("data", "mediumtext", false)
             ->column("insertUserID", "int", false, ["index"])
@@ -135,5 +166,30 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->column("dateInserted", "datetime")
             ->column("dateUpdated", "datetime")
             ->set();
+
+        // Implement theme revisions (release: 2020.009)
+        // relates to: https://github.com/vanilla/knowledge/issues/1772
+        $db = $this->database->sql();
+
+        $themes = $this->themeModel->get(['revisionID' => 0]);
+        foreach ($themes as $theme) {
+            $rev = $this->themeRevisionModel->insert([
+                'themeID' => $theme['themeID'],
+                'name' => 'rev 1.0'
+            ]);
+            $this->themeModel->update(
+                ['revisionID' => $rev],
+                ['themeID' => $theme['themeID']]
+            );
+            $this->themeAssetModel->update(
+                ['activeRevision' => $rev],
+                ['themeID' => $theme['themeID']]
+            );
+            $this->themeAssetModel->update(
+                ['revisionID' => $rev],
+                ['themeID' => $theme['themeID']]
+            );
+        }
+
     }
 }

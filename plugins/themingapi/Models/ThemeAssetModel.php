@@ -44,13 +44,15 @@ class ThemeAssetModel extends PipelineModel {
      * Set asset. Insert asset record or update record if already exists.
      *
      * @param int $themeID
+     * @param int $revisionID
      * @param string $assetKey
      * @param string $data
      * @return array
      */
-    public function setAsset(int $themeID, string $assetKey, string $data): array {
+    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
         $where = [
             'themeID' => $themeID,
+            'revisionID' => $revisionID,
             'assetKey' => $assetKey
         ];
         try {
@@ -65,6 +67,7 @@ class ThemeAssetModel extends PipelineModel {
             $this->insert([
                 'data' => $data,
                 'themeID' => $themeID,
+                'revisionID' => $revisionID,
                 'assetKey' => $assetKey
             ]);
         }
@@ -75,13 +78,15 @@ class ThemeAssetModel extends PipelineModel {
      * Get asset by themeId and assetKey.
      *
      * @param int $themeID
+     * @param int $revisionID
      * @param string $assetKey
      * @return array
      */
-    public function getAsset(int $themeID, string $assetKey): array {
+    public function getAsset(int $themeID, int $revisionID, string $assetKey): array {
         return $this->selectSingle(
             [
                 'themeID' => $themeID,
+                'revisionID' => $revisionID,
                 'assetKey' => $assetKey
             ],
             ['select' => ['data']]
