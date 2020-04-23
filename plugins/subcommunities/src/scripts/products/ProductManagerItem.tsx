@@ -172,11 +172,12 @@ export function ProductManagerItem(props: IProps) {
                     )}
                     <div className={classes.itemActions}>
                         {isEditMode ? (
-                            <Button baseClass={ButtonTypes.ICON} submit disabled={inputValue.length < 1}>
+                            <Button key={"save"} baseClass={ButtonTypes.ICON} submit disabled={inputValue.length < 1}>
                                 <PlusCircleIcon />
                             </Button>
                         ) : (
-                            <Button baseClass={ButtonTypes.ICON} onClick={onEditClick}>
+                            // For some reason react mixes up the submits of these 2 buttons if they don't have a key.
+                            <Button key={"edit"} baseClass={ButtonTypes.ICON} onClick={onEditClick}>
                                 {loadedProduct && loadedProduct.patchProduct.status === LoadStatus.LOADING ? (
                                     <ButtonLoader buttonType={ButtonTypes.ICON} />
                                 ) : (
