@@ -97,7 +97,7 @@ class ThemeModel extends PipelineModel {
     public function getRevisions(int $themeID): array {
         $db = $this->sql();
 
-        $db->select('t.themeID, t.name, t.current, t.parentTheme, t.parent, t.parentVersion')
+        $db->select('t.themeID, t.name, t.current, t.parentTheme, t.parentVersion')
             ->select('r.insertUserID, r.insertUserID as updateUserID, r.dateInserted, r.dateInserted as dateUpdated')
             ->select('r.revisionID')
             ->select('r.revisionID = t.revisionID', 'if(%s,1,0)','active')

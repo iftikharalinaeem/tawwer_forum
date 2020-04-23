@@ -62,11 +62,23 @@ class ThemesDbTest extends AbstractAPIv2Test {
      * @depends testPostTheme
      */
     public function testPatchTheme() {
-        $response = $this->api()->PATCH("themes/".self::$data['newTheme']['themeID'], ['name'=>'custom theme PATCHED']);
+        $response = $this->api()->patch("themes/".self::$data['newTheme']['themeID'], ['name'=>'custom theme PATCHED']);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals('custom theme PATCHED', $body['name']);
         $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
         $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+    }
+
+    /**
+     * Test GET theme revisions.
+     *
+     * @depends testPatchTheme
+     */
+    public function testThemeRevisions() {
+        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID'].'/revisions');
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(2, count($body));
     }
 }
