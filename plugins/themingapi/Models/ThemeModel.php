@@ -82,6 +82,8 @@ class ThemeModel extends PipelineModel {
     }
 
     /**
+     * Get theme active revisionID
+     *
      * @param int $themeID
      * @return int
      */
@@ -91,6 +93,8 @@ class ThemeModel extends PipelineModel {
     }
 
     /**
+     * Get all theme revisions
+     *
      * @param int $themeID
      * @return array
      */

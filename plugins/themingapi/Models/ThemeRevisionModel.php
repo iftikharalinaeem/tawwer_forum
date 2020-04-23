@@ -37,6 +37,14 @@ class ThemeRevisionModel extends PipelineModel {
         $this->addPipelineProcessor($userProcessor);
     }
 
+    /**
+     * Create new revision
+     *
+     * @param int $themeID
+     * @param string $name
+     * @return int
+     * @throws \Exception
+     */
     public function create(int $themeID, string $name = ''): int {
         if (empty($name)) {
             $result = $this->get(
@@ -49,7 +57,6 @@ class ThemeRevisionModel extends PipelineModel {
             );
             $revision = reset($result);
             $name = ++$revision['name'];
-
         }
         $revisionID = $this->insert(['themeID' => $themeID, 'name' => $name]);
         return $revisionID;
