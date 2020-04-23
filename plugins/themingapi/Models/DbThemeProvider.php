@@ -166,15 +166,15 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         $revisions = $this->themeModel->getRevisions($themeID);
         foreach ($revisions as &$revision) {
             $revision = $this->normalizeTheme(
-                    $revision,
-                    $this->themeAssetModel->get(
-                        [
-                            'themeID' => $themeID,
-                            'revisionID' => $revision['revisionID']
-                        ],
-                        ['select' => ['assetKey', 'data']]
-                    )
-                );
+                $revision,
+                $this->themeAssetModel->get(
+                    [
+                        'themeID' => $themeID,
+                        'revisionID' => $revision['revisionID']
+                    ],
+                    ['select' => ['assetKey', 'data']]
+                )
+            );
         }
         return $revisions;
     }
