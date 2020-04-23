@@ -9,16 +9,15 @@ import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import React from "react";
 import ThemeBuilderForm from "./ThemeBuilderPanel";
 import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
-import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 
 export interface IProps {
     themeID: string | number;
     variables?: IThemeVariables;
     getSendMessage: (sendMessage: (message: {}) => void) => void;
-    isRevisionsPage?: boolean;
+    isRevisionPage?: boolean;
 }
 
-export default function ThemeEditor(props: IProps) {
+export default function ThemeRevisionComponent(props: IProps) {
     const classes = themeEditorClasses();
     const { iframeRef, setIFrameRef, sendMessage } = useIFrameCommunication();
 
@@ -36,15 +35,9 @@ export default function ThemeEditor(props: IProps) {
                     <div className={classes.shadowTop}></div>
                     <div className={classes.shadowRight}></div>
                 </div>
-                {props.isRevisionsPage ? (
-                    <div className={classes.panel}>
-                        <ThemeRevisionsPanel />
-                    </div>
-                ) : (
-                    <div className={classes.panel}>
-                        <ThemeBuilderForm />
-                    </div>
-                )}
+                <div className={classes.panel}>
+                    <ThemeBuilderForm />
+                </div>
             </div>
         </>
     );
