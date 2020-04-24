@@ -28,6 +28,7 @@ use Vanilla\Theme\ScriptsAsset;
 use Vanilla\Theme\JavascriptAsset;
 use Vanilla\Theme\ImageAsset;
 use Vanilla\Models\ThemeModelHelper;
+use UserModel;
 
 /**
  * Class DbThemeProvider
@@ -65,6 +66,9 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /** @var FsThemeProvider */
     private $fsThemeProvider;
 
+    /** @var UserModel $userModel */
+    private $userModel;
+
     /**
      * DbThemeProvider constructor.
      *
@@ -75,6 +79,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
      * @param ThemeModelHelper $themeHelper
      * @param FsThemeProvider $fsThemeProvider
      * @param ThemeRevisionModel $themeRevisionModel
+     * @param UserModel $userModel
      */
     public function __construct(
         ThemeAssetModel $themeAssetModel,
@@ -83,7 +88,8 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         Gdn_Request $request,
         ThemeModelHelper $themeHelper,
         FsThemeProvider $fsThemeProvider,
-        ThemeRevisionModel $themeRevisionModel
+        ThemeRevisionModel $themeRevisionModel,
+        UserModel $userModel
     ) {
         $this->themeAssetModel = $themeAssetModel;
         $this->themeModel = $themeModel;
@@ -92,6 +98,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         $this->request = $request;
         $this->fsThemeProvider = $fsThemeProvider;
         $this->themeRevisionModel = $themeRevisionModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -174,6 +181,12 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
                     ],
                     ['select' => ['assetKey', 'data']]
                 )
+            );
+        }
+        if (isset($revisions[0]['insertUserID'])) {
+            $this->userModel->expandUsers(
+                $revisions,
+                ["insertUserID"]
             );
         }
         return $revisions;
@@ -447,6 +460,12 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
             $res['active'] = $theme['active'] === 1;
         }
 
+        if (isset($theme['dateInserted'])) {
+            $res['dateInserted'] = $theme['dateInserted'];
+        }
+        if (isset($theme['insertUserID'])) {
+            $res['insertUserID'] = $theme['insertUserID'];
+        }
         $res["assets"] = $this->getDefaultAssets($theme);
         $primaryAssets = array_intersect_key(
             $assets,
