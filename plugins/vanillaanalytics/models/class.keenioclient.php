@@ -33,6 +33,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
 
     const REQUEST_POST = 'post';
 
+    private const REQUEST_TIMEOUT = 15;
+
     /**
      * @link https://keen.io/docs/api/#master-key
      * @var string Non-scoped key for the project, capable of reading and writing.
@@ -103,6 +105,8 @@ class KeenIOClient extends Garden\Http\HttpClient {
         $this->setProjectID($config['projectID']);
         $this->setWriteKey($config['writeKey']);
         $this->setReadKey($config['readKey']);
+
+        $this->setDefaultOption("timeout", self::REQUEST_TIMEOUT);
     }
 
     /**
