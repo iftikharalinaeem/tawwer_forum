@@ -237,7 +237,9 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         }
 
         if (($body['revisionID'] ?? -1) === -1) {
-            $body['revisionID'] = $this->themeRevisionModel->create($themeID);
+            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '' );
+        } elseif (!empty($body['revisionName'] ?? '')) {
+            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']] );
         }
         $theme = $this->themeModel->update($body, ['themeID' => $themeID]);
 
@@ -255,6 +257,8 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
             ],
             ['select' => self::SELECT_FIELDS]
         );
+        $theme['revisionName'] = $this->themeRevisionModel->getName($revisionID);
+
         $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
         return $this->normalizeTheme(
             $theme,
@@ -458,6 +462,9 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         ];
         if (isset($theme['active'])) {
             $res['active'] = $theme['active'] === 1;
+        }
+        if (isset($theme['revisionName'])) {
+            $res['revisionName'] = $theme['revisionName'];
         }
 
         if (isset($theme['dateInserted'])) {

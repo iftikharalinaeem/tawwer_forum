@@ -160,4 +160,25 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
         $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
     }
+
+    /**
+     * Test PATCH endpoint used to rename revision
+     *
+     * @depends testPostTheme
+     */
+    public function testThemeRevisionRename() {
+        $response = $this->api()->patch(
+            "themes/".self::$data['newTheme']['themeID'],
+            [
+                'revisionID' => self::$data['revisions']['patched']['revisionID'],
+                'revisionName' => 'rev 2020.001'
+            ]
+        );
+        $this->assertEquals(200, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals('custom theme PATCHED', $body['name']);
+        $this->assertEquals('rev 2020.001', $body['revisionName']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+    }
 }
