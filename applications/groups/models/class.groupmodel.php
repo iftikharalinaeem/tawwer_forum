@@ -681,8 +681,7 @@ class GroupModel extends Gdn_Model {
             if (class_exists('ConversationModel')) {
                 $model = new ConversationModel();
 
-                $groupPrivacy = $group['Privacy'] ?? null;
-                $groupURL = ($groupPrivacy == 'Secret') ? '/groups' : groupUrl($group);
+                $groupURL = groupUrl($group);
 
                 $args = [
                     'Name' => htmlspecialchars($group['Name']),
