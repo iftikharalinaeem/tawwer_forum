@@ -1,0 +1,19 @@
+{
+    "name": "Knowledge Porter Runner",
+    "description": "Provides a framework for running knowledge-porter on the HostedQueue",
+    "version": "1.0",
+    "icon": "knowledgePorterRunner.svg",
+    "hidden": false,
+    "key": "knowledgePorterRunner",
+    "type": "addon",
+    "require": {
+        "hosted-job": ">=1.0"
+    },
+    "authors": [
+        {
+            "name": "Eduardo Garcia Julia",
+            "email": "eduardo.garciajulia@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}
