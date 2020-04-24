@@ -38,7 +38,7 @@ export default function ThemeEditor(props: IProps) {
                 </div>
                 {props.isRevisionsPage ? (
                     <div className={classes.panel}>
-                        <ThemeRevisionsPanel />
+                        <ThemeRevisionsPanel themeID={props.themeID} />
                     </div>
                 ) : (
                     <div className={classes.panel}>
