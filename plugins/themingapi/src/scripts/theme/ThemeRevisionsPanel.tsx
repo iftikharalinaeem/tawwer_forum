@@ -8,15 +8,21 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import { ThemeBuilderSectionGroup } from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { useGetThemeState } from "@library/theming/themeReducer";
 import { useThemeActions } from "@library/theming/ThemeActions";
+import { UserProfileItem } from "@library/forms/themeEditor/UseProfileItem";
 import { LoadStatus } from "@library/@types/api/core";
+import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 
 export interface IProps {
     themeID: number;
+    handleChange: (id: any) => void;
 }
 
 export function ThemeRevisionsPanel(props: IProps) {
     const themeState = useGetThemeState();
     const actions = useThemeActions();
+    const [revisions, setRevisions] = useState();
+    const [selectedRevisionID, setSelectedRevisionID] = useState();
+    const classes = themeBuilderClasses();
 
     useEffect(() => {
         if (themeState.themeRevisions.status === LoadStatus.PENDING) {
@@ -24,15 +30,59 @@ export function ThemeRevisionsPanel(props: IProps) {
         }
     }, [themeState]);
 
-    const revisions = themeState.themeRevisions?.data;
-    console.log(revisions);
+    useEffect(() => {
+        setRevisions(themeState.themeRevisions.data);
+        const initialActiveRevision = revisions
+            ? revisions.find(revision => {
+                  return revision.active === true;
+              })
+            : undefined;
+        if (initialActiveRevision) {
+            setSelectedRevisionID(initialActiveRevision.revisionID);
+        }
+    }, [themeState, revisions]);
 
-    const classes = themeBuilderClasses();
+    useEffect(() => {
+        props.handleChange(selectedRevisionID);
+    }, [selectedRevisionID]);
+
+    if (
+        themeState.themeRevisions.status === LoadStatus.LOADING ||
+        themeState.themeRevisions.status === LoadStatus.ERROR
+    ) {
+        return <NavigationPlaceholder />;
+    }
+
+    const panelContent = revisions ? (
+        revisions.map((revision, index) => {
+            let isSelected = false;
+            if (revision.revisionID === selectedRevisionID) {
+                isSelected = true;
+            }
+
+            return (
+                <UserProfileItem
+                    key={revision.revisionID}
+                    name={revision.insertUser?.name}
+                    imageUrl={revision.insertUser?.photoUrl}
+                    date={revision.dateInserted}
+                    userInfo={revision.insertUser}
+                    revisionID={revision.revisionID}
+                    isSelected={isSelected}
+                    onClick={event => {
+                        event.preventDefault();
+                        setSelectedRevisionID(revision.revisionID);
+                    }}
+                />
+            );
+        })
+    ) : (
+        <></>
+    );
+
     return (
-        <>
-            <div className={classes.root}>
-                <ThemeBuilderSectionGroup label={"Revisions"}></ThemeBuilderSectionGroup>
-            </div>
-        </>
+        <div className={classes.root}>
+            <ThemeBuilderSectionGroup label={"Revisions"}>{panelContent}</ThemeBuilderSectionGroup>
+        </div>
     );
 }

@@ -11,7 +11,7 @@ import { useIFrameCommunication, useOwnFrameMessages } from "@themingapi/theme/I
 import { themeBuilderClasses } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilder.styles";
 import { ThemeBuilderContextProvider } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 import React from "react";
-import { useThemeActions } from "./ThemeEditorActions";
+import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
 import {
@@ -29,7 +29,7 @@ export interface IThemeBuilderForm {
 
 export default function ThemeBuilderPanel() {
     const classes = themeBuilderClasses();
-    const { updateAssets } = useThemeActions();
+    const { updateAssets } = useThemeEditorActions();
     const { sendMessage } = useIFrameCommunication();
     const variables = useThemeEditorState()?.form?.assets.variables?.data;
     const initialLoad = useThemeEditorState()?.form.initialLoad;

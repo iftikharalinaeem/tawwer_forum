@@ -36,19 +36,21 @@ class ThemePreviewPage extends Page {
 
     /**
      * @param string|number $themeID The theme ID.
+     * @param array $query
      */
-    public function initialize($themeID = null) {
+    public function initialize($themeID = null, $query = []) {
         $this->session->checkPermission('Garden.Settings.Manage');
 
         $this->setSeoTitle('Theme Preview')
             ->setSeoRequired(false)
             ->blockRobots()
-            ->requiresSession("/theme/theme-settings/$themeID/preview");
+            ->requiresSession("/theme/theme-settings/$themeID/preview?revisionID={$query['revisionID']}");
 
         $me = $this->usersApi->get_me([]);
         $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
 
         $this->themePreloader->setForcedThemeKey($themeID);
+        $this->themePreloader->setForcedRevisionID($query['revisionID']);
         $this->registerReduxActionProvider($this->themePreloader);
     }
 

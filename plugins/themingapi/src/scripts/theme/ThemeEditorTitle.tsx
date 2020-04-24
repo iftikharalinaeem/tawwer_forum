@@ -10,7 +10,7 @@ import classNames from "classnames";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { EditIcon } from "@vanilla/library/src/scripts/icons/common";
-import { useThemeActions } from "@themingapi/theme/ThemeEditorActions";
+import { useThemeEditorActions } from "@themingapi/theme/ThemeEditorActions";
 import { visibility } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { style } from "typestyle";
 import { t } from "@vanilla/i18n";
@@ -24,7 +24,7 @@ interface IProps {
 }
 
 export const ThemeEditorTitle = (props: IProps) => {
-    const { updateAssets } = useThemeActions();
+    const { updateAssets } = useThemeEditorActions();
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [name, setName] = useState(props.themeName);
     const classes = themeEditorPageClasses();
@@ -47,16 +47,19 @@ export const ThemeEditorTitle = (props: IProps) => {
                 ref={inputRef}
                 value={name}
                 placeholder={t("Untitled")}
+                disabled={props.isDisabled}
             />
 
-            <Button
-                baseClass={ButtonTypes.ICON_COMPACT}
-                onClick={() => {
-                    editThemeName();
-                }}
-            >
-                <EditIcon className={classes.editIcon} small={true} />
-            </Button>
+            {!props.isDisabled && (
+                <Button
+                    baseClass={ButtonTypes.ICON_COMPACT}
+                    onClick={() => {
+                        editThemeName();
+                    }}
+                >
+                    <EditIcon className={classes.editIcon} small={true} />
+                </Button>
+            )}
         </li>
     );
 };
@@ -113,6 +116,7 @@ const AutoWidthInput = React.forwardRef(function AutoWidthInput(
                 ref={ref}
                 className={classNames(props.className, minWidthClass)}
                 onChange={handleChange}
+                disabled={props.disabled}
             />
             <span ref={spanRef} className={classNames(classes.hiddenInputMeasure, props.className)}>
                 {props.value}

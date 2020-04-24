@@ -21,7 +21,7 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
-import { useThemeActions } from "./ThemeEditorActions";
+import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
@@ -43,8 +43,8 @@ interface IOwnProps
 
 export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme } = useThemeActions();
-    const actions = useThemeActions();
+    const { updateAssets, saveTheme } = useThemeEditorActions();
+    const actions = useThemeEditorActions();
     const { getThemeById } = actions;
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;

@@ -8,11 +8,11 @@ import { ThemeEditorPreviewContentsGlobal } from "@themingapi/theme/ThemeEditorP
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
-import { useThemeCacheID, resetThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
+import { useThemeCacheID } from "@vanilla/library/src/scripts/styles/styleUtils";
 import ThemeActions, { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import { ThemeProvider } from "@vanilla/library/src/scripts/theming/ThemeProvider";
 import React, { useCallback, useEffect, useState } from "react";
-import { MemoryRouter, useParams } from "react-router-dom";
+import { MemoryRouter, useHistory, useParams } from "react-router-dom";
 import themeEditorPreviewClasses from "./ThemeEditorPreviewContents.styles";
 import { enableComponentTheming } from "@vanilla/library/src/scripts/utility/componentRegistry";
 import {
@@ -22,6 +22,7 @@ import {
 } from "@themingapi/theme/ActivePanelContext";
 import { ThemeEditorPreviewContentsContent } from "@themingapi/theme/ThemeEditorPreviewContentsContent";
 import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
+import qs from "qs";
 
 // force theming, even though this is a "dashboard" page.
 enableComponentTheming();
@@ -30,6 +31,9 @@ export default function ThemeEditorPreviewPage() {
     const { id } = useParams();
     const { cacheID } = useThemeCacheID();
     const { forceVariables } = useThemeActions();
+
+    const history = useHistory();
+    const query = qs.parse(history.location.search.replace(/^\?/, ""));
 
     useEffect(() => {
         document.body.classList.add(classes.contentContainer);
@@ -51,7 +55,7 @@ export default function ThemeEditorPreviewPage() {
     }
 
     return (
-        <ThemeProvider themeKey={id} key={cacheID} errorComponent={ErrorPage}>
+        <ThemeProvider themeKey={id} revisionID={query.revisionID} key={cacheID} errorComponent={ErrorPage}>
             <MemoryRouter>
                 <LinkContext.Provider
                     value={{

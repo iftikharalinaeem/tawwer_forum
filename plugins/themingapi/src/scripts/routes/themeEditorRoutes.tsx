@@ -25,7 +25,7 @@ export const ThemeEditorRoute = new RouteHandler(
 );
 
 const loadRevisions = () =>
-    import(/* webpackChunkName: "pages/themeRevisions */ "@themingapi/theme/ThemeRevisionsPage");
+    import(/* webpackChunkName: "pages/themeRevisions" */ "@themingapi/theme/ThemeRevisionsPage");
 export const ThemeRevisionsRoute = new RouteHandler(
     loadRevisions,
     "/theme/theme-settings/:id/revisions",

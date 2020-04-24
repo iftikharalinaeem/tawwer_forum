@@ -18,6 +18,7 @@ const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
     themeID: string | number;
+    revisionID?: number | null;
 }
 type IGetThemeResponse = ITheme;
 type IPostThemeResponse = ITheme;
@@ -32,9 +33,10 @@ export interface IPostThemeRequest {
 }
 export interface IPatchThemeRequest {
     themeID: string | number;
-    name: string;
+    name?: string;
     parentTheme?: string;
     parentVersion?: string;
+    revisionID?: number;
     assets?: Partial<IPostPatchThemeAssets>;
 }
 
@@ -65,7 +67,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public static clearSubmitAC = actionCreator("CLEAR_SUBMIT");
     public clearSubmit = this.bindDispatch(ThemeActions.clearSubmitAC);
 
-    public getThemeById = async (themeID: number | string, history: History) => {
+    public getThemeById = async (themeID: number | string, history: History, revisionID: number | null = null) => {
         const query = qs.parse(history.location.search.replace(/^\?/, ""));
 
         let currentPageType = "";
@@ -78,30 +80,37 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             currentPageType = PageType.EDIT_THEME;
         }
 
-        const request = {
+        let request = {
             themeID: themeID,
         };
+
+        if (revisionID) {
+            request = {
+                themeID: themeID,
+                revisionID: revisionID,
+            };
+        }
 
         return await this.getTheme(request, currentPageType);
     };
 
     public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
-            const { themeID } = options;
-            const response = await this.api.get(`/themes/${options.themeID}`, {
-                params: { allowAddonVariables: false },
+            const { themeID, revisionID } = options;
+            const response = await this.api.get(`/themes/${themeID}`, {
+                params: { allowAddonVariables: false, revisionID: revisionID },
             });
-
+            console.log(response);
             // KLUDGE - There is currently no get_edit endpoint.
             const { assets } = response.data;
 
             if ("styles" in assets) {
-                const stylesResponse = await this.api.get(`/themes/${options.themeID}/assets/styles.css`);
+                const stylesResponse = await this.api.get(`/themes/${themeID}/assets/styles.css`);
                 assets.styles = stylesResponse.data;
             }
 
             if ("javascript" in assets) {
-                const javascriptResponse = await this.api.get(`/themes/${options.themeID}/assets/javascript.js`);
+                const javascriptResponse = await this.api.get(`/themes/${themeID}/assets/javascript.js`);
                 assets.javascript = javascriptResponse.data;
             }
 
@@ -178,6 +187,11 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         return this.dispatch(thunk);
     }
 
+    public patchThemeWithRevisionID = async (body: IPatchThemeRequest) => {
+        let result = await this.patchTheme({ themeID: body.themeID, revisionID: body.revisionID });
+        return result;
+    };
+
     public patchTheme(options: IPatchThemeRequest) {
         const { themeID, ...body } = options;
 
@@ -190,7 +204,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     }
 }
 
-export function useThemeActions() {
+export function useThemeEditorActions() {
     const dispatch = useDispatch();
     const actions = useMemo(() => new ThemeActions(dispatch, apiv2), [dispatch]);
     return actions;

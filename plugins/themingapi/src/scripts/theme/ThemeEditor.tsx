@@ -9,13 +9,11 @@ import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import React from "react";
 import ThemeBuilderForm from "./ThemeBuilderPanel";
 import { IThemeVariables } from "@vanilla/library/src/scripts/theming/themeReducer";
-import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 
 export interface IProps {
     themeID: string | number;
     variables?: IThemeVariables;
     getSendMessage: (sendMessage: (message: {}) => void) => void;
-    isRevisionsPage?: boolean;
 }
 
 export default function ThemeEditor(props: IProps) {
@@ -28,7 +26,7 @@ export default function ThemeEditor(props: IProps) {
                 <div className={classes.frame}>
                     <iframe
                         ref={setIFrameRef}
-                        src={siteUrl(`/theme/theme-settings/${props.themeID}/preview`)}
+                        src={siteUrl(`/theme/theme-settings/${props.themeID}/preview?revisionID=${props.revisionID}`)}
                         width="100%"
                         height="100%"
                         scrolling="yes"
@@ -36,15 +34,9 @@ export default function ThemeEditor(props: IProps) {
                     <div className={classes.shadowTop}></div>
                     <div className={classes.shadowRight}></div>
                 </div>
-                {props.isRevisionsPage ? (
-                    <div className={classes.panel}>
-                        <ThemeRevisionsPanel themeID={props.themeID} />
-                    </div>
-                ) : (
-                    <div className={classes.panel}>
-                        <ThemeBuilderForm />
-                    </div>
-                )}
+                <div className={classes.panel}>
+                    <ThemeBuilderForm />
+                </div>
             </div>
         </>
     );

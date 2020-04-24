@@ -7,7 +7,10 @@ import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { ActionBar } from "@library/headers/ActionBar";
 import { Tabs } from "@library/sectioning/Tabs";
 import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
-import { IframeCommunicationContextProvider } from "@themingapi/theme/IframeCommunicationContext";
+import {
+    IframeCommunicationContextProvider,
+    useIFrameCommunication,
+} from "@themingapi/theme/IframeCommunicationContext";
 import { ThemeEditorTitle } from "@themingapi/theme/ThemeEditorTitle";
 import { t } from "@vanilla/i18n";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
@@ -21,14 +24,16 @@ import qs from "qs";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
-import { useThemeActions } from "./ThemeEditorActions";
+import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import { useRouteChangePrompt } from "@vanilla/react-utils";
-import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
+import { siteUrl } from "@library/utility/appUtils";
+import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
+import ThemeBuilderForm from "@themingapi/theme/ThemeBuilderPanel";
+import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
+import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
 
 interface IProps extends IOwnProps {
     themeID: string | number;
@@ -43,36 +48,27 @@ interface IOwnProps
 
 export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme } = useThemeActions();
-    const actions = useThemeActions();
+    const { patchThemeWithRevisionID } = useThemeEditorActions();
+    const { putPreviewTheme } = useThemeActions();
+    const actions = useThemeEditorActions();
     const { getThemeById } = actions;
-    const { theme, form, formSubmit } = useThemeEditorState();
-    const { assets } = form;
+    const { theme } = useThemeEditorState();
+
     const [themeName, setThemeName] = useState("");
-    const [showUserNotificationModal, setShowUserNotificationModal] = useState(false);
-    const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState(true);
+    const [revisionID, setRevisionID] = useState();
+    const classes = themeEditorClasses();
+    const { setIFrameRef } = useIFrameCommunication();
     const { pushSmartLocation } = useLinkContext();
+
     bodyCSS();
 
     let themeID = props.match.params.id;
-
-    const DEFAULT_THEME = "theme-foundation";
-
-    const getTemplateName = () => {
-        const query = qs.parse(props.history.location.search.replace(/^\?/, ""));
-        return props.history.location.pathname === "/theme/theme-settings/add" && !query.templateName
-            ? DEFAULT_THEME
-            : query.templateName;
-    };
-
-    if (themeID === undefined) {
-        themeID = getTemplateName();
-    }
 
     useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
     const history = useHistory();
+
     useEffect(() => {
         if (themeStatus === LoadStatus.PENDING && themeID !== undefined) {
             getThemeById(themeID, history);
@@ -83,39 +79,34 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     useEffect(() => {
         if (theme.status === LoadStatus.SUCCESS && lastStatus !== LoadStatus.SUCCESS && theme.data) {
             setThemeName(theme.data.name);
+            setRevisionID(theme.data.revisionID);
         }
     }, [theme.status, theme.data, lastStatus]);
 
     const submitHandler = async event => {
         event.preventDefault();
 
-        if (themeID !== null) {
-            if (form.errors) {
-                return false;
-            } else {
-                setDisableRouteChangePrompt(true);
-                const theme = await saveTheme();
-                if (theme) {
-                    history.replace(makeThemeEditorUrl({ themeID: theme.themeID }));
-                }
+        if (revisionID !== null && themeID) {
+            const theme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
+            if (theme) {
+                pushSmartLocation(`/theme/theme-settings/${themeID}/revisions`);
             }
         }
     };
 
-    let content: React.ReactNode;
-
-    let sendMessage;
-    const getSendMessage = (sendMessageFunction: (message: {}) => void) => {
-        sendMessage = sendMessageFunction;
-        window.sendMessage = sendMessage;
+    const handleChange = id => {
+        setRevisionID(id);
     };
 
+    const handlePreview = async () => {
+        putPreviewTheme({ themeID: themeID, type: PreviewStatusType.PREVIEW });
+    };
+
+    let content: React.ReactNode;
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
         content = <Loader />;
     } else if (theme.status === LoadStatus.ERROR || !theme.data) {
         content = <ErrorPage error={theme.error} />;
-    } else if (formSubmit.status === LoadStatus.ERROR) {
-        content = <ErrorPage apiError={formSubmit.error}/>;
     } else {
         const tabData = [
             {
@@ -123,14 +114,27 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                 panelData: "style",
 
                 contents: (
-                    <ThemeEditor
-                        themeID={themeID ?? getTemplateName()}
-                        variables={theme.data.assets.variables}
-                        getSendMessage={getSendMessage}
-                        isRevisionsPage={true}
-                    />
+                    <>
+                        <div className={classes.wrapper}>
+                            <div className={classes.frame}>
+                                <iframe
+                                    ref={setIFrameRef}
+                                    src={siteUrl(`/theme/theme-settings/${themeID}/preview?revisionID=${revisionID}`)}
+                                    width="100%"
+                                    height="100%"
+                                    scrolling="yes"
+                                ></iframe>
+                                <div className={classes.shadowTop}></div>
+                                <div className={classes.shadowRight}></div>
+                            </div>
+
+                            <div className={classes.panel}>
+                                <ThemeRevisionsPanel themeID={themeID} handleChange={handleChange} />
+                            </div>
+                        </div>
+                    </>
                 ),
-            }
+            },
         ];
 
         content = (
@@ -138,26 +142,16 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                 <form onSubmit={submitHandler}>
                     <ActionBar
                         useShadow={false}
-                        callToActionTitle={formSubmit.status === LoadStatus.SUCCESS ? t("Saved") : t("Save")}
-                        title={<ThemeEditorTitle themeName={theme.data?.name} pageType={form.pageType} />}
+                        callToActionTitle={false ? t("Saved") : t("Restore")}
+                        anotherCallToActionTitle={"Preview"}
+                        title={<ThemeEditorTitle themeName={theme.data?.name} isDisabled={true} />}
                         fullWidth={true}
                         backTitle={t("Back")}
-                        isCallToActionLoading={formSubmit.status === LoadStatus.LOADING}
-                        isCallToActionDisabled={!!form.errors}
-                        optionsMenu={
-                            <>
-                                {/* WIP not wired up. */}
-                                {/* <DropDown
-                                        flyoutType={FlyoutType.LIST}
-                                        openDirection={DropDownOpenDirection.BELOW_LEFT}
-                                    >
-                                        <DropDownItemButton name={t("Copy")} onClick={() => {}} />
-                                        <DropDownItemButton name={t("Exit")} onClick={() => {}} />
-                                        <DropDownItemSeparator />
-                                        <DropDownItemButton name={t("Delete")} onClick={() => {}} />
-                                    </DropDown> */}
-                            </>
-                        }
+                        isCallToActionLoading={false}
+                        isCallToActionDisabled={false}
+                        anotherCallToActionLoading={false}
+                        anotherCallToActionDisabled={false}
+                        handleAnotherSubmit={handlePreview}
                     />
                 </form>
 
