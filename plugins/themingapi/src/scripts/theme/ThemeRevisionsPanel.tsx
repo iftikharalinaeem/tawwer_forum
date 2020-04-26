@@ -8,9 +8,9 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import { ThemeBuilderSectionGroup } from "@library/forms/themeEditor/ThemeBuilderSectionGroup";
 import { useGetThemeState } from "@library/theming/themeReducer";
 import { useThemeActions } from "@library/theming/ThemeActions";
-import { UserProfileItem } from "@library/forms/themeEditor/UseProfileItem";
 import { LoadStatus } from "@library/@types/api/core";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
+import { ThemeRevisionItem } from "@library/forms/themeEditor/ThemeRevisionItem";
 
 export interface IProps {
     themeID: number;
@@ -54,14 +54,14 @@ export function ThemeRevisionsPanel(props: IProps) {
     }
 
     const panelContent = revisions ? (
-        revisions.map((revision, index) => {
+        revisions.map(revision => {
             let isSelected = false;
             if (revision.revisionID === selectedRevisionID) {
                 isSelected = true;
             }
 
             return (
-                <UserProfileItem
+                <ThemeRevisionItem
                     key={revision.revisionID}
                     name={revision.insertUser?.name}
                     imageUrl={revision.insertUser?.photoUrl}
@@ -73,6 +73,7 @@ export function ThemeRevisionsPanel(props: IProps) {
                         event.preventDefault();
                         setSelectedRevisionID(revision.revisionID);
                     }}
+                    isLoading={themeState.themeRevisions.status === LoadStatus.LOADING}
                 />
             );
         })
