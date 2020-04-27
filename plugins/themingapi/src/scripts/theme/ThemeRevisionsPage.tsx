@@ -31,6 +31,7 @@ import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
 import { tabBrowseClasses } from "@library/sectioning/tabStyles";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
+import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 
 interface IProps extends IOwnProps {
     themeID: number;
@@ -55,11 +56,9 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     const [iframeLoading, setIframeLoading] = useState(true);
     const [isFormSubmitting, setIsFormSubmitting] = useState(false);
     const classes = themeEditorClasses();
-
-    const { setIFrameRef } = useIFrameCommunication();
     const { pushSmartLocation } = useLinkContext();
 
-    bodyCSS();
+    const { setIFrameRef } = useIFrameCommunication();
 
     let themeID = props.match.params.id;
 
@@ -84,9 +83,10 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
         event.preventDefault();
         if (revisionID !== null && themeID) {
             setIsFormSubmitting(true);
-            const theme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
-            if (theme) {
+            const updatedTheme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
+            if (updatedTheme) {
                 setIsFormSubmitting(false);
+                pushSmartLocation(`/theme/theme-settings/${themeID}/revisions`);
             }
         }
     };

@@ -28,6 +28,7 @@ export function ThemeRevisionsPanel(props: IProps) {
     const [revisions, setRevisions] = useState();
     const [selectedRevisionID, setSelectedRevisionID] = useState();
     const classes = themeBuilderClasses();
+    const revisionPageClasses = themeRevisionPageClasses();
 
     useEffect(() => {
         if (themeState.themeRevisions.status === LoadStatus.PENDING) {
@@ -86,7 +87,10 @@ export function ThemeRevisionsPanel(props: IProps) {
 
     return (
         <div className={classNames(classes.root)}>
-            <ThemeBuilderSection label={"Revisions"}>{panelContent}</ThemeBuilderSection>
+            <div className={classes.section}>
+                <h3 className={revisionPageClasses.title}>Revision History</h3>
+                {panelContent}
+            </div>
         </div>
     );
 }
