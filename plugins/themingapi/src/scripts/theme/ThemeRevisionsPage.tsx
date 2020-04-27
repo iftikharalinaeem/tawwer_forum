@@ -29,6 +29,8 @@ import { siteUrl } from "@library/utility/appUtils";
 import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
+import { tabBrowseClasses } from "@library/sectioning/tabStyles";
+import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 
 interface IProps extends IOwnProps {
     themeID: number;
@@ -44,12 +46,16 @@ interface IOwnProps
 export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
     const { patchThemeWithRevisionID } = useThemeEditorActions();
+    const { previewStatus } = useThemeSettingsState();
     const { putPreviewTheme } = useThemeActions();
     const actions = useThemeEditorActions();
     const { getThemeById } = actions;
     const { theme } = useThemeEditorState();
     const [revisionID, setRevisionID] = useState();
+    const [iframeLoading, setIframeLoading] = useState(true);
+    const [isFormSubmitting, setIsFormSubmitting] = useState(false);
     const classes = themeEditorClasses();
+
     const { setIFrameRef } = useIFrameCommunication();
     const { pushSmartLocation } = useLinkContext();
 
@@ -68,30 +74,40 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
         }
     }, [themeStatus, themeID, getThemeById, history]);
 
-    const lastStatus = useLastValue(theme.status);
     useEffect(() => {
-        if (theme.status === LoadStatus.SUCCESS && lastStatus !== LoadStatus.SUCCESS && theme.data) {
+        if (theme.status === LoadStatus.SUCCESS && theme.data) {
             setRevisionID(theme.data.revisionID);
         }
-    }, [theme.status, theme.data, lastStatus]);
+    }, [theme.status, theme.data]);
 
     const submitHandler = async event => {
         event.preventDefault();
-
         if (revisionID !== null && themeID) {
+            setIsFormSubmitting(true);
             const theme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
             if (theme) {
-                pushSmartLocation(`/theme/theme-settings/${themeID}/revisions`);
+                setIsFormSubmitting(false);
             }
         }
     };
 
     const handleChange = id => {
         setRevisionID(id);
+        setIframeLoading(true);
     };
 
     const handlePreview = async () => {
-        putPreviewTheme({ themeID: themeID, type: PreviewStatusType.PREVIEW });
+        putPreviewTheme({ themeID: themeID, revisionID: revisionID, type: PreviewStatusType.PREVIEW });
+    };
+
+    useEffect(() => {
+        if (previewStatus.status === LoadStatus.SUCCESS) {
+            window.location.href = "/";
+        }
+    });
+
+    const handleReload = e => {
+        setIframeLoading(false);
     };
 
     let content: React.ReactNode;
@@ -110,32 +126,32 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                             width="100%"
                             height="100%"
                             scrolling="yes"
+                            onLoad={handleReload}
                         ></iframe>
                         <div className={classes.shadowTop}></div>
                         <div className={classes.shadowRight}></div>
                     </div>
 
                     <div className={classes.panel}>
-                        <ThemeRevisionsPanel themeID={themeID} handleChange={handleChange} />
+                        <ThemeRevisionsPanel themeID={themeID} handleChange={handleChange} disabled={iframeLoading} />
                     </div>
                 </div>
             </>
         );
-
         content = (
             <>
                 <form onSubmit={submitHandler}>
                     <ActionBar
                         useShadow={false}
-                        callToActionTitle={false ? t("Saved") : t("Restore")}
+                        callToActionTitle={isFormSubmitting ? t("Restored") : t("Restore")}
                         anotherCallToActionTitle={"Preview"}
                         title={<ThemeEditorTitle themeName={theme.data?.name} isDisabled={true} />}
                         fullWidth={true}
                         backTitle={t("Back")}
-                        isCallToActionLoading={false}
-                        isCallToActionDisabled={false}
+                        isCallToActionLoading={isFormSubmitting}
+                        isCallToActionDisabled={iframeLoading}
                         anotherCallToActionLoading={false}
-                        anotherCallToActionDisabled={false}
+                        anotherCallToActionDisabled={iframeLoading}
                         handleAnotherSubmit={handlePreview}
                     />
                 </form>
@@ -145,10 +161,8 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     }
 
     return (
-        <IframeCommunicationContextProvider>
-            <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
-                {content}
-            </Modal>
-        </IframeCommunicationContextProvider>
+        <Modal isVisible={true} scrollable={true} titleID={titleID} size={ModalSizes.FULL_SCREEN}>
+            {content}
+        </Modal>
     );
 }

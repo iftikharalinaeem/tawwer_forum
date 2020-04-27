@@ -100,7 +100,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
             const response = await this.api.get(`/themes/${themeID}`, {
                 params: { allowAddonVariables: false, revisionID: revisionID },
             });
-            console.log(response);
+
             // KLUDGE - There is currently no get_edit endpoint.
             const { assets } = response.data;
 

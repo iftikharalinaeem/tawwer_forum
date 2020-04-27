@@ -26,7 +26,7 @@ export default function ThemeEditor(props: IProps) {
                 <div className={classes.frame}>
                     <iframe
                         ref={setIFrameRef}
-                        src={siteUrl(`/theme/theme-settings/${props.themeID}/preview?revisionID=${props.revisionID}`)}
+                        src={siteUrl(`/theme/theme-settings/${props.themeID}/preview`)}
                         width="100%"
                         height="100%"
                         scrolling="yes"

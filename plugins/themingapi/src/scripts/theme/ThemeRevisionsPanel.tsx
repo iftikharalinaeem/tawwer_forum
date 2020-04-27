@@ -11,10 +11,15 @@ import { useThemeActions } from "@library/theming/ThemeActions";
 import { LoadStatus } from "@library/@types/api/core";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
 import { ThemeRevisionItem } from "@library/forms/themeEditor/ThemeRevisionItem";
+import { ThemeBuilderSection } from "@library/forms/themeEditor/ThemeBuilderSection";
+import ThemeBuilderPanel from "@themingapi/theme/ThemeBuilderPanel";
+import classNames from "classnames";
+import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 
 export interface IProps {
     themeID: number;
     handleChange: (id: any) => void;
+    disabled: boolean;
 }
 
 export function ThemeRevisionsPanel(props: IProps) {
@@ -63,17 +68,15 @@ export function ThemeRevisionsPanel(props: IProps) {
             return (
                 <ThemeRevisionItem
                     key={revision.revisionID}
-                    name={revision.insertUser?.name}
-                    imageUrl={revision.insertUser?.photoUrl}
-                    date={revision.dateInserted}
+                    revision={revision}
                     userInfo={revision.insertUser}
-                    revisionID={revision.revisionID}
                     isSelected={isSelected}
+                    isActive={revision.active}
                     onClick={event => {
                         event.preventDefault();
                         setSelectedRevisionID(revision.revisionID);
                     }}
-                    isLoading={themeState.themeRevisions.status === LoadStatus.LOADING}
+                    disabled={props.disabled}
                 />
             );
         })
@@ -82,8 +85,8 @@ export function ThemeRevisionsPanel(props: IProps) {
     );
 
     return (
-        <div className={classes.root}>
-            <ThemeBuilderSectionGroup label={"Revisions"}>{panelContent}</ThemeBuilderSectionGroup>
+        <div className={classNames(classes.root)}>
+            <ThemeBuilderSection label={"Revisions"}>{panelContent}</ThemeBuilderSection>
         </div>
     );
 }
