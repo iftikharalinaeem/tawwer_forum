@@ -111,6 +111,27 @@ paths:
         tags:
           - Themes
         summary: Get current theme.
+  /themes/{themeID}/revisions:
+    get:
+      parameters:
+        - description: Unique themeID.
+          in: path
+          name: themeID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        $ref: "#/components/requestBodies/Theme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Update theme name.
   /themes/{themeID}/assets/{assetKey}:
       put:
         parameters:
@@ -219,6 +240,15 @@ components:
                     parentVersion:
                       type: string
                       description: Parent theme template version
+                    revisionID:
+                      type: integer
+                      description: Theme revision ID
+                    revisionName:
+                      type: string
+                      description: Theme revision name
+                    active:
+                      type: string
+                      description: Flag theme revision is active or not. Only for GET themes/{id}/revisions
                     assets:
                       type: object
                       properties:
