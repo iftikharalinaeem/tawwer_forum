@@ -12,9 +12,9 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -74,7 +74,7 @@ class ArticlesApiHelper {
         DraftModel $draftModel,
         \Gdn_Session $session,
         \MediaModel $mediaModel,
-        FormatService $formatService
+        ExtendedContentFormatService $formatService
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;

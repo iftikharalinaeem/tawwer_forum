@@ -15,7 +15,9 @@ use Garden\Web\Exception\NotFoundException;
 use UserModel;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -119,6 +121,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var \Gdn_Session */
     private $session;
 
+    /** @var ExtendedContentFormatService */
+    private $formatService;
+
     /**
      * DI.
      * @inheritdoc
@@ -140,7 +145,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ArticleFeaturedModel $articleFeaturedModel,
         KnowledgeApiController $knowledgeApiController,
         ArticlesApiHelper $articleHelper,
-        \Gdn_Session $session
+        \Gdn_Session $session,
+        ExtendedContentFormatService $formatService
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -159,6 +165,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->knowledgeApiController = $knowledgeApiController;
         $this->articleHelper = $articleHelper;
         $this->session = $session;
+        $this->formatService = $formatService;
     }
 
     /**
