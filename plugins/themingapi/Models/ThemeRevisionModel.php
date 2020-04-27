@@ -60,4 +60,16 @@ class ThemeRevisionModel extends PipelineModel {
         $revisionID = $this->insert(['themeID' => $themeID, 'name' => $name]);
         return $revisionID;
     }
+
+    /**
+     * Get revision name
+     *
+     * @param int $revisionID
+     * @return string
+     */
+    public function getName(int $revisionID): string {
+        $result = $this->get(['revisionID' => $revisionID]);
+        $revision = reset($result);
+        return $revision['name'];
+    }
 }
