@@ -237,9 +237,9 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         }
 
         if (($body['revisionID'] ?? -1) === -1) {
-            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '' );
+            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
         } elseif (!empty($body['revisionName'] ?? '')) {
-            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']] );
+            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
         }
         $theme = $this->themeModel->update($body, ['themeID' => $themeID]);
 
@@ -326,10 +326,14 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function setPreviewTheme($themeID): array {
-        $this->themeHelper->setSessionPreviewTheme($themeID, $this);
+    public function setPreviewTheme($themeID, int $revisionID = null): array {
+        $this->themeHelper->setSessionPreviewTheme($themeID, $this, $revisionID);
         if (!empty($themeID)) {
-            $theme = $this->getThemeWithAssets($themeID);
+            $args = [];
+            if (!empty($revisionID)) {
+                $args['revisionID'] = $revisionID;
+            }
+            $theme = $this->getThemeWithAssets($themeID, $args);
         } else {
             $theme = $this->getCurrent();
         }
