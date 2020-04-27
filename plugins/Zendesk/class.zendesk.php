@@ -9,11 +9,33 @@
  */
 class Zendesk {
 
-    CONST REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
+    const REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
 
+    /**
+     * @var string
+     */
     protected $apiUrl;
+
+    /**
+     * @var string|null
+     *
+     */
     protected $apiUser;
+
+    /**
+     * @var string|null
+     */
     protected $apiToken;
+
+    /**
+     * @var string[] Ticket types
+     */
+    const ZENDESK_TICKET_TYPE = ['question' => 'Question', 'incident' => 'Incident', 'problem' => 'Problem', 'task' => 'Task'];
+
+    /**
+     * @var string[] Ticket priority
+     */
+    const ZENDESK_TICKET_PRIORITY = ['low' => 'Low', 'normal' => 'Normal', 'high' => 'High', 'urgent' => 'Urgent'];
 
     /**
      * Setup Properties.
@@ -21,11 +43,16 @@ class Zendesk {
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
      * @param string $url Url to API.
      * @param string $accessToken OAuth AccessToken.
+     * @param string|null $apiToken
+     * @param string|null $apiUser
      */
-    public function __construct(IZendeskHttpRequest $curlRequest, $url, $accessToken) {
+    public function __construct(IZendeskHttpRequest $curlRequest, $url, ?string $accessToken = null,
+                                ?string $apiToken = null, ?string $apiUser = null) {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
         $this->AccessToken = $accessToken;
+        $this->apiToken = $apiToken;
+        $this->apiUser = $apiUser;
     }
 
 
@@ -164,9 +191,14 @@ class Zendesk {
             default:
                 break;
         }
+        if ($this->apiToken && $this->apiUser) {
+            $authorization = 'Authorization: Basic '.base64_encode($this->apiUser.'/token:'.$this->apiToken);
+        } else {
+            $authorization = 'Authorization: Bearer '.$this->AccessToken;
+        }
         $this->curl->setOption(
             CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
+            ['Content-type: application/json', $authorization]
         );
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
