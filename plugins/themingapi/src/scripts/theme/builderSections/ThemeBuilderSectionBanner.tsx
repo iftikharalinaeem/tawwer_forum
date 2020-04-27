@@ -4,7 +4,6 @@
  */
 
 import React from "react";
-import { ThemeBuilderTitle } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderTitle";
 import { t } from "@vanilla/i18n";
 import { ThemeBuilderBlock } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBlock";
 import { ThemeColorPicker } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeColorPicker";
@@ -22,11 +21,15 @@ import {
     ThemeBuilderBreakpoints,
     BreakpointViewType,
 } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderBreakpoints";
+import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
 
 export function ThemeBuilderSectionBanner() {
     return (
         <>
             <ActivePanelChooser titlePanel={ActiveVariablePanel.BANNER} />
+            <ThemeBuilderBlock label={t("Banner Title")}>
+                <ThemeInputText varKey={"banner.title.text"} allowEmpty={true} />
+            </ThemeBuilderBlock>
             <ThemeBuilderBlock label={t("Text Color")}>
                 <ThemeColorPicker variableKey="banner.colors.primaryContrast" />
             </ThemeBuilderBlock>

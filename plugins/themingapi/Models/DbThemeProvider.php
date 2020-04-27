@@ -237,9 +237,9 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         }
 
         if (($body['revisionID'] ?? -1) === -1) {
-            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '' );
+            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
         } elseif (!empty($body['revisionName'] ?? '')) {
-            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']] );
+            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
         }
         $theme = $this->themeModel->update($body, ['themeID' => $themeID]);
 
@@ -326,7 +326,8 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function setPreviewTheme($themeID, ?int $revisionID = null): array {
+
+    public function setPreviewTheme($themeID, int $revisionID = null): array {
         $this->themeHelper->setSessionPreviewTheme($themeID, $this, $revisionID);
         if (!empty($themeID)) {
             $args = [];

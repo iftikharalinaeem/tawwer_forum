@@ -158,7 +158,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->table("themeAsset")
             ->primaryKey("assetID")
             ->column("themeID", "int", false, ["index", "index.record"])
-            ->column("revisionID", "int", false, ["index", "index.record"])
+            ->column("revisionID", "int", false, ["index"])
             ->column("assetKey", "varchar(32)", false, ["index", "index.record"])
             ->column("data", "mediumtext", false)
             ->column("insertUserID", "int", false, ["index"])

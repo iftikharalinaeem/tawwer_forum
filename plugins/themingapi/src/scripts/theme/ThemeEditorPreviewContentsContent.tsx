@@ -18,6 +18,7 @@ import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyle
 import { colorOut, flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 import { ToolTip, ToolTipIcon } from "@vanilla/library/src/scripts/toolTip/ToolTip";
 import { InformationIcon } from "@vanilla/library/src/scripts/icons/common";
+import { getMeta } from "@library/utility/appUtils";
 
 export function ThemeEditorPreviewContentsContent() {
     const classes = themeEditorPreviewClasses();
@@ -54,7 +55,7 @@ function PreviewContentBanner() {
     if (vars.options.enabled) {
         return (
             <PanelActivator panel={ActiveVariablePanel.CONTENT_BANNER} color={bannerVariables().colors.primaryContrast}>
-                <Banner isContentBanner title={t("Welcome To Your Theme")} />
+                <Banner isContentBanner title={t(bannerVariables().title.text)} />
             </PanelActivator>
         );
     } else {
