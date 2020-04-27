@@ -88,7 +88,7 @@ function SearchForm(props: IProps) {
                                         searchBarClasses().heading,
                                         classes.smallBackLink,
                                     )}
-                                    headingClassName={classNames(typographyClasses().subTitle)}
+                                    headingClassName={classNames(typographyClasses().pageTitle)}
                                     title={"Search"}
                                     includeBackLink={true}
                                     isCompactHeading={true}
