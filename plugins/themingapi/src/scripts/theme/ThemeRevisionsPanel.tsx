@@ -16,7 +16,7 @@ import { ThemePanelPlaceholder } from "@themingapi/theme/ThemePanelPlaceholder";
 export interface IProps {
     themeID: number;
     handleChange: (id: any) => void;
-    disabled: boolean;
+    disabled?: boolean;
     updated: boolean;
 }
 
@@ -75,7 +75,6 @@ export function ThemeRevisionsPanel(props: IProps) {
                         event.preventDefault();
                         setSelectedRevisionID(revision.revisionID);
                     }}
-                    disabled={props.disabled}
                 />
             );
         })

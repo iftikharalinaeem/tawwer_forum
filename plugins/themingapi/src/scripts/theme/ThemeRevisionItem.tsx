@@ -16,7 +16,6 @@ interface IProps {
     isSelected?: boolean;
     userInfo: IUserFragment;
     onClick?: (event: any) => void;
-    disabled?: boolean;
     isActive?: boolean;
 }
 
@@ -60,7 +59,7 @@ export function ThemeRevisionItem(props: IProps) {
     );
 
     return (
-        <DropDownItemButton onClick={props.onClick} role={"switch"} aria-checked={isSelected} disabled={props.disabled}>
+        <DropDownItemButton onClick={props.onClick} role={"switch"} aria-checked={isSelected}>
             {content}
         </DropDownItemButton>
     );

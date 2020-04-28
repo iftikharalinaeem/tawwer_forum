@@ -5,10 +5,7 @@
 
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { ActionBar } from "@library/headers/ActionBar";
-import {
-    IframeCommunicationContextProvider,
-    useIFrameCommunication,
-} from "@themingapi/theme/IframeCommunicationContext";
+import { useIFrameCommunication } from "@themingapi/theme/IframeCommunicationContext";
 import { ThemeEditorTitle } from "@themingapi/theme/ThemeEditorTitle";
 import { t } from "@vanilla/i18n";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
@@ -17,21 +14,16 @@ import Modal from "@vanilla/library/src/scripts/modal/Modal";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
-import { useLastValue } from "@vanilla/react-utils";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router-dom";
 import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
-import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
-import { useLinkContext } from "@library/routing/links/LinkContextProvider";
-import { formatUrl, siteUrl } from "@library/utility/appUtils";
+import { siteUrl } from "@library/utility/appUtils";
 import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
-import { tabBrowseClasses } from "@library/sectioning/tabStyles";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
-import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 
 interface IProps extends IOwnProps {
@@ -50,11 +42,10 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     const { patchThemeWithRevisionID, getThemeById } = useThemeEditorActions();
     const { putPreviewTheme } = useThemeActions();
     const { previewStatus } = useThemeSettingsState();
-    const { theme } = useThemeEditorState();
+    const { theme, formSubmit } = useThemeEditorState();
     const [revisionID, setRevisionID] = useState();
     const [iframeLoading, setIframeLoading] = useState(true);
     const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-    const { pushSmartLocation } = useLinkContext();
     const classes = themeEditorClasses();
     const RevisionPageClasses = themeRevisionPageClasses();
 
@@ -65,6 +56,7 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
+    const formStatus = formSubmit.status;
     const history = useHistory();
 
     useEffect(() => {
@@ -83,6 +75,8 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
         event.preventDefault();
         if (revisionID !== null && themeID) {
             setIsFormSubmitting(true);
+            console.log("1", formSubmit.status);
+
             const updatedTheme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
             if (updatedTheme) {
                 setIsFormSubmitting(false);
@@ -135,7 +129,7 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                         <ThemeRevisionsPanel
                             themeID={parseInt(themeID)}
                             handleChange={handleChange}
-                            disabled={iframeLoading}
+                            disabled={isFormSubmitting}
                             updated={isFormSubmitting}
                         />
                     </div>
@@ -147,14 +141,14 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                 <form onSubmit={submitHandler}>
                     <ActionBar
                         useShadow={false}
-                        callToActionTitle={isFormSubmitting ? t("Restored") : t("Restore")}
+                        callToActionTitle={t("Restore")}
                         anotherCallToActionTitle={"Preview"}
                         title={<ThemeEditorTitle themeName={theme.data?.name} isDisabled={true} />}
                         fullWidth={true}
                         backTitle={t("Back")}
-                        isCallToActionLoading={isFormSubmitting}
+                        isCallToActionLoading={formStatus === LoadStatus.LOADING}
                         isCallToActionDisabled={iframeLoading}
-                        anotherCallToActionLoading={false}
+                        anotherCallToActionLoading={previewStatus.status === LoadStatus.LOADING}
                         anotherCallToActionDisabled={iframeLoading}
                         handleAnotherSubmit={handlePreview}
                     />
