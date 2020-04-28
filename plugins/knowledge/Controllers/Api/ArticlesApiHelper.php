@@ -33,6 +33,9 @@ class ArticlesApiHelper {
 
     use UpdateMediaTrait;
 
+    const REHOST_SUCCESS_HEADER = 'x-file-rehosted-success-count';
+    const REHOST_FAILED_HEADER = 'x-file-rehosted-failed-count';
+
     /** @var ArticleModel */
     private $articleModel;
 
@@ -598,15 +601,15 @@ class ArticlesApiHelper {
                     $body = str_replace($url, $result['url'], $body);
                     $successCount++;
                 } catch (\Exception $e) {
-                    trigger_error($e->getMessage(), E_USER_NOTICE);
+                    trigger_error($e, E_USER_NOTICE);
                     $failedCount++;
                 }
             }
         }
         $requestBody['body'] = $body;
         $rehostResponseHeaders = [
-            'x-file-rehosted-success-count' => $successCount,
-            'x-file-rehosted-failed-count' => $failedCount,
+            self::REHOST_SUCCESS_HEADER => $successCount,
+            self::REHOST_FAILED_HEADER => $failedCount,
         ];
         return [$requestBody, $rehostResponseHeaders];
     }

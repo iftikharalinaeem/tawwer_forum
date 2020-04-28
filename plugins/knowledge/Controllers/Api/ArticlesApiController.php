@@ -589,7 +589,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
-        return new Data($result, $rehostResponseHeaders);
+        return new Data($result, [], $rehostResponseHeaders);
     }
 
     /**
@@ -764,7 +764,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
-        return new Data($result, $rehostResponseHeaders);
+        return new Data($result, [], $rehostResponseHeaders);
     }
 
     /**
