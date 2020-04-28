@@ -226,8 +226,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 'CategoryID' => $args['FormPostValues']['CategoryID'],
                 'CatalogueDisplay' => 1,
             ]
-        )->firstRow()
-        ;
+        )->firstRow();
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
     }
 
