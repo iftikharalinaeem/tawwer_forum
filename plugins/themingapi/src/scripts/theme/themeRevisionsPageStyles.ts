@@ -60,6 +60,10 @@ export const themeRevisionPageClasses = useThemeCache(() => {
         paddingLeft: unit(10),
     });
 
+    const activeItem = style("activeItem", {
+        color: colorOut(globalVars.mainColors.primary),
+    });
+
     const mediaQueries = layoutVariables().mediaQueries();
     const frame = style(
         "frame",
@@ -84,5 +88,6 @@ export const themeRevisionPageClasses = useThemeCache(() => {
         title,
         padding,
         frame,
+        activeItem,
     };
 });

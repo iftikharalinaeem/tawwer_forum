@@ -48,7 +48,11 @@ export function ThemeRevisionItem(props: IProps) {
                     <span className={classNames(revisionPageClasses.labelMetas, revisionPageClasses.itemLabel)}>
                         <DateTime timestamp={revision.dateInserted} extended={true} />
                     </span>
-                    {isActive && <span className={revisionPageClasses.labelMetas}>active</span>}
+                    {isActive && (
+                        <span className={classNames(revisionPageClasses.labelMetas, revisionPageClasses.activeItem)}>
+                            Current
+                        </span>
+                    )}
                 </div>
                 <span className={classNames(classes.checkContainer, "sc-only")}>{checkStatus}</span>
             </div>
