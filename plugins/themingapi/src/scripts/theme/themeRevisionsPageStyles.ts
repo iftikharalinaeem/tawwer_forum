@@ -3,15 +3,21 @@
  * @license GPL-2.0-only
  */
 
-import { unit, colorOut, margins } from "@library/styles/styleHelpers";
+import { unit, colorOut, margins, absolutePosition } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
+import { titleBarVariables } from "@library/headers/titleBarStyles";
+import { calc, percent } from "csx";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { themeEditorVariables } from "@themingapi/theme/ThemeEditor.styles";
 
 export const themeRevisionPageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
     const vars = metasVariables();
+    const titleBarVars = titleBarVariables();
+    const themeEditorVars = themeEditorVariables();
 
     const title = style("title", {
         fontWeight: globalVars.fonts.weights.bold,
@@ -40,15 +46,34 @@ export const themeRevisionPageClasses = useThemeCache(() => {
     });
 
     const itemLabelContainer = style("itemLabelContainer", {
-        margin: "10px",
-        width: "250px",
+        margin: unit(10),
+        width: unit(250),
     });
 
     const revisionItem = style("revisionItem", {
         display: "flex",
         alignItems: "center",
-        height: "55px",
+        height: unit(55),
     });
+
+    const padding = style("padding", {
+        paddingLeft: unit(10),
+    });
+
+    const mediaQueries = layoutVariables().mediaQueries();
+    const frame = style(
+        "frame",
+        {
+            top: unit(titleBarVars.sizing.height),
+            position: "relative",
+            flexBasis: calc(`${percent(themeEditorVars.frame.width)} - ${unit(themeEditorVars.panel.width)}`),
+            height: percent(100),
+        },
+
+        mediaQueries.oneColumnDown({
+            width: percent(100),
+        }),
+    );
 
     return {
         userNameFont,
@@ -57,5 +82,7 @@ export const themeRevisionPageClasses = useThemeCache(() => {
         revisionItem,
         itemLabelContainer,
         title,
+        padding,
+        frame,
     };
 });

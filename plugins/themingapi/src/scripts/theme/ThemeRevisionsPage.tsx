@@ -32,6 +32,7 @@ import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeAction
 import { tabBrowseClasses } from "@library/sectioning/tabStyles";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
+import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 
 interface IProps extends IOwnProps {
     themeID: number;
@@ -55,6 +56,7 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     const [isFormSubmitting, setIsFormSubmitting] = useState(false);
     const { pushSmartLocation } = useLinkContext();
     const classes = themeEditorClasses();
+    const RevisionPageClasses = themeRevisionPageClasses();
 
     const { setIFrameRef } = useIFrameCommunication();
 
@@ -115,9 +117,9 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
         content = <ErrorPage error={theme.error} />;
     } else {
         const contents = (
-            <>
+            <div>
                 <div className={classes.wrapper}>
-                    <div className={classes.frame}>
+                    <div className={RevisionPageClasses.frame}>
                         <iframe
                             ref={setIFrameRef}
                             src={siteUrl(`/theme/theme-settings/${themeID}/preview?revisionID=${revisionID}`)}
@@ -134,7 +136,7 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                         <ThemeRevisionsPanel themeID={themeID} handleChange={handleChange} disabled={iframeLoading} />
                     </div>
                 </div>
-            </>
+            </div>
         );
         content = (
             <>
