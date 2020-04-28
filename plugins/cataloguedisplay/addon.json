@@ -11,7 +11,12 @@
     "authors": [
         {
             "name": "Patrick Kelly",
-            "email": "patrick.k@vanillaforums.com"
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        },
+        {
+            "name": "Raphaël Bergina",
+            "email": "raphael.bergina@vanillaforums.com"
         }
     ],
     "require": {
