@@ -28,16 +28,6 @@ class Zendesk {
     protected $apiToken;
 
     /**
-     * @var string[] Ticket types
-     */
-    const ZENDESK_TICKET_TYPE = ['question' => 'Question', 'incident' => 'Incident', 'problem' => 'Problem', 'task' => 'Task'];
-
-    /**
-     * @var string[] Ticket priority
-     */
-    const ZENDESK_TICKET_PRIORITY = ['low' => 'Low', 'normal' => 'Normal', 'high' => 'High', 'urgent' => 'Urgent'];
-
-    /**
      * Setup Properties.
      *
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
