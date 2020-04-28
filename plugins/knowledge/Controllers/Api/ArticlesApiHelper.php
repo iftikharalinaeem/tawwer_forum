@@ -15,6 +15,7 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
@@ -23,6 +24,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Models\DraftModel;
+use Vanilla\UploadedFile;
 
 /**
  * API controller helper functions.
@@ -58,6 +60,12 @@ class ArticlesApiHelper {
     /** @var \Gdn_Session */
     private $session;
 
+    /** @var FormatService */
+    private $formatService;
+
+    /** @var \Gdn_Upload */
+    private $upload;
+
     /**
      * DI.
      *
@@ -74,7 +82,8 @@ class ArticlesApiHelper {
         DraftModel $draftModel,
         \Gdn_Session $session,
         \MediaModel $mediaModel,
-        ExtendedContentFormatService $formatService
+        ExtendedContentFormatService $formatService,
+        \Gdn_Upload $upload
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -85,6 +94,8 @@ class ArticlesApiHelper {
         $this->discussionApi = $discussionApi;
         $this->draftModel = $draftModel;
         $this->session = $session;
+        $this->formatService = $formatService;
+        $this->upload = $upload;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -534,5 +545,65 @@ class ArticlesApiHelper {
             $this->defaultArticleModel->update(['defaultArticleID' => $defaultArticleID], ['knowledgeBaseID' => $kbID]);
         }
         return $defaultArticleID;
+    }
+
+    /**
+     * Rehost the images in an article.
+     *
+     * @param array $requestBody The request body of a POST/PATCH request.
+     * @return array A tuple of [$modifiedRow, $replaceCount, $failedCount].
+     */
+    public function rehostArticleImages(array $requestBody): array {
+        $shouldRehost = $requestBody['fileRehosting']['enabled'] ?? false;
+
+        if (!$shouldRehost) {
+            return [$requestBody, []];
+        }
+
+        $rehostRequestHeaders = $requestBody['fileRehosting']['requestHeaders'] ?? [];
+        
+        $body = $requestBody['body'];
+        $format = $requestBody['format'];
+        $allUrls = $this->formatService->parseImageUrls($body, $format);
+        $failedCount = 0;
+        $successCount = 0;
+
+        $oldUrlToNewUrlMap = [];
+        foreach ($allUrls as $url) {
+            if ($this->upload->isOwnWebPath($url)) {
+                continue;
+            }
+
+            // Check if we've already migrated it.
+            try {
+                $result = $this->mediaModel->findUploadedMediaByForeignUrl($url);
+            } catch (NotFoundException $e) {
+                $result = null;
+            }
+
+            if ($result) {
+                $oldUrlToNewUrlMap[$url] = $result['url'];
+                $body = str_replace($url, $result['url'], $body);
+                $successCount++;
+            } else {
+                // We need to clone the file.
+                try {
+                    $upload = UploadedFile::fromRemoteResourceUrl($url, $rehostRequestHeaders);
+                    $upload->persistUpload(false, 'migrated');
+                    $result = $this->mediaModel->saveUploadedFile($upload);
+                    $body = str_replace($url, $result['url'], $body);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    trigger_error($e->getMessage(), E_USER_NOTICE);
+                    $failedCount++;
+                }
+            }
+        }
+        $requestBody['body'] = $body;
+        $rehostResponseHeaders = [
+            'x-file-rehosted-success-count' => $successCount,
+            'x-file-rehosted-failed-count' => $failedCount,
+        ];
+        return [$requestBody, $rehostResponseHeaders];
     }
 }
