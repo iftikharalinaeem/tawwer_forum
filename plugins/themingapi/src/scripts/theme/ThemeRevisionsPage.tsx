@@ -133,7 +133,11 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                     </div>
 
                     <div className={classes.panel}>
-                        <ThemeRevisionsPanel themeID={themeID} handleChange={handleChange} disabled={iframeLoading} />
+                        <ThemeRevisionsPanel
+                            themeID={parseInt(themeID)}
+                            handleChange={handleChange}
+                            disabled={iframeLoading}
+                        />
                     </div>
                 </div>
             </div>

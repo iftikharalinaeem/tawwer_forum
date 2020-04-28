@@ -83,6 +83,5 @@ class ThemeSettingsPageController extends PageDispatchController {
             ->render()
         ;
         return $response;
-
     }
 }
