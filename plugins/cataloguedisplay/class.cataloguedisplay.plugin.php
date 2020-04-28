@@ -215,7 +215,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     public function discussionModel_beforeSaveDiscussion_handler(DiscussionModel $sender, array $args) {
         $category = $this->categoryModel->getWhere(
             [
-                'CategoryID' => valr('FormPostValues.CategoryID', $args),
+                'CategoryID' => $args['FormPostValues']['CategoryID'],
                 'CatalogueDisplay' => 1,
             ]
         )->firstRow()
@@ -240,10 +240,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
      *
-     * @param DiscussionController $sender
+     * @param DiscussionsController $sender
      * @param array $args
      */
-    public function discussionsController_beforeDiscussionContent_handler(DiscussionController $sender, array $args) {
+    public function discussionsController_beforeDiscussionContent_handler(DiscussionsController $sender, array $args) {
         if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
@@ -308,7 +308,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_beforeDiscussionName_handler(DiscussionsController $sender, array $args) {
-        if (valr('Discussion.CatalogueDisplay', $args)) {
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
+            return;
+        }
+        $discussion = $args['Discussion']??null;
+        if ($discussion && is_object($discussion) && $discussion->CatalogueDisplay) {
             $args['CssClass'] .= ' CatalogueRow';
         }
     }
@@ -320,7 +324,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function categoriesController_beforeDiscussionName_handler(CategoriesController $sender, array $args) {
-        if (valr('Discussion.CatalogueDisplay', $args)) {
+        $discussion = $args['Discussion']??null;
+        if ($discussion && is_object($discussion) && $discussion->CatalogueDisplay) {
             $args['CssClass'] .= ' CatalogueRow';
         }
     }
