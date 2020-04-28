@@ -51,6 +51,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var ConfigurationInterface
      */
     private $config;
+    /**
+     * @var Gdn_Cache
+     */
+    private $cache;
+
 
     /**
      * CatalogueDisplayPlugin constructor.
@@ -62,6 +67,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param FormatConfig $formatConfig
      * @param Gdn_Locale $locale
      * @param ConfigurationInterface $config
+     * @param Gdn_Cache $cache
      */
     public function __construct(
         EventManager $eventManager,
@@ -70,7 +76,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         FormatService $formatService,
         FormatConfig $formatConfig,
         Gdn_Locale $locale,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        Gdn_Cache $cache
     ) {
         parent::__construct();
         $this->eventManager = $eventManager;
@@ -80,6 +87,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $this->formatConfig = $formatConfig;
         $this->locale = $locale;
         $this->config = $config;
+        $this->cache = $cache;
     }
 
     /**
@@ -233,7 +241,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         if (isset($args['Discussion'])) {
             // Remove the cache entry iff we deleted the post
             $cacheKey = $this->makeThumbnailCacheKey($args['Discussion']->DiscussionID);
-            Gdn::cache()->remove($cacheKey);
+            $this->cache->remove($cacheKey);
         }
     }
 
@@ -387,13 +395,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     public function findImageUrl($discussion) {
         // Get the image URL from cache.
         $cacheKey = $this->makeThumbnailCacheKey($discussion->DiscussionID);
-        $imageUrl = Gdn::cache()->get($cacheKey);
+        $imageUrl = $this->cache->get($cacheKey);
         if (!$imageUrl || $imageUrl === Gdn_Cache::CACHEOP_FAILURE) {
             // If no image URL is cached, parse it from the DOM.
             /** @var string|null $imageUrl First image URL from the discussion body */
             $imageUrl = $this->formatService->parseImageUrls($discussion->Body, $discussion->Format)[0] ?? null;
             if ($imageUrl) {
-                Gdn::cache()->store($cacheKey, $imageUrl);
+                $this->cache->store($cacheKey, $imageUrl);
             }
         }
 
