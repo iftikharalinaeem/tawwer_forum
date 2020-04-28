@@ -593,7 +593,7 @@ class ArticlesApiHelper {
                 // We need to clone the file.
                 try {
                     $upload = UploadedFile::fromRemoteResourceUrl($url, $rehostRequestHeaders);
-                    $upload->persistUpload(false, 'migrated');
+                    $upload->persistUpload();
                     $result = $this->mediaModel->saveUploadedFile($upload);
                     $body = str_replace($url, $result['url'], $body);
                     $successCount++;
