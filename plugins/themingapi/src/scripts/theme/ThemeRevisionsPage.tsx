@@ -46,17 +46,15 @@ interface IOwnProps
 
 export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { patchThemeWithRevisionID } = useThemeEditorActions();
-    const { previewStatus } = useThemeSettingsState();
+    const { patchThemeWithRevisionID, getThemeById } = useThemeEditorActions();
     const { putPreviewTheme } = useThemeActions();
-    const actions = useThemeEditorActions();
-    const { getThemeById } = actions;
+    const { previewStatus } = useThemeSettingsState();
     const { theme } = useThemeEditorState();
     const [revisionID, setRevisionID] = useState();
     const [iframeLoading, setIframeLoading] = useState(true);
     const [isFormSubmitting, setIsFormSubmitting] = useState(false);
-    const classes = themeEditorClasses();
     const { pushSmartLocation } = useLinkContext();
+    const classes = themeEditorClasses();
 
     const { setIFrameRef } = useIFrameCommunication();
 

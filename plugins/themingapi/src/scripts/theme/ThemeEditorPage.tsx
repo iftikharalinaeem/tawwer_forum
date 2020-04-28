@@ -43,9 +43,7 @@ interface IOwnProps
 
 export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
     const titleID = useUniqueID("themeEditor");
-    const { updateAssets, saveTheme } = useThemeEditorActions();
-    const actions = useThemeEditorActions();
-    const { getThemeById } = actions;
+    const { updateAssets, saveTheme, getThemeById } = useThemeEditorActions();
     const { theme, form, formSubmit } = useThemeEditorState();
     const { assets } = form;
     const [themeName, setThemeName] = useState("");
