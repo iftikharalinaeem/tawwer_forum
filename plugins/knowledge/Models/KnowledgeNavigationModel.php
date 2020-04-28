@@ -43,6 +43,9 @@ class KnowledgeNavigationModel {
     /** @var ArticleModel */
     private $articleModel;
 
+    /** @var ArticleNavigationModel $articleNavigationModel*/
+    private $articleNavigationModel;
+
     /** @var KnowledgeBaseModel */
     private $knowledgeBaseModel;
 
@@ -74,7 +77,8 @@ class KnowledgeNavigationModel {
         KnowledgeBaseModel $knowledgeBaseModel,
         TranslationModel $translationModel,
         DefaultArticleModel $defaultArticleModel,
-        KnowledgeNavigationCache $navCache
+        KnowledgeNavigationCache $navCache,
+        ArticleNavigationModel $articleNavigationModel
     ) {
         $this->articleModel = $articleModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
@@ -82,6 +86,7 @@ class KnowledgeNavigationModel {
         $this->translation = $translationModel->getContentTranslationProvider();
         $this->defaultArticleModel = $defaultArticleModel;
         $this->navCache = $navCache;
+        $this->articleNavigationModel = $articleNavigationModel;
     }
 
     /**
@@ -473,7 +478,7 @@ class KnowledgeNavigationModel {
             KnowledgeNavigationModel::RECORD_TYPE_ARTICLE,
             "articleID",
             "knowledgeCategoryID",
-            $this->articleModel
+            $this->articleNavigationModel
         );
 
         if ($knowledgeBase['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
