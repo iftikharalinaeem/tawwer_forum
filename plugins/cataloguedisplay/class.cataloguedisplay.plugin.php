@@ -19,8 +19,8 @@ use Vanilla\Web\TwigRenderTrait;
 class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
 
-    const DEFAULT_USE_ONLY_ON_CATEGORY = true;
-    const DEFAULT_MASONRY_ENABLED = false;
+    const CATEGORY_ONLY = true;
+    const MASONRY_ENABLED = false;
 
     /**
      * @var EventManager
@@ -192,8 +192,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
             }
         }
-        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::DEFAULT_USE_ONLY_ON_CATEGORY));
-        $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::DEFAULT_MASONRY_ENABLED));
+        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY));
+        $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
         $sender->Form->setValue('Photo', c('CatalogueDisplay.PlaceHolderImage', null));
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
