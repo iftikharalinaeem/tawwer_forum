@@ -8,7 +8,7 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import { useGetThemeState } from "@library/theming/themeReducer";
 import { useThemeActions } from "@library/theming/ThemeActions";
 import { LoadStatus } from "@library/@types/api/core";
-import { ThemeRevisionItem } from "@library/forms/themeEditor/ThemeRevisionItem";
+import { ThemeRevisionItem } from "@themingapi/theme/ThemeRevisionItem";
 import classNames from "classnames";
 import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 import { ThemePanelPlaceholder } from "@themingapi/theme/ThemePanelPlaceholder";
