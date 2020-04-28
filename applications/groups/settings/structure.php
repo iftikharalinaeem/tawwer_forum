@@ -196,13 +196,26 @@ $ActivityModel->defineType('Events');
 if ($St->tableExists('Discussion')) {
     $groupModel = new GroupModel();
     $groupCategoryIDs = $groupModel->getGroupCategoryIDs();
-    $result = Gdn::sql()
-        ->update('Discussion')
-        ->set('Announce', 2)
-        ->where('Announce', 1)
-        ->beginWhereGroup()
-        ->where('GroupID is not null', '')
-        ->orWhereIn('CategoryID', $groupCategoryIDs)
-        ->endWhereGroup()
-        ->put();
+    if ($groupCategoryIDs) {
+        $updateDiscussions =  Gdn::sql()
+            ->select('DiscussionID')
+            ->where('Announce', 1)
+            ->beginWhereGroup()
+            ->where('GroupID is not null', '')
+            ->orWhereIn('CategoryID', $groupCategoryIDs)
+            ->endWhereGroup()
+            ->get(' Discussion', '', '', 1)
+            ->resultObject();
+        if ($updateDiscussions) {
+            $result = Gdn::sql()
+                ->update('Discussion')
+                ->set('Announce', 2)
+                ->where('Announce', 1)
+                ->beginWhereGroup()
+                ->where('GroupID is not null', '')
+                ->orWhereIn('CategoryID', $groupCategoryIDs)
+                ->endWhereGroup()
+                ->put();
+        }
+    }
 }
