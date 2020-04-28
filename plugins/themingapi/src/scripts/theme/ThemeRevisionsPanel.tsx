@@ -17,6 +17,7 @@ export interface IProps {
     themeID: number;
     handleChange: (id: any) => void;
     disabled: boolean;
+    updated: boolean;
 }
 
 export function ThemeRevisionsPanel(props: IProps) {
@@ -28,10 +29,10 @@ export function ThemeRevisionsPanel(props: IProps) {
     const revisionPageClasses = themeRevisionPageClasses();
 
     useEffect(() => {
-        if (themeState.themeRevisions.status === LoadStatus.PENDING) {
+        if (themeState.themeRevisions.status === LoadStatus.PENDING || props.updated) {
             actions.getThemeRevisions(props.themeID);
         }
-    }, [themeState]);
+    }, [themeState, props.updated]);
 
     useEffect(() => {
         setRevisions(themeState.themeRevisions.data);

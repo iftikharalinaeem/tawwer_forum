@@ -25,7 +25,7 @@ import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
-import { siteUrl } from "@library/utility/appUtils";
+import { formatUrl, siteUrl } from "@library/utility/appUtils";
 import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
@@ -86,7 +86,6 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
             const updatedTheme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
             if (updatedTheme) {
                 setIsFormSubmitting(false);
-                pushSmartLocation(`/theme/theme-settings/${themeID}/revisions`);
             }
         }
     };
@@ -137,6 +136,7 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                             themeID={parseInt(themeID)}
                             handleChange={handleChange}
                             disabled={iframeLoading}
+                            updated={isFormSubmitting}
                         />
                     </div>
                 </div>
