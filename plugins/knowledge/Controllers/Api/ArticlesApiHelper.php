@@ -565,6 +565,10 @@ class ArticlesApiHelper {
         $body = $requestBody['body'];
         $format = $requestBody['format'];
         $allUrls = $this->formatService->parseImageUrls($body, $format);
+        $attachments = $this->formatService->parseAttachments($body, $format);
+        foreach ($attachments as $attachment) {
+            $allUrls[] = $attachment->url;
+        }
         $failedCount = 0;
         $successCount = 0;
 
