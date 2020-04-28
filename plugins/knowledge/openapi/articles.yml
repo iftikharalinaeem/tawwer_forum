@@ -67,6 +67,8 @@ paths:
         post:
             responses:
                 "201":
+                    headers:
+                        $ref: "#/components/schemas/ArticleRehostResponseHeaders"
                     content:
                         "application/json":
                             schema:
@@ -374,6 +376,8 @@ paths:
                       type: integer
             responses:
                 "200":
+                    headers:
+                        $ref: "#/components/schemas/ArticleRehostResponseHeaders"
                     content:
                         "application/json":
                             schema:
@@ -428,6 +432,8 @@ paths:
                                     updateUserID:
                                         description: Unique ID of the last user to update the draft.
                                         type: integer
+                                    fileRehosting:
+                                        description: Apply par
                                 required:
                                     - draftID
                                     - recordType
@@ -1084,6 +1090,30 @@ components:
                         example: { 'aliases': [ 'category/discussion-migrated-from/forum/', 'another-url/for-the-same/article' ]}
             required: true
     schemas:
+        ArticleRehostFiles:
+            description: >
+                Control rehosting of files within an article body. When configured correctly images and attachments in
+                the article body will be rehosted within Vanilla (or it's CDN).
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                    description: Enable file rehosting.
+                    example: true
+                requestHeaders:
+                    description: Headers to pass when fetching the remote resources. Primary use case is authentication.
+                    type: array
+                    items: string
+                    example: ["Authorization: Basic cHc0czFaZ05tRkQyUjZSTA="]
+        ArticleRehostResponseHeaders:
+            x-file-rehosted-success-count:
+                description: Number of images and attachments that were successfully rehosted.
+                schema:
+                    type: integer
+            x-file-rehosted-failed-count:
+                description: Number of images and attachments that were unable to be rehosted.
+                schema:
+                    type: integer
         Article:
             properties:
                 articleID:
@@ -1273,6 +1303,8 @@ components:
                     type: string
                     maxLength: 32
                     nullable: true
+                rehostFiles:
+                    $ref: "#/components/schemas/ArticleRehostFiles"
             required:
                 - knowledgeCategoryID
                 - name
@@ -1327,6 +1359,8 @@ components:
                     type: string
                     maxLength: 32
                     nullable: true
+                rehostFiles:
+                    $ref: "#/components/schemas/ArticleRehostFiles"
             type: object
         ArticleSimple:
             type: object
