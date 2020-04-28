@@ -36,8 +36,13 @@ class Zendesk {
      * @param string|null $apiToken
      * @param string|null $apiUser
      */
-    public function __construct(IZendeskHttpRequest $curlRequest, $url, ?string $accessToken = null,
-                                ?string $apiToken = null, ?string $apiUser = null) {
+    public function __construct(
+        IZendeskHttpRequest $curlRequest,
+        $url,
+        ?string $accessToken = null,
+        ?string $apiToken = null,
+        ?string $apiUser = null
+    ) {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
         $this->AccessToken = $accessToken;
