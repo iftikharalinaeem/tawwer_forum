@@ -5,6 +5,7 @@
  */
 
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\FormatService;
@@ -46,6 +47,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var Gdn_Locale
      */
     private $locale;
+    /**
+     * @var ConfigurationInterface
+     */
+    private $config;
 
     /**
      * CatalogueDisplayPlugin constructor.
@@ -56,6 +61,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param FormatService $formatService
      * @param FormatConfig $formatConfig
      * @param Gdn_Locale $locale
+     * @param ConfigurationInterface $config
      */
     public function __construct(
         EventManager $eventManager,
@@ -63,7 +69,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         CategoryModel $categoryModel,
         FormatService $formatService,
         FormatConfig $formatConfig,
-        Gdn_Locale $locale
+        Gdn_Locale $locale,
+        ConfigurationInterface $config
     ) {
         parent::__construct();
         $this->eventManager = $eventManager;
@@ -72,6 +79,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $this->formatService = $formatService;
         $this->formatConfig = $formatConfig;
         $this->locale = $locale;
+        $this->config = $config;
     }
 
     /**
@@ -110,14 +118,14 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function base_render_before(Gdn_Controller $sender) {
         if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController'
-                || (!c('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
+                || (!$this->config->get('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
             // include magnific-popup before catalogue-style so that catalogue style can override styles.
             $sender->addCssFile('magnific-popup.css', 'dashboard');
-            if (!c('CatalogueDisplay.Masonry.Enabled')) {
+            if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
                 $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
             }
             $sender->addJsFile('magnific-popup.min.js');
-            $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.c('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
+            $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.$this->config->get('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
         }
     }
 
@@ -179,7 +187,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
             Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
-            $existingImage = c('CatalogueDisplay.PlaceHolderImage');
+            $existingImage = $this->config->get('CatalogueDisplay.PlaceHolderImage');
             $request = Gdn::request();
             $tmpImageUrl = $request->post('Photo', null);
 
@@ -192,9 +200,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
             }
         }
-        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', c('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY));
-        $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', c('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
-        $sender->Form->setValue('Photo', c('CatalogueDisplay.PlaceHolderImage', null));
+        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', $this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY));
+        $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', $this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
+        $sender->Form->setValue('Photo', $this->config->get('CatalogueDisplay.PlaceHolderImage', null));
         $sender->render('settings', '', 'plugins/cataloguedisplay');
     }
 
@@ -210,7 +218,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 'CategoryID' => valr('FormPostValues.CategoryID', $args),
                 'CatalogueDisplay' => 1,
             ]
-        )->firstRow();
+        )->firstRow()
+        ;
         $args['FormPostValues']['CatalogueDisplay'] = ($category) ? 1 : 0;
     }
 
@@ -235,10 +244,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function discussionsController_beforeDiscussionContent_handler(DiscussionController $sender, array $args) {
-        if (c('Vanilla.Discussions.Layout') === 'table') {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
-        if (c('CatalogueDisplay.OnlyOnCategory')) {
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
         $discussion = $args['Discussion'] ?? null;
@@ -255,10 +264,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function discussionsController_beforeDiscussionTitle_handler(DiscussionController $sender, array $args) {
         $discussion = $args['Discussion'] ?? null;
-        if (c('CatalogueDisplay.OnlyOnCategory')) {
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
             return;
         }
-        if (c('Vanilla.Discussions.Layout') === 'table' && $discussion) {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
             echo $this->displayCatalogueImage($discussion);
         }
     }
@@ -271,7 +280,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function categoriesController_beforeDiscussionContent_handler(CategoriesController $sender, array $args) {
         $discussion = $args['Discussion'] ?? null;
-        if (c('Vanilla.Discussions.Layout') === 'table') {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
         if ($discussion) {
@@ -287,7 +296,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function categoriesController_beforeDiscussionTitle_handler(CategoriesController $sender, array $args) {
         $discussion = $args['Discussion'] ?? null;
-        if (c('Vanilla.Discussions.Layout') === 'table' && $discussion) {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
             echo $this->displayCatalogueImage($discussion);
         }
     }
@@ -332,10 +341,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $cssClassWrapper = [];
         $imgAttributes = ['class' => []];
         $catalogueImgURL = discussionUrl($discussion);
-        if (!c('CatalogueDisplay.Masonry.Enabled')) {
+        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
         }
-        if (!c('CatalogueDisplay.Masonry.Enabled')) {
+        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
             $imgAttributes['class'] = ['catalogue-image'];
         }
 
@@ -343,7 +352,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $imageUrl = $this->findImageUrl($discussion);
 
         // If there is no image, look for the Placeholder Image saved in the config.
-        $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
+        $placeHolderUrl = $this->config->get('CatalogueDisplay.PlaceHolderImage');
         if (!$imageUrl && $placeHolderUrl) {
             $imgAttributes['class'][] = 'placeholder-image';
             $imgAttributes['alt'] = $this->locale->translate('Placeholder');
@@ -404,10 +413,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      */
     public function categoriesController_render_before(CategoriesController $sender) {
-        if (c('Vanilla.Discussions.Layout') === 'table') {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
-        if (c('CatalogueDisplay.Masonry.Enabled')) {
+        if ($this->config->get('CatalogueDisplay.Masonry.Enabled')) {
             $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
             $sender->addJsFile('masonry-categories.js', 'plugins/cataloguedisplay');
             $sender->addCssFile('catalogue-masonry.css', 'plugins/cataloguedisplay');
