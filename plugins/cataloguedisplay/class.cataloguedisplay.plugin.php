@@ -42,6 +42,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var FormatConfig
      */
     private $formatConfig;
+    /**
+     * @var Gdn_Locale
+     */
+    private $locale;
 
     /**
      * CatalogueDisplayPlugin constructor.
@@ -51,13 +55,15 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param CategoryModel $categoryModel
      * @param FormatService $formatService
      * @param FormatConfig $formatConfig
+     * @param Gdn_Locale $locale
      */
     public function __construct(
         EventManager $eventManager,
         DiscussionModel $discussionModel,
         CategoryModel $categoryModel,
         FormatService $formatService,
-        FormatConfig $formatConfig
+        FormatConfig $formatConfig,
+        Gdn_Locale $locale
     ) {
         parent::__construct();
         $this->eventManager = $eventManager;
@@ -65,6 +71,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $this->categoryModel = $categoryModel;
         $this->formatService = $formatService;
         $this->formatConfig = $formatConfig;
+        $this->locale = $locale;
     }
 
     /**
@@ -142,9 +149,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $warningText = '';
         if (strcasecmp($this->formatConfig->getDefaultDesktopFormat(), TextFormat::FORMAT_KEY) === 0
             || strcasecmp($this->formatConfig->getDefaultMobileFormat(), TextFormat::FORMAT_KEY) === 0) {
-            $warningText = ' <em>'.Gdn::translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
+            $warningText = ' <em>'.$this->locale->translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
         }
-        $description = Gdn::translate('Each discussion will show an uploaded image on the Discussions page instead of the author information. '
+        $description = $this->locale->translate('Each discussion will show an uploaded image on the Discussions page instead of the author information. '
             .'This only applies to categories with "Discussions" as the "Display As.');
         $sender->Data['_ExtendedFields']['CatalogueDisplay'] = [
             'Name' => 'CatalogueDisplay',
@@ -163,7 +170,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      */
     public function settingsController_catalogueDisplay_create(SettingsController $sender, $args) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Title', Gdn::translate('Upload Placeholder Image'));
+        $sender->setData('Title', $this->locale->translate('Upload Placeholder Image'));
         if ($sender->Form->authenticatedPostBack() === true) {
             if ($sender->Form->getFormValue('Photo', false) === '') {
                 $sender->Form->removeFormValue('Photo');
@@ -339,7 +346,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $placeHolderUrl = c('CatalogueDisplay.PlaceHolderImage');
         if (!$imageUrl && $placeHolderUrl) {
             $imgAttributes['class'][] = 'placeholder-image';
-            $imgAttributes['alt'] = Gdn::translate('Placeholder');
+            $imgAttributes['alt'] = $this->locale->translate('Placeholder');
             $imageUrl = $placeHolderUrl;
         }
 
