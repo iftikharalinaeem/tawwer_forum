@@ -100,7 +100,7 @@ trait ArticlesApiMigration {
             $id,
             true
         );
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -127,7 +127,7 @@ trait ArticlesApiMigration {
             $id,
             true
         );
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
