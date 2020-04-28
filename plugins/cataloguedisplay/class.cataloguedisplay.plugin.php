@@ -127,12 +127,9 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     public function base_render_before(Gdn_Controller $sender) {
         if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController'
                 || (!$this->config->get('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
-            // include magnific-popup before catalogue-style so that catalogue style can override styles.
-            $sender->addCssFile('magnific-popup.css', 'dashboard');
-            if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
+            if ($sender->ClassName == 'DiscussionsController' || !$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
                 $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
             }
-            $sender->addJsFile('magnific-popup.min.js');
             $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.$this->config->get('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
         }
     }

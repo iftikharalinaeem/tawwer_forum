@@ -25,3 +25,14 @@ li.CatalogueRow img {
         width: 100%;
     }
 }
+
+/**
+If the Discussion Photo plugin is turned on, hide the user's avatar on the catalogue page only.
+ */
+li.CatalogueRow .IndexPhoto {
+    display: none;
+}
+.DataList.Discussions .CatalogueRow.ItemDiscussion-withPhoto .Discussion.ItemContent{
+    padding-left: 0px;
+
+}
