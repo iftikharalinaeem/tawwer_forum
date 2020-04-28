@@ -6,7 +6,6 @@
     "license": "Proprietary",
     "key": "cataloguedisplay",
     "settingsUrl": "/settings/cataloguedisplay",
-    "priority": 10,
     "type": "addon",
     "authors": [
         {
@@ -20,7 +19,6 @@
         }
     ],
     "require": {
-        "vanilla": ">=2.3",
-        "editor": ">=1.8"
+        "vanilla": ">=3.3"
     }
 }
