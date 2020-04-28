@@ -7,9 +7,9 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\EventManager;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
-use Gdn_Session as SessionInterface;
-use MediaModel;
+use Garden\Web\Exception\HttpException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
@@ -17,6 +17,7 @@ use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -27,8 +28,6 @@ use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
-use Vanilla\Formatting\UpdateMediaTrait;
-use Vanilla\Formatting\FormatService;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
@@ -46,11 +45,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
     use ArticlesApiSchemes;
 
-    use UpdateMediaTrait;
-
     use FormatCompatTrait;
 
-    use ArticlesApiHelper;
     use ArticlesApiDrafts;
     use ArticlesApiMigration;
 
@@ -119,30 +115,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var KnowledgeBasesApiController */
     private $knowledgeApiController;
 
+    /** @var ArticlesApiHelper */
+    private $articleHelper;
+
+    /** @var \Gdn_Session */
+    private $session;
+
+    /** @var ExtendedContentFormatService */
+    private $formatService;
+
     /**
-     * ArticlesApiController constructor
-     *
-     * @param ArticleModel $articleModel
-     * @param ArticleRevisionModel $articleRevisionModel
-     * @param ArticleReactionModel $articleReactionModel
-     * @param UserModel $userModel
-     * @param DraftModel $draftModel
-     * @param ReactionModel $reactionModel
-     * @param ReactionOwnerModel $reactionOwnerModel
-     * @param KnowledgeCategoryModel $knowledgeCategoryModel
-     * @param KnowledgeBaseModel $knowledgeBaseModel
-     * @param ExtendedContentFormatService $formatService
-     * @param MediaModel $mediaModel
-     * @param DiscussionsApiController $discussionApi
-     * @param SessionInterface $sessionInterface
-     * @param BreadcrumbModel $breadcrumbModel
-     * @param DiscussionArticleModel $discussionArticleModel
-     * @param PageRouteAliasModel $pageRouteAliasModel
-     * @param EventManager $eventManager
-     * @param ArticleFeaturedModel $articleFeaturedModel
-     * @param KnowledgeApiController $knowledgeApiController
-     * @param DefaultArticleModel $defaultArticleModel
-     * @param KnowledgeNavigationModel $knowledgeNavigationModel
+     * DI.
+     * @inheritdoc
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -154,18 +138,15 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ReactionOwnerModel $reactionOwnerModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        ExtendedContentFormatService $formatService,
-        MediaModel $mediaModel,
-        DiscussionsApiController $discussionApi,
-        SessionInterface $sessionInterface,
         BreadcrumbModel $breadcrumbModel,
         DiscussionArticleModel $discussionArticleModel,
         PageRouteAliasModel $pageRouteAliasModel,
         EventManager $eventManager,
         ArticleFeaturedModel $articleFeaturedModel,
         KnowledgeApiController $knowledgeApiController,
-        DefaultArticleModel $defaultArticleModel,
-        KnowledgeNavigationModel $knowledgeNavigationModel
+        ArticlesApiHelper $articleHelper,
+        \Gdn_Session $session,
+        ExtendedContentFormatService $formatService
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -177,19 +158,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->reactionOwnerModel = $reactionOwnerModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
-        $this->discussionApi = $discussionApi;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->discussionArticleModel = $discussionArticleModel;
         $this->pageRouteAliasModel = $pageRouteAliasModel;
         $this->eventManager = $eventManager;
         $this->knowledgeApiController = $knowledgeApiController;
-        $this->defaultArticleModel = $defaultArticleModel;
-        $this->knowledgeNavigationModel = $knowledgeNavigationModel;
-
-        $this->setMediaForeignTable("article");
-        $this->setMediaModel($mediaModel);
-        $this->setFormatterService($formatService);
-        $this->setSessionInterface($sessionInterface);
+        $this->articleHelper = $articleHelper;
+        $this->session = $session;
+        $this->formatService = $formatService;
     }
 
     /**
@@ -246,7 +222,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
 
         $out = $this->articleSchema("out");
-        $article = $this->retrieveRow($id, $query);
+        $article = $this->articleHelper->retrieveRow($id, $query);
 
         $this->userModel->expandUsers(
             $article,
@@ -265,13 +241,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'userReaction' => $this->articleReactionModel->getUserReaction(
                 ArticleReactionModel::TYPE_HELPFUL,
                 $id,
-                $this->sessionInterface->UserID
+                $this->session->UserID
             ),
         ];
         if (isset($query["locale"])) {
             $article["queryLocale"] = $query["locale"];
         }
-        $article = $this->normalizeOutput($article);
+        $article = $this->articleHelper->normalizeOutput($article);
         $result = $out->validate($article);
         return $result;
     }
@@ -308,7 +284,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
         $article = $this->articleByID($id, true, false, true);
 
-        $result =  $this->getArticleTranslationData($article);
+        $result =  $this->articleHelper->getArticleTranslationData($article);
         $result = $out->validate($result);
 
         return $result;
@@ -346,10 +322,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "foreignID",
             "dateUpdated"
         ])->add($this->fullSchema()), "out");
-        $article = $this->retrieveRow($id, $query);
+        $article = $this->articleHelper->retrieveRow($id, $query);
         $this->knowledgeBaseModel->checkEditPermission($article['knowledgeBaseID']);
         $body = $article['body'];
-        $article = $this->normalizeOutput($article);
+        $article = $this->articleHelper->normalizeOutput($article);
         $article['body'] = $body;
         $result = $out->validate($article);
         $this->applyFormatCompatibility($result, 'body', 'format');
@@ -360,7 +336,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * List published articles in a given knowledge category.
      *
      * @param array $query
-     * @return \Garden\Web\Data
+     * @return Data
      * @throws ValidationException If input validation fails.
      * @throws ValidationException If output validation fails.
      * @throws HttpException If a relevant ban has been applied on the permission(s) for this session.
@@ -410,7 +386,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ];
 
         $includeSubcategories = $query['includeSubcategories'] ?? false;
-        $knowledgeCategory = $this->knowledgeCategoryByID($query["knowledgeCategoryID"]);
+        $knowledgeCategory = $this->articleHelper->knowledgeCategoryByID($query["knowledgeCategoryID"]);
         $paging = \Vanilla\ApiUtils::numberedPagerInfo(
             $includeSubcategories ? $knowledgeCategory['articleCountRecursive'] : $knowledgeCategory["articleCount"],
             "/api/v2/articles",
@@ -467,7 +443,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             if (isset($query["locale"])) {
                 $row["queryLocale"] = $locale;
             }
-            $row = $this->normalizeOutput($row);
+            $row = $this->articleHelper->normalizeOutput($row);
             if (!$includeExcerpts) {
                 unset($row["excerpt"]);
             }
@@ -574,7 +550,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * @param int $id
      * @param array $body
      * @return array
-     * @throws Exception If no session is available.
+     * @throws \Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
@@ -588,14 +564,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $body = $in->validate($body, true);
 
-        $initialRow = $this->retrieveRow($id);
+        $initialRow = $this->articleHelper->retrieveRow($id);
         // Make sure we have permission of the place we're coming from.
-        $initialKnowledgeBase = $this->getKnowledgeBaseFromCategoryID($initialRow["knowledgeCategoryID"]);
+        $initialKnowledgeBase = $this->articleHelper->getKnowledgeBaseFromCategoryID($initialRow["knowledgeCategoryID"]);
         $this->knowledgeBaseModel->checkEditPermission($initialKnowledgeBase['knowledgeBaseID']);
 
         if (isset($body['knowledgeCategoryID'])) {
             // Make sure we have permission of the place we're going to.
-            $newKnowledgeBase = $this->getKnowledgeBaseFromCategoryID($body['knowledgeCategoryID']);
+            $newKnowledgeBase = $this->articleHelper->getKnowledgeBaseFromCategoryID($body['knowledgeCategoryID']);
             $this->knowledgeBaseModel->checkEditPermission($newKnowledgeBase['knowledgeBaseID']);
         }
 
@@ -603,14 +579,14 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $this->validateFirstArticleRevision($id, $body);
         }
 
-        $this->save($body, $id);
-        $row = $this->retrieveRow($id, $body);
+        $this->articleHelper->save($body, $id);
+        $row = $this->articleHelper->retrieveRow($id, $body);
 
         $locale = $body['locale'] ?? $row['locale'] ?? null;
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']), $locale);
         $row['breadcrumbs'] = $crumbs;
 
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -649,7 +625,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         }
 
         $row = $this->articleByID($id, true);
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
@@ -664,13 +640,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *        Possible values: , deleted, etc
      *
      * @return array Data array Article record/item
-     * @throws Exception If no session is available.
+     * @throws \Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
     public function put_react(int $id, array $body): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
-        if (!$this->sessionInterface->isValid()) {
+        if (!$this->session->isValid()) {
             throw new ClientException('User must be signed in to post reaction.');
         }
 
@@ -696,12 +672,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
         $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        $mode = $this->getOperationMode();
+        $mode = $this->articleHelper->getOperationMode();
         if ($mode === Operation::MODE_DEFAULT) {
-            $fields['insertUserID'] = $this->sessionInterface->UserID;
+            $fields['insertUserID'] = $this->session->UserID;
             $fields['foreignID'] = '';
         } else {
-            $fields['insertUserID'] = $body['insertUserID'] ?? $this->sessionInterface->UserID;
+            $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
             $fields['foreignID'] = $body['foreignID'] ?? '';
         }
 
@@ -742,7 +718,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             'userReaction' => $newReactionValue,
         ];
         $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -752,7 +728,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param array $body
      * @return array
-     * @throws Exception If no session is available.
+     * @throws \Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws ClientException If locale is not supported.
@@ -766,7 +742,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
 
-        $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($body["knowledgeCategoryID"]);
+        $knowledgeBase = $this->articleHelper->getKnowledgeBaseFromCategoryID($body["knowledgeCategoryID"]);
         $this->knowledgeBaseModel->checkEditPermission($knowledgeBase['knowledgeBaseID']);
         $sourceLocale = $knowledgeBase["sourceLocale"] ?? c("Garden.Locale");
 
@@ -778,10 +754,10 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body["locale"] = $sourceLocale;
         }
 
-        $articleID = $this->save($body);
+        $articleID = $this->articleHelper->save($body);
         $row = $this->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
-        $row = $this->normalizeOutput($row);
+        $row = $this->articleHelper->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
@@ -811,7 +787,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "out")
         ]);
 
-        $this->updateInvalidateArticleTranslations($id);
+        $this->articleHelper->updateInvalidateArticleTranslations($id);
 
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $results = $out->validate($articles);
@@ -924,5 +900,23 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
         }
         return array_values($articles);
+    }
+
+    /**
+     * Check if the required fields are there for the first revision in a different locale.
+     *
+     * @param int $id
+     * @param array $body
+     * @return array
+     */
+    protected function validateFirstArticleRevision(int $id, array $body) {
+        $revisions = $this->articleRevisionModel->get(["articleID" => $id]);
+        $revisionForLocale = array_column($revisions, "locale");
+        if (!in_array($body["locale"], $revisionForLocale)) {
+            $firstRevisionSchema = $this->firstArticleRevisionPatchSchema("in")
+                ->setDescription("Update an existing article.");
+            $body = $firstRevisionSchema->validate($body);
+        }
+        return $body;
     }
 }

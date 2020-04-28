@@ -6,21 +6,93 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
-use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\ExtendedContentFormatService;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
+use Vanilla\Models\DraftModel;
 
 /**
  * API controller helper functions.
  */
-trait ArticlesApiHelper {
+class ArticlesApiHelper {
+
+    use UpdateMediaTrait;
+
+    /** @var ArticleModel */
+    private $articleModel;
+
+    /** @var ArticleRevisionModel */
+    private $articleRevisionModel;
+
+    /** @var KnowledgeBaseModel */
+    private $knowledgeBaseModel;
+
+    /** @var KnowledgeCategoryModel */
+    private $knowledgeCategoryModel;
+
+    /** @var KnowledgeNavigationModel */
+    private $knowledgeNavigationModel;
+
+    /** @var DefaultArticleModel */
+    private $defaultArticleModel;
+
+    /** @var \DiscussionsApiController */
+    private $discussionApi;
+
+    /** @var DraftModel */
+    private $draftModel;
+
+    /** @var \Gdn_Session */
+    private $session;
+
+    /**
+     * DI.
+     *
+     * @inheritdoc
+     */
+    public function __construct(
+        ArticleModel $articleModel,
+        ArticleRevisionModel $articleRevisionModel,
+        KnowledgeBaseModel $knowledgeBaseModel,
+        KnowledgeCategoryModel $knowledgeCategoryModel,
+        KnowledgeNavigationModel $knowledgeNavigationModel,
+        DefaultArticleModel $defaultArticleModel,
+        \DiscussionsApiController $discussionApi,
+        DraftModel $draftModel,
+        \Gdn_Session $session,
+        \MediaModel $mediaModel,
+        ExtendedContentFormatService $formatService
+    ) {
+        $this->articleModel = $articleModel;
+        $this->articleRevisionModel = $articleRevisionModel;
+        $this->knowledgeBaseModel = $knowledgeBaseModel;
+        $this->knowledgeCategoryModel = $knowledgeCategoryModel;
+        $this->knowledgeNavigationModel = $knowledgeNavigationModel;
+        $this->defaultArticleModel = $defaultArticleModel;
+        $this->discussionApi = $discussionApi;
+        $this->draftModel = $draftModel;
+        $this->session = $session;
+
+        $this->setMediaForeignTable("article");
+        $this->setMediaModel($mediaModel);
+        $this->setFormatterService($formatService);
+        $this->setSessionInterface($session);
+    }
+
+
     /**
      * Massage article row data for useful API output.
      *
@@ -61,7 +133,7 @@ trait ArticlesApiHelper {
      * @throws NotFoundException If the knowledge category could not be found.
      * @throws ValidationException If the result fails schema validation.
      */
-    private function knowledgeCategoryByID(int $id, bool $includeDeleted = false): array {
+    public function knowledgeCategoryByID(int $id, bool $includeDeleted = false): array {
         try {
             $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(["knowledgeCategoryID" => $id]);
             if (!$includeDeleted) {
@@ -79,7 +151,7 @@ trait ArticlesApiHelper {
      * @param array $article
      * @return array
      */
-    protected function getArticleTranslationData(array $article): array {
+    public function getArticleTranslationData(array $article): array {
         $result = [];
         $firstRevision = reset($article);
 
@@ -129,48 +201,12 @@ trait ArticlesApiHelper {
      * @param int $id
      * @return array
      */
-    protected function getKnowledgeBaseFromCategoryID(int $id): array {
+    public function getKnowledgeBaseFromCategoryID(int $id): array {
         $knowledgeBaseCategoryFragement = $this->knowledgeCategoryModel->selectSingleFragment($id);
         $knowledgeBaseID = $knowledgeBaseCategoryFragement->getKnowledgeBaseID();
         $knowledgeBase = $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
         $knowledgeBase = reset($knowledgeBase);
         return $knowledgeBase;
-    }
-
-    /**
-     * Get SiteSectionSlug from a locale.
-     *
-     * @param string $articleLocale
-     * @param array $allLocales
-     * @return string
-     */
-    protected function getSitSectionSlug(string $articleLocale, array $allLocales): string {
-        $siteSectionSlug = "";
-
-        foreach ($allLocales as $locale) {
-            if ($locale["locale"] === $articleLocale) {
-                $siteSectionSlug = $locale["slug"];
-            }
-        }
-        return $siteSectionSlug;
-    }
-
-    /**
-     * Check if the required fields are there for the first revision in a different locale.
-     *
-     * @param int $id
-     * @param array $body
-     * @return array
-     */
-    private function validateFirstArticleRevision(int $id, array $body) {
-        $revisions = $this->articleRevisionModel->get(["articleID" => $id]);
-        $revisionForLocale = array_column($revisions, "locale");
-        if (!in_array($body["locale"], $revisionForLocale)) {
-            $firstRevisionSchema = $this->firstArticleRevisionPatchSchema("in")
-                ->setDescription("Update an existing article.");
-            $body = $firstRevisionSchema->validate($body);
-        }
-        return $body;
     }
 
     /**
@@ -181,7 +217,7 @@ trait ArticlesApiHelper {
      * @return array
      * @throws ClientException When no record is found.
      */
-    private function retrieveRow(int $id, array $query = []): array {
+    public function retrieveRow(int $id, array $query = []): array {
         $article = $this->articleModel->selectSingle(["articleID" => $id]);
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($article["knowledgeCategoryID"]);
         $this->knowledgeBaseModel->checkViewPermission($knowledgeBase['knowledgeBaseID']);
@@ -213,7 +249,7 @@ trait ArticlesApiHelper {
 
         if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
             // Deleted articles have a special permission check.
-            $this->permission(KnowledgeBaseModel::EDIT_PERMISSION);
+            $this->knowledgeBaseModel->checkEditPermission($record['knowledgeBaseID']);
         }
 
         return $record;
@@ -227,7 +263,7 @@ trait ArticlesApiHelper {
      * @param array $knowledgeBase
      * @throws ClientException If locale is not supported.
      */
-    private function checkKbSupportsLocale(string $locale, array $knowledgeBase) {
+    public function checkKbSupportsLocale(string $locale, array $knowledgeBase) {
         $allLocales = $this->knowledgeBaseModel->getLocales($knowledgeBase["siteSectionGroup"]);
         $allLocales = array_column($allLocales, "locale");
         $allLocales[] = $knowledgeBase["sourceLocale"];
@@ -242,7 +278,7 @@ trait ArticlesApiHelper {
      *
      * @param int $id
      */
-    private function updateInvalidateArticleTranslations(int $id) {
+    public function updateInvalidateArticleTranslations(int $id) {
         $articles = $this->articleModel->getIDWithRevision($id, true);
         $firstArticle = reset($articles);
         $knowledgeBase = $this->knowledgeBaseModel->selectSingle(["knowledgeBaseID" => $firstArticle["knowledgeBaseID"]]);
@@ -266,14 +302,10 @@ trait ArticlesApiHelper {
      *
      * @return string
      */
-    private function getOperationMode(): string {
-        try {
-            $this->permission('knowledge.articles.manage');
-            $mode = Operation::MODE_IMPORT;
-        } catch (PermissionException $e) {
-            $mode = Operation::MODE_DEFAULT;
-        }
-        return $mode;
+    public function getOperationMode(): string {
+        return $this->session->checkPermission('knowledge.articles.manage')
+            ? Operation::MODE_IMPORT
+            : Operation::MODE_DEFAULT;
     }
 
     /**
@@ -294,10 +326,10 @@ trait ArticlesApiHelper {
      * @param array $fields
      * @param int|null $articleID
      * @return int
-     * @throws Exception If an error is encountered while performing underlying database operations.
+     * @throws \Exception If an error is encountered while performing underlying database operations.
      * @throws NoResultsException If the article could not be found.
      */
-    private function save(array $fields, int $articleID = null): int {
+    public function save(array $fields, int $articleID = null): int {
         $revisionFields = $this->getRevisionFields();
 
         $article = array_diff_key($fields, $revisionFields);
@@ -440,10 +472,10 @@ trait ArticlesApiHelper {
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
             $revision["name"] = $revision["name"] ?? "";
             $revision["body"] = $revision["body"] ?? "";
-            $revision["format"] = $revision["format"] ?? strtolower(\Gdn_Format::defaultFormat());
+            $revision["format"] = $revision["format"] ?? HtmlFormat::FORMAT_KEY;
 
             // Temporary hack to avoid a Rich format error if we have no body.
-            if ($revision["body"] === "" && $revision["format"] === "rich") {
+            if ($revision["body"] === "" && $revision["format"] === RichFormat::FORMAT_KEY) {
                 $revision["body"] = "[]";
             }
 
@@ -490,6 +522,8 @@ trait ArticlesApiHelper {
      * Update parent KB default article ID when needed
      *
      * @param int $knowledgeCategoryID
+     *
+     * @return int|null
      */
     public function updateDefaultArticleID(int $knowledgeCategoryID): ?int {
         $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategoryID);

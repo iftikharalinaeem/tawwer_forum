@@ -21,7 +21,7 @@ class ArticleDraft {
     /**
      * ArticleDraft constructor.
      *
-     * @param FormatService $formatService Blot formatService
+     * @param ExtendedContentFormatService $formatService Blot formatService
      */
     public function __construct(ExtendedContentFormatService $formatService) {
         $this->formatService = $formatService;

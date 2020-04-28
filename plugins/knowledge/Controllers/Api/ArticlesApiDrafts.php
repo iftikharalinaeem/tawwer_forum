@@ -40,11 +40,11 @@ trait ArticlesApiDrafts {
             $this->articleByID($body['recordID']);
         }
 
-        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
+        $body = (new ArticleDraft($this->formatService))->prepareDraftFields($body);
 
         $draftID = $this->draftModel->insert($body);
         $row = $this->draftByID($draftID);
-        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
+        $row = (new ArticleDraft($this->formatService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
@@ -126,7 +126,7 @@ trait ArticlesApiDrafts {
         $out = $this->schema($this->fullDraftSchema(), "out");
 
         $draft = $this->draftByID($draftID, true);
-        $draft = (new ArticleDraft($this->formatterService))->normalizeDraftFields($draft);
+        $draft = (new ArticleDraft($this->formatService))->normalizeDraftFields($draft);
         $result = $out->validate($draft);
         $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
@@ -175,7 +175,7 @@ trait ArticlesApiDrafts {
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
         $options = ['orderFields' => 'dateUpdated', 'orderDirection' => 'desc'];
         $rows = $this->draftModel->get($where, $options);
-        $rows = (new ArticleDraft($this->formatterService))->normalizeDraftFields($rows, false);
+        $rows = (new ArticleDraft($this->formatService))->normalizeDraftFields($rows, false);
 
         $expandUsers = $this->resolveExpandFields(
             $query,
@@ -214,7 +214,7 @@ trait ArticlesApiDrafts {
         $body = $in->validate($body, true);
 
         $body["recordType"] = "article";
-        $body = (new ArticleDraft($this->formatterService))->prepareDraftFields($body);
+        $body = (new ArticleDraft($this->formatService))->prepareDraftFields($body);
 
         $draft = $this->draftByID($draftID, true);
         if ($draft["insertUserID"] !== $this->getSession()->UserID) {
@@ -223,7 +223,7 @@ trait ArticlesApiDrafts {
 
         $this->draftModel->update($body, ["draftID" => $draftID]);
         $row = $this->draftByID($draftID, true);
-        $row = (new ArticleDraft($this->formatterService))->normalizeDraftFields($row);
+        $row = (new ArticleDraft($this->formatService))->normalizeDraftFields($row);
         $result = $out->validate($row);
         return $result;
     }
