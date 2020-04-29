@@ -1,6 +1,6 @@
 /*
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 import { unit, colorOut, margins, absolutePosition } from "@library/styles/styleHelpers";
@@ -15,7 +15,7 @@ import { themeEditorVariables } from "@themingapi/theme/ThemeEditor.styles";
 export const themeRevisionPageClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const style = styleFactory("themeEditorPage");
-    const vars = metasVariables();
+    const metasVars = metasVariables();
     const titleBarVars = titleBarVariables();
     const themeEditorVars = themeEditorVariables();
 
@@ -34,8 +34,8 @@ export const themeRevisionPageClasses = useThemeCache(() => {
         lineHeight: unit(14),
     });
     const labelMetas = style("labelMetas", {
-        fontSize: unit(vars.fonts.size),
-        color: colorOut(vars.colors.fg),
+        fontSize: unit(metasVars.fonts.size),
+        color: colorOut(metasVars.colors.fg),
         lineHeight: unit(1),
     });
 

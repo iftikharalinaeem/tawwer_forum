@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.styles";
 import { useGetThemeState } from "@library/theming/themeReducer";
 import { useThemeActions } from "@library/theming/ThemeActions";
@@ -16,39 +16,26 @@ import { useThemeEditorState } from "@themingapi/theme/themeEditorReducer";
 
 export interface IProps {
     themeID: number;
-    handleChange: (id: any) => void;
+    selectedRevisionID: number;
+    onSelectedRevisionIDChange: (id: number) => void;
 }
 
 export function ThemeRevisionsPanel(props: IProps) {
     const themeState = useGetThemeState();
     const actions = useThemeActions();
-    const [revisions, setRevisions] = useState();
     const { formSubmit } = useThemeEditorState();
-    const [selectedRevisionID, setSelectedRevisionID] = useState();
     const classes = themeBuilderClasses();
     const revisionPageClasses = themeRevisionPageClasses();
 
+    const { themeID, selectedRevisionID, onSelectedRevisionIDChange } = props;
+    const revisionStatus = themeState.themeRevisions.status;
     useEffect(() => {
-        if (themeState.themeRevisions.status === LoadStatus.PENDING || formSubmit.status === LoadStatus.LOADING) {
-            actions.getThemeRevisions(props.themeID);
+        if (revisionStatus === LoadStatus.PENDING) {
+            actions.getThemeRevisions(themeID);
         }
-    }, [themeState, formSubmit]);
+    }, [revisionStatus, formSubmit, themeID, actions]);
 
-    useEffect(() => {
-        setRevisions(themeState.themeRevisions.data);
-        const initialActiveRevision = revisions
-            ? revisions.find(revision => {
-                  return revision.active === true;
-              })
-            : undefined;
-        if (initialActiveRevision) {
-            setSelectedRevisionID(initialActiveRevision.revisionID);
-        }
-    }, [themeState, revisions]);
-
-    useEffect(() => {
-        props.handleChange(selectedRevisionID);
-    }, [selectedRevisionID]);
+    const revisions = themeState.themeRevisions.data;
 
     if (
         themeState.themeRevisions.status === LoadStatus.LOADING ||
@@ -59,21 +46,18 @@ export function ThemeRevisionsPanel(props: IProps) {
 
     const panelContent = revisions ? (
         revisions.map(revision => {
-            let isSelected = false;
-            if (revision.revisionID === selectedRevisionID) {
-                isSelected = true;
-            }
+            let isSelected = revision.revisionID === selectedRevisionID;
 
             return (
                 <ThemeRevisionItem
                     key={revision.revisionID}
                     revision={revision}
-                    userInfo={revision.insertUser}
+                    userInfo={revision.insertUser!}
                     isSelected={isSelected}
                     isActive={revision.active}
                     onClick={event => {
                         event.preventDefault();
-                        setSelectedRevisionID(revision.revisionID);
+                        onSelectedRevisionIDChange(revision.revisionID);
                     }}
                 />
             );

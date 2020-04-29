@@ -14,6 +14,7 @@ import { History } from "history";
 import qs from "qs";
 import { t } from "@vanilla/i18n/src";
 import { ITheme, IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
+import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -22,7 +23,6 @@ interface IGetThemeParams {
 }
 type IGetThemeResponse = ITheme;
 type IPostThemeResponse = ITheme;
-type IPatchThemeResponse = ITheme;
 export type IPostPatchThemeAssets = Partial<IThemeAssets>;
 
 export interface IPostThemeRequest {
@@ -30,14 +30,6 @@ export interface IPostThemeRequest {
     parentTheme?: number | string;
     parentVersion?: string;
     assets?: IPostPatchThemeAssets;
-}
-export interface IPatchThemeRequest {
-    themeID: string | number;
-    name?: string;
-    parentTheme?: string;
-    parentVersion?: string;
-    revisionID?: number;
-    assets?: Partial<IPostPatchThemeAssets>;
 }
 
 export enum PageType {
@@ -50,22 +42,20 @@ export enum PageType {
  * Actions for working with resources from the /api/v2/theme endpoint.
  */
 
-export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
+export default class ThemeEditorActions extends ReduxActions<IThemeEditorStoreState> {
     public static getTheme_ACs = actionCreator.async<IGetThemeParams, IGetThemeResponse, IApiError>("GET_THEME");
     public static postTheme_ACs = actionCreator.async<IPostThemeRequest, IPostThemeResponse, IApiError>("POST_THEME"); //Copy
 
-    public static patchTheme_ACs = actionCreator.async<IPatchThemeRequest, IPatchThemeResponse, IApiError>(
-        "PATCH_THEME",
-    );
-
     public static initAssetsAC = actionCreator<{ themeID?: string | number }>("INIT_ASSETS");
-    public initAssets = this.bindDispatch(ThemeActions.initAssetsAC);
+    public initAssets = this.bindDispatch(ThemeEditorActions.initAssetsAC);
 
     public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
-    public updateAssets = this.bindDispatch(ThemeActions.updateAssetsAC);
+    public updateAssets = this.bindDispatch(ThemeEditorActions.updateAssetsAC);
 
     public static clearSubmitAC = actionCreator("CLEAR_SUBMIT");
-    public clearSubmit = this.bindDispatch(ThemeActions.clearSubmitAC);
+    public clearSubmit = this.bindDispatch(ThemeEditorActions.clearSubmitAC);
+
+    private themeActions = new ThemeActions(this.dispatch, this.api, this.getState);
 
     public getThemeById = async (themeID: number | string, history: History, revisionID: number | null = null) => {
         const query = qs.parse(history.location.search.replace(/^\?/, ""));
@@ -89,7 +79,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     };
 
     public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
-        const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
+        const thunk = bindThunkAction(ThemeEditorActions.getTheme_ACs, async () => {
             const { themeID, revisionID } = options;
             const params = revisionID
                 ? { allowAddonVariables: false, revisionID: revisionID }
@@ -154,7 +144,7 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
         let result: any;
         if (form.type == "themeDB" && pageType === PageType.EDIT_THEME) {
             if (themeID) {
-                result = await this.patchTheme({
+                result = await this.themeActions.patchTheme({
                     ...request,
                     themeID,
                 });
@@ -176,24 +166,8 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     };
 
     public postTheme(options: IPostThemeRequest) {
-        const thunk = bindThunkAction(ThemeActions.postTheme_ACs, async () => {
+        const thunk = bindThunkAction(ThemeEditorActions.postTheme_ACs, async () => {
             const response = await this.api.post(`/themes`, options);
-            return response.data;
-        })(options);
-
-        return this.dispatch(thunk);
-    }
-
-    public patchThemeWithRevisionID = async (body: IPatchThemeRequest) => {
-        let result = await this.patchTheme({ themeID: body.themeID, revisionID: body.revisionID });
-        return result;
-    };
-
-    public patchTheme(options: IPatchThemeRequest) {
-        const { themeID, ...body } = options;
-
-        const thunk = bindThunkAction(ThemeActions.patchTheme_ACs, async () => {
-            const response = await this.api.patch(`/themes/${options.themeID}`, body);
             return response.data;
         })(options);
 
@@ -203,6 +177,6 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
 
 export function useThemeEditorActions() {
     const dispatch = useDispatch();
-    const actions = useMemo(() => new ThemeActions(dispatch, apiv2), [dispatch]);
+    const actions = useMemo(() => new ThemeEditorActions(dispatch, apiv2), [dispatch]);
     return actions;
 }

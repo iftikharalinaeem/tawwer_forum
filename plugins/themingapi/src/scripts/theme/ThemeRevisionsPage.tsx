@@ -1,6 +1,6 @@
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
+ * @license Proprietary
  */
 
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
@@ -14,12 +14,11 @@ import Modal from "@vanilla/library/src/scripts/modal/Modal";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
-import React, { useContext, useEffect, useState } from "react";
-import { RouteComponentProps, useHistory, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
-import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
-import { siteUrl } from "@library/utility/appUtils";
+import { siteUrl, formatUrl } from "@library/utility/appUtils";
 import { ThemeRevisionsPanel } from "@themingapi/theme/ThemeRevisionsPanel";
 import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
@@ -28,8 +27,8 @@ import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageSt
 
 export default function ThemeRevisionsPage() {
     const titleID = useUniqueID("themeEditor");
-    const { patchThemeWithRevisionID, getThemeById } = useThemeEditorActions();
-    const { putPreviewTheme } = useThemeActions();
+    const { getThemeById } = useThemeEditorActions();
+    const { putPreviewTheme, patchThemeWithRevisionID } = useThemeActions();
     const { previewStatus } = useThemeSettingsState();
     const { theme, formSubmit } = useThemeEditorState();
     const [revisionID, setRevisionID] = useState();
@@ -76,7 +75,7 @@ export default function ThemeRevisionsPage() {
 
     useEffect(() => {
         if (previewStatus.status === LoadStatus.SUCCESS) {
-            window.location.href = "/";
+            window.location.href = formatUrl("/", true);
         }
     });
 
@@ -102,7 +101,11 @@ export default function ThemeRevisionsPage() {
                     </div>
 
                     <div className={classes.panel}>
-                        <ThemeRevisionsPanel themeID={parseInt(themeID)} handleChange={handleChange} />
+                        <ThemeRevisionsPanel
+                            themeID={parseInt(themeID)}
+                            selectedRevisionID={revisionID}
+                            onSelectedRevisionIDChange={handleChange}
+                        />
                     </div>
                 </div>
             </div>

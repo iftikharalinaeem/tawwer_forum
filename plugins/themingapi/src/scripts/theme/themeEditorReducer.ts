@@ -8,16 +8,17 @@ import { ICoreStoreState } from "@vanilla/library/src/scripts/redux/reducerRegis
 import produce from "immer";
 import { useSelector } from "react-redux";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
-import ThemeActions, { PageType } from "./ThemeEditorActions";
+import ThemeEditorActions, { PageType } from "./ThemeEditorActions";
 import { ITheme, IThemeAssets, ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";
 import clone from "lodash/clone";
+import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
 
 export interface IThemeExternalAsset {
     type: string;
     url: string;
 }
 
-export interface IThemeForm extends Omit<ITheme, "themeID" | "features" | "preview"> {
+export interface IThemeForm extends Omit<ITheme, "themeID" | "features" | "preview" | "revisionID"> {
     themeID?: number | string;
     pageType: PageType;
     errors: boolean;
@@ -77,16 +78,16 @@ const INITIAL_STATE: IThemeState = {
 
 export const themeEditorReducer = produce(
     reducerWithInitialState<IThemeState>(clone(INITIAL_STATE))
-        .case(ThemeActions.getTheme_ACs.started, (state, payload) => {
+        .case(ThemeEditorActions.getTheme_ACs.started, (state, payload) => {
             state.theme.status = LoadStatus.LOADING;
             return state;
         })
-        .case(ThemeActions.getTheme_ACs.failed, (state, payload) => {
+        .case(ThemeEditorActions.getTheme_ACs.failed, (state, payload) => {
             state.theme.status = LoadStatus.ERROR;
             state.theme.error = payload.error;
             return state;
         })
-        .case(ThemeActions.getTheme_ACs.done, (state, payload) => {
+        .case(ThemeEditorActions.getTheme_ACs.done, (state, payload) => {
             state.theme.status = LoadStatus.SUCCESS;
             state.theme.data = payload.result;
             state.form = {
@@ -95,7 +96,7 @@ export const themeEditorReducer = produce(
             };
             return state;
         })
-        .case(ThemeActions.updateAssetsAC, (state, payload) => {
+        .case(ThemeEditorActions.updateAssetsAC, (state, payload) => {
             if (payload !== undefined) {
                 state.form = {
                     ...state.form,
@@ -113,16 +114,16 @@ export const themeEditorReducer = produce(
 
             return state;
         })
-        .case(ThemeActions.postTheme_ACs.started, (state, payload) => {
+        .case(ThemeEditorActions.postTheme_ACs.started, (state, payload) => {
             state.formSubmit.status = LoadStatus.LOADING;
             return state;
         })
-        .case(ThemeActions.postTheme_ACs.failed, (state, payload) => {
+        .case(ThemeEditorActions.postTheme_ACs.failed, (state, payload) => {
             state.formSubmit.status = LoadStatus.ERROR;
             state.formSubmit.error = payload.error;
             return state;
         })
-        .case(ThemeActions.postTheme_ACs.done, (state, payload) => {
+        .case(ThemeEditorActions.postTheme_ACs.done, (state, payload) => {
             state.formSubmit.status = LoadStatus.SUCCESS;
             state.formSubmit.data = payload.result;
             state.form = {
@@ -150,7 +151,7 @@ export const themeEditorReducer = produce(
             state.formSubmit.data = payload.result;
             return state;
         })
-        .case(ThemeActions.clearSubmitAC, state => {
+        .case(ThemeEditorActions.clearSubmitAC, state => {
             if (state.formSubmit.status !== LoadStatus.LOADING) {
                 // Do not modify anything if we currently have a request in-flight.
                 state.formSubmit = INITIAL_STATE.formSubmit;
