@@ -250,8 +250,13 @@ class Zendesk {
 
     }
 
+    /**
+     * Set authentication strategy.
+     *
+     * @param ZendeskAuthenticationStrategy $authenticationStrategy
+     */
     public function setAuthentication(ZendeskAuthenticationStrategy $authenticationStrategy) {
-        return $this->authentication = $authenticationStrategy;
+        $this->authentication = $authenticationStrategy;
     }
 
     /**
