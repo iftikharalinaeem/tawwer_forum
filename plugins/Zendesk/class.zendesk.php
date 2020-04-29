@@ -14,6 +14,10 @@ class Zendesk {
     protected $apiUrl;
     protected $apiUser;
     protected $apiToken;
+    /**
+     * @var ZendeskAuthenticationStrategy
+     */
+    protected $authentication;
 
     /**
      * Setup Properties.
@@ -26,6 +30,7 @@ class Zendesk {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
         $this->AccessToken = $accessToken;
+        $this->authentication =  new ZendeskOAuthTokenStrategy($accessToken);
     }
 
 
@@ -164,7 +169,8 @@ class Zendesk {
             default:
                 break;
         }
-        $this->defineAuthorizationHeader();
+        $authenticationHeader = $this->authentication->getAuthentication();
+        $this->curl->setOption(CURLOPT_HTTPHEADER, ['Content-type: application/json', $authenticationHeader]);
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, 1);
@@ -242,6 +248,10 @@ class Zendesk {
 
         return $decoded;
 
+    }
+
+    public function setAuthentication(ZendeskAuthenticationStrategy $authenticationStrategy) {
+        return $this->authentication = $authenticationStrategy;
     }
 
     /**
