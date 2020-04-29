@@ -164,10 +164,7 @@ class Zendesk {
             default:
                 break;
         }
-        $this->curl->setOption(
-            CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
-        );
+        $this->defineAuthorizationHeader();
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, 1);
@@ -221,8 +218,14 @@ class Zendesk {
             $errorMessage = 'Unknown error. Try again '.($retryAfter ? "in $retryAfter seconds." : 'later.');
             $errorMessage .= "\nIf the error persist contact Zendesk with the provided Request ID";
         }
-
-        if ($httpCode < 200 || $httpCode >= 300) {
+        if ($httpCode == 401) {
+            $errorMessage = 'Unauthorized: Invalid authentication credentials.';
+            $errorMessage .= isset($decoded['error_description']) ? ("\n".$decoded['error_description']) : '';
+            $errorMessage .= "\n See ".self::REST_API_URL.'/support/requests#authentication';
+        } elseif ($httpCode == 403) {
+            $errorMessage = 'Forbidden Access: You must use an valid API token or an OAuth token with required permissions.';
+            $errorMessage .= "\n See ".self::REST_API_URL.'/support/requests#authentication';
+        } elseif ($httpCode < 200 || $httpCode >= 300) {
             $errorMessage = 'Unknown error.';
         }
 
@@ -239,6 +242,17 @@ class Zendesk {
 
         return $decoded;
 
+    }
+
+    /**
+     * Define Authorization header.
+     * Set Authorization: Bearer by using AccessToken.
+     */
+    protected function defineAuthorizationHeader() {
+        $this->curl->setOption(
+            CURLOPT_HTTPHEADER,
+            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
+        );
     }
 
     /**
