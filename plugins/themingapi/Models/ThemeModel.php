@@ -108,6 +108,7 @@ class ThemeModel extends PipelineModel {
             ->from($this->getTable().' t')
             ->join('themeRevision r', 't.themeID = r.themeID')
             ->where(['t.themeID' => $themeID])
+            ->orderBy('r.dateInserted', 'desc')
         ;
         $revisions = $db->get()->resultArray();
         foreach ($revisions as &$revision) {
