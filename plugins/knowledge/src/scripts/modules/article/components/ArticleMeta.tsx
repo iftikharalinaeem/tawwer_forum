@@ -11,6 +11,7 @@ import DateTime from "@library/content/DateTime";
 import { Link } from "react-router-dom";
 import { IUserFragment } from "@library/@types/api/users";
 import { metasClasses } from "@library/styles/metasStyles";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -36,9 +37,9 @@ export class ArticleMeta extends React.Component<IProps> {
                     <Translate
                         source="Last Updated: <0/>"
                         c0={
-                            <Link to={permaLink} className={classesMetas.meta}>
+                            <SmartLink to={permaLink} className={classesMetas.meta}>
                                 <DateTime timestamp={dateUpdated} />
-                            </Link>
+                            </SmartLink>
                         }
                     />
                 </span>
