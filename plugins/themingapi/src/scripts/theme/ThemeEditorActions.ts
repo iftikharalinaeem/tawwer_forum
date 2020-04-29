@@ -82,14 +82,8 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
 
         let request = {
             themeID: themeID,
+            revisionID: revisionID,
         };
-
-        if (revisionID) {
-            request = {
-                themeID: themeID,
-                revisionID: revisionID,
-            };
-        }
 
         return await this.getTheme(request, currentPageType);
     };
@@ -97,8 +91,11 @@ export default class ThemeActions extends ReduxActions<IThemeEditorStoreState> {
     public getTheme = async (options: IGetThemeParams, currentPageType: string) => {
         const thunk = bindThunkAction(ThemeActions.getTheme_ACs, async () => {
             const { themeID, revisionID } = options;
+            const params = revisionID
+                ? { allowAddonVariables: false, revisionID: revisionID }
+                : { allowAddonVariables: false };
             const response = await this.api.get(`/themes/${themeID}`, {
-                params: { allowAddonVariables: false, revisionID: revisionID },
+                params: params,
             });
 
             // KLUDGE - There is currently no get_edit endpoint.
