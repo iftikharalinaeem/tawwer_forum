@@ -296,6 +296,7 @@ class PollsPlugin extends Gdn_Plugin {
     public function postController_afterForms_handler($sender) {
         $forms = $sender->data('Forms');
         $forms[] = ['Name' => 'Poll', 'Label' => sprite('SpPoll').t('New Poll'), 'Url' => 'post/poll'];
+        $sender->addJsFile('polls.js', 'plugins/Polls');
         $sender->setData('Forms', $forms);
     }
 
