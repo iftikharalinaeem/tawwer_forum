@@ -32,7 +32,7 @@ class ZendeskOAuthTokenStrategy implements ZendeskAuthenticationStrategy {
      *
      * @return string
      */
-    public function getAuthentication(): string {
+    public function getAuthenticationHeader(): string {
         return 'Authorization: Bearer '.$this->accessToken;
     }
 }

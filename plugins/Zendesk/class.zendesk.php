@@ -168,7 +168,7 @@ class Zendesk {
             default:
                 break;
         }
-        $authenticationHeader = $this->authentication->getAuthentication();
+        $authenticationHeader = $this->authentication->getAuthenticationHeader();
         $this->curl->setOption(CURLOPT_HTTPHEADER, ['Content-type: application/json', $authenticationHeader]);
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);

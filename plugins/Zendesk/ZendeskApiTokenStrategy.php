@@ -37,7 +37,7 @@ class ZendeskApiTokenStrategy implements ZendeskAuthenticationStrategy {
      *
      * @return string
      */
-    public function getAuthentication(): string {
+    public function getAuthenticationHeader(): string {
         return 'Authorization: Basic '.base64_encode($this->apiUser.'/token:'.$this->apiToken);
     }
 }

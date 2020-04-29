@@ -14,5 +14,5 @@ interface ZendeskAuthenticationStrategy {
      *
      * @return string
      */
-    public function getAuthentication(): string;
+    public function getAuthenticationHeader(): string;
 }
