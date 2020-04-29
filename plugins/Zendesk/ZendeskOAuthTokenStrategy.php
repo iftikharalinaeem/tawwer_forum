@@ -12,10 +12,6 @@ class ZendeskOAuthTokenStrategy implements ZendeskAuthenticationStrategy {
     /**
      * @var string
      */
-    private $apiToken;
-    /**
-     * @var string
-     */
     private $accessToken;
 
     /**
