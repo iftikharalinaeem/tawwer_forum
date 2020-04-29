@@ -12,8 +12,7 @@ class Zendesk {
     CONST REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
 
     protected $apiUrl;
-    protected $apiUser;
-    protected $apiToken;
+
     /**
      * @var ZendeskAuthenticationStrategy
      */
@@ -257,17 +256,6 @@ class Zendesk {
      */
     public function setAuthentication(ZendeskAuthenticationStrategy $authenticationStrategy) {
         $this->authentication = $authenticationStrategy;
-    }
-
-    /**
-     * Define Authorization header.
-     * Set Authorization: Bearer by using AccessToken.
-     */
-    protected function defineAuthorizationHeader() {
-        $this->curl->setOption(
-            CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
-        );
     }
 
     /**
