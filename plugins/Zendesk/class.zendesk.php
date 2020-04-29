@@ -23,13 +23,16 @@ class Zendesk {
      *
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
      * @param string $url Url to API.
-     * @param string $accessToken OAuth AccessToken.
+     * @param ZendeskAuthenticationStrategy $authenticationStrategy Authentication method.
      */
-    public function __construct(IZendeskHttpRequest $curlRequest, $url, $accessToken) {
+    public function __construct(
+        IZendeskHttpRequest $curlRequest,
+        $url,
+        ZendeskAuthenticationStrategy $authenticationStrategy
+    ) {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
-        $this->AccessToken = $accessToken;
-        $this->authentication =  new ZendeskOAuthTokenStrategy($accessToken);
+        $this->authentication = $authenticationStrategy;
     }
 
 
