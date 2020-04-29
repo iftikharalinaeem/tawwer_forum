@@ -9,22 +9,10 @@
  */
 class Zendesk {
 
-    const REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
+    CONST REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
 
-    /**
-     * @var string
-     */
     protected $apiUrl;
-
-    /**
-     * @var string|null
-     *
-     */
     protected $apiUser;
-
-    /**
-     * @var string|null
-     */
     protected $apiToken;
 
     /**
@@ -33,21 +21,11 @@ class Zendesk {
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
      * @param string $url Url to API.
      * @param string $accessToken OAuth AccessToken.
-     * @param string|null $apiToken
-     * @param string|null $apiUser
      */
-    public function __construct(
-        IZendeskHttpRequest $curlRequest,
-        $url,
-        ?string $accessToken = null,
-        ?string $apiToken = null,
-        ?string $apiUser = null
-    ) {
+    public function __construct(IZendeskHttpRequest $curlRequest, $url, $accessToken) {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
         $this->AccessToken = $accessToken;
-        $this->apiToken = $apiToken;
-        $this->apiUser = $apiUser;
     }
 
 
@@ -186,14 +164,9 @@ class Zendesk {
             default:
                 break;
         }
-        if ($this->apiToken && $this->apiUser) {
-            $authorization = 'Authorization: Basic '.base64_encode($this->apiUser.'/token:'.$this->apiToken);
-        } else {
-            $authorization = 'Authorization: Bearer '.$this->AccessToken;
-        }
         $this->curl->setOption(
             CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', $authorization]
+            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
         );
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
