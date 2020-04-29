@@ -9,13 +9,14 @@ import { margins, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { cssOut } from "@dashboard/compatibilityStyles";
+import { important } from "csx";
 
 export const searchFormFilterVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("searchFormFilters");
 
     const spacer = makeThemeVars("spacer", {
-        default: globalVars.spacer.size,
+        default: globalVars.gutter.size,
     });
 
     return {
@@ -34,6 +35,11 @@ export const searchFormFilterClasses = useThemeCache(() => {
 
     const title = style("title", {
         marginBottom: unit(vars.spacer.default),
+        $nest: {
+            "&:before": {
+                display: important("none"),
+            },
+        },
     });
 
     const submit = style("submit", {
