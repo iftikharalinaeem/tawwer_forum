@@ -27,7 +27,11 @@ class ZendeskOAuthTokenStrategy implements ZendeskAuthenticationStrategy {
         $this->accessToken = $accessToken;
     }
 
-
+    /**
+     * Define authorization method for OAuthToken.
+     *
+     * @return string
+     */
     public function getAuthentication(): string {
         return 'Authorization: Bearer '.$this->accessToken;
     }

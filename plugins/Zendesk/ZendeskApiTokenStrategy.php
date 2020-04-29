@@ -32,7 +32,11 @@ class ZendeskApiTokenStrategy implements ZendeskAuthenticationStrategy {
         $this->apiUser = $apiUser;
     }
 
-
+    /**
+     * Define authorization method for API token.
+     *
+     * @return string
+     */
     public function getAuthentication(): string {
         return 'Authorization: Basic '.base64_encode($this->apiUser.'/token:'.$this->apiToken);
     }
