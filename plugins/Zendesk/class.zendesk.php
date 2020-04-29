@@ -241,7 +241,7 @@ class Zendesk {
         if ($errorMessage) {
             Logger::log(Logger::DEBUG, 'zendesk_request_error', [
                 'error' => $errorMessage . "\nZendesk Request ID: $requestID\nAPI call: $apiURL\nResponse: $responseBody\n",
-                'access_token' => $this->AccessToken,
+                'authentication_header' => $this->authentication->getAuthenticationHeader(),
                 'request' => $action.' '.$apiURL,
                 'response' => $response,
             ]);
