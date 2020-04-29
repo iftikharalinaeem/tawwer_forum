@@ -19,29 +19,19 @@ import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
 import qs from "qs";
 import React, { useEffect, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import ThemeEditor from "./ThemeEditor";
 import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
-import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import { bodyCSS } from "@vanilla/library/src/scripts/layout/bodyStyles";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { useRouteChangePrompt } from "@vanilla/react-utils";
 import { makeThemeEditorUrl } from "@themingapi/routes/makeThemeEditorUrl";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 
-interface IProps extends IOwnProps {
-    themeID: string | number;
-    type?: string;
-    name?: string;
-    assets?: IThemeAssets;
-}
-interface IOwnProps
-    extends RouteComponentProps<{
-        id: string;
-    }> {}
+interface IProps {}
 
-export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwnProps) {
+export default function ThemeEditorPage(props: IProps) {
     const titleID = useUniqueID("themeEditor");
     const { updateAssets, saveTheme, getThemeById } = useThemeEditorActions();
     const { theme, form, formSubmit } = useThemeEditorState();
@@ -52,13 +42,16 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     const { pushSmartLocation } = useLinkContext();
     bodyCSS();
 
-    let themeID = props.match.params.id;
+    const history = useHistory();
+    let themeID = useParams<{
+        id: string;
+    }>().id;
 
     const DEFAULT_THEME = "theme-foundation";
 
     const getTemplateName = () => {
-        const query = qs.parse(props.history.location.search.replace(/^\?/, ""));
-        return props.history.location.pathname === "/theme/theme-settings/add" && !query.templateName
+        const query = qs.parse(history.location.search.replace(/^\?/, ""));
+        return history.location.pathname === "/theme/theme-settings/add" && !query.templateName
             ? DEFAULT_THEME
             : query.templateName;
     };
@@ -70,7 +63,6 @@ export default function ThemeEditorPage(this: any, props: IProps, ownProps: IOwn
     useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
-    const history = useHistory();
     useEffect(() => {
         if (themeStatus === LoadStatus.PENDING && themeID !== undefined) {
             getThemeById(themeID, history);
