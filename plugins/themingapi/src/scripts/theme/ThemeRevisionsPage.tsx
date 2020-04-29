@@ -15,7 +15,7 @@ import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 import { useFallbackBackUrl } from "@vanilla/library/src/scripts/routing/links/BackRoutingProvider";
 import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 import React, { useContext, useEffect, useState } from "react";
-import { RouteComponentProps, useHistory } from "react-router-dom";
+import { RouteComponentProps, useHistory, useParams } from "react-router-dom";
 import { useThemeEditorActions } from "./ThemeEditorActions";
 import { useThemeEditorState } from "./themeEditorReducer";
 import { IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
@@ -25,39 +25,27 @@ import { themeEditorClasses } from "@themingapi/theme/ThemeEditor.styles";
 import { PreviewStatusType, useThemeActions } from "@library/theming/ThemeActions";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
-import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 
-interface IProps extends IOwnProps {
-    themeID: number;
-    type?: string;
-    name?: string;
-    assets?: IThemeAssets;
-}
-interface IOwnProps
-    extends RouteComponentProps<{
-        id: string;
-    }> {}
-
-export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: IOwnProps) {
+export default function ThemeRevisionsPage() {
     const titleID = useUniqueID("themeEditor");
     const { patchThemeWithRevisionID, getThemeById } = useThemeEditorActions();
     const { putPreviewTheme } = useThemeActions();
     const { previewStatus } = useThemeSettingsState();
     const { theme, formSubmit } = useThemeEditorState();
     const [revisionID, setRevisionID] = useState();
-    const [iframeLoading, setIframeLoading] = useState(true);
-    const [isFormSubmitting, setIsFormSubmitting] = useState(false);
     const classes = themeEditorClasses();
     const RevisionPageClasses = themeRevisionPageClasses();
     const { setIFrameRef } = useIFrameCommunication();
-
-    let themeID = props.match.params.id;
 
     useFallbackBackUrl("/theme/theme-settings");
 
     const themeStatus = theme.status;
     const formStatus = formSubmit.status;
     const history = useHistory();
+
+    let themeID = useParams<{
+        id: string;
+    }>().id;
 
     useEffect(() => {
         if (themeStatus === LoadStatus.PENDING && themeID !== undefined) {
@@ -74,18 +62,12 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
     const submitHandler = async event => {
         event.preventDefault();
         if (revisionID !== null && themeID) {
-            setIsFormSubmitting(true);
-
-            const updatedTheme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
-            if (updatedTheme) {
-                setIsFormSubmitting(false);
-            }
+            const theme = await patchThemeWithRevisionID({ themeID: themeID, revisionID: revisionID });
         }
     };
 
     const handleChange = id => {
         setRevisionID(id);
-        setIframeLoading(true);
     };
 
     const handlePreview = async () => {
@@ -97,10 +79,6 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
             window.location.href = "/";
         }
     });
-
-    const handleReload = e => {
-        setIframeLoading(false);
-    };
 
     let content: React.ReactNode;
     if (theme.status === LoadStatus.LOADING || theme.status === LoadStatus.PENDING) {
@@ -118,19 +96,13 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                             width="100%"
                             height="100%"
                             scrolling="yes"
-                            onLoad={handleReload}
                         ></iframe>
                         <div className={classes.shadowTop}></div>
                         <div className={classes.shadowRight}></div>
                     </div>
 
                     <div className={classes.panel}>
-                        <ThemeRevisionsPanel
-                            themeID={parseInt(themeID)}
-                            handleChange={handleChange}
-                            disabled={isFormSubmitting}
-                            updated={isFormSubmitting}
-                        />
+                        <ThemeRevisionsPanel themeID={parseInt(themeID)} handleChange={handleChange} />
                     </div>
                 </div>
             </div>
@@ -146,9 +118,9 @@ export default function ThemeRevisionsPage(this: any, props: IProps, ownProps: I
                         fullWidth={true}
                         backTitle={t("Back")}
                         isCallToActionLoading={formStatus === LoadStatus.LOADING}
-                        isCallToActionDisabled={iframeLoading}
+                        isCallToActionDisabled={false}
                         anotherCallToActionLoading={previewStatus.status === LoadStatus.LOADING}
-                        anotherCallToActionDisabled={iframeLoading}
+                        anotherCallToActionDisabled={false}
                         handleAnotherSubmit={handlePreview}
                     />
                 </form>

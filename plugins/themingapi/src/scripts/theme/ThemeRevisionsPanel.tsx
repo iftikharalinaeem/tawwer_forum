@@ -12,27 +12,27 @@ import { ThemeRevisionItem } from "@themingapi/theme/ThemeRevisionItem";
 import classNames from "classnames";
 import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 import { ThemePanelPlaceholder } from "@themingapi/theme/ThemePanelPlaceholder";
+import { useThemeEditorState } from "@themingapi/theme/themeEditorReducer";
 
 export interface IProps {
     themeID: number;
     handleChange: (id: any) => void;
-    disabled?: boolean;
-    updated: boolean;
 }
 
 export function ThemeRevisionsPanel(props: IProps) {
     const themeState = useGetThemeState();
     const actions = useThemeActions();
     const [revisions, setRevisions] = useState();
+    const { formSubmit } = useThemeEditorState();
     const [selectedRevisionID, setSelectedRevisionID] = useState();
     const classes = themeBuilderClasses();
     const revisionPageClasses = themeRevisionPageClasses();
 
     useEffect(() => {
-        if (themeState.themeRevisions.status === LoadStatus.PENDING || props.updated) {
+        if (themeState.themeRevisions.status === LoadStatus.PENDING || formSubmit.status === LoadStatus.LOADING) {
             actions.getThemeRevisions(props.themeID);
         }
-    }, [themeState, props.updated]);
+    }, [themeState, formSubmit]);
 
     useEffect(() => {
         setRevisions(themeState.themeRevisions.data);
