@@ -65,6 +65,18 @@ export default function CurrentTheme(props: IProps) {
                             {t("Copy")}
                         </LinkAsButton>
                     }
+                    revisionHistoryButton={
+                        currentTheme.type === ThemeType.DB ? (
+                            <LinkAsButton
+                                className={classes.themeActionButton}
+                                to={`/theme/theme-settings/${props.currentTheme.themeID}/revisions`}
+                            >
+                                {t("Revision History")}
+                            </LinkAsButton>
+                        ) : (
+                            undefined
+                        )
+                    }
                 />
             </div>
         </div>

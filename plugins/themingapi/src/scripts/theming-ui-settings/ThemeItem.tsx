@@ -10,12 +10,10 @@ import { t, translate } from "@vanilla/i18n";
 import { useThemeSettingsState } from "@library/theming/themeSettingsReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { ThemeDeleteModal } from "@themingapi/components/ThemeDeleteModal";
-import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
+import { ThemeEditorRoute, ThemeRevisionsRoute } from "@themingapi/routes/themeEditorRoutes";
 import classNames from "classnames";
 import ModalConfirm from "@vanilla/library/src/scripts/modal/ModalConfirm";
 import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
-import { InformationIcon } from "@vanilla/library/src/scripts/icons/common";
-import { ToolTip, ToolTipIcon } from "@vanilla/library/src/scripts/toolTip/ToolTip";
 import { ThemePreviewTitle } from "@vanilla/library/src/scripts/theming/ThemePreviewTitle";
 
 interface IProps {
@@ -91,6 +89,7 @@ export function ThemeItem(props: IProps) {
                     }
                     onEdit={ThemeEditorRoute.url({ themeID: themeID })}
                     onCopy={ThemeEditorRoute.url({ templateName: themeID })}
+                    onRevision={ThemeRevisionsRoute.url({ themeID: themeID })}
                     onPreview={handlePreview}
                     globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
                     globalBg={preview?.["global.mainColors.bg"] ?? undefined}
@@ -102,6 +101,7 @@ export function ThemeItem(props: IProps) {
                     canCopy={props.theme.type !== "themeDB"}
                     canDelete={props.theme.type === "themeDB"}
                     canEdit={props.theme.type === "themeDB"}
+                    revisions={props.theme.type === "themeDB"}
                     onDelete={() => {
                         setDeleteID(props.theme.themeID);
                     }}

@@ -24,6 +24,15 @@ export const ThemeEditorRoute = new RouteHandler(
     THEME_EDITOR_KEY,
 );
 
+const loadRevisions = () =>
+    import(/* webpackChunkName: "pages/themeRevisions" */ "@themingapi/theme/ThemeRevisionsPage");
+export const ThemeRevisionsRoute = new RouteHandler(
+    loadRevisions,
+    "/theme/theme-settings/:id/revisions",
+    (data: { themeID: string | number }) => `/theme/theme-settings/${data.themeID}/revisions`,
+    ModalLoader,
+);
+
 export const ThemePreviewRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/themePreview" */ "@themingapi/theme/ThemeEditorPreviewPage"),
     "/theme/theme-settings/:id/preview",
@@ -31,5 +40,5 @@ export const ThemePreviewRoute = new RouteHandler(
 );
 
 export function getThemeRoutes() {
-    return [ThemePreviewRoute.route, ThemeEditorRoute.route];
+    return [ThemePreviewRoute.route, ThemeEditorRoute.route, ThemeRevisionsRoute.route];
 }

@@ -326,6 +326,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
+
     public function setPreviewTheme($themeID, int $revisionID = null): array {
         $this->themeHelper->setSessionPreviewTheme($themeID, $this, $revisionID);
         if (!empty($themeID)) {

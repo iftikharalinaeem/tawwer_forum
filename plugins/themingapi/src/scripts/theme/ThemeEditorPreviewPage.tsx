@@ -8,7 +8,7 @@ import { ThemeEditorPreviewContentsGlobal } from "@themingapi/theme/ThemeEditorP
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { LinkContext } from "@vanilla/library/src/scripts/routing/links/LinkContextProvider";
 import NotFoundPage from "@vanilla/library/src/scripts/routing/NotFoundPage";
-import { useThemeCacheID, resetThemeCache } from "@vanilla/library/src/scripts/styles/styleUtils";
+import { useThemeCacheID } from "@vanilla/library/src/scripts/styles/styleUtils";
 import ThemeActions, { useThemeActions } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import { ThemeProvider } from "@vanilla/library/src/scripts/theming/ThemeProvider";
 import React, { useCallback, useEffect, useState } from "react";
