@@ -137,6 +137,7 @@ trait ArticlesApiSchemes {
                     "dateInserted?",
                     "dateUpdated?",
                     "insertUserID?",
+                    "fileRehosting?" => $this->fileRehostSchema(),
                 ])->add($this->fullSchema()),
                 "ArticlePost"
             );
@@ -172,13 +173,24 @@ trait ArticlesApiSchemes {
                     "dateInserted?",
                     "dateUpdated?",
                     "insertUserID?",
-                    "updateUserID?"
+                    "updateUserID?",
+                    "fileRehosting?" => $this->fileRehostSchema(),
                 ])->add($this->fullSchema()),
                 "ArticlePatch"
             );
         }
 
         return $this->schema($this->articlePatchSchema, $type);
+    }
+
+    /**
+     * @return Schema
+     */
+    public function fileRehostSchema(): Schema {
+        return Schema::parse([
+            'enabled:b?',
+            'requestHeaders:a?',
+        ]);
     }
 
     /**

@@ -549,12 +549,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      *
      * @param int $id
      * @param array $body
-     * @return array
+     * @return Data
      * @throws \Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      */
-    public function patch(int $id, array $body = []): array {
+    public function patch(int $id, array $body = []): Data {
         $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->articlePatchSchema("in")
@@ -579,6 +579,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $this->validateFirstArticleRevision($id, $body);
         }
 
+        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($body);
         $this->articleHelper->save($body, $id);
         $row = $this->articleHelper->retrieveRow($id, $body);
 
@@ -588,7 +589,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
-        return $result;
+        return new Data($result, [], $rehostResponseHeaders);
     }
 
     /**
@@ -728,13 +729,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      * Create a new article.
      *
      * @param array $body
-     * @return array
+     * @return Data
      * @throws \Exception If no session is available.
      * @throws HttpException If a ban has been applied on the permission(s) for this session.
      * @throws PermissionException If the user does not have the specified permission(s).
      * @throws ClientException If locale is not supported.
      */
-    public function post(array $body): array {
+    public function post(array $body): Data {
         $this->checkPermission(KnowledgeBaseModel::EDIT_PERMISSION);
 
         $in = $this->articlePostSchema("in")
@@ -755,6 +756,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body["locale"] = $sourceLocale;
         }
 
+        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($body);
+
         $articleID = $this->articleHelper->save($body);
         $row = $this->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
@@ -762,7 +765,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
         $result = $out->validate($row);
-        return $result;
+        return new Data($result, [], $rehostResponseHeaders);
     }
 
     /**
