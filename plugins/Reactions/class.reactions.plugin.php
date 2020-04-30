@@ -1409,7 +1409,10 @@ if (!function_exists('writeReactions')) {
         if ($types === null) {
             $types = ReactionModel::getReactionTypes(['Class' => ['Positive', 'Negative'], 'Active' => 1]);
         }
-        Gdn::controller()->EventArguments['ReactionTypes'] = &$types;
+        // Since statically cache the types, we do a copy of type for this row so that plugin can modify the value by reference.
+        // Not doing so would alter types for every rows and since Discussions and Comments have different behavior that could be a problem.
+        $rowReactionTypesReference = $types;
+        Gdn::controller()->EventArguments['ReactionTypes'] = &$rowReactionTypesReference;
 
         if ($iD = val('CommentID', $row)) {
             $recordType = 'comment';
@@ -1472,7 +1475,7 @@ if (!function_exists('writeReactions')) {
 
         // Write the reactions.
         $reactionHtml = "";
-        foreach ($types as $type) {
+        foreach ($rowReactionTypesReference as $type) {
             if (isset($type['RecordTypes']) && !in_array($recordType, (array)$type['RecordTypes'])) {
                 continue;
             }
