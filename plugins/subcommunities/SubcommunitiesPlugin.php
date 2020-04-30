@@ -545,11 +545,12 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      *
      * Used to filter down the category dropdown when you are in a subcommunity.
      *
-     * @param $sender Sending controller instance.
-     * @param $args Event arguments.
+     * @param Gdn_Controller $sender Sending controller instance.
+     * @param array $args Event arguments.
      */
     public function gdn_form_beforeCategoryDropDown_handler($sender, $args) {
-        if (!SubCommunityModel::getCurrent()) {
+        //Drafts is shared content so subcommunities should not intervene
+        if (!SubCommunityModel::getCurrent() || array_key_exists('DraftID', $args['Options'])) {
             return;
         }
 
@@ -571,7 +572,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
             // Prevent moving posts into a subcommunity root category
             $subcommunities = SubcommunityModel::all();
-            foreach($subcommunities as $subcommunity) {
+            foreach ($subcommunities as $subcommunity) {
                 $defaultCategories[$subcommunity['CategoryID']]['AllowDiscussions'] = 0;
             }
 
