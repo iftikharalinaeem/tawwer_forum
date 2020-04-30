@@ -157,8 +157,10 @@ $St->primaryKey('EventID')
     ->column('Name', 'varchar(255)')
     ->column('Body', 'text')
     ->column('Format', 'varchar(10)', true)
-    ->column('DateStarts', 'datetime')
-    ->column('DateEnds', 'datetime', true)
+    ->column('RecordType', 'varchar(25)', true, 'index.Event')
+    ->column('RecordID', 'int', true, 'index.Event')
+    ->column('DateStarts', 'datetime',false, 'index.Date')
+    ->column('DateEnds', 'datetime', true, 'index.Date')
     ->column('AllDayEvent', 'tinyint', '0')
     ->column('Location', 'varchar(255)', true)
     ->column('DateInserted', 'datetime')
@@ -215,6 +217,26 @@ if ($St->tableExists('Discussion')) {
                 ->where('GroupID is not null', '')
                 ->orWhereIn('CategoryID', $groupCategoryIDs)
                 ->endWhereGroup()
+                ->put();
+        }
+    }
+}
+
+if ($St->tableExists('Event')); {
+    $events = Gdn::sql()
+        ->select()
+        ->from('Event')
+        ->where('GroupId is not null')
+        ->get()
+        ->resultArray();
+
+    foreach ($events as $event) {
+        if (!isset($event['RecordType']) && !isset($event['RecordID'])) {
+            Gdn::sql()
+                ->update('Event')
+                ->set('RecordType', 'GroupEvent')
+                ->set('RecordID', $event['GroupID'])
+                ->where('EventID', $event['EventID'])
                 ->put();
         }
     }
