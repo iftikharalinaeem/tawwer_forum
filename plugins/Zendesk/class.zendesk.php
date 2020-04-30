@@ -12,20 +12,27 @@ class Zendesk {
     CONST REST_API_URL = 'https://developer.zendesk.com/rest_api/docs';
 
     protected $apiUrl;
-    protected $apiUser;
-    protected $apiToken;
+
+    /**
+     * @var ZendeskAuthenticationStrategy
+     */
+    protected $authentication;
 
     /**
      * Setup Properties.
      *
      * @param IZendeskHttpRequest $curlRequest Curl Request Object.
      * @param string $url Url to API.
-     * @param string $accessToken OAuth AccessToken.
+     * @param ZendeskAuthenticationStrategy $authenticationStrategy Authentication method.
      */
-    public function __construct(IZendeskHttpRequest $curlRequest, $url, $accessToken) {
+    public function __construct(
+        IZendeskHttpRequest $curlRequest,
+        $url,
+        ZendeskAuthenticationStrategy $authenticationStrategy
+    ) {
         $this->curl = $curlRequest;
         $this->apiUrl = trim($url, '/').'/api/v2';
-        $this->AccessToken = $accessToken;
+        $this->authentication = $authenticationStrategy;
     }
 
 
@@ -164,10 +171,8 @@ class Zendesk {
             default:
                 break;
         }
-        $this->curl->setOption(
-            CURLOPT_HTTPHEADER,
-            ['Content-type: application/json', 'Authorization: Bearer '.$this->AccessToken]
-        );
+        $authenticationHeader = $this->authentication->getAuthenticationHeader();
+        $this->curl->setOption(CURLOPT_HTTPHEADER, ['Content-type: application/json', $authenticationHeader]);
         $userAgent = Gdn::request()->getValueFrom(INPUT_SERVER, 'HTTP_USER_AGENT', 'MozillaXYZ/1.0');
         $this->curl->setOption(CURLOPT_USERAGENT, $userAgent);
         $this->curl->setOption(CURLOPT_RETURNTRANSFER, 1);
@@ -221,8 +226,14 @@ class Zendesk {
             $errorMessage = 'Unknown error. Try again '.($retryAfter ? "in $retryAfter seconds." : 'later.');
             $errorMessage .= "\nIf the error persist contact Zendesk with the provided Request ID";
         }
-
-        if ($httpCode < 200 || $httpCode >= 300) {
+        if ($httpCode == 401) {
+            $errorMessage = 'Unauthorized: Invalid authentication credentials.';
+            $errorMessage .= isset($decoded['error_description']) ? ("\n".$decoded['error_description']) : '';
+            $errorMessage .= "\n See ".self::REST_API_URL.'/support/requests#authentication';
+        } elseif ($httpCode == 403) {
+            $errorMessage = 'Forbidden Access: You must use an valid API token or an OAuth token with required permissions.';
+            $errorMessage .= "\n See ".self::REST_API_URL.'/support/requests#authentication';
+        } elseif ($httpCode < 200 || $httpCode >= 300) {
             $errorMessage = 'Unknown error.';
         }
 
@@ -230,7 +241,7 @@ class Zendesk {
         if ($errorMessage) {
             Logger::log(Logger::DEBUG, 'zendesk_request_error', [
                 'error' => $errorMessage . "\nZendesk Request ID: $requestID\nAPI call: $apiURL\nResponse: $responseBody\n",
-                'access_token' => $this->AccessToken,
+                'authentication_header' => $this->authentication->getAuthenticationHeader(),
                 'request' => $action.' '.$apiURL,
                 'response' => $response,
             ]);
@@ -239,6 +250,15 @@ class Zendesk {
 
         return $decoded;
 
+    }
+
+    /**
+     * Set authentication strategy.
+     *
+     * @param ZendeskAuthenticationStrategy $authenticationStrategy
+     */
+    public function setAuthentication(ZendeskAuthenticationStrategy $authenticationStrategy) {
+        $this->authentication = $authenticationStrategy;
     }
 
     /**

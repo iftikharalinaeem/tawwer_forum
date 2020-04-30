@@ -837,7 +837,7 @@ class ZendeskPlugin extends Gdn_Plugin {
             $this->zendesk = new Zendesk(
                 new ZendeskCurlRequest(),
                 c('Plugins.Zendesk.Url'),
-                $accessToken
+                new ZendeskOAuthTokenStrategy($accessToken)
             );
         }
     }
