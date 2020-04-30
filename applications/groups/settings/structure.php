@@ -157,8 +157,8 @@ $St->primaryKey('EventID')
     ->column('Name', 'varchar(255)')
     ->column('Body', 'text')
     ->column('Format', 'varchar(10)', true)
-    ->column('RecordType', 'varchar(25)', true, 'index.Event')
-    ->column('RecordID', 'int', true, 'index.Event')
+    ->column('ParentRecordType', 'varchar(25)', true, 'index.Event')
+    ->column('ParentID', 'int', true, 'index.Event')
     ->column('DateStarts', 'datetime',false, 'index.Date')
     ->column('DateEnds', 'datetime', true, 'index.Date')
     ->column('AllDayEvent', 'tinyint', '0')
@@ -226,16 +226,16 @@ if ($St->tableExists('Event')); {
     $events = Gdn::sql()
         ->select()
         ->from('Event')
-        ->where('GroupId is not null')
+        ->where('GroupID is not null')
         ->get()
         ->resultArray();
 
     foreach ($events as $event) {
-        if (!isset($event['RecordType']) && !isset($event['RecordID'])) {
+        if (!isset($event['ParentRecordType']) && !isset($event['ParentRecordType'])) {
             Gdn::sql()
                 ->update('Event')
-                ->set('RecordType', 'GroupEvent')
-                ->set('RecordID', $event['GroupID'])
+                ->set('ParentRecordType', 'group')
+                ->set('ParentRecordID', $event['GroupID'])
                 ->where('EventID', $event['EventID'])
                 ->put();
         }
