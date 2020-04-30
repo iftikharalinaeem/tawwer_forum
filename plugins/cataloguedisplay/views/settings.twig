@@ -1,0 +1,18 @@
+<h1>{{ Title }}</h1>
+
+{{ form.open({'enctype': 'multipart/form-data'}) }}
+<div class="padded">
+    {{ form.errors() }}
+    {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Uplaod a placeholder image that will display when users do not have an image in their post.')) }}
+</div>
+<div class="padded">
+    {{ form.toggle('CatalogueDisplay.OnlyOnCategory', t('Display only on catogory page')) }}
+</div>
+<div class="padded">
+    {{ form.toggle('CatalogueDisplay.Masonry.Enabled', t('Use Masonry display')) }}
+</div>
+<div class="buttons form-footer">
+    {{ form.button('Save', {'type' : 'submit', 'class': 'btn btn-primary'}) }}
+</div>
+
+{{ form.close() }}

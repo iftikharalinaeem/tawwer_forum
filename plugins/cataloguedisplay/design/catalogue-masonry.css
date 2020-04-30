@@ -1,0 +1,38 @@
+.ItemDiscussion.CatalogueRow {
+    display: inline-block;
+    width: 33.333%;
+    border: none;
+    padding: 8px;
+}
+
+li.CatalogueRow img {
+    width: 100%;
+}
+
+.ItemDiscussion.CatalogueRow .MItem.LastCommentBy {
+    display: inline-grid;
+}
+
+@media screen and (min-width: 767px) {
+    .ItemDiscussion.CatalogueRow:last-child {
+        border: none;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .ItemDiscussion.CatalogueRow {
+        display: inline-block;
+        width: 100%;
+    }
+}
+
+/**
+If the Discussion Photo plugin is turned on, hide the user's avatar on the catalogue page only.
+ */
+li.CatalogueRow .IndexPhoto {
+    display: none;
+}
+.DataList.Discussions .CatalogueRow.ItemDiscussion-withPhoto .Discussion.ItemContent{
+    padding-left: 0px;
+
+}

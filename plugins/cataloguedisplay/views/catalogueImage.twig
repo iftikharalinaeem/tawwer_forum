@@ -1,0 +1,6 @@
+<div {% if(cssClassWrapper) %} class="{{ cssClassWrapper|join(' ') }}" {% endif %}>
+    <a href="{{ placeHolderUrl }}">
+        <img src="{{ placeHolderImgUrl }}"
+             class="{{ imgAttributes.class|join(' ') }}" {% if imgAttributes.alt is defined %} alt="{{ imgAttributes.alt }}" {% endif %}/>
+    </a>
+</div>
