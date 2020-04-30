@@ -1288,7 +1288,7 @@ class Warnings2Plugin extends Gdn_Plugin {
      * @param array $args
      */
     public function userModel_beforeDeleteUser_handler(\UserModel $sender, array $args) {
-        if ($args['Options']['DeleteNotes']) {
+        if ($args['Options']['DeleteModInfo']) {
             $this->userModel->getDelete('UserNote', ['UserID' => $args['UserID']], $args['Content']);
         }
     }
