@@ -158,7 +158,7 @@ $St->primaryKey('EventID')
     ->column('Body', 'text')
     ->column('Format', 'varchar(10)', true)
     ->column('ParentRecordType', 'varchar(25)', true, 'index.Event')
-    ->column('ParentID', 'int', true, 'index.Event')
+    ->column('ParentRecordID', 'int', true, 'index.Event')
     ->column('DateStarts', 'datetime',false, 'index.Date')
     ->column('DateEnds', 'datetime', true, 'index.Date')
     ->column('AllDayEvent', 'tinyint', '0')
@@ -231,7 +231,7 @@ if ($St->tableExists('Event')); {
         ->resultArray();
 
     foreach ($events as $event) {
-        if (!isset($event['ParentRecordType']) && !isset($event['ParentRecordType'])) {
+        if (!isset($event['ParentRecordType']) && !isset($event['ParentRecordID'])) {
             Gdn::sql()
                 ->update('Event')
                 ->set('ParentRecordType', 'group')
