@@ -8,7 +8,7 @@ import { titleBarVariables } from "@library/headers/titleBarStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { percent, px } from "csx";
+import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const subcommunityChooserVariables = useThemeCache(() => {
@@ -31,7 +31,11 @@ export const subcommunityChooserVariables = useThemeCache(() => {
         height: 0, // IE11 compat.
     });
 
-    return { arrow, toggle, options };
+    const dropDown = vars("dropDown", {
+        maxHeightOffset: 100,
+    });
+
+    return { arrow, toggle, options, dropDown };
 });
 
 export const subcommunityChooserClasses = useThemeCache(() => {
@@ -93,6 +97,7 @@ export const subcommunityChooserClasses = useThemeCache(() => {
 
     const body = style("body", {
         ...paddings({ vertical: unit(dropdownVars.spacer.margin.vertical) }),
+        maxHeight: calc(`100vh - ${unit(titleBarVariables().fullHeight + vars.dropDown.maxHeightOffset)}`),
     });
 
     const headingDivider = style("headingDivider", {

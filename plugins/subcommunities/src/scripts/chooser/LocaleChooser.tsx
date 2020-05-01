@@ -9,6 +9,7 @@ import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunity
 import { useLocaleInfo, LocaleDisplayer } from "@vanilla/i18n";
 import React from "react";
 import { useAvailableSubcommunityLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 interface IProps {
     value: string | null;
@@ -26,19 +27,24 @@ export function LocaleChooser(props: IProps) {
     }
 
     const classes = subcommunityChooserClasses();
+    const currentLocale = getCurrentLocale();
 
     return (
         <div>
-            {Object.values(locales).map(locale => {
-                return (
-                    <DropDownItemButton key={locale.localeID} onClick={() => props.onChange(locale.localeKey)}>
-                        <span className={classes.row}>
-                            <LocaleDisplayer localeContent={locale.localeKey} displayLocale={locale.localeKey} />
-                            <RightChevronIcon className={classes.rowArrow} />
-                        </span>
-                    </DropDownItemButton>
-                );
-            })}
+            {Object.values(locales)
+                .sort((a, b) => {
+                    return a.localeID === currentLocale ? -1 : b.localeID === currentLocale ? 1 : 0;
+                })
+                .map(locale => {
+                    return (
+                        <DropDownItemButton key={locale.localeID} onClick={() => props.onChange(locale.localeKey)}>
+                            <span className={classes.row}>
+                                <LocaleDisplayer localeContent={locale.localeKey} displayLocale={locale.localeKey} />
+                                <RightChevronIcon className={classes.rowArrow} />
+                            </span>
+                        </DropDownItemButton>
+                    );
+                })}
         </div>
     );
 }
