@@ -223,21 +223,10 @@ if ($St->tableExists('Discussion')) {
 }
 
 if ($St->tableExists('Event')); {
-    $events = Gdn::sql()
-        ->select()
-        ->from('Event')
-        ->where('GroupID is not null')
-        ->get()
-        ->resultArray();
-
-    foreach ($events as $event) {
-        if (!isset($event['ParentRecordType']) && !isset($event['ParentRecordID'])) {
-            Gdn::sql()
-                ->update('Event')
-                ->set('ParentRecordType', 'group')
-                ->set('ParentRecordID', $event['GroupID'])
-                ->where('EventID', $event['EventID'])
-                ->put();
-        }
-    }
+    Gdn::sql()
+        ->update('Event e')
+        ->set('ParentRecordID', 'e.GroupID', false)
+        ->set('ParentRecordType', 'group')
+        ->where('ParentRecordID is null')
+        ->put();
 }
