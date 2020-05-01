@@ -222,7 +222,7 @@ if ($St->tableExists('Discussion')) {
     }
 }
 
-if ($St->tableExists('Event')); {
+if ($St->tableExists('Event')) {
     Gdn::sql()
         ->update('Event e')
         ->set('ParentRecordID', 'e.GroupID', false)
