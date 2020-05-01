@@ -157,8 +157,10 @@ $St->primaryKey('EventID')
     ->column('Name', 'varchar(255)')
     ->column('Body', 'text')
     ->column('Format', 'varchar(10)', true)
-    ->column('DateStarts', 'datetime')
-    ->column('DateEnds', 'datetime', true)
+    ->column('ParentRecordType', 'varchar(25)', true, 'index.Event')
+    ->column('ParentRecordID', 'int', true, 'index.Event')
+    ->column('DateStarts', 'datetime', false, 'index.DateStart')
+    ->column('DateEnds', 'datetime', true, 'index.DateEnd')
     ->column('AllDayEvent', 'tinyint', '0')
     ->column('Location', 'varchar(255)', true)
     ->column('DateInserted', 'datetime')
@@ -218,4 +220,13 @@ if ($St->tableExists('Discussion')) {
                 ->put();
         }
     }
+}
+
+if ($St->tableExists('Event')) {
+    Gdn::sql()
+        ->update('Event e')
+        ->set('ParentRecordID', 'e.GroupID', false)
+        ->set('ParentRecordType', 'group')
+        ->where('ParentRecordID is null')
+        ->put();
 }
