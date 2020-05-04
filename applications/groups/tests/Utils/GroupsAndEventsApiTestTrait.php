@@ -79,16 +79,12 @@ trait GroupsAndEventsApiTestTrait {
         $name = "Test Category $salt";
         $categoryID = $overrides['parentID'] ?? $this->lastInsertedCategoryID;
 
-        if ($categoryID === null) {
-            throw new \Exception('Could not insert a test category because a parent knowledgeCategoryID was not available');
-        }
-
         $params = $overrides + [
                 'customPermissions' => false,
                 'displayAs' => 'discussions',
-                'parentCategoryID' => null,
+                'parentID' => $categoryID,
                 'name' => $name,
-                'slug' => slugify($name)
+                'urlCode' => slugify($name)
             ];
         $result = $this->api()->post('/categories', $params)->getBody();
         $this->lastInsertedCategoryID = $result['categoryID'];

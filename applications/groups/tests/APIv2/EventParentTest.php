@@ -28,5 +28,24 @@ class EventParentTest extends AbstractAPIv2Test {
 
         $this->assertEquals($this->lastInsertedGroupID, $event['parentRecordID']);
         $this->assertEquals('group', $event['parentRecordType']);
+
+        // Backwards compatibility
+        $this->assertEquals($this->lastInsertedGroupID, $event['groupID']);
+    }
+
+    /**
+     * Test that we can insert events into groups, and fetch them back.
+     */
+    public function testParentCategory() {
+        $this->createCategory();
+        $this->createEvent();
+
+        $event = $this->api()->get("/events/".$this->lastInsertedEventID)->getBody();
+
+        $this->assertEquals($this->lastInsertedCategoryID, $event['parentRecordID']);
+        $this->assertEquals('category', $event['parentRecordType']);
+
+        // Backwards compatibility
+        $this->assertFalse(isset($event['groupID']));
     }
 }
