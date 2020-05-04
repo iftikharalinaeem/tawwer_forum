@@ -140,15 +140,15 @@ class EventsApiController extends AbstractApiController {
             // Name this schema so that it can be read by swagger.
             $schema = $this->schema([
                 'eventID:i' => 'The ID of the event.',
-                'groupID:i?' => 'The group the event is in.',
+                'groupID:i?' => 'ID of the group. This parameter is deprecrated',
+                'parentRecordType:s' => 'The record type of the parent record.',
+                'parentRecordID:i' => 'The record ID of the parent record',
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The description of the event.',
                 'location:s|n' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
-                'parentRecordType:s' => 'Parent where the event was created',
-                'parentRecordID:i' => 'ID of the Parent where the event was created',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -228,7 +228,7 @@ class EventsApiController extends AbstractApiController {
         $participantData = $this->normalizeEventParticipantInput($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Filters
         $where = [];
@@ -275,6 +275,8 @@ class EventsApiController extends AbstractApiController {
             Schema::parse([
                 'eventID',
                 'groupID',
+                'parentRecordType',
+                'parentRecordID',
                 'name',
                 'body',
                 'format' => new \Vanilla\Models\FormatSchema(true),
@@ -297,19 +299,57 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
-     * Get a group by its ID.
+     * Ensure a parent record exists, and the user has access to it.
      *
-     * @param int $id The group ID.
+     * @param array $inputParams Check if we can insert in some parent record/id combo if supplied.
      * @throws NotFoundException If the group could not be found.
-     * @return array
      */
-    public function groupByID($id) {
-        $row = $this->groupModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
-            throw new NotFoundException('Group');
+    public function validateParentRecordInsert(array $inputParams) {
+        $parentRecordID = $inputParams['parentRecordID'] ?? null;
+        $parentRecordType = $inputParams['parentRecordType'] ?? null;
+        if ($parentRecordType === GroupModel::RECORD_TYPE && $parentRecordID !== null) {
+            $row = $this->groupModel->getID($parentRecordID, DATASET_TYPE_ARRAY);
+            if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
+                throw new NotFoundException('Group');
+            }
+        } else {
+            // Other record types aren't implemented.
         }
 
-        return $row;
+        if ($parentRecordType !== null && $parentRecordID !== null) {
+            if (!$this->eventModel->canCreateEvents($parentRecordType, $parentRecordID)) {
+                throw new ClientException('You do not have permission to create an event in this group.');
+            }
+        }
+    }
+
+    /**
+     * Add an event end date.
+     *
+     * if we don't have an endDate, set it to midnight of that day
+     * make it to an all day event.
+     *
+     * @param $eventData
+     * @return array
+     */
+    private function calculateEventEndDate($eventData) {
+        $startDate = $eventData['dateStarts'] ?? $eventData['DateStarts'] ?? false;
+        $eventEndDateInfo = [];
+        if ($startDate instanceof DateTimeInterface) {
+            $formattedStartDate = $startDate->format('Y-m-d');
+            $newEndDate = new DateTime($formattedStartDate);
+            $newEndDate->add(new DateInterval('PT23H59M59S'))->format('Y-m-d H:i:s');
+            $eventEndDateInfo['dateEnds'] = $newEndDate;
+        } else {
+            $convertedStartDate = new DateTime($startDate);
+            $formattedStartDate = $convertedStartDate->format('Y-m-d');
+            $newEndDate = new DateTime($formattedStartDate);
+            $newEndDate->add(new DateInterval('PT23H59M59S'));
+            $eventEndDateInfo['dateEnds'] = $newEndDate->format('Y-m-d H:i:s');
+        }
+        $eventEndDateInfo['allDayEvent'] = 1;
+
+        return $eventEndDateInfo;
     }
 
     /**
@@ -393,7 +433,7 @@ class EventsApiController extends AbstractApiController {
         }
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Filters
         $where = [];
@@ -460,6 +500,12 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a database record.
      */
     public function normalizeEventInput(array $schemaRecord) {
+        $parentRecordType = $schemaRecord['parentRecordType'] ?? null;
+        $parentRecordID = $schemaRecord['parentRecordID'] ?? null;
+        if ($parentRecordType === GroupModel::RECORD_TYPE && $parentRecordID !== null) {
+            // Backwards compatibility.
+            $schemaRecord['GroupID'] = $schemaRecord['parentRecordID'];
+        }
         $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
@@ -524,23 +570,30 @@ class EventsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamEventSchema();
-        $in = $this->postEventSchema()->setDescription('Update an event.');
+        $in = $this->patchEventSchema();
         $out = $this->schema($this->fullEventSchema(), 'out');
 
+        $body = $this->normalizeInputIDs($body);
         $body = $in->validate($body, true);
 
         $event = $this->eventByID($id);
 
         $eventData = $this->normalizeEventInput($body);
+
+        // backwards compatibility, if a null endDate is passed we should add one.
+        if (array_key_exists('dateEnds', $body) && !$body['dateEnds']) {
+            $newEndDate = $this->calculateEventEndDate($event);
+            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
+            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
+        }
+
         $eventData['EventID'] = $id;
 
         if (!$this->eventModel->checkPermission('Edit', $event)) {
             throw new ClientException('You do not have the rights to edit this event.');
         }
 
-        if (!empty($eventData['GroupID'])) {
-            $this->groupByID($eventData['GroupID']);
-        }
+        $this->validateParentRecordInsert($body);
 
         $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);
@@ -567,15 +620,19 @@ class EventsApiController extends AbstractApiController {
         $in = $this->postEventSchema()->setDescription('Create an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
+        $body = $this->normalizeInputIDs($body);
         $body = $in->validate($body);
 
-        if (!$this->eventModel->canCreateEvents($body['groupID'])) {
-            throw new ClientException('You do not have permission to create an event in this group.');
-        }
-
-        $this->groupByID($body['groupID']);
+        $this->validateParentRecordInsert($body);
 
         $eventData = $this->normalizeEventInput($body);
+
+        // backwards compatibility, if a null endDate is passed we should add one.
+        if (!isset($body['dateEnds'])) {
+            $newEndDate = $this->calculateEventEndDate($eventData);
+            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
+            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
+        }
 
         $id = $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);
@@ -649,6 +706,20 @@ class EventsApiController extends AbstractApiController {
         return $out->validate($result);
     }
 
+    /**
+     * Normalize input groupIDs into recordType and recordID.
+     *
+     * @param array $input
+     * @return array
+     */
+    private function normalizeInputIDs(array $input): array {
+        $groupID = $input['groupID'] ?? null;
+        if ($groupID !== null) {
+            $input['parentRecordType'] = GroupModel::RECORD_TYPE;
+            $input['parentRecordID'] = $groupID;
+        }
+        return $input;
+    }
 
     /**
      * Get an event schema with minimal add/edit fields.
@@ -661,7 +732,8 @@ class EventsApiController extends AbstractApiController {
         if ($postEventSchema === null) {
             $postEventSchema = $this->schema(
                 Schema::parse([
-                    'groupID',
+                    'parentRecordID',
+                    'parentRecordType',
                     'name',
                     'body',
                     'format' => new \Vanilla\Models\FormatSchema(),
@@ -686,7 +758,7 @@ class EventsApiController extends AbstractApiController {
 
         $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
 
-        $defaultDateTime =  (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        $defaultDateTime = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
         $operator = $query['operator'] ?? '';
         $range = DateFilterSphinxSchema::dateFilterRange($query);
         if ($operator === '[]' || $operator === '()') {
@@ -717,5 +789,31 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $where;
+    }
+    /**
+     * Get an event schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function patchEventSchema() {
+        static $postEventSchema;
+
+        if ($postEventSchema === null) {
+            $postEventSchema = $this->schema(
+                Schema::parse([
+                    'parentRecordID?',
+                    'parentRecordType?',
+                    'name?',
+                    'body?',
+                    'format?' => new \Vanilla\Models\FormatSchema(),
+                    'location?',
+                    'dateStarts?',
+                    'dateEnds?',
+                ])->add($this->fullEventSchema()),
+                'EventPatch'
+            );
+        }
+
+        return $this->schema($postEventSchema, 'in');
     }
 }
