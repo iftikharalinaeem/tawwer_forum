@@ -6,11 +6,14 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
+use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
@@ -21,6 +24,9 @@ use Vanilla\Utility\CapitalCaseScheme;
 class EventsApiController extends AbstractApiController {
 
     use FormatCompatTrait;
+
+    const PARENT_TYPE_GROUP = 'group';
+    const PARENT_TYPE_CATEGORY = 'category';
 
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
@@ -141,9 +147,13 @@ class EventsApiController extends AbstractApiController {
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
+                'parentRecordType:s' => 'Parent where the event was created',
+                'parentRecordID:i' => 'ID of the Parent where the event was created',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
+                'allDayEvent:b?' => 'Event taking the full day',
                 'dateInserted:dt' => 'When the event was created.',
+                'breadcrumbs:a?'=> '',
                 'insertUserID:i' => 'The user that created the event.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateUpdated:dt|n' => 'When the event was updated.',
@@ -319,10 +329,21 @@ class EventsApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
+
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
-            'groupID:i' => 'Filter by group ID.',
+            'groupID:i?' => 'Filter by group ID.',
+            'body:s?' => 'Excerpt of the event description',
+            'parentRecordType:s' => 'Parent where the event was created',
+            'parentRecordID:i' => 'ID of the Parent where the event was created',
+            'dateStarts:dt?' => new DateFilterSphinxSchema([
+                'description' => 'Filter events start dates',
+            ]),
+            'dateEnds:dt?' => new DateFilterSphinxSchema([
+                'description' => 'Filter events end dates',
+            ]),
+            'allDayEvent:b?' => 'If the event is all day' ,
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -346,6 +367,15 @@ class EventsApiController extends AbstractApiController {
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
+        $groupID = $query['groupID'] ?? null;
+
+        // for backwards compatibility use the groupID supplied as the parentID
+        $query['parentRecordType'] = ($groupID) ? self::PARENT_TYPE_GROUP : $query['parentRecordType'];
+        $query['parentRecordID'] =  ($groupID) ? ($groupID) : $query['parentRecordID'];
+
+        $parentRecordType = $query['parentRecordType'] ?? null;
+        $parentRecordID = $query['parentRecordID'] ?? null;
+
         $query = $in->validate($query);
 
         // Sorting
@@ -363,17 +393,39 @@ class EventsApiController extends AbstractApiController {
 
         // Filters
         $where = [];
-        if (array_key_exists('groupID', $query)) {
-            $group = $this->groupModel->getID($query['groupID']);
-            $groupPrivacy = $group['Privacy'];
-            $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
-            $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-            if (!$this->groupModel->checkPermission($access, $query['groupID']) && !$isAdmin) {
-                // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
-                $where['GroupID'] = -1;
-            } else {
-                $where['GroupID'] = $query['groupID'];
+
+        if ($parentRecordType === self::PARENT_TYPE_GROUP) {
+            if ($parentRecordID) {
+                $group = $this->groupModel->getID($parentRecordID);
+                $groupPrivacy = $group['Privacy'];
+                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
+                $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+                if (!$this->groupModel->checkPermission($access, $parentRecordID) && !$isAdmin) {
+                    // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
+                    $where['GroupID'] = -1;
+                } else {
+                    $where['GroupID'] = $parentRecordID;
+                }
             }
+        } elseif ($parentRecordType === self::PARENT_TYPE_CATEGORY) {
+            if ($parentRecordID) {
+                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+                // check the permission based on the category.
+                $where['ParentRecordID'] = $parentRecordID;
+                $where['ParentRecordType'] = $parentRecordType;
+            }
+        }
+
+        if ($query['dateStarts'] ?? null) {
+            $where = $this->addDateQuery('dateStarts', $query['dateStarts'], $where);
+        }
+
+        if ($query['dateEnds'] ?? null) {
+            $where = $this->addDateQuery('dateEnds', $query['dateEnds'], $where);
+        }
+
+        if ($query['allDayEvent'] ?? null) {
+            $where['AllDayEvent'] = 1;
         }
 
         // Data
@@ -381,6 +433,7 @@ class EventsApiController extends AbstractApiController {
         if ($where) {
             $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
         }
+
 
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
@@ -617,5 +670,50 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $this->schema($postEventSchema, 'in');
+    }
+
+    /**
+     * @param string $dateType
+     * @param array $query
+     * @param array $where
+     * @return array
+     */
+    private function addDateQuery(string $dateType, array $query, array $where): array {
+
+        $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
+
+        $defaultDateTime =  (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        $operator = $query['operator'] ?? '';
+        $range = DateFilterSphinxSchema::dateFilterRange($query);
+        if ($operator === '[]' || $operator === '()') {
+            $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
+            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+            $where["{$fieldName} =>"] = $range['startDate']->format('Y-m-d H:i:s');
+            $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >"] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
+        }
+
+
+
+        return $where;
     }
 }
