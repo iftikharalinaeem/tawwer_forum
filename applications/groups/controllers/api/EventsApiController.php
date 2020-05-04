@@ -325,7 +325,7 @@ class EventsApiController extends AbstractApiController {
      * @param $eventData
      * @return array
      */
-    private function setEventEndDate($eventData) {
+    private function calculateEventEndDate($eventData) {
         $startDate = $eventData['dateStarts'] ?? $eventData['DateStarts'] ?? false;
         $eventEndDateInfo = [];
         if ($startDate instanceof DateTimeInterface) {
@@ -527,7 +527,7 @@ class EventsApiController extends AbstractApiController {
 
         // backwards compatibility, if a null endDate is passed we should add one.
         if (array_key_exists('dateEnds', $body) && !$body['dateEnds']) {
-            $newEndDate = $this->setEventEndDate($event);
+            $newEndDate = $this->calculateEventEndDate($event);
             $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
             $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
         }
@@ -573,8 +573,8 @@ class EventsApiController extends AbstractApiController {
         $eventData = $this->normalizeEventInput($body);
 
         // backwards compatibility, if a null endDate is passed we should add one.
-        if (array_key_exists('dateEnds', $body) && !$body['dateEnds']) {
-            $newEndDate = $this->setEventEndDate($eventData);
+        if (!isset($body['dateEnds'])) {
+            $newEndDate = $this->calculateEventEndDate($eventData);
             $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
             $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
         }
