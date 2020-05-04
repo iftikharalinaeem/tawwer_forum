@@ -140,7 +140,7 @@ class EventsApiController extends AbstractApiController {
             // Name this schema so that it can be read by swagger.
             $schema = $this->schema([
                 'eventID:i' => 'The ID of the event.',
-                'groupID:i' => 'The group the event is in.',
+                'groupID:i?' => 'The group the event is in.',
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The description of the event.',
                 'location:s|n' => [
@@ -333,9 +333,14 @@ class EventsApiController extends AbstractApiController {
 
         $in = $this->schema([
             'groupID:i?' => 'Filter by group ID.',
-            'body:s?' => 'Excerpt of the event description',
             'parentRecordType:s' => 'Parent where the event was created',
-            'parentRecordID:i' => 'ID of the Parent where the event was created',
+            'parentRecordID:i' => [
+                'ID of the Parent where the event was created',
+                'enum' => [
+                    EventsApiController::PARENT_TYPE_GROUP,
+                    EventsApiController::PARENT_TYPE_CATEGORY
+                ],
+            ],
             'dateStarts:dt?' => new DateFilterSphinxSchema([
                 'description' => 'Filter events start dates',
             ]),
