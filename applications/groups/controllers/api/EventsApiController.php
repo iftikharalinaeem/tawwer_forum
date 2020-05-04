@@ -153,7 +153,6 @@ class EventsApiController extends AbstractApiController {
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
                 'dateInserted:dt' => 'When the event was created.',
-                'breadcrumbs:a?'=> '',
                 'insertUserID:i' => 'The user that created the event.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateUpdated:dt|n' => 'When the event was updated.',
@@ -688,7 +687,7 @@ class EventsApiController extends AbstractApiController {
         if ($operator === '[]' || $operator === '()') {
             $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
             $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-            $where["{$fieldName} =>"] = $range['startDate']->format('Y-m-d H:i:s');
+            $where["{$fieldName} >="] = $range['startDate']->format('Y-m-d H:i:s');
             $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
         }
 
@@ -711,8 +710,6 @@ class EventsApiController extends AbstractApiController {
             $date = $range['startDate'] ?? $defaultDateTime;
             $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
         }
-
-
 
         return $where;
     }
