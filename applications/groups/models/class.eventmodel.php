@@ -241,18 +241,24 @@ class EventModel extends Gdn_Model {
     }
 
     /**
-     * Checks to see whether or not a user can create events for a group.
+     * Checks to see whether or not a user can create events in a parent record..
      *
-     * @param int $groupID
+     * @param string $parentRecordType
+     * @param int $parentRecordID
      * @return bool
      */
-    public function canCreateEvents(int $groupID): bool {
-        if (groupPermission('Leader', $groupID)) {
-            return true;
-        } elseif (c('Groups.Members.CanAddEvents', true) && groupPermission('Member', $groupID)) {
-            return true;
+    public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
+        if ($parentRecordType === GroupModel::RECORD_TYPE) {
+            if (groupPermission('Leader', $parentRecordID)) {
+                return true;
+            } elseif (c('Groups.Members.CanAddEvents', true) && groupPermission('Member', $parentRecordID)) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            // Not implemented yet.
+            return true;
         }
     }
 

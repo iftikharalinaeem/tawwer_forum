@@ -9,6 +9,8 @@
  */
 class GroupModel extends Gdn_Model {
 
+    const RECORD_TYPE = "group";
+
     /** @var int The maximum number of groups a regular user is allowed to create. */
     public $MaxUserGroups = 0;
 
