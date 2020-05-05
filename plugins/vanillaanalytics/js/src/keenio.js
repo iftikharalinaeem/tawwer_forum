@@ -102,11 +102,8 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
 
     var extractUserData = function(cookie) {
         if (typeof cookie !== 'object') {
-            console.log('user: default');
             return userData;
         }
-
-        console.log('user: cookie');
 
         // Missing a UUID, but one is available from our cookie? Update it.
         if (typeof cookie.uuid !== 'undefined') {
