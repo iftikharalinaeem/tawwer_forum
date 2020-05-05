@@ -357,56 +357,6 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
-     * Add dateStarts/dateEnds to where condition.
-     *
-     * @param string $dateType
-     * @param array $query
-     * @param array $where
-     * @return array
-     */
-    private function addDateQuery(string $dateType, array $query, array $where): array {
-
-        $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
-
-        $defaultDateTime = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
-        $operator = $query['operator'] ?? '';
-        $range = DateFilterSphinxSchema::dateFilterRange($query);
-        if ($operator === '[]' || $operator === '()') {
-            $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
-            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-            $where["{$fieldName} >="] = $range['startDate']->format('Y-m-d H:i:s');
-            $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '>=') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} >="] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '>') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} >"] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '<=') {
-            $date = $range['endDate'] ?? $defaultDateTime;
-            $where["{$fieldName} <="] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '<') {
-            $date = $range['endDate'] ?? $defaultDateTime;
-            $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '=') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} ="] = $date->format('Y-m-d H:i:s');
-        }
-
-        return $where;
-    }
-
-    /**
      * Get an ID-only event record schema.
      *
      * @return Schema Returns a schema object.
@@ -435,11 +385,19 @@ class EventsApiController extends AbstractApiController {
                     EventModel::PARENT_TYPE_CATEGORY
                 ],
             ],
-            'dateStarts:dt?' => new DateFilterSphinxSchema([
-                'description' => 'Filter events start dates',
+            'dateStarts:dt?' => new DateFilterSchema([
+                'description' => 'Filter events by start dates',
+                'x-filter' => [
+                    'field' => 'DateStarts',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
             ]),
-            'dateEnds:dt?' => new DateFilterSphinxSchema([
-                'description' => 'Filter events end dates',
+            'dateEnds:dt?' => new DateFilterSchema([
+                'description' => 'Filter events by end dates',
+                'x-filter' => [
+                    'field' => 'DateEnds',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
             ]),
             'allDayEvent:b?' => 'If the event is all day' ,
             'sort:s?' => [
@@ -489,7 +447,7 @@ class EventsApiController extends AbstractApiController {
         [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Filters
-        $where = [];
+        $where = ApiUtils::queryToFilters($in, $query);
 
         if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
             if ($query['parentRecordID']) {
@@ -511,14 +469,6 @@ class EventsApiController extends AbstractApiController {
                 $where['ParentRecordID'] = $query['parentRecordID'];
                 $where['ParentRecordType'] = $query['parentRecordType'];
             }
-        }
-
-        if ($query['dateStarts'] ?? null) {
-            $where = $this->addDateQuery('dateStarts', $query['dateStarts'], $where);
-        }
-
-        if ($query['dateEnds'] ?? null) {
-            $where = $this->addDateQuery('dateEnds', $query['dateEnds'], $where);
         }
 
         if ($query['allDayEvent'] ?? null) {
