@@ -62,7 +62,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_GROUP,
+                "parentRecordType" => \EventModel::PARENT_TYPE_GROUP,
                 "parentRecordID" => $this->lastInsertedGroupID
             ]
         )->getBody();
@@ -71,7 +71,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $parentRecordTypes = array_unique($parentRecordTypes);
 
         $this->assertEquals(3, count($events));
-        $this->assertEquals(\EventsApiController::PARENT_TYPE_GROUP, $parentRecordTypes[0]);
+        $this->assertEquals(\EventModel::PARENT_TYPE_GROUP, $parentRecordTypes[0]);
     }
     /**
      * Test GET /events with parentRecordType of Category.
@@ -85,7 +85,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_CATEGORY,
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
                 "parentRecordID" => $this->lastInsertedCategoryID,
             ]
         )->getBody();
@@ -94,7 +94,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $parentRecordTypes = array_unique($parentRecordTypes);
 
         $this->assertEquals(2, count($events));
-        $this->assertEquals(\EventsApiController::PARENT_TYPE_CATEGORY, $parentRecordTypes[0]);
+        $this->assertEquals(\EventModel::PARENT_TYPE_CATEGORY, $parentRecordTypes[0]);
     }
 
     /**
@@ -108,7 +108,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_GROUP,
+                "parentRecordType" => \EventModel::PARENT_TYPE_GROUP,
                 "parentRecordID" => $this->lastInsertedGroupID,
                 "allDayEvent" => true,
             ]
@@ -135,7 +135,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_GROUP,
+                "parentRecordType" => \EventModel::PARENT_TYPE_GROUP,
                 "parentRecordID" => $this->lastInsertedGroupID,
                 "dateStarts" => $queryParam,
             ]
@@ -183,7 +183,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_CATEGORY,
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
                 "parentRecordID" => $this->lastInsertedCategoryID,
                 "dateEnds" => $queryParam,
             ]
@@ -258,7 +258,7 @@ class EventParentTest extends AbstractAPIv2Test {
         $events = $this->api()->get(
             "/events",
             [
-                "parentRecordType" => \EventsApiController::PARENT_TYPE_CATEGORY,
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
                 "parentRecordID" => $this->lastInsertedCategoryID,
                 "dateStarts" => $queryParam[0],
                 "dateEnds" => $queryParam[1],

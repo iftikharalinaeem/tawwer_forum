@@ -26,9 +26,6 @@ class EventsApiController extends AbstractApiController {
 
     use FormatCompatTrait;
 
-    const PARENT_TYPE_GROUP = 'group';
-    const PARENT_TYPE_CATEGORY = 'category';
-
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
 
@@ -142,7 +139,13 @@ class EventsApiController extends AbstractApiController {
             $schema = $this->schema([
                 'eventID:i' => 'The ID of the event.',
                 'groupID:i?' => 'ID of the group. This parameter is deprecrated',
-                'parentRecordType:s' => 'The record type of the parent record.',
+                'parentRecordType:s' => [
+                    'ID of the Parent where the event was created',
+                    'enum' => [
+                        EventModel::PARENT_TYPE_GROUP,
+                        EventModel::PARENT_TYPE_CATEGORY
+                    ],
+                ],
                 'parentRecordID:i' => 'The record ID of the parent record',
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The description of the event.',
@@ -307,8 +310,8 @@ class EventsApiController extends AbstractApiController {
      */
     public function validateParentRecordInsert(array $inputParams) {
         $parentRecordID = $inputParams['parentRecordID'] ?? null;
-        $parentRecordType = $inputParams['parentRecordType'] ?? null;
-        if ($parentRecordType === GroupModel::RECORD_TYPE && $parentRecordID !== null) {
+        $parentRecordType = $inputeParams['parentRecordType'] ?? null;
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
             $row = $this->groupModel->getID($parentRecordID, DATASET_TYPE_ARRAY);
             if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
                 throw new NotFoundException('Group');
@@ -423,12 +426,13 @@ class EventsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
+            'groupID:i?' => 'Filter by group ID.',
             'parentRecordID:i' => 'Parent where the event was created',
             'parentRecordType:s' => [
                 'ID of the Parent where the event was created',
                 'enum' => [
-                    EventsApiController::PARENT_TYPE_GROUP,
-                    EventsApiController::PARENT_TYPE_CATEGORY
+                    EventModel::PARENT_TYPE_GROUP,
+                    EventModel::PARENT_TYPE_CATEGORY
                 ],
             ],
             'dateStarts:dt?' => new DateFilterSphinxSchema([
@@ -466,8 +470,8 @@ class EventsApiController extends AbstractApiController {
         $parentRecordID = $query['parentRecordID'] ?? null;
 
         // for backwards compatibility use the groupID supplied as the parentID
-        $query['parentRecordType'] = ($groupID) ? self::PARENT_TYPE_GROUP : $parentRecordType;
-        $query['parentRecordID'] =  ($groupID) ? ($groupID) : $parentRecordID;
+        $query['parentRecordType'] = ($groupID) ? EventModel::PARENT_TYPE_GROUP : $parentRecordType;
+        $query['parentRecordID'] =  ($groupID) ? $groupID : $parentRecordID;
 
         $query = $in->validate($query);
 
@@ -487,25 +491,25 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = [];
 
-        if ($parentRecordType === self::PARENT_TYPE_GROUP) {
-            if ($parentRecordID) {
-                $group = $this->groupModel->getID($parentRecordID);
+        if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
+            if ($query['parentRecordID']) {
+                $group = $this->groupModel->getID($query['parentRecordID']);
                 $groupPrivacy = $group['Privacy'];
                 $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
                 $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-                if (!$this->groupModel->checkPermission($access, $parentRecordID) && !$isAdmin) {
+                if (!$this->groupModel->checkPermission($access, $query['parentRecordID']) && !$isAdmin) {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
                 } else {
-                    $where['GroupID'] = $parentRecordID;
+                    $where['GroupID'] = $query['parentRecordID'];
                 }
             }
-        } elseif ($parentRecordType === self::PARENT_TYPE_CATEGORY) {
-            if ($parentRecordID) {
+        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+            if ($query['parentRecordID']) {
                 $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
                 // check the permission based on the category.
-                $where['ParentRecordID'] = $parentRecordID;
-                $where['ParentRecordType'] = $parentRecordType;
+                $where['ParentRecordID'] = $query['parentRecordID'];
+                $where['ParentRecordType'] = $query['parentRecordType'];
             }
         }
 
@@ -551,7 +555,7 @@ class EventsApiController extends AbstractApiController {
     public function normalizeEventInput(array $schemaRecord) {
         $parentRecordType = $schemaRecord['parentRecordType'] ?? null;
         $parentRecordID = $schemaRecord['parentRecordID'] ?? null;
-        if ($parentRecordType === GroupModel::RECORD_TYPE && $parentRecordID !== null) {
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
             // Backwards compatibility.
             $schemaRecord['GroupID'] = $schemaRecord['parentRecordID'];
         }
@@ -782,7 +786,13 @@ class EventsApiController extends AbstractApiController {
             $postEventSchema = $this->schema(
                 Schema::parse([
                     'parentRecordID',
-                    'parentRecordType',
+                    'parentRecordType:s' => [
+                        'ID of the Parent where the event was created',
+                        'enum' => [
+                            EventModel::PARENT_TYPE_GROUP,
+                            EventModel::PARENT_TYPE_CATEGORY
+                        ],
+                    ],
                     'name',
                     'body',
                     'format' => new FormatSchema(),
@@ -810,7 +820,13 @@ class EventsApiController extends AbstractApiController {
             $postEventSchema = $this->schema(
                 Schema::parse([
                     'parentRecordID?',
-                    'parentRecordType?',
+                    'parentRecordType:s' => [
+                        'ID of the Parent where the event was created',
+                        'enum' => [
+                            EventModel::PARENT_TYPE_GROUP,
+                            EventModel::PARENT_TYPE_CATEGORY
+                        ],
+                    ],
                     'name?',
                     'body?',
                     'format?' => new FormatSchema(),

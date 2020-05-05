@@ -107,7 +107,7 @@ class EventsTest extends AbstractResourceTest {
         $record = [
             'groupID' => self::$groups[0]['groupID'],
             'parentRecordID' => self::$groups[0]['groupID'],
-            'parentRecordType' => \GroupModel::RECORD_TYPE,
+            'parentRecordType' => \EventModel::PARENT_TYPE_GROUP,
             'name' => $name,
             'body' => "$name description",
             'format' => 'markdown',

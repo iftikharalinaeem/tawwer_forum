@@ -13,6 +13,9 @@
  */
 class EventModel extends Gdn_Model {
 
+    const PARENT_TYPE_GROUP = 'group';
+    const PARENT_TYPE_CATEGORY = 'category';
+
     /**
      * Class constructor. Defines the related database table name.
      *
