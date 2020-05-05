@@ -15,6 +15,7 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Models\FormatSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 
@@ -279,7 +280,7 @@ class EventsApiController extends AbstractApiController {
                 'parentRecordID',
                 'name',
                 'body',
-                'format' => new \Vanilla\Models\FormatSchema(true),
+                'format' => new FormatSchema(true),
                 'location',
                 'dateStarts',
                 'dateEnds'
@@ -353,6 +354,56 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
+     * Add dateStarts/dateEnds to where condition.
+     *
+     * @param string $dateType
+     * @param array $query
+     * @param array $where
+     * @return array
+     */
+    private function addDateQuery(string $dateType, array $query, array $where): array {
+
+        $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
+
+        $defaultDateTime = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        $operator = $query['operator'] ?? '';
+        $range = DateFilterSphinxSchema::dateFilterRange($query);
+        if ($operator === '[]' || $operator === '()') {
+            $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
+            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+            $where["{$fieldName} >="] = $range['startDate']->format('Y-m-d H:i:s');
+            $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >"] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<=') {
+            $date = $range['endDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<') {
+            $date = $range['endDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} ="] = $date->format('Y-m-d H:i:s');
+        }
+
+        return $where;
+    }
+
+    /**
      * Get an ID-only event record schema.
      *
      * @return Schema Returns a schema object.
@@ -372,9 +423,8 @@ class EventsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->schema([
-            'groupID:i?' => 'Filter by group ID.',
-            'parentRecordType:s' => 'Parent where the event was created',
-            'parentRecordID:i' => [
+            'parentRecordID:i' => 'Parent where the event was created',
+            'parentRecordType:s' => [
                 'ID of the Parent where the event was created',
                 'enum' => [
                     EventsApiController::PARENT_TYPE_GROUP,
@@ -412,13 +462,12 @@ class EventsApiController extends AbstractApiController {
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
         $groupID = $query['groupID'] ?? null;
-
-        // for backwards compatibility use the groupID supplied as the parentID
-        $query['parentRecordType'] = ($groupID) ? self::PARENT_TYPE_GROUP : $query['parentRecordType'];
-        $query['parentRecordID'] =  ($groupID) ? ($groupID) : $query['parentRecordID'];
-
         $parentRecordType = $query['parentRecordType'] ?? null;
         $parentRecordID = $query['parentRecordID'] ?? null;
+
+        // for backwards compatibility use the groupID supplied as the parentID
+        $query['parentRecordType'] = ($groupID) ? self::PARENT_TYPE_GROUP : $parentRecordType;
+        $query['parentRecordID'] =  ($groupID) ? ($groupID) : $parentRecordID;
 
         $query = $in->validate($query);
 
@@ -736,10 +785,11 @@ class EventsApiController extends AbstractApiController {
                     'parentRecordType',
                     'name',
                     'body',
-                    'format' => new \Vanilla\Models\FormatSchema(),
+                    'format' => new FormatSchema(),
                     'location',
                     'dateStarts',
                     'dateEnds?',
+                    'allDayEvent?',
                 ])->add($this->fullEventSchema()),
                 'EventPost'
             );
@@ -748,48 +798,6 @@ class EventsApiController extends AbstractApiController {
         return $this->schema($postEventSchema, 'in');
     }
 
-    /**
-     * @param string $dateType
-     * @param array $query
-     * @param array $where
-     * @return array
-     */
-    private function addDateQuery(string $dateType, array $query, array $where): array {
-
-        $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
-
-        $defaultDateTime = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
-        $operator = $query['operator'] ?? '';
-        $range = DateFilterSphinxSchema::dateFilterRange($query);
-        if ($operator === '[]' || $operator === '()') {
-            $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
-            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-            $where["{$fieldName} >="] = $range['startDate']->format('Y-m-d H:i:s');
-            $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '>=') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} >="] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '>') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} >"] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '<=') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} <="] = $date->format('Y-m-d H:i:s');
-        }
-
-        if ($operator === '<') {
-            $date = $range['startDate'] ?? $defaultDateTime;
-            $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
-        }
-
-        return $where;
-    }
     /**
      * Get an event schema with minimal add/edit fields.
      *
@@ -805,7 +813,7 @@ class EventsApiController extends AbstractApiController {
                     'parentRecordType?',
                     'name?',
                     'body?',
-                    'format?' => new \Vanilla\Models\FormatSchema(),
+                    'format?' => new FormatSchema(),
                     'location?',
                     'dateStarts?',
                     'dateEnds?',
