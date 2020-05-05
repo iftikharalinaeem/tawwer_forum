@@ -100,28 +100,30 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
     // Defaulting to an empty object.
     var userData = {};
 
-    var extractUserData = function(cookie) {
+    var extractUserData = function(cookie, data) {
         if (typeof cookie !== 'object') {
-            return userData;
+            return data;
         }
 
         // Missing a UUID, but one is available from our cookie? Update it.
         if (typeof cookie.uuid !== 'undefined') {
-            userData.uuid = cookie.uuid;
+            data.uuid = cookie.uuid;
         }
 
         // Missing a session ID, but one is available from our cookie? Update it.
         if (isGuestCollection) {
             if (typeof cookie.secondarySessionID !== 'undefined') {
-                userData.sessionID = cookie.secondarySessionID;
+                data.sessionID = cookie.secondarySessionID;
             }
         } else if (typeof cookie.sessionID !== 'undefined') {
-            userData.sessionID = cookie.sessionID;
+            data.sessionID = cookie.sessionID;
         }
 
         if (typeof cookie.pv !== 'undefined') {
-            userData.pv = cookie.pv;
+            data.pv = cookie.pv;
         }
+
+        return data;
     };
 
     // eventData needs to be a valid object and contain a property of "user", which is also an object.
@@ -133,7 +135,7 @@ keenTracker.getUser = function(eventData, isGuestCollection) {
          */
         if (typeof Cookies === 'function') {
             var cookie = Cookies.getJSON(gdn.definition('vaCookieName'));
-            userData = extractUserData(cookie);
+            userData = extractUserData(cookie, userData);
         }
     }
 
