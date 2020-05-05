@@ -5,9 +5,11 @@
  */
 
 use \Garden\Schema\Schema;
+use Vanilla\Navigation\BreadcrumbModel;
 use \Vanilla\Web\Controller;
 use Garden\Container\Container;
 use Vanilla\Groups\Models\SearchRecordTypeGroup;
+use Garden\Container\Reference;
 
 /**
  * Class GroupsHooks
@@ -69,6 +71,10 @@ class GroupsHooks extends Gdn_Plugin {
         $dic
             ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeGroup()])
+        ;
+
+        $dic->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(EventsBreadCrumbProvider::class)])
         ;
     }
 

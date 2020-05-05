@@ -12,8 +12,12 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\DateFilterSphinxSchema;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * API Controller for the `/events` resource.
@@ -37,21 +41,27 @@ class EventsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * EventsApiController constructor.
      *
      * @param EventModel $eventModel
      * @param GroupModel $groupModel
      * @param UserModel $userModel
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         EventModel $eventModel,
         GroupModel $groupModel,
-        UserModel $userModel
+        UserModel $userModel,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+        $this->breadcrumbModel =  $breadcrumbModel;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -151,6 +161,7 @@ class EventsApiController extends AbstractApiController {
                 'dateUpdated:dt|n' => 'When the event was updated.',
                 'updateUserID:i|n' => 'The user that updated the event.',
                 'updateUser?' => $this->getUserFragmentSchema(),
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
@@ -178,6 +189,8 @@ class EventsApiController extends AbstractApiController {
         }
 
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
+
+        $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
 
         $result = $this->normalizeEventOutput($event);
         return $out->validate($result);
@@ -343,6 +356,54 @@ class EventsApiController extends AbstractApiController {
         $eventEndDateInfo['allDayEvent'] = 1;
 
         return $eventEndDateInfo;
+    }
+
+    /**
+     * Add dateStarts/dateEnds to where condition.
+     *
+     * @param string $dateType
+     * @param array $query
+     * @param array $where
+     * @return array
+     */
+    private function addDateQuery(string $dateType, array $query, array $where): array {
+        $fieldName = ($dateType === 'dateStarts') ? 'DateStarts' : 'DateEnds';
+        $defaultDateTime = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        $operator = $query['operator'] ?? '';
+        $range = DateFilterSphinxSchema::dateFilterRange($query);
+        if ($operator === '[]' || $operator === '()') {
+            $range['startDate'] = $range['startDate'] ?? $defaultDateTime;
+            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+            $where["{$fieldName} >="] = $range['startDate']->format('Y-m-d H:i:s');
+            $where["{$fieldName} <="] = $range['endDate']->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '>') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} >"] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<=') {
+            $date = $range['endDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <="] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '<') {
+            $date = $range['endDate'] ?? $defaultDateTime;
+            $where["{$fieldName} <"] = $date->format('Y-m-d H:i:s');
+        }
+
+        if ($operator === '=') {
+            $date = $range['startDate'] ?? $defaultDateTime;
+            $where["{$fieldName} ="] = $date->format('Y-m-d H:i:s');
+        }
+
+        return $where;
     }
 
     /**
