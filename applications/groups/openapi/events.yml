@@ -4,13 +4,51 @@ paths:
   /events:
     get:
       parameters:
+      - description: If an event takes place for the full day.
+        in: query
+        name: allDayEvent
+        schema:
+          type: boolean
       - description: |
           Filter by group ID.
         in: query
         name: groupID
-        required: true
         schema:
           type: integer
+      - description: >
+          <p>Filter by start date of an event<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.</p>
+        in: query
+        name: dateEnds
+        schema:
+          format: date-filter
+          type: string
+      - description: >
+          <p>Filter by end date of an event<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.</p>
+        in: query
+        name: dateStarts
+        schema:
+          format: date-filter
+          type: string
       - description: >
           Sort the results by the specified field. The default sort order
           is ascending.Prefixing the field with "-" will sort using a
@@ -33,6 +71,22 @@ paths:
           default: 1
           minimum: 1
       - description: |
+          Record type of the parent where the event was created (ie. group/category).
+        in: query
+        name: parentRecordType
+        required: true
+        schema:
+          enum:
+          - group
+          - category
+      - description: |
+          Record ID of the parent where the event was created
+        in: query
+        name: parentRecordType
+        required: true
+        schema:
+          type: string
+      - description: |
           Desired number of items per page.
         in: query
         name: limit
@@ -53,7 +107,7 @@ paths:
             'application/json':
               schema:
                 items:
-                  $ref: '#/components/schemas/Event'
+                  $ref: '#/components/schemas/FullEvent'
                 type: array
           description: Success
       tags:
@@ -255,6 +309,69 @@ paths:
       summary: RSVP to an event.
 components:
   schemas:
+    FullEvent:
+      properties:
+        eventID:
+          description: The event ID.
+          type: number
+        body:
+          description: The description of the event.
+          type: string
+        location:
+          description: Where the event is taking place.
+          type: string
+        parentRecordType:
+          description: The type of record from where the event was created.
+          type: string
+        parentRecordID:
+          description: The ID of record from where the event was created.
+          type: integer
+        groupID:
+          description: The ID of group from where the event was created.
+          type: integer
+        datedStarts:
+          description: The start date of the event/
+          format: date-time
+          type: string
+        dateEnds:
+          description: The end date of the event.
+          format: date-time
+          type: string
+        allDayEvent:
+          description: Does the event take the whole day.
+          type: boolean
+        insertUserID:
+          description: The id of the user who created the event.
+          type: integer
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        updateUserID:
+          description: The id of the user who updated the event.
+          type: integer
+        updateUser:
+          $ref: '#/components/schemas/UserFragment'
+        dateInserted:
+          description: The date the event was created.
+          format: date-time
+          type: string
+        dateUpated:
+          description: The date the event was updated.
+          format: date-time
+          type: string
+        url:
+          description: The full URL to the event.
+          type: string
+      required:
+        - eventID
+        - parentRecordType
+        - parentRecordID
+        - name
+        - body
+        - location
+        - dateStarts
+        - dateEnds
+        - insertUserID
+        - url
     Event:
       properties:
         attending:
