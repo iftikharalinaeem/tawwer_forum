@@ -55,10 +55,10 @@ class EventParentTest extends AbstractAPIv2Test {
      */
     public function testGetEventsWithGroupRecordType() {
         $this->createGroup();
+        $this->createEvent();
+        $this->createEvent();
+        $this->createEvent();
 
-        for ($i = 0; $i <= 2; $i++) {
-            $this->createEvent();
-        }
         $events = $this->api()->get(
             "/events",
             [
@@ -78,10 +78,9 @@ class EventParentTest extends AbstractAPIv2Test {
      */
     public function testGetEventsWithCategoryRecordType() {
         $this->createCategory();
+        $this->createEvent();
+        $this->createEvent();
 
-        for ($i = 0; $i <= 1; $i++) {
-            $this->createEvent();
-        }
         $events = $this->api()->get(
             "/events",
             [
