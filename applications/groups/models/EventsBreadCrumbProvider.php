@@ -27,7 +27,11 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
      * @param CategoryCollection $categoryCollection
      * @param GroupModel $groupModel
      */
-    public function __construct(EventModel $eventModel, CategoryCollection $categoryCollection, GroupModel $groupModel) {
+    public function __construct(
+        EventModel $eventModel,
+        CategoryCollection $categoryCollection,
+        GroupModel $groupModel
+    ) {
         $this->eventModel = $eventModel;
         $this->categoryCollection = $categoryCollection;
         $this->groupModel = $groupModel;
@@ -42,7 +46,7 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
         $parentRecordID = $event['ParentRecordID'] ?? null;
 
         $crumbs = [
-            new Breadcrumb(t('Home'), \Gdn::request()->url('/')),
+            new Breadcrumb(t('Home'), \Gdn::request()->url('/', true)),
         ];
 
         if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID) {
