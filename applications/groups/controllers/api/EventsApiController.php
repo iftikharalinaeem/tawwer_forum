@@ -491,7 +491,6 @@ class EventsApiController extends AbstractApiController {
         if ($where) {
             $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
         }
-        
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
