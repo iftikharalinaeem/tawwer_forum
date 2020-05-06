@@ -535,30 +535,6 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Modify the data on /api/v2/discussions/:id to include reactions.
-     *
-     * @param array $result Post-validated data.
-     * @param DiscussionsApiController $sender
-     * @param Schema $inSchema
-     * @param array $query The request query.
-     * @param array $row Pre-validated data.
-     * @return array
-     */
-    public function discussionsApiController_getOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $row) {
-        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
-
-        if ($sender->isExpandField('reactions', $expand)) {
-            $schema = $this->getReactionSummaryFragment();
-            $withAttributes = $this->addAttributes($row, $row['attributes']);
-            $summary = $this->reactionModel->getRecordSummary($withAttributes);
-            $summary = $schema->validate($summary);
-            $result['reactions'] = $summary;
-        }
-
-        return $result;
-    }
-
-    /**
      * Modify the data on /api/v2/discussions index to include reactions.
      *
      * @param array $result Post-validated data.
@@ -571,10 +547,14 @@ class ReactionsPlugin extends Gdn_Plugin {
     public function discussionsApiController_indexOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
+        // Put the result and row data in arrays if they aren't already.
+        $result = array_key_exists($result, 'DiscussionID') ?: [$result];
+        $rows = array_key_exists($rows, 'DiscussionID') ?: [$rows];
+
         if ($sender->isExpandField('reactions', $expand)) {
             $attributes = array_column($rows, 'attributes', 'discussionID');
             $schema = $this->getReactionSummaryFragment();
-            array_walk($result, function(&$row) use ($attributes, $schema) {
+            array_walk($result, function (&$row) use ($attributes, $schema) {
                 $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
