@@ -9,7 +9,7 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbProviderInterface;
 
 /**
- * Breadcrumb provider for the groups application.
+ * Breadcrumb provider for events.
  */
 class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
     /** @var EventModel $eventModel */
@@ -17,6 +17,7 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
 
     /** @var CategoryCollection */
     private $categoryCollection;
+
     /** @var GroupModel $groupModel */
     private $groupModel;
 
@@ -50,11 +51,11 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
         ];
 
         if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID) {
-            $crumbs = $this->setGroupTypeBreadCrumbs($parentRecordID, $crumbs);
+            $crumbs = $this->calcGroupTypeBreadCrumbs($parentRecordID, $crumbs);
         }
 
         if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY && $parentRecordID) {
-            $crumbs = $this->setCategoryTypeBreadcrumbs($parentRecordID, $crumbs);
+            $crumbs = $this->calcCategoryTypeBreadcrumbs($parentRecordID, $crumbs);
         }
 
         $eventName = $event['Name'] ?? '';
@@ -77,7 +78,7 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
      * @param array $crumbs
      * @return array
      */
-    private function setGroupTypeBreadCrumbs(int $parentRecordID, array $crumbs): array {
+    private function calcGroupTypeBreadCrumbs(int $parentRecordID, array $crumbs): array {
         $crumbs[] = new Breadcrumb(t('Groups'), url('/groups'));
         $group = $this->groupModel->getID($parentRecordID);
         if ($group) {
@@ -95,7 +96,7 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
      * @param array $crumbs
      * @return array
      */
-    private function setCategoryTypeBreadcrumbs(int $parentRecordID, array $crumbs): array {
+    private function calcCategoryTypeBreadcrumbs(int $parentRecordID, array $crumbs): array {
         $ancestors = $this->categoryCollection->getAncestors($parentRecordID);
         if ($ancestors) {
             foreach ($ancestors as $ancestor) {
