@@ -544,7 +544,7 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $rows Raw result.
      * @return array
      */
-    public function discussionsApiController_indexOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function discussionsApiController_getOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         // Put the result and row data in arrays if they aren't already.
