@@ -74,7 +74,11 @@ class GroupsHooks extends Gdn_Plugin {
         ;
 
         $dic->rule(BreadcrumbModel::class)
-            ->addCall('addProvider', [new Reference(EventsBreadCrumbProvider::class)])
+            ->addCall('addProvider', [new Reference(EventsBreadcrumbProvider::class)])
+        ;
+
+        $dic->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(GroupBreadcrumbProvider::class)])
         ;
     }
 

@@ -5,37 +5,27 @@
  */
 
 use Vanilla\Contracts\RecordInterface;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Navigation\BreadcrumbProviderInterface;
 
 /**
  * Breadcrumb provider for events.
  */
-class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
+class EventsBreadcrumbProvider implements BreadcrumbProviderInterface {
+
     /** @var EventModel $eventModel */
     private $eventModel;
-
-    /** @var CategoryCollection */
-    private $categoryCollection;
-
-    /** @var GroupModel $groupModel */
-    private $groupModel;
 
     /**
      * Constructor for EventBreadCrumbProvider.
      *
      * @param EventModel $eventModel
-     * @param CategoryCollection $categoryCollection
-     * @param GroupModel $groupModel
      */
-    public function __construct(
-        EventModel $eventModel,
-        CategoryCollection $categoryCollection,
-        GroupModel $groupModel
-    ) {
+    public function __construct(EventModel $eventModel) {
         $this->eventModel = $eventModel;
-        $this->categoryCollection = $categoryCollection;
-        $this->groupModel = $groupModel;
     }
 
     /**
@@ -46,16 +36,14 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
         $parentRecordType = $event['ParentRecordType'] ?? null;
         $parentRecordID = $event['ParentRecordID'] ?? null;
 
-        $crumbs = [
-            new Breadcrumb(t('Home'), \Gdn::request()->url('/', true)),
-        ];
+        $breadCrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
 
         if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID) {
-            $crumbs = $this->calcGroupTypeBreadCrumbs($parentRecordID, $crumbs);
+            $crumbs = $breadCrumbModel->getForRecord(new GroupRecordType($parentRecordID));
         }
 
         if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY && $parentRecordID) {
-            $crumbs = $this->calcCategoryTypeBreadcrumbs($parentRecordID, $crumbs);
+            $crumbs = $breadCrumbModel->getForRecord(new ForumCategoryRecordType($parentRecordID));
         }
 
         $eventName = $event['Name'] ?? '';
@@ -71,38 +59,4 @@ class EventsBreadCrumbProvider implements BreadcrumbProviderInterface {
         return [EventRecordType::TYPE];
     }
 
-    /**
-     * Set Breadcrumbs for Group Event.
-     *
-     * @param int $parentRecordID
-     * @param array $crumbs
-     * @return array
-     */
-    private function calcGroupTypeBreadCrumbs(int $parentRecordID, array $crumbs): array {
-        $crumbs[] = new Breadcrumb(t('Groups'), url('/groups'));
-        $group = $this->groupModel->getID($parentRecordID);
-        if ($group) {
-            $groupName = $group['Name'] ?? '';
-            $crumbs[] = new Breadcrumb(t($groupName), groupUrl($group));
-        }
-
-        return $crumbs;
-    }
-
-    /**
-     * Set BreadCrumb for Category Event.
-     *
-     * @param int $parentRecordID
-     * @param array $crumbs
-     * @return array
-     */
-    private function calcCategoryTypeBreadcrumbs(int $parentRecordID, array $crumbs): array {
-        $ancestors = $this->categoryCollection->getAncestors($parentRecordID);
-        if ($ancestors) {
-            foreach ($ancestors as $ancestor) {
-                $crumbs[] = new Breadcrumb($ancestor['Name'], categoryUrl($ancestor));
-            }
-        }
-        return $crumbs;
-    }
 }
