@@ -7,7 +7,7 @@ import { dropdownSwitchButtonClasses } from "@library/flyouts/dropDownSwitchButt
 import { CheckCompactIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import DateTime from "@library/content/DateTime";
+import DateTime, { DateFormats } from "@library/content/DateTime";
 import { ITheme } from "@library/theming/themeReducer";
 import { themeRevisionPageClasses } from "@themingapi/theme/themeRevisionsPageStyles";
 
@@ -45,7 +45,7 @@ export function ThemeRevisionItem(props: IProps) {
                         {userInfo.name}
                     </span>
                     <span className={classNames(revisionPageClasses.labelMetas, revisionPageClasses.itemLabel)}>
-                        <DateTime timestamp={revision.dateInserted} extended={true} />
+                        <DateTime timestamp={revision.dateInserted} type={DateFormats.EXTENDED} />
                     </span>
                     {isActive && (
                         <span className={classNames(revisionPageClasses.labelMetas, revisionPageClasses.activeItem)}>
