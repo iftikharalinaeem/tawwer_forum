@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Vanilla\Groups\Models\GroupPermissions;
+
 /**
  * Groups Application - Event Model
  *
@@ -16,6 +18,9 @@ class EventModel extends Gdn_Model {
     const PARENT_TYPE_GROUP = 'group';
     const PARENT_TYPE_CATEGORY = 'category';
 
+    /** @var GroupModel */
+    private $groupModel;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -23,6 +28,7 @@ class EventModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Event');
+        $this->groupModel = \Gdn::getContainer()->get(GroupModel::class);
     }
 
     /**
@@ -191,7 +197,7 @@ class EventModel extends Gdn_Model {
                     $groupModel = new GroupModel();
                     $eventGroup = $groupModel->getID($eventGroupID);
 
-                    if (groupPermission('Member', $eventGroupID)) {
+                    if ($this->groupModel->hasGroupPermission(GroupPermissions::MEMBER, $eventGroupID)) {
                         $perms['Member'] = true;
                         $perms['View'] = true;
                     } else {
@@ -202,7 +208,7 @@ class EventModel extends Gdn_Model {
             }
 
             // Allow Admins to restrict event creation to leaders only.
-            if (!c('Groups.Members.CanAddEvents', true) && !groupPermission('Leader', $eventGroupID)) {
+            if (!c('Groups.Members.CanAddEvents', true) && !$this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $eventGroupID)) {
                 $perms['Create'] = false;
             }
 
@@ -252,9 +258,9 @@ class EventModel extends Gdn_Model {
      */
     public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
         if ($parentRecordType === GroupModel::RECORD_TYPE) {
-            if (groupPermission('Leader', $parentRecordID)) {
+            if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
                 return true;
-            } elseif (c('Groups.Members.CanAddEvents', true) && groupPermission('Member', $parentRecordID)) {
+            } elseif (c('Groups.Members.CanAddEvents', true) && $this->groupModel->hasGroupPermission(GroupPermissions::MEMBER, $parentRecordID)) {
                 return true;
             } else {
                 return false;

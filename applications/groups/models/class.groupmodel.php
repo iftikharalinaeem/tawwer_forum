@@ -4,6 +4,10 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Groups\Models\GroupPermissions;
+
 /**
  * Class GroupModel
  */
@@ -23,6 +27,9 @@ class GroupModel extends Gdn_Model {
     /** @var array The permissions associated with a group. */
     private static $permissions = [];
 
+    /** @var Gdn_Session */
+    private $session;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -30,6 +37,7 @@ class GroupModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Group');
+        $this->session = \Gdn::getContainer()->get(\Gdn_Session::class);
         $this->fireEvent('Init');
     }
 
@@ -49,10 +57,10 @@ class GroupModel extends Gdn_Model {
             throw new Gdn_UserException('Cannot apply to a group that is not private.');
         }
 
-        $permissions = $this->checkPermission(false, $groupID, $userID);
-
-        if (!$permissions['Join']) {
-            throw new GDN_UserException($permissions['Join.Reason']);
+        try {
+            $this->hasGroupPermission(GroupPermissions::JOIN, $groupID, $userID);
+        } catch (ForbiddenException $e) {
+            throw new GDN_UserException($e->getMessage(), $e->getCode(), $e);
         }
 
         $model = new Gdn_Model('GroupApplicant');
@@ -116,6 +124,186 @@ class GroupModel extends Gdn_Model {
     }
 
     /**
+     * Calculate the permissions for a group.
+     *
+     * @param int $groupID The group ID.
+     * @param int|null $userID The userID to calculate the permissions for. Defaults to the current user.
+     * @return GroupPermissions
+     */
+    public function calculatePermissionsForGroup(int $groupID, ?int $userID = null): GroupPermissions {
+        if ($userID === null) {
+            $userID = $this->session->UserID;
+        }
+
+        $localCacheKey = "$userID-$groupID";
+
+        if (isset(self::$permissions[$localCacheKey])) {
+            return self::$permissions[$localCacheKey];
+        }
+
+        $group = $this->getID($groupID);
+        if (!$group) {
+            throw new NotFoundException('Group');
+        }
+
+        if ($userID === UserModel::GUEST_USER_ID) {
+            $userGroup = false;
+            $groupApplicant = false;
+        } else {
+            $userGroup = $this->SQL->getWhere(
+                'UserGroup',
+                [
+                    'GroupID' => $groupID,
+                    'UserID' => $userID,
+                ]
+            )->firstRow(DATASET_TYPE_ARRAY);
+            $groupApplicant = $this->SQL->getWhere(
+                'GroupApplicant',
+                [
+                    'GroupID' => $groupID,
+                    'UserID' => $userID,
+                ]
+            )->firstRow(DATASET_TYPE_ARRAY);
+        }
+
+        $permissions = new GroupPermissions();
+
+        // The group creator is always a member and leader.
+        $isOwner = $userID == $group['InsertUserID'];
+        if ($isOwner) {
+            $permissions->setPermission(GroupPermissions::DELETE, true);
+
+            if (!$userGroup) {
+                $userGroup = ['Role' => 'Leader'];
+            }
+        }
+
+        if ($this->session->isValid()) {
+            // By default all uses can join groups.
+            $permissions->setPermission(GroupPermissions::JOIN, true);
+        }
+
+        // Apply permissions out of the userGroup record.
+        if ($userGroup) {
+            $isLeader = $userGroup['Role'] === 'Leader';
+
+            $permissions
+                ->setPermission(
+                    GroupPermissions::JOIN,
+                    false,
+                    t('You are already a member of this group.')
+                )
+                ->setPermission(GroupPermissions::MEMBER, true)
+                ->setPermission(GroupPermissions::LEADER, $isLeader)
+                ->setPermission(GroupPermissions::EDIT, $isLeader)
+                ->setPermission(GroupPermissions::MODERATE, $isLeader)
+                ->setPermission(
+                    GroupPermissions::LEAVE,
+                    !$isOwner,
+                    t("You can't leave the group you started.")
+                )
+            ;
+        } else {
+            // We are not currently part of the group.
+            // This is based off of the group type.
+            if ($group['Privacy'] !== 'Public') {
+                $permissions
+                    ->setPermission(GroupPermissions::APPLY, true)
+                    ->setPermission(
+                        GroupPermissions::VIEW,
+                        false,
+                        t('Join this group to view its content.')
+                    )
+                ;
+            }
+
+            if ($group['Privacy'] === 'Secret') {
+                $permissions
+                    ->setPermission('Access', false)
+                    ->setPermission('Apply', false)
+                ;
+            }
+        }
+
+        // Handle existing applications and invites.
+        if ($groupApplicant) {
+            switch (strtolower($groupApplicant['Type'])) {
+                case 'application':
+                    $reason = t("You've applied to join this group.");
+                    $permissions
+                        ->setPermission(GroupPermissions::JOIN, false, $reason)
+                        ->setPermission(GroupPermissions::APPLY, false, $reason)
+                    ;
+                    break;
+                case 'denied':
+                    $reason = t("You're application for this group was denied.", 'Your application for this group was denied.');
+                    $permissions
+                        ->setPermission(GroupPermissions::JOIN, false, $reason)
+                        ->setPermission(GroupPermissions::APPLY, false, $reason)
+                    ;
+                    break;
+                case 'ban':
+                    $reason = t("You're banned from joining this group.", 'Your application for this group was denied.');
+                    $permissions
+                        ->setPermission(GroupPermissions::JOIN, false, $reason)
+                        ->setPermission(GroupPermissions::APPLY, false, $reason)
+                    ;
+                    break;
+                case 'invitation':
+                    $reason = t('You have a pending invitation to join this group.');
+                    $permissions
+                        ->setPermission(GroupPermissions::JOIN, true)
+                        ->setPermission(GroupPermissions::APPLY, false, $reason)
+                    ;
+                    break;
+            }
+        }
+
+        // Overlay moderator permissions.
+        $isManager = $isOwner || $this->isModerator();
+        if ($isManager) {
+            $permissions
+                ->setPermission(GroupPermissions::ACCESS, true)
+                ->setPermission(GroupPermissions::DELETE, true)
+                ->setPermission(GroupPermissions::EDIT, true)
+                ->setPermission(GroupPermissions::LEADER, true)
+                ->setPermission(GroupPermissions::MODERATE, true)
+                ->setPermission(GroupPermissions::VIEW, true)
+            ;
+        }
+
+        self::$permissions[$localCacheKey] = $permissions;
+
+        return $permissions;
+    }
+
+    /**
+     * Check if a permission exists on a group. Throws an exception if that permission is not set.
+     *
+     * @param string $permission One of the constants from GroupPermission::
+     * @param int $groupID The ID of the group to check.
+     * @param int|null $userID
+     *
+     * @return bool Whether or not the user has the permission.
+     */
+    public function hasGroupPermission(string $permission, int $groupID, int $userID = null): bool {
+        $permissions = $this->calculatePermissionsForGroup($groupID, $userID);
+        return $permissions->hasPermission($permission);
+    }
+
+    /**
+     * Check if a permission exists on a group.
+     *
+     * @param string $permission One of the constants from GroupPermission::
+     * @param int $groupID The ID of the group to check.
+     * @param int|null $userID
+     */
+    public function checkGroupPermission(string $permission, int $groupID, int $userID = null) {
+        $permissions = $this->calculatePermissionsForGroup($groupID, $userID);
+        $permissions->checkPermission($permission);
+    }
+
+    /**
      * Check permission on a group.
      *
      * @param string $permission The permission to check. Valid values are:
@@ -131,159 +319,35 @@ class GroupModel extends Gdn_Model {
      * @param int|array $groupID The groupID or group record.
      * @param int|null $userID
      * @param bool $useCache Use the user-group permission cache? If false, don't read or write to it.
-     * @return boolean
+     * @return boolean|string String if there is a reason for no permission.
+     * @deprecated Use checkGroupPermission instead.
      */
     public function checkPermission($permission, $groupID, $userID = null, $useCache = true) {
+        deprecated(__METHOD__, 'checkGroupPermission');
 
-        if ($userID === null) {
-            $userID = Gdn::session()->UserID;
+        if (!$useCache) {
+            $this->resetCachedPermissions();
         }
-
         if (is_array($groupID)) {
-            $group = $groupID;
-            $groupID = $group['GroupID'];
+            $groupID = $groupID['GroupID'];
         }
 
-        $key = "$userID-$groupID";
-
-        if (!$useCache || !isset(self::$permissions[$key])) {
-            // Get the data for the group.
-            if (!isset($group)) {
-                $group = $this->getID($groupID);
-            }
-
-            if ($userID) {
-                $userGroup = Gdn::sql()->getWhere('UserGroup', ['GroupID' => $groupID, 'UserID' => Gdn::session()->UserID])->firstRow(DATASET_TYPE_ARRAY);
-                $groupApplicant = Gdn::sql()->getWhere('GroupApplicant', ['GroupID' => $groupID, 'UserID' => Gdn::session()->UserID])->firstRow(DATASET_TYPE_ARRAY);
-            } else {
-                $userGroup = false;
-                $groupApplicant = false;
-            }
-
-            // Set the default permissions.
-            $perms = [
-                'Access' => true,
-                'Member' => false,
-                'Leader' => false,
-                'Apply' => false,
-                'Join' => Gdn::session()->isValid(),
-                'Leave' => false,
-                'Edit' => false,
-                'Delete' => false,
-                'Moderate' => false,
-                'View' => true,
-            ];
-
-            // The group creator is always a member and leader.
-            if ($userID == $group['InsertUserID']) {
-                $perms['Delete'] = true;
-
-                if (!$userGroup) {
-                    $userGroup = ['Role' => 'Leader'];
-                }
-            }
-
-            if ($userGroup) {
-                $perms['Join'] = false;
-                $perms['Join.Reason'] = t('You are already a member of this group.');
-
-                $perms['Member'] = true;
-                $perms['Leader'] = ($userGroup['Role'] == 'Leader');
-                $perms['Edit'] = $perms['Leader'];
-                $perms['Moderate'] = $perms['Leader'];
-
-                if ($userID != $group['InsertUserID']) {
-                    $perms['Leave'] = true;
-                } else {
-                    $perms['Leave.Reason'] = t("You can't leave the group you started.");
-                }
-            } else {
-                if ($group['Privacy'] != 'Public') {
-                    $perms['Apply'] = true;
-                    $perms['View'] = false;
-                    $perms['View.Reason'] = t('Join this group to view its content.');
-
-                    // Secret groups basically have the same permissions as non-public groups with some minor tweaks.
-                    if ($group['Privacy'] === 'Secret') {
-                        $perms['Access'] = false;
-                        $perms['Apply'] = false;
-                    }
-                }
-            }
-
-            if ($groupApplicant) {
-                $perms['Apply'] = false; // Already applied or banned.
-                $perms['Join'] = false; // Already applied or banned.
-                switch (strtolower($groupApplicant['Type'])) {
-                    case 'application':
-                        $perms['Join.Reason'] = t("You've applied to join this group.");
-                        $perms['Apply.Reason'] = t("You've applied to join this group.");
-                        break;
-                    case 'denied':
-                        $perms['Join.Reason'] = t("You're application for this group was denied.", 'Your application for this group was denied.');
-                        $perms['Apply.Reason'] = t("You're application for this group was denied.", 'Your application for this group was denied.');
-                        break;
-                    case 'ban':
-                        $perms['Join.Reason'] = t("You're banned from joining this group.");
-                        $perms['Apply.Reason'] = t("You're banned from joining this group.");
-                        break;
-                    case 'invitation':
-                        $perms['Access'] = true;
-                        $perms['Apply.Reason'] = t('You have a pending invitation to join this group.');
-                        $perms['Join'] = true;
-                        unset($perms['Join.Reason']);
-                        break;
-                }
-            }
-
-            // Moderators can view and edit all groups.
-            $canManage = $this->isModerator();
-
-            if ($userID == Gdn::session()->UserID && $canManage) {
-                $managerOverrides = [
-                    'Access' => true,
-                    'Delete' => true,
-                    'Edit' => true,
-                    'Leader' => true,
-                    'Moderate' => true,
-                    'View' => true,
-                ];
-
-                unset($perms['View.Reason']);
-                $perms = array_merge($perms, $managerOverrides);
-            }
-
-            if ($useCache) {
-                self::$permissions[$key] = $perms;
-            }
-        } else {
-            $perms = self::$permissions[$key];
+        $isReason = strpos($permission, '.Reason') !== false;
+        if ($isReason) {
+            $permission = str_replace('.Reason', '', $permission);
         }
 
-        if (!$permission) {
-            return $perms;
-        }
-
-        if (!isset($perms[$permission])) {
-            if (strpos($permission, '.Reason') === false) {
+        try {
+            $this->checkGroupPermission((string) $permission, (int) $groupID, $userID);
+            return true;
+        } catch (ForbiddenException $e) {
+            // This is a legacy function an used to return the "reason" why the permission failed as a string.
+            if ($isReason) {
                 trigger_error("Invalid group permission $permission.");
                 return false;
             } else {
-                $permission = stringEndsWith($permission, '.Reason', true, true);
-                if ($perms[$permission]) {
-                    return '';
-                }
-
-                if (in_array($permission, ['Member', 'Leader'])) {
-                    $message = t(sprintf("You aren't a %s of this group.", strtolower($permission)));
-                } else {
-                    $message = sprintf(t("You aren't allowed to %s this group."), t(strtolower($permission)));
-                }
-
-                return $message;
+                return $e->getMessage();
             }
-        } else {
-            return $perms[$permission];
         }
     }
 
@@ -1283,7 +1347,7 @@ class GroupModel extends Gdn_Model {
         }
         $categoryID = val('PermissionCategoryID', $category);
 
-        if ($this->checkPermission('Moderate', $group)) {
+        if ($this->hasGroupPermission(GroupPermissions::MODERATE, $group['GroupID'])) {
             Gdn::session()->setPermission('Vanilla.Discussions.Announce', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Discussions.Close', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Discussions.Edit', [$categoryID]);
@@ -1296,7 +1360,7 @@ class GroupModel extends Gdn_Model {
             }
         }
 
-        if ($this->checkPermission('View', $group)) {
+        if ($this->hasGroupPermission(GroupPermissions::VIEW, $group['GroupID'])) {
             Gdn::session()->setPermission('Vanilla.Discussions.View', [$categoryID]);
             CategoryModel::setLocalField($categoryID, 'PermsDiscussionsView', true);
         } else {
@@ -1306,7 +1370,9 @@ class GroupModel extends Gdn_Model {
             Gdn::session()->setPermission('Vanilla.Discussions.View', []);
         }
 
-        if ($this->checkPermission('Member', $group) || $this->checkPermission('Moderate', $group)) {
+        if ($this->hasGroupPermission(GroupPermissions::MEMBER, $group['GroupID'])
+            || $this->hasGroupPermission(GroupPermissions::MODERATE, $group['GroupID'])
+        ) {
             Gdn::session()->setPermission('Vanilla.Discussions.Add', [$categoryID]);
             Gdn::session()->setPermission('Vanilla.Comments.Add', [$categoryID]);
         } else {

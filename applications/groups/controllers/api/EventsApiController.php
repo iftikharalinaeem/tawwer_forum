@@ -14,6 +14,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\FormatSchema;
@@ -470,9 +471,9 @@ class EventsApiController extends AbstractApiController {
             if ($query['parentRecordID']) {
                 $group = $this->groupModel->getID($query['parentRecordID']);
                 $groupPrivacy = $group['Privacy'];
-                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
+                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  GroupPermissions::MEMBER :  GroupPermissions::ACCESS;
                 $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-                if (!$this->groupModel->checkPermission($access, $query['parentRecordID']) && !$isAdmin) {
+                if (!$this->groupModel->hasGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
                 } else {
