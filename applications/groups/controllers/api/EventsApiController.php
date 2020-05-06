@@ -13,11 +13,13 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
-use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\FormatSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * API Controller for the `/events` resource.
@@ -41,21 +43,27 @@ class EventsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * EventsApiController constructor.
      *
      * @param EventModel $eventModel
      * @param GroupModel $groupModel
      * @param UserModel $userModel
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         EventModel $eventModel,
         GroupModel $groupModel,
-        UserModel $userModel
+        UserModel $userModel,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+        $this->breadcrumbModel =  $breadcrumbModel;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -162,6 +170,7 @@ class EventsApiController extends AbstractApiController {
                 'dateUpdated:dt|n' => 'When the event was updated.',
                 'updateUserID:i|n' => 'The user that updated the event.',
                 'updateUser?' => $this->getUserFragmentSchema(),
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
@@ -173,10 +182,11 @@ class EventsApiController extends AbstractApiController {
      * Get an event.
      *
      * @param int $id The ID of the event.
-     * @throws Exception
+     * @param array $query
      * @return array
+     * @throws ClientException
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
         $this->idParamEventSchema()->setDescription('Get an event.');
@@ -189,6 +199,10 @@ class EventsApiController extends AbstractApiController {
         }
 
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
+
+        if ($this->isExpandField('breadcrumbs', $query)) {
+            $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+        }
 
         $result = $this->normalizeEventOutput($event);
         return $out->validate($result);
@@ -362,7 +376,10 @@ class EventsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function idParamEventSchema() {
-        return $this->schema(['id:i' => 'The event ID.'], 'in');
+        return $this->schema([
+            'id:i' => 'The event ID.',
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs'])
+        ], 'in');
     }
 
     /**
@@ -480,8 +497,6 @@ class EventsApiController extends AbstractApiController {
         if ($where) {
             $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
         }
-
-
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
