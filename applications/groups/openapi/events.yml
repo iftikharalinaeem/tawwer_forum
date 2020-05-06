@@ -155,12 +155,22 @@ paths:
         required: true
         schema:
           type: integer
+      - description: Expand breadcrumbs.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+              - all
+              - breadcrumbs
+            type: string
+          type: array
       responses:
         '200':
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/FullEvent'
           description: Success
       tags:
       - Events
@@ -358,6 +368,20 @@ components:
           description: The date the event was updated.
           format: date-time
           type: string
+        breadcrumbs:
+          description: List of breadcrumbs, returned on expand.
+          items:
+            properties:
+              name:
+                description: Breadcrumb element name.
+                minLength: 1
+                type: string
+              url:
+                description: Breadcrumb element url.
+                minLength: 1
+                type: string
+            type: object
+          type: array
         url:
           description: The full URL to the event.
           type: string

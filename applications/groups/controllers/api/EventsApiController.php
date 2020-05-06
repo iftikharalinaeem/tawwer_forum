@@ -182,10 +182,11 @@ class EventsApiController extends AbstractApiController {
      * Get an event.
      *
      * @param int $id The ID of the event.
-     * @throws Exception
+     * @param array $query
      * @return array
+     * @throws ClientException
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
 
         $this->idParamEventSchema()->setDescription('Get an event.');
@@ -199,7 +200,9 @@ class EventsApiController extends AbstractApiController {
 
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+        if ($this->isExpandField('breadcrumbs', $query)) {
+            $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+        }
 
         $result = $this->normalizeEventOutput($event);
         return $out->validate($result);
@@ -373,7 +376,10 @@ class EventsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function idParamEventSchema() {
-        return $this->schema(['id:i' => 'The event ID.'], 'in');
+        return $this->schema([
+            'id:i' => 'The event ID.',
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs'])
+        ], 'in');
     }
 
     /**
