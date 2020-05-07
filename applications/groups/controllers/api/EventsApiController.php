@@ -512,6 +512,45 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
+     * @param array $query
+     * @return mixed
+     */
+    public function get_userEvents(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+        $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
+
+        $in = $this->schema([
+            'userID:i' => 'The users ID',
+            'parentRecordID:i' => 'Parent where the event was created',
+            'parentRecordType:s' => [
+                'ID of the Parent where the event was created',
+                'enum' => [
+                    EventModel::PARENT_TYPE_GROUP,
+                    EventModel::PARENT_TYPE_CATEGORY
+                ],
+            ],
+        ], 'in')->setDescription('List events.');
+
+        $query = $in->validate($query);
+
+        $out = $this->schema([':a' => $this->userEventSchema()], 'out');
+
+        $usersEvents = $this->eventModel->getUsersEvents(
+            $query['userID'],
+            $query['parentRecordID'],
+            $query['parentRecordType']
+        );
+
+        foreach ($usersEvents as &$usersEvent) {
+            $usersEvent = $this->normalizeEventOutput($usersEvent);
+        }
+
+        $results = $out->validate($usersEvents);
+
+        return $results;
+    }
+
+    /**
      * Normalize an event Schema record to match the database definition.
      *
      * @param array $schemaRecord Event Schema record.
@@ -804,5 +843,27 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $this->schema($postEventSchema, 'in');
+    }
+
+    /**
+     * userEvents schema
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function userEventSchema() {
+        static $userEventSchema;
+
+        if ($userEventSchema === null) {
+            $userEventSchema = $this->schema(
+                Schema::parse([
+                    'EventID',
+                    'UserID',
+                    'Attending',
+                ])->add($this->fullEventSchema()),
+                'UserEvents'
+            );
+        }
+
+        return $this->schema($userEventSchema, 'in');
     }
 }

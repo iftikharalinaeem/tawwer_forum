@@ -408,6 +408,31 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * @param int $userID
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     */
+    public function getUsersEvents(int $userID, int $parentRecordID, string $parentRecordType) {
+        $userID = $userID ?? null;
+        $parentRecordID = $parentRecordID ?? null;
+        $parentRecordType = $parentRecordType ?? null;
+
+        $results = $this->SQL
+            ->select('ue.EventID, ue.UserID, ue.Attending')
+            ->from('Event e')
+            ->join('UserEvent ue', 'e.EventID = ue.EventID')
+            ->where([
+                'e.ParentRecordType' => $parentRecordType,
+                'e.ParentRecordID' => $parentRecordID,
+                'ue.UserID' => $userID
+            ])
+            ->get()->resultArray();
+        ;
+
+        return $results;
+    }
+
+    /**
      * Override event save.
      *
      * Set 'Fix' = false to bypass date munging
