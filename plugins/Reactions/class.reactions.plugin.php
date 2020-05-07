@@ -548,8 +548,8 @@ class ReactionsPlugin extends Gdn_Plugin {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         // Put the $result and $row data in arrays if they aren't already.
-        $result = array_key_exists($result, 'DiscussionID') ?: [$result];
-        $rows = array_key_exists($rows, 'DiscussionID') ?: [$rows];
+        $result = array_key_exists($result, 'DiscussionID') ? [$result] : $result;
+        $rows = array_key_exists($rows, 'DiscussionID') ? [$rows] : $rows;
 
         if ($sender->isExpandField('reactions', $expand)) {
             $attributes = array_column($rows, 'attributes', 'discussionID');
