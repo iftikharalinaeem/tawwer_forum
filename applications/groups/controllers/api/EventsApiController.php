@@ -354,16 +354,12 @@ class EventsApiController extends AbstractApiController {
         $startDate = $eventData['dateStarts'] ?? $eventData['DateStarts'] ?? false;
         $eventEndDateInfo = [];
         if ($startDate instanceof DateTimeInterface) {
-            $formattedStartDate = $startDate->format('Y-m-d');
-            $newEndDate = new DateTime($formattedStartDate);
-            $newEndDate->add(new DateInterval('PT23H59M59S'))->format('Y-m-d H:i:s');
-            $eventEndDateInfo['dateEnds'] = $newEndDate;
+            $endDate = $startDate->modify('1 Day');
+            $eventEndDateInfo['dateEnds'] = $endDate->format('Y-m-d H:i:s');
         } else {
             $convertedStartDate = new DateTime($startDate);
-            $formattedStartDate = $convertedStartDate->format('Y-m-d');
-            $newEndDate = new DateTime($formattedStartDate);
-            $newEndDate->add(new DateInterval('PT23H59M59S'));
-            $eventEndDateInfo['dateEnds'] = $newEndDate->format('Y-m-d H:i:s');
+            $convertedStartDate->modify('1 Day');
+            $eventEndDateInfo['dateEnds'] = $convertedStartDate->format('Y-m-d H:i:s');
         }
         $eventEndDateInfo['allDayEvent'] = 1;
 

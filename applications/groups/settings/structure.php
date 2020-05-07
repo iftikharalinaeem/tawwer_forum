@@ -229,4 +229,11 @@ if ($St->tableExists('Event')) {
         ->set('ParentRecordType', 'group')
         ->where('ParentRecordID is null')
         ->put();
+
+    Gdn::sql()
+        ->update('Event')
+        ->set('DateEnds', 'DateStarts + INTERVAL 1 DAY', false)
+        ->set('AllDayEvent', 1)
+        ->where('DateEnds is NULL')
+        ->put();
 }
