@@ -408,9 +408,13 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Get all the events associated to a user.
+     *
      * @param int $userID
-     * @param string $parentRecordType
      * @param int $parentRecordID
+     * @param string $parentRecordType
+     *
+     * @return array
      */
     public function getUsersEvents(int $userID, int $parentRecordID, string $parentRecordType) {
         $userID = $userID ?? null;

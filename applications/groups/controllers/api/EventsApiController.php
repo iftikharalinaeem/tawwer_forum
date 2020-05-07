@@ -512,6 +512,8 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
+     * GET /events/user-events
+     *
      * @param array $query
      * @return mixed
      */
