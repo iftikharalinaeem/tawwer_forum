@@ -14,6 +14,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Groups\Models\EventPermissions;
 use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -82,11 +83,7 @@ class EventsApiController extends AbstractApiController {
         $this->idParamEventSchema()->setDescription('Delete an event.');
         $this->schema([], 'out');
 
-        $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('Organizer', $event)) {
-            throw new ClientException('You do not have the rights to delete this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::ORGANIZER, $id);
 
         // EventModel->deleteID() won't do here because it does not delete all the event's data.
         $this->eventModel->delete(['EventID' => $id]);
@@ -185,7 +182,6 @@ class EventsApiController extends AbstractApiController {
      * @param int $id The ID of the event.
      * @param array $query
      * @return array
-     * @throws ClientException
      */
     public function get($id, array $query) {
         $this->permission();
@@ -194,11 +190,7 @@ class EventsApiController extends AbstractApiController {
         $out = $this->schema($this->fullEventSchema(), 'out');
 
         $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view this event.');
-        }
-
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
         if ($this->isExpandField('breadcrumbs', $query)) {
@@ -307,10 +299,7 @@ class EventsApiController extends AbstractApiController {
         );
 
         $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
 
         $result = $out->validate($event);
         $this->applyFormatCompatibility($result, 'body', 'format');
@@ -328,7 +317,7 @@ class EventsApiController extends AbstractApiController {
         $parentRecordType = $inputeParams['parentRecordType'] ?? null;
         if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
             $row = $this->groupModel->getID($parentRecordID, DATASET_TYPE_ARRAY);
-            if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
+            if (!$row || !$this->groupModel->hasGroupPermission(GroupPermissions::ACCESS, $parentRecordID)) {
                 throw new NotFoundException('Group');
             }
         } else {
@@ -472,7 +461,7 @@ class EventsApiController extends AbstractApiController {
                 $group = $this->groupModel->getID($query['parentRecordID']);
                 $groupPrivacy = $group['Privacy'];
                 $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  GroupPermissions::MEMBER :  GroupPermissions::ACCESS;
-                $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+                $isAdmin = $this->getSession()->checkPermission('Garden.Settings.Manage');
                 if (!$this->groupModel->hasGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
@@ -608,9 +597,7 @@ class EventsApiController extends AbstractApiController {
 
         $eventData['EventID'] = $id;
 
-        if (!$this->eventModel->checkPermission('Edit', $event)) {
-            throw new ClientException('You do not have the rights to edit this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::EDIT, $id);
 
         $this->validateParentRecordInsert($body);
 
@@ -690,15 +677,12 @@ class EventsApiController extends AbstractApiController {
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
         $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view that event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
 
         $body = $in->validate($body);
 
         $userID = !empty($body['userID']) ? $body['userID'] : $this->getSession()->UserID;
-        if ($this->getSession()->UserID !== $userID && !$this->eventModel->checkPermission('Organizer', $event, $this->getSession()->UserID)) {
+        if ($this->getSession()->UserID !== $userID && $this->eventModel->hasEventPermission(EventPermissions::ORGANIZER, $id)) {
             throw new ClientException('You do not have the rights to add a participant to that event.');
         }
 

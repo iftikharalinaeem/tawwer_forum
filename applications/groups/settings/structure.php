@@ -20,6 +20,17 @@ Gdn::permissionModel()->define([
     'Groups.Moderation.Manage' => 'Garden.Moderation.Manage',
 ]);
 
+// Define Category Event Permissions
+Gdn::permissionModel()->define(
+    [
+        'Vanilla.Events.Manage' => 'Garden.Community.Manage',
+        'Vanilla.Events.View' => 'Vanilla.Discussions.View',
+    ],
+    'tinyint',
+    'Category',
+    'PermissionCategoryID'
+);
+
 // Define the groups table.
 $St->table('Group');
 $GroupExists = $St->tableExists();
