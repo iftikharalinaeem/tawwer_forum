@@ -226,6 +226,7 @@ class EventsApiController extends AbstractApiController {
                 'enum' => ['yes', 'no', 'maybe', 'answered', 'unanswered', 'all'],
                 'description' => 'Filter participant by attending status.',
             ],
+            'userID:i?' => ['description' => 'Get the participation status of a specific user'],
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,
@@ -250,6 +251,13 @@ class EventsApiController extends AbstractApiController {
 
         // Filters
         $where = [];
+
+        $userID = $query['userID'] ?? null;
+
+        if ($userID) {
+            $where['UserID'] = $userID;
+        }
+
         if (array_key_exists('Attending', $participantData)) {
             if ($participantData['Attending'] === 'Answered') {
                 $where['Attending<>'] = 'Invited';
@@ -276,6 +284,8 @@ class EventsApiController extends AbstractApiController {
 
         return new Data($result, ['paging' => $paging]);
     }
+
+
 
     /**
      * Get an event for editing.
@@ -722,6 +732,28 @@ class EventsApiController extends AbstractApiController {
 
         $result = $this->normalizeEventParticipantOutput($participant);
         return $out->validate($result);
+    }
+
+    public function get_userEvents($id) {
+
+        $in = $this->schema([
+            'parentRecordID:i' => 'Parent where the event was created',
+            'parentRecordType:s' => [
+                'ID of the Parent where the event was created',
+                'enum' => [
+                    EventModel::PARENT_TYPE_GROUP,
+                    EventModel::PARENT_TYPE_CATEGORY
+                ],
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => $this->eventModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100,
+            ],
+            'expand:b?' => 'Expand associated records.',
+        ], 'in')->setDescription('List events.');
+
     }
 
     /**
