@@ -408,7 +408,7 @@ class EventModel extends Gdn_Model {
     }
 
     /**
-     * Get a list of Events with participation status.
+     * Get a list of Events with the attending status.
      *
      * @param array $where
      * @param string $orderFields
@@ -418,18 +418,16 @@ class EventModel extends Gdn_Model {
      *
      * @return array
      */
-    public function getEvents(array $where, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
-        $parentRecordID = $where['ParentRecordID'] ?? null;
-        $parentRecordType = $where['ParentRecordType'] ?? null;
+    public function getEvents(array $where, string $orderFields = '', string $orderDirection = 'asc', $limit = false, $offset = false) {
+
+        $userID = $where['UserID'] ?? null;
+        unset($where['UserID']);
 
         $results = $this->SQL
             ->select("e.*, ue.Attending")
             ->from('Event e')
-            ->join('UserEvent ue', "e.EventID = ue.EventID and ue.UserID= \"" . $where['userID']. "\"", 'left')
-            ->where([
-                'e.ParentRecordType' => $parentRecordType,
-                'e.ParentRecordID' => $parentRecordID,
-            ])
+            ->join('UserEvent ue', "e.EventID = ue.EventID and ue.UserID= \"" . $userID . "\"", 'left')
+            ->where($where)
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
             ->get()->resultArray();

@@ -412,14 +412,14 @@ class EventsApiController extends AbstractApiController {
             'dateStarts:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by start dates',
                 'x-filter' => [
-                    'field' => 'DateStarts',
+                    'field' => 'e.DateStarts',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
             'dateEnds:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by end dates',
                 'x-filter' => [
-                    'field' => 'DateEnds',
+                    'field' => 'e.DateEnds',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
@@ -484,21 +484,21 @@ class EventsApiController extends AbstractApiController {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
                 } else {
-                    $where['ParentRecordType'] = $query['parentRecordType'];
-                    $where['ParentRecordID'] =  $query['parentRecordID'];
+                    $where['e.ParentRecordType'] = $query['parentRecordType'];
+                    $where['e.ParentRecordID'] =  $query['parentRecordID'];
                 }
             }
         } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
             if ($query['parentRecordID']) {
                 $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
                 // check the permission based on the category.
-                $where['ParentRecordID'] = $query['parentRecordID'];
-                $where['ParentRecordType'] = $query['parentRecordType'];
+                $where['e.ParentRecordID'] = $query['parentRecordID'];
+                $where['e.ParentRecordType'] = $query['parentRecordType'];
             }
         }
 
         if ($query['allDayEvent'] ?? null) {
-            $where['AllDayEvent'] = 1;
+            $where['e.AllDayEvent'] = 1;
         }
 
         if ($query['userID'] ?? null) {
@@ -509,14 +509,13 @@ class EventsApiController extends AbstractApiController {
         $rows = [];
         if ($where) {
             $rows = $this->eventModel->getEvents($where, $sortField, $sortOrder, $limit, $offset);
-        }
 
+        }
 
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
         foreach ($rows as &$row) {
-
             $row = $this->normalizeEventOutput($row);
         }
 
