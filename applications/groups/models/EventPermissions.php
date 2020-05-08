@@ -22,12 +22,15 @@ final class EventPermissions extends AbstractPermissions {
 
     const VIEW = 'View';
 
+    const ATTEND = 'Attend';
+
     protected $values = [
         self::ORGANIZER => false,
         self::CREATE => false,
         self::EDIT => false,
         self::MEMBER => false,
         self::VIEW => false,
+        self::ATTEND => false,
     ];
 
     /**
@@ -47,6 +50,7 @@ final class EventPermissions extends AbstractPermissions {
             self::EDIT,
             self::MEMBER,
             self::VIEW,
+            self::ATTEND,
         ];
     }
 
@@ -61,6 +65,10 @@ final class EventPermissions extends AbstractPermissions {
         } else {
             $message = sprintf(t("You aren't allowed to %s this event."), t(strtolower($permissionName)));
         }
-        return parent::getDefaultReasonForPermission($permissionName);
+        if ($message) {
+            return $message;
+        } else {
+            return parent::getDefaultReasonForPermission($permissionName);
+        }
     }
 }

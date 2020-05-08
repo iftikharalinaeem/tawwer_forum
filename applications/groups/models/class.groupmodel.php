@@ -340,7 +340,7 @@ class GroupModel extends Gdn_Model {
         try {
             $this->checkGroupPermission((string) $permission, (int) $groupID, $userID);
             return true;
-        } catch (ForbiddenException $e) {
+        } catch (Exception $e) {
             // This is a legacy function an used to return the "reason" why the permission failed as a string.
             if ($isReason) {
                 trigger_error("Invalid group permission $permission.");
@@ -651,6 +651,10 @@ class GroupModel extends Gdn_Model {
      * @return int|false
      */
     public static function idFromSlug($slug) {
+        if (is_numeric($slug)) {
+            return (int) $slug;
+        }
+
         $id = false;
         if (preg_match('/(\d+)-.*/', $slug, $matches)) {
             $id = (int)$matches[1];

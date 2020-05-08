@@ -646,7 +646,7 @@ class EventsApiController extends AbstractApiController {
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
         $event = $this->eventByID($id);
-        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
+        $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $id);
 
         $body = $in->validate($body);
 

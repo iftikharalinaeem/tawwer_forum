@@ -30,6 +30,28 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Add events to the new discussion module.
+     *
+     * @param mixed $notActuallyACategoryModel
+     * @param array $args
+     */
+    public function categoryModel_allowedDiscussionTypes_handler($notActuallyACategoryModel, array $args) {
+        $allowedTypes = &$args['AllowedDiscussionTypes'];
+        $category = $args['Category'];
+        $actualCategoryID = $category['CategoryID'] ?? -1; // Some locations we don't have a real category. In these cases, it's the root.
+        $permissionCategory = $args['PermissionCategory'];
+
+        if (CategoryModel::checkPermission($permissionCategory, 'Vanilla.Events.Manage')) {
+            $allowedTypes['Event'] = [
+                'Singular' => 'Event',
+                'Plural' => 'Events',
+                'AddUrl' => '/event/add/'.$actualCategoryID.'?parentRecordType=category',
+                'AddText' => 'New Event'
+            ];
+        }
+    }
+
+    /**
      * Hook in when default category permissions are being built. Update permissions for the Social Groups category.
      *
      * @param PermissionModel $permissionModel
