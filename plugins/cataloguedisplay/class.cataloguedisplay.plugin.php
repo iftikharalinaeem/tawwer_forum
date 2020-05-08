@@ -20,7 +20,6 @@ use Vanilla\Web\TwigRenderTrait;
 class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
 
-    const CATEGORY_ONLY = true;
     const MASONRY_ENABLED = false;
 
     /**
@@ -119,20 +118,14 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         ;
     }
 
-    /**
-     * Add CSS to handle the thumbnail in the list view, JS to handle the popoup.
-     *
-     * @param Gdn_Controller $sender
-     */
-    public function base_render_before(Gdn_Controller $sender) {
-        if (is_object($sender->Head) && ($sender->ClassName == 'CategoriesController'
-                || (!$this->config->get('CatalogueDisplay.OnlyOnCategory') && $sender->ClassName == 'DiscussionsController'))) {
-            if ($sender->ClassName == 'DiscussionsController' || !$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
-                $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
-            }
-            $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.$this->config->get('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
-        }
-    }
+//    /**
+//     * Add CSS to handle the thumbnail in the list view, JS to handle the popoup.
+//     *
+//     * @param Gdn_Controller $sender
+//     */
+//    public function base_render_before(Gdn_Controller $sender) {
+//
+//    }
 
     /**
      * When editing a category, if there are discussions in the category, update them to add or remove the "catalogue" style.
@@ -188,8 +181,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             if ($sender->Form->getFormValue('Photo', false) === '') {
                 $sender->Form->removeFormValue('Photo');
             }
-            $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
-            Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
             Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
             $existingImage = $this->config->get('CatalogueDisplay.PlaceHolderImage');
@@ -205,7 +196,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
             }
         }
-        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', $this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY));
         $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', $this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
         $sender->Form->setValue('Photo', $this->config->get('CatalogueDisplay.PlaceHolderImage', null));
         $sender->render('settings', '', 'plugins/cataloguedisplay');
@@ -244,41 +234,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
      *
-     * @param DiscussionsController $sender
-     * @param array $args
-     */
-    public function discussionsController_beforeDiscussionContent_handler(DiscussionsController $sender, array $args) {
-        if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
-            return;
-        }
-        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
-            return;
-        }
-        $discussion = $args['Discussion'] ?? null;
-        if ($discussion) {
-            echo $this->displayCatalogueImage($discussion);
-        }
-    }
-
-    /**
-     * If the Discussions Layout is table, echo out the thumbnail (or placeholder).
-     *
-     * @param DiscussionController $sender
-     * @param array $args
-     */
-    public function discussionsController_beforeDiscussionTitle_handler(DiscussionController $sender, array $args) {
-        $discussion = $args['Discussion'] ?? null;
-        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
-            return;
-        }
-        if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
-            echo $this->displayCatalogueImage($discussion);
-        }
-    }
-
-    /**
-     * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
-     *
      * @param CategoriesController $sender
      * @param array $args
      */
@@ -302,22 +257,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $discussion = $args['Discussion'] ?? null;
         if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
             echo $this->displayCatalogueImage($discussion);
-        }
-    }
-
-    /**
-     * Add the CSS class to "catalogue" displayed discussions in the discussion view.
-     *
-     * @param DiscussionsController $sender
-     * @param array $args
-     */
-    public function discussionsController_beforeDiscussionName_handler(DiscussionsController $sender, array $args) {
-        if ($this->config->get('CatalogueDisplay.OnlyOnCategory')) {
-            return;
-        }
-        $discussion = $args['Discussion']??null;
-        if ($discussion && is_object($discussion) && $discussion->CatalogueDisplay) {
-            $args['CssClass'] .= ' CatalogueRow';
         }
     }
 
@@ -425,10 +364,16 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
             return;
         }
+
         if ($this->config->get('CatalogueDisplay.Masonry.Enabled')) {
+            if (is_object($sender->Head)) {
+                $sender->Head->addString('<style>.CatalogueRow .ItemContent {min-height: '.$this->config->get('CatalogueDisplay.Thumbnail.Size', '70').'px}</style>');
+            }
             $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions');
             $sender->addJsFile('masonry-categories.js', 'plugins/cataloguedisplay');
             $sender->addCssFile('catalogue-masonry.css', 'plugins/cataloguedisplay');
+        } else {
+            $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
         }
     }
 }
