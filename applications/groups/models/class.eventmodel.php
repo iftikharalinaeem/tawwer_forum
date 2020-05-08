@@ -7,6 +7,7 @@
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Groups\Models\EventPermissions;
@@ -325,17 +326,82 @@ class EventModel extends Gdn_Model {
      * @return bool
      */
     public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
-        if ($parentRecordType === GroupModel::RECORD_TYPE) {
-            if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
-                return true;
-            } elseif (c('Groups.Members.CanAddEvents', true) && $this->groupModel->hasGroupPermission(GroupPermissions::MEMBER, $parentRecordID)) {
-                return true;
-            } else {
+        switch ($parentRecordType) {
+            case GroupRecordType::TYPE:
+                if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
+                    return true;
+                } elseif (c('Groups.Members.CanAddEvents', true)
+                    && $this->groupModel->hasGroupPermission(GroupPermissions::MEMBER, $parentRecordID)
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+            case ForumCategoryRecordType::TYPE:
+                return $this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.Manage');
+                break;
+            default:
                 return false;
+        }
+    }
+
+    /**
+     * Checks to see whether or not a user can view events in a parent resource.
+     *
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @return bool
+     */
+    public function canViewEvents(string $parentRecordType, int $parentRecordID): bool {
+        switch ($parentRecordType) {
+            case GroupRecordType::TYPE:
+                return $this->groupModel->hasGroupPermission(GroupPermissions::VIEW, $parentRecordID);
+                break;
+            case ForumCategoryRecordType::TYPE:
+                return $this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.View');
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Check whether or not an event can be created. Throw an exception if it can't.
+     *
+     * @param string $permission One of EventPermissions::VIEW or EventPermissions::CREATE
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     */
+    public function checkParentEventPermission(string $permission, string $parentRecordType, int $parentRecordID) {
+        $hasPermission = false;
+        if ($permission === EventPermissions::VIEW) {
+            $hasPermission = $this->canViewEvents($parentRecordType, $parentRecordID);
+        } elseif ($permission === EventPermissions::CREATE) {
+            $hasPermission = $this->canCreateEvents($parentRecordType, $parentRecordID);
+        }
+
+        if ($hasPermission) {
+            return;
+        }
+
+        $groupIsSecret = false;
+        if ($parentRecordType === GroupRecordType::TYPE) {
+            $groupIsSecret = !$this->groupModel->hasGroupPermission(GroupPermissions::ACCESS, $parentRecordID);
+        }
+
+        if ($groupIsSecret) {
+            throw new NotFoundException('Group');
+        } elseif ($parentRecordType === ForumCategoryRecordType::TYPE) {
+            // Check that the category exists.
+            $category = $this->categoryModel::categories($parentRecordID);
+            if (!$category) {
+                throw new NotFoundException('Category');
             }
+            throw new PermissionException('Vanilla.Events.Manage');
         } else {
-            // Not implemented yet.
-            return true;
+            $permissions = new EventPermissions();
+            throw new ForbiddenException($permissions->getDefaultReasonForPermission(EventPermissions::CREATE));
         }
     }
 

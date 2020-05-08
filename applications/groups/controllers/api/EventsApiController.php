@@ -9,6 +9,7 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
@@ -307,37 +308,12 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
-     * Ensure a parent record exists, and the user has access to it.
-     *
-     * @param array $inputParams Check if we can insert in some parent record/id combo if supplied.
-     * @throws NotFoundException If the group could not be found.
-     */
-    public function validateParentRecordInsert(array $inputParams) {
-        $parentRecordID = $inputParams['parentRecordID'] ?? null;
-        $parentRecordType = $inputeParams['parentRecordType'] ?? null;
-        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
-            $row = $this->groupModel->getID($parentRecordID, DATASET_TYPE_ARRAY);
-            if (!$row || !$this->groupModel->hasGroupPermission(GroupPermissions::ACCESS, $parentRecordID)) {
-                throw new NotFoundException('Group');
-            }
-        } else {
-            // Other record types aren't implemented.
-        }
-
-        if ($parentRecordType !== null && $parentRecordID !== null) {
-            if (!$this->eventModel->canCreateEvents($parentRecordType, $parentRecordID)) {
-                throw new ClientException('You do not have permission to create an event in this group.');
-            }
-        }
-    }
-
-    /**
      * Add an event end date.
      *
      * if we don't have an endDate, set it to midnight of that day
      * make it to an all day event.
      *
-     * @param $eventData
+     * @param array $eventData
      * @return array
      */
     private function calculateEventEndDate($eventData) {
@@ -440,6 +416,13 @@ class EventsApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
+        // Check permissions for our filters.
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::VIEW,
+            $query['parentRecordType'],
+            $query['parentRecordID']
+        );
+
         // Sorting
         $sortField = '';
         $sortOrder = 'asc';
@@ -456,27 +439,8 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = ApiUtils::queryToFilters($in, $query);
 
-        if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
-            if ($query['parentRecordID']) {
-                $group = $this->groupModel->getID($query['parentRecordID']);
-                $groupPrivacy = $group['Privacy'];
-                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  GroupPermissions::MEMBER :  GroupPermissions::ACCESS;
-                $isAdmin = $this->getSession()->checkPermission('Garden.Settings.Manage');
-                if (!$this->groupModel->hasGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
-                    // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
-                    $where['GroupID'] = -1;
-                } else {
-                    $where['GroupID'] = $query['parentRecordID'];
-                }
-            }
-        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
-            if ($query['parentRecordID']) {
-                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
-                // check the permission based on the category.
-                $where['ParentRecordID'] = $query['parentRecordID'];
-                $where['ParentRecordType'] = $query['parentRecordType'];
-            }
-        }
+        $where['ParentRecordID'] = $query['parentRecordID'];
+        $where['ParentRecordType'] = $query['parentRecordType'];
 
         if ($query['allDayEvent'] ?? null) {
             $where['AllDayEvent'] = 1;
@@ -599,7 +563,12 @@ class EventsApiController extends AbstractApiController {
 
         $this->eventModel->checkEventPermission(EventPermissions::EDIT, $id);
 
-        $this->validateParentRecordInsert($body);
+        // Check permissions for our filters.
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::CREATE,
+            $body['parentRecordType'],
+            $body['parentRecordID']
+        );
 
         $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);
@@ -629,7 +598,11 @@ class EventsApiController extends AbstractApiController {
         $body = $this->normalizeInputIDs($body);
         $body = $in->validate($body);
 
-        $this->validateParentRecordInsert($body);
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::CREATE,
+            $body['parentRecordType'],
+            $body['parentRecordID']
+        );
 
         $eventData = $this->normalizeEventInput($body);
 

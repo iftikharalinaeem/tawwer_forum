@@ -53,7 +53,7 @@ final class EventPermissions extends AbstractPermissions {
     /**
      * @inheritdoc
      */
-    protected function getDefaultReasonForPermission(string $permissionName): string {
+    public function getDefaultReasonForPermission(string $permissionName): string {
         // These look backwards, but this is what the existing translation strings looked like.
         // they've been preserved through the refactoring.
         if (in_array($permissionName, [self::ORGANIZER, self::MEMBER])) {
