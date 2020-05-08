@@ -193,11 +193,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             }
         } else {
             // Create excerpt to show in form popup
-            $row = getRecord($recordType, $iD);
-
-            if (!$row) {
-                throw new Exception(t('ErrorRecordNotFound', 'The requested record could not be found.'));
-            }
+            $row = getRecord($recordType, $iD, true);
 
             $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
             $row = $discussionModel->fixRow($row);
