@@ -20,6 +20,19 @@ Gdn::permissionModel()->define([
     'Groups.Moderation.Manage' => 'Garden.Moderation.Manage',
 ]);
 
+// Define Category Event Permissions
+Gdn::permissionModel()->define(
+    [
+        // We can only default to permissions already in the current junction table (categories).
+        // This means we can't use any existing `Manage` permissions as the default.
+        'Vanilla.Events.Manage' => 'Vanilla.Discussions.Announce',
+        'Vanilla.Events.View' => 'Vanilla.Discussions.View',
+    ],
+    'tinyint',
+    'Category',
+    'PermissionCategoryID'
+);
+
 // Define the groups table.
 $St->table('Group');
 $GroupExists = $St->tableExists();
