@@ -161,6 +161,11 @@ class EventsApiController extends AbstractApiController {
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
+                'attending:s|n?' => [
+                    'enum' => ['yes', 'no', 'maybe'],
+                    'description' => 'Is the participant attending the event.',
+                ],
+                'userID:i?' => 'The users ID',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -392,6 +397,8 @@ class EventsApiController extends AbstractApiController {
 
         $this->permission('Garden.SignIn.Allow');
 
+        $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
+
         $in = $this->schema([
             'groupID:i?' => 'Filter by group ID.',
             'parentRecordID:i' => 'Parent where the event was created',
@@ -417,6 +424,7 @@ class EventsApiController extends AbstractApiController {
                 ],
             ]),
             'allDayEvent:b?' => 'If the event is all day' ,
+            'userID:i' => 'The users ID',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -476,7 +484,8 @@ class EventsApiController extends AbstractApiController {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
                 } else {
-                    $where['GroupID'] = $query['parentRecordID'];
+                    $where['ParentRecordType'] = $query['parentRecordType'];
+                    $where['ParentRecordID'] =  $query['parentRecordID'];
                 }
             }
         } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
@@ -492,15 +501,22 @@ class EventsApiController extends AbstractApiController {
             $where['AllDayEvent'] = 1;
         }
 
+        if ($query['userID'] ?? null) {
+            $where['UserID'] = $query['userID'];
+        }
+
         // Data
         $rows = [];
         if ($where) {
-            $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
+            $rows = $this->eventModel->getEvents($where, $sortField, $sortOrder, $limit, $offset);
         }
+
+
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
         foreach ($rows as &$row) {
+
             $row = $this->normalizeEventOutput($row);
         }
 
@@ -509,47 +525,6 @@ class EventsApiController extends AbstractApiController {
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events", $query, $in);
 
         return new Data($result, ['paging' => $paging]);
-    }
-
-    /**
-     * GET /events/user-events
-     *
-     * @param array $query
-     * @return mixed
-     */
-    public function get_userEvents(array $query) {
-        $this->permission('Garden.SignIn.Allow');
-        $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
-
-        $in = $this->schema([
-            'userID:i' => 'The users ID',
-            'parentRecordID:i' => 'Parent where the event was created',
-            'parentRecordType:s' => [
-                'ID of the Parent where the event was created',
-                'enum' => [
-                    EventModel::PARENT_TYPE_GROUP,
-                    EventModel::PARENT_TYPE_CATEGORY
-                ],
-            ],
-        ], 'in')->setDescription('List events.');
-
-        $query = $in->validate($query);
-
-        $out = $this->schema([':a' => $this->userEventSchema()], 'out');
-
-        $usersEvents = $this->eventModel->getUsersEvents(
-            $query['userID'],
-            $query['parentRecordID'],
-            $query['parentRecordType']
-        );
-
-        foreach ($usersEvents as &$usersEvent) {
-            $usersEvent = $this->normalizeEventOutput($usersEvent);
-        }
-
-        $results = $out->validate($usersEvents);
-
-        return $results;
     }
 
     /**
@@ -595,6 +570,10 @@ class EventsApiController extends AbstractApiController {
      */
     public function normalizeEventOutput(array $dbRecord) {
         $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
+        if (isset( $dbRecord['Attending'])) {
+            $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
+            $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
+        }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['url'] = eventUrl($dbRecord);
@@ -845,27 +824,5 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $this->schema($postEventSchema, 'in');
-    }
-
-    /**
-     * userEvents schema
-     *
-     * @return Schema Returns a schema object.
-     */
-    public function userEventSchema() {
-        static $userEventSchema;
-
-        if ($userEventSchema === null) {
-            $userEventSchema = $this->schema(
-                Schema::parse([
-                    'EventID',
-                    'UserID',
-                    'Attending',
-                ])->add($this->fullEventSchema()),
-                'UserEvents'
-            );
-        }
-
-        return $this->schema($userEventSchema, 'in');
     }
 }

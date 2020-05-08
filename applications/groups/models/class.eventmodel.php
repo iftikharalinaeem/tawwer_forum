@@ -408,28 +408,30 @@ class EventModel extends Gdn_Model {
     }
 
     /**
-     * Get all the events associated to a user.
+     * Get a list of Events with participation status.
      *
-     * @param int $userID
-     * @param int $parentRecordID
-     * @param string $parentRecordType
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param bool $offset
      *
      * @return array
      */
-    public function getUsersEvents(int $userID, int $parentRecordID, string $parentRecordType) {
-        $userID = $userID ?? null;
-        $parentRecordID = $parentRecordID ?? null;
-        $parentRecordType = $parentRecordType ?? null;
+    public function getEvents(array $where, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $parentRecordID = $where['ParentRecordID'] ?? null;
+        $parentRecordType = $where['ParentRecordType'] ?? null;
 
         $results = $this->SQL
-            ->select('ue.EventID, ue.UserID, ue.Attending')
+            ->select("e.*, ue.Attending")
             ->from('Event e')
-            ->join('UserEvent ue', 'e.EventID = ue.EventID')
+            ->join('UserEvent ue', "e.EventID = ue.EventID and ue.UserID= \"" . $where['userID']. "\"", 'left')
             ->where([
                 'e.ParentRecordType' => $parentRecordType,
                 'e.ParentRecordID' => $parentRecordID,
-                'ue.UserID' => $userID
             ])
+            ->orderBy($orderFields, $orderDirection)
+            ->limit($limit, $offset)
             ->get()->resultArray();
         ;
 
