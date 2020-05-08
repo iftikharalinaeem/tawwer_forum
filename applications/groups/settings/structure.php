@@ -15,18 +15,6 @@ if (!isset($Explicit)) {
 $Sql = Gdn::sql();
 $St = Gdn::structure();
 
-if (defined('TESTMODE_ENABLED') && TESTMODE_ENABLED) {
-    // Pulled out of DashboardHooks::updateModel_afterStructure_handler
-    // Which doesn't run early enough in our tests.
-    // Due to the risk of running this generally, I'm adding it here.
-
-    // Only setup default permissions if no role permissions are set.
-    $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0])->firstRow(DATASET_TYPE_ARRAY);
-    if (!$hasPermissions) {
-        PermissionModel::resetAllRoles();
-    }
-}
-
 Gdn::permissionModel()->define([
     'Groups.Group.Add' => 'Garden.Profiles.Edit',
     'Groups.Moderation.Manage' => 'Garden.Moderation.Manage',

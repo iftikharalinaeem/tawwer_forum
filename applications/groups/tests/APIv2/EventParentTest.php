@@ -24,6 +24,15 @@ class EventParentTest extends AbstractAPIv2Test {
     use UsersAndRolesApiTestTrait;
 
     /**
+     * @inheritdoc
+     */
+    public static function setupBeforeClass(): void {
+        parent::setupBeforeClass();
+        // Needed to finish permission initialization.
+        \PermissionModel::resetAllRoles();
+    }
+
+    /**
      * Test that we can insert events into groups, and fetch them back.
      */
     public function testParentGroup() {
@@ -97,7 +106,7 @@ class EventParentTest extends AbstractAPIv2Test {
             ]]
         ]);
         $this->createUser([
-            'roleID' => [\RoleModel::DEFAULT_MEMBER_ID, $this->lastRoleID]
+            'roleID' => [\RoleModel::MEMBER_ID, $this->lastRoleID]
         ]);
         $this->api()->setUserID($this->lastUserID);
 
@@ -171,7 +180,7 @@ class EventParentTest extends AbstractAPIv2Test {
             ]]
         ]);
         $this->createUser([
-            'roleID' => [\RoleModel::DEFAULT_MEMBER_ID, $this->lastRoleID]
+            'roleID' => [\RoleModel::MEMBER_ID, $this->lastRoleID]
         ]);
         $this->api()->setUserID($this->lastUserID);
 
