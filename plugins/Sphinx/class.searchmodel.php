@@ -337,18 +337,14 @@ class SphinxSearchModel extends \SearchModel {
         }
 
         if ($search['group']) {
-            $sphinx->setGroupBy('DiscussionID', SPH_GROUPBY_ATTR, 'sort DESC');
+            $sphinx->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
         }
 
         $results['Search'] = $search;
 
         if ($doSearch) {
             if ($filtered && empty($query)) {
-                if (method_exists($sphinx, "setMatchMode")) {
-                    $sphinx->setMatchMode(SPH_MATCH_ALL);
-                } else {
-                    $sphinx->setRankingMode(SPH_RANK_PROXIMITY);
-                }
+                $sphinx->setRankingMode(SphinxClient::RANK_PROXIMITY);
             }
             $results = $this->doSearch($sphinx, $query, $indexes);
             $results['SearchTerms'] = array_unique($terms);
