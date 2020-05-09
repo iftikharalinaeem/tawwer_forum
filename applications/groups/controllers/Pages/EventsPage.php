@@ -1,18 +1,18 @@
 <?php
 
+use Vanilla\Web\Page;
 use Vanilla\Web\ThemedPage;
 
-class EventsPage extends ThemedPage {
+class EventsPage extends Page {
     /**
      * DI.
      */
     public function __construct() {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function initialize(string $title = "") {
+
+
+    public function initialize(string $title ="", string $parentRecordType="", int $parentRecordID = null) {
         $this
             ->setSeoRequired(false)
             ->setSeoTitle($title)

@@ -15,10 +15,7 @@ class NewEventPageController extends PageDispatchController {
      * @return Data
      */
     public function get(): Data {
-        /** @var EventsPage $page */
-        $page = $this->usePage(EventPage::class);
-        $page->initialize("Events");
-        return $page->render();
+
     }
 
     public function index(): Data {
