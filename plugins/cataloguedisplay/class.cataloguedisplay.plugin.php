@@ -118,15 +118,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         ;
     }
 
-//    /**
-//     * Add CSS to handle the thumbnail in the list view, JS to handle the popoup.
-//     *
-//     * @param Gdn_Controller $sender
-//     */
-//    public function base_render_before(Gdn_Controller $sender) {
-//
-//    }
-
     /**
      * When editing a category, if there are discussions in the category, update them to add or remove the "catalogue" style.
      *
