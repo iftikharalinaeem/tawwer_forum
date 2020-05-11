@@ -7,7 +7,7 @@ import RouteHandler from "@library/routing/RouteHandler";
 import { getMeta } from "@library/utility/appUtils";
 
 function getEventPath(path: string = "") {
-    const newEventPage = getMeta("themeFeatures.UseNewEventsPage", false);
+    const newEventPage = getMeta("themeFeatures.NewEventsPage", false);
     const base = newEventPage ? "events" : "new-events";
 
     return `/${base}/${path}`;

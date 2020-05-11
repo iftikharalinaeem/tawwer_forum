@@ -209,6 +209,7 @@ class EventListModule extends Gdn_Module {
      * @return array A data array representing an event item in an event list.
      */
     protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
+        $eventModel
         $dateStarts = EventModel::formatEventDate($event['DateStarts']);
         $dateStartsDateTime = new DateTime($dateStarts[3]);
 
@@ -219,7 +220,7 @@ class EventListModule extends Gdn_Module {
         $item['text'] = sliceParagraph(Gdn_Format::plainText(val('Body', $event), val('Format', $event)), 100);
         $item['textCssClass'] = 'EventDescription';
         $item['heading'] = Gdn_Format::text(val('Name', $event));
-        $item['url'] = eventUrl($event);
+        $item['url'] = $this->eventModel->eventUrl($event);
         $item['metaCssClass'] = '';
         $item['cssClass'] = 'Event event js-event';
         $item['meta']['location']['text'] = Gdn_Format::text($event['Location']);
