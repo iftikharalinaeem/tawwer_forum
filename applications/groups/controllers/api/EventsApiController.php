@@ -250,7 +250,6 @@ class EventsApiController extends AbstractApiController {
 
         // Filters
         $where = [];
-
         if (array_key_exists('Attending', $participantData)) {
             if ($participantData['Attending'] === 'Answered') {
                 $where['Attending<>'] = 'Invited';
@@ -277,9 +276,7 @@ class EventsApiController extends AbstractApiController {
 
         return new Data($result, ['paging' => $paging]);
     }
-
-
-
+    
     /**
      * Get an event for editing.
      *
