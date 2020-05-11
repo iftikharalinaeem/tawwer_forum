@@ -89,7 +89,7 @@ class EventModel extends Gdn_Model {
             }
         }
         if ($siteSectionPath === null) {
-            $siteSectionPath = $sectionModel->getCurrentSiteSection();
+            $siteSectionPath = $sectionModel->getCurrentSiteSection()->getBasePath();
         }
         // Make sure we don't have double-slashes in the path.
         $siteSectionPath = rtrim($siteSectionPath, '/');
