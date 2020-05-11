@@ -275,7 +275,7 @@ class EventsApiController extends AbstractApiController {
 
         return new Data($result, ['paging' => $paging]);
     }
-    
+
     /**
      * Get an event for editing.
      *
@@ -449,7 +449,7 @@ class EventsApiController extends AbstractApiController {
                 $groupPrivacy = $group['Privacy'];
                 $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
                 $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-                if (!$this->groupModel->checkPermission($access, $query['parentRecordID']) && !$isAdmin) {
+                if (!$this->groupModel->checkGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
                     // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
                     $where['GroupID'] = -1;
                 } else {
