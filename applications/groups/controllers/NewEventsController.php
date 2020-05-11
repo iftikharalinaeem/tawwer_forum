@@ -29,4 +29,9 @@ class NewEventsController extends \Gdn_Controller {
         $this->render('index');
     }
 
+    public function event($id) {
+        $this->permission('Garden.SignIn.Allow');
+        $this->render('event');
+    }
+
 }

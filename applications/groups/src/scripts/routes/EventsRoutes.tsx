@@ -19,6 +19,12 @@ export const EventsRoute = new RouteHandler(
     (data?: { parentRecordType: string; parentRecordID: number }) => getEventPath(),
 );
 
+export const EventRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "events/pages/EventPage" */ "@groups/events/pages/EventPage"),
+    getEventPath("event/:id"),
+    (data?: { id: number }) => getEventPath(`event/:id`),
+);
+
 export function getEventsRoutes() {
-    return [EventsRoute.route];
+    return [EventsRoute.route, EventRoute.route];
 }

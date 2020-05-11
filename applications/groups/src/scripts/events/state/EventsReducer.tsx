@@ -23,8 +23,8 @@ export interface IEvent {
     insertUser: IUserFragment;
     updatedUser: IUserFragment;
     groupID?: number;
+    url: string;
 }
-
 export interface IEventsState {
     events: ILoadable<{
         events: IEvent[];
