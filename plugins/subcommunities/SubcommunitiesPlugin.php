@@ -6,6 +6,7 @@
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
 use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 use Vanilla\Web\Page;
@@ -38,6 +39,19 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     protected $savedDoHeadings = '';
 
     protected $categories;
+
+    /** @var SiteSectionModel */
+    protected $siteSectionModel;
+
+    /**
+     * SubcommunitiesPlugin constructor.
+     *
+     * @param SiteSectionModel $siteSectionModel
+     */
+    public function __construct(SiteSectionModel $siteSectionModel) {
+        parent::__construct();
+        $this->siteSectionModel = $siteSectionModel;
+    }
 
     /// Methods ///
 
@@ -905,6 +919,20 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $args['Wheres']['d.CategoryID'] = $this->getCategoryIDs();
+    }
+
+    /**
+     * Change the target to /  when subcommunities is used and the default subcommunity route destination is equal to target.
+     *
+     * @param \Gdn_Dispatcher $sender
+     * @param array $args
+     */
+    public function gdn_Dispatcher_beforeDispatch_handler(\Gdn_Dispatcher $sender, array $args) {
+        /** @var \Gdn_Request $request */
+        $request = $args['Request'];
+        if ($this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] == $request->get('Target')) {
+            $request->setQueryItem('Target', '/');
+        }
     }
 }
 
