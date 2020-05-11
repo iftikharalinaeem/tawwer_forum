@@ -41,14 +41,19 @@ class GroupsHooks extends Gdn_Plugin {
         $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
 
         if ($themeFeatures->allFeatures()['NewEventsPage']) {
-            // Add a rewrite into our router.
+            // Add some rewrites into our router.
             // Eg.
             // /events internally to /new-events
             // /events/some-path to /new-events/some-path
             Gdn::router()->setRoute('events\/?(.*)?', 'new-events/$1', 'Internal', false);
 
+            // Externally redirect /new-events/* to /events/*
+            // Make sure this ends up on the canonical URL.
+            Gdn::router()->setRoute('new-events\/?(.*)?', 'events/$1', 'Temporary', false);
+
+
             // Redirect old event pages to the new ones.
-            Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Permanent', false);
+            Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Temporary', false);
         }
     }
 
