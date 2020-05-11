@@ -160,6 +160,11 @@ class EventsApiController extends AbstractApiController {
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
+                'attending:s|n?' => [
+                    'enum' => ['yes', 'no', 'maybe'],
+                    'description' => 'Is the participant attending the event.',
+                ],
+                'userID:i?' => 'The users ID',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -270,7 +275,7 @@ class EventsApiController extends AbstractApiController {
 
         return new Data($result, ['paging' => $paging]);
     }
-    
+
     /**
      * Get an event for editing.
      *
@@ -354,6 +359,8 @@ class EventsApiController extends AbstractApiController {
 
         $this->permission('Garden.SignIn.Allow');
 
+        $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
+
         $in = $this->schema([
             'groupID:i?' => 'Filter by group ID.',
             'parentRecordID:i' => 'Parent where the event was created',
@@ -367,18 +374,19 @@ class EventsApiController extends AbstractApiController {
             'dateStarts:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by start dates',
                 'x-filter' => [
-                    'field' => 'DateStarts',
+                    'field' => 'e.DateStarts',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
             'dateEnds:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by end dates',
                 'x-filter' => [
-                    'field' => 'DateEnds',
+                    'field' => 'e.DateEnds',
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
             'allDayEvent:b?' => 'If the event is all day' ,
+            'userID:i' => 'The users ID',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -435,18 +443,44 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = ApiUtils::queryToFilters($in, $query);
 
-        $where['ParentRecordID'] = $query['parentRecordID'];
-        $where['ParentRecordType'] = $query['parentRecordType'];
+        if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
+            if ($query['parentRecordID']) {
+                $group = $this->groupModel->getID($query['parentRecordID']);
+                $groupPrivacy = $group['Privacy'];
+                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
+                $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+                if (!$this->groupModel->checkGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
+                    // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
+                    $where['GroupID'] = -1;
+                } else {
+                    $where['e.ParentRecordType'] = $query['parentRecordType'];
+                    $where['e.ParentRecordID'] =  $query['parentRecordID'];
+                }
+            }
+        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+            if ($query['parentRecordID']) {
+                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+                // check the permission based on the category.
+                $where['e.ParentRecordID'] = $query['parentRecordID'];
+                $where['e.ParentRecordType'] = $query['parentRecordType'];
+            }
+        }
 
         if ($query['allDayEvent'] ?? null) {
-            $where['AllDayEvent'] = 1;
+            $where['e.AllDayEvent'] = 1;
+        }
+
+        if ($query['userID'] ?? null) {
+            $where['UserID'] = $query['userID'];
         }
 
         // Data
         $rows = [];
         if ($where) {
-            $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
+            $rows = $this->eventModel->getEvents($where, $sortField, $sortOrder, $limit, $offset);
+
         }
+
         if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
@@ -504,6 +538,10 @@ class EventsApiController extends AbstractApiController {
      */
     public function normalizeEventOutput(array $dbRecord) {
         $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
+        if (isset( $dbRecord['Attending'])) {
+            $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
+            $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
+        }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
         $schemaRecord['url'] = eventUrl($dbRecord);

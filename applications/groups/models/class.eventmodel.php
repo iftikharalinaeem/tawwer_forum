@@ -538,6 +538,35 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Get a list of Events with the attending status.
+     *
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param bool $offset
+     *
+     * @return array
+     */
+    public function getEvents(array $where, string $orderFields = '', string $orderDirection = 'asc', $limit = false, $offset = false) {
+
+        $userID = $where['UserID'] ?? null;
+        unset($where['UserID']);
+
+        $results = $this->SQL
+            ->select("e.*, ue.Attending")
+            ->from('Event e')
+            ->join('UserEvent ue', "e.EventID = ue.EventID and ue.UserID= \"" . $userID . "\"", 'left')
+            ->where($where)
+            ->orderBy($orderFields, $orderDirection)
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+        ;
+
+        return $results;
+    }
+
+    /**
      * Override event save.
      *
      * Set 'Fix' = false to bypass date munging
