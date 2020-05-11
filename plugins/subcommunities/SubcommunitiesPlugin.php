@@ -6,6 +6,7 @@
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Subcommunities\Models\MultisiteReduxPreloader;
 use Vanilla\Subcommunities\Models\SubcommunitySiteSection;
 use Vanilla\Web\Page;
@@ -905,6 +906,22 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         }
 
         $args['Wheres']['d.CategoryID'] = $this->getCategoryIDs();
+    }
+
+    /**
+     * Change the target to /  when subcommunities is used and the default subcommunity route destination is equal to target.
+     *
+     * @param \Gdn_Dispatcher $sender
+     * @param array $args
+     */
+    public function gdn_dispatcher_beforeDispatch_handler(\Gdn_Dispatcher $sender, array $args) {
+        /** @var \Gdn_Request $request */
+        $request = $args['Request'];
+        /** @var SiteSectionModel $siteSectionModel */
+        $siteSectionModel =  Gdn::getContainer()->get(SiteSectionModel::class);
+        if ($siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] == $request->get('Target')) {
+            $request->setQueryItem('Target', '/');
+        }
     }
 }
 
