@@ -40,19 +40,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     protected $categories;
 
-    /** @var SiteSectionModel */
-    protected $siteSectionModel;
-
-    /**
-     * SubcommunitiesPlugin constructor.
-     *
-     * @param SiteSectionModel $siteSectionModel
-     */
-    public function __construct(SiteSectionModel $siteSectionModel) {
-        parent::__construct();
-        $this->siteSectionModel = $siteSectionModel;
-    }
-
     /// Methods ///
 
     public function setup() {
@@ -930,7 +917,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     public function gdn_Dispatcher_beforeDispatch_handler(\Gdn_Dispatcher $sender, array $args) {
         /** @var \Gdn_Request $request */
         $request = $args['Request'];
-        if ($this->siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] == $request->get('Target')) {
+        /** @var SiteSectionModel $siteSectionModel */
+        $siteSectionModel =  Gdn::getContainer()->get(SiteSectionModel::class);
+        if ($siteSectionModel->getCurrentSiteSection()->getDefaultRoute()['Destination'] == $request->get('Target')) {
             $request->setQueryItem('Target', '/');
         }
     }
