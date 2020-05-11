@@ -645,15 +645,19 @@ class EventsApiController extends AbstractApiController {
         ])->setDescription('RSVP to an event.');
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
+        // Check event existance.
         $event = $this->eventByID($id);
-        $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $id);
+
+        $userID = $body['userID'] ?? $this->getSession()->UserID;
+        if ($userID !== null && $userID !== $this->getSession()->UserID) {
+            // Checking for organizer permission because we are adding someone else.
+            $this->eventModel->checkEventPermission(EventPermissions::ORGANIZER, $id);
+        } else {
+            // Checking for ourselves.
+            $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $id);
+        }
 
         $body = $in->validate($body);
-
-        $userID = !empty($body['userID']) ? $body['userID'] : $this->getSession()->UserID;
-        if ($this->getSession()->UserID !== $userID && $this->eventModel->hasEventPermission(EventPermissions::ORGANIZER, $id)) {
-            throw new ClientException('You do not have the rights to add a participant to that event.');
-        }
 
         $participantData = $this->normalizeEventParticipantInput($body);
 

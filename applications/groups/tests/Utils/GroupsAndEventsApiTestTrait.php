@@ -78,7 +78,9 @@ trait GroupsAndEventsApiTestTrait {
             throw new \Exception('Could not join a group because none was specified.');
         }
 
-        return $this->api()->post("/groups/$groupID/join")->getBody();
+        $result = $this->api()->post("/groups/$groupID/join")->getBody();
+        $this->clearGroupMemoryCache();
+        return $result;
     }
 
     /**
