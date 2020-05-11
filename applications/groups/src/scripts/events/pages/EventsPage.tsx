@@ -16,11 +16,11 @@ export default function EventsPage() {
 
     let { parentRecordType, parentRecordID } = useParams();
 
-    if (eventsState.events.status === LoadStatus.PENDING || eventsState.events.status === LoadStatus.LOADING) {
-        useEffect(() => {
+    useEffect(() => {
+        if (eventsState.events.status === LoadStatus.PENDING || eventsState.events.status === LoadStatus.LOADING) {
             getEvents();
-        });
-    }
+        }
+    });
 
     {
         /*<EventList data={events} />;*/
