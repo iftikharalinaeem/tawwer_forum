@@ -562,9 +562,18 @@ class EventsApiController extends AbstractApiController {
         // Check permissions for our filters.
         $this->eventModel->checkParentEventPermission(
             EventPermissions::CREATE,
-            $body['parentRecordType'],
-            $body['parentRecordID']
+            $event['ParentRecordType'],
+            $event['ParentRecordID']
         );
+
+        if (isset($body['parentRecordType']) || isset($body['parentRecordID'])) {
+            // Check permissions of wherever we are moving it.
+            $this->eventModel->checkParentEventPermission(
+                EventPermissions::CREATE,
+                $body['parentRecordType'] ?? $event['ParentRecordType'],
+                $body['parentRecordID'] ?? $event['ParentRecordID']
+            );
+        }
 
         $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);
