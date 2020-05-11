@@ -4,11 +4,19 @@
  */
 
 import RouteHandler from "@library/routing/RouteHandler";
+import { getMeta } from "@library/utility/appUtils";
+
+function getEventPath(path: string = "") {
+    const newEventPage = getMeta("themeFeatures.UseNewEventsPage", false);
+    const base = newEventPage ? "events" : "new-events";
+
+    return `/${base}/${path}`;
+}
 
 export const EventsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "events/pages/EventsPage" */ "@groups/events/pages/EventsPage"),
-    "/new-events",
-    (data?: { parentRecordType: string; parentRecordID: number }) => `/new-events`,
+    getEventPath(),
+    (data?: { parentRecordType: string; parentRecordID: number }) => getEventPath(),
 );
 
 export function getEventsRoutes() {
