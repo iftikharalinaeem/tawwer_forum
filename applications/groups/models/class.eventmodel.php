@@ -4,6 +4,15 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Forum\Navigation\GroupRecordType;
+use Vanilla\Groups\Models\EventPermissions;
+use Vanilla\Groups\Models\GroupPermissions;
+
 /**
  * Groups Application - Event Model
  *
@@ -16,6 +25,21 @@ class EventModel extends Gdn_Model {
     const PARENT_TYPE_GROUP = 'group';
     const PARENT_TYPE_CATEGORY = 'category';
 
+    /** @var GroupModel */
+    private $groupModel;
+
+    /** @var Gdn_Session */
+    private $session;
+
+    /** @var CategoryModel */
+    private $categoryModel;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
+    /** @var array The permissions associated with a group. */
+    private static $permissions = [];
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -23,6 +47,10 @@ class EventModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Event');
+        $this->groupModel = \Gdn::getContainer()->get(GroupModel::class);
+        $this->session = \Gdn::getContainer()->get(Gdn_Session::class);
+        $this->config = \Gdn::getContainer()->get(ConfigurationInterface::class);
+        $this->categoryModel = \Gdn::getContainer()->get(CategoryModel::class);
     }
 
     /**
@@ -126,121 +154,168 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Calculate permissions for an event.
+     *
+     * @param int $eventID The event ID.
+     * @param int|null $userID The userID to calculate the permissions for. Defaults to the current user.
+     * @return EventPermissions
+     */
+    public function calculatePermissionsForEvent(int $eventID, ?int $userID): EventPermissions {
+        if ($userID === null) {
+            $userID = $this->session->UserID;
+        }
+
+        $localCacheKey = "{$userID}-{$eventID}";
+
+
+        if (isset(self::$permissions[$localCacheKey])) {
+            return self::$permissions[$localCacheKey];
+        }
+
+        $event = $this->getID($eventID);
+        if (!$event) {
+            throw new NotFoundException('Event');
+        }
+
+        $userEvent = false;
+        if ($this->session->isValid()) {
+            $userEvent = $this->SQL
+                ->getWhere('UserEvent', [
+                    'EventID' => $eventID,
+                    'UserID' => $userID
+                ])
+                ->firstRow(DATASET_TYPE_ARRAY)
+            ;
+        }
+
+        $permissions = new EventPermissions();
+
+        // The event owner starts out with access to all events.
+        if ($userID === $event['InsertUserID']) {
+            $permissions
+                ->setPermission(EventPermissions::ORGANIZER, true)
+                ->setPermission(EventPermissions::EDIT, true)
+                ->setPermission(EventPermissions::MEMBER, true)
+                ->setPermission(EventPermissions::VIEW, true)
+            ;
+        } elseif ($userEvent) {
+            $permissions
+                ->setPermission(EventPermissions::MEMBER, true)
+                ->setPermission(EventPermissions::VIEW, true)
+            ;
+        }
+
+        $parentRecordID = $event['ParentRecordID'];
+        $parentRecordType = $event['ParentRecordType'];
+        switch ($parentRecordType) {
+            case ForumCategoryRecordType::TYPE:
+                if ($this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.Manage')) {
+                    $permissions
+                        ->setPermission(EventPermissions::CREATE, true)
+                        ->setPermission(EventPermissions::EDIT, true)
+                        ->setPermission(EventPermissions::VIEW, true)
+                    ;
+                } elseif ($this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.View')) {
+                    $permissions->setPermission(EventPermissions::VIEW, true);
+                }
+                break;
+            case GroupRecordType::TYPE:
+                $membersCanAddEvents = $this->config->get('Groups.Members.CanAddEvents', true);
+                $eventGroupPermissions = $this->groupModel->calculatePermissionsForGroup($parentRecordID, $userID);
+                if ($eventGroupPermissions->hasPermission(GroupPermissions::MEMBER)) {
+                    $permissions
+                        ->setPermission(EventPermissions::MEMBER, true)
+                        ->setPermission(EventPermissions::VIEW, true)
+                        ->setPermission(EventPermissions::CREATE, $membersCanAddEvents)
+                    ;
+                } elseif ($eventGroupPermissions->hasPermission(GroupPermissions::LEADER)) {
+                    $permissions
+                        ->setPermission(EventPermissions::CREATE, true)
+                        ->setPermission(EventPermissions::EDIT, true)
+                        ->setPermission(EventPermissions::VIEW, true)
+                    ;
+                } elseif ($eventGroupPermissions->hasPermission(GroupPermissions::VIEW)) {
+                    $permissions->setPermission(EventPermissions::VIEW, true);
+                }
+                break;
+        }
+
+        $isModerator = $this->groupModel->isModerator();
+        if ($isModerator) {
+            $permissions
+                ->setPermission(EventPermissions::EDIT, true)
+                ->setPermission(EventPermissions::VIEW, true)
+            ;
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * Check if a permission exists on a group. Throws an exception if that permission is not set.
+     *
+     * @param string $permission One of the constants from GroupPermission::
+     * @param int $eventID The ID of the group to check.
+     * @param int|null $userID
+     *
+     * @return bool Whether or not the user has the permission.
+     */
+    public function checkEventPermission(string $permission, int $eventID, int $userID = null): bool {
+        $permissions = $this->calculatePermissionsForEvent($eventID, $userID);
+        return $permissions->checkPermission($permission);
+    }
+
+    /**
+     * Check if a permission exists on a group.
+     *
+     * @param string $permission One of the constants from GroupPermission::
+     * @param int $eventID The ID of the group to check.
+     * @param int|null $userID
+     */
+    public function hasEventPermission(string $permission, int $eventID, int $userID = null) {
+        $permissions = $this->calculatePermissionsForEvent($eventID, $userID);
+        $permissions->hasPermission($permission);
+    }
+
+
+    /**
      * Check permission on a event.
      *
      * @param string $permission The permission to check. Valid values are:
-     *  - Organizer: User is a leader of the event.
-     *  - Member: User is a member of the event.
-     *  - Create: User can create events.
-     *  - Edit: User can edit the event.
-     *  - View: The user may view the event's contents.
      * @param int|array $eventID The event ID of the event record
      * @param int|null $userID
      * @return boolean
      */
     public function checkPermission($permission, $eventID, $userID = null) {
-        static $permissions = [];
-
-        if (!$userID) {
-            $userID = Gdn::session()->UserID;
-        }
-
+        deprecated(__METHOD__, 'checkEventPermission');
         if (is_array($eventID)) {
-            $event = $eventID;
-            $eventID = $event['EventID'];
+            $eventID = $eventID['EventID'];
         }
 
-        $key = "{$userID}-{$eventID}";
-        if (!isset($permissions[$key])) {
-            // Get the data for the group.
-            if (!isset($event)) {
-                $event = $this->getID($eventID);
-            }
-
-            $userEvent = false;
-            if ($userID) {
-                $userEvent = Gdn::sql()
-                    ->getWhere('UserEvent', ['EventID' => $eventID, 'UserID' => $userID])
-                    ->firstRow(DATASET_TYPE_ARRAY);
-            }
-
-            // Set the default permissions.
-            $perms = [
-                'Organizer' => false,
-                'Create' => true,
-                'Edit' => false,
-                'Member' => false,
-                'View' => true
-            ];
-
-            // The group creator is always a member and leader.
-            if ($userID == $event['InsertUserID']) {
-                $perms['Organizer'] = true;
-                $perms['Edit'] = true;
-                $perms['Member'] = true;
-                $perms['View'] = true;
-            }
-
-            if ($userEvent) {
-                $perms['Member'] = true;
-                $perms['View'] = true;
-            } else {
-                // Check if we're in a group
-                $eventGroupID = val('GroupID', $event, null);
-                if ($eventGroupID) {
-                    $groupModel = new GroupModel();
-                    $eventGroup = $groupModel->getID($eventGroupID);
-
-                    if (groupPermission('Member', $eventGroupID)) {
-                        $perms['Member'] = true;
-                        $perms['View'] = true;
-                    } else {
-                        $perms['Create'] = false;
-                    }
-                }
-
-            }
-
-            // Allow Admins to restrict event creation to leaders only.
-            if (!c('Groups.Members.CanAddEvents', true) && !groupPermission('Leader', $eventGroupID)) {
-                $perms['Create'] = false;
-            }
-
-            // Moderators can view and edit all events.
-            if ($userID == Gdn::session()->UserID && checkPermission('Garden.Moderation.Manage')) {
-                $perms['Edit'] = true;
-                $perms['View'] = true;
-            }
-            $permissions[$key] = $perms;
+        $isReason = strpos($permission, '.Reason') !== false;
+        if ($isReason) {
+            $permission = str_replace('.Reason', '', $permission);
         }
 
-        $perms = $permissions[$key];
-
-        if (!$permission) {
-            return $perms;
-        }
-
-        if (!isset($perms[$permission])) {
-            if (strpos($permission, '.Reason') === false) {
-                trigger_error("Invalid group permission $permission.");
+        try {
+            $this->checkEventPermission((string) $permission, (int) $eventID, $userID);
+            return true;
+        } catch (ForbiddenException $e) {
+            // This is a legacy function an used to return the "reason" why the permission failed as a string.
+            if ($isReason) {
+                trigger_error("Invalid event permission $permission.");
                 return false;
             } else {
-                $permission = stringEndsWith($permission, '.Reason', true, true);
-                if ($perms[$permission]) {
-                    return '';
-                }
-
-                if (in_array($permission, ['Member', 'Leader'])) {
-                    $message = t(sprintf("You aren't a %s of this event.", strtolower($permission)));
-                } else {
-                    $message = sprintf(t("You aren't allowed to %s this event."), t(strtolower($permission)));
-                }
-
-                return $message;
+                return $e->getMessage();
             }
-        } else {
-            return $perms[$permission];
         }
+    }
+
+    /**
+     * Reset the cached grouped permissions.
+     */
+    public function resetCachedPermissions() {
+        self::$permissions = [];
     }
 
     /**
@@ -251,17 +326,82 @@ class EventModel extends Gdn_Model {
      * @return bool
      */
     public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
-        if ($parentRecordType === GroupModel::RECORD_TYPE) {
-            if (groupPermission('Leader', $parentRecordID)) {
-                return true;
-            } elseif (c('Groups.Members.CanAddEvents', true) && groupPermission('Member', $parentRecordID)) {
-                return true;
-            } else {
+        switch ($parentRecordType) {
+            case GroupRecordType::TYPE:
+                if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
+                    return true;
+                } elseif (c('Groups.Members.CanAddEvents', true)
+                    && $this->groupModel->hasGroupPermission(GroupPermissions::MEMBER, $parentRecordID)
+                ) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+            case ForumCategoryRecordType::TYPE:
+                return $this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.Manage');
+                break;
+            default:
                 return false;
+        }
+    }
+
+    /**
+     * Checks to see whether or not a user can view events in a parent resource.
+     *
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @return bool
+     */
+    public function canViewEvents(string $parentRecordType, int $parentRecordID): bool {
+        switch ($parentRecordType) {
+            case GroupRecordType::TYPE:
+                return $this->groupModel->hasGroupPermission(GroupPermissions::VIEW, $parentRecordID);
+                break;
+            case ForumCategoryRecordType::TYPE:
+                return $this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.View');
+                break;
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Check whether or not an event can be created. Throw an exception if it can't.
+     *
+     * @param string $permission One of EventPermissions::VIEW or EventPermissions::CREATE
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     */
+    public function checkParentEventPermission(string $permission, string $parentRecordType, int $parentRecordID) {
+        $hasPermission = false;
+        if ($permission === EventPermissions::VIEW) {
+            $hasPermission = $this->canViewEvents($parentRecordType, $parentRecordID);
+        } elseif ($permission === EventPermissions::CREATE) {
+            $hasPermission = $this->canCreateEvents($parentRecordType, $parentRecordID);
+        }
+
+        if ($hasPermission) {
+            return;
+        }
+
+        $groupIsSecret = false;
+        if ($parentRecordType === GroupRecordType::TYPE) {
+            $groupIsSecret = !$this->groupModel->hasGroupPermission(GroupPermissions::ACCESS, $parentRecordID);
+        }
+
+        if ($groupIsSecret) {
+            throw new NotFoundException('Group');
+        } elseif ($parentRecordType === ForumCategoryRecordType::TYPE) {
+            // Check that the category exists.
+            $category = $this->categoryModel::categories($parentRecordID);
+            if (!$category) {
+                throw new NotFoundException('Category');
             }
+            throw new PermissionException('Vanilla.Events.Manage');
         } else {
-            // Not implemented yet.
-            return true;
+            $permissions = new EventPermissions();
+            throw new ForbiddenException($permissions->getDefaultReasonForPermission(EventPermissions::CREATE));
         }
     }
 

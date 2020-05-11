@@ -45,6 +45,29 @@ class GroupsHooks extends Gdn_Plugin {
             $permissionModel->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
             $permissionModel->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
         }
+
+        $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(
+            RoleModel::TYPE_MODERATOR,
+            [
+                'Vanilla.Events.View' => 1,
+                'Vanilla.Events.Manage' => 1,
+            ],
+            'Category',
+            -1
+        );
+        $permissionModel->addDefault(
+            RoleModel::TYPE_ADMINISTRATOR,
+            [
+                'Vanilla.Events.View' => 1,
+                'Vanilla.Events.Manage' => 1,
+            ],
+            'Category',
+            -1
+        );
     }
 
     /**

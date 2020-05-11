@@ -8,15 +8,29 @@
 namespace VanillaTests\APIv2;
 
 use DateTime;
+use Garden\Web\Exception\ForbiddenException;
+use Garden\Web\Exception\NotFoundException;
 use VanillaTests\Groups\Utils\GroupsAndEventsApiTestTrait;
+use VanillaTests\InternalClient;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for parent resources of events.
  */
 class EventParentTest extends AbstractAPIv2Test {
 
-    protected static $addons = ['vanilla', 'groups'];
+    protected static $addons = ['vanilla', 'groups', 'dashboard'];
     use GroupsAndEventsApiTestTrait;
+    use UsersAndRolesApiTestTrait;
+
+    /**
+     * @inheritdoc
+     */
+    public static function setupBeforeClass(): void {
+        parent::setupBeforeClass();
+        // Needed to finish permission initialization.
+        \PermissionModel::resetAllRoles();
+    }
 
     /**
      * Test that we can insert events into groups, and fetch them back.
@@ -48,6 +62,130 @@ class EventParentTest extends AbstractAPIv2Test {
 
         // Backwards compatibility
         $this->assertFalse(isset($event['groupID']));
+    }
+
+    /**
+     * Test that permissions on the parent group surrounding event creation work properly.
+     */
+    public function testGroupMembersEventCreate() {
+        $group = $this->createGroup();
+        $newUser = $this->createUser();
+        $this->api()->setUserID($this->lastUserID);
+        $this->joinGroup();
+        $this->clearGroupMemoryCache();
+
+        // By default members can add events.
+        $event = $this->createEvent();
+        $this->assertEquals($group['groupID'], $event['parentRecordID']);
+
+        \Gdn::config()->saveToConfig('Groups.Members.CanAddEvents', false);
+
+        $hasException = false;
+        try {
+            $this->createEvent();
+        } catch (ForbiddenException $e) {
+            $hasException = true;
+        }
+        $this->assertEquals(true, $hasException, 'A forbidden exception was received');
+        \Gdn::config()->removeFromConfig('Groups.Members.CanAddEvents');
+    }
+
+    /**
+     * Test permissions on creating an event in a category.
+     */
+    public function testCategoryPermissionEventCreate() {
+        $category = $this->createCategory();
+        $role = $this->createRole([
+            'permissions' => [[
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => [
+                    'events.manage' => true,
+                    'events.view' => true,
+                ],
+                "type" => "category"
+            ]]
+        ]);
+        $this->createUser([
+            'roleID' => [\RoleModel::MEMBER_ID, $this->lastRoleID]
+        ]);
+        $this->api()->setUserID($this->lastUserID);
+
+        $event = $this->createEvent();
+        $this->assertEquals($category['categoryID'], $event['parentRecordID']);
+    }
+
+    /**
+     * Test permissions on creating an event in a category.
+     *
+     * @param string $privacy
+     *
+     * @dataProvider provideRestrictedGroupPrivacies
+     */
+    public function testRestrictedGroupEventView(string $privacy) {
+        $this->createGroup(
+            ['privacy' => $privacy]
+        );
+        $this->createEvent();
+        $this->createUser();
+        $this->api()->setUserID($this->lastUserID);
+
+        $exception = null;
+        try {
+            $this->api()->get("/events/".$this->lastInsertedEventID);
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        $this->assertInstanceOf(ForbiddenException::class, $exception);
+
+        // Have them join the group
+        $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
+        $this->api()->post('/groups/'.$this->lastInsertedGroupID.'/members', [
+            'role' => 'member',
+            'userID' => $this->lastUserID,
+        ]);
+        $this->clearGroupMemoryCache();
+
+        // Switch back and check again.
+        $this->api()->setUserID($this->lastUserID);
+        $response = $this->api()->get("/events/".$this->lastInsertedEventID);
+        $this->assertEquals($this->lastInsertedGroupID, $response['parentRecordID']);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideRestrictedGroupPrivacies(): array {
+        return [
+            ['private', ForbiddenException::class],
+            ['secret', NotFoundException::class],
+        ];
+    }
+
+    /**
+     * Test permissions on creating an event in a category.
+     */
+    public function testCategoryPermissionEventView() {
+        $this->createCategory();
+        $this->createEvent();
+
+        // Create a user that shouldn't be able to access it.
+        $this->createRole([
+            'permissions' => [[
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => [
+                    'events.view' => false
+                ],
+                "type" => "category"
+            ]]
+        ]);
+        $this->createUser([
+            'roleID' => [\RoleModel::MEMBER_ID, $this->lastRoleID]
+        ]);
+        $this->api()->setUserID($this->lastUserID);
+
+        $this->expectException(ForbiddenException::class);
+        $this->api()->get("/events/".$this->lastInsertedEventID);
     }
 
     /**
@@ -97,6 +235,63 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Make sure we get proper permission errors when we can't access a category.
+     */
+    public function testGetEventsCategoryPermissionError() {
+        $this->createCategory();
+        $this->createEvent();
+        $this->createEvent();
+
+        // Enable custom permissions for the category.
+        $this->createRole([
+            'permissions' => [[
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => [],
+                "type" => "category"
+            ]]
+        ]);
+
+        $this->createUser();
+        $this->api()->setUserID($this->lastUserID);
+
+        $this->expectException(ForbiddenException::class);
+        $this->api()->get(
+            "/events",
+            [
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
+                "parentRecordID" => $this->lastInsertedCategoryID,
+            ]
+        )->getBody();
+    }
+
+    /**
+     * Test that we get proper permission errors when fetching a group we can't access.
+     *
+     * @param string $groupPrivacy
+     * @param string $exceptionClass
+     *
+     * @dataProvider provideRestrictedGroupPrivacies
+     */
+    public function testGetEventsGroupPermissionError(string $groupPrivacy, string $exceptionClass) {
+        $this->createGroup([
+            'privacy' => $groupPrivacy,
+        ]);
+        $this->createEvent();
+
+        $this->createUser();
+        $this->api()->setUserID($this->lastUserID);
+
+        $this->expectException($exceptionClass);
+        $this->api()->get(
+            "/events",
+            [
+                "parentRecordType" => \EventModel::PARENT_TYPE_GROUP,
+                "parentRecordID" => $this->lastInsertedGroupID
+            ]
+        )->getBody();
+    }
+
+    /**
      * Test GET/ events with allDayEvent filter.
      */
     public function testGetEventsAllDayEvent() {
@@ -119,12 +314,12 @@ class EventParentTest extends AbstractAPIv2Test {
     /**
      * Test GET/ events with dateStarts filter.
      *
-     * @param $dates
-     * @param $queryParam
-     * @param $expected
+     * @param array $dates
+     * @param string $queryParam
+     * @param int $expected
      * @dataProvider provideDateStartsFilter
      */
-    public function testGetEventsDateStartsFilter($dates, $queryParam, $expected) {
+    public function testGetEventsDateStartsFilter(array $dates, string $queryParam, int $expected) {
         $this->createGroup();
 
         $this->createEvent(['dateStarts' => $dates[0]]);
@@ -166,13 +361,13 @@ class EventParentTest extends AbstractAPIv2Test {
     /**
      * Test GET/ events dateEnds filters.
      *
-     * @param $dateStarts
-     * @param $dateEnds
-     * @param $queryParam
-     * @param $expected
+     * @param array $dateStarts
+     * @param array $dateEnds
+     * @param string $queryParam
+     * @param int $expected
      * @dataProvider provideDateEndsFilter
      */
-    public function testGetEventsDateEndsFilter($dateStarts, $dateEnds, $queryParam, $expected) {
+    public function testGetEventsDateEndsFilter(array $dateStarts, array $dateEnds, string $queryParam, int $expected) {
         $this->createCategory();
 
         $this->createEvent(['dateStarts' => $dateStarts[0], 'dateEnds' => $dateEnds[0]]);
@@ -241,13 +436,13 @@ class EventParentTest extends AbstractAPIv2Test {
     /**
      * Test GET/ events with dateStarts and dateEnds filters.
      *
-     * @param $dateStarts
-     * @param $dateEnds
-     * @param $queryParam
-     * @param $expected
+     * @param array $dateStarts
+     * @param array $dateEnds
+     * @param array $queryParam
+     * @param int $expected
      * @dataProvider provideDatesFilter
      */
-    public function testGetEventsWithBothDates($dateStarts, $dateEnds, $queryParam, $expected) {
+    public function testGetEventsWithBothDates(array $dateStarts, array $dateEnds, array $queryParam, int $expected) {
         $this->createCategory();
 
         $this->createEvent(['dateStarts' => $dateStarts[0], 'dateEnds' => $dateEnds[0]]);
