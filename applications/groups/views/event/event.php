@@ -1,13 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$header = new GroupHeaderModule($this->data('Group'));
-echo $header;
-/* @var EventController $this */
+/** @var EventController $this */
+
+if ($this->data('Group')) {
+    $header = new GroupHeaderModule($this->data('Group'));
+    echo $header;
+}
 ?>
 <div class="Event-Header PageTitle">
     <!-- Edit/Delete Buttons -->
     <div class="Options">
-         <?php writeEventOptions(); ?>
+         <?php writeEventOptions($this->data('Event')); ?>
     </div>
     <h1 class="Event-Title"><?php echo htmlspecialchars($this->data('Event.Name')); ?></h1>
 </div>
@@ -35,7 +38,7 @@ echo $header;
         <li class="Organizer"><span class="Label"><?php echo t('Organizer'); ?></span><span class="FieldInfo"><?php echo userAnchor($this->data('Event.Organizer')); ?></span></li>
     </ul>
 
-    <div class="Body"><?php echo Gdn_Format::to($this->data('Event.Body'), $this->data('Event.Format')); ?></div>
+    <div class="Body"><?php echo \Gdn::formatService()->renderHTML($this->data('Event.Body'), $this->data('Event.Format')); ?></div>
 </div>
 <?php if (!EventModel::isEnded($this->data('Event')))  { ?>
 <div class="FormWrapper StructuredForm Attending">

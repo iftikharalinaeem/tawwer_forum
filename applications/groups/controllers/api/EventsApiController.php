@@ -562,9 +562,18 @@ class EventsApiController extends AbstractApiController {
         // Check permissions for our filters.
         $this->eventModel->checkParentEventPermission(
             EventPermissions::CREATE,
-            $body['parentRecordType'],
-            $body['parentRecordID']
+            $event['ParentRecordType'],
+            $event['ParentRecordID']
         );
+
+        if (isset($body['parentRecordType']) || isset($body['parentRecordID'])) {
+            // Check permissions of wherever we are moving it.
+            $this->eventModel->checkParentEventPermission(
+                EventPermissions::CREATE,
+                $body['parentRecordType'] ?? $event['ParentRecordType'],
+                $body['parentRecordID'] ?? $event['ParentRecordID']
+            );
+        }
 
         $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);
@@ -645,15 +654,19 @@ class EventsApiController extends AbstractApiController {
         ])->setDescription('RSVP to an event.');
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
+        // Check event existance.
         $event = $this->eventByID($id);
-        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
+
+        $userID = $body['userID'] ?? $this->getSession()->UserID;
+        if ($userID !== null && $userID !== $this->getSession()->UserID) {
+            // Checking for organizer permission because we are adding someone else.
+            $this->eventModel->checkEventPermission(EventPermissions::ORGANIZER, $id);
+        } else {
+            // Checking for ourselves.
+            $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $id);
+        }
 
         $body = $in->validate($body);
-
-        $userID = !empty($body['userID']) ? $body['userID'] : $this->getSession()->UserID;
-        if ($this->getSession()->UserID !== $userID && $this->eventModel->hasEventPermission(EventPermissions::ORGANIZER, $id)) {
-            throw new ClientException('You do not have the rights to add a participant to that event.');
-        }
 
         $participantData = $this->normalizeEventParticipantInput($body);
 

@@ -73,7 +73,7 @@ class EventModel extends Gdn_Model {
      * @param integer $eventID
      * @param integer $datasetType
      * @param array $options Base class compatibility.
-     * @return type
+     * @return array
      */
     public function getID($eventID, $datasetType = DATASET_TYPE_ARRAY, $options = []) {
         $eventID = self::parseID($eventID);
@@ -197,11 +197,13 @@ class EventModel extends Gdn_Model {
                 ->setPermission(EventPermissions::EDIT, true)
                 ->setPermission(EventPermissions::MEMBER, true)
                 ->setPermission(EventPermissions::VIEW, true)
+                ->setPermission(EventPermissions::ATTEND, true)
             ;
         } elseif ($userEvent) {
             $permissions
                 ->setPermission(EventPermissions::MEMBER, true)
                 ->setPermission(EventPermissions::VIEW, true)
+                ->setPermission(EventPermissions::ATTEND, true)
             ;
         }
 
@@ -214,9 +216,13 @@ class EventModel extends Gdn_Model {
                         ->setPermission(EventPermissions::CREATE, true)
                         ->setPermission(EventPermissions::EDIT, true)
                         ->setPermission(EventPermissions::VIEW, true)
+                        ->setPermission(EventPermissions::ATTEND, true)
                     ;
                 } elseif ($this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.View')) {
-                    $permissions->setPermission(EventPermissions::VIEW, true);
+                    $permissions
+                        ->setPermission(EventPermissions::VIEW, true)
+                        ->setPermission(EventPermissions::ATTEND, true)
+                    ;
                 }
                 break;
             case GroupRecordType::TYPE:
@@ -227,12 +233,14 @@ class EventModel extends Gdn_Model {
                         ->setPermission(EventPermissions::MEMBER, true)
                         ->setPermission(EventPermissions::VIEW, true)
                         ->setPermission(EventPermissions::CREATE, $membersCanAddEvents)
+                        ->setPermission(EventPermissions::ATTEND, true)
                     ;
                 } elseif ($eventGroupPermissions->hasPermission(GroupPermissions::LEADER)) {
                     $permissions
                         ->setPermission(EventPermissions::CREATE, true)
                         ->setPermission(EventPermissions::EDIT, true)
                         ->setPermission(EventPermissions::VIEW, true)
+                        ->setPermission(EventPermissions::ATTEND, true)
                     ;
                 } elseif ($eventGroupPermissions->hasPermission(GroupPermissions::VIEW)) {
                     $permissions->setPermission(EventPermissions::VIEW, true);
@@ -258,11 +266,10 @@ class EventModel extends Gdn_Model {
      * @param int $eventID The ID of the group to check.
      * @param int|null $userID
      *
-     * @return bool Whether or not the user has the permission.
      */
-    public function checkEventPermission(string $permission, int $eventID, int $userID = null): bool {
+    public function checkEventPermission(string $permission, int $eventID, int $userID = null) {
         $permissions = $this->calculatePermissionsForEvent($eventID, $userID);
-        return $permissions->checkPermission($permission);
+        $permissions->checkPermission($permission);
     }
 
     /**
@@ -271,10 +278,12 @@ class EventModel extends Gdn_Model {
      * @param string $permission One of the constants from GroupPermission::
      * @param int $eventID The ID of the group to check.
      * @param int|null $userID
+     *
+     * @return bool Whether or not the user has the permission.
      */
-    public function hasEventPermission(string $permission, int $eventID, int $userID = null) {
+    public function hasEventPermission(string $permission, int $eventID, int $userID = null): bool {
         $permissions = $this->calculatePermissionsForEvent($eventID, $userID);
-        $permissions->hasPermission($permission);
+        return $permissions->hasPermission($permission);
     }
 
 
@@ -285,6 +294,7 @@ class EventModel extends Gdn_Model {
      * @param int|array $eventID The event ID of the event record
      * @param int|null $userID
      * @return boolean
+     * @deprecated
      */
     public function checkPermission($permission, $eventID, $userID = null) {
         deprecated(__METHOD__, 'checkEventPermission');
@@ -300,7 +310,7 @@ class EventModel extends Gdn_Model {
         try {
             $this->checkEventPermission((string) $permission, (int) $eventID, $userID);
             return true;
-        } catch (ForbiddenException $e) {
+        } catch (Exception $e) {
             // This is a legacy function an used to return the "reason" why the permission failed as a string.
             if ($isReason) {
                 trigger_error("Invalid event permission $permission.");
@@ -339,7 +349,12 @@ class EventModel extends Gdn_Model {
                 }
                 break;
             case ForumCategoryRecordType::TYPE:
-                return $this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.Manage');
+                // Make sure the category exists.
+                $category = $this->categoryModel::categories($parentRecordID);
+                if (!$category) {
+                    return false;
+                }
+                return $this->categoryModel::checkPermission($category, 'Vanilla.Events.Manage');
                 break;
             default:
                 return false;
@@ -432,36 +447,6 @@ class EventModel extends Gdn_Model {
     }
 
     /**
-     * Invite an entire group to this event.
-     *
-     * @param integer $eventID
-     * @param integer $groupID
-     */
-    public function inviteGroup($eventID, $groupID) {
-        return;
-        $event = $this->getID($eventID, DATASET_TYPE_ARRAY);
-        $groupModel = new GroupModel();
-        $groupMembers = $groupModel->getMembers($groupID);
-
-        // Notify the users of the invitation
-        $activityModel = new ActivityModel();
-        $activity = [
-            'ActivityType' => 'Events',
-            'ActivityUserID' => $event['InsertUserID'],
-            'HeadlineFormat' => t('Activity.NewEvent', '{ActivityUserID,User} added a new event: <a href="{Url,html}">{Data.Name,text}</a>.'),
-            'RecordType' => 'Event',
-            'RecordID' => 'EventID',
-            'Route' => eventUrl($event),
-            'Data' => ['Name' => $event['Name']]
-        ];
-
-        foreach ($groupMembers as $groupMember) {
-            $activity['NotifyUserID'] = $groupMember['UserID'];
-            $activityID = $activityModel->queue($activity);
-        }
-    }
-
-    /**
      * Checks whether an event has ended.
      *
      * @param array $event The event to check.
@@ -484,7 +469,12 @@ class EventModel extends Gdn_Model {
      */
     public function invited($eventID) {
         $collapsedInvited = $this->SQL->getWhere('UserEvent', ['EventID' => $eventID])->resultArray();
-        Gdn::userModel()->joinUsers($collapsedInvited, ['UserID']);
+        $canSeePersonalInfo = $this->session->checkPermission('Garden.Users.Edit');
+        $joinedFields = ['Name', 'Photo'];
+        if ($canSeePersonalInfo) {
+            $joinedFields[] = 'Email';
+        }
+        Gdn::userModel()->joinUsers($collapsedInvited, ['UserID'], ['Join' => $joinedFields]);
         $invited = [];
         foreach ($collapsedInvited as $invitee) {
             $invited[$invitee['Attending']][] = $invitee;
