@@ -125,6 +125,15 @@ class GroupsHooks extends Gdn_Plugin {
         $dic->rule(BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(GroupBreadcrumbProvider::class)])
         ;
+
+        $dic->rule('@event-route')
+            ->setClass(\Garden\Web\ResourceRoute::class)
+            ->setConstructorArgs(['/', 'Vanilla\\Events\\%sPageController'])
+            // Set a default content type.
+            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
+            ->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new Reference('@event-route'), 'event-route'])
+        ;
     }
 
     /**

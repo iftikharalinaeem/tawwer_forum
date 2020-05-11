@@ -270,7 +270,7 @@ class EventsApiController extends AbstractApiController {
 
         return new Data($result, ['paging' => $paging]);
     }
-
+    
     /**
      * Get an event for editing.
      *
