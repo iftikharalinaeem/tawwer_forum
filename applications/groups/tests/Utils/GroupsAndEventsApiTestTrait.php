@@ -9,7 +9,6 @@ namespace VanillaTests\Groups\Utils;
 
 use Vanilla\Formatting\Formats\TextFormat;
 use VanillaTests\InternalClient;
-use VanillaTests\SiteTestTrait;
 
 /**
  * @method InternalClient api()
@@ -34,9 +33,7 @@ trait GroupsAndEventsApiTestTrait {
     /**
      * Clear local info between tests.
      */
-    public function setUp(): void {
-        parent::setUp();
-
+    public function setUpGroupsAndEventsApiTestTrait(): void {
         $this->lastInsertedCategoryID = null;
         $this->lastInsertedEventID = null;
         $this->lastInsertedGroupID = null;
@@ -64,6 +61,25 @@ trait GroupsAndEventsApiTestTrait {
         $this->lastInsertedGroupID = $result['groupID'];
         $this->lastInsertedParentID = $result['groupID'];
         $this->lastInsertedParentType = 'group';
+        return $result;
+    }
+
+    /**
+     * Have the current user join a group.
+     *
+     * @param array $overrides
+     *
+     * @return array
+     */
+    public function joinGroup(array $overrides = []): array {
+        $groupID = $overrides['groupID'] ?? $this->lastInsertedGroupID;
+
+        if ($groupID === null) {
+            throw new \Exception('Could not join a group because none was specified.');
+        }
+
+        $result = $this->api()->post("/groups/$groupID/join")->getBody();
+        $this->clearGroupMemoryCache();
         return $result;
     }
 
@@ -123,13 +139,11 @@ trait GroupsAndEventsApiTestTrait {
     }
 
     /**
-     * Truncate all KB tables.
+     * Clear the in memory cache of group permissions.
      */
-    public function truncateTables() {
-        $tables = ['group', 'event', 'category'];
-
-        foreach ($tables as $table) {
-            \Gdn::sql()->truncate($table);
-        }
+    protected function clearGroupMemoryCache() {
+        /** @var \GroupModel $model */
+        $model = \Gdn::getContainer()->get(\GroupModel::class);
+        $model->resetCachedPermissions();
     }
 }

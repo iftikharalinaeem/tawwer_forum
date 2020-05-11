@@ -4,6 +4,13 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Forum\Navigation\GroupRecordType;
+use Vanilla\Groups\Models\EventPermissions;
+use Vanilla\Models\GenericRecord;
+use Vanilla\Navigation\BreadcrumbModel;
+
 /**
  * Groups Application - Events Controller
  *
@@ -12,6 +19,32 @@
  * @since 1.0
  */
 class EventsController extends Gdn_Controller {
+
+    const ALLOWED_PARENT_RECORD_TYPES = [ForumCategoryRecordType::TYPE, GroupRecordType::TYPE];
+
+    /** @var EventModel */
+    private $eventModel;
+
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
+    /** @var GroupModel */
+    private $groupModel;
+
+    /**
+     * DI.
+     *
+     * @param EventModel $eventModel
+     * @param BreadcrumbModel $breadcrumbModel
+     * @param GroupModel $groupModel
+     */
+    public function __construct(EventModel $eventModel, BreadcrumbModel $breadcrumbModel, GroupModel $groupModel) {
+        parent::__construct();
+        $this->eventModel = $eventModel;
+        $this->breadcrumbModel = $breadcrumbModel;
+        $this->groupModel = $groupModel;
+    }
+
 
     /**
      * Include JS, CSS, and modules used by all methods.
@@ -37,74 +70,63 @@ class EventsController extends Gdn_Controller {
     }
 
     /**
+     * Event list page.
      *
-     *
-     * @param null $context
-     * @param null $contextID
-     * @throws Exception
+     * @param string|null $parentRecordType The parent record type.
+     * @param string|null $parentRecordID The parent record ID. May have a slug appended.
      */
-    public function index($context = null, $contextID = null) {
-        return $this->events($context, $contextID);
-    }
+    public function index(?string $parentRecordType = null, ?string $parentRecordID = null) {
+        ///
+        /// Validation and permission logic.
+        ///
+        $this->permission('Garden.SignIn.Allow');
 
-    /**
-     * Show all events for the supplied context
-     *
-     * If the context is null, show events the current user is invited to.
-     *
-     * @param string $context
-     * @param integer $contextID
-     */
-    public function events($context = null, $contextID = null) {
-        $eventModel = new EventModel();
-        $eventCriteria = [];
-
-        // Determine context
-        switch ($context) {
-            // Events for this group
-            case 'group':
-                $groupModel = new GroupModel();
-                $group = $groupModel->getID($contextID, DATASET_TYPE_ARRAY);
-                if (!$group || !$groupModel->checkPermission('Access', $group)) {
-                    throw notFoundException('Group');
-                }
-
-                $this->EventArguments['Group'] = &$group;
-                $this->fireEvent('GroupLoaded');
-
-                $this->setData('Group', $group);
-                $this->setData('NewButtonId', val('GroupID', $group));
-
-                // Check if this person is a member of the group or a moderator
-                $viewGroupEvents = groupPermission('View', $group);
-                if (!$viewGroupEvents) {
-                    throw permissionException();
-                }
-
-                $this->addBreadcrumb('Groups', url('/groups'));
-                $this->addBreadcrumb($group['Name'], groupUrl($group));
-
-                // Register GroupID as criteria
-                $eventCriteria['GroupID'] = $group['GroupID'];
-                break;
-
-            // Events this user is invited to
-            default:
-                // Register logged-in user being invited as criteria
-                $eventCriteria['Invited'] = Gdn::session()->UserID;
-                break;
+        if ($parentRecordType === null) {
+            throw new NotFoundException();
         }
+        $parentRecordType ? strtolower($parentRecordType) : null;
+        if (!in_array($parentRecordType, self::ALLOWED_PARENT_RECORD_TYPES)) {
+            throw new NotFoundException();
+        }
+
+        if ($parentRecordID === null) {
+            throw new NotFoundException();
+        }
+
+        // We have a slug on this id.
+        $parentRecordID = GroupModel::idFromSlug($parentRecordID);
+
+        // Validate our permissions for the records.
+        $this->eventModel->checkParentEventPermission(EventPermissions::VIEW, $parentRecordType, $parentRecordID);
+
+        ///
+        /// Prepare data for view rendering.
+        ///
         $this->title(t('Events'));
-        $this->addBreadcrumb($this->title());
+
+        // Set breadcrumbs.
+        $crumbs = $this->breadcrumbModel->getForRecord(new GenericRecord($parentRecordType, $parentRecordID));
+        // Legacy page so pop off the first crumb.
+        array_shift($crumbs);
+
+        foreach ($crumbs as $crumb) {
+            $this->addBreadcrumb($crumb->getName(), $crumb->getUrl());
+        }
+
+        $this->addBreadcrumb(t('Events'), $this->canonicalUrl());
         $this->CssClass .= ' NoPanel';
 
+        $eventCriteria = [
+            'ParentRecordID' => $parentRecordID,
+            'ParentRecordType' => $parentRecordType,
+        ];
         // Upcoming events
         $upcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
-        $upcomingEvents = $eventModel->getUpcoming($upcomingRange, $eventCriteria);
+        $upcomingEvents = $this->eventModel->getUpcoming($upcomingRange, $eventCriteria);
 
         // Recent events
         $recentRange = c('Groups.Events.RecentRange', '-365 days');
-        $recentEvents = $eventModel->getUpcoming($recentRange, $eventCriteria, true);
+        $recentEvents = $this->eventModel->getUpcoming($recentRange, $eventCriteria, true);
 
         $this->EventArguments['UpcomingEvents'] = &$upcomingEvents;
         $this->EventArguments['RecentEvents'] = &$recentEvents;
@@ -121,4 +143,22 @@ class EventsController extends Gdn_Controller {
         $this->render();
     }
 
+    /**
+     * We have some group specific view data.
+     *
+     * @param int $groupID
+     */
+    private function applyGroupSpecificViewData(int $groupID) {
+        $group = $this->groupModel->getID($groupID, DATASET_TYPE_ARRAY);
+        if (!$group) {
+            throw new NotFoundException('Group');
+        }
+
+        $this->EventArguments['Group'] = &$group;
+        $this->fireEvent('GroupLoaded');
+
+        $this->setData('Group', $group);
+        $this->setData('NewButtonId', val('GroupID', $group));
+
+    }
 }

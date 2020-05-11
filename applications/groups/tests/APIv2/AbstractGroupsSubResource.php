@@ -91,4 +91,13 @@ abstract class AbstractGroupsSubResource extends AbstractAPIv2Test {
 
          return implode('/', $parts);
     }
+
+    /**
+     * Clear the in memory cache of group permissions.
+     */
+    protected function clearGroupMemoryCache() {
+        /** @var \GroupModel $model */
+        $model = \Gdn::getContainer()->get(\GroupModel::class);
+        $model->resetCachedPermissions();
+    }
 }
