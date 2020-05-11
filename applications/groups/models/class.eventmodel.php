@@ -12,6 +12,7 @@ use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Groups\Models\EventPermissions;
 use Vanilla\Groups\Models\GroupPermissions;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Groups Application - Event Model
@@ -51,6 +52,49 @@ class EventModel extends Gdn_Model {
         $this->session = \Gdn::getContainer()->get(Gdn_Session::class);
         $this->config = \Gdn::getContainer()->get(ConfigurationInterface::class);
         $this->categoryModel = \Gdn::getContainer()->get(CategoryModel::class);
+    }
+
+    /**
+     * Get the canonical event URL for an event.
+     *
+     * @param array $event
+     *
+     * @return string The event URL.
+     */
+    public function eventUrl(array $event): string {
+        $eventID = $event['EventID'];
+        $name = $event['Name'];
+        $slug = Gdn_Format::url($name);
+        $parentRecordID = $event['ParentRecordID'];
+        $parentRecordType = $event['ParentRecordType'];
+
+        // Lazily get our theme features.
+        $themeFeatures = Gdn::themeFeatures();
+
+        $eventPath = $themeFeatures->allFeatures()['NewEventsPage'] ? "/events/$eventID-$slug" : "/event/$eventID-$slug";
+        // Try to find the correct subcommunity.
+        /** @var SiteSectionModel $sectionModel */
+        $sectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
+
+        $siteSectionPath = null;
+
+        if ($parentRecordType === ForumCategoryRecordType::class) {
+            // Go through the sections to find the correct one.
+            $sections = $sectionModel->getAll();
+            foreach ($sections as $section) {
+                if ($section->getAttributes()['CategoryID'] === $parentRecordID) {
+                    $siteSectionPath = $section->getBasePath();
+                    break;
+                }
+            }
+        }
+        if ($siteSectionPath === null) {
+            $siteSectionPath = $sectionModel->getCurrentSiteSection();
+        }
+        // Make sure we don't have double-slashes in the path.
+        $siteSectionPath = rtrim($siteSectionPath, '/');
+        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath);
+        return $result;
     }
 
     /**

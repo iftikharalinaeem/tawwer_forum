@@ -6,6 +6,7 @@
 
 use \Garden\Schema\Schema;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Theme\ThemeFeatures;
 use \Vanilla\Web\Controller;
 use Garden\Container\Container;
 use Vanilla\Groups\Models\SearchRecordTypeGroup;
@@ -27,6 +28,28 @@ class GroupsHooks extends Gdn_Plugin {
     public function __construct(GroupModel $groupModel) {
         parent::__construct();
         $this->groupModel = $groupModel;
+    }
+
+    /**
+     * Conditionally switch between the new and old event pages.
+     *
+     * @param Gdn_Dispatcher $dispatcher
+     * @param array $args
+     */
+    public function gdn_dispatcher_beforeDispatch_handler(Gdn_Dispatcher $dispatcher, array $args) {
+        /** @var ThemeFeatures $themeFeatures */
+        $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
+
+        if ($themeFeatures->allFeatures()['NewEventsPage']) {
+            // Add a rewrite into our router.
+            // Eg.
+            // /events internally to /new-events
+            // /events/some-path to /new-events/some-path
+            Gdn::router()->setRoute('events\/?(.*)?', 'new-events/$1', 'Internal', false);
+
+            // Redirect old event pages to the new ones.
+            Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Permanent', false);
+        }
     }
 
     /**

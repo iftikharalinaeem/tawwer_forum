@@ -47,7 +47,7 @@ class EventsBreadcrumbProvider implements BreadcrumbProviderInterface {
         }
 
         $eventName = $event['Name'] ?? '';
-        $crumbs[] = new Breadcrumb(t($eventName), eventUrl($event));
+        $crumbs[] = new Breadcrumb(t($eventName), $this->eventModel->eventUrl($event));
 
         return $crumbs;
     }
@@ -58,5 +58,4 @@ class EventsBreadcrumbProvider implements BreadcrumbProviderInterface {
     public static function getValidRecordTypes(): array {
         return [EventRecordType::TYPE];
     }
-
 }

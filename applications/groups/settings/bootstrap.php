@@ -23,6 +23,12 @@ function eventSlug($event) {
     return $event['EventID'].'-'.Gdn_Format::url($event['Name']);
 }
 
+/**
+ * @param $event
+ * @param null $method
+ * @return string
+ * @deprecated EventModel::eventUrl()
+ */
 function eventUrl($event, $method = null) {
     if ($method) {
         return url("/event/$method/".eventSlug($event), '//');

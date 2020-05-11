@@ -15,6 +15,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Groups\Models\EventPermissions;
 use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\Navigation\Breadcrumb;
@@ -49,24 +50,25 @@ class EventsApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
-     * EventsApiController constructor.
-     *
-     * @param EventModel $eventModel
-     * @param GroupModel $groupModel
-     * @param UserModel $userModel
-     * @param BreadcrumbModel $breadcrumbModel
+     * DI.
+     * @inheritdoc
      */
     public function __construct(
         EventModel $eventModel,
         GroupModel $groupModel,
         UserModel $userModel,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        FormatService $formatService
     ) {
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
         $this->breadcrumbModel =  $breadcrumbModel;
+        $this->formatService = $formatService;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -537,14 +539,14 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a schema record.
      */
     public function normalizeEventOutput(array $dbRecord) {
-        $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
-        if (isset( $dbRecord['Attending'])) {
+        $dbRecord['Body'] = $this->formatService->renderHTML($dbRecord['Body'], $dbRecord['Format']);
+        if (isset($dbRecord['Attending'])) {
             $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
             $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
         }
 
+        $dbRecord['url'] = $this->eventModel->eventUrl($dbRecord);
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['url'] = eventUrl($dbRecord);
 
         return $schemaRecord;
     }
