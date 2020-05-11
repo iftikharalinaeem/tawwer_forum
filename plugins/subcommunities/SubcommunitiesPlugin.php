@@ -914,7 +914,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      * @param \Gdn_Dispatcher $sender
      * @param array $args
      */
-    public function gdn_Dispatcher_beforeDispatch_handler(\Gdn_Dispatcher $sender, array $args) {
+    public function gdn_dispatcher_beforeDispatch_handler(\Gdn_Dispatcher $sender, array $args) {
         /** @var \Gdn_Request $request */
         $request = $args['Request'];
         /** @var SiteSectionModel $siteSectionModel */
