@@ -53,7 +53,7 @@ class GroupsHooks extends Gdn_Plugin {
 
             // Redirect old event pages to the new ones.
             // CAN'T DO THIS UNTIL WE MAKE THE NEW EVENT ADD/EDIT PAGE
-             Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Temporary', false);
+             Gdn::router()->setRoute('event\/\d.(.*)', 'events/$1', 'Temporary', false);
         }
     }
 

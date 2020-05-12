@@ -92,11 +92,13 @@ export default function EventPage() {
                         : crumbs && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
                 }
                 middleTop={
-                    <PageTitle
-                        title={event.name}
-                        actions={<EventsOptionsDropDown event={event} />}
-                        includeBackLink={false}
-                    />
+                    <PanelWidget>
+                        <PageTitle
+                            title={event.name}
+                            actions={<EventsOptionsDropDown event={event} />}
+                            includeBackLink={false}
+                        />
+                    </PanelWidget>
                 }
                 middleBottom={
                     <PanelWidget>

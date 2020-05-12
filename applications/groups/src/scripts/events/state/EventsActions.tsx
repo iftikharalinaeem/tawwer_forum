@@ -57,7 +57,7 @@ export class EventsActions extends ReduxActions {
 
     public getEventList = (params: IGetEventsQuery) => {
         const thunk = bindThunkAction(EventsActions.getEventListACs, async () => {
-            const response = await this.api.get(`/events?expand=permissions`, { params });
+            const response = await this.api.get(`/events?expand[]=permissions`, { params });
             const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
             const result: IEventList = {
                 events: response.data,
@@ -123,7 +123,7 @@ export class EventsActions extends ReduxActions {
     public getEventByID = (eventID: number) => {
         const thunk = bindThunkAction(EventsActions.getEventACs, async () => {
             const [eventResponse, participantResponse] = await Promise.all([
-                this.api.get(`/events/${eventID}?expand=all`),
+                this.api.get(`/events/${eventID}?expand[]=all`),
                 this.api.get(`/events/${eventID}/participants?expand=true`),
             ]);
 

@@ -324,7 +324,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         marginRight: globalVars.gutter.quarter,
     });
     const details = style("details", {});
-    const separator = style("details", {
+    const separator = style("separator", {
         display: "block",
         width: percent(100),
         borderTop: 0,
@@ -379,6 +379,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const section = style("section", {
         ...margins(vars.section.spacing),
+    });
+
+    const firstSection = style("firstSection", {
+        marginTop: -globalVars.spacer.size,
     });
 
     const pageTitle = style("pageTitle", {
@@ -441,6 +445,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendeePlus,
         noAttendees,
         section,
+        firstSection,
         pageTitle,
         sectionTitle,
         description,

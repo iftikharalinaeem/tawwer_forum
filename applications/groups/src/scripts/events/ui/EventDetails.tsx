@@ -13,10 +13,12 @@ import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
 import React from "react";
-import { IEvent, EventAttendance } from "@groups/events/state/eventsTypes";
+import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
 
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { EventPermission } from "@groups/events/state/EventPermission";
+import classNames from "classnames";
 
 interface IProps {
     event: IEvent;
@@ -56,35 +58,37 @@ export function EventDetails(props: IProps) {
                         ),
                     },
                 ]}
-                className={classes.section}
+                className={classNames(classes.section, classes.firstSection)}
                 caption={t("Event Details")}
             />
-            <ButtonTabs
-                activeTab={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
-                accessibleTitle={t("Are you going?")}
-                setData={props.onChange}
-                className={classes.attendanceSelector}
-            >
-                <ButtonTab
-                    disabled={!!props.loadingAttendance}
-                    label={t("Going")}
-                    isLoading={props.loadingAttendance === EventAttendance.GOING}
-                    data={EventAttendance.GOING}
-                />
-                <ButtonTab
-                    disabled={!!props.loadingAttendance}
-                    label={t("Maybe")}
-                    data={EventAttendance.MAYBE}
-                    isLoading={props.loadingAttendance === EventAttendance.MAYBE}
-                />
-                <ButtonTab
-                    disabled={!!props.loadingAttendance}
-                    label={t("Not going")}
-                    data={EventAttendance.NOT_GOING}
-                    isLoading={props.loadingAttendance === EventAttendance.NOT_GOING}
-                    className={"isLast"}
-                />
-            </ButtonTabs>
+            <EventPermission event={event} permission={EventPermissionName.ATTEND}>
+                <ButtonTabs
+                    activeTab={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
+                    accessibleTitle={t("Are you going?")}
+                    setData={props.onChange}
+                    className={classes.attendanceSelector}
+                >
+                    <ButtonTab
+                        disabled={!!props.loadingAttendance}
+                        label={t("Going")}
+                        isLoading={props.loadingAttendance === EventAttendance.GOING}
+                        data={EventAttendance.GOING}
+                    />
+                    <ButtonTab
+                        disabled={!!props.loadingAttendance}
+                        label={t("Maybe")}
+                        data={EventAttendance.MAYBE}
+                        isLoading={props.loadingAttendance === EventAttendance.MAYBE}
+                    />
+                    <ButtonTab
+                        disabled={!!props.loadingAttendance}
+                        label={t("Not going")}
+                        data={EventAttendance.NOT_GOING}
+                        isLoading={props.loadingAttendance === EventAttendance.NOT_GOING}
+                        className={"isLast"}
+                    />
+                </ButtonTabs>
+            </EventPermission>
 
             <div className={classes.section}>
                 <hr className={classes.separator} />

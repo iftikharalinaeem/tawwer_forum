@@ -322,31 +322,6 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
-     * Add an event end date.
-     *
-     * if we don't have an endDate, set it to midnight of that day
-     * make it to an all day event.
-     *
-     * @param array $eventData
-     * @return array
-     */
-    private function calculateEventEndDate($eventData) {
-        $startDate = $eventData['dateStarts'] ?? $eventData['DateStarts'] ?? false;
-        $eventEndDateInfo = [];
-        if ($startDate instanceof DateTimeInterface) {
-            $endDate = $startDate->modify('1 Day');
-            $eventEndDateInfo['dateEnds'] = $endDate->format('Y-m-d H:i:s');
-        } else {
-            $convertedStartDate = new DateTime($startDate);
-            $convertedStartDate->modify('1 Day');
-            $eventEndDateInfo['dateEnds'] = $convertedStartDate->format('Y-m-d H:i:s');
-        }
-        $eventEndDateInfo['allDayEvent'] = 1;
-
-        return $eventEndDateInfo;
-    }
-
-    /**
      * Get an ID-only event record schema.
      *
      * @return Schema Returns a schema object.
@@ -608,13 +583,6 @@ class EventsApiController extends AbstractApiController {
 
         $eventData = $this->normalizeEventInput($body);
 
-        // backwards compatibility, if a null endDate is passed we should add one.
-        if (array_key_exists('dateEnds', $body) && !$body['dateEnds']) {
-            $newEndDate = $this->calculateEventEndDate($event);
-            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
-            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
-        }
-
         $eventData['EventID'] = $id;
 
         $this->eventModel->checkEventPermission(EventPermissions::EDIT, $id);
@@ -670,13 +638,6 @@ class EventsApiController extends AbstractApiController {
         );
 
         $eventData = $this->normalizeEventInput($body);
-
-        // backwards compatibility, if a null endDate is passed we should add one.
-        if (!isset($body['dateEnds'])) {
-            $newEndDate = $this->calculateEventEndDate($eventData);
-            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
-            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
-        }
 
         $id = $this->eventModel->save($eventData);
         $this->validateModel($this->eventModel);

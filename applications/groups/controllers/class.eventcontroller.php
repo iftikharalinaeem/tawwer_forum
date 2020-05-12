@@ -194,7 +194,7 @@ class EventController extends Gdn_Controller {
             if ($eventID = $this->Form->save()) {
                 $eventData['EventID'] = $eventID;
                 $this->informMessage(formatString(t("New event created for <b>'{Name}'</b>"), $eventData));
-                redirectTo(eventUrl($eventData));
+                redirectTo($this->eventModel->eventUrl($eventData));
             }
         }
 
@@ -235,7 +235,7 @@ class EventController extends Gdn_Controller {
                 $eventData['EventID'] = $eventID;
 
                 $this->informMessage(formatString(t("<b>'{Name}'</b> has been updated"), $eventData));
-                redirectTo(eventUrl($event));
+                redirectTo($this->eventModel->eventUrl($event));
             }
         }
 

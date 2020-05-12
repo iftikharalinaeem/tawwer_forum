@@ -661,6 +661,12 @@ class EventModel extends Gdn_Model {
      * @return array
      */
     public function save($event, $settings = []) {
+        if (!isset($event['DateEnds']) || !$event['DateEnds']) {
+            $newEndDate = $this->calculateEventEndDate($event);
+            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
+            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
+        }
+
         // Fix the dates.
         if (array_key_exists('DateStarts', $event)) {
             $this->Validation->applyRule('DateStarts', 'ValidateDate');
@@ -872,6 +878,31 @@ class EventModel extends Gdn_Model {
             return $built;
         }
         return getValue($lookupTimezone, $built);
+    }
+
+    /**
+     * Add an event end date.
+     *
+     * if we don't have an endDate, set it to midnight of that day
+     * make it to an all day event.
+     *
+     * @param array $eventData
+     * @return array
+     */
+    public function calculateEventEndDate($eventData) {
+        $startDate = $eventData['dateStarts'] ?? $eventData['DateStarts'] ?? false;
+        $eventEndDateInfo = [];
+        if ($startDate instanceof DateTimeInterface) {
+            $endDate = $startDate->modify('1 Day');
+            $eventEndDateInfo['DateEnds'] = $endDate->format('Y-m-d H:i:s');
+        } else {
+            $convertedStartDate = new DateTime($startDate);
+            $convertedStartDate->modify('1 Day');
+            $eventEndDateInfo['DateEnds'] = $convertedStartDate->format('Y-m-d H:i:s');
+        }
+        $eventEndDateInfo['AllDayEvent'] = 1;
+
+        return $eventEndDateInfo;
     }
 
     /**
