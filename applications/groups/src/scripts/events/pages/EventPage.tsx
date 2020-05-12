@@ -3,29 +3,27 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useState } from "react";
+import { useEvent, useEventAttendance } from "@groups/events/state/eventsHooks";
+import { EventDetails } from "@groups/events/ui/EventDetails";
+import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { LoadStatus } from "@library/@types/api/core";
-import { useParams } from "react-router";
-import { useEventActions } from "@groups/events/state/EventActions";
-import { useEventState } from "@groups/events/state/EventReducer";
-import Loader from "@library/loaders/Loader";
 import { IUserFragment } from "@library/@types/api/users";
+import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import Loader from "@library/loaders/Loader";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
-import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
-import { EventDetails } from "@groups/events/ui/EventDetails";
+import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
+import { notEmpty } from "@vanilla/utils";
+import React from "react";
+import { useParams } from "react-router";
 
 export default function EventPage() {
-    const { getEventByID, getEventParticipantsByEventID, postEventParticipants } = useEventActions();
-    const [disableAttendance, setDisableAttendance] = useState(false);
-
     let eventID = useParams<{
         id: string;
     }>().id;
@@ -34,99 +32,93 @@ export default function EventPage() {
     const renderPanelBackground =
         device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
 
-    const eventState = useEventState();
-    let event = eventState.event;
-    let participants = eventState.eventParticipants;
-    let postParticipants = eventState.participant;
+    const eventWithParticipants = useEvent(Number.parseInt(eventID, 10));
+    const { setEventAttendance, setEventAttendanceLoadable } = useEventAttendance(Number.parseInt(eventID, 10));
 
-    useEffect(() => {
-        if (event.status === LoadStatus.PENDING || event.status === LoadStatus.LOADING) {
-            getEventByID(parseInt(eventID));
-            getEventParticipantsByEventID(parseInt(eventID));
-        }
-    }, [event.data]);
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(eventWithParticipants.status)) {
+        return <Loader />;
+    }
 
-    const organizer = event.data?.insertUser;
+    if (!eventWithParticipants.data || eventWithParticipants.error) {
+        return <ErrorPage error={eventWithParticipants.error} />;
+    }
 
-    const crumbs = event.data?.breadcrumbs;
+    let { participants, event } = eventWithParticipants.data;
+
+    const organizer = event.insertUser;
+    const crumbs = event.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
-    const setAttendance = async attendingStatus => {
-        setDisableAttendance(true);
-        await postEventParticipants({ id: parseInt(eventID), attending: attendingStatus });
-        let event = await getEventByID(parseInt(eventID));
-        let eventParticipants = await getEventParticipantsByEventID(parseInt(eventID));
-        if (event && eventParticipants) {
-            setDisableAttendance(false);
-        }
-    };
-
-    if (!event.data || !participants.data) {
-        return <Loader />;
-    } else {
-        const going: IUserFragment[] = participants?.data
-            .filter(participant => {
-                if (participant.attending === "yes") {
-                    return participant.user;
-                }
-            })
-            .map(participant => {
+    const going: IUserFragment[] = participants
+        .filter(participant => {
+            if (participant.attending === "yes") {
                 return participant.user;
-            });
-        const notGoing: IUserFragment[] = participants?.data
-            .filter(participant => {
-                if (participant.attending === "no") {
-                    return participant.user;
-                }
-            })
-            .map(participant => {
+            }
+        })
+        .map(participant => {
+            return participant.user;
+        })
+        .filter(notEmpty);
+    const notGoing: IUserFragment[] = participants
+        .filter(participant => {
+            if (participant.attending === "no") {
                 return participant.user;
-            });
-
-        const maybe: IUserFragment[] = participants?.data
-            .filter(participant => {
-                if (participant.attending === "maybe") {
-                    return participant.user;
-                }
-            })
-            .map(participant => {
+            }
+        })
+        .map(participant => {
+            return participant.user;
+        })
+        .filter(notEmpty);
+    const maybe: IUserFragment[] = participants
+        .filter(participant => {
+            if (participant.attending === "maybe") {
                 return participant.user;
-            });
+            }
+        })
+        .map(participant => {
+            return participant.user;
+        })
+        .filter(notEmpty);
 
-        return (
-            <Container>
-                <TitleBar />
-                <PanelLayout
-                    renderLeftPanelBackground={renderPanelBackground}
-                    leftBottom={<></>}
-                    breadcrumbs={
-                        (device === Devices.XS || device === Devices.MOBILE) && crumbs
-                            ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
-                            : crumbs && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
-                    }
-                    middleTop={
-                        <PageTitle
-                            title={event.data.name}
-                            actions={<EventsOptionsDropDown eventID={parseInt(eventID)} />}
-                            includeBackLink={false}
+    return (
+        <Container>
+            <TitleBar />
+            <PanelLayout
+                renderLeftPanelBackground={renderPanelBackground}
+                leftBottom={<></>}
+                breadcrumbs={
+                    (device === Devices.XS || device === Devices.MOBILE) && crumbs
+                        ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
+                        : crumbs && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
+                }
+                middleTop={
+                    <PageTitle
+                        title={event.name}
+                        actions={<EventsOptionsDropDown event={event} />}
+                        includeBackLink={false}
+                    />
+                }
+                middleBottom={
+                    <PanelWidget>
+                        <EventDetails
+                            event={event}
+                            organizer={organizer.name}
+                            going={going}
+                            notGoing={notGoing}
+                            maybe={maybe}
+                            onChange={newAttending => {
+                                setEventAttendance(newAttending);
+                            }}
+                            loadingAttendance={
+                                setEventAttendanceLoadable.status === LoadStatus.LOADING
+                                    ? setEventAttendanceLoadable.data?.attending
+                                    : undefined
+                            }
                         />
-                    }
-                    middleBottom={
-                        <PanelWidget>
-                            <EventDetails
-                                event={event.data}
-                                organizer={organizer.name}
-                                going={going}
-                                notGoing={notGoing}
-                                maybe={maybe}
-                                onChange={setAttendance}
-                                disableAttendance={disableAttendance}
-                            />
-                        </PanelWidget>
-                    }
-                    rightTop={<PanelEmptyColumn />}
-                />
-            </Container>
-        );
-    }
+                    </PanelWidget>
+                }
+                rightTop={<PanelEmptyColumn />}
+            />
+        </Container>
+    );
 }

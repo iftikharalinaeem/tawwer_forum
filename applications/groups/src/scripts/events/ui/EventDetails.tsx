@@ -25,7 +25,7 @@ interface IProps {
     maybe?: IUserFragment[] | undefined;
     notGoing?: IUserFragment[] | undefined;
     onChange: (data: any) => void;
-    disableAttendance?: boolean;
+    loadingAttendance?: EventAttendance;
 }
 
 /**
@@ -60,25 +60,28 @@ export function EventDetails(props: IProps) {
                 caption={t("Event Details")}
             />
             <ButtonTabs
-                activeTab={props.event.attending ?? EventAttendance.RSVP}
+                activeTab={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
                 accessibleTitle={t("Are you going?")}
                 setData={props.onChange}
                 className={classes.attendanceSelector}
             >
                 <ButtonTab
-                    disabled={props.disableAttendance}
+                    disabled={!!props.loadingAttendance}
                     label={t("Going")}
-                    data={EventAttendance.GOING.toString()}
+                    isLoading={props.loadingAttendance === EventAttendance.GOING}
+                    data={EventAttendance.GOING}
                 />
                 <ButtonTab
-                    disabled={props.disableAttendance}
+                    disabled={!!props.loadingAttendance}
                     label={t("Maybe")}
-                    data={EventAttendance.MAYBE.toString()}
+                    data={EventAttendance.MAYBE}
+                    isLoading={props.loadingAttendance === EventAttendance.MAYBE}
                 />
                 <ButtonTab
-                    disabled={props.disableAttendance}
+                    disabled={!!props.loadingAttendance}
                     label={t("Not going")}
-                    data={EventAttendance.NOT_GOING.toString()}
+                    data={EventAttendance.NOT_GOING}
+                    isLoading={props.loadingAttendance === EventAttendance.NOT_GOING}
                     className={"isLast"}
                 />
             </ButtonTabs>

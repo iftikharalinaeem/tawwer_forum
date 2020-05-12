@@ -1,46 +1,74 @@
-import React, { useState } from "react";
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import React, { useState, useEffect } from "react";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import SmartLink from "@library/routing/links/SmartLink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import ModalConfirm from "@library/modal/ModalConfirm";
-import { t } from "@library/utility/appUtils";
+import { t, formatUrl } from "@library/utility/appUtils";
 import { LoadStatus } from "@library/@types/api/core";
-import { useEventActions } from "@groups/events/state/EventActions";
-import { useEventState } from "@groups/events/state/EventReducer";
 import { buttonClasses } from "@library/forms/buttonStyles";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import { useEventsActions } from "@groups/events/state/EventsActions";
+import { useEventsState } from "@groups/events/state/eventsHooks";
+import { IEvent } from "@groups/events/state/eventsTypes";
+import Message from "@vanilla/library/src/scripts/messages/Message";
 
 interface IProps {
-    eventID: number;
+    event: IEvent;
 }
 
 export const EventsOptionsDropDown = (props: IProps) => {
+    const { eventID, breadcrumbs } = props.event;
     const [visible, setVisible] = useState<boolean>(false);
-    const [deleteID, setDeleteID] = useState<number | string | null>(props.eventID);
 
     const classesButtons = buttonClasses();
     const classesDropDown = dropDownClasses();
 
-    const { deleteEvent } = useEventActions();
-    const deleteStatus = useEventState();
+    const { deleteEvent, clearDeleteStatus } = useEventsActions();
+    const deleteStatus = useEventsState().deleteStatusesByID[eventID];
+
+    const deleteRedirectUrl = breadcrumbs[breadcrumbs.length - 2]?.url ?? formatUrl("/");
+
+    useEffect(() => {
+        if (deleteStatus.status === LoadStatus.SUCCESS) {
+            window.location.href = deleteRedirectUrl;
+        }
+
+        if (deleteStatus.status === LoadStatus.ERROR) {
+            setVisible(false);
+        }
+    }, [deleteStatus, deleteRedirectUrl]);
 
     return (
         <>
-            {deleteID !== null && (
+            {deleteStatus.error && (
+                <Message
+                    isFixed
+                    stringContents={deleteStatus.error.message}
+                    onConfirm={() => {
+                        clearDeleteStatus({ eventID });
+                    }}
+                />
+            )}
+            {visible && (
                 <ModalConfirm
                     isVisible={visible}
                     title={t("Delete")}
                     onCancel={e => {
                         setVisible(false);
                     }}
-                    onConfirm={e => {
+                    onConfirm={async e => {
                         e.stopPropagation();
-                        deleteEvent(props.eventID);
+                        deleteEvent(eventID);
                     }}
-                    isConfirmLoading={deleteStatus.deleteEvent.status === LoadStatus.LOADING}
+                    isConfirmLoading={deleteStatus?.status === LoadStatus.LOADING}
                     elementToFocusOnExit={document.activeElement as HTMLElement}
                 >
                     {t("Do you want to delete this event?")}
@@ -48,7 +76,7 @@ export const EventsOptionsDropDown = (props: IProps) => {
             )}
             <DropDown flyoutType={FlyoutType.LIST} className={classNames("pageTitle-menu", classesButtons.icon)}>
                 <DropDownItem>
-                    <SmartLink to={`/event/edit/${props.eventID}`} className={classesDropDown.action}>
+                    <SmartLink to={`/event/edit/${eventID}`} className={classesDropDown.action}>
                         {t("Edit")}
                     </SmartLink>
                 </DropDownItem>

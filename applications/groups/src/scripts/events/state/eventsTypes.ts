@@ -43,6 +43,7 @@ export interface IEvent {
     groupID?: number;
     url: string;
     permissions?: Record<EventPermissionName, boolean>;
+    breadcrumbs: ICrumb[];
 }
 
 export interface IEventList {
@@ -59,4 +60,17 @@ export interface IEventParentRecord {
     breadcrumbs: ICrumb[];
     bannerUrl: string | null;
     iconUrl: string | null;
+}
+
+export interface IEventParticipant {
+    attending: EventAttendance;
+    dateInserted: string;
+    eventID: number;
+    user?: IUserFragment;
+    userID: number;
+}
+
+export interface IEventWithParticipants {
+    event: IEvent;
+    participants: IEventParticipant[];
 }

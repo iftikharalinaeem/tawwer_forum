@@ -8,7 +8,8 @@ import { IEventsStoreState } from "@groups/events/state/EventsReducer";
 import { IGetEventsQuery, useEventsActions, IGetEventParentRecordQuery } from "@groups/events/state/EventsActions";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import { useEffect } from "react";
+import { useEffect, useReducer, useCallback } from "react";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
 export function useEventsState() {
     return useSelector((state: IEventsStoreState) => {
@@ -60,4 +61,46 @@ export function useEventParentRecord(params: IGetEventParentRecordQuery) {
     }, [status, actions, parentRecordID, parentRecordType]);
 
     return existingResult;
+}
+
+export function useEvent(eventID: number) {
+    const actions = useEventsActions();
+
+    const existingResult = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.eventsByID[eventID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+    const { status } = existingResult;
+
+    useEffect(() => {
+        if ([LoadStatus.PENDING].includes(status)) {
+            actions.getEventByID(eventID);
+        }
+    }, [status, actions, eventID]);
+
+    return existingResult;
+}
+
+export function useEventAttendance(eventID: number) {
+    const actions = useEventsActions();
+
+    const setEventAttendance = useCallback(
+        (attending: EventAttendance) => {
+            actions.postEventParticipants({ eventID, attending });
+        },
+        [actions, eventID],
+    );
+
+    const setEventAttendanceLoadable = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.partipateStatusByEventID[eventID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+
+    return { setEventAttendance, setEventAttendanceLoadable };
 }

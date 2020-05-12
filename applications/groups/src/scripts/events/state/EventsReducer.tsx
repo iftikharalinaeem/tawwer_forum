@@ -4,7 +4,12 @@
  */
 
 import { EventsActions } from "@groups/events/state/EventsActions";
-import { IEventList, IEventParentRecord } from "@groups/events/state/eventsTypes";
+import {
+    IEventList,
+    IEventParentRecord,
+    IEventWithParticipants,
+    EventAttendance,
+} from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { stableObjectHash } from "@vanilla/utils";
@@ -14,6 +19,9 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 export interface IEventsState {
     eventsLists: Record<string, ILoadable<IEventList>>;
     eventParentRecords: Record<string, ILoadable<IEventParentRecord>>;
+    eventsByID: Record<number, ILoadable<IEventWithParticipants>>;
+    partipateStatusByEventID: Record<number, ILoadable<{ attending: EventAttendance }>>;
+    deleteStatusesByID: Record<number, ILoadable<{}>>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -23,6 +31,9 @@ export interface IEventsStoreState extends ICoreStoreState {
 const DEFAULT_EVENT_STATE: IEventsState = {
     eventsLists: {},
     eventParentRecords: {},
+    eventsByID: {},
+    partipateStatusByEventID: {},
+    deleteStatusesByID: {},
 };
 
 export const eventsReducer = produce(
@@ -73,6 +84,109 @@ export const eventsReducer = produce(
             nextState.eventParentRecords[hash].status = LoadStatus.ERROR;
             nextState.eventParentRecords[hash].error = payload.error;
 
+            return nextState;
+        })
+        .case(EventsActions.getEventACs.started, (nextState, params) => {
+            nextState.eventsByID[params.eventID] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(EventsActions.getEventACs.done, (nextState, payload) => {
+            const { eventID } = payload.params;
+            const data = payload.result;
+
+            nextState.eventsByID[eventID] = {
+                status: LoadStatus.SUCCESS,
+                data,
+            };
+
+            return nextState;
+        })
+        .case(EventsActions.getEventACs.failed, (nextState, payload) => {
+            const { eventID } = payload.params;
+            const { error } = payload;
+            nextState.eventsByID[eventID] = {
+                status: LoadStatus.SUCCESS,
+                error,
+            };
+            return nextState;
+        })
+        .case(EventsActions.postEventParticipants_ACS.started, (nextState, params) => {
+            nextState.partipateStatusByEventID[params.eventID] = {
+                status: LoadStatus.LOADING,
+                data: {
+                    attending: params.attending,
+                },
+            };
+
+            return nextState;
+        })
+        .case(EventsActions.postEventParticipants_ACS.done, (nextState, payload) => {
+            nextState.partipateStatusByEventID[payload.params.eventID] = {
+                status: LoadStatus.SUCCESS,
+                data: {
+                    attending: payload.result.attending,
+                },
+            };
+
+            // Attempt to update an already fetch event participation status.
+            const existingEvent = nextState.eventsByID[payload.result.eventID];
+            if (existingEvent && existingEvent.data) {
+                const modifiedUserID = payload.result.userID;
+                const modifiedAttendingStatus = payload.result.attending;
+
+                // Modify the participants.
+                const { event, participants } = existingEvent.data;
+                event.attending = modifiedAttendingStatus;
+
+                let wasAdded = false;
+                for (const participant of participants) {
+                    if (participant.userID === modifiedUserID) {
+                        participant.attending = modifiedAttendingStatus;
+                        wasAdded = true;
+                        break;
+                    }
+                }
+
+                if (!wasAdded) {
+                    participants.push(payload.result);
+                }
+            }
+
+            return nextState;
+        })
+        .case(EventsActions.postEventParticipants_ACS.failed, (nextState, payload) => {
+            nextState.partipateStatusByEventID[payload.params.eventID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+
+            return nextState;
+        })
+        .case(EventsActions.deleteEvent_ACS.started, (nextState, params) => {
+            nextState.deleteStatusesByID[params.eventID] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(EventsActions.deleteEvent_ACS.done, (nextState, payload) => {
+            nextState.deleteStatusesByID[payload.params.eventID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return nextState;
+        })
+        .case(EventsActions.deleteEvent_ACS.failed, (nextState, payload) => {
+            nextState.deleteStatusesByID[payload.params.eventID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return nextState;
+        })
+        .case(EventsActions.clearDeleteStatusAC, (nextState, payload) => {
+            nextState.deleteStatusesByID[payload.eventID] = {
+                status: LoadStatus.PENDING,
+            };
             return nextState;
         }),
 );
