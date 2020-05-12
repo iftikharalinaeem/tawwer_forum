@@ -70,7 +70,7 @@ export function UniversalKnowledgeWidget(props: IProps) {
             )}
             {helpCenters.length > 0 && (
                 <>
-                    {props.hasTopSeparator || guides.length > 0 ? separator : null}
+                    {props.hasTopSeparator && guides.length > 0 ? separator : null}
                     {helpCenters.map(helpCenter => {
                         return (
                             <UniversalHelpCenterNav
@@ -102,6 +102,10 @@ export function UniversalHelpCenterNav(props: { kbID: number }) {
     const loadingStatuses = [LoadStatus.PENDING, LoadStatus.LOADING];
     if (loadingStatuses.includes(kb.status) || loadingStatuses.includes(nav.status) || !nav.data || !kb.data) {
         return <NavLinksPlaceholder title={kb.data.name} />;
+    }
+
+    if (nav.data.navigation.groups.length + nav.data.navigation.ungroupedItems.length === 0) {
+        return null;
     }
 
     return (
