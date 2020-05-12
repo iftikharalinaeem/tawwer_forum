@@ -177,6 +177,7 @@ class EventsApiController extends AbstractApiController {
                 'updateUserID:i|n' => 'The user that updated the event.',
                 'updateUser?' => $this->getUserFragmentSchema(),
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
+                "permissions?" => new InstanceValidatorSchema(EventPermissions::class),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
@@ -204,6 +205,10 @@ class EventsApiController extends AbstractApiController {
 
         if ($this->isExpandField('breadcrumbs', $query)) {
             $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+        }
+
+        if ($this->isExpandField('permissions', $query)) {
+            $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
         }
 
         $result = $this->normalizeEventOutput($event);
@@ -349,7 +354,7 @@ class EventsApiController extends AbstractApiController {
         return $this->schema([
             'id:i' => 'The event ID.',
             'userID:i?' => 'The users ID',
-            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs'])
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions'])
         ], 'in');
     }
 
@@ -410,7 +415,7 @@ class EventsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-            'expand:b?' => 'Expand associated records.',
+            'expand' => ApiUtils::getExpandDefinition(['users', 'permissions']),
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
@@ -485,8 +490,11 @@ class EventsApiController extends AbstractApiController {
 
         }
 
-        if (!empty($query['expand'])) {
+        if ($this->isExpandField('users', $query)) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
+        }
+        if ($this->isExpandField('permissions', $query)) {
+            $this->eventModel->expandPermissions($rows);
         }
         foreach ($rows as &$row) {
             $row = $this->normalizeEventOutput($row);

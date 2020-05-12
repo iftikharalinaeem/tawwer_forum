@@ -32,7 +32,7 @@ export class EventsActions extends ReduxActions {
 
     public getEventList = (params: IGetEventsQuery) => {
         const thunk = bindThunkAction(EventsActions.getEventListACs, async () => {
-            const response = await this.api.get(`/events`, { params });
+            const response = await this.api.get(`/events?expand=permissions`, { params });
             const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
             const result: IEventList = {
                 events: response.data,
@@ -60,6 +60,7 @@ export class EventsActions extends ReduxActions {
                     parentRecordID: data.categoryID,
                     parentRecordType: "category",
                     url: data.url,
+                    description: data.description,
                 };
                 return result;
             } else {

@@ -43,7 +43,7 @@ export class EventActions extends ReduxActions {
 
     public getEventByID = (id: number) => {
         const thunk = bindThunkAction(EventActions.getEvent_ACS, async () => {
-            const response = await this.api.get(`/events/${id}?expand=breadcrumbs`);
+            const response = await this.api.get(`/events/${id}?expand=all`);
             return response.data;
         })();
         return this.dispatch(thunk);

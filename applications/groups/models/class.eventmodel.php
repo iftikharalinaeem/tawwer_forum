@@ -235,7 +235,7 @@ class EventModel extends Gdn_Model {
      * @param int|null $userID The userID to calculate the permissions for. Defaults to the current user.
      * @return EventPermissions
      */
-    public function calculatePermissionsForEvent(int $eventID, ?int $userID): EventPermissions {
+    public function calculatePermissionsForEvent(int $eventID, ?int $userID = null): EventPermissions {
         if ($userID === null) {
             $userID = $this->session->UserID;
         }
@@ -361,6 +361,16 @@ class EventModel extends Gdn_Model {
         return $permissions->hasPermission($permission);
     }
 
+    /**
+     * Expand out permissions on rows of events.
+     *
+     * @param array $eventRows
+     */
+    public function expandPermissions(array &$eventRows) {
+        foreach ($eventRows as &$event) {
+            $event['permissions'] = $this->calculatePermissionsForEvent($event['eventID'] ?? $event['EventID']);
+        }
+    }
 
     /**
      * Check permission on a event.

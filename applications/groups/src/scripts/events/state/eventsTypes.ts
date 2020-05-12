@@ -7,6 +7,15 @@ import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { IWithPagination, ILinkPages } from "@vanilla/library/src/scripts/navigation/SimplePagerModel";
 import { ICrumb } from "@vanilla/library/src/scripts/navigation/Breadcrumbs";
 
+export enum EventPermissionName {
+    ORGANIZER = "Organizer",
+    CREATE = "Create",
+    EDIT = "Edit",
+    MEMBER = "Member",
+    VIEW = "View",
+    ATTEND = "Attend",
+}
+
 export interface IEvent {
     eventID: number;
     name: string;
@@ -25,6 +34,7 @@ export interface IEvent {
     updatedUser: IUserFragment;
     groupID?: number;
     url: string;
+    permissions?: Record<EventPermissionName, boolean>;
 }
 
 export interface IEventList {
