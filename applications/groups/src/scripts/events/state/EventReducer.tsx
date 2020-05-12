@@ -4,8 +4,8 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { IEvent } from "@groups/events/state/EventsReducer";
 import { EventActions } from "@groups/events/state/EventActions";
+import { IEvent } from "@groups/events/state/eventsTypes";
 
 export interface IEventParticipant {
     attending: string;
@@ -19,6 +19,7 @@ export interface IEventState {
     event: ILoadable<IEvent>;
     eventParticipants: ILoadable<IEventParticipant[]>;
     participant: ILoadable<IEventParticipant>;
+    deleteEvent: ILoadable<undefined>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -33,6 +34,9 @@ const DEFAULT_EVENT_STATE: IEventState = {
         status: LoadStatus.PENDING,
     },
     participant: {
+        status: LoadStatus.PENDING,
+    },
+    deleteEvent: {
         status: LoadStatus.PENDING,
     },
 };
@@ -82,6 +86,19 @@ export const eventReducer = produce(
         .case(EventActions.postEventParticipants_ACS.failed, (nextState, payload) => {
             nextState.participant.status = LoadStatus.ERROR;
             nextState.participant.error = payload.error;
+            return nextState;
+        })
+        .case(EventActions.deleteEvent_ACS.started, (nextState, payload) => {
+            nextState.deleteEvent.status = LoadStatus.LOADING;
+            return nextState;
+        })
+        .case(EventActions.deleteEvent_ACS.done, (nextState, payload) => {
+            nextState.deleteEvent.status = LoadStatus.SUCCESS;
+            return nextState;
+        })
+        .case(EventActions.deleteEvent_ACS.failed, (nextState, payload) => {
+            nextState.deleteEvent.status = LoadStatus.ERROR;
+            nextState.deleteEvent.error = payload.error;
             return nextState;
         }),
 );

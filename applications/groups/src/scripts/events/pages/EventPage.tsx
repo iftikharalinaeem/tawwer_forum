@@ -19,6 +19,8 @@ import { t } from "@library/utility/appUtils";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { EventDetails } from "@groups/events/ui/EventDetails";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
 
 export default function EventPage() {
     const { getEventByID, getEventParticipantsByEventID, postEventParticipants } = useEventActions();
@@ -102,6 +104,13 @@ export default function EventPage() {
                         (device === Devices.XS || device === Devices.MOBILE) && crumbs
                             ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
                             : crumbs && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
+                    }
+                    middleTop={
+                        <PageTitle
+                            title={event.data.name}
+                            actions={<EventsOptionsDropDown eventID={parseInt(eventID)} />}
+                            includeBackLink={false}
+                        />
                     }
                     middleBottom={
                         <PanelWidget>
