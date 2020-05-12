@@ -79,7 +79,7 @@ export const eventReducer = produce(
         })
         .case(EventActions.postEventParticipants_ACS.done, (nextState, payload) => {
             nextState.participant.status = LoadStatus.SUCCESS;
-            nextState.event.data.attending = payload.result.attending;
+            nextState.participant.data = payload.result;
 
             return nextState;
         })

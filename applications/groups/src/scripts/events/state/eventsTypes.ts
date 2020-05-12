@@ -20,7 +20,7 @@ export enum EventAttendance {
     RSVP = "rsvp", // only for default value in EventAttendanceDropDown
     GOING = "yes",
     MAYBE = "maybe",
-    NOT_GOING = "not",
+    NOT_GOING = "no",
 }
 
 export interface IEvent {

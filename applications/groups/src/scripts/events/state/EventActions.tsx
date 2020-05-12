@@ -56,7 +56,7 @@ export class EventActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public postEventParticipants = (params: IEventPostParticipant) => {
+    public postEventParticipants = async (params: IEventPostParticipant) => {
         const { id } = params;
 
         const thunk = bindThunkAction(EventActions.postEventParticipants_ACS, async () => {

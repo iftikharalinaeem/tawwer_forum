@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import { useParams } from "react-router";
 import { useEventActions } from "@groups/events/state/EventActions";
@@ -24,6 +24,7 @@ import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
 
 export default function EventPage() {
     const { getEventByID, getEventParticipantsByEventID, postEventParticipants } = useEventActions();
+    const [disableAttendance, setDisableAttendance] = useState(false);
 
     let eventID = useParams<{
         id: string;
@@ -50,18 +51,21 @@ export default function EventPage() {
     const crumbs = event.data?.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
-    const setAttendance = attendingStatus => {
-        postEventParticipants({ id: parseInt(eventID), attending: attendingStatus });
-        getEventByID(parseInt(eventID));
-        getEventParticipantsByEventID(parseInt(eventID));
+    const setAttendance = async attendingStatus => {
+        setDisableAttendance(true);
+        await postEventParticipants({ id: parseInt(eventID), attending: attendingStatus });
+        let event = await getEventByID(parseInt(eventID));
+        let eventParticipants = await getEventParticipantsByEventID(parseInt(eventID));
+        if (event && eventParticipants) {
+            setDisableAttendance(false);
+        }
     };
 
     if (
         !event.data ||
         !participants.data ||
         event.status === LoadStatus.LOADING ||
-        event.status === LoadStatus.PENDING ||
-        postParticipants.status === LoadStatus.LOADING
+        event.status === LoadStatus.PENDING
     ) {
         return <Loader />;
     } else {
@@ -121,6 +125,7 @@ export default function EventPage() {
                                 notGoing={notGoing}
                                 maybe={maybe}
                                 onChange={setAttendance}
+                                disableAttendance={disableAttendance}
                             />
                         </PanelWidget>
                     }
