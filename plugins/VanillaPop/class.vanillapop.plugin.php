@@ -1106,7 +1106,7 @@ class VanillaPopPlugin extends Gdn_Plugin {
         }
 
         $sender->setData('Title', t('Post an Email'));
-        $sender->render('Email', '', 'plugins/VanillaPop');
+        $sender->render('blank', 'utility', 'dashboard');
     }
 
     public function postController_sendgrid_create($sender, $args = []) {
