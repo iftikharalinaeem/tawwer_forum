@@ -4,7 +4,6 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { useSelector } from "react-redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { EventsActions } from "@groups/events/state/EventsActions";
 import { IEvent } from "@groups/events/state/EventsReducer";
 import { EventActions } from "@groups/events/state/EventActions";
 
@@ -19,6 +18,7 @@ export interface IEventParticipant {
 export interface IEventState {
     event: ILoadable<IEvent>;
     eventParticipants: ILoadable<IEventParticipant[]>;
+    participant: ILoadable<IEventParticipant>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -30,6 +30,9 @@ const DEFAULT_EVENT_STATE: IEventState = {
         status: LoadStatus.PENDING,
     },
     eventParticipants: {
+        status: LoadStatus.PENDING,
+    },
+    participant: {
         status: LoadStatus.PENDING,
     },
 };
@@ -64,6 +67,21 @@ export const eventReducer = produce(
         .case(EventActions.getEventParticipants_ACS.failed, (nextState, payload) => {
             nextState.eventParticipants.status = LoadStatus.ERROR;
             nextState.eventParticipants.error = payload.error;
+            return nextState;
+        })
+        .case(EventActions.postEventParticipants_ACS.started, (nextState, payload) => {
+            nextState.participant.status = LoadStatus.LOADING;
+            return nextState;
+        })
+        .case(EventActions.postEventParticipants_ACS.done, (nextState, payload) => {
+            nextState.participant.status = LoadStatus.SUCCESS;
+            nextState.event.data.attending = payload.result.attending;
+
+            return nextState;
+        })
+        .case(EventActions.postEventParticipants_ACS.failed, (nextState, payload) => {
+            nextState.participant.status = LoadStatus.ERROR;
+            nextState.participant.error = payload.error;
             return nextState;
         }),
 );
