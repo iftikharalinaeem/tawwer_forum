@@ -209,7 +209,6 @@ class EventListModule extends Gdn_Module {
      * @return array A data array representing an event item in an event list.
      */
     protected function getEventInfo($event, $layout, $withJoinButtons = true, $withOptions = true) {
-        $eventModel
         $dateStarts = EventModel::formatEventDate($event['DateStarts']);
         $dateStartsDateTime = new DateTime($dateStarts[3]);
 
