@@ -663,8 +663,8 @@ class EventModel extends Gdn_Model {
     public function save($event, $settings = []) {
         if (!isset($event['DateEnds']) || !$event['DateEnds']) {
             $newEndDate = $this->calculateEventEndDate($event);
-            $eventData['DateEnds'] = $newEndDate['dateEnds'] ?? null;
-            $eventData['AllDayEvent'] = $newEndDate['allDayEvent'] ?? null;
+            $event['DateEnds'] = $newEndDate['DateEnds'] ?? null;
+            $event['AllDayEvent'] = $newEndDate['AllDayEvent'] ?? null;
         }
 
         // Fix the dates.
