@@ -327,6 +327,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const separator = style("details", {
         display: "block",
         width: percent(100),
+        borderTop: 0,
         // Has to be a border and not a BG, because sometimes chrome rounds it's height to 0.99px and it disappears.
         borderBottom: singleBorder({
             color: vars.separator.fg,
