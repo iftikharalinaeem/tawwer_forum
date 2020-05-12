@@ -56,6 +56,7 @@ class NewEventsController extends AbstractEventsController {
         $this->render('index');
     }
 
+
     /**
      * Render a single event.
      *
@@ -67,4 +68,5 @@ class NewEventsController extends AbstractEventsController {
         $this->applyBreadcrumbs(EventRecordType::TYPE, $eventID);
         $this->render('index');
     }
+
 }

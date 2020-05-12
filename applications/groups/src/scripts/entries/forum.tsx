@@ -8,8 +8,13 @@ import { registerReducer } from "@library/redux/reducerRegistry";
 import { eventsReducer } from "@groups/events/state/EventsReducer";
 import { Router } from "@library/Router";
 import { getEventsRoutes } from "@groups/routes/EventsRoutes";
-import { addComponent } from "@library/utility/componentRegistry";
+import { eventReducer } from "@groups/events/state/EventReducer";
 
+import { addComponent } from "@library/utility/componentRegistry";
 registerReducer("events", eventsReducer);
+
 addComponent("events-page", () => <Router disableDynamicRouting />);
+
+registerReducer("event", eventReducer);
+
 Router.addRoutes(getEventsRoutes());
