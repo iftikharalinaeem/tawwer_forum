@@ -36,11 +36,6 @@ class NewEventsController extends AbstractEventsController {
         Gdn_Theme::section('NewEventList');
 
         [$parentRecordType, $parentRecordID] = $this->validateParentRecords($parentRecordType ?: 'category', $parentRecordID ?? -1);
-        $events = $this->eventsApi->index([
-            'parentRecordType' => $parentRecordType,
-            'parentRecordID' => $parentRecordID,
-        ]);
-
         $this->canonicalUrl($this->eventModel->eventParentUrl($parentRecordType, $parentRecordID));
 
         // Make sure category banner works.
@@ -49,7 +44,12 @@ class NewEventsController extends AbstractEventsController {
             $this->setData('ContextualCategoryID', $parentRecordID);
         }
 
+        $newEventModule = new NewEventModule();
+        $newEventModule->parentRecordID = $parentRecordID;
+        $newEventModule->parentRecordType = $parentRecordType;
+        $this->addModule($newEventModule, 'Panel');
         $this->addModule(new DiscussionFilterModule($this));
+
         $this->title(t('Events'));
         $this->applyBreadcrumbs($parentRecordType, $parentRecordID);
         $this->addBreadcrumb(t('Events'), $this->canonicalUrl());

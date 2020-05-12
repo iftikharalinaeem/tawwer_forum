@@ -11,6 +11,7 @@ import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loa
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import { EventList } from "@groups/events/ui/EventList";
+import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
 
 interface IProps {
     query: IGetEventsQuery;
@@ -24,13 +25,7 @@ export function EventsModule(props: IProps) {
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(events.status) ||
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventParent.status)
     ) {
-        return (
-            <div>
-                <LoadingRectange height={12} />
-                <LoadingSpacer height={6} />
-                <LoadingRectange height={12} />
-            </div>
-        );
+        return <EventListPlaceholder count={5} />;
     }
 
     if (!events.data || !eventParent.data || events.error || eventParent.error) {

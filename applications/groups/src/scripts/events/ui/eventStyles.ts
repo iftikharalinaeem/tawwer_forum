@@ -308,8 +308,12 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         marginLeft: "auto",
     });
 
-    const filter = style("filter", {});
-    const filterLabel = style("filterLabel", {});
+    const filter = style("filter", {
+        marginBottom: globalVars.gutter.half,
+    });
+    const filterLabel = style("filterLabel", {
+        marginRight: globalVars.gutter.quarter,
+    });
     const details = style("details", {});
     const separator = style("details", {
         display: "block",
@@ -366,6 +370,14 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins(vars.section.spacing),
     });
 
+    const pageTitle = style("pageTitle", {
+        $nest: {
+            "&&": {
+                marginBottom: unit(globalVars.gutter.size),
+            },
+        },
+    });
+
     const sectionTitle = style("sectionTitle", {
         ...fonts(vars.section.title.font),
         marginBottom: unit(vars.title.margin),
@@ -410,6 +422,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendeePlus,
         noAttendees,
         section,
+        pageTitle,
         sectionTitle,
         description,
     };

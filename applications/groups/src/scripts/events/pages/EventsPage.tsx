@@ -3,41 +3,74 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect } from "react";
-import { useEventsActions } from "@groups/eventList/state/EventsActions";
-import { LoadStatus } from "@library/@types/api/core";
-import { useParams, useLocation } from "react-router";
-import { useEventsList, useEventParentRecord } from "@groups/events/state/eventsHooks";
 import { EventsModule } from "@groups/events/modules/EventsModule";
-import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
-import { DefaultError } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
-import Loader from "@vanilla/library/src/scripts/loaders/Loader";
-import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
+import { useEventParentRecord, useEventsList } from "@groups/events/state/eventsHooks";
+import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
+import EventFilter, { EventFilterTypes, useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
+import { eventsClasses } from "@groups/events/ui/eventStyles";
+import PageTitle from "@knowledge/modules/common/PageTitle";
+import { LoadStatus } from "@library/@types/api/core";
+import { t } from "@vanilla/i18n";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
-import { notEmpty } from "@vanilla/utils";
-import PanelLayout from "@vanilla/library/src/scripts/layout/PanelLayout";
-import Breadcrumbs from "@vanilla/library/src/scripts/navigation/Breadcrumbs";
+import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
+import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { notEmpty, slugify } from "@vanilla/utils";
+import React, { useMemo } from "react";
+import { useHistory, useLocation, useParams } from "react-router";
+import { LocationDescriptorObject } from "history";
 
 export default function EventsPage() {
     const query = useQuery();
-    const parentRecordType = query.get("parentRecordType") ?? "category";
-    const parentRecordID = query.get("parentRecordID") !== null ? parseInt(query.get("parentRecordID")!) : -1;
+    const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
+    const parentRecordType = params.parentRecordType ?? "category";
+    const parentRecordID = params.parentRecordID !== null ? parseInt(params.parentRecordID!) : -1;
+    const filterValue = query.get("filter");
+    const filter = useMemo(() => {
+        if (!Object.values(EventFilterTypes as any).includes(filterValue)) {
+            return EventFilterTypes.UPCOMING;
+        } else {
+            return filterValue as EventFilterTypes;
+        }
+    }, [filterValue]);
+    const history = useHistory();
 
-    const isValidID = Number.isNaN(parentRecordID);
+    const dateQuery = useDatesForEventFilter(filter);
+    const eventQuery = { ...dateQuery, parentRecordType, parentRecordID };
 
-    const eventList = useEventsList({ parentRecordType, parentRecordID });
+    const eventList = useEventsList(eventQuery);
     const eventParent = useEventParentRecord({ parentRecordType, parentRecordID });
+    const classes = eventsClasses();
+
+    const pageTop = (
+        <>
+            <PageTitle title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <EventFilter
+                filter={filter}
+                key={filter}
+                onFilterChange={newFilter => {
+                    const newParams = {
+                        filter: newFilter,
+                    };
+                    const newQueryString = new URLSearchParams(newParams).toString();
+                    const newLocation: LocationDescriptorObject = {
+                        ...history.location,
+                        search: newQueryString,
+                    };
+                    history.replace(newLocation);
+                }}
+            />
+        </>
+    );
 
     if (
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventList.status) ||
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventParent.status)
     ) {
         return (
-            <div>
-                <LoadingRectange height={12} />
-                <LoadingSpacer height={6} />
-                <LoadingRectange height={12} />
-            </div>
+            <>
+                {pageTop}
+                <EventListPlaceholder count={10} />
+            </>
         );
     }
 
@@ -45,9 +78,19 @@ export default function EventsPage() {
         return <ErrorMessages errors={[eventList.error, eventParent.error].filter(notEmpty)} />;
     }
 
+    const parentRecordSlug = slugify(eventParent.data.name);
+
     return (
         <>
-            <EventsModule query={{ parentRecordID, parentRecordType }} />
+            {pageTop}
+            <EventsModule query={eventQuery} />
+            <SimplePager
+                url={formatUrl(
+                    `/events/${parentRecordType}/${parentRecordID}-${parentRecordSlug}?page=:page:&filter=${filter}`,
+                    true,
+                )}
+                pages={eventList.data.pagination}
+            />
         </>
     );
 }

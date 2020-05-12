@@ -6,9 +6,9 @@
 
 /**
  * Groups Application - Group Module
- * 
+ *
  * Shows a group box with basic group info.
- * 
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
  * @package groups
  * @since 1.0
@@ -16,7 +16,7 @@
 class GroupModule extends Gdn_Module {
 
     /** @var   */
-    protected $GroupID;
+    public $GroupID;
 
     /** @var null  */
     protected $Group = null;

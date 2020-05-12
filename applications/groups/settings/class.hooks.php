@@ -51,9 +51,9 @@ class GroupsHooks extends Gdn_Plugin {
             // Make sure this ends up on the canonical URL.
             Gdn::router()->setRoute('new-events\/?(.*)?', 'events/$1', 'Temporary', false);
 
-
             // Redirect old event pages to the new ones.
-            Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Temporary', false);
+            // CAN'T DO THIS UNTIL WE MAKE THE NEW EVENT ADD/EDIT PAGE
+             Gdn::router()->setRoute('event\/(.*)', 'events/$1', 'Temporary', false);
         }
     }
 
