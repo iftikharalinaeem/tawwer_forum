@@ -38,13 +38,19 @@ class EventsBreadcrumbProvider implements BreadcrumbProviderInterface {
 
         $breadCrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
 
-        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID) {
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
             $crumbs = $breadCrumbModel->getForRecord(new GroupRecordType($parentRecordID));
         }
 
-        if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY && $parentRecordID) {
+        if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY && $parentRecordID !== null) {
             $crumbs = $breadCrumbModel->getForRecord(new ForumCategoryRecordType($parentRecordID));
         }
+
+        $groupEventsCrumb = new Breadcrumb(
+            t('Events'),
+            $this->eventModel->eventParentUrl($parentRecordType, $parentRecordID)
+        );
+        $crumbs[] = $groupEventsCrumb;
 
         $eventName = $event['Name'] ?? '';
         $crumbs[] = new Breadcrumb(t($eventName), $this->eventModel->eventUrl($event));

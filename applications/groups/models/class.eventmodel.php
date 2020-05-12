@@ -72,11 +72,23 @@ class EventModel extends Gdn_Model {
         $themeFeatures = Gdn::themeFeatures();
 
         $eventPath = $themeFeatures->allFeatures()['NewEventsPage'] ? "/events/$eventID-$slug" : "/event/$eventID-$slug";
+        $siteSectionPath = $this->getSiteSectionPathForParentRecord($parentRecordType, $parentRecordID);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath);
+        return $result;
+    }
+
+    /**
+     * Get a site section path.
+     *
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     * @return string
+     */
+    private function getSiteSectionPathForParentRecord(string $parentRecordType, int $parentRecordID): string {
+        $siteSectionPath = null;
         // Try to find the correct subcommunity.
         /** @var SiteSectionModel $sectionModel */
         $sectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
-
-        $siteSectionPath = null;
 
         if ($parentRecordType === ForumCategoryRecordType::class) {
             // Go through the sections to find the correct one.
@@ -93,8 +105,27 @@ class EventModel extends Gdn_Model {
         }
         // Make sure we don't have double-slashes in the path.
         $siteSectionPath = rtrim($siteSectionPath, '/');
-        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath);
-        return $result;
+        return $siteSectionPath;
+    }
+
+    /**
+     * Get the canonical event URL for an event.
+     *
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     *
+     * @return string The event URL.
+     */
+    public function eventParentUrl(string $parentRecordType, int $parentRecordID): string {
+        $parentRecordName = '';
+        if ($parentRecordType === ForumCategoryRecordType::TYPE) {
+            $parentRecordName = $this->categoryModel::categories($parentRecordID)['Name'];
+        } elseif ($parentRecordType === GroupRecordType::TYPE) {
+            $parentRecordName = $this->groupModel->getID($parentRecordID)['Name'];
+        }
+        $slug = Gdn_Format::url($parentRecordName);
+        $siteSectionPath = $this->getSiteSectionPathForParentRecord($parentRecordType, $parentRecordID);
+        return "${siteSectionPath}/events/${parentRecordType}/${parentRecordID}-${slug}";
     }
 
     /**

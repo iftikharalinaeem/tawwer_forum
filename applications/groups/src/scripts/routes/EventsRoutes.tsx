@@ -10,13 +10,14 @@ function getEventPath(path: string = "") {
     const newEventPage = getMeta("themeFeatures.NewEventsPage", false);
     const base = newEventPage ? "events" : "new-events";
 
-    return `/${base}/${path}`;
+    return `/${base}${path}`;
 }
 
 export const EventsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "events/pages/EventsPage" */ "@groups/events/pages/EventsPage"),
-    getEventPath(),
-    (data?: { parentRecordType: string; parentRecordID: number }) => getEventPath(),
+    [getEventPath("/:parentRecordType/:parentRecordSlug"), getEventPath()],
+    (data?: { parentRecordType: string; parentRecordID: number }) =>
+        getEventPath(`/${data?.parentRecordType}/${data?.parentRecordID}`),
 );
 
 export function getEventsRoutes() {

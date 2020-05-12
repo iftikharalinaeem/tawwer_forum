@@ -11,9 +11,13 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Groups\Models\GroupPermissions;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * API Controller for the `/groups` resource.
@@ -32,18 +36,24 @@ class GroupsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
     /**
      * ConversationsApiController constructor.
      *
      * @param GroupModel $groupModel
      * @param UserModel $userModel
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         GroupModel $groupModel,
-        UserModel $userModel
+        UserModel $userModel,
+        BreadcrumbModel $breadcrumbModel
     ) {
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+        $this->breadcrumbModel = $breadcrumbModel;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -222,6 +232,7 @@ class GroupsApiController extends AbstractApiController {
                 'countMembers:i' => 'The number of user belonging to the group.',
                 'countDiscussions:i' => 'The number of discussions in the group.',
                 'url:s' => 'The full URL to the group.',
+                'breadcrumbs:a' => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'Group');
         }
 
@@ -262,6 +273,7 @@ class GroupsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
 
         $row = $this->normalizeGroupOutput($row);
+
         return $out->validate($row);
     }
 
@@ -691,7 +703,9 @@ class GroupsApiController extends AbstractApiController {
             $dbRecord['Body'] = $dbRecord['Description'];
         }
 
-        return ApiUtils::convertOutputKeys($dbRecord);
+        $result = ApiUtils::convertOutputKeys($dbRecord);
+        $result['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new GroupRecordType($result['groupID']));
+        return $result;
     }
 
     /**

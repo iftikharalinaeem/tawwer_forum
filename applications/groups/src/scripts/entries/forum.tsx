@@ -9,9 +9,7 @@ import { eventsReducer } from "@groups/events/state/EventsReducer";
 import { Router } from "@library/Router";
 import { getEventsRoutes } from "@groups/routes/EventsRoutes";
 import { addComponent } from "@library/utility/componentRegistry";
-import EventsPage from "@groups/events/pages/EventsPage";
-// import "@dashboard/legacy";
 
 registerReducer("events", eventsReducer);
-addComponent("events-page", () => <Router />);
+addComponent("events-page", () => <Router disableDynamicRouting />);
 Router.addRoutes(getEventsRoutes());

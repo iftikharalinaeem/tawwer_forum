@@ -1,34 +1,19 @@
-import produce from "immer";
-import { IUserFragment } from "@library/@types/api/users";
-import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
-import { useSelector } from "react-redux";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { EventsActions } from "@groups/events/state/EventsActions";
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
-export interface IEvent {
-    eventID: number;
-    name: string;
-    body: string;
-    format: string;
-    parentRecordType: string; //enum?
-    parentRecordID: number;
-    dateStarts: string;
-    dateEnds: string;
-    allDayEvent: boolean;
-    location: string;
-    dateInserted: string;
-    dateUpdated?: string;
-    attending?: string;
-    insertUser: IUserFragment;
-    updatedUser: IUserFragment;
-    groupID?: number;
-}
+import { EventsActions } from "@groups/events/state/EventsActions";
+import { IEventList, IEventParentRecord } from "@groups/events/state/eventsTypes";
+import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { ICoreStoreState } from "@library/redux/reducerRegistry";
+import { stableObjectHash } from "@vanilla/utils";
+import produce from "immer";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IEventsState {
-    events: ILoadable<{
-        events: IEvent[];
-    }>;
+    eventsLists: Record<string, ILoadable<IEventList>>;
+    eventParentRecords: Record<string, ILoadable<IEventParentRecord>>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -36,32 +21,58 @@ export interface IEventsStoreState extends ICoreStoreState {
 }
 
 const DEFAULT_EVENT_STATE: IEventsState = {
-    events: {
-        status: LoadStatus.PENDING,
-    },
+    eventsLists: {},
+    eventParentRecords: {},
 };
 
 export const eventsReducer = produce(
     reducerWithInitialState<IEventsState>(DEFAULT_EVENT_STATE)
-        .case(EventsActions.getAllEvents_ACS.started, (nextState, payload) => {
-            nextState.events.status = LoadStatus.LOADING;
+        .case(EventsActions.getEventListACs.started, (nextState, payload) => {
+            const hash = stableObjectHash(payload);
+            nextState.eventsLists[hash] = {
+                status: LoadStatus.LOADING,
+            };
             return nextState;
         })
-        .case(EventsActions.getAllEvents_ACS.done, (nextState, payload) => {
-            nextState.events.status = LoadStatus.SUCCESS;
-            nextState.events.data = { events: payload.result };
+        .case(EventsActions.getEventListACs.done, (nextState, payload) => {
+            const hash = stableObjectHash(payload.params);
+            nextState.eventsLists[hash] = {
+                status: LoadStatus.SUCCESS,
+                data: payload.result,
+            };
 
             return nextState;
         })
-        .case(EventsActions.getAllEvents_ACS.failed, (nextState, payload) => {
-            nextState.events.status = LoadStatus.ERROR;
-            nextState.events.error = payload.error;
+        .case(EventsActions.getEventListACs.failed, (nextState, payload) => {
+            const hash = stableObjectHash(payload.params);
+            nextState.eventsLists[hash].status = LoadStatus.ERROR;
+            nextState.eventsLists[hash].error = payload.error;
+
+            return nextState;
+        })
+        .case(EventsActions.getEventParentRecord.started, (nextState, params) => {
+            const hash = params.parentRecordType + params.parentRecordID;
+            nextState.eventParentRecords[hash] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(EventsActions.getEventParentRecord.done, (nextState, payload) => {
+            const { params } = payload;
+            const hash = params.parentRecordType + params.parentRecordID;
+            nextState.eventParentRecords[hash] = {
+                status: LoadStatus.SUCCESS,
+                data: payload.result,
+            };
+
+            return nextState;
+        })
+        .case(EventsActions.getEventParentRecord.failed, (nextState, payload) => {
+            const { params } = payload;
+            const hash = params.parentRecordType + params.parentRecordID;
+            nextState.eventParentRecords[hash].status = LoadStatus.ERROR;
+            nextState.eventParentRecords[hash].error = payload.error;
+
             return nextState;
         }),
 );
-
-export function useEventsState() {
-    return useSelector((state: IEventsStoreState) => {
-        return state.events;
-    });
-}
