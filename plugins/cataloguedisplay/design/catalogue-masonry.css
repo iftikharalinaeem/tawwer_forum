@@ -10,7 +10,7 @@ li.CatalogueRow img {
 }
 
 .ItemDiscussion.CatalogueRow .MItem.LastCommentBy {
-    display: inline-grid;
+    display: inline-block;
 }
 
 @media screen and (min-width: 767px) {

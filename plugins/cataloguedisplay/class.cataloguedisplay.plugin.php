@@ -15,7 +15,7 @@ use Vanilla\Web\TwigRenderTrait;
  * Class CatalogueDisplayPlugin
  *
  * Creates a "catalogue" style for viewing discussions.
- * This means that the first thumbnail in the Discussion is displayed when listed on the Recent Discussions or the Category page.
+ * This means that the first thumbnail in the Discussion is displayed when listed on the Category page.
  */
 class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
@@ -38,10 +38,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @var FormatService
      */
     private $formatService;
-    /**
-     * @var FormatConfig
-     */
-    private $formatConfig;
     /**
      * @var Gdn_Locale
      */
@@ -73,7 +69,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         DiscussionModel $discussionModel,
         CategoryModel $categoryModel,
         FormatService $formatService,
-        FormatConfig $formatConfig,
         Gdn_Locale $locale,
         ConfigurationInterface $config,
         Gdn_Cache $cache
@@ -83,7 +78,6 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $this->discussionModel = $discussionModel;
         $this->categoryModel = $categoryModel;
         $this->formatService = $formatService;
-        $this->formatConfig = $formatConfig;
         $this->locale = $locale;
         $this->config = $config;
         $this->cache = $cache;
@@ -143,18 +137,13 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_addEditCategory_handler(VanillaSettingsController $sender, array $args) {
-        $warningText = '';
-        if (strcasecmp($this->formatConfig->getDefaultDesktopFormat(), TextFormat::FORMAT_KEY) === 0
-            || strcasecmp($this->formatConfig->getDefaultMobileFormat(), TextFormat::FORMAT_KEY) === 0) {
-            $warningText = ' <em>'.$this->locale->translate('You must have the Post and Mobile Formats set to anything but "Text" in the Advanced Editor Plugin.').'</em>';
-        }
-        $description = $this->locale->translate('Each discussion will show an uploaded image on the Discussions page instead of the author information. '
-            .'This only applies to categories with "Discussions" as the "Display As.');
+        $description = $this->locale->translate('Each discussion will show an uploaded image on the Category page. '
+            .'This only applies to categories with "Discussions" as the "Display As."');
         $sender->Data['_ExtendedFields']['CatalogueDisplay'] = [
             'Name' => 'CatalogueDisplay',
             'Label' => 'Catalogue Style',
             'Control' => 'Toggle',
-            'Description' => '<div class="Warning">'.$description.$warningText.'</div>',
+            'Description' => $description,
         ];
     }
 
