@@ -13,10 +13,14 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React from "react";
+import React, { useState } from "react";
 import { IEvent } from "@groups/events/state/eventsTypes";
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { useEventActions } from "@groups/events/state/EventActions";
+import { useEventState } from "@groups/events/state/EventReducer";
+import { LoadStatus } from "@library/@types/api/core";
+import Loader from "@library/loaders/Loader";
 
 interface IProps {
     event: IEvent;
@@ -24,6 +28,7 @@ interface IProps {
     going?: IUserFragment[];
     maybe?: IUserFragment[];
     notGoing?: IUserFragment[];
+    onChange: (data: any) => void;
 }
 
 /**
@@ -56,11 +61,9 @@ export function EventDetails(props: IProps) {
                 caption={t("Event Details")}
             />
             <ButtonTabs
-                activeTab={props.event.attending}
+                activeTab={event.attending}
                 accessibleTitle={t("Are you going?")}
-                setData={(data: EventAttendance) => {
-                    ///
-                }}
+                setData={props.onChange}
                 className={classes.attendanceSelector}
             >
                 <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />

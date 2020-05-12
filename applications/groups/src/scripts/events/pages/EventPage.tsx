@@ -7,9 +7,8 @@ import React, { useEffect } from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import { useParams } from "react-router";
 import { useEventActions } from "@groups/events/state/EventActions";
-import { IEventParticipant, useEventState } from "@groups/events/state/EventReducer";
+import { useEventState } from "@groups/events/state/EventReducer";
 import Loader from "@library/loaders/Loader";
-import { eventAttendanceOptions } from "@groups/events/ui/eventOptions";
 import { IUserFragment } from "@library/@types/api/users";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
@@ -35,6 +34,7 @@ export default function EventPage() {
     const eventState = useEventState();
     let event = eventState.event;
     let participants = eventState.eventParticipants;
+    let postParticipants = eventState.participant;
 
     useEffect(() => {
         if (event.status === LoadStatus.PENDING || event.status === LoadStatus.LOADING) {
@@ -48,11 +48,18 @@ export default function EventPage() {
     const crumbs = event.data?.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
+    const setAttendance = attendingStatus => {
+        postEventParticipants({ id: parseInt(eventID), attending: attendingStatus });
+        getEventByID(parseInt(eventID));
+        getEventParticipantsByEventID(parseInt(eventID));
+    };
+
     if (
         !event.data ||
         !participants.data ||
         event.status === LoadStatus.LOADING ||
-        event.status === LoadStatus.PENDING
+        event.status === LoadStatus.PENDING ||
+        postParticipants.status === LoadStatus.LOADING
     ) {
         return <Loader />;
     } else {
@@ -89,7 +96,7 @@ export default function EventPage() {
             <Container>
                 <TitleBar />
                 <PanelLayout
-                    // renderLeftPanelBackground={renderPanelBackground}
+                    renderLeftPanelBackground={renderPanelBackground}
                     leftBottom={<></>}
                     breadcrumbs={
                         (device === Devices.XS || device === Devices.MOBILE) && crumbs
@@ -104,6 +111,7 @@ export default function EventPage() {
                                 going={going}
                                 notGoing={notGoing}
                                 maybe={maybe}
+                                onChange={setAttendance}
                             />
                         </PanelWidget>
                     }
