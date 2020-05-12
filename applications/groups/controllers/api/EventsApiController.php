@@ -204,11 +204,11 @@ class EventsApiController extends AbstractApiController {
         $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        if ($this->isExpandField('breadcrumbs', $query)) {
+        if ($this->isExpandField('breadcrumbs', $query['expand'] ?? false)) {
             $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
         }
 
-        if ($this->isExpandField('permissions', $query)) {
+        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
             $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
         }
 
@@ -271,7 +271,7 @@ class EventsApiController extends AbstractApiController {
         // Data
         $rows = $this->eventModel->getInvitedUsers($id, $where, '', 'asc', $limit, $offset);
 
-        if (!empty($query['expand'])) {
+        if (!empty($query['expand'] ?? false)) {
             $this->userModel->expandUsers($rows, ['UserID']);
         }
         foreach ($rows as &$row) {
@@ -416,7 +416,7 @@ class EventsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-            'expand' => ApiUtils::getExpandDefinition(['users', 'permissions']),
+            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions']),
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
@@ -469,9 +469,18 @@ class EventsApiController extends AbstractApiController {
             }
         } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
             if ($query['parentRecordID']) {
+                /** @var CategoryModel $categoryModel */
                 $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+
+                $parentIDs = [-1, $query['parentRecordID']];
+                // get all parent category IDs up to the root.
+                $ancestors = $categoryModel::getAncestors($query['parentRecordID'], true);
+                if ($ancestors) {
+                    $parentIDs = array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID')));
+                }
+
                 // check the permission based on the category.
-                $where['e.ParentRecordID'] = $query['parentRecordID'];
+                $where['e.ParentRecordID'] = $parentIDs;
                 $where['e.ParentRecordType'] = $query['parentRecordType'];
             }
         }
@@ -491,10 +500,10 @@ class EventsApiController extends AbstractApiController {
 
         }
 
-        if ($this->isExpandField('users', $query)) {
+        if ($this->isExpandField('users', $query['expand'] ?? false)) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
         }
-        if ($this->isExpandField('permissions', $query)) {
+        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
             $this->eventModel->expandPermissions($rows);
         }
         foreach ($rows as &$row) {

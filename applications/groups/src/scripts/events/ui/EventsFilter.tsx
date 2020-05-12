@@ -3,29 +3,53 @@
  * @license Proprietary
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { t } from "@vanilla/i18n/src";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { IGetEventsQuery } from "@groups/events/state/EventsActions";
 
 export enum EventFilterTypes {
     ALL = "all",
-    UPCOMING = "upcoming events",
-    PAST = "past events",
+    UPCOMING = "upcoming",
+    PAST = "past",
+}
+
+export function useDatesForEventFilter(filter: EventFilterTypes): Partial<IGetEventsQuery> {
+    const dateNow = useMemo(() => {
+        return new Date().toISOString();
+    }, []);
+    switch (filter) {
+        case EventFilterTypes.ALL:
+            return {};
+        case EventFilterTypes.PAST:
+            return {
+                dateStarts: `<${dateNow}`,
+            };
+        case EventFilterTypes.UPCOMING:
+            return {
+                dateEnds: `>${dateNow}`,
+            };
+    }
+}
+
+interface IProps {
+    filter: EventFilterTypes;
+    onFilterChange: (newFilter: EventFilterTypes) => void;
 }
 
 /**
  * Component for displaying an event filters
  */
-export default function EventFilter(props: { filter: EventFilterTypes }) {
-    const { filter = EventFilterTypes.ALL } = props;
+export default function EventFilter(props: IProps) {
+    const { filter } = props;
 
-    const options = [
+    const options: ISelectBoxItem[] = [
         { name: t("All"), value: EventFilterTypes.ALL },
         { name: t("Upcoming Events"), value: EventFilterTypes.UPCOMING },
         { name: t("Past Events"), value: EventFilterTypes.PAST },
-    ] as ISelectBoxItem[];
+    ];
 
     const activeOption = options.find(option => option.value === filter);
     const id = uniqueIDFromPrefix("attendanceFilter");
@@ -41,8 +65,11 @@ export default function EventFilter(props: { filter: EventFilterTypes }) {
                 options={options}
                 describedBy={id}
                 value={activeOption}
-                renderLeft={true}
+                renderLeft={false}
                 offsetPadding={true}
+                onChange={value => {
+                    props.onFilterChange(value.value as EventFilterTypes);
+                }}
             />
         </div>
     );

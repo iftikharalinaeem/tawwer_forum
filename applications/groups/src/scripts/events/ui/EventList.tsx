@@ -50,21 +50,19 @@ export function EventList(props: IEventList) {
     }
 
     return (
-        <>
-            <ul className={classes.list}>
-                {props.events.map((event, i) => {
-                    return (
-                        <Event
-                            className={classNames({ isFirst: i === 0 })}
-                            headingLevel={props.headingLevel}
-                            event={event}
-                            key={i}
-                            longestCharCount={longestCharCount}
-                            compact={props.compact}
-                        />
-                    );
-                })}
-            </ul>
-        </>
+        <ul className={classes.list}>
+            {props.events.map((event, i) => {
+                return (
+                    <Event
+                        className={classNames({ isFirst: i === 0 })}
+                        headingLevel={props.headingLevel}
+                        event={event}
+                        key={i}
+                        longestCharCount={longestCharCount}
+                        compact={props.compact}
+                    />
+                );
+            })}
+        </ul>
     );
 }
