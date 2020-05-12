@@ -1089,30 +1089,6 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
-    public function postController_email_create($sender, $args = []) {
-        $this->utilityController_email_create($sender, $args);
-    }
-
-    public function utilityController_email_create($sender, $args = []) {
-        if (Gdn::session()->UserID == 0) {
-            Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false);
-            Gdn::session()->User->Admin = false;
-        }
-
-        if ($sender->Form->isPostBack()) {
-            $data = $sender->Form->formValues();
-            trace('Saving data.');
-            if ($this->save($data, $sender)) {
-                $sender->StatusMessage = t('Saved');
-                $sender->setData('Saved', true);
-                $sender->setData('Trace', trace());
-            }
-        }
-
-        $sender->setData('Title', t('Post an Email'));
-        $sender->render('Email', '', 'plugins/VanillaPop');
-    }
-
     public function postController_sendgrid_create($sender, $args = []) {
         $this->utilityController_sendgrid_create($sender, $args);
     }
