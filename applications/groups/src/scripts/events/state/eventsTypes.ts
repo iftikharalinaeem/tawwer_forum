@@ -16,10 +16,18 @@ export enum EventPermissionName {
     ATTEND = "Attend",
 }
 
+export enum EventAttendance {
+    RSVP = "rsvp", // only for default value in EventAttendanceDropDown
+    GOING = "yes",
+    MAYBE = "maybe",
+    NOT_GOING = "not",
+}
+
 export interface IEvent {
     eventID: number;
     name: string;
     body: string;
+    excerpt: string;
     format: string;
     parentRecordType: string;
     parentRecordID: number;
@@ -29,7 +37,7 @@ export interface IEvent {
     location: string;
     dateInserted: string;
     dateUpdated?: string;
-    attending: string;
+    attending: EventAttendance | null;
     insertUser: IUserFragment;
     updatedUser: IUserFragment;
     groupID?: number;
@@ -49,5 +57,6 @@ export interface IEventParentRecord {
     parentRecordType: string;
     url: string;
     breadcrumbs: ICrumb[];
-    imageUrl: string;
+    bannerUrl: string | null;
+    iconUrl: string | null;
 }

@@ -5,7 +5,6 @@
 
 import { camelCaseToDash } from "@dashboard/compatibilityStyles";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
-import { EventAttendance } from "@groups/events/ui/eventOptions";
 import { dateTimeVariables } from "@library/content/dateTimeStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { userPhotoClasses, userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
@@ -17,6 +16,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent, translateY } from "csx";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);

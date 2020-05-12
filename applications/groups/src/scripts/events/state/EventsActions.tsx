@@ -61,6 +61,8 @@ export class EventsActions extends ReduxActions {
                     parentRecordType: "category",
                     url: data.url,
                     description: data.description,
+                    bannerUrl: data.bannerUrl,
+                    iconUrl: data.iconUrl,
                 };
                 return result;
             } else {
@@ -72,6 +74,9 @@ export class EventsActions extends ReduxActions {
                     parentRecordID: data.groupID,
                     parentRecordType: "category",
                     url: data.url,
+                    description: data.description,
+                    bannerUrl: data.bannerUrl,
+                    iconUrl: data.iconUrl,
                 };
                 return result;
             }
