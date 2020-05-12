@@ -8,19 +8,16 @@ import { FromToDateTime } from "@library/content/FromToDateTime";
 import UserContent from "@library/content/UserContent";
 import { DataList } from "@library/dataLists/DataList";
 import { EventAttendees } from "@groups/events/ui/Attendees";
-import { EventAttendance } from "@groups/events/ui/eventOptions";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React, { useState } from "react";
-import { IEvent } from "@groups/events/state/eventsTypes";
+import React from "react";
+import { IEvent, EventAttendance } from "@groups/events/state/eventsTypes";
+
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
-import { useEventActions } from "@groups/events/state/EventActions";
-import { useEventState } from "@groups/events/state/EventReducer";
-import { LoadStatus } from "@library/@types/api/core";
-import Loader from "@library/loaders/Loader";
+
 
 interface IProps {
     event: IEvent;
@@ -61,7 +58,7 @@ export function EventDetails(props: IProps) {
                 caption={t("Event Details")}
             />
             <ButtonTabs
-                activeTab={event.attending}
+                activeTab={props.event.attending ?? EventAttendance.RSVP}
                 accessibleTitle={t("Are you going?")}
                 setData={props.onChange}
                 className={classes.attendanceSelector}

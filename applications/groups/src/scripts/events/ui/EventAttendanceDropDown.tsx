@@ -7,7 +7,7 @@ import { t } from "@library/utility/appUtils";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import React from "react";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import { EventAttendance } from "@groups/events/ui/eventOptions";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
 export interface IEventAttendance {
     attendance: EventAttendance;

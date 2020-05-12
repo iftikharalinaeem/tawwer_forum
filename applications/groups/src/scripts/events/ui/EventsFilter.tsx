@@ -4,17 +4,10 @@
  */
 
 import React from "react";
-import { IEvent } from "@groups/events/ui/Event";
 import { t } from "@vanilla/i18n/src";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-
-export interface IProps {
-    events: IEvent;
-    viewMoreLink: string;
-    viewMoreText?: string;
-}
 
 export enum EventFilterTypes {
     ALL = "all",

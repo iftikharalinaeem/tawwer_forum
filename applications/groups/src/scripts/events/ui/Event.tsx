@@ -3,9 +3,8 @@
  * @license Proprietary
  */
 
-import { IEvent } from "@groups/events/state/eventsTypes";
+import { IEvent, EventAttendance } from "@groups/events/state/eventsTypes";
 import { AttendanceStamp } from "@groups/events/ui/AttendanceStamp";
-import { EventAttendance } from "@groups/events/ui/eventOptions";
 import { eventsClasses, eventsVariables } from "@groups/events/ui/eventStyles";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import TruncatedText from "@library/content/TruncatedText";
@@ -67,7 +66,7 @@ export function Event(props: IProps) {
                             </HeadingTag>
                             {!props.compact && (
                                 <Paragraph className={classes.excerpt}>
-                                    <TruncatedText maxCharCount={160}>{event.body}</TruncatedText>
+                                    <TruncatedText maxCharCount={160}>{event.excerpt}</TruncatedText>
                                 </Paragraph>
                             )}
                             {showMetas && (

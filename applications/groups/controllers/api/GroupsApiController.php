@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\Navigation\Breadcrumb;
@@ -39,21 +40,23 @@ class GroupsApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var FormatService */
+    private $formatService;
+
     /**
-     * ConversationsApiController constructor.
-     *
-     * @param GroupModel $groupModel
-     * @param UserModel $userModel
-     * @param BreadcrumbModel $breadcrumbModel
+     * DI.
+     * @inheritdoc
      */
     public function __construct(
         GroupModel $groupModel,
         UserModel $userModel,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        FormatService $formatService
     ) {
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->formatService = $formatService;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -699,7 +702,8 @@ class GroupsApiController extends AbstractApiController {
         $dbRecord['Privacy'] = strtolower($dbRecord['Privacy']);
 
         if (empty($options['skipFormatting'])) {
-            $dbRecord['Description'] = Gdn_Format::to($dbRecord['Description'], $dbRecord['Format']);
+            $dbRecord['excerpt'] = $this->formatService->renderExcerpt($dbRecord['Description'], $dbRecord['Format']);
+            $dbRecord['Description'] = $this->formatService->renderHTML($dbRecord['Description'], $dbRecord['Format']);
             $dbRecord['Body'] = $dbRecord['Description'];
         }
 

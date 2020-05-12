@@ -1,9 +1,8 @@
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { IApiError } from "@library/@types/api/core";
 import { actionCreatorFactory } from "typescript-fsa";
-import { IEvent } from "applications/groups/src/scripts/events/state/EventsReducer";
-
 import { IEventParticipant } from "@groups/events/state/EventReducer";
+import { IEvent } from "@groups/events/state/eventsTypes";
 
 const createAction = actionCreatorFactory("@@events");
 

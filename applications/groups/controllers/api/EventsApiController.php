@@ -157,7 +157,8 @@ class EventsApiController extends AbstractApiController {
                 ],
                 'parentRecordID:i' => 'The record ID of the parent record',
                 'name:s' => 'The name of the event.',
-                'body:s' => 'The description of the event.',
+                'body:s' => 'The HTML description of the event.',
+                'excerpt:s' => 'The description of the event.',
                 'location:s|n' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
@@ -549,7 +550,6 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a schema record.
      */
     public function normalizeEventOutput(array $dbRecord) {
-        $dbRecord['Body'] = $this->formatService->renderHTML($dbRecord['Body'], $dbRecord['Format']);
         if (isset($dbRecord['Attending'])) {
             $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
             $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
@@ -557,7 +557,8 @@ class EventsApiController extends AbstractApiController {
 
         $dbRecord['url'] = $this->eventModel->eventUrl($dbRecord);
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-
+        $schemaRecord['body'] = $this->formatService->renderHTML($dbRecord['Body'], $dbRecord['Format']);
+        $schemaRecord['excerpt'] = $this->formatService->renderExcerpt($dbRecord['Body'], $dbRecord['Format']);
         return $schemaRecord;
     }
 
