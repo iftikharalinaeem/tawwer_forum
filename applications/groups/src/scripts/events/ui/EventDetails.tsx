@@ -21,10 +21,9 @@ import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 interface IProps {
     event: IEvent;
     organizer: string;
-    disableAttendance: boolean
-    going?: IUserFragment[];
-    maybe?: IUserFragment[];
-    notGoing?: IUserFragment[];
+    going?: IUserFragment[] | undefined;
+    maybe?: IUserFragment[] | undefined;
+    notGoing?: IUserFragment[] | undefined;
     onChange: (data: any) => void;
     disableAttendance?: boolean;
 }
