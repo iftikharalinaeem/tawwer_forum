@@ -9,7 +9,15 @@ import { dateTimeVariables } from "@library/content/dateTimeStyles";
 import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
 import { userPhotoClasses, userPhotoVariables } from "@library/headers/mebox/pieces/userPhotoStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, EMPTY_FONTS, fonts, IFont, negativeUnit, unit } from "@library/styles/styleHelpers";
+import {
+    colorOut,
+    EMPTY_FONTS,
+    ensureColorHelper,
+    fonts,
+    IFont,
+    negativeUnit,
+    unit,
+} from "@library/styles/styleHelpers";
 import { borders, EMPTY_BORDER, IBorderStyles, singleBorder } from "@library/styles/styleHelpersBorders";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
@@ -17,6 +25,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, percent, translateY } from "csx";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
+import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -156,7 +165,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...fonts(vars.title.font),
     });
 
-    const linkColors = clickableItemStates()["$nest"];
+    const linkColors = clickableItemStates();
     const toggleClass = selectBoxClasses().toggle;
 
     const link = style("link", {
@@ -174,19 +183,19 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
                 fontWeight: globalVars.fonts.weights.normal,
             },
             [`&:hover .${title}`]: {
-                ...linkColors!["&&:hover"],
+                ...linkColors["$nest"]!["&&:hover"],
             },
             [`&:focus .${title}`]: {
-                ...linkColors!["&&:focus"],
+                ...linkColors["$nest"]!["&&:focus"],
             },
             [`&.focus-visible .${title}`]: {
-                ...linkColors!["&&:focus-visible"],
+                ...linkColors["$nest"]!["&&:focus-visible"],
             },
             [`&:active .${title}`]: {
-                ...linkColors!["&&:active"],
+                ...linkColors["$nest"]!["&&:active"],
             },
             [`&:visited .${title}`]: {
-                ...linkColors!["&&:visited"],
+                ...linkColors["$nest"]!["&&:visited"],
             },
         },
     });
@@ -322,6 +331,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         borderBottom: singleBorder({
             color: vars.separator.fg,
         }),
+        height: 0, // gets rid of default styles
         ...margins({
             bottom: vars.section.spacing.vertical,
         }),
@@ -391,6 +401,14 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         },
     });
 
+    const organizer = style("organizer", {
+        ...fonts({
+            ...EMPTY_FONTS,
+            color: ensureColorHelper(linkColors.color as string),
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
+    });
+
     return {
         root,
         item,
@@ -425,5 +443,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         pageTitle,
         sectionTitle,
         description,
+        organizer,
     };
 });
