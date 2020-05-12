@@ -6,10 +6,9 @@
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { storyWithConfig } from "@library/storybook/StoryContext";
-import { IEvent } from "@groups/events/ui/Event";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { EventAttendance } from "@groups/events/ui/eventOptions";
 import { EventList as EventListComponent } from "@groups/events/ui/EventList";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
 export default {
     title: "Event Lists",
@@ -121,14 +120,14 @@ const dummyEventData = [
         },
         url: "http://google.ca",
     },
-] as IEvent[];
+];
 
-export function EventList(props: { title?: string; headingLevel?: 2 | 3 | 4; data?: IEvent[]; compact?: boolean }) {
+export function EventList(props: { title?: string; headingLevel?: 2 | 3 | 4; data; compact?: boolean }) {
     const { title = "Event List", headingLevel = 2, data = dummyEventData, compact = false } = props;
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
-            <EventListComponent data={data} headingLevel={headingLevel} compact={compact} />
+            <EventListComponent events={data} headingLevel={headingLevel} compact={compact} />
         </>
     );
 }

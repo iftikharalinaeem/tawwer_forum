@@ -18,7 +18,6 @@ import { IEvent, EventAttendance } from "@groups/events/state/eventsTypes";
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 
-
 interface IProps {
     event: IEvent;
     organizer: string;
@@ -27,6 +26,7 @@ interface IProps {
     maybe?: IUserFragment[];
     notGoing?: IUserFragment[];
     onChange: (data: any) => void;
+    disableAttendance?: boolean;
 }
 
 /**
@@ -51,7 +51,9 @@ export function EventDetails(props: IProps) {
                     {
                         key: t("Organizer"),
                         value: (
-                            <SmartLink to={makeProfileUrl(event.insertUser.name)}>{event.insertUser.name}</SmartLink>
+                            <SmartLink className={classes.organizer} to={makeProfileUrl(event.insertUser.name)}>
+                                {event.insertUser.name}
+                            </SmartLink>
                         ),
                     },
                 ]}
@@ -64,9 +66,22 @@ export function EventDetails(props: IProps) {
                 setData={props.onChange}
                 className={classes.attendanceSelector}
             >
-                <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
-                <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
-                <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} className={"isLast"} />
+                <ButtonTab
+                    disabled={props.disableAttendance}
+                    label={t("Going")}
+                    data={EventAttendance.GOING.toString()}
+                />
+                <ButtonTab
+                    disabled={props.disableAttendance}
+                    label={t("Maybe")}
+                    data={EventAttendance.MAYBE.toString()}
+                />
+                <ButtonTab
+                    disabled={props.disableAttendance}
+                    label={t("Not going")}
+                    data={EventAttendance.NOT_GOING.toString()}
+                    className={"isLast"}
+                />
             </ButtonTabs>
 
             <div className={classes.section}>

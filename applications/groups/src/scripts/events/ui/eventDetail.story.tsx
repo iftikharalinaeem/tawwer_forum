@@ -6,8 +6,8 @@
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { EventDetails, IEventExtended } from "@groups/events/ui/EventDetails";
-import { dummyEventDetailsData } from "@library/dataLists/dummyEventData";
+import { EventDetails } from "@groups/events/ui/EventDetails";
+import { dummyEventDetailsData } from "@groups/events/dummyEventData";
 
 export default {
     title: "Event Details",
@@ -18,12 +18,12 @@ export default {
     },
 };
 
-export function StoryEventDetails(props: { data: IEventExtended; title: string }) {
+export function StoryEventDetails(props: { data; title: string }) {
     const { data = dummyEventDetailsData, title = "Event Details" } = props;
     return (
         <>
             <StoryHeading depth={1}>{title}</StoryHeading>
-            <EventDetails {...data} />
+            <EventDetails {...data} event={data} />
         </>
     );
 }
