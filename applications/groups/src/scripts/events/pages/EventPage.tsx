@@ -61,15 +61,10 @@ export default function EventPage() {
         }
     };
 
-    if (
-        !event.data ||
-        !participants.data ||
-        event.status === LoadStatus.LOADING ||
-        event.status === LoadStatus.PENDING
-    ) {
+    if (!event.data || !participants.data) {
         return <Loader />;
     } else {
-        const going: IUserFragment = participants?.data
+        const going: IUserFragment[] = participants?.data
             .filter(participant => {
                 if (participant.attending === "yes") {
                     return participant.user;
@@ -78,7 +73,7 @@ export default function EventPage() {
             .map(participant => {
                 return participant.user;
             });
-        const notGoing: IUserFragment = participants?.data
+        const notGoing: IUserFragment[] = participants?.data
             .filter(participant => {
                 if (participant.attending === "no") {
                     return participant.user;
@@ -88,7 +83,7 @@ export default function EventPage() {
                 return participant.user;
             });
 
-        const maybe: IUserFragment = participants?.data
+        const maybe: IUserFragment[] = participants?.data
             .filter(participant => {
                 if (participant.attending === "maybe") {
                     return participant.user;

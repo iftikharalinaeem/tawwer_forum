@@ -23,9 +23,9 @@ interface IProps {
     event: IEvent;
     organizer: string;
     disableAttendance: boolean
-    going?: IUserFragment[];
-    maybe?: IUserFragment[];
-    notGoing?: IUserFragment[];
+    going?: IUserFragment[] | undefined;
+    maybe?: IUserFragment[] | undefined;
+    notGoing?: IUserFragment[] | undefined;
     onChange: (data: any) => void;
 }
 
@@ -64,9 +64,9 @@ export function EventDetails(props: IProps) {
                 setData={props.onChange}
                 className={classes.attendanceSelector}
             >
-                <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} />
-                <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} />
-                <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} className={"isLast"} />
+                <ButtonTab label={t("Going")} data={EventAttendance.GOING.toString()} disable={props.disableAttendance} />
+                <ButtonTab label={t("Maybe")} data={EventAttendance.MAYBE.toString()} disable={props.disableAttendance} />
+                <ButtonTab label={t("Not going")} data={EventAttendance.NOT_GOING.toString()} className={"isLast"} disable={props.disableAttendance} />
             </ButtonTabs>
 
             <div className={classes.section}>
