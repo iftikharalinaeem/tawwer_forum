@@ -566,6 +566,8 @@ class ReactionsPlugin extends Gdn_Plugin {
             });
         }
 
+        // If there's only one discussion, remove it from the nesting array.
+        $result = count($result) === 1 ? $result[0] : $result;
         return $result;
     }
 
