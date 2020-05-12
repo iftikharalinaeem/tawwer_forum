@@ -1089,6 +1089,13 @@ class VanillaPopPlugin extends Gdn_Plugin {
         $args['BlockExceptions']['`post/sendgrid(\/.*)?$`'] = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
+    /**
+     * Create an email.
+     *
+     * @param mixed $sender Sender.
+     * @param array $args Arguments passed from event.
+     * @throws Exception Throws exceptions if session doesn't pass.
+     */
     public function utilityController_email_create($sender, $args = []) {
         if (Gdn::session()->UserID == 0) {
             Gdn::session()->start(Gdn::userModel()->getSystemUserID(), false);
