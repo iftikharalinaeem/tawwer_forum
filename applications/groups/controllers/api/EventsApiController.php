@@ -195,7 +195,7 @@ class EventsApiController extends AbstractApiController {
         $this->idParamEventSchema()->setDescription('Get an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
-        $event = $this->eventModel->getEvents(['e.EventID' => $id,'UserID' => 10]);
+        $event = $this->eventModel->getEvents(['e.EventID' => $id,'UserID' => $query['UserID']]);
         $event = reset($event);
         $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);

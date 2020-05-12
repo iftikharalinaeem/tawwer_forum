@@ -24,6 +24,7 @@ export interface IEvent {
     updatedUser: IUserFragment;
     groupID?: number;
     url: string;
+    breadcrumbs?: [];
 }
 export interface IEventsState {
     events: ILoadable<{
