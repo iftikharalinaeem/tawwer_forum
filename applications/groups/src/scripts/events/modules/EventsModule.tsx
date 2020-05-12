@@ -5,13 +5,12 @@
 
 import React from "react";
 import { IGetEventsQuery } from "@groups/events/state/EventsActions";
-
 import { useEventsList, useEventParentRecord } from "@groups/events/state/eventsHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
-import { EventList } from "@library/events/EventList";
+import { EventList } from "@groups/events/ui/EventList";
 
 interface IProps {
     query: IGetEventsQuery;
@@ -38,7 +37,5 @@ export function EventsModule(props: IProps) {
         return <ErrorMessages errors={[events.error, eventParent.error].filter(notEmpty)} />;
     }
 
-    return (
-        <EventList hideIfEmpty={true} data={events.data.events.map(event => ({ ...event, date: event.dateStarts }))} />
-    );
+    return <EventList hideIfEmpty={true} events={events.data.events} />;
 }

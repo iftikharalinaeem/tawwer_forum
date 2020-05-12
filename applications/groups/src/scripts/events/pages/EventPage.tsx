@@ -8,9 +8,8 @@ import { LoadStatus } from "@library/@types/api/core";
 import { useParams } from "react-router";
 import { useEventActions } from "@groups/events/state/EventActions";
 import { IEventParticipant, useEventState } from "@groups/events/state/EventReducer";
-import { EventDetails } from "@library/events/EventDetails";
 import Loader from "@library/loaders/Loader";
-import { eventAttendanceOptions } from "@library/events/eventOptions";
+import { eventAttendanceOptions } from "@groups/events/ui/eventOptions";
 import { IUserFragment } from "@library/@types/api/users";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
@@ -19,6 +18,8 @@ import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
+import { EventDetails } from "@groups/events/ui/EventDetails";
+import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 
 export default function EventPage() {
     const { getEventByID, getEventParticipantsByEventID, postEventParticipants } = useEventActions();
@@ -42,13 +43,7 @@ export default function EventPage() {
         }
     }, [event.data]);
 
-    const eventCreator = event.data?.insertUser;
-    const dateStarts = event.data?.dateStarts;
-    const dateEnds = event.data?.dateEnds;
-    const name = event.data?.name;
-    const location = event.data?.location;
-    const url = event.data?.url;
-    const attendance = event.data?.attending;
+    const organizer = event.data?.insertUser;
 
     const crumbs = event.data?.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
@@ -92,8 +87,10 @@ export default function EventPage() {
 
         return (
             <Container>
+                <TitleBar />
                 <PanelLayout
-                    renderLeftPanelBackground={renderPanelBackground}
+                    // renderLeftPanelBackground={renderPanelBackground}
+                    leftBottom={<></>}
                     breadcrumbs={
                         (device === Devices.XS || device === Devices.MOBILE) && crumbs
                             ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
@@ -102,14 +99,8 @@ export default function EventPage() {
                     middleBottom={
                         <PanelWidget>
                             <EventDetails
-                                organizer={eventCreator.name}
-                                dateStart={dateStarts}
-                                dateEnd={dateEnds}
-                                name={name}
-                                location={location}
-                                url={url}
-                                attendance={attendance}
-                                attendanceOptions={eventAttendanceOptions}
+                                event={event.data}
+                                organizer={organizer.name}
                                 going={going}
                                 notGoing={notGoing}
                                 maybe={maybe}

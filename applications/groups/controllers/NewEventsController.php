@@ -64,9 +64,10 @@ class NewEventsController extends AbstractEventsController {
      */
     private function renderSingleEvent(int $eventID) {
         $event = $this->eventsApi->get($eventID, []);
+        $this->setIsReactView(true);
         $this->title($event['name']);
         $this->applyBreadcrumbs(EventRecordType::TYPE, $eventID);
-        $this->render('index');
+        $this->render('event');
     }
 
 }
