@@ -50,7 +50,7 @@ export function EventPlaceholder(props: IProps) {
                 >
                     <div className={classes.linkAlignment}>
                         <DateTimeCompactPlaceholder className={classes.dateCompact} />
-                        <div className={classes.main}>
+                        <div className={classNames(classes.main(true))}>
                             <LoadingRectange height={16} width={120} />
                             <LoadingSpacer height={7} />
                             {!props.compact && <LoadingRectange height={10} width={240} />}
@@ -74,19 +74,6 @@ export function EventPlaceholder(props: IProps) {
                                     style={{ display: "inline-block" }}
                                 />
                             </div>
-                            {/* {showMetas && (
-
-                                    {showAttendance && (
-                                        <AttendanceStamp attendance={event.attending} className={classes.meta} />
-                                    )}
-                                    {event.location && <div className={classes.meta}>{event.location}</div>}
-                                    {!props.compact && (
-                                        <div className={classes.meta}>
-                                            <DateTime type={DateFormats.DEFAULT} timestamp={event.dateStarts} />
-                                        </div>
-                                    )}
-                                </div>
-                            )} */}
                         </div>
                     </div>
                 </span>

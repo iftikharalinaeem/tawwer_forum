@@ -16,6 +16,7 @@ import { calc } from "csx";
 import React from "react";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import EventAttendanceDropDown from "@groups/events/ui/EventAttendanceDropDown";
+import { FromToDateTime } from "@library/content/FromToDateTime";
 
 interface IProps {
     event: IEvent;
@@ -33,10 +34,10 @@ export function Event(props: IProps) {
     const { event } = props;
 
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
-
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
-    const showAttendance = props.compact && event.attending !== EventAttendance.RSVP;
+    const showAttendance = event.attending && event.attending !== EventAttendance.RSVP;
     const showMetas = event.location || !props.compact || showAttendance;
+
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
@@ -61,7 +62,7 @@ export function Event(props: IProps) {
                             type={DateFormats.COMPACT}
                             timestamp={event.dateStarts}
                         />
-                        <div className={classes.main}>
+                        <div className={classes.main()}>
                             <HeadingTag title={event.name} className={classes.title}>
                                 {event.name}
                             </HeadingTag>
@@ -73,12 +74,15 @@ export function Event(props: IProps) {
                             {showMetas && (
                                 <div className={classes.metas}>
                                     {showAttendance && (
-                                        <AttendanceStamp attendance={event.attending} className={classes.meta} />
+                                        <AttendanceStamp
+                                            attending={event.attending}
+                                            className={classNames(classes.meta, classes.metaAttendance)}
+                                        />
                                     )}
                                     {event.location && <div className={classes.meta}>{event.location}</div>}
                                     {!props.compact && (
-                                        <div className={classes.meta}>
-                                            <DateTime type={DateFormats.DEFAULT} timestamp={event.dateStarts} />
+                                        <div className={classNames(classes.meta, classes.metaDate)}>
+                                            <FromToDateTime dateStarts={event.dateStarts} dateEnds={event.dateEnds} />
                                         </div>
                                     )}
                                 </div>
