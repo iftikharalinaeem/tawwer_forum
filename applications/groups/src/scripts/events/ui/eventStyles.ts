@@ -314,7 +314,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const viewMore = style("viewMore", {
-        marginLeft: "auto",
+        marginTop: globalVars.gutter.half,
+        display: "block",
+        textAlign: "right",
     });
 
     const filter = style("filter", {

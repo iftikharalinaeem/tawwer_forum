@@ -204,6 +204,10 @@ class GroupsHooks extends Gdn_Plugin {
         if (is_object($menu = getValue('Menu', $sender))) {
             $menu->addLink('Groups', t('Groups'), '/groups/', false, ['class' => 'Groups']);
         }
+
+        if (inSection(['CategoryList', 'CategoryDiscussionList', 'DiscussionList'])) {
+             $sender->addModule(new NewEventsModule());
+        }
     }
 
     /**
@@ -316,7 +320,6 @@ class GroupsHooks extends Gdn_Plugin {
         foreach ($categories as $id => $cat) {
             CategoryModel::setLocalField($id, 'PermsDiscussionsView', $this->categoryPermissions[$id]);
         }
-
     }
 
 

@@ -9,9 +9,10 @@ import { t } from "@vanilla/i18n/src";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import Heading from "@library/layout/Heading";
 import { EventList, IEventList } from "@groups/events/ui/EventList";
+import { IEvent } from "@groups/events/state/eventsTypes";
 
 export interface IProps {
-    events: Omit<IEventList, "compact" | "headingLevel">;
+    events: IEvent[];
     viewMoreLink: string;
     viewMoreText?: string;
     title?: string;
@@ -29,14 +30,14 @@ export function EventsPanel(props: IProps) {
         title = t("Upcoming Events"),
         headingLevel = 2,
     } = props;
-    if (events.events.length === 0) {
+    if (events.length === 0) {
         return null;
     }
     const classes = eventsClasses();
     return (
         <>
             <Heading>{title}</Heading>
-            <EventList {...events} compact={false} headingLevel={(headingLevel + 1) as 3 | 4} />
+            <EventList events={events} compact={true} headingLevel={(headingLevel + 1) as 3 | 4} />
             <SmartLink to={viewMoreLink} className={classes.viewMore}>
                 {viewMoreText}
             </SmartLink>
