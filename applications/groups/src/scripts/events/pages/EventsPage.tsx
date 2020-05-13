@@ -18,21 +18,14 @@ import React, { useMemo } from "react";
 import { useHistory, useLocation, useParams } from "react-router";
 import { LocationDescriptorObject } from "history";
 import { PageHeading } from "@library/layout/PageHeading";
+import { useEventsListFilterQuery, EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
 
 export default function EventsPage() {
-    const query = useQuery();
     const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
     const parentRecordType = params.parentRecordType ?? "category";
     const parentRecordID = params.parentRecordID !== null ? parseInt(params.parentRecordID!) : -1;
-    const filterValue = query.get("filter");
-    const filter = useMemo(() => {
-        if (!Object.values(EventFilterTypes as any).includes(filterValue)) {
-            return EventFilterTypes.UPCOMING;
-        } else {
-            return filterValue as EventFilterTypes;
-        }
-    }, [filterValue]);
-    const history = useHistory();
+
+    const { filter, changeFilter } = useEventsListFilterQuery();
 
     const dateQuery = useDatesForEventFilter(filter);
     const eventQuery = { ...dateQuery, parentRecordType, parentRecordID };
@@ -40,38 +33,11 @@ export default function EventsPage() {
     const eventList = useEventsList(eventQuery);
     const eventParent = useEventParentRecord({ parentRecordType, parentRecordID });
     const classes = eventsClasses();
-
-    const pageTop = (
-        <>
-            <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
-            <EventFilter
-                filter={filter}
-                key={filter}
-                onFilterChange={newFilter => {
-                    const newParams = {
-                        filter: newFilter,
-                    };
-                    const newQueryString = new URLSearchParams(newParams).toString();
-                    const newLocation: LocationDescriptorObject = {
-                        ...history.location,
-                        search: newQueryString,
-                    };
-                    history.replace(newLocation);
-                }}
-            />
-        </>
-    );
-
     if (
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventList.status) ||
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventParent.status)
     ) {
-        return (
-            <>
-                {pageTop}
-                <EventListPlaceholder count={10} />
-            </>
-        );
+        return <EventsPagePlaceholder />;
     }
 
     if (!eventList.data || !eventParent.data || eventList.error || eventParent.error) {
@@ -82,7 +48,8 @@ export default function EventsPage() {
 
     return (
         <>
-            {pageTop}
+            <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
             <SimplePager
                 url={formatUrl(
@@ -93,10 +60,4 @@ export default function EventsPage() {
             />
         </>
     );
-}
-
-// A custom hook that builds on useLocation to parse
-// the query string for you.
-function useQuery() {
-    return new URLSearchParams(useLocation().search);
 }

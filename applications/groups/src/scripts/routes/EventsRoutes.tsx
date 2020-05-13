@@ -5,6 +5,7 @@
 
 import RouteHandler from "@library/routing/RouteHandler";
 import { getMeta } from "@library/utility/appUtils";
+import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
 
 function getEventPath(path: string = "") {
     const newEventPage = getMeta("themeFeatures.NewEventsPage", false);
@@ -18,6 +19,7 @@ export const EventsRoute = new RouteHandler(
     [getEventPath("/:parentRecordType/:parentRecordID(-?\\d+)(-[^/]+)?"), getEventPath()],
     (data?: { parentRecordType: string; parentRecordID: number }) =>
         getEventPath(`/${data?.parentRecordType}/${data?.parentRecordID}`),
+    EventsPagePlaceholder,
 );
 
 export const EventRoute = new RouteHandler(
