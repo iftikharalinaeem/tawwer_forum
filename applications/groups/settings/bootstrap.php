@@ -24,8 +24,10 @@ function eventSlug($event) {
 }
 
 /**
- * @param $event
- * @param null $method
+ * Make an event URL.
+ *
+ * @param array $event
+ * @param null|string $method
  * @return string
  * @deprecated EventModel::eventUrl()
  */

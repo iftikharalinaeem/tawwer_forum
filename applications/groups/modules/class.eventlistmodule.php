@@ -148,7 +148,7 @@ class EventListModule extends Gdn_Module {
     /**
      * Enables the 'New Event' button before the event list.
      *
-     * @param $id The group id to add the event to, if one exists.
+     * @param string $id The group id to add the event to, if one exists.
      */
     public function addNewEventButton($id = '') {
         $this->addNewEventButton = true;

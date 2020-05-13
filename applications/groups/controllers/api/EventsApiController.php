@@ -472,7 +472,6 @@ class EventsApiController extends AbstractApiController {
         $rows = [];
         if ($where) {
             $rows = $this->eventModel->getEvents($where, $sortField, $sortOrder, $limit, $offset);
-
         }
 
         if ($this->isExpandField('users', $query['expand'] ?? false)) {
