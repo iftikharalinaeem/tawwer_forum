@@ -4,10 +4,7 @@
  * @license Proprietary
  */
 
-use Garden\Web\Exception\NotFoundException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
-use Vanilla\Groups\Models\EventPermissions;
-use Vanilla\Models\GenericRecord;
 
 /**
  * New events controller.
@@ -15,6 +12,12 @@ use Vanilla\Models\GenericRecord;
 class NewEventsController extends AbstractEventsController {
 
     /**
+     * Main handler for routing.
+     *
+     * /events/5-my-event
+     * /events/group/5-group-name
+     * /event/category/5-category-name
+     *
      * @param string|null $parentRecordTypeOrID
      * @param string|null $parentRecordID
      */
@@ -69,5 +72,4 @@ class NewEventsController extends AbstractEventsController {
         $this->applyBreadcrumbs(EventRecordType::TYPE, $eventID);
         $this->render('event');
     }
-
 }
