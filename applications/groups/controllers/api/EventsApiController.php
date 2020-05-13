@@ -6,14 +6,24 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\DateFilterSchema;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Groups\Models\EventPermissions;
+use Vanilla\Groups\Models\GroupPermissions;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Models\FormatSchema;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * API Controller for the `/events` resource.
@@ -37,21 +47,28 @@ class EventsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
+    /** @var FormatService */
+    private $formatService;
+
     /**
-     * EventsApiController constructor.
-     *
-     * @param EventModel $eventModel
-     * @param GroupModel $groupModel
-     * @param UserModel $userModel
+     * DI.
+     * @inheritdoc
      */
     public function __construct(
         EventModel $eventModel,
         GroupModel $groupModel,
-        UserModel $userModel
+        UserModel $userModel,
+        BreadcrumbModel $breadcrumbModel,
+        FormatService $formatService
     ) {
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+        $this->breadcrumbModel =  $breadcrumbModel;
+        $this->formatService = $formatService;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -69,11 +86,7 @@ class EventsApiController extends AbstractApiController {
         $this->idParamEventSchema()->setDescription('Delete an event.');
         $this->schema([], 'out');
 
-        $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('Organizer', $event)) {
-            throw new ClientException('You do not have the rights to delete this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::ORGANIZER, $id);
 
         // EventModel->deleteID() won't do here because it does not delete all the event's data.
         $this->eventModel->delete(['EventID' => $id]);
@@ -134,21 +147,38 @@ class EventsApiController extends AbstractApiController {
             // Name this schema so that it can be read by swagger.
             $schema = $this->schema([
                 'eventID:i' => 'The ID of the event.',
-                'groupID:i' => 'The group the event is in.',
+                'groupID:i?' => 'ID of the group. This parameter is deprecrated',
+                'parentRecordType:s' => [
+                    'ID of the Parent where the event was created',
+                    'enum' => [
+                        EventModel::PARENT_TYPE_GROUP,
+                        EventModel::PARENT_TYPE_CATEGORY
+                    ],
+                ],
+                'parentRecordID:i' => 'The record ID of the parent record',
                 'name:s' => 'The name of the event.',
-                'body:s' => 'The description of the event.',
+                'body:s' => 'The HTML description of the event.',
+                'excerpt:s' => 'The description of the event.',
                 'location:s|n' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
+                'attending:s|n?' => [
+                    'enum' => ['yes', 'no', 'maybe'],
+                    'description' => 'Is the participant attending the event.',
+                ],
+                'userID:i?' => 'The users ID',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
+                'allDayEvent:b?' => 'Event taking the full day',
                 'dateInserted:dt' => 'When the event was created.',
                 'insertUserID:i' => 'The user that created the event.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateUpdated:dt|n' => 'When the event was updated.',
                 'updateUserID:i|n' => 'The user that updated the event.',
                 'updateUser?' => $this->getUserFragmentSchema(),
+                "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
+                "permissions?" => new InstanceValidatorSchema(EventPermissions::class),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
@@ -160,22 +190,27 @@ class EventsApiController extends AbstractApiController {
      * Get an event.
      *
      * @param int $id The ID of the event.
-     * @throws Exception
+     * @param array $query
      * @return array
      */
-    public function get($id) {
+    public function get($id, array $query) {
         $this->permission();
-
+        $query['UserID'] = $query['userID'] ?? $this->getSession()->UserID;
         $this->idParamEventSchema()->setDescription('Get an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
-        $event = $this->eventByID($id);
+        $event = $this->eventModel->getEvents(['e.EventID' => $id,'UserID' => $query['UserID']]);
+        $event = reset($event);
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
+        $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view this event.');
+        if ($this->isExpandField('breadcrumbs', $query['expand'] ?? false)) {
+            $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
         }
 
-        $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
+        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
+            $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
+        }
 
         $result = $this->normalizeEventOutput($event);
         return $out->validate($result);
@@ -219,7 +254,7 @@ class EventsApiController extends AbstractApiController {
         $participantData = $this->normalizeEventParticipantInput($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Filters
         $where = [];
@@ -236,7 +271,7 @@ class EventsApiController extends AbstractApiController {
         // Data
         $rows = $this->eventModel->getInvitedUsers($id, $where, '', 'asc', $limit, $offset);
 
-        if (!empty($query['expand'])) {
+        if (!empty($query['expand'] ?? false)) {
             $this->userModel->expandUsers($rows, ['UserID']);
         }
         foreach ($rows as &$row) {
@@ -266,9 +301,11 @@ class EventsApiController extends AbstractApiController {
             Schema::parse([
                 'eventID',
                 'groupID',
+                'parentRecordType',
+                'parentRecordID',
                 'name',
                 'body',
-                'format' => new \Vanilla\Models\FormatSchema(true),
+                'format' => new FormatSchema(true),
                 'location',
                 'dateStarts',
                 'dateEnds'
@@ -277,30 +314,11 @@ class EventsApiController extends AbstractApiController {
         );
 
         $event = $this->eventByID($id);
-
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
 
         $result = $out->validate($event);
         $this->applyFormatCompatibility($result, 'body', 'format');
         return $result;
-    }
-
-    /**
-     * Get a group by its ID.
-     *
-     * @param int $id The group ID.
-     * @throws NotFoundException If the group could not be found.
-     * @return array
-     */
-    public function groupByID($id) {
-        $row = $this->groupModel->getID($id, DATASET_TYPE_ARRAY);
-        if (!$row || !$this->groupModel->checkPermission('Access', $row)) {
-            throw new NotFoundException('Group');
-        }
-
-        return $row;
     }
 
     /**
@@ -309,7 +327,11 @@ class EventsApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function idParamEventSchema() {
-        return $this->schema(['id:i' => 'The event ID.'], 'in');
+        return $this->schema([
+            'id:i' => 'The event ID.',
+            'userID:i?' => 'The users ID',
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions'])
+        ], 'in');
     }
 
     /**
@@ -319,10 +341,37 @@ class EventsApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
+
         $this->permission('Garden.SignIn.Allow');
 
+        $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
+
         $in = $this->schema([
-            'groupID:i' => 'Filter by group ID.',
+            'groupID:i?' => 'Filter by group ID.',
+            'parentRecordID:i' => 'Parent where the event was created',
+            'parentRecordType:s' => [
+                'ID of the Parent where the event was created',
+                'enum' => [
+                    EventModel::PARENT_TYPE_GROUP,
+                    EventModel::PARENT_TYPE_CATEGORY
+                ],
+            ],
+            'dateStarts:dt?' => new DateFilterSchema([
+                'description' => 'Filter events by start dates',
+                'x-filter' => [
+                    'field' => 'e.DateStarts',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'dateEnds:dt?' => new DateFilterSchema([
+                'description' => 'Filter events by end dates',
+                'x-filter' => [
+                    'field' => 'e.DateEnds',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
+            'allDayEvent:b?' => 'If the event is all day' ,
+            'userID:i' => 'The users ID',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -342,11 +391,26 @@ class EventsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-            'expand:b?' => 'Expand associated records.',
+            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions']),
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
+        $groupID = $query['groupID'] ?? null;
+        $parentRecordType = $query['parentRecordType'] ?? null;
+        $parentRecordID = $query['parentRecordID'] ?? null;
+
+        // for backwards compatibility use the groupID supplied as the parentID
+        $query['parentRecordType'] = ($groupID) ? EventModel::PARENT_TYPE_GROUP : $parentRecordType;
+        $query['parentRecordID'] =  ($groupID) ? $groupID : $parentRecordID;
+
         $query = $in->validate($query);
+
+        // Check permissions for our filters.
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::VIEW,
+            $query['parentRecordType'],
+            $query['parentRecordID']
+        );
 
         // Sorting
         $sortField = '';
@@ -359,31 +423,62 @@ class EventsApiController extends AbstractApiController {
         }
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Filters
-        $where = [];
-        if (array_key_exists('groupID', $query)) {
-            $group = $this->groupModel->getID($query['groupID']);
-            $groupPrivacy = $group['Privacy'];
-            $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
-            $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-            if (!$this->groupModel->checkPermission($access, $query['groupID']) && !$isAdmin) {
-                // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
-                $where['GroupID'] = -1;
-            } else {
-                $where['GroupID'] = $query['groupID'];
+        $where = ApiUtils::queryToFilters($in, $query);
+
+        if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
+            if ($query['parentRecordID']) {
+                $group = $this->groupModel->getID($query['parentRecordID']);
+                $groupPrivacy = $group['Privacy'];
+                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
+                $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+                if (!$this->groupModel->checkGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
+                    // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
+                    $where['GroupID'] = -1;
+                } else {
+                    $where['e.ParentRecordType'] = $query['parentRecordType'];
+                    $where['e.ParentRecordID'] =  $query['parentRecordID'];
+                }
             }
+        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+            if ($query['parentRecordID']) {
+                /** @var CategoryModel $categoryModel */
+                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+
+                $parentIDs = [-1, $query['parentRecordID']];
+                // get all parent category IDs up to the root.
+                $ancestors = $categoryModel::getAncestors($query['parentRecordID'], true);
+                if ($ancestors) {
+                    $parentIDs = array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID')));
+                }
+
+                // check the permission based on the category.
+                $where['e.ParentRecordID'] = $parentIDs;
+                $where['e.ParentRecordType'] = $query['parentRecordType'];
+            }
+        }
+
+        if ($query['allDayEvent'] ?? null) {
+            $where['e.AllDayEvent'] = 1;
+        }
+
+        if ($query['userID'] ?? null) {
+            $where['UserID'] = $query['userID'];
         }
 
         // Data
         $rows = [];
         if ($where) {
-            $rows = $this->eventModel->getWhere($where, $sortField, $sortOrder, $limit, $offset)->resultArray();
+            $rows = $this->eventModel->getEvents($where, $sortField, $sortOrder, $limit, $offset);
         }
 
-        if (!empty($query['expand'])) {
+        if ($this->isExpandField('users', $query['expand'] ?? false)) {
             $this->userModel->expandUsers($rows, ['InsertUserID', 'UpdateUserID']);
+        }
+        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
+            $this->eventModel->expandPermissions($rows);
         }
         foreach ($rows as &$row) {
             $row = $this->normalizeEventOutput($row);
@@ -403,6 +498,12 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a database record.
      */
     public function normalizeEventInput(array $schemaRecord) {
+        $parentRecordType = $schemaRecord['parentRecordType'] ?? null;
+        $parentRecordID = $schemaRecord['parentRecordID'] ?? null;
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP && $parentRecordID !== null) {
+            // Backwards compatibility.
+            $schemaRecord['GroupID'] = $schemaRecord['parentRecordID'];
+        }
         $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
         return $dbRecord;
     }
@@ -432,11 +533,15 @@ class EventsApiController extends AbstractApiController {
      * @return array Return a schema record.
      */
     public function normalizeEventOutput(array $dbRecord) {
-        $dbRecord['Body'] = Gdn_Format::to($dbRecord['Body'], $dbRecord['Format']);
+        if (isset($dbRecord['Attending'])) {
+            $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
+            $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
+        }
 
+        $dbRecord['url'] = $this->eventModel->eventUrl($dbRecord);
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
-        $schemaRecord['url'] = eventUrl($dbRecord);
-
+        $schemaRecord['body'] = $this->formatService->renderHTML($dbRecord['Body'], $dbRecord['Format']);
+        $schemaRecord['excerpt'] = $this->formatService->renderExcerpt($dbRecord['Body'], $dbRecord['Format']);
         return $schemaRecord;
     }
 
@@ -467,22 +572,34 @@ class EventsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $this->idParamEventSchema();
-        $in = $this->postEventSchema()->setDescription('Update an event.');
+        $in = $this->patchEventSchema();
         $out = $this->schema($this->fullEventSchema(), 'out');
 
+        $body = $this->normalizeInputIDs($body);
         $body = $in->validate($body, true);
 
         $event = $this->eventByID($id);
 
         $eventData = $this->normalizeEventInput($body);
+
         $eventData['EventID'] = $id;
 
-        if (!$this->eventModel->checkPermission('Edit', $event)) {
-            throw new ClientException('You do not have the rights to edit this event.');
-        }
+        $this->eventModel->checkEventPermission(EventPermissions::EDIT, $id);
 
-        if (!empty($eventData['GroupID'])) {
-            $this->groupByID($eventData['GroupID']);
+        // Check permissions for our filters.
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::CREATE,
+            $event['ParentRecordType'],
+            $event['ParentRecordID']
+        );
+
+        if (isset($body['parentRecordType']) || isset($body['parentRecordID'])) {
+            // Check permissions of wherever we are moving it.
+            $this->eventModel->checkParentEventPermission(
+                EventPermissions::CREATE,
+                $body['parentRecordType'] ?? $event['ParentRecordType'],
+                $body['parentRecordID'] ?? $event['ParentRecordID']
+            );
         }
 
         $this->eventModel->save($eventData);
@@ -510,13 +627,14 @@ class EventsApiController extends AbstractApiController {
         $in = $this->postEventSchema()->setDescription('Create an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
 
+        $body = $this->normalizeInputIDs($body);
         $body = $in->validate($body);
 
-        if (!$this->eventModel->canCreateEvents($body['groupID'])) {
-            throw new ClientException('You do not have permission to create an event in this group.');
-        }
-
-        $this->groupByID($body['groupID']);
+        $this->eventModel->checkParentEventPermission(
+            EventPermissions::CREATE,
+            $body['parentRecordType'],
+            $body['parentRecordID']
+        );
 
         $eventData = $this->normalizeEventInput($body);
 
@@ -556,18 +674,19 @@ class EventsApiController extends AbstractApiController {
         ])->setDescription('RSVP to an event.');
         $out = $this->schema($this->fullEventParticipantSchema(), 'out');
 
+        // Check event existance.
         $event = $this->eventByID($id);
 
-        if (!$this->eventModel->checkPermission('View', $event)) {
-            throw new ClientException('You do not have the rights to view that event.');
+        $userID = $body['userID'] ?? $this->getSession()->UserID;
+        if ($userID !== null && $userID !== $this->getSession()->UserID) {
+            // Checking for organizer permission because we are adding someone else.
+            $this->eventModel->checkEventPermission(EventPermissions::ORGANIZER, $id);
+        } else {
+            // Checking for ourselves.
+            $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $id);
         }
 
         $body = $in->validate($body);
-
-        $userID = !empty($body['userID']) ? $body['userID'] : $this->getSession()->UserID;
-        if ($this->getSession()->UserID !== $userID && !$this->eventModel->checkPermission('Organizer', $event, $this->getSession()->UserID)) {
-            throw new ClientException('You do not have the rights to add a participant to that event.');
-        }
 
         $participantData = $this->normalizeEventParticipantInput($body);
 
@@ -592,6 +711,20 @@ class EventsApiController extends AbstractApiController {
         return $out->validate($result);
     }
 
+    /**
+     * Normalize input groupIDs into recordType and recordID.
+     *
+     * @param array $input
+     * @return array
+     */
+    private function normalizeInputIDs(array $input): array {
+        $groupID = $input['groupID'] ?? null;
+        if ($groupID !== null) {
+            $input['parentRecordType'] = GroupModel::RECORD_TYPE;
+            $input['parentRecordID'] = $groupID;
+        }
+        return $input;
+    }
 
     /**
      * Get an event schema with minimal add/edit fields.
@@ -604,15 +737,56 @@ class EventsApiController extends AbstractApiController {
         if ($postEventSchema === null) {
             $postEventSchema = $this->schema(
                 Schema::parse([
-                    'groupID',
+                    'parentRecordID',
+                    'parentRecordType:s' => [
+                        'ID of the Parent where the event was created',
+                        'enum' => [
+                            EventModel::PARENT_TYPE_GROUP,
+                            EventModel::PARENT_TYPE_CATEGORY
+                        ],
+                    ],
                     'name',
                     'body',
-                    'format' => new \Vanilla\Models\FormatSchema(),
+                    'format' => new FormatSchema(),
                     'location',
                     'dateStarts',
                     'dateEnds?',
+                    'allDayEvent?',
                 ])->add($this->fullEventSchema()),
                 'EventPost'
+            );
+        }
+
+        return $this->schema($postEventSchema, 'in');
+    }
+
+    /**
+     * Get an event schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function patchEventSchema() {
+        static $postEventSchema;
+
+        if ($postEventSchema === null) {
+            $postEventSchema = $this->schema(
+                Schema::parse([
+                    'parentRecordID?',
+                    'parentRecordType:s' => [
+                        'ID of the Parent where the event was created',
+                        'enum' => [
+                            EventModel::PARENT_TYPE_GROUP,
+                            EventModel::PARENT_TYPE_CATEGORY
+                        ],
+                    ],
+                    'name?',
+                    'body?',
+                    'format?' => new FormatSchema(),
+                    'location?',
+                    'dateStarts?',
+                    'dateEnds?',
+                ])->add($this->fullEventSchema()),
+                'EventPatch'
             );
         }
 

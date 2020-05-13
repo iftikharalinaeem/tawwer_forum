@@ -22,10 +22,10 @@ class EventsTest extends AbstractResourceTest {
     protected $baseUrl = '/events';
 
     /** {@inheritdoc} */
-    protected $editFields = ['groupID', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds'];
+    protected $editFields = ['groupID', 'parentRecordID', 'parentRecordType', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds'];
 
     /** {@inheritdoc} */
-    protected $patchFields = ['groupID', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds'];
+    protected $patchFields = ['groupID', 'parentRecordID', 'parentRecordType', 'name', 'body', 'format', 'location', 'dateStarts', 'dateEnds'];
 
     /** {@inheritdoc} */
     protected $pk = 'eventID';
@@ -106,6 +106,8 @@ class EventsTest extends AbstractResourceTest {
         $name = "Test Event $count";
         $record = [
             'groupID' => self::$groups[0]['groupID'],
+            'parentRecordID' => self::$groups[0]['groupID'],
+            'parentRecordType' => \EventModel::PARENT_TYPE_GROUP,
             'name' => $name,
             'body' => "$name description",
             'format' => 'markdown',

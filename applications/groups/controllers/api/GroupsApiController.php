@@ -11,8 +11,14 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Formatting\FormatService;
+use Vanilla\Forum\Navigation\GroupRecordType;
+use Vanilla\Groups\Models\GroupPermissions;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
+use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * API Controller for the `/groups` resource.
@@ -31,18 +37,26 @@ class GroupsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
+    /** @var FormatService */
+    private $formatService;
+
     /**
-     * ConversationsApiController constructor.
-     *
-     * @param GroupModel $groupModel
-     * @param UserModel $userModel
+     * DI.
+     * @inheritdoc
      */
     public function __construct(
         GroupModel $groupModel,
-        UserModel $userModel
+        UserModel $userModel,
+        BreadcrumbModel $breadcrumbModel,
+        FormatService $formatService
     ) {
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
+        $this->breadcrumbModel = $breadcrumbModel;
+        $this->formatService = $formatService;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -60,11 +74,8 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupSchema()->setDescription('Delete a group.');
         $this->schema([], 'out');
 
-        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Delete', $group)) {
-            throw new ClientException('You do not have the rights to delete this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::DELETE, $id);
 
         // GroupModel->deleteID() won't do here since it does not delete all the group's data.
         $this->groupModel->delete(['GroupID' => $id]);
@@ -84,12 +95,7 @@ class GroupsApiController extends AbstractApiController {
         $this->idParamGroupMemberSchema(false)->setDescription('Delete an invite to a user from a group.');
         $this->schema([], 'out');
 
-        $group = $this->groupByID($id);
-
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
-
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
         $this->groupModel->deleteInvites($id, $userID);
     }
 
@@ -229,6 +235,7 @@ class GroupsApiController extends AbstractApiController {
                 'countMembers:i' => 'The number of user belonging to the group.',
                 'countDiscussions:i' => 'The number of discussions in the group.',
                 'url:s' => 'The full URL to the group.',
+                'breadcrumbs:a' => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'Group');
         }
 
@@ -269,6 +276,7 @@ class GroupsApiController extends AbstractApiController {
         $this->userModel->expandUsers($row, ['InsertUserID', 'UpdateUserID']);
 
         $row = $this->normalizeGroupOutput($row);
+
         return $out->validate($row);
     }
 
@@ -299,9 +307,7 @@ class GroupsApiController extends AbstractApiController {
 
         $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Edit', $group)) {
-            throw new ClientException('You do not have the rights to edit this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::EDIT, $id);
 
         $result = $this->normalizeGroupOutput($group, ['skipFormatting' => true]);
         return $out->validate($result);
@@ -336,16 +342,12 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('List the invites for a group.');
         $out = $this->schema([':a' => $this->fullGroupInviteSchema()], 'out');
 
-        $group = $this->groupByID($id);
-
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
 
         $query = $in->validate($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $invites = $this->groupModel->getApplicants($id, ['Type' => 'Invitation'], $limit, $offset, false);
 
@@ -394,16 +396,12 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('List applicants to a group.');
         $out = $this->schema([':a' => $this->fullGroupApplicantSchema()], 'out');
 
-        $group = $this->groupByID($id);
-
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
 
         $query = $in->validate($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $applicants = $this->groupModel->getApplicants($id, ['Type' => 'Application'], $limit, $offset, false);
 
@@ -457,16 +455,13 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('List members of a group.');
         $out = $this->schema([':a' => $this->fullGroupMemberSchema()], 'out');
 
-        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('View', $group)) {
-            throw new ClientException('You do not have the rights to view this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::VIEW, $id);
 
         $query = $in->validate($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         $members = $this->groupModel->getMembers($id, [], $limit, $offset, false);
 
@@ -546,10 +541,10 @@ class GroupsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // Sorting
-        list($sortField, $sortOrder) = $this->resultSorting($query);
+        [$sortField, $sortOrder] = $this->resultSorting($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
         // Default filters
         $where = [];
@@ -599,19 +594,13 @@ class GroupsApiController extends AbstractApiController {
      *
      * @param int $id
      * @param int $userID
-     * @throws ClientException
      */
-    private function leaveGroup($id, $userID) {
-        $group = $this->groupByID($id);
+    private function leaveGroup(int $id, int $userID) {
 
-        $permissions = $this->groupModel->checkPermission(false, $group, $userID);
-
-        if ($userID !== $this->getSession()->UserID && !$permissions['Moderate']) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
-
-        if (!$permissions['Leave']) {
-            throw new ClientException($permissions['Leave.Reason']);
+        if ($userID !== $this->getSession()->UserID) {
+            $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id, $userID);
+        } else {
+            $this->groupModel->checkGroupPermission(GroupPermissions::LEAVE, $id, $userID);
         }
 
         $this->groupModel->removeMember($id, $userID);
@@ -713,11 +702,14 @@ class GroupsApiController extends AbstractApiController {
         $dbRecord['Privacy'] = strtolower($dbRecord['Privacy']);
 
         if (empty($options['skipFormatting'])) {
-            $dbRecord['Description'] = Gdn_Format::to($dbRecord['Description'], $dbRecord['Format']);
+            $dbRecord['excerpt'] = $this->formatService->renderExcerpt($dbRecord['Description'], $dbRecord['Format']);
+            $dbRecord['Description'] = $this->formatService->renderHTML($dbRecord['Description'], $dbRecord['Format']);
             $dbRecord['Body'] = $dbRecord['Description'];
         }
 
-        return ApiUtils::convertOutputKeys($dbRecord);
+        $result = ApiUtils::convertOutputKeys($dbRecord);
+        $result['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new GroupRecordType($result['groupID']));
+        return $result;
     }
 
     /**
@@ -758,14 +750,10 @@ class GroupsApiController extends AbstractApiController {
 
         $body = $in->validate($body, true);
 
-        $group = $this->groupByID($id);
-
         $groupData = $this->normalizeGroupInput($body);
         $groupData['GroupID'] = $id;
 
-        if (!$this->groupModel->checkPermission('Edit', $group)) {
-            throw new ClientException('You do not have the rights to edit this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::EDIT, $id);
 
         $this->groupModel->save($groupData);
         $this->validateModel($this->groupModel);
@@ -800,11 +788,8 @@ class GroupsApiController extends AbstractApiController {
         ], 'in')->setDescription('Approve or deny a group applicant.');
         $out = $this->schema($this->fullGroupApplicantSchema(), 'out');
 
-        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
 
         $applicants = $this->groupModel->getApplicants($id, ['Type' => 'Application', 'UserID' => $userID], false, false, false);
         if (count($applicants) === 0) {
@@ -847,12 +832,9 @@ class GroupsApiController extends AbstractApiController {
         ])->setDescription('Change a user\'s role within a group.');
         $out = $this->schema($this->fullGroupMemberSchema(), 'out');
 
-        $group = $this->groupByID($id);
         $this->memberByID($id, $userID);
 
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
 
         $body = $in->validate($body);
 
@@ -962,11 +944,8 @@ class GroupsApiController extends AbstractApiController {
         $in = $this->schema(['userID:i'], 'in')->setDescription('Invite a user to a group.');
         $out = $this->schema($this->fullGroupInviteSchema(), 'out');
 
-        $group = $this->groupByID($id);
 
-        if (!$this->groupModel->checkPermission('Moderate', $group)) {
-            throw new ClientException('You do not have the rights to moderate this group.');
-        }
+        $this->groupModel->checkGroupPermission(GroupPermissions::MODERATE, $id);
 
         $body = $in->validate($body);
 
@@ -1112,13 +1091,13 @@ class GroupsApiController extends AbstractApiController {
         $query = $in->validate($query);
 
         // Sorting
-        list($sortField, $sortOrder) = $this->resultSorting($query);
+        [$sortField, $sortOrder] = $this->resultSorting($query);
 
         $groupName = $query['query'];
         $page = $query['page'];
         $limit = $query['limit'];
 
-        list($offset, $limit) = offsetLimit("p{$page}", $limit);
+        [$offset, $limit] = offsetLimit("p{$page}", $limit);
 
         $rows = $this->groupModel->searchByName($groupName, $sortField, $sortOrder, $limit, $offset);
         foreach ($rows as &$row) {
@@ -1197,13 +1176,11 @@ class GroupsApiController extends AbstractApiController {
      * @throws NotFoundException If the current user does not have access to the group.
      */
     private function verifyAccess(array $group) {
-        /**
-         * GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
-         * are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
-         */
-        if ($this->groupModel->checkPermission('Access', $group, null, false) === false) {
+         // GroupModel's checkPermission method caches permissions, which make it a pain for contexts where permissions
+         // are prone to changing, like in tests or API endpoints that attempt to verify group access before a user joins.
+        $this->groupModel->resetCachedPermissions();
+        if (!$this->groupModel->hasGroupPermission(GroupPermissions::ACCESS, $group['GroupID'])) {
             throw new NotFoundException('Group');
         }
-
     }
 }

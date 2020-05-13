@@ -5,9 +5,12 @@
  */
 
 use \Garden\Schema\Schema;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Theme\ThemeFeatures;
 use \Vanilla\Web\Controller;
 use Garden\Container\Container;
 use Vanilla\Groups\Models\SearchRecordTypeGroup;
+use Garden\Container\Reference;
 
 /**
  * Class GroupsHooks
@@ -28,6 +31,55 @@ class GroupsHooks extends Gdn_Plugin {
     }
 
     /**
+     * Conditionally switch between the new and old event pages.
+     *
+     * @param Gdn_Dispatcher $dispatcher
+     * @param array $args
+     */
+    public function gdn_dispatcher_beforeDispatch_handler(Gdn_Dispatcher $dispatcher, array $args) {
+        /** @var ThemeFeatures $themeFeatures */
+        $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
+
+        if ($themeFeatures->allFeatures()['NewEventsPage']) {
+            // Add some rewrites into our router.
+            // Eg.
+            // /events internally to /new-events
+            // /events/some-path to /new-events/some-path
+            Gdn::router()->setRoute('events\/?(.*)?', 'new-events/$1', 'Internal', false);
+
+            // Externally redirect /new-events/* to /events/*
+            // Make sure this ends up on the canonical URL.
+            Gdn::router()->setRoute('new-events\/?(.*)?', 'events/$1', 'Temporary', false);
+
+            // Redirect old event pages to the new ones.
+            // CAN'T DO THIS UNTIL WE MAKE THE NEW EVENT ADD/EDIT PAGE
+             Gdn::router()->setRoute('event\/\d.(.*)', 'events/$1', 'Temporary', false);
+        }
+    }
+
+    /**
+     * Add events to the new discussion module.
+     *
+     * @param mixed $notActuallyACategoryModel
+     * @param array $args
+     */
+    public function categoryModel_allowedDiscussionTypes_handler($notActuallyACategoryModel, array $args) {
+        $allowedTypes = &$args['AllowedDiscussionTypes'];
+        $category = $args['Category'];
+        $actualCategoryID = $category['CategoryID'] ?? -1; // Some locations we don't have a real category. In these cases, it's the root.
+        $permissionCategory = $args['PermissionCategory'];
+
+        if (CategoryModel::checkPermission($permissionCategory, 'Vanilla.Events.Manage')) {
+            $allowedTypes['Event'] = [
+                'Singular' => 'Event',
+                'Plural' => 'Events',
+                'AddUrl' => '/event/add/'.$actualCategoryID.'?parentRecordType=category',
+                'AddText' => 'New Event'
+            ];
+        }
+    }
+
+    /**
      * Hook in when default category permissions are being built. Update permissions for the Social Groups category.
      *
      * @param PermissionModel $permissionModel
@@ -43,6 +95,29 @@ class GroupsHooks extends Gdn_Plugin {
             $permissionModel->addDefault(RoleModel::TYPE_MODERATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
             $permissionModel->addDefault(RoleModel::TYPE_ADMINISTRATOR, ['Vanilla.Discussions.View' => 0], 'Category', $categoryID);
         }
+
+        $permissionModel->addDefault(RoleModel::TYPE_GUEST, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_APPLICANT, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_UNCONFIRMED, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(RoleModel::TYPE_MEMBER, ['Vanilla.Events.View' => 1], 'Category', -1);
+        $permissionModel->addDefault(
+            RoleModel::TYPE_MODERATOR,
+            [
+                'Vanilla.Events.View' => 1,
+                'Vanilla.Events.Manage' => 1,
+            ],
+            'Category',
+            -1
+        );
+        $permissionModel->addDefault(
+            RoleModel::TYPE_ADMINISTRATOR,
+            [
+                'Vanilla.Events.View' => 1,
+                'Vanilla.Events.Manage' => 1,
+            ],
+            'Category',
+            -1
+        );
     }
 
     /**
@@ -69,6 +144,23 @@ class GroupsHooks extends Gdn_Plugin {
         $dic
             ->rule(Vanilla\Contracts\Search\SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeGroup()])
+        ;
+
+        $dic->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(EventsBreadcrumbProvider::class)])
+        ;
+
+        $dic->rule(BreadcrumbModel::class)
+            ->addCall('addProvider', [new Reference(GroupBreadcrumbProvider::class)])
+        ;
+
+        $dic->rule('@event-route')
+            ->setClass(\Garden\Web\ResourceRoute::class)
+            ->setConstructorArgs(['/', 'Vanilla\\Events\\%sPageController'])
+            // Set a default content type.
+            ->addCall('setMeta', ['CONTENT_TYPE', 'text/html; charset=utf-8'])
+            ->rule(\Garden\Web\Dispatcher::class)
+            ->addCall('addRoute', ['route' => new Reference('@event-route'), 'event-route'])
         ;
     }
 
@@ -111,6 +203,10 @@ class GroupsHooks extends Gdn_Plugin {
     public function base_render_before($sender) {
         if (is_object($menu = getValue('Menu', $sender))) {
             $menu->addLink('Groups', t('Groups'), '/groups/', false, ['class' => 'Groups']);
+        }
+
+        if (inSection(['CategoryList', 'CategoryDiscussionList', 'DiscussionList'])) {
+             $sender->addModule(new NewEventsModule());
         }
     }
 
@@ -224,7 +320,6 @@ class GroupsHooks extends Gdn_Plugin {
         foreach ($categories as $id => $cat) {
             CategoryModel::setLocalField($id, 'PermsDiscussionsView', $this->categoryPermissions[$id]);
         }
-
     }
 
 

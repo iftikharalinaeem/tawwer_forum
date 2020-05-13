@@ -7,6 +7,8 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Web\Exception\ForbiddenException;
+
 require_once(__DIR__.'/AbstractGroupsSubResource.php');
 
 /**
@@ -153,7 +155,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
      * Test POST :groupID/leave as the owner of the group.
      */
     public function testOwnerLeaveGroup() {
-        $this->expectException(\Exception::class);
+        $this->expectException(ForbiddenException::class);
         $this->expectExceptionMessage('You can\'t leave the group you started.');
 
         $originalGroup = $this->createGroup(__FUNCTION__, true);
@@ -174,6 +176,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
         // Join as one of our test user.
         $this->api()->setUserID(self::$userIDs[0]);
         $this->api()->post($this->createURL($originalGroup['groupID'], 'join'));
+        $this->clearGroupMemoryCache();
 
         // Leave
         $result = $this->api()->post(
@@ -198,6 +201,7 @@ class GroupsMembersTest extends AbstractGroupsSubResource {
          // Join as one or our test user.
         $this->api()->setUserID(self::$userIDs[0]);
         $result = $this->api()->post($this->createURL($originalGroup['groupID'], 'join'));
+        $this->clearGroupMemoryCache();
 
         // Let's continue to do requests as the group creator.
         $this->api()->setUserID(self::$siteInfo['adminUserID']);

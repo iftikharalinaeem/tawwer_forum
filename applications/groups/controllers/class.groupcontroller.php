@@ -4,6 +4,8 @@
  * @license Proprietary
  */
 
+use Vanilla\Forum\Navigation\GroupRecordType;
+
 /**
  * Class GroupController
  */
@@ -108,7 +110,15 @@ class GroupController extends Gdn_Controller {
         $maxEvents = c('Groups.Events.MaxList', 5);
         $EventModel = new EventModel();
         $upcomingRange = c('Groups.Events.UpcomingRange', '+365 days');
-        $Events = $EventModel->getUpcoming($upcomingRange, ['GroupID' => $GroupID], null, $maxEvents);
+        $Events = $EventModel->getUpcoming(
+            $upcomingRange,
+            [
+                'ParentRecordType' => GroupRecordType::TYPE,
+                'ParentRecordID' => $GroupID
+            ],
+            null,
+            $maxEvents
+        );
 
         $this->EventArguments['Events'] = &$Events;
         $this->fireEvent('GroupEventsLoaded');
@@ -941,7 +951,7 @@ class GroupController extends Gdn_Controller {
         $this->setData('Group', $group);
         $this->GroupModel->overridePermissions($group);
 
-        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        [$offset, $limit] = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
         $discussionModel = new DiscussionModel();
         $this->DiscussionData = $this->setData('Discussions', $discussionModel->getWhereRecent(['GroupID' => $group['GroupID']], $limit, $offset));
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
@@ -1040,7 +1050,7 @@ class GroupController extends Gdn_Controller {
         $this->addBreadcrumb($Group['Name'], groupUrl($Group));
         $this->addBreadcrumb(t('GroupMembers', 'Members'), groupUrl($Group, 'members'));
 
-        list($Offset, $Limit) = offsetLimit($Page, $this->GroupModel->MemberPageSize);
+        [$Offset, $Limit] = offsetLimit($Page, $this->GroupModel->MemberPageSize);
 
         // Don't show the leaders module when filtering.
         if ($memberFilter) {

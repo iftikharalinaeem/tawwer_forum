@@ -4,7 +4,15 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\NotFoundException;
+use Garden\Web\RequestInterface;
+use Vanilla\ApiUtils;
 use Vanilla\Formatting\FormatCompatTrait;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Forum\Navigation\GroupRecordType;
+use Vanilla\Groups\Models\EventPermissions;
+use Vanilla\Models\GenericRecord;
+use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Groups Application - Event Controller
@@ -24,7 +32,29 @@ class EventController extends Gdn_Controller {
     protected $Form;
 
     /** @var GroupModel */
-    protected $GroupModel;
+    private $groupModel;
+
+    /** @var EventModel */
+    private $eventModel;
+
+    /** @var BreadcrumbModel */
+    private $breadcrumbModel;
+
+    /** @var RequestInterface */
+    private $request;
+
+    /**
+     * DI.
+     * @inheritdoc
+     */
+    public function __construct(GroupModel $groupModel, EventModel $eventModel, BreadcrumbModel $breadcrumbModel, RequestInterface $request) {
+        parent::__construct();
+        $this->groupModel = $groupModel;
+        $this->eventModel = $eventModel;
+        $this->breadcrumbModel = $breadcrumbModel;
+        $this->request = $request;
+    }
+
 
     /**
      * Include JS, CSS, and modules used by all methods.
@@ -80,8 +110,12 @@ class EventController extends Gdn_Controller {
      * Common add/edit functionality
      *
      * @param integer $eventID
+     * @param string $parentRecordType
+     * @param int $parentRecordID
+     *
+     * @return array|null
      */
-    protected function addEdit($eventID = null, $groupID = null) {
+    protected function addEdit($eventID = null, ?string $parentRecordType = null, ?int $parentRecordID = null): ?array {
         $this->permission('Garden.SignIn.Allow');
 
         $this->addJsFile('jquery.timepicker.min.js');
@@ -93,84 +127,75 @@ class EventController extends Gdn_Controller {
 
         // Lookup event
         if ($eventID) {
-            $eventModel = new EventModel();
-            $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
-            if (!$event) throw notFoundException('Event');
+            $this->eventModel->checkEventPermission(EventPermissions::EDIT, $eventID);
+
+            $event = $this->eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+            if (!$event) {
+                throw new NotFoundException('Event');
+            }
 
             $this->applyFormatCompatibility($event, 'Body', 'Format');
             $this->setData('Event', $event);
-            $groupID = $event['GroupID'];
+
+            // These get ignored when editing an event.
+            $parentRecordType = null;
+            $parentRecordID = null;
+            $breadcrumbs = $this->breadcrumbModel->getForRecord(new EventRecordType($eventID));
+        } else {
+            $parentRecordType = $parentRecordType ?? ForumCategoryRecordType::TYPE;
+            $parentRecordID = $parentRecordID ?? -1;
+            $this->eventModel->checkParentEventPermission(EventPermissions::CREATE, $parentRecordType, $parentRecordID);
+            $this->setData([
+                'parentRecordType' => $parentRecordType,
+                'parentRecordID' => $parentRecordID,
+            ]);
+            $breadcrumbs = $this->breadcrumbModel->getForRecord(new GenericRecord($parentRecordType, $parentRecordID));
         }
 
-        // Lookup group, if there is one
-        if ($groupID) {
-            $groupModel = new GroupModel();
-            $group = $groupModel->getID($groupID);
-            $this->verifyGroupAccess($group);
-            $this->setData('Group', $group);
+        // This is an old controller using the new breadcrumb model, so we need to pop off the first crumb.
+        // Old themes have some very, very specific breadcrumb handling.
+        array_shift($breadcrumbs);
+
+        foreach ($breadcrumbs as $crumb) {
+            $this->addBreadcrumb($crumb->getName(), $crumb->getUrl());
         }
 
-        // Add breadcrumbs
-        if ($group) {
-            $this->addBreadcrumb($group['Name'], groupUrl($group));
+        if (!$eventID) {
+            $this->addBreadcrumb(t('New Event'));
         }
 
-        if ($event) {
-            $this->addBreadcrumb($event['Name'], eventUrl($event));
-        }
-
-        return [$event, $group];
+        return $event;
     }
 
     /**
      * Create a new event
      *
-     * @param integer $GroupID Optional, if we're creating a group event
-     * @throws Exception
+     * @param int $parentRecordID Optional, if we're creating an event.
      */
-    public function add($GroupID = null) {
-        list($Event, $Group) = $this->addEdit(null, $GroupID);
-
-        if ($GroupID) {
-            if(!groupPermission('Member')) {
-                throw forbiddenException('@' . groupPermission('View.Reason', $GroupID));
-            }
-        }
-
-        if (!eventPermission('Create')) {
-            throw forbiddenException('create a new event');
-        }
+    public function add($parentRecordID = null) {
+        $parentRecordType = $this->request->getQuery()['parentRecordType'] ?? GroupRecordType::TYPE;
+        $this->addEdit(null, $parentRecordType, $parentRecordID);
 
         $this->title(t('New Event'));
-        $this->addBreadcrumb($this->title());
 
-
-        // TODO: Event create permission
-
-
-        $EventModel = new EventModel();
-        $this->Form->setModel($EventModel);
+        $this->Form->setModel($this->eventModel);
         if ($this->Form->isPostBack()) {
-            $EventData = $this->Form->formValues();
+            $eventData = $this->Form->formValues();
 
-            if ($GroupID) {
-                $EventData['GroupID'] = $GroupID;
+            if ($parentRecordID) {
+                $eventData['ParentRecordID'] = $parentRecordID;
+                $eventData['ParentRecordType'] = $parentRecordType;
             }
 
             // Apply munged event data back to form
             $this->Form->clearInputs();
-            $this->Form->setFormValue($EventData);
+            $this->Form->setFormValue($eventData);
 
-            if ($EventID = $this->Form->save()) {
-                $EventData['EventID'] = $EventID;
-                if (val('GroupID',$EventData, false)) {
-                    $EventModel->inviteGroup($EventID, $GroupID);
-                }
-
-                $this->informMessage(formatString(t("New event created for <b>'{Name}'</b>"), $EventData));
-                redirectTo(eventUrl($EventData));
+            if ($eventID = $this->Form->save()) {
+                $eventData['EventID'] = $eventID;
+                $this->informMessage(formatString(t("New event created for <b>'{Name}'</b>"), $eventData));
+                redirectTo($this->eventModel->eventUrl($eventData));
             }
-
         }
 
         // Pull in group and event functions
@@ -185,39 +210,32 @@ class EventController extends Gdn_Controller {
     /**
      * Edit an event
      *
-     * @param type $EventID
+     * @param type $eventID
      */
-    public function edit($EventID) {
-        list($Event, $Group) = $this->addEdit($EventID);
-
-        if (!eventPermission('Edit')) {
-            throw forbiddenException('edit this event');
-        }
+    public function edit($eventID) {
+        $event = $this->addEdit($eventID);
         $this->title(t('Edit Event'));
-        $this->addBreadcrumb($this->title());
-        $this->Form->setData($Event);
+        $this->Form->setData($event);
 
-        $EventModel = new EventModel();
-        $this->Form->setModel($EventModel);
+        $this->Form->setModel($this->eventModel);
         if ($this->Form->isPostBack()) {
-            $EventData = $this->Form->formValues();
+            $eventData = $this->Form->formValues();
 
             // Re-assign IDs
-            $EventData['EventID'] = $Event['EventID'];
-            $EventData['GroupID'] = $Event['GroupID'];
+            $eventData['EventID'] = $event['EventID'];
+            $eventData['GroupID'] = $event['GroupID'];
+            $eventData['ParentRecordID'] = $event['ParentRecordID'];
+            $eventData['ParentRecordType'] = $event['ParentRecordType'];
 
             // Apply munged event data back to form
             $this->Form->clearInputs();
-            $this->Form->setFormValue($EventData);
+            $this->Form->setFormValue($eventData);
 
-            if ($EventID = $this->Form->save()) {
-                $EventData['EventID'] = $EventID;
-                if ($GroupID = val('GroupID',$EventData, false)) {
-                    $EventModel->inviteGroup($EventID, $GroupID);
-                }
+            if ($eventID = $this->Form->save()) {
+                $eventData['EventID'] = $eventID;
 
-                $this->informMessage(formatString(t("<b>'{Name}'</b> has been updated"), $EventData));
-                redirectTo(eventUrl($Event));
+                $this->informMessage(formatString(t("<b>'{Name}'</b> has been updated"), $eventData));
+                redirectTo($this->eventModel->eventUrl($event));
             }
         }
 
@@ -233,74 +251,49 @@ class EventController extends Gdn_Controller {
     /**
      * View an event.
      *
-     * @param integer $EventID Event ID (and optional -slug)
-     * @return type
-     * @throws Exception
+     * @param string $eventIDAndSlug Event ID (and optional -slug)
      */
-    public function event($EventID) {
+    public function event(string $eventIDAndSlug) {
         // Lookup event
-        $EventModel = new EventModel();
-        $Event = $EventModel->getID($EventID, DATASET_TYPE_ARRAY);
-        if (!$Event) {
+        $event = $this->eventModel->getID($eventIDAndSlug, DATASET_TYPE_ARRAY);
+        if (!$event) {
             throw notFoundException('Event');
         }
-        $ViewEvent = false;
+        $eventID = $event['EventID'];
+        $this->eventModel->checkEventPermission(EventPermissions::VIEW, $eventID);
 
         // Check our invite status
-        $InvitedToEvent = $EventModel->isInvited(Gdn::session()->UserID, $EventID);
+        $InvitedToEvent = $this->eventModel->isInvited(Gdn::session()->UserID, $eventID);
+
+        // Apply breadcrumbs. We need to pop off the first crumb to conform with our old theme breadcrumbs.
+        $crumbs = $this->breadcrumbModel->getForRecord(new EventRecordType($eventID));
+        array_shift($crumbs);
+        foreach ($crumbs as $crumb) {
+            $this->addBreadcrumb($crumb->getName(), $crumb->getUrl());
+        }
 
         // Lookup group, if there is one
-        $GroupID = val('GroupID', $Event, false);
-        $Group = false;
-        if ($GroupID) {
-            $GroupModel = new GroupModel();
-            $Group = $GroupModel->getID($GroupID, DATASET_TYPE_ARRAY);
-            $this->verifyGroupAccess($Group);
+        $parentRecordType = $event['ParentRecordType'];
+        $parentRecordID = $event['ParentRecordID'];
+
+        if ($parentRecordType === GroupRecordType::TYPE) {
+            $group = $this->groupModel->getID($parentRecordID, DATASET_TYPE_ARRAY);
         }
 
-        $this->EventArguments['Event'] = &$Event;
-        $this->EventArguments['Group'] = &$Group;
+        $this->EventArguments['Event'] = &$event;
+        $this->EventArguments['Group'] = &$group;
         $this->fireEvent('EventLoaded');
+        $this->setData('Group', $group ?? null);
 
-        if ($Group) {
-            $this->setData('Group', $Group);
-
-            // Check if this person is a member of the group or a moderator
-            $MemberOfGroup = $GroupModel->isMember(Gdn::session()->UserID, $GroupID);
-            if ($MemberOfGroup || Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-                $ViewEvent = true;
-            }
-
-            $this->addBreadcrumb('Groups', url('/groups'));
-            $this->addBreadcrumb($Group['Name'], groupUrl($Group));
-        } else {
-            // Group organizer
-            if ($Event['InsertUserID'] == Gdn::session()->UserID) {
-                $ViewEvent = true;
-            }
-
-            // No group, so user has to have been invited to view
-            if ($InvitedToEvent || checkPermission('Garden.Moderation.Manage')) {
-                $ViewEvent = true;
-            }
-
-            $this->addBreadcrumb('Events', url('/events'));
-        }
-
-        // No permission
-        if (!$ViewEvent) {
-            throw forbiddenException('view this event');
-        }
-
-        $this->title($Event['Name']);
-        $this->addBreadcrumb($this->title());
+        $this->title($event['Name']);
         $this->CssClass .= ' NoPanel';
 
-        $OrganizerID = $Event['InsertUserID'];
-        $Organizer = Gdn::userModel()->getID($OrganizerID, DATASET_TYPE_ARRAY);
-        $Event['Organizer'] = $Organizer;
+        $OrganizerID = $event['InsertUserID'];
+        $Organizer = Gdn::userModel()->getFragmentByID($OrganizerID);
+        $Organizer = ApiUtils::convertInputKeys($Organizer);
+        $event['Organizer'] = $Organizer;
 
-        $this->setData('Event', $Event);
+        $this->setData('Event', $event);
         $this->setData('Attending', $InvitedToEvent);
 
         if ($InvitedToEvent != 'Invited') {
@@ -308,7 +301,7 @@ class EventController extends Gdn_Controller {
         }
 
         // Invited
-        $Invited = $EventModel->invited($EventID);
+        $Invited = $this->eventModel->invited($eventID);
         $this->setData('Invited', $Invited);
 
         // Pull in group functions
@@ -318,7 +311,7 @@ class EventController extends Gdn_Controller {
         $this->addModule('DiscussionFilterModule');
         $this->RequestMethod = 'event';
         $this->View = 'event';
-        return $this->render();
+        $this->render();
     }
 
     /**
@@ -327,23 +320,17 @@ class EventController extends Gdn_Controller {
      * @param integer $eventID
      */
     public function delete($eventID) {
-        list($event, $group) = $this->addEdit($eventID);
-
-        if (!eventPermission('Edit')) {
-            throw forbiddenException('delete this event');
-        }
+        $event = $this->addEdit($eventID);
 
         if ($this->Form->authenticatedPostBack()) {
-            $eventModel = new EventModel();
-            $deleted = $eventModel->delete(['EventID' => $eventID]);
+            $deleted = $this->eventModel->delete(['EventID' => $eventID]);
 
             if ($deleted) {
                 $this->informMessage(formatString(t('<b>{Name}</b> deleted.'), $event));
-                if ($group) {
-                    $this->setRedirectTo(groupUrl($group));
-                } else {
-                    $this->setRedirectTo('/groups');
-                }
+                $crumbs = $this->breadcrumbModel->getForRecord(new GenericRecord($event['ParentRecordType'], $event['ParentRecordID']));
+                $secondToLastCrumb = $crumbs[count($crumbs) - 1] ?? null;
+                $redirectUrl = $secondToLastCrumb ? $secondToLastCrumb->getUrl() : '/groups';
+                $this->setRedirectTo($redirectUrl);
             } else {
                 $this->informMessage(t('Failed to delete event.'));
             }
@@ -368,54 +355,20 @@ class EventController extends Gdn_Controller {
         }
 
         $eventID = $this->Form->getFormValue('EventID');
+        // Can we attend?
+        $this->eventModel->checkEventPermission(EventPermissions::ATTEND, $eventID);
+
         $attending = $this->Form->getFormValue('Attending');
 
         // Lookup event
-        $eventModel = new EventModel();
-        $event = $eventModel->getID($eventID, DATASET_TYPE_ARRAY);
+        $event = $this->eventModel->getID($eventID, DATASET_TYPE_ARRAY);
         if (!$event) {
             throw notFoundException('Event');
         }
-        $attendEvent = false;
 
         // Check our invite status
-        $invitedToEvent = $eventModel->isInvited(Gdn::session()->UserID, $eventID);
-
-        // Lookup group, if there is one
-        $groupID = val('GroupID', $event, false);
-        if ($groupID) {
-            $groupModel = new GroupModel();
-            $group = $groupModel->getID($groupID, DATASET_TYPE_ARRAY);
-            $this->verifyGroupAccess($group);
-
-            // Check if this person is a member of the group or a moderator
-            $memberOfGroup = $groupModel->isMember(Gdn::session()->UserID, $groupID);
-            if ($memberOfGroup) {
-                $attendEvent = true;
-            }
-
-            $this->addBreadcrumb('Groups', url('/groups'));
-            $this->addBreadcrumb($group['Name'], groupUrl($group));
-        } else {
-            // Group organizer
-            if ($event['InsertUserID'] == Gdn::session()->UserID) {
-                $attendEvent = true;
-            }
-
-            // No group, so user has to have been invited to view
-            if ($invitedToEvent) {
-                $attendEvent = true;
-            }
-
-            $this->addBreadcrumb('Events', url('/events'));
-        }
-
-        // No permission
-        if (!$attendEvent) {
-            throw forbiddenException('attend this event');
-        }
-        $eventName = val('Name', $event, t('this event'));
-        $eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
+        $eventName = $event['Name'] ?? t('this event');
+        $this->eventModel->attend(Gdn::session()->UserID, $eventID, $attending);
 
         $this->informMessage(sprintf(t('Your status for %s is now: <b>%s</b>'), htmlspecialchars($eventName), t($attending)));
         $this->jsonTarget('#EventAttendees', $this->attendees($eventID));
@@ -429,8 +382,7 @@ class EventController extends Gdn_Controller {
      * @return string
      */
     protected function attendees($eventID) {
-        $eventModel = new EventModel();
-        $invited = $eventModel->invited($eventID);
+        $invited = $this->eventModel->invited($eventID);
         $this->setData('Invited', $invited);
 
         $attendeesView = $this->fetchView('attendees', 'event', 'groups');
@@ -509,18 +461,6 @@ class EventController extends Gdn_Controller {
                  wrap($fromStr, 'time', ['datetime' => $fromParts[3]]),
                  wrap($toStr, 'time', ['datetime' => $toParts[3]])
             );
-        }
-    }
-
-    /**
-     * Verify a user can access a group.
-     *
-     * @param array $group A group row.
-     * @throws Gdn_UserException If the group cannot be accessed by the current user.
-     */
-    private function verifyGroupAccess($group) {
-        if (!$group || !$this->GroupModel->checkPermission('Access', $group)) {
-            throw notFoundException('Group');
         }
     }
 }

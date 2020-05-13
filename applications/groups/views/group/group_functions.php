@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php use Vanilla\Groups\Models\GroupPermissions;
+
+if (!defined('APPLICATION')) exit();
 
 if (!function_exists('DateTile')):
     /**
@@ -27,23 +29,22 @@ if (!function_exists('getGroupOptions')):
  * @return array The options for the group that the user can access.
  */
 function getGroupOptions($group, $sectionId = 'home') {
-     $options = [];
-     if (groupPermission('Edit', $group)) {
-          $options['Edit'] = ['Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => groupUrl($group, 'edit')];
-     }
-     if (groupPermission('Leave', $group)) {
-          $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => groupUrl($group, 'leave'), 'CssClass' => 'Popup'];
-     }
-     if (groupPermission('Leader', $group)) {
-          $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => groupUrl($group, 'delete'), 'CssClass' => 'Popup'];
-     }
-     if (groupPermission('Leader', $group)) {
-          $options['Invite'] = ['Text' => t('Invite Members'), 'Url' => groupUrl($group, 'invite'), 'CssClass' => 'js-invite-members'];
-     }
-     if (groupPermission('Leader', $group)) {
-          $options['Members'] = ['Text' => t('Manage Members'), 'Url' => groupUrl($group, 'members')];
-     }
-     return $options;
+    /** @var GroupModel $groupModel */
+    $groupModel = \Gdn::getContainer()->get(GroupModel::class);
+    $groupID = $group['GroupID'];
+    $options = [];
+    if ($groupModel->hasGroupPermission(GroupPermissions::EDIT, $groupID)) {
+        $options['Edit'] = ['Text' => sprintf(t('Edit %s'), t('Group')), 'Url' => groupUrl($group, 'edit')];
+    }
+    if ($groupModel->hasGroupPermission(GroupPermissions::LEAVE, $groupID)) {
+        $options['Leave'] = ['Text' => t('Leave Group'), 'Url' => groupUrl($group, 'leave'), 'CssClass' => 'Popup'];
+    }
+    if ($groupModel->hasGroupPermission(GroupPermissions::LEADER, $groupID)) {
+        $options['Delete'] = ['Text' => sprintf(t('Delete %s'), t('Group')), 'Url' => groupUrl($group, 'delete'), 'CssClass' => 'Popup'];
+        $options['Invite'] = ['Text' => t('Invite Members'), 'Url' => groupUrl($group, 'invite'), 'CssClass' => 'js-invite-members'];
+        $options['Members'] = ['Text' => t('Manage Members'), 'Url' => groupUrl($group, 'members')];
+    }
+    return $options;
 }
 endif;
 
@@ -55,25 +56,30 @@ if (!function_exists('getGroupButtons')):
  * @return array The buttons for the group.
  */
 function getGroupButtons($group) {
-     $groupModel = new GroupModel();
-     $buttons = [];
-     if (Gdn::session()->isValid() && !groupPermission('Member', $group) && groupPermission('Join', $group) && !$groupModel->getApplicantType(val('GroupID', $group))) {
-          $joinButton['text'] = t('Join');
-          $joinButton['url'] = groupUrl($group, 'join');
-          $joinButton['cssClass'] = 'Popup';
-          $buttons[] = $joinButton;
-     }
-     if (Gdn::session()->isValid() && ($groupModel->getApplicantType(val('GroupID', $group))) === 'Invitation') {
-          $acceptButton['text'] = t('Join');
-          $acceptButton['url'] = groupUrl($group, 'inviteaccept');
-          $acceptButton['cssClass'] = 'Hijack';
-          $declineButton['text'] = t('Decline');
-          $declineButton['url'] = groupUrl($group, 'invitedecline');
-          $declineButton['cssClass'] = 'Hijack';
-          $buttons[] = $acceptButton;
-          $buttons[] = $declineButton;
-     }
-     return $buttons;
+    /** @var GroupModel $groupModel */
+    $groupModel = \Gdn::getContainer()->get(GroupModel::class);
+    $groupID = $group['GroupID'];
+    $buttons = [];
+    if (Gdn::session()->isValid()
+        && $groupModel->hasGroupPermission(GroupPermissions::JOIN, $groupID)
+        && !$groupModel->getApplicantType($groupID)
+    ) {
+        $joinButton['text'] = t('Join');
+        $joinButton['url'] = groupUrl($group, 'join');
+        $joinButton['cssClass'] = 'Popup';
+        $buttons[] = $joinButton;
+    }
+    if (Gdn::session()->isValid() && ($groupModel->getApplicantType($groupID)) === 'Invitation') {
+        $acceptButton['text'] = t('Join');
+        $acceptButton['url'] = groupUrl($group, 'inviteaccept');
+        $acceptButton['cssClass'] = 'Hijack';
+        $declineButton['text'] = t('Decline');
+        $declineButton['url'] = groupUrl($group, 'invitedecline');
+        $declineButton['cssClass'] = 'Hijack';
+        $buttons[] = $acceptButton;
+        $buttons[] = $declineButton;
+    }
+    return $buttons;
 }
 endif;
 
@@ -199,8 +205,10 @@ function writeGroupButtons($group = null) {
     if (!$group)
         return;
     echo '<div class="Group-Buttons">';
+    /** @var GroupModel $groupModel */
+    $groupModel = \Gdn::getContainer()->get(GroupModel::class);
 
-    if (Gdn::session()->isValid() && !groupPermission('Member', $group)) {
+    if (Gdn::session()->isValid() && !$groupModel->hasGroupPermission(GroupPermissions::MEMBER, $group['groupID'])) {
         if (groupPermission('Join', $group)) {
             echo ' '.anchor(t('Join this Group'), groupUrl($group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
         } else {
@@ -346,7 +354,9 @@ function writeGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLin
     }
     if ($icon) {
          $output = '';
-         if ($addChangeIconLink && groupPermission('Edit', val('GroupID', $group))) {
+        /** @var GroupModel $groupModel */
+        $groupModel = \Gdn::getContainer()->get(GroupModel::class);
+         if ($addChangeIconLink && $groupModel->hasGroupPermission(GroupPermissions::EDIT, $group['GroupID'])) {
               $output .= '';
               $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), groupUrl($group, 'groupicon'), 'ChangePicture');
          }

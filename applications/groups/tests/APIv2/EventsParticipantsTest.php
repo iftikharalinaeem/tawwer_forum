@@ -7,10 +7,14 @@
 
 namespace VanillaTests\APIv2;
 
+use VanillaTests\Groups\Utils\GroupsAndEventsApiTestTrait;
+
 /**
  * Test the /api/v2/events/:eventID/participants sub-resource endpoints.
  */
 class EventsParticipantsTest extends AbstractAPIv2Test {
+
+    use GroupsAndEventsApiTestTrait;
 
     protected static $group;
 
@@ -64,30 +68,6 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Create an event.
-     *
-     * @param string $testName Name of the test function from which the event is created.
-     * @return array The created event.
-     */
-    protected function createEvent($testName) {
-        /** @var \EventsApiController $eventsAPIController */
-        $eventsAPIController = static::container()->get('EventsApiController');
-
-        $name = uniqid($testName.' ');
-        $event = $eventsAPIController->post([
-            'groupID' => self::$group['groupID'],
-            'name' => $name,
-            'body' => "$name description",
-            'format' => 'markdown',
-            'location' => 'Somewhere',
-            'dateStarts' => date(\DateTime::RFC3339),
-            'dateEnds' => date(\DateTime::RFC3339, now() + 36000),
-        ]);
-
-        return (array)$event;
-    }
-
-    /**
      * Create an endpoint URL.
      * /events/:eventID[/:action][/:userID]
      *
@@ -116,9 +96,11 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      * @param string|null $attending
      */
     public function testRSVP($attending) {
-        $event = $this->createEvent(__FUNCTION__." $attending");
-
+        $this->createGroup();
+        $event = $this->createEvent();
         $this->api()->setUserID(self::$userIDs[0]);
+        $this->joinGroup();
+
         $result = $this->api()->post(
             $this->createURL($event['eventID'], 'participants'),
             [
@@ -145,7 +127,8 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      * @param string|null $attending
      */
     public function testRSVPForUser($attending) {
-        $event = $this->createEvent(__FUNCTION__." $attending");
+        $this->createGroup();
+        $event = $this->createEvent();
 
         $result = $this->api()->post(
             $this->createURL($event['eventID'], 'participants'),
@@ -171,9 +154,11 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      *
      */
     public function testRSVPMultipleTimes() {
-        $event = $this->createEvent(__FUNCTION__);
-
+        $this->createGroup();
+        $event = $this->createEvent();
         $this->api()->setUserID(self::$userIDs[0]);
+        $this->joinGroup();
+
         foreach (['maybe', null, 'yes', 'no'] as $attending) {
             $result = $this->api()->post(
                 $this->createURL($event['eventID'], 'participants'),
@@ -207,10 +192,12 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      * @depends testRSVP
      */
     public function testListParticipants() {
-        $event = $this->createEvent(__FUNCTION__);
+        $this->createGroup();
+        $event = $this->createEvent();
 
         foreach (self::$userIDs as $userID) {
             $this->api()->setUserID($userID);
+            $this->joinGroup();
             $this->api()->post(
                 $this->createURL($event['eventID'], 'participants'),
                 [
@@ -239,12 +226,14 @@ class EventsParticipantsTest extends AbstractAPIv2Test {
      * @depends testListParticipants
      */
     public function testListParticipantsWithAttendingFilter() {
-        $event = $this->createEvent(__FUNCTION__);
+        $this->createGroup();
+        $event = $this->createEvent();
 
         $attendingAnswers = ['maybe', null, 'yes', 'no'];
         foreach ($attendingAnswers as $index => $attending) {
             $userID = self::$userIDs[$index];
             $this->api()->setUserID($userID);
+            $this->joinGroup();
             $result = $this->api()->post(
                 $this->createURL($event['eventID'], 'participants'),
                 [
