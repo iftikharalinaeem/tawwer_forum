@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IEvent, EventAttendance } from "@groups/events/state/eventsTypes";
+import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
 import { AttendanceStamp } from "@groups/events/ui/AttendanceStamp";
 import { eventsClasses, eventsVariables } from "@groups/events/ui/eventStyles";
 import DateTime, { DateFormats } from "@library/content/DateTime";
@@ -14,6 +14,8 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import classNames from "classnames";
 import { calc } from "csx";
 import React from "react";
+import { EventPermission } from "@groups/events/state/EventPermission";
+import EventAttendanceDropDown from "@groups/events/ui/EventAttendanceDropDown";
 
 interface IProps {
     event: IEvent;
@@ -21,7 +23,6 @@ interface IProps {
     className?: string;
     compact?: boolean;
     longestCharCount?: number; // for dynamic width, based on language
-    options?: React.ReactNode;
 }
 
 /**
@@ -34,7 +35,7 @@ export function Event(props: IProps) {
     const HeadingTag = (props.headingLevel ? `h${props.headingLevel}` : "h2") as "h2" | "h3";
 
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
-    const showAttendance = props.compact && event.attending !== EventAttendance.NOT_GOING;
+    const showAttendance = props.compact && event.attending !== EventAttendance.RSVP;
     const showMetas = event.location || !props.compact || showAttendance;
     return (
         <li className={classNames(classes.item, props.className)}>
@@ -85,17 +86,19 @@ export function Event(props: IProps) {
                         </div>
                     </div>
                 </SmartLink>
-                {!props.compact && props.options && (
-                    <div
-                        className={classes.attendance}
-                        style={{
-                            flexBasis: `${attendanceWidth}`,
-                            width: `${attendanceWidth}`,
-                        }}
-                    >
-                        {props.options}
-                    </div>
-                )}
+                <EventPermission permission={EventPermissionName.ATTEND} event={props.event}>
+                    {!props.compact && (
+                        <div
+                            className={classes.attendance}
+                            style={{
+                                flexBasis: `${attendanceWidth}`,
+                                width: `${attendanceWidth}`,
+                            }}
+                        >
+                            <EventAttendanceDropDown event={props.event} />
+                        </div>
+                    )}
+                </EventPermission>
             </article>
         </li>
     );

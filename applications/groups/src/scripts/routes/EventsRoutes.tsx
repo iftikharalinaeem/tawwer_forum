@@ -15,7 +15,7 @@ function getEventPath(path: string = "") {
 
 export const EventsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "events/pages/EventsPage" */ "@groups/events/pages/EventsPage"),
-    [getEventPath("/:parentRecordType/:parentRecordID(\\d+)(-[^/]+)?"), getEventPath()],
+    [getEventPath("/:parentRecordType/:parentRecordID(-?\\d+)(-[^/]+)?"), getEventPath()],
     (data?: { parentRecordType: string; parentRecordID: number }) =>
         getEventPath(`/${data?.parentRecordType}/${data?.parentRecordID}`),
 );
