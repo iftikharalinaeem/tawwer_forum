@@ -119,7 +119,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/FullEvent'
           description: Success
       tags:
       - Events
@@ -155,6 +155,11 @@ paths:
         required: true
         schema:
           type: integer
+      - description: UserID
+        in: query
+        name: userID
+        schema:
+          type: integer
       - description: Expand breadcrumbs.
         in: query
         name: expand
@@ -188,7 +193,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/FullEvent'
           description: Success
       tags:
       - Events
@@ -214,7 +219,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/FullEvent'
           description: Success
       tags:
       - Events
@@ -350,6 +355,15 @@ components:
         allDayEvent:
           description: Does the event take the whole day.
           type: boolean
+        attending:
+          description: Is the participant attending the event.
+          enum:
+            - 'yes'
+            - 'no'
+            - maybe
+          minLength: 1
+          nullable: true
+          type: string
         insertUserID:
           description: The id of the user who created the event.
           type: integer
@@ -385,6 +399,9 @@ components:
         url:
           description: The full URL to the event.
           type: string
+        userID:
+          description: The user ID of the participant.
+          type: integer
       required:
         - eventID
         - parentRecordType
@@ -431,6 +448,15 @@ components:
             description: The description of the event.
             minLength: 1
             type: string
+          parentRecordType:
+            description: The parent type of the event.
+            enum:
+            - group
+            - category
+            type: string
+          parentRecordID:
+            description: The ID of the event parent.
+            type: integer
           dateEnds:
             description: When the event ends.
             format: date-time
@@ -456,12 +482,13 @@ components:
             minLength: 1
             type: string
         required:
-        - groupID
         - name
         - body
         - format
         - location
         - dateStarts
+        - parentRecordType
+        - parentRecordID
         type: object
     EventPatch:
       properties:
@@ -469,6 +496,15 @@ components:
           description: The description of the event.
           minLength: 1
           type: string
+        parentRecordType:
+          description: The parent type of the event.
+          enum:
+          - group
+          - category
+          type: string
+        parentRecordID:
+          description: The ID of the event parent.
+          type: integer
         dateEnds:
           description: When the event ends.
           format: date-time
@@ -493,4 +529,6 @@ components:
           description: The name of the event.
           minLength: 1
           type: string
+      required:
+        - parentRecordType
       type: object
