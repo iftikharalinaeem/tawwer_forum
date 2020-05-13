@@ -53,7 +53,9 @@ function writeEventCard($event) {
     } else {
 
         echo dateTile($dateStarts->format('Y-m-d'));
-        echo '<h3 class="Event-Title">'.anchor(Gdn_Format::text($event['Name']), eventUrl($event));
+        /** @var EventModel $eventModel */
+        $eventModel = \Gdn::getContainer()->get(EventModel::class);
+        echo '<h3 class="Event-Title">'.anchor(Gdn_Format::text($event['Name']), $eventModel->eventUrl($event));
         if ($dateStarts->format('g:ia') != '12:00am')
             echo ' <span class="Event-Time MItem">'.$dateStarts->format('g:ia').'</span>';
         echo '</h3>';
