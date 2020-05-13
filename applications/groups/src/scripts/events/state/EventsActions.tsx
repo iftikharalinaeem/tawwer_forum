@@ -57,7 +57,7 @@ export class EventsActions extends ReduxActions {
 
     public getEventList = (params: IGetEventsQuery) => {
         const thunk = bindThunkAction(EventsActions.getEventListACs, async () => {
-            const response = await this.api.get(`/events?expand[]=permissions`, { params });
+            const response = await this.api.get(`/events`, { params: { ...params, expand: true } });
             const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
             const result: IEventList = {
                 events: response.data,

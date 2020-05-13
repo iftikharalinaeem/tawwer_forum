@@ -352,7 +352,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const viewMore = style("viewMore", {
-        marginTop: globalVars.gutter.half,
+        ...margins({
+            vertical: globalVars.gutter.half,
+        }),
         display: "block",
         textAlign: "right",
     });
@@ -454,6 +456,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
     });
 
+    const panelHeading = style("panelHeading", {
+        ...margins({ bottom: globalVars.gutter.half }),
+    });
+
     return {
         root,
         item,
@@ -492,5 +498,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         sectionTitle,
         description,
         organizer,
+        panelHeading,
     };
 });
