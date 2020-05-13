@@ -125,7 +125,8 @@ class EventModel extends Gdn_Model {
         }
         $slug = Gdn_Format::url($parentRecordName);
         $siteSectionPath = $this->getSiteSectionPathForParentRecord($parentRecordType, $parentRecordID);
-        return "${siteSectionPath}/events/${parentRecordType}/${parentRecordID}-${slug}";
+        $result = "${siteSectionPath}/events/${parentRecordType}/${parentRecordID}-${slug}";
+        return \Gdn::request()->getSimpleUrl($result);
     }
 
     /**

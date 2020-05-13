@@ -76,7 +76,10 @@ export function Event(props: IProps) {
                                     {showAttendance && (
                                         <AttendanceStamp
                                             attending={event.attending}
-                                            className={classNames(classes.meta, classes.metaAttendance)}
+                                            className={classNames(
+                                                classes.meta,
+                                                !props.compact && classes.metaAttendance,
+                                            )}
                                         />
                                     )}
                                     {event.location && <div className={classes.meta}>{event.location}</div>}

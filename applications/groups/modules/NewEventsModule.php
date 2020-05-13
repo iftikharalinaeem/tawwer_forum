@@ -79,6 +79,7 @@ class NewEventsModule extends Gdn_Module {
             $events = $this->eventApi->index(array_merge($this->getDateFiltersForMode(), [
                 'parentRecordType' => $this->parentRecordType,
                 'parentRecordID' => $this->parentRecordID,
+                'expand' => true,
             ]));
 
             if (count($events) === 0) {

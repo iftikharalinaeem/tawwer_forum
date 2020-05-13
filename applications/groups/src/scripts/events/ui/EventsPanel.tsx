@@ -36,7 +36,7 @@ export function EventsPanel(props: IProps) {
     const classes = eventsClasses();
     return (
         <>
-            <Heading>{title}</Heading>
+            <Heading className={classes.panelHeading}>{title}</Heading>
             <EventList events={events} compact={true} headingLevel={(headingLevel + 1) as 3 | 4} />
             <SmartLink to={viewMoreLink} className={classes.viewMore}>
                 {viewMoreText}
