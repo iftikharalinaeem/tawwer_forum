@@ -139,5 +139,4 @@ class NewEventsModule extends Gdn_Module {
                 return [];
         }
     }
-
 }
