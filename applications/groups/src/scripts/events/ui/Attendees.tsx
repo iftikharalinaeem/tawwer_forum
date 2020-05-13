@@ -13,7 +13,7 @@ import React from "react";
 interface IProps {
     data: IUserFragment[];
     title: string;
-    extra?: number;
+    extra: number;
     separator?: boolean;
     depth?: 2 | 3;
     maxCount?: number;
@@ -30,6 +30,8 @@ export function EventAttendees(props: IProps) {
     const classes = eventsClasses();
     const HeadingTag = `h${depth}` as "h1";
 
+    const extraCount = extra - maxCount;
+
     return (
         <section className={classNames(classes.section, props.className)}>
             {separator && <hr className={classes.separator} />}
@@ -38,6 +40,9 @@ export function EventAttendees(props: IProps) {
             {!empty && (
                 <ul className={classes.attendeeList}>
                     {data.map((user, i) => {
+                        if (i >= maxCount) {
+                            return null;
+                        }
                         return (
                             <li
                                 className={classNames(classes.attendee, {
@@ -53,9 +58,9 @@ export function EventAttendees(props: IProps) {
                             </li>
                         );
                     })}
-                    {extra && (
+                    {extraCount > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
-                            +<NumberFormatted value={extra} />
+                            +<NumberFormatted value={extraCount} />
                         </li>
                     )}
                 </ul>

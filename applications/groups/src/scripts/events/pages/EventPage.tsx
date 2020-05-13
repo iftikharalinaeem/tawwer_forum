@@ -6,8 +6,6 @@
 import { useEvent, useEventAttendance } from "@groups/events/state/eventsHooks";
 import { EventDetails } from "@groups/events/ui/EventDetails";
 import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
-import PageTitle from "@knowledge/modules/common/PageTitle";
-import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import Container from "@library/layout/components/Container";
@@ -22,6 +20,7 @@ import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 import { notEmpty } from "@vanilla/utils";
 import React from "react";
 import { useParams } from "react-router";
+import { PageHeading } from "@library/layout/PageHeading";
 
 export default function EventPage() {
     let eventID = useParams<{
@@ -93,7 +92,7 @@ export default function EventPage() {
                 }
                 middleTop={
                     <PanelWidget>
-                        <PageTitle
+                        <PageHeading
                             title={event.name}
                             actions={<EventsOptionsDropDown event={event} />}
                             includeBackLink={false}
@@ -119,7 +118,6 @@ export default function EventPage() {
                         />
                     </PanelWidget>
                 }
-                rightTop={<PanelEmptyColumn />}
             />
         </Container>
     );
