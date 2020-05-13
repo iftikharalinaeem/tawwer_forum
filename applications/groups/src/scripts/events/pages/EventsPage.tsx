@@ -8,7 +8,6 @@ import { useEventParentRecord, useEventsList } from "@groups/events/state/events
 import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
 import EventFilter, { EventFilterTypes, useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import PageTitle from "@knowledge/modules/common/PageTitle";
 import { LoadStatus } from "@library/@types/api/core";
 import { t } from "@vanilla/i18n";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
@@ -18,6 +17,7 @@ import { notEmpty, slugify } from "@vanilla/utils";
 import React, { useMemo } from "react";
 import { useHistory, useLocation, useParams } from "react-router";
 import { LocationDescriptorObject } from "history";
+import { PageHeading } from "@library/layout/PageHeading";
 
 export default function EventsPage() {
     const query = useQuery();
@@ -43,7 +43,7 @@ export default function EventsPage() {
 
     const pageTop = (
         <>
-            <PageTitle title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter
                 filter={filter}
                 key={filter}
