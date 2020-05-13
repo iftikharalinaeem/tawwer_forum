@@ -5,6 +5,7 @@
  */
 
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Navigation\GroupRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 
@@ -63,12 +64,20 @@ class EventsController extends AbstractEventsController {
         $this->CssClass .= ' NoPanel';
 
         $eventCriteria = [
-            'ParentRecordID' => $parentRecordID,
             'ParentRecordType' => $parentRecordType,
+            'ParentRecordID' => $parentRecordID,
         ];
 
         if ($parentRecordType === GroupRecordType::TYPE) {
             $this->applyGroupSpecificViewData($parentRecordID);
+        } elseif ($parentRecordType === ForumCategoryRecordType::TYPE) {
+            $parentIDs = [-1, $parentRecordID];
+            // get all parent category IDs up to the root.
+            $ancestors = CategoryModel::getAncestors($parentRecordID, true);
+            if ($ancestors) {
+                $parentIDs = array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID')));
+            }
+            $eventCriteria['ParentRecordID'] = $parentIDs;
         }
 
         // Upcoming events
