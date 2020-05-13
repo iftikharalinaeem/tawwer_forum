@@ -13,7 +13,7 @@ import React from "react";
 interface IProps {
     data: IUserFragment[];
     title: string;
-    extra: number;
+    extra: number | undefined;
     separator?: boolean;
     depth?: 2 | 3;
     maxCount?: number;
@@ -25,7 +25,7 @@ interface IProps {
  * Component for displaying an event details
  */
 export function EventAttendees(props: IProps) {
-    const { data, maxCount = 10, extra, separator = false, depth = 2, title, emptyMessage } = props;
+    const { data, maxCount = 10, extra = 0, separator = false, depth = 2, title, emptyMessage } = props;
     const empty = data.length === 0;
     const classes = eventsClasses();
     const HeadingTag = `h${depth}` as "h1";

@@ -23,9 +23,11 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { calc, percent, translateY } from "csx";
+import { calc, important, percent, translateY } from "csx";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { media } from "typestyle";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -49,7 +51,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const spacing = makeVars("spacing", {
-        contentSpacer: globalVars.gutter.half - alignment.verticalCheat, // Cheated for alignment
+        contentSpacer: globalVars.gutter.half - 2, // Cheated for alignment
         attendanceOffset: 5,
         padding: {
             vertical: 20,
@@ -132,6 +134,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const vars = eventsVariables();
     const globalVars = globalVariables();
     const compactDateSize = dateTimeVariables().compact.container.size;
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const root = style("root", {
         display: "block",
@@ -168,37 +171,43 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const linkColors = clickableItemStates();
     const toggleClass = selectBoxClasses().toggle;
 
-    const link = style("link", {
-        color: colorOut(globalVars.mainColors.fg),
-        display: "flex",
-        width: percent(100),
-        flexWrap: "nowrap",
-        flexGrow: 1,
-        justifyContent: "flex-start",
-        alignItems: "flex-start",
-        ...paddings(vars.spacing.padding),
-        $nest: {
-            [`& .${toggleClass}`]: {
-                marginLeft: "auto",
-                fontWeight: globalVars.fonts.weights.normal,
-            },
-            [`&:hover .${title}`]: {
-                ...linkColors["$nest"]!["&&:hover"],
-            },
-            [`&:focus .${title}`]: {
-                ...linkColors["$nest"]!["&&:focus"],
-            },
-            [`&.focus-visible .${title}`]: {
-                ...linkColors["$nest"]!["&&:focus-visible"],
-            },
-            [`&:active .${title}`]: {
-                ...linkColors["$nest"]!["&&:active"],
-            },
-            [`&:visited .${title}`]: {
-                ...linkColors["$nest"]!["&&:visited"],
+    const link = style(
+        "link",
+        {
+            color: colorOut(globalVars.mainColors.fg),
+            display: "flex",
+            width: percent(100),
+            flexWrap: "nowrap",
+            flexGrow: 1,
+            justifyContent: "flex-start",
+            alignItems: "flex-start",
+            ...paddings(vars.spacing.padding),
+            $nest: {
+                [`& .${toggleClass}`]: {
+                    marginLeft: "auto",
+                    fontWeight: globalVars.fonts.weights.normal,
+                },
+                [`&:hover .${title}`]: {
+                    ...linkColors["$nest"]!["&&:hover"],
+                },
+                [`&:focus .${title}`]: {
+                    ...linkColors["$nest"]!["&&:focus"],
+                },
+                [`&.focus-visible .${title}`]: {
+                    ...linkColors["$nest"]!["&&:focus-visible"],
+                },
+                [`&:active .${title}`]: {
+                    ...linkColors["$nest"]!["&&:active"],
+                },
+                [`&:visited .${title}`]: {
+                    ...linkColors["$nest"]!["&&:visited"],
+                },
             },
         },
-    });
+        mediaQueries.oneColumnDown({
+            maxWidth: important("100%"),
+        }),
+    );
 
     const linkAlignment = style("linkAlignment", {
         display: "flex",
@@ -207,7 +216,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         justifyContent: "flex-start",
         minHeight: unit(compactDateSize),
         flexGrow: 1,
-        overflow: "hidden",
     });
 
     const result = style("result", {
@@ -222,23 +230,28 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         flexBasis: unit(compactDateSize),
         flexShrink: 1,
         alignSelf: "flex-start",
+        color: colorOut(globalVars.mainColors.fg),
     });
 
     const body = style("body", {
         display: "block",
     });
 
-    const main = style("main", {
-        ...lineHeightAdjustment(),
-        display: "block",
-        paddingLeft: unit(vars.compact.gutter),
-        transform: translateY(`${unit(vars.alignment.verticalCheat)}`), // text alignment cheat
-        maxWidth: calc(`100% - ${unit(compactDateSize)}`),
-    });
+    const main = (skipOffset?: boolean) => {
+        const offset = skipOffset ? {} : lineHeightAdjustment();
+        return style("main", {
+            ...offset,
+            display: "block",
+            paddingLeft: unit(vars.compact.gutter),
+            transform: translateY(`${unit(vars.alignment.verticalCheat)}`), // text alignment cheat
+            maxWidth: calc(`100% - ${unit(compactDateSize)}`),
+        });
+    };
 
     const excerpt = style("excerpt", {
         display: "block",
         marginTop: unit(vars.spacing.contentSpacer),
+        color: colorOut(globalVars.mainColors.fg),
     });
 
     const metas = style("metas", {
@@ -258,12 +271,34 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
     });
 
-    const attendance = style("attendance", {
-        display: "block",
-        ...paddings({
-            vertical: vars.spacing.padding.vertical,
+    const metaDate = style(
+        "metaDate",
+        {},
+        mediaQueries.oneColumnDown({
+            display: important("none"),
         }),
-    });
+    );
+
+    const metaAttendance = style(
+        "metaAttendance",
+        {},
+        mediaQueries.aboveOneColumn({
+            display: important("none"),
+        }),
+    );
+
+    const attendance = style(
+        "attendance",
+        {
+            display: "block",
+            ...paddings({
+                vertical: vars.spacing.padding.vertical,
+            }),
+        },
+        mediaQueries.oneColumnDown({
+            display: "none",
+        }),
+    );
 
     const attendanceSelector = style("attendanceSelector", {
         display: "flex",
@@ -309,6 +344,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
             },
             [`&.${meta}`]: {
                 marginRight: globalVars.meta.spacing.default * 2,
+            },
+            [`&.${metaAttendance}`]: {
+                display: "inline",
             },
         },
     });
@@ -429,6 +467,8 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         excerpt,
         metas,
         meta,
+        metaDate,
+        metaAttendance,
         empty,
         attendance,
         dateCompact,
