@@ -428,7 +428,7 @@ pageTracker._trackPageview();
             $availablePlugins['groups'] = $groupsApp;
         }
 
-        $groupsApp = $enabledPlugins['Groups and Events'] ?? null;
+        $groupsApp = $enabledApps['Groups and Events'] ?? null;
         if ($groupsApp) {
             $enabledPlugins['groups'] = $groupsApp;
         }
@@ -611,7 +611,7 @@ pageTracker._trackPageview();
             try {
                 $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
-                    Gdn::applicationManager()->enableApplication($addonName, NULL);
+                    Gdn::applicationManager()->enableApplication($addonInfo['keyRaw'], NULL);
                 } else {
                     Gdn::pluginManager()->enablePlugin($addonName, NULL);
                 }
