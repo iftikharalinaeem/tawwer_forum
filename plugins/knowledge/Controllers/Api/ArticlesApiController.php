@@ -649,7 +649,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function put_react(int $id, array $body): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         if (!$this->session->isValid()) {
-            throw new ClientException('User must be signed in to post reaction.');
+            $body['insertUserID'] = -1;
         }
 
         $this->idParamSchema();
@@ -676,7 +676,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
         $mode = $this->articleHelper->getOperationMode();
         if ($mode === Operation::MODE_DEFAULT) {
-            $fields['insertUserID'] = $this->session->UserID;
+            $fields['insertUserID'] = $this->session->UserID ?? $body['insertUserID'];
             $fields['foreignID'] = '';
         } else {
             $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;

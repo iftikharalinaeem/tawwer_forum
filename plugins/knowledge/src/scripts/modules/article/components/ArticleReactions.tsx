@@ -46,7 +46,7 @@ export function ArticleReactions(props: IProps) {
 
     const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
 
-    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || !props.isSignedIn;
+    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null;
 
     return (
         <section className={classes.frame}>
@@ -54,7 +54,6 @@ export function ArticleReactions(props: IProps) {
             <div className={classes.votingButtons}>
                 <ReactionButton
                     reactionData={helpfulReactions}
-                    isSignedIn={props.isSignedIn}
                     title={t("Yes")}
                     reactionValue="yes"
                     isSubmitting={!!isYesSubmitting}
@@ -63,7 +62,6 @@ export function ArticleReactions(props: IProps) {
                 />
                 <ReactionButton
                     reactionData={helpfulReactions}
-                    isSignedIn={props.isSignedIn}
                     title={t("No")}
                     reactionValue="no"
                     isSubmitting={!!isNoSubmitting}
@@ -71,7 +69,6 @@ export function ArticleReactions(props: IProps) {
                     onClick={props.onNoClick}
                 />
             </div>
-            <SignInLink isSignedIn={props.isSignedIn} />
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
     );
@@ -82,7 +79,6 @@ export function ArticleReactions(props: IProps) {
  */
 function ReactionButton(props: {
     reactionData: IArticleReaction;
-    isSignedIn: boolean;
     title: string;
     reactionValue: string;
     isSubmitting: boolean;
