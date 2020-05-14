@@ -10,6 +10,7 @@ import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useEffect, useReducer, useCallback } from "react";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
+import { useLocation } from "react-router";
 
 export function useEventsState() {
     return useSelector((state: IEventsStoreState) => {
@@ -103,4 +104,20 @@ export function useEventAttendance(eventID: number) {
     });
 
     return { setEventAttendance, setEventAttendanceLoadable };
+}
+
+export function useQueryParamPage(): number {
+    const query = new URLSearchParams(useLocation().search);
+    const queryPage = query.get("page");
+
+    if (!queryPage) {
+        return 1;
+    }
+
+    const parsed = parseInt(queryPage, 10);
+    if (Number.isNaN(parsed)) {
+        return 1;
+    }
+
+    return queryPage;
 }

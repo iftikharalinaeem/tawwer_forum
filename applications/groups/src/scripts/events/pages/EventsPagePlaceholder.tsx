@@ -25,7 +25,7 @@ export function EventsPagePlaceholder() {
     );
 }
 
-export function useEventsListFilterQuery() {
+export function useEventsListFilterQuery(page: number = 1) {
     const history = useHistory();
     const query = new URLSearchParams(useLocation().search);
 
@@ -38,17 +38,21 @@ export function useEventsListFilterQuery() {
         }
     }, [filterValue]);
 
-    const changeFilter = useCallback((newFilter: EventFilterTypes) => {
-        const newParams = {
-            filter: newFilter,
-        };
-        const newQueryString = new URLSearchParams(newParams).toString();
-        const newLocation: LocationDescriptorObject = {
-            ...history.location,
-            search: newQueryString,
-        };
-        history.replace(newLocation);
-    }, []);
+    const changeFilter = useCallback(
+        (newFilter: EventFilterTypes) => {
+            const newParams = {
+                filter: newFilter,
+                page: page.toString(),
+            };
+            const newQueryString = new URLSearchParams(newParams).toString();
+            const newLocation: LocationDescriptorObject = {
+                ...history.location,
+                search: newQueryString,
+            };
+            history.replace(newLocation);
+        },
+        [history, page],
+    );
 
     return { filter, changeFilter };
 }
