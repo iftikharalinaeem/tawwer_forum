@@ -511,6 +511,9 @@ class ArticlesApiHelper {
                 $this->articleRevisionModel->publish($articleRevisionID, $revision["insertUserID"] ?? null, $this->getOperationMode());
             }
 
+            if (isset($fields['knowledgeCategoryID'])) {
+                $this->updateDefaultArticleID($fields['knowledgeCategoryID']);
+            }
             $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
             $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);
         }
