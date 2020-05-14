@@ -293,6 +293,7 @@ class EventModel extends Gdn_Model {
                         ->setPermission(EventPermissions::EDIT, true)
                         ->setPermission(EventPermissions::VIEW, true)
                         ->setPermission(EventPermissions::ATTEND, true)
+                        ->setPermission(EventPermissions::ORGANIZER, true)
                     ;
                 } elseif ($this->categoryModel::checkPermission($parentRecordID, 'Vanilla.Events.View')) {
                     $permissions
@@ -329,6 +330,18 @@ class EventModel extends Gdn_Model {
             $permissions
                 ->setPermission(EventPermissions::EDIT, true)
                 ->setPermission(EventPermissions::VIEW, true)
+                ->setPermission(EventPermissions::CREATE, true)
+            ;
+        }
+
+        $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+        if ($isAdmin) {
+            $permissions
+                ->setPermission(EventPermissions::CREATE, true)
+                ->setPermission(EventPermissions::EDIT, true)
+                ->setPermission(EventPermissions::VIEW, true)
+                ->setPermission(EventPermissions::ATTEND, true)
+                ->setPermission(EventPermissions::ORGANIZER, true)
             ;
         }
 

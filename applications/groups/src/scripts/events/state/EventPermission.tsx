@@ -21,7 +21,7 @@ interface IProps {
  * Make sure the event you pass had it's permissions expanded from the API.
  */
 export function EventPermission(props: IProps) {
-    if (hasEventPermission(props.event, props.permission) || hasPermission("site.manage")) {
+    if (hasEventPermission(props.event, props.permission)) {
         return <>{props.children}</>;
     } else {
         return <>{props.fallback ?? null}</>;
