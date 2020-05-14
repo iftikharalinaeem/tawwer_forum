@@ -47,11 +47,11 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const alignment = makeVars("alignment", {
-        verticalCheat: 1,
+        verticalCheat: 2,
     });
 
     const spacing = makeVars("spacing", {
-        contentSpacer: globalVars.gutter.half - 2, // Cheated for alignment
+        contentSpacer: globalVars.gutter.half - 4, // Cheated for alignment
         attendanceOffset: 5,
         padding: {
             vertical: 20,
@@ -153,10 +153,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const item = style("item", {
         display: "block",
         borderBottom: singleBorder(),
-        ...paddings({
-            horizontal: vars.spacing.padding.horizontal,
-        }),
         $nest: {
+            ["&&"]: {
+                ...paddings({
+                    vertical: important(0),
+                    horizontal: vars.spacing.padding.horizontal,
+                }),
+            },
             [`&.isFirst`]: {
                 borderTop: singleBorder(),
             },
@@ -166,6 +169,11 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const title = style("title", {
         display: "block",
         ...fonts(vars.title.font),
+        $nest: {
+            "&&": margins({
+                all: 0,
+            }),
+        },
     });
 
     const linkColors = clickableItemStates();
@@ -355,7 +363,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const viewMore = style("viewMore", {
         ...margins({
-            vertical: globalVars.gutter.half,
+            top: globalVars.gutter.size,
         }),
         display: "block",
         textAlign: "right",
