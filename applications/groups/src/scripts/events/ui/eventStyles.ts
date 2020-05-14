@@ -290,7 +290,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const attendance = style(
         "attendance",
         {
-            display: "block",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
             ...paddings({
                 vertical: vars.spacing.padding.vertical,
             }),
