@@ -41,6 +41,8 @@ export interface IGetEventsQuery {
     parentRecordID: number;
     dateStarts?: string;
     dateEnds?: string;
+    page: number;
+    limit: number;
 }
 
 export interface IGetEventParentRecordQuery {
@@ -51,6 +53,8 @@ export interface IGetEventParentRecordQuery {
 type IGetEventsResponse = IEventList;
 
 export class EventsActions extends ReduxActions {
+    public static DEFAULT_LIMIT = 30;
+
     public static readonly getEventListACs = createAction.async<IGetEventsQuery, IGetEventsResponse, IApiError>(
         "GET_EVENT_LIST",
     );

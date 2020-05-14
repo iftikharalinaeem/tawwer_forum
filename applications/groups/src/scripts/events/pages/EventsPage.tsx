@@ -4,31 +4,37 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
-import { useEventParentRecord, useEventsList } from "@groups/events/state/eventsHooks";
-import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
-import EventFilter, { EventFilterTypes, useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
+import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
+import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
+import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { LoadStatus } from "@library/@types/api/core";
+import { PageHeading } from "@library/layout/PageHeading";
 import { t } from "@vanilla/i18n";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
 import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { notEmpty, slugify } from "@vanilla/utils";
-import React, { useMemo } from "react";
-import { useHistory, useLocation, useParams } from "react-router";
-import { LocationDescriptorObject } from "history";
-import { PageHeading } from "@library/layout/PageHeading";
-import { useEventsListFilterQuery, EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
+import React from "react";
+import { useParams, useLocation } from "react-router";
+import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
 
 export default function EventsPage() {
+    const page = useQueryParamPage();
     const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
     const parentRecordType = params.parentRecordType ?? "category";
     const parentRecordID = params.parentRecordID !== null ? parseInt(params.parentRecordID!) : -1;
 
-    const { filter, changeFilter } = useEventsListFilterQuery();
+    const { filter, changeFilter } = useEventsListFilterQuery(page);
 
     const dateQuery = useDatesForEventFilter(filter);
-    const eventQuery = { ...dateQuery, parentRecordType, parentRecordID };
+    const eventQuery: IGetEventsQuery = {
+        ...dateQuery,
+        parentRecordType,
+        parentRecordID,
+        limit: EventsActions.DEFAULT_LIMIT,
+        page,
+    };
 
     const eventList = useEventsList(eventQuery);
     const eventParent = useEventParentRecord({ parentRecordType, parentRecordID });
