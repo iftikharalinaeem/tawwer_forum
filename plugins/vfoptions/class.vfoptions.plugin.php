@@ -609,7 +609,7 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $info['oldType'] ?? null;
+                $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
                     Gdn::applicationManager()->enableApplication($addonName, NULL);
                 } else {
