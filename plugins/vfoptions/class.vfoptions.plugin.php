@@ -609,7 +609,7 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addon->getSpecial('oldType');
+                $type = $info['oldType'] ?? null;
                 if ($type === 'application') {
                     Gdn::applicationManager()->enableApplication($addonName, NULL);
                 } else {
@@ -651,7 +651,7 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addonInfo['oldType'];
+                $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
                     Gdn::applicationManager()->disableApplication($addonName, NULL);
                 } else {
