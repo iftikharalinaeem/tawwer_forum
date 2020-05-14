@@ -92,9 +92,9 @@ export const EventsOptionsDropDown = (props: IProps) => {
                             {t("Edit")}
                         </SmartLink>
                     </DropDownItem>
-                    <DropDownItemSeparator />
                 </EventPermission>
                 <EventPermission event={event} permission={EventPermissionName.ORGANIZER}>
+                    <DropDownItemSeparator />
                     <DropDownItemButton onClick={e => setVisible(true)}>{t("Delete")}</DropDownItemButton>
                 </EventPermission>
             </DropDown>
