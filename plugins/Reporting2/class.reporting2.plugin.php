@@ -193,7 +193,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             }
         } else {
             // Create excerpt to show in form popup
-            $row = getRecord($recordType, $iD);
+            $row = getRecord($recordType, $iD, true);
 
             $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
             $row = $discussionModel->fixRow($row);
@@ -242,7 +242,7 @@ class Reporting2Plugin extends Gdn_Plugin {
             $args['DashboardCount'] = $args['DashboardCount'];
         }
     }
-    
+
     /**
      * Render the Quote html for the view.
      *
