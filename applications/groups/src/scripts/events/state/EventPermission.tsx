@@ -6,6 +6,7 @@
 import React from "react";
 import { IEvent, EventPermissionName } from "@groups/events/state/eventsTypes";
 import { logWarning } from "@vanilla/utils";
+import { hasPermission } from "@library/features/users/Permission";
 
 interface IProps {
     event: IEvent;
