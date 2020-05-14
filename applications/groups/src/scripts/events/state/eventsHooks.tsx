@@ -119,5 +119,5 @@ export function useQueryParamPage(): number {
         return 1;
     }
 
-    return queryPage;
+    return parsed;
 }
