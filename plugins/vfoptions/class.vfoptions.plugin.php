@@ -611,9 +611,9 @@ pageTracker._trackPageview();
             try {
                 $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
-                    Gdn::applicationManager()->enableApplication($addonInfo['keyRaw'], NULL);
+                    Gdn::applicationManager()->enableApplication($addonInfo['keyRaw'], null);
                 } else {
-                    Gdn::pluginManager()->enablePlugin($addonName, NULL);
+                    Gdn::pluginManager()->enablePlugin($addonName, null);
                 }
                 $sender->informMessage(sprintf(t('%s Enabled.'), val('name', $addonInfo, t('Addon'))));
 
