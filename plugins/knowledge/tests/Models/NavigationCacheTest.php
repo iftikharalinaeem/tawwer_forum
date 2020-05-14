@@ -72,7 +72,7 @@ class NavigationCacheTest extends KbApiTestCase {
     /**
      * Test that navigations are cached independantly.
      */
-    public function testIndependantCaches() {
+    public function testIndependentCaches() {
         $kb = $this->createKnowledgeBase();
         $this->createCategory(['name' => 'cat2']);
         $this->createArticle(['name' => 'article2']);

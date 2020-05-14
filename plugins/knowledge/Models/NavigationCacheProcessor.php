@@ -33,8 +33,11 @@ class NavigationCacheProcessor implements Processor {
      * @return mixed|void
      */
     public function handle(Operation $databaseOperation, callable $stack) {
+        $result = $stack($databaseOperation);
+
         if (in_array($databaseOperation->getType(), [Operation::TYPE_INSERT, Operation::TYPE_DELETE, Operation::TYPE_UPDATE])) {
             $this->cache->deleteAll();
         }
+        return $result;
     }
 }
