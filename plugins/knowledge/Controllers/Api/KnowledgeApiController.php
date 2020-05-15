@@ -744,7 +744,7 @@ class KnowledgeApiController extends AbstractApiController {
             "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
             "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["users", "breadcrumbs"]),
             'dateUpdated?' => new DateFilterSphinxSchema([
-                'description' => 'Filter by date when the event was updated.',
+                'description' => 'Filter by date when the article was updated.',
             ]),
             "statuses:a?" => "Article statuses array to filter results.",
             "name:s?" => "Keywords to search against article name.",

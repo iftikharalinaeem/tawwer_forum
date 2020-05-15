@@ -67,7 +67,7 @@ export function ArticleReactions(props: IProps) {
 
     const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
 
-    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null;
+    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || disableGuestVoting;
 
     return (
         <section className={classes.frame}>
