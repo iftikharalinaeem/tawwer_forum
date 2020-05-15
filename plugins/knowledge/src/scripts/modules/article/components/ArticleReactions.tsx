@@ -24,7 +24,7 @@ import { CheckCompactIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export function ArticleReactions(props: IProps) {
-    const { isNoSubmitting, isYesSubmitting } = props;
+    const { isNoSubmitting, isYesSubmitting, isSignedIn } = props;
     const classes = reactionClasses();
 
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
@@ -35,7 +35,28 @@ export function ArticleReactions(props: IProps) {
     }
 
     // Build the text for the view.
-    const { yes, total, userReaction } = helpfulReactions;
+    const { yes, total } = helpfulReactions;
+
+    let localeStorage = typeof localStorage !== "undefined" ? localStorage : false;
+    let disableGuestVoting = !localeStorage;
+
+    if (!isSignedIn && localeStorage) {
+        if (localeStorage) {
+            try {
+                const hasVoted = localeStorage.getItem(`hasVoted-${props.articleID}`);
+                if (!hasVoted && (isYesSubmitting || isNoSubmitting)) {
+                    localeStorage.setItem(`hasVoted-${props.articleID}`, isYesSubmitting ? "yes" : "no");
+                } else if (hasVoted) {
+                    const userReactionType = hasVoted === "yes" ? "yes" : "no";
+                    helpfulReactions.userReaction = userReactionType;
+                }
+            } catch (e) {
+                disableGuestVoting = true;
+            }
+        }
+    }
+
+    const { userReaction } = helpfulReactions;
 
     const resultText =
         total < 1 ? (
@@ -69,6 +90,7 @@ export function ArticleReactions(props: IProps) {
                     onClick={props.onNoClick}
                 />
             </div>
+            {disableGuestVoting && <SignInLink isSignedIn={props.isSignedIn} />}
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
     );

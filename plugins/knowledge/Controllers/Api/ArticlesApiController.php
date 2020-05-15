@@ -232,18 +232,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']), $query['locale'] ?? null);
         $article['breadcrumbs'] = $crumbs;
 
-        $reactionCounts = $this->articleReactionModel->getReactionCount($id);
-        $article['reactions'][]  = [
-            'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
-            'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
-            'no' => (int)$reactionCounts['neutralCount'] ?? 0,
-            'total' => (int)$reactionCounts['allCount'] ?? 0,
-            'userReaction' => $this->articleReactionModel->getUserReaction(
-                ArticleReactionModel::TYPE_HELPFUL,
-                $id,
-                $this->session->UserID
-            ),
-        ];
+            $reactionCounts = $this->articleReactionModel->getReactionCount($id);
+            $article['reactions'][]  = [
+                'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
+                'no' => (int)$reactionCounts['neutralCount'] ?? 0,
+                'total' => (int)$reactionCounts['allCount'] ?? 0,
+                'userReaction' => ($this->session->UserID) ? $this->articleReactionModel->getUserReaction(
+                    ArticleReactionModel::TYPE_HELPFUL,
+                    $id,
+                    $this->session->UserID
+                ) : null,
+            ];
+
         if (isset($query["locale"])) {
             $article["queryLocale"] = $query["locale"];
         }
@@ -649,7 +650,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function put_react(int $id, array $body): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         if (!$this->session->isValid()) {
-            $body['insertUserID'] = -1;
+            $body['insertUserID'] = 0;
         }
 
         $this->idParamSchema();
@@ -694,7 +695,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
         }
 
-        if ($existingReactionValue !== null) {
+        if ($existingReactionValue !== null && $fields['insertUserID'] !== 0) {
             throw new ClientException('You already reacted on this article before.');
         }
 
