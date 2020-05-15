@@ -192,6 +192,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
             || empty($options['arl.locale'])) {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
+                ['ar.dateInserted, a.dateInserted', 'COALESCE', 'dateUpdated'],
                 "ar.seoImage",
                 "ar.articleRevisionID",
                 "ar.name",
@@ -208,7 +209,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
         } else {
             $options['selectColumns'] = [
                 "a.*, c.knowledgeBaseID",
-                ['arl.seoImage, ar.seoImage', 'COALESCE', 'seoImage'],
+                ['arl.dateInserted, ar.dateInserted, a.dateInserted', 'COALESCE', 'dateUpdated'],
                 "ar.articleRevisionID",
                 ['arl.name, ar.name', 'COALESCE', 'name'],
                 ['arl.locale, ar.locale', 'COALESCE', 'locale'],

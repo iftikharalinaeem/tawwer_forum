@@ -192,6 +192,7 @@ class ArticlesApiHelper {
                     "locale" => $translation["locale"],
                     "sourceLocale" => $knowledgeBase["sourceLocale"],
                     "translationStatus" => $translation["translationStatus"],
+                    "dateUpdated" => $translation["dateUpdated"],
                 ];
             } else {
                 $articleToGenerateFrom = $firstRevision + ['queryLocale' => $locale['locale']];
@@ -202,6 +203,7 @@ class ArticlesApiHelper {
                     "locale" => $locale["locale"],
                     "sourceLocale" => $knowledgeBase["sourceLocale"],
                     "translationStatus" => ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED,
+                    "dateUpdated" => $firstRevision["dateUpdated"],
                 ];
                 $result[] = $notFound;
             }

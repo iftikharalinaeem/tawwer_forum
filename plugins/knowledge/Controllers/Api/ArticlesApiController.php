@@ -275,6 +275,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "url:s?",
             "locale:s",
             "sourceLocale:s",
+            "dateUpdated:dt",
             "translationStatus:s" => [
                 "enum" =>["up-to-date", "out-of-date", "not-translated"]
             ],

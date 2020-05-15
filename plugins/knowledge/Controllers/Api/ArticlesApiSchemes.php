@@ -208,6 +208,7 @@ trait ArticlesApiSchemes {
                     "name",
                     "locale",
                     "validateLocale?",
+                    "dateInserted?",
                     "sort?",
                     "discussionID?",
                     "previousRevisionID?",
