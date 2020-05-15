@@ -421,6 +421,18 @@ pageTracker._trackPageview();
         $enabledPlugins = Gdn::pluginManager()->enabledPlugins();
         $enabledApps = Gdn::applicationManager()->enabledApplications();
 
+        // Kludge on the Groups app
+        // Apps are misnamed for some reason.
+        $groupsApp = $availableApps['Groups and Events'] ?? null;
+        if ($groupsApp) {
+            $availablePlugins['groups'] = $groupsApp;
+        }
+
+        $groupsApp = $enabledApps['Groups and Events'] ?? null;
+        if ($groupsApp) {
+            $enabledPlugins['groups'] = $groupsApp;
+        }
+
         // Determine plan's plugin availability
         $planPlugins = false;
         if (class_exists('Infrastructure')) {
@@ -453,12 +465,15 @@ pageTracker._trackPageview();
                 "RoleTitle",
                 "ShareThis",
                 "Signatures",
-                "Tagging"
+                "Tagging",
+                "groups"
             ]);
+        } elseif (!in_array('groups', $planPlugins)) {
+            $planPlugins[] = 'groups';
         }
         $allowedPlugins = array();
         foreach ($planPlugins as $key) {
-            $info = val($key, $availablePlugins);
+            $info = $availablePlugins[$key] ?? null;
             if ($info) {
                 $allowedPlugins[$key] = $info;
             }
@@ -502,21 +517,6 @@ pageTracker._trackPageview();
                 $info['ToggleText'] = $toggleText = $enabled ? 'Disable' : 'Enable';
                 $info['ToggleUrl'] = "/settings/addons/" . $sender->Filter . "/" . strtolower($toggleText) . "/$key/" . Gdn::session()->transientKey();
             }
-        }
-
-        // Kludge on the Groups app
-        $planTier = val('tier', $plan);
-        if (in_array($planTier, ['advanced','corporate','enterprise','vip'])) {
-            $enabled = array_key_exists('Groups', $enabledApps);
-            $Groups = array('Groups' => array(
-                'Name' => 'Groups',
-                'Description' => 'Create user groups and schedule events within those groups.',
-                'IconUrl' => 'applications/groups/social-groups.png',
-                'ToggleText' => ($enabled ? 'Disable' : 'Enable'),
-                'ToggleUrl' => "/settings/addons/" . $sender->Filter . "/" . ($enabled ? 'disable' : 'enable') . "/Groups",
-                'Enabled' => $enabled
-            ));
-            $addons = array_merge($Groups, $addons);
         }
 
         // Filter & add conditional data to plugins
@@ -609,11 +609,11 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addon->getSpecial('oldType');
+                $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
-                    Gdn::applicationManager()->enableApplication($addonName, NULL);
+                    Gdn::applicationManager()->enableApplication($addonInfo['keyRaw'], null);
                 } else {
-                    Gdn::pluginManager()->enablePlugin($addonName, NULL);
+                    Gdn::pluginManager()->enablePlugin($addonName, null);
                 }
                 $sender->informMessage(sprintf(t('%s Enabled.'), val('name', $addonInfo, t('Addon'))));
 
@@ -633,9 +633,7 @@ pageTracker._trackPageview();
         }
         $sender->permission('Garden.Settings.Manage');
 
-        $addonName = $args[0];
-        $filter = $args[1];
-        $isAllowed = $args[2];
+        [$addonName, $filter, $isAllowed] = $args;
 
         if (!$filter) {
             $filter = 'all';
@@ -653,7 +651,7 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addon->getSpecial('oldType');
+                $type = $addonInfo['oldType'] ?? null;
                 if ($type === 'application') {
                     Gdn::applicationManager()->disableApplication($addonName, NULL);
                 } else {
