@@ -1094,7 +1094,8 @@ class ArticlesTest extends AbstractResourceTest {
     public function testPutReactHelpfulAsGuest() {
         $article = $this->testPost();
 
-        $this->api()->patch('/roles/2',
+        $this->api()->patch(
+            '/roles/2',
             [
                 'name' => 'Guest',
                 'permissions' => [
