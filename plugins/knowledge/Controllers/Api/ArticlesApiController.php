@@ -580,7 +580,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $this->validateFirstArticleRevision($id, $body);
         }
 
-        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($body);
+        $bodyWithFormat = $body;
+        // Make sure the format gets passed.
+        if (!isset($bodyWithFormat['format'])) {
+            $bodyWithFormat['format'] = $initialRow['format'];
+        }
+        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($bodyWithFormat);
         $this->articleHelper->save($body, $id);
         $row = $this->articleHelper->retrieveRow($id, $body);
 

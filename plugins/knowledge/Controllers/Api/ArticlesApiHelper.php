@@ -350,6 +350,10 @@ class ArticlesApiHelper {
 
         $article = array_diff_key($fields, $revisionFields);
         $revision = array_intersect_key($fields, $revisionFields);
+        if (isset($article['dateUpdated'])) {
+            // The dateUpdated should be used for the revision.
+            $revision['dateInserted'] = $article['dateUpdated'];
+        }
 
         $locale = $fields["locale"] ?? null;
 
@@ -563,15 +567,15 @@ class ArticlesApiHelper {
      */
     public function rehostArticleImages(array $requestBody): array {
         $shouldRehost = $requestBody['fileRehosting']['enabled'] ?? false;
+        $body = $requestBody['body'] ?? null;
+        $format = $requestBody['format'] ?? null;
 
-        if (!$shouldRehost) {
+        if (!$shouldRehost || !$body || !$format) {
             return [$requestBody, []];
         }
 
         $rehostRequestHeaders = $requestBody['fileRehosting']['requestHeaders'] ?? [];
-        
-        $body = $requestBody['body'];
-        $format = $requestBody['format'];
+
         $allUrls = $this->formatService->parseImageUrls($body, $format);
         $attachments = $this->formatService->parseAttachments($body, $format);
         foreach ($attachments as $attachment) {
