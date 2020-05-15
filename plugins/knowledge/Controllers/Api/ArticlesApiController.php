@@ -649,9 +649,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function put_react(int $id, array $body): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
-        if (!$this->session->isValid()) {
-            $body['insertUserID'] = 0;
-        }
 
         $this->idParamSchema();
         $in = $this->schema([
