@@ -119,7 +119,7 @@ class KnowledgeBasesApiController extends AbstractApiController {
         $locale = $query['locale'] ?? null;
         $row = $this->knowledgeBaseByID($id, false);
         $this->knowledgeBaseModel->checkViewPermission($row['knowledgeBaseID']);
-        
+
         if ($locale) {
             $row['locale'] = $locale;
             $rows = $this->translateProperties([$row], $locale);
@@ -250,7 +250,6 @@ class KnowledgeBasesApiController extends AbstractApiController {
             }
             return $this->normalizeOutput($row);
         }, $rows);
-
         $result = $out->validate($rows);
         return $result ?? $rows;
     }
@@ -570,6 +569,11 @@ class KnowledgeBasesApiController extends AbstractApiController {
 
         if (array_key_exists('isUniversalSource', $body)) {
             $body['isUniversalSource'] = ($body['isUniversalSource'] === true) ? 1 : 0;
+        }
+
+        // We may have to update our default articleID if we are becoming a guide.
+        if (isset($body['viewType']) && $body['viewType'] === KnowledgeBaseModel::TYPE_GUIDE) {
+            $body['defaultArticleID'] = $this->knowledgeNavigationModel->getDefaultArticleID($id);
         }
 
         $universalTargetIDs = $body['universalTargetIDs'] ?? null;
