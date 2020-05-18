@@ -4,6 +4,7 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
+import { EventParticipantsModule } from "@groups/events/modules/EventParticipantsModule";
 import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
 import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
 import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
@@ -54,6 +55,7 @@ export default function EventsPage() {
 
     return (
         <>
+            <EventParticipantsModule />
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />

@@ -11,6 +11,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useEffect, useReducer, useCallback } from "react";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { useLocation } from "react-router";
+import { action } from "@storybook/addon-actions";
 
 export function useEventsState() {
     return useSelector((state: IEventsStoreState) => {
@@ -38,6 +39,28 @@ export function useEventsList(params: IGetEventsQuery) {
         // Using the hash instead of the object
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, actions, hash]);
+
+    return existingResult;
+}
+
+export function useEventParticipants(eventID: number) {
+    const actions = useEventsActions();
+
+    const existingResult = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.participantsByEventID[eventID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+
+    const { status } = existingResult;
+
+    useEffect(() => {
+        if ([LoadStatus.PENDING].includes(status)) {
+            actions.getEventParticipants(eventID);
+        }
+    }, [status, action, eventID]);
 
     return existingResult;
 }

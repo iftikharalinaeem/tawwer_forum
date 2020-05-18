@@ -9,6 +9,8 @@ import {
     IEventParentRecord,
     IEventWithParticipants,
     EventAttendance,
+    IEventParticipant,
+    IEventParticipantList,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -22,6 +24,7 @@ export interface IEventsState {
     eventsByID: Record<number, ILoadable<IEventWithParticipants>>;
     partipateStatusByEventID: Record<number, ILoadable<{ attending: EventAttendance }>>;
     deleteStatusesByID: Record<number, ILoadable<{}>>;
+    participantsByEventID: Record<number, ILoadable<IEventParticipantList>>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -34,6 +37,7 @@ const DEFAULT_EVENT_STATE: IEventsState = {
     eventsByID: {},
     partipateStatusByEventID: {},
     deleteStatusesByID: {},
+    participantsByEventID: {},
 };
 
 export const eventsReducer = produce(
@@ -84,6 +88,31 @@ export const eventsReducer = produce(
             nextState.eventParentRecords[hash].status = LoadStatus.ERROR;
             nextState.eventParentRecords[hash].error = payload.error;
 
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsACs.started, (nextState, params) => {
+            nextState.participantsByEventID[params.eventID] = {
+                status: LoadStatus.LOADING,
+            };
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsACs.done, (nextState, payload) => {
+            const { eventID } = payload.params;
+            const data = payload.result;
+
+            nextState.participantsByEventID[eventID] = {
+                status: LoadStatus.SUCCESS,
+                data,
+            };
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsACs.failed, (nextState, payload) => {
+            const { eventID } = payload.params;
+            const { error } = payload;
+            nextState.participantsByEventID[eventID] = {
+                status: LoadStatus.SUCCESS,
+                error,
+            };
             return nextState;
         })
         .case(EventsActions.getEventACs.started, (nextState, params) => {

@@ -70,6 +70,11 @@ export interface IEventParticipant {
     userID: number;
 }
 
+export interface IEventParticipantList {
+    eventID: number;
+    participants: IEventParticipant[];
+}
+
 export interface IEventWithParticipants {
     event: IEvent;
     participants: IEventParticipant[];

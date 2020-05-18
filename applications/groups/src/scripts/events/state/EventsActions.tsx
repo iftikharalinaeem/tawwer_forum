@@ -13,8 +13,10 @@ import {
     IEvent,
     IEventParticipant,
     EventAttendance,
+    IEventParticipantList,
 } from "@groups/events/state/eventsTypes";
 import SimplePagerModel from "@vanilla/library/src/scripts/navigation/SimplePagerModel";
+import { number } from "prop-types";
 
 const createAction = actionCreatorFactory("@@events");
 
@@ -110,6 +112,24 @@ export class EventsActions extends ReduxActions {
                 return result;
             }
         })(params);
+        return this.dispatch(thunk);
+    };
+
+    public static readonly getEventParticipantsACs = createAction.async<
+        { eventID: number },
+        IEventParticipantList,
+        IApiError
+    >("GET_EVENT_PARTICIPANTS");
+
+    public getEventParticipants = (eventID: number) => {
+        const thunk = bindThunkAction(EventsActions.getEventParticipantsACs, async () => {
+            const response = await this.api.get(`/events/${eventID}/participants`);
+            const result: IEventParticipantList = {
+                eventID: eventID,
+                participants: response.data,
+            };
+            return result;
+        })({ eventID });
         return this.dispatch(thunk);
     };
 
