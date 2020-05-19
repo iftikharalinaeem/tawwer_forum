@@ -17,7 +17,6 @@ import { onReady, t } from "@library/utility/appUtils";
 import { debug } from "@vanilla/utils";
 import { getMeta } from "@library/utility/appUtils";
 import { initAllUserContent } from "@library/content";
-import { loadReCaptcha } from "react-recaptcha-v3";
 
 // Knowledge Modules
 import { deploymentKeyMiddleware } from "@knowledge/server/deploymentKeyMiddleware";
