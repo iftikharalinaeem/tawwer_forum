@@ -48,6 +48,7 @@ function WebhookAddEdit() {
             events.splice(events.indexOf(event, 1));
         }
 
+        console.log(events);
         updateForm({ events: events });
     };
 
@@ -161,6 +162,13 @@ function WebhookAddEdit() {
                                 checked={form.events.includes(EventType.DISCUSSION)}
                                 disabled={form.events.includes(EventType.ALL)}
                                 onChange={isChecked => handleIndividualEvents(isChecked, EventType.DISCUSSION)}
+                            />
+                            <DashboardCheckBox
+                                label={"Notifications"}
+                                className={webhookCSSClasses.eventRadio}
+                                checked={form.events.includes(EventType.NOTIFICATION)}
+                                disabled={form.events.includes(EventType.ALL)}
+                                onChange={isChecked => handleIndividualEvents(isChecked, EventType.NOTIFICATION)}
                             />
                             <DashboardCheckBox
                                 label={"Users"}
