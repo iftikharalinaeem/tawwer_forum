@@ -32,7 +32,8 @@ import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/Oth
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
+import { ReCaptcha, loadReCaptcha } from "react-recaptcha-v3";
+import { useState } from "react";
 
 interface IProps {
     useBackButton?: boolean;
@@ -65,6 +66,8 @@ export default function ArticleLayout(props: IProps) {
     const { articleID } = article;
     const knowledgeBase = useKnowledgeBase(article.knowledgeBaseID);
 
+    const [responseToken, setResponseToken] = useState("");
+
     const activeRecord = {
         recordID: articleID,
         recordType: KbRecordType.ARTICLE,
@@ -92,6 +95,11 @@ export default function ArticleLayout(props: IProps) {
     ) : (
         <OtherLanguages articleLocaleData={articlelocales} knowledgeBaseID={article.knowledgeBaseID} />
     );
+
+    const handleReCaptcha = recaptchaToken => {
+        setResponseToken(recaptchaToken);
+    };
+    loadReCaptcha("_____PUT____KEY____HERE_____");
 
     return (
         <>
@@ -172,7 +180,16 @@ export default function ArticleLayout(props: IProps) {
                                 <UserContent content={article.body} />
                             </PanelWidget>
                             <PanelWidget>
-                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
+                                <ArticleReactions
+                                    reactions={article.reactions}
+                                    articleID={article.articleID}
+                                    responseToken={responseToken}
+                                />
+                                <ReCaptcha
+                                    sitekey="_____PUT____KEY____HERE_____"
+                                    action="social"
+                                    verifyCallback={handleReCaptcha}
+                                />
                             </PanelWidget>
                             {(!!prevNavArticle || !!nextNavArticle) && (
                                 <PanelWidget>

@@ -60,6 +60,7 @@ const createAction = actionCreatorFactory("@@article");
 interface IHelpfulParams {
     articleID: number;
     helpful: "yes" | "no";
+    responseToken?: string;
 }
 
 export interface IRelatedArticles {

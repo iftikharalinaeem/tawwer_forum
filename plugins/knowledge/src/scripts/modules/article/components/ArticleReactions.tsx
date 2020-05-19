@@ -26,7 +26,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting } = props;
     const classes = reactionClasses();
-
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
     // If we don't have reaction data bail out early.
@@ -112,15 +111,18 @@ function ReactionButton(props: {
         },
         styles.votingButton,
     );
+
     return (
-        <Button
-            baseClass={checked ? ButtonTypes.PRIMARY : ButtonTypes.STANDARD}
-            disabled={isDisabled}
-            className={classes}
-            onClick={onClick}
-        >
-            {content}
-        </Button>
+        <>
+            <Button
+                baseClass={checked ? ButtonTypes.PRIMARY : ButtonTypes.STANDARD}
+                disabled={isDisabled}
+                className={classes}
+                onClick={onClick}
+            >
+                {content}
+            </Button>
+        </>
     );
 }
 
@@ -151,6 +153,7 @@ function SignInLink(props: { isSignedIn: boolean }) {
 interface IOwnProps {
     articleID: number;
     reactions: IArticleReaction[];
+    responseToken?: string;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
@@ -182,7 +185,7 @@ function mapStateToProps(state: IUsersStoreState & IKnowledgeAppStoreState, ownP
  * Map in some bound actions.
  */
 function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
-    const { articleID } = ownProps;
+    const { articleID, responseToken } = ownProps;
     const articleActions = new ArticleActions(dispatch, apiv2);
 
     return {
@@ -190,11 +193,13 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
             articleActions.reactHelpful({
                 articleID,
                 helpful: "yes",
+                responseToken: responseToken,
             }),
         onNoClick: () =>
             articleActions.reactHelpful({
                 articleID,
                 helpful: "no",
+                responseToken: responseToken,
             }),
     };
 }
