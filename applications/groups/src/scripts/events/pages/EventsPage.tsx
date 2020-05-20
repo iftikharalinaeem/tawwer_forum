@@ -16,9 +16,10 @@ import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
 import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { notEmpty, slugify } from "@vanilla/utils";
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
-import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
+import { IGetEventsQuery, EventsActions, useEventsActions } from "@groups/events/state/EventsActions";
+import { actions } from "@storybook/addon-actions";
 
 export default function EventsPage() {
     const page = useQueryParamPage();
@@ -39,6 +40,14 @@ export default function EventsPage() {
 
     const eventList = useEventsList(eventQuery);
     const eventParent = useEventParentRecord({ parentRecordType, parentRecordID });
+
+    const { getEventParticipants } = useEventsActions();
+    const [participantsQuery, setParticipantsQuery] = useState({
+        eventID: 2,
+        limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
+        page: 1,
+    });
+
     const classes = eventsClasses();
     if (
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventList.status) ||
@@ -53,11 +62,19 @@ export default function EventsPage() {
 
     const parentRecordSlug = slugify(eventParent.data.name);
 
-    const participantsQuery = { eventID: 2, limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT, page: 2 };
-
     return (
         <>
             <EventParticipantsModule query={participantsQuery} />
+            <button
+                type="button"
+                onClick={() => {
+                    const newQuery = { ...participantsQuery, page: participantsQuery.page + 1 };
+                    setParticipantsQuery(newQuery);
+                    getEventParticipants(newQuery);
+                }}
+            >
+                Next
+            </button>
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />

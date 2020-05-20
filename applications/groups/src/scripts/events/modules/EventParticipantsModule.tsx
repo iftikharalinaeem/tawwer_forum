@@ -14,15 +14,13 @@ interface IProps {
 export function EventParticipantsModule(props: IProps) {
     const participants = useEventParticipants(props.query);
 
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(participants.status)) {
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(participants.status) && !participants.data) {
         return <Loader />;
     }
 
     if (!participants.data || participants.error) {
         return <ErrorMessages errors={[participants.error].filter(notEmpty)} />;
     }
-
-    console.log(participants);
 
     return <EventParticipants participants={participants.data.participants} />;
 }

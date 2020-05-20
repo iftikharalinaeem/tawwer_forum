@@ -91,19 +91,25 @@ export const eventsReducer = produce(
             return nextState;
         })
         .case(EventsActions.getEventParticipantsACs.started, (nextState, params) => {
-            nextState.participantsByEventID[params.eventID] = {
-                status: LoadStatus.LOADING,
-            };
+            const existing = nextState.participantsByEventID[params.eventID];
+            if (existing) {
+                existing.status = LoadStatus.LOADING;
+            } else {
+                nextState.participantsByEventID[params.eventID] = { status: LoadStatus.LOADING };
+            }
             return nextState;
         })
         .case(EventsActions.getEventParticipantsACs.done, (nextState, payload) => {
             const { eventID } = payload.params;
             const data = payload.result;
 
+            // console.log("data---", data);
             nextState.participantsByEventID[eventID] = {
                 status: LoadStatus.SUCCESS,
                 data,
             };
+            // Merge results from higher pages.
+
             return nextState;
         })
         .case(EventsActions.getEventParticipantsACs.failed, (nextState, payload) => {

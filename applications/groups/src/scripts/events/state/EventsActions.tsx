@@ -62,7 +62,7 @@ type IGetEventsResponse = IEventList;
 
 export class EventsActions extends ReduxActions {
     public static DEFAULT_LIMIT = 1;
-    public static DEFAULT_PARTICIPANTS_LIMIT = 2;
+    public static DEFAULT_PARTICIPANTS_LIMIT = 1;
 
     public static readonly getEventListACs = createAction.async<IGetEventsQuery, IGetEventsResponse, IApiError>(
         "GET_EVENT_LIST",

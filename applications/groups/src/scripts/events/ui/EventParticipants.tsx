@@ -1,9 +1,10 @@
 import React from "react";
 
-export function EventParticipants(participants) {
+export function EventParticipants({ participants }) {
+    // console.log(participants);
     return (
-        <div>
-            <h1> Event Participants </h1>
-        </div>
+        <ul>
+            {participants && participants.map(participant => <li key={participant.userID}> {participant.userID} </li>)}
+        </ul>
     );
 }
