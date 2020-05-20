@@ -60,7 +60,7 @@ export function useEventParticipants(eventID: number) {
         if ([LoadStatus.PENDING].includes(status)) {
             actions.getEventParticipants(eventID);
         }
-    }, [status, action, eventID]);
+    }, [status, actions, eventID]);
 
     return existingResult;
 }

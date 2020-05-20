@@ -55,7 +55,7 @@ export default function EventsPage() {
 
     return (
         <>
-            <EventParticipantsModule />
+            <EventParticipantsModule eventID={2} />
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />

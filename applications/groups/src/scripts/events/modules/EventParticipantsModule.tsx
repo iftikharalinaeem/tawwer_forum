@@ -11,8 +11,7 @@ interface IProps {
 }
 
 export function EventParticipantsModule(props: IProps) {
-    // const participants = useEventParticipants(props.eventID);
-    const participants = useEventParticipants(1);
+    const participants = useEventParticipants(props.eventID);
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(participants.status)) {
         return <Loader />;
