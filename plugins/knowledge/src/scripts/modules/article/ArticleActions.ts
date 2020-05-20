@@ -77,7 +77,6 @@ interface IRecaptcha {
 }
 
 export async function ensureReCaptcha(siteKey: string): Promise<IRecaptcha | null> {
-    console.log(siteKey);
     await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
     return { execute: siteKey => window.grecaptcha.execute(siteKey) };
 }
@@ -101,7 +100,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 const siteKey = getMeta("reCaptchaKey");
                 const reCaptcha = await ensureReCaptcha(siteKey);
                 const responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
-                console.log("guest");
+
                 if (responseToken) {
                     body.responseToken = responseToken;
                 }
