@@ -678,26 +678,17 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "responseToken:s?" => [
                 "description" => "The response provided from reCaptcha."
             ],
-        ], "in")->setDescription("Reaction about an article.")
-        ;
+        ], "in")->setDescription("Reaction about an article.");
+
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
 
         // This is just check if article exists and knowledge base has status "published"
         $row = $this->articleByID($id);
 
-
         $validReaction = true;
         if ($body["responseToken"] ?? false) {
-            $httpClient = new HttpClient();
-            $reCaptchaResponse = $httpClient->post(
-                'https://www.google.com/recaptcha/api/siteverify',
-                    [
-                        "secret" => $this->config->get("Recaptcha.PrivateKey", ''),
-                        "response" => $body['responseToken'],
-                    ]
-            )->getBody();
-            $validReaction = $reCaptchaResponse["success"] ?? false;
+            $validReaction = $this->reCaptchaVerification($body["responseToken"]);
         }
 
         if ($validReaction) {
@@ -954,5 +945,25 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $firstRevisionSchema->validate($body);
         }
         return $body;
+    }
+
+    /**
+     * Verify that we have a valid response from reCaptchaV3.
+     *
+     * @param string $responseToken
+     * @return bool
+     */
+    private function reCaptchaVerification(string $responseToken): bool {
+        $httpClient = new HttpClient();
+        $reCaptchaResponse = $httpClient->post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            [
+                "secret" => $this->config->get("Recaptcha.PrivateKey", ''),
+                "response" => $responseToken,
+            ]
+        )->getBody();
+        $validReaction = $reCaptchaResponse["success"] ?? false;
+
+        return $validReaction;
     }
 }
