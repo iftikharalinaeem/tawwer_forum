@@ -94,7 +94,9 @@ export default function ArticleLayout(props: IProps) {
     );
 
     const siteKey = getMeta("reCaptchaKey");
-    ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
+    if (siteKey) {
+        ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
+    }
 
     return (
         <>
