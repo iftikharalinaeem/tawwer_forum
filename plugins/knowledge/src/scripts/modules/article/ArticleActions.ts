@@ -50,6 +50,8 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { ensureScript } from "@vanilla/dom-utils/src";
+import { getMeta } from "@library/utility/appUtils";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -70,6 +72,16 @@ export interface IRelatedArticles {
     minimumArticles?: number;
 }
 
+interface IRecaptcha {
+    execute: (string) => string;
+}
+
+export async function ensureReCaptcha(siteKey: string): Promise<IRecaptcha | null> {
+    console.log(siteKey);
+    await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
+    return { execute: siteKey => window.grecaptcha.execute(siteKey) };
+}
+
 /**
  * Actions for the article page.
  */
@@ -79,8 +91,21 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public static putReactACs = createAction.async<IHelpfulParams, IArticle, IApiError>("PUT_REACT");
 
     public reactHelpful = (params: IHelpfulParams) => {
-        const { articleID, ...body } = params;
+        const { articleID } = params;
+
         const apiThunk = bindThunkAction(ArticleActions.putReactACs, async () => {
+            let { ...body } = params;
+
+            const currentUser = this.getState().users.current;
+            if (currentUser.data?.userID === 0 || !currentUser) {
+                const siteKey = getMeta("reCaptchaKey");
+                const reCaptcha = await ensureReCaptcha(siteKey);
+                const responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
+                console.log("guest");
+                if (responseToken) {
+                    body.responseToken = responseToken;
+                }
+            }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
             return response.data;
         })(params);

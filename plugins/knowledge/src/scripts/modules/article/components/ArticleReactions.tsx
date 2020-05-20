@@ -171,7 +171,6 @@ function SignInLink(props: { isSignedIn: boolean }) {
 interface IOwnProps {
     articleID: number;
     reactions: IArticleReaction[];
-    responseToken?: string;
 }
 
 type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>;
@@ -203,7 +202,7 @@ function mapStateToProps(state: IUsersStoreState & IKnowledgeAppStoreState, ownP
  * Map in some bound actions.
  */
 function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
-    const { articleID, responseToken } = ownProps;
+    const { articleID } = ownProps;
     const articleActions = new ArticleActions(dispatch, apiv2);
 
     return {
@@ -211,13 +210,11 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
             articleActions.reactHelpful({
                 articleID,
                 helpful: "yes",
-                responseToken: responseToken,
             }),
         onNoClick: () =>
             articleActions.reactHelpful({
                 articleID,
                 helpful: "no",
-                responseToken: responseToken,
             }),
     };
 }

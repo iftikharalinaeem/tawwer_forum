@@ -16,7 +16,7 @@ import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/navigation/NextPrevious";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle, IArticleLocale, IRelatedArticle } from "@knowledge/@types/api/article";
@@ -32,8 +32,7 @@ import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/Oth
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { ReCaptcha, loadReCaptcha } from "react-recaptcha-v3";
-import { useState } from "react";
+import { ensureScript } from "@vanilla/dom-utils/src";
 
 interface IProps {
     useBackButton?: boolean;
@@ -66,8 +65,6 @@ export default function ArticleLayout(props: IProps) {
     const { articleID } = article;
     const knowledgeBase = useKnowledgeBase(article.knowledgeBaseID);
 
-    const [responseToken, setResponseToken] = useState("");
-
     const activeRecord = {
         recordID: articleID,
         recordType: KbRecordType.ARTICLE,
@@ -96,10 +93,9 @@ export default function ArticleLayout(props: IProps) {
         <OtherLanguages articleLocaleData={articlelocales} knowledgeBaseID={article.knowledgeBaseID} />
     );
 
-    const handleReCaptcha = recaptchaToken => {
-        setResponseToken(recaptchaToken);
-    };
-    loadReCaptcha("_____PUT____KEY____HERE_____");
+    const siteKey = getMeta("reCaptchaKey");
+    console.log(siteKey);
+    ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
 
     return (
         <>
@@ -180,16 +176,7 @@ export default function ArticleLayout(props: IProps) {
                                 <UserContent content={article.body} />
                             </PanelWidget>
                             <PanelWidget>
-                                <ArticleReactions
-                                    reactions={article.reactions}
-                                    articleID={article.articleID}
-                                    responseToken={responseToken}
-                                />
-                                <ReCaptcha
-                                    sitekey="_____PUT____KEY____HERE_____"
-                                    action="social"
-                                    verifyCallback={handleReCaptcha}
-                                />
+                                <ArticleReactions reactions={article.reactions} articleID={article.articleID} />
                             </PanelWidget>
                             {(!!prevNavArticle || !!nextNavArticle) && (
                                 <PanelWidget>

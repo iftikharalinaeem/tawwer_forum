@@ -14,6 +14,7 @@ use Garden\Web\Exception\HttpException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
@@ -125,6 +126,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ExtendedContentFormatService */
     private $formatService;
 
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
      * DI.
      * @inheritdoc
@@ -147,7 +151,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         KnowledgeApiController $knowledgeApiController,
         ArticlesApiHelper $articleHelper,
         \Gdn_Session $session,
-        ExtendedContentFormatService $formatService
+        ExtendedContentFormatService $formatService,
+        ConfigurationInterface $config
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -167,6 +172,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->articleHelper = $articleHelper;
         $this->session = $session;
         $this->formatService = $formatService;
+        $this->config = $config;
     }
 
     /**
@@ -680,20 +686,18 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         // This is just check if article exists and knowledge base has status "published"
         $row = $this->articleByID($id);
 
+
         $validReaction = true;
         if ($body["responseToken"] ?? false) {
             $httpClient = new HttpClient();
             $reCaptchaResponse = $httpClient->post(
                 'https://www.google.com/recaptcha/api/siteverify',
-                [
-                    "secret" => "_____PUT____SECRET______HERE_____",
-                    "response" => $body["responseToken"]
-                ]
-            );
-
-            if ($reCaptchaResponse["success"] ?? false) {
-                $validReaction = $reCaptchaResponse["success"];
-            }
+                    [
+                        "secret" => $this->config->get("Recaptcha.PrivateKey", ''),
+                        "response" => $body['responseToken'],
+                    ]
+            )->getBody();
+            $validReaction = $reCaptchaResponse["success"] ?? false;
         }
 
         if ($validReaction) {
