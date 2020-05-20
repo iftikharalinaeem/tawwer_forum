@@ -92,6 +92,7 @@ export const eventsReducer = produce(
         })
         .case(EventsActions.getEventParticipantsACs.started, (nextState, params) => {
             const existing = nextState.participantsByEventID[params.eventID];
+
             if (existing) {
                 existing.status = LoadStatus.LOADING;
             } else {
@@ -103,12 +104,18 @@ export const eventsReducer = produce(
             const { eventID } = payload.params;
             const data = payload.result;
 
-            // console.log("data---", data);
-            nextState.participantsByEventID[eventID] = {
-                status: LoadStatus.SUCCESS,
-                data,
-            };
-            // Merge results from higher pages.
+            const existing = nextState.participantsByEventID[eventID];
+            if (existing && existing.data) {
+                existing.data.participants = existing.data.participants.concat(data.participants);
+                // We understand that only next in pagination matters, all items up to next
+                // have been fetched
+                existing.data.pagination = data.pagination;
+            } else {
+                nextState.participantsByEventID[eventID] = {
+                    status: LoadStatus.SUCCESS,
+                    data,
+                };
+            }
 
             return nextState;
         })
