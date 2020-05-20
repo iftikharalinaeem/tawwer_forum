@@ -47,6 +47,12 @@ export interface IGetEventsQuery {
     limit: number;
 }
 
+export interface IGetEventParticipantsQuery {
+    eventID: number;
+    limit: number;
+    page?: number;
+}
+
 export interface IGetEventParentRecordQuery {
     parentRecordType: string;
     parentRecordID: number;
@@ -55,7 +61,8 @@ export interface IGetEventParentRecordQuery {
 type IGetEventsResponse = IEventList;
 
 export class EventsActions extends ReduxActions {
-    public static DEFAULT_LIMIT = 30;
+    public static DEFAULT_LIMIT = 1;
+    public static DEFAULT_PARTICIPANTS_LIMIT = 2;
 
     public static readonly getEventListACs = createAction.async<IGetEventsQuery, IGetEventsResponse, IApiError>(
         "GET_EVENT_LIST",
@@ -121,12 +128,17 @@ export class EventsActions extends ReduxActions {
         IApiError
     >("GET_EVENT_PARTICIPANTS");
 
-    public getEventParticipants = (eventID: number) => {
+    public getEventParticipants = (params: IGetEventParticipantsQuery) => {
+        const { eventID, limit } = params;
         const thunk = bindThunkAction(EventsActions.getEventParticipantsACs, async () => {
-            const response = await this.api.get(`/events/${eventID}/participants`);
+            const response = await this.api.get(`/events/${eventID}/participants`, {
+                params: { ...params, expand: true },
+            });
+            const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
             const result: IEventParticipantList = {
                 eventID: eventID,
                 participants: response.data,
+                pagination,
             };
             return result;
         })({ eventID });

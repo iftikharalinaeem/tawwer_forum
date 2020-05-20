@@ -53,9 +53,11 @@ export default function EventsPage() {
 
     const parentRecordSlug = slugify(eventParent.data.name);
 
+    const participantsQuery = { eventID: 2, limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT, page: 2 };
+
     return (
         <>
-            <EventParticipantsModule eventID={2} />
+            <EventParticipantsModule query={participantsQuery} />
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />

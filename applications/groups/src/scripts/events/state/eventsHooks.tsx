@@ -5,7 +5,12 @@
 
 import { useSelector } from "react-redux";
 import { IEventsStoreState } from "@groups/events/state/EventsReducer";
-import { IGetEventsQuery, useEventsActions, IGetEventParentRecordQuery } from "@groups/events/state/EventsActions";
+import {
+    IGetEventsQuery,
+    useEventsActions,
+    IGetEventParentRecordQuery,
+    IGetEventParticipantsQuery,
+} from "@groups/events/state/EventsActions";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useEffect, useReducer, useCallback } from "react";
@@ -43,12 +48,12 @@ export function useEventsList(params: IGetEventsQuery) {
     return existingResult;
 }
 
-export function useEventParticipants(eventID: number) {
+export function useEventParticipants(query: IGetEventParticipantsQuery) {
     const actions = useEventsActions();
 
     const existingResult = useSelector((state: IEventsStoreState) => {
         return (
-            state.events.participantsByEventID[eventID] ?? {
+            state.events.participantsByEventID[query.eventID] ?? {
                 status: LoadStatus.PENDING,
             }
         );
@@ -58,9 +63,9 @@ export function useEventParticipants(eventID: number) {
 
     useEffect(() => {
         if ([LoadStatus.PENDING].includes(status)) {
-            actions.getEventParticipants(eventID);
+            actions.getEventParticipants(query);
         }
-    }, [status, actions, eventID]);
+    }, [status, actions, query]);
 
     return existingResult;
 }

@@ -72,6 +72,7 @@ export interface IEventParticipant {
 
 export interface IEventParticipantList {
     eventID: number;
+    pagination: ILinkPages;
     participants: IEventParticipant[];
 }
 
