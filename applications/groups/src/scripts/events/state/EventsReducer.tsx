@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { EventsActions } from "@groups/events/state/EventsActions";
+import { EventsActions, IGetEventParticipantsByAttendanceQuery } from "@groups/events/state/EventsActions";
 import {
     IEventList,
     IEventParentRecord,
@@ -11,11 +11,12 @@ import {
     EventAttendance,
     IEventParticipant,
     IEventParticipantList,
+    IEventParticipantsByAttendance,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { stableObjectHash } from "@vanilla/utils";
-import produce from "immer";
+import produce, { original } from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IEventsState {
@@ -25,6 +26,7 @@ export interface IEventsState {
     partipateStatusByEventID: Record<number, ILoadable<{ attending: EventAttendance }>>;
     deleteStatusesByID: Record<number, ILoadable<{}>>;
     participantsByEventID: Record<number, ILoadable<IEventParticipantList>>;
+    participantsByAttendanceByEventID: Record<number, ILoadable<Record<string, IEventParticipantsByAttendance>>>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -38,6 +40,7 @@ const DEFAULT_EVENT_STATE: IEventsState = {
     partipateStatusByEventID: {},
     deleteStatusesByID: {},
     participantsByEventID: {},
+    participantsByAttendanceByEventID: {},
 };
 
 export const eventsReducer = produce(
@@ -96,7 +99,9 @@ export const eventsReducer = produce(
             if (existing) {
                 existing.status = LoadStatus.LOADING;
             } else {
-                nextState.participantsByEventID[params.eventID] = { status: LoadStatus.LOADING };
+                nextState.participantsByEventID[params.eventID] = {
+                    status: LoadStatus.LOADING,
+                };
             }
             return nextState;
         })
@@ -108,8 +113,9 @@ export const eventsReducer = produce(
             if (existing && existing.data) {
                 existing.data.participants = existing.data.participants.concat(data.participants);
                 // We understand that only next in pagination matters, all items up to next
-                // have been fetched
+                // have been accumulated
                 existing.data.pagination = data.pagination;
+                existing.status = LoadStatus.SUCCESS;
             } else {
                 nextState.participantsByEventID[eventID] = {
                     status: LoadStatus.SUCCESS,
@@ -123,6 +129,51 @@ export const eventsReducer = produce(
             const { eventID } = payload.params;
             const { error } = payload;
             nextState.participantsByEventID[eventID] = {
+                status: LoadStatus.SUCCESS,
+                error,
+            };
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsByAttendanceACs.started, (nextState, params) => {
+            const { eventID } = params;
+            const existing = nextState.participantsByAttendanceByEventID[eventID];
+
+            if (existing) {
+                existing.status = LoadStatus.LOADING;
+            } else {
+                nextState.participantsByAttendanceByEventID[eventID] = { status: LoadStatus.LOADING };
+            }
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsByAttendanceACs.done, (nextState, payload) => {
+            const { eventID, attending } = payload.params;
+            const data: IEventParticipantsByAttendance = payload.result;
+
+            const existing = nextState.participantsByAttendanceByEventID[eventID];
+            if (existing && existing.data) {
+                // console.log(original(existing));
+                // console.log(data[attending].participants);
+                existing.data[attending].participants = existing.data[attending].participants.concat(data.participants);
+                // We understand that only next in pagination matters, all items up to next
+                // have been accumulated
+                existing.data[attending].pagination = data.pagination;
+                existing.status = LoadStatus.SUCCESS;
+            } else {
+                const newData: Record<string, IEventParticipantsByAttendance> = {
+                    [data.attending]: data,
+                };
+                nextState.participantsByAttendanceByEventID[eventID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: newData,
+                };
+            }
+
+            return nextState;
+        })
+        .case(EventsActions.getEventParticipantsByAttendanceACs.failed, (nextState, payload) => {
+            const { eventID } = payload.params;
+            const { error } = payload;
+            nextState.participantsByAttendanceByEventID[eventID] = {
                 status: LoadStatus.SUCCESS,
                 error,
             };

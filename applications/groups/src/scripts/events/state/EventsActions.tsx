@@ -14,13 +14,11 @@ import {
     IEventParticipant,
     EventAttendance,
     IEventParticipantList,
+    IEventParticipantsByAttendance,
 } from "@groups/events/state/eventsTypes";
 import SimplePagerModel from "@vanilla/library/src/scripts/navigation/SimplePagerModel";
-import { number } from "prop-types";
 
 const createAction = actionCreatorFactory("@@events");
-
-type IEventParticipantsResponse = IEventParticipant[];
 
 type IEventPatchRequest = {
     parentRecordID: string;
@@ -53,6 +51,13 @@ export interface IGetEventParticipantsQuery {
     page?: number;
 }
 
+export interface IGetEventParticipantsByAttendanceQuery {
+    eventID: number;
+    attending: EventAttendance;
+    limit: number;
+    page?: number;
+}
+
 export interface IGetEventParentRecordQuery {
     parentRecordType: string;
     parentRecordID: number;
@@ -70,7 +75,9 @@ export class EventsActions extends ReduxActions {
 
     public getEventList = (params: IGetEventsQuery) => {
         const thunk = bindThunkAction(EventsActions.getEventListACs, async () => {
-            const response = await this.api.get(`/events`, { params: { ...params, expand: true } });
+            const response = await this.api.get(`/events`, {
+                params: { ...params, expand: true },
+            });
             const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
             const result: IEventList = {
                 events: response.data,
@@ -129,7 +136,7 @@ export class EventsActions extends ReduxActions {
     >("GET_EVENT_PARTICIPANTS");
 
     public getEventParticipants = (params: IGetEventParticipantsQuery) => {
-        const { eventID, limit } = params;
+        const { eventID } = params;
         const thunk = bindThunkAction(EventsActions.getEventParticipantsACs, async () => {
             const response = await this.api.get(`/events/${eventID}/participants`, {
                 params: { ...params, expand: true },
@@ -142,6 +149,29 @@ export class EventsActions extends ReduxActions {
             };
             return result;
         })({ eventID });
+        return this.dispatch(thunk);
+    };
+
+    public static readonly getEventParticipantsByAttendanceACs = createAction.async<
+        IGetEventParticipantsByAttendanceQuery,
+        IEventParticipantsByAttendance,
+        IApiError
+    >("GET_EVENT_PARTICIPANTS_BY_ATTENDANCE");
+
+    public getEventParticipantsByAttendance = (params: IGetEventParticipantsByAttendanceQuery) => {
+        const thunk = bindThunkAction(EventsActions.getEventParticipantsByAttendanceACs, async () => {
+            const response = await this.api.get(`/events/${params.eventID}/participants`, {
+                params: { ...params, expand: true },
+            });
+            const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
+            const result: IEventParticipantsByAttendance = {
+                eventID: params.eventID,
+                attending: params.attending,
+                participants: response.data,
+                pagination,
+            };
+            return result;
+        })(params);
         return this.dispatch(thunk);
     };
 

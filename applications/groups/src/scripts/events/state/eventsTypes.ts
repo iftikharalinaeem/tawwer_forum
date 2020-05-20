@@ -76,6 +76,18 @@ export interface IEventParticipantList {
     participants: IEventParticipant[];
 }
 
+// export interface IParticipantList {
+//     pagination: ILinkPages;
+//     participants: IEventParticipant[];
+// }
+
+export interface IEventParticipantsByAttendance {
+    eventID: number;
+    attending: EventAttendance;
+    pagination: ILinkPages;
+    participants: IEventParticipant[];
+}
+
 export interface IEventWithParticipants {
     event: IEvent;
     participants: IEventParticipant[];

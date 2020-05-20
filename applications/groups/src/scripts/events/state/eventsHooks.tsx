@@ -10,6 +10,7 @@ import {
     useEventsActions,
     IGetEventParentRecordQuery,
     IGetEventParticipantsQuery,
+    IGetEventParticipantsByAttendanceQuery,
 } from "@groups/events/state/EventsActions";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
@@ -17,6 +18,7 @@ import { useEffect, useReducer, useCallback } from "react";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { useLocation } from "react-router";
 import { action } from "@storybook/addon-actions";
+import { original } from "immer";
 
 export function useEventsState() {
     return useSelector((state: IEventsStoreState) => {
@@ -64,6 +66,27 @@ export function useEventParticipants(query: IGetEventParticipantsQuery) {
     useEffect(() => {
         if ([LoadStatus.PENDING].includes(status)) {
             actions.getEventParticipants(query);
+        }
+    }, [status, actions, query]);
+
+    return existingResult;
+}
+
+export function useEventParticipantsByAttendance(query: IGetEventParticipantsByAttendanceQuery) {
+    const actions = useEventsActions();
+
+    const existingResult = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.participantsByAttendanceByEventID[query.eventID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+
+    const { status } = existingResult;
+    useEffect(() => {
+        if ([LoadStatus.PENDING].includes(status)) {
+            actions.getEventParticipantsByAttendance(query);
         }
     }, [status, actions, query]);
 

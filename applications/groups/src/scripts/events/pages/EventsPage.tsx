@@ -4,7 +4,10 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
-import { EventParticipantsModule } from "@groups/events/modules/EventParticipantsModule";
+import {
+    EventParticipantsModule,
+    EventParticipantsByAttendanceModule,
+} from "@groups/events/modules/EventParticipantsModule";
 import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
 import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
 import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
@@ -19,7 +22,7 @@ import { notEmpty, slugify } from "@vanilla/utils";
 import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions, useEventsActions } from "@groups/events/state/EventsActions";
-import { actions } from "@storybook/addon-actions";
+import { EventAttendance } from "../state/eventsTypes";
 
 export default function EventsPage() {
     const page = useQueryParamPage();
@@ -44,6 +47,22 @@ export default function EventsPage() {
     const { getEventParticipants } = useEventsActions();
     const [participantsQuery, setParticipantsQuery] = useState({
         eventID: 2,
+        limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
+        page: 1,
+    });
+
+    const { getEventParticipantsByAttendance } = useEventsActions();
+
+    const [tpquery, setTPQuery] = useState({
+        eventID: 1,
+        attending: EventAttendance.GOING,
+        limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
+        page: 1,
+    });
+
+    const [ttpquery, setTTPQuery] = useState({
+        eventID: 2,
+        attending: EventAttendance.MAYBE,
         limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
         page: 1,
     });
@@ -75,6 +94,40 @@ export default function EventsPage() {
             >
                 Next
             </button>
+            <br />
+            <br />
+            <br />
+            <EventParticipantsByAttendanceModule query={tpquery} />
+
+            <button
+                type="button"
+                onClick={() => {
+                    const newQuery = { ...tpquery, page: tpquery.page + 1 };
+                    // console.log(newQuery);
+                    setTPQuery(newQuery);
+                    getEventParticipantsByAttendance(newQuery);
+                }}
+            >
+                Next
+            </button>
+
+            <br />
+            <br />
+            <br />
+            <EventParticipantsByAttendanceModule query={tpquery} />
+
+            <button
+                type="button"
+                onClick={() => {
+                    const newQuery = { ...ttpquery, page: ttpquery.page + 1 };
+                    // console.log(newQuery);
+                    setTTPQuery(newQuery);
+                    getEventParticipantsByAttendance(newQuery);
+                }}
+            >
+                Next
+            </button>
+
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
