@@ -1089,6 +1089,41 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
+     * Test PUT /articles/<id>/react as Guest
+     */
+    public function testPutReactHelpfulAsGuest() {
+        $article = $this->testPost();
+
+        $this->api()->patch(
+            '/roles/2',
+            [
+                'name' => 'Guest',
+                'permissions' => [
+                    [
+                        'type' => 'global',
+                        'permissions' => [
+                            'kb.view' => true,
+                            'articles.add' => false
+                        ]
+                    ]
+                ]
+            ]
+        );
+        $this->api()->setUserID(0);
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/react",
+            ['helpful' => 'no']
+        )->getBody();
+
+        $this->assertEquals($article['name'], $body['name']);
+        $this->assertEquals('helpful', $body['reactions'][0]['reactionType']);
+        $this->assertEquals(0, $body['reactions'][0]['yes']);
+        $this->assertEquals(1, $body['reactions'][0]['no']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
      * Setup user with kb permissions.
      *
      * @param string $roleType

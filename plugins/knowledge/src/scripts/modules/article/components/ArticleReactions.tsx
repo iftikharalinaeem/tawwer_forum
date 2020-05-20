@@ -24,7 +24,7 @@ import { CheckCompactIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export function ArticleReactions(props: IProps) {
-    const { isNoSubmitting, isYesSubmitting } = props;
+    const { isNoSubmitting, isYesSubmitting, isSignedIn } = props;
     const classes = reactionClasses();
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
@@ -34,7 +34,28 @@ export function ArticleReactions(props: IProps) {
     }
 
     // Build the text for the view.
-    const { yes, total, userReaction } = helpfulReactions;
+    const { yes, total } = helpfulReactions;
+
+    let localeStorage = typeof localStorage !== "undefined" ? localStorage : false;
+    let disableGuestVoting = !localeStorage;
+
+    if (!isSignedIn && localeStorage) {
+        if (localeStorage) {
+            try {
+                const hasVoted = localeStorage.getItem(`hasVoted-${props.articleID}`);
+                if (!hasVoted && (isYesSubmitting || isNoSubmitting)) {
+                    localeStorage.setItem(`hasVoted-${props.articleID}`, isYesSubmitting ? "yes" : "no");
+                } else if (hasVoted) {
+                    const userReactionType = hasVoted === "yes" ? "yes" : "no";
+                    helpfulReactions.userReaction = userReactionType;
+                }
+            } catch (e) {
+                disableGuestVoting = true;
+            }
+        }
+    }
+
+    const { userReaction } = helpfulReactions;
 
     const resultText =
         total < 1 ? (
@@ -45,7 +66,7 @@ export function ArticleReactions(props: IProps) {
 
     const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
 
-    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || !props.isSignedIn;
+    const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || disableGuestVoting;
 
     return (
         <section className={classes.frame}>
@@ -53,7 +74,6 @@ export function ArticleReactions(props: IProps) {
             <div className={classes.votingButtons}>
                 <ReactionButton
                     reactionData={helpfulReactions}
-                    isSignedIn={props.isSignedIn}
                     title={t("Yes")}
                     reactionValue="yes"
                     isSubmitting={!!isYesSubmitting}
@@ -62,7 +82,6 @@ export function ArticleReactions(props: IProps) {
                 />
                 <ReactionButton
                     reactionData={helpfulReactions}
-                    isSignedIn={props.isSignedIn}
                     title={t("No")}
                     reactionValue="no"
                     isSubmitting={!!isNoSubmitting}
@@ -70,7 +89,7 @@ export function ArticleReactions(props: IProps) {
                     onClick={props.onNoClick}
                 />
             </div>
-            <SignInLink isSignedIn={props.isSignedIn} />
+            {disableGuestVoting && <SignInLink isSignedIn={props.isSignedIn} />}
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
     );
@@ -81,7 +100,6 @@ export function ArticleReactions(props: IProps) {
  */
 function ReactionButton(props: {
     reactionData: IArticleReaction;
-    isSignedIn: boolean;
     title: string;
     reactionValue: string;
     isSubmitting: boolean;

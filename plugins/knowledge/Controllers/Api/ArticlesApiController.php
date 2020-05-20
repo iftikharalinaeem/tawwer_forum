@@ -233,18 +233,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($article['knowledgeCategoryID']), $query['locale'] ?? null);
         $article['breadcrumbs'] = $crumbs;
 
-        $reactionCounts = $this->articleReactionModel->getReactionCount($id);
-        $article['reactions'][]  = [
-            'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
-            'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
-            'no' => (int)$reactionCounts['neutralCount'] ?? 0,
-            'total' => (int)$reactionCounts['allCount'] ?? 0,
-            'userReaction' => $this->articleReactionModel->getUserReaction(
-                ArticleReactionModel::TYPE_HELPFUL,
-                $id,
-                $this->session->UserID
-            ),
-        ];
+            $reactionCounts = $this->articleReactionModel->getReactionCount($id);
+            $article['reactions'][]  = [
+                'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                'yes' => (int)$reactionCounts['positiveCount'] ?? 0,
+                'no' => (int)$reactionCounts['neutralCount'] ?? 0,
+                'total' => (int)$reactionCounts['allCount'] ?? 0,
+                'userReaction' => ($this->session->UserID) ? $this->articleReactionModel->getUserReaction(
+                    ArticleReactionModel::TYPE_HELPFUL,
+                    $id,
+                    $this->session->UserID
+                ) : null,
+            ];
+
         if (isset($query["locale"])) {
             $article["queryLocale"] = $query["locale"];
         }
@@ -276,6 +277,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "url:s?",
             "locale:s",
             "sourceLocale:s",
+            "dateUpdated:dt",
             "translationStatus:s" => [
                 "enum" =>["up-to-date", "out-of-date", "not-translated"]
             ],
@@ -580,7 +582,12 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $this->validateFirstArticleRevision($id, $body);
         }
 
-        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($body);
+        $bodyWithFormat = $body;
+        // Make sure the format gets passed.
+        if (!isset($bodyWithFormat['format'])) {
+            $bodyWithFormat['format'] = $initialRow['format'];
+        }
+        [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($bodyWithFormat);
         $this->articleHelper->save($body, $id);
         $row = $this->articleHelper->retrieveRow($id, $body);
 
@@ -649,9 +656,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
      */
     public function put_react(int $id, array $body): array {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
-        if (!$this->session->isValid()) {
-            throw new ClientException('User must be signed in to post reaction.');
-        }
 
         $this->idParamSchema();
         $in = $this->schema([
@@ -676,85 +680,77 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         // This is just check if article exists and knowledge base has status "published"
         $row = $this->articleByID($id);
 
-        $mode = $this->articleHelper->getOperationMode();
-        if ($mode === Operation::MODE_DEFAULT) {
-            $fields['insertUserID'] = $this->session->UserID;
-            $fields['foreignID'] = '';
-        } else {
-            $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
-            $fields['foreignID'] = $body['foreignID'] ?? '';
+        $validReaction = true;
+        if ($body["responseToken"] ?? false) {
+            $httpClient = new HttpClient();
+            $reCaptchaResponse = $httpClient->post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                [
+                    "secret" => "_____PUT____SECRET______HERE_____",
+                    "response" => $body["responseToken"]
+                ]
+            );
 
-            $validReaction = true;
-            if ($body["responseToken"] ?? false) {
-                $httpClient = new HttpClient();
-                $reCaptchaResponse = $httpClient->post('https://www.google.com/recaptcha/api/siteverify',
-                    [
-                        "secret" => "_____PUT____SECRET______HERE_____",
-                        "response" => $body["responseToken"]
-                    ]
-                );
+            if ($reCaptchaResponse["success"] ?? false) {
+                $validReaction = $reCaptchaResponse["success"];
+            }
+        }
 
-                if ($reCaptchaResponse["success"] ?? false) {
-                    $validReaction = $reCaptchaResponse["success"];
-                }
+        if ($validReaction) {
+            $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
+            $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
+
+            $mode = $this->articleHelper->getOperationMode();
+            if ($mode === Operation::MODE_DEFAULT) {
+                $fields['insertUserID'] = $this->session->UserID ?? $body['insertUserID'];
+                $fields['foreignID'] = '';
+            } else {
+                $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
+                $fields['foreignID'] = $body['foreignID'] ?? '';
             }
 
-            if ($validReaction) {
-                $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
-                $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
-
-                $mode = $this->articleHelper->getOperationMode();
-                if ($mode === Operation::MODE_DEFAULT) {
-                    $fields['insertUserID'] = $this->session->UserID ?? $body['insertUserID'];
-                    $fields['foreignID'] = '';
-                } else {
-                    $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
-                    $fields['foreignID'] = $body['foreignID'] ?? '';
-                }
-
-                if (empty($fields['foreignID'])) {
-                    $existingReactionValue = $this->articleReactionModel->getUserReaction(
-                        ArticleReactionModel::TYPE_HELPFUL,
-                        $id,
-                        $fields['insertUserID']
-                    );
-                } else {
-                    $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
-                }
-
-                if ($existingReactionValue !== null && $fields['insertUserID'] !== 0) {
-                    throw new ClientException('You already reacted on this article before.');
-                }
-
-                $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
-
-                $this->reactionModel->insert($fields, $mode);
-
-                $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
-
-                $row = $this->articleByID($id, true);
-
-                $newReactionValue = $this->articleReactionModel->getUserReaction(
+            if (empty($fields['foreignID'])) {
+                $existingReactionValue = $this->articleReactionModel->getUserReaction(
                     ArticleReactionModel::TYPE_HELPFUL,
                     $id,
                     $fields['insertUserID']
                 );
-                $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
-                $row['reactions'][] = [
-                    'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
-                    'yes' => (int)$reactionCounts['positiveCount'],
-                    'no' => (int)$reactionCounts['neutralCount'],
-                    'total' => (int)$reactionCounts['allCount'],
-                    'userReaction' => $newReactionValue,
-                ];
-                $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
+            } else {
+                $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
             }
 
-            $row = $this->articleHelper->normalizeOutput($row);
-            $result = $out->validate($row);
+            if ($existingReactionValue !== null && $fields['insertUserID'] !== 0) {
+                throw new ClientException('You already reacted on this article before.');
+            }
 
-            return $result;
+            $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
+
+            $this->reactionModel->insert($fields, $mode);
+
+            $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
+
+            $row = $this->articleByID($id, true);
+
+            $newReactionValue = $this->articleReactionModel->getUserReaction(
+                ArticleReactionModel::TYPE_HELPFUL,
+                $id,
+                $fields['insertUserID']
+            );
+            $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+            $row['reactions'][] = [
+                'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                'yes' => (int)$reactionCounts['positiveCount'],
+                'no' => (int)$reactionCounts['neutralCount'],
+                'total' => (int)$reactionCounts['allCount'],
+                'userReaction' => $newReactionValue,
+            ];
+            $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
         }
+
+        $row = $this->articleHelper->normalizeOutput($row);
+        $result = $out->validate($row);
+
+        return $result;
     }
 
     /**
