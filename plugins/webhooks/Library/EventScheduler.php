@@ -97,6 +97,7 @@ class EventScheduler {
      * @return array
      */
     public function generateJobMessage(ResourceEvent $event, WebhookConfig $webhook, string $deliveryID): array {
+
         $body = [
             "action" => $this->getActionFromEvent($event),
             "payload" => $event->getPayload(),
@@ -104,6 +105,11 @@ class EventScheduler {
             "site" => $this->site(),
         ];
 
+        array_walk_recursive($body, function (&$value) {
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DATE_ATOM);
+            }
+        });
         $json = StringUtils::jsonEncodeChecked($body, \JSON_UNESCAPED_SLASHES);
 
         $result = [

@@ -48,7 +48,6 @@ function WebhookAddEdit() {
             events.splice(events.indexOf(event, 1));
         }
 
-        console.log(events);
         updateForm({ events: events });
     };
 
