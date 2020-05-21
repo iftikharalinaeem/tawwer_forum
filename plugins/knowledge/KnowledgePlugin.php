@@ -17,7 +17,7 @@ use Vanilla\Models\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use Vanilla\Knowledge\Models\KnowledgeVariablesProvider;
 use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
@@ -95,7 +95,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('addRoute', ['route' => new Reference(KbPageRoutes::class), 'kb-page'])
             ->rule(BreadcrumbModel::class)
             ->addCall('addProvider', [new Reference(KbBreadcrumbProvider::class)])
-            ->rule(ThemeModel::class)
+            ->rule(ThemeService::class)
             ->addCall("addVariableProvider", [new Reference(KnowledgeVariablesProvider::class)])
             ->rule(SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeArticle()])
