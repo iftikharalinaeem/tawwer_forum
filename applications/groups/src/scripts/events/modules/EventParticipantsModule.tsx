@@ -40,6 +40,5 @@ export function EventParticipantsByAttendanceModule(props: IParticipantsByAttend
         return <ErrorMessages errors={[participants.error].filter(notEmpty)} />;
     }
 
-    // console.log(participants);
-    return <EventParticipants participants={participants.data[props.query.attending].participants} />;
+    return <EventParticipants participants={participants.data.participants} />;
 }

@@ -61,7 +61,7 @@ export default function EventsPage() {
     });
 
     const [ttpquery, setTTPQuery] = useState({
-        eventID: 2,
+        eventID: 1,
         attending: EventAttendance.MAYBE,
         limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
         page: 1,
@@ -114,7 +114,7 @@ export default function EventsPage() {
             <br />
             <br />
             <br />
-            <EventParticipantsByAttendanceModule query={tpquery} />
+            <EventParticipantsByAttendanceModule query={ttpquery} />
 
             <button
                 type="button"

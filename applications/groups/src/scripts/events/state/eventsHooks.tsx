@@ -74,10 +74,12 @@ export function useEventParticipants(query: IGetEventParticipantsQuery) {
 
 export function useEventParticipantsByAttendance(query: IGetEventParticipantsByAttendanceQuery) {
     const actions = useEventsActions();
+    const { eventID, attending } = query;
+    const hash = stableObjectHash({ eventID, attending });
 
     const existingResult = useSelector((state: IEventsStoreState) => {
         return (
-            state.events.participantsByAttendanceByEventID[query.eventID] ?? {
+            state.events.participantsByAttendanceByEventID[hash] ?? {
                 status: LoadStatus.PENDING,
             }
         );

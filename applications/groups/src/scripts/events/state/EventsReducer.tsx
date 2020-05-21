@@ -3,20 +3,19 @@
  * @license Proprietary
  */
 
-import { EventsActions, IGetEventParticipantsByAttendanceQuery } from "@groups/events/state/EventsActions";
+import { EventsActions } from "@groups/events/state/EventsActions";
 import {
     IEventList,
     IEventParentRecord,
     IEventWithParticipants,
     EventAttendance,
-    IEventParticipant,
     IEventParticipantList,
     IEventParticipantsByAttendance,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { stableObjectHash } from "@vanilla/utils";
-import produce, { original } from "immer";
+import produce from "immer";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 
 export interface IEventsState {
@@ -26,7 +25,7 @@ export interface IEventsState {
     partipateStatusByEventID: Record<number, ILoadable<{ attending: EventAttendance }>>;
     deleteStatusesByID: Record<number, ILoadable<{}>>;
     participantsByEventID: Record<number, ILoadable<IEventParticipantList>>;
-    participantsByAttendanceByEventID: Record<number, ILoadable<Record<string, IEventParticipantsByAttendance>>>;
+    participantsByAttendanceByEventID: Record<string, ILoadable<IEventParticipantsByAttendance>>;
 }
 
 export interface IEventsStoreState extends ICoreStoreState {
@@ -135,45 +134,43 @@ export const eventsReducer = produce(
             return nextState;
         })
         .case(EventsActions.getEventParticipantsByAttendanceACs.started, (nextState, params) => {
-            const { eventID } = params;
-            const existing = nextState.participantsByAttendanceByEventID[eventID];
+            const { eventID, attending } = params;
+            const hash = stableObjectHash({ eventID, attending });
+            const existing = nextState.participantsByAttendanceByEventID[hash];
 
             if (existing) {
                 existing.status = LoadStatus.LOADING;
             } else {
-                nextState.participantsByAttendanceByEventID[eventID] = { status: LoadStatus.LOADING };
+                nextState.participantsByAttendanceByEventID[hash] = { status: LoadStatus.LOADING };
             }
             return nextState;
         })
         .case(EventsActions.getEventParticipantsByAttendanceACs.done, (nextState, payload) => {
             const { eventID, attending } = payload.params;
+            const hash = stableObjectHash({ eventID, attending });
             const data: IEventParticipantsByAttendance = payload.result;
 
-            const existing = nextState.participantsByAttendanceByEventID[eventID];
+            const existing = nextState.participantsByAttendanceByEventID[hash];
             if (existing && existing.data) {
-                // console.log(original(existing));
-                // console.log(data[attending].participants);
-                existing.data[attending].participants = existing.data[attending].participants.concat(data.participants);
+                existing.data.participants = existing.data.participants.concat(data.participants);
                 // We understand that only next in pagination matters, all items up to next
                 // have been accumulated
-                existing.data[attending].pagination = data.pagination;
+                existing.data.pagination = data.pagination;
                 existing.status = LoadStatus.SUCCESS;
             } else {
-                const newData: Record<string, IEventParticipantsByAttendance> = {
-                    [data.attending]: data,
-                };
-                nextState.participantsByAttendanceByEventID[eventID] = {
+                nextState.participantsByAttendanceByEventID[hash] = {
                     status: LoadStatus.SUCCESS,
-                    data: newData,
+                    data,
                 };
             }
 
             return nextState;
         })
         .case(EventsActions.getEventParticipantsByAttendanceACs.failed, (nextState, payload) => {
-            const { eventID } = payload.params;
+            const { eventID, attending } = payload.params;
+            const hash = stableObjectHash({ eventID, attending });
             const { error } = payload;
-            nextState.participantsByAttendanceByEventID[eventID] = {
+            nextState.participantsByAttendanceByEventID[hash] = {
                 status: LoadStatus.SUCCESS,
                 error,
             };
