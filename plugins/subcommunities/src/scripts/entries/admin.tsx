@@ -9,6 +9,7 @@ import { ProductIntegrationFormGroup } from "@subcommunities/forms/ProductIntegr
 import { ProductSelectorFormGroup } from "@subcommunities/forms/ProductSelectorFormGroup";
 import { getMeta } from "@library/utility/appUtils";
 import { SubcommunityThemeFormGroup } from "@subcommunities/forms/SubcommunityThemeFormGroup";
+import { MultiSubcommunityInput } from "@subcommunities/chooser/MultiSubcommunityInput";
 
 const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
 
@@ -31,4 +32,6 @@ if (isProductIntgrationEnabled) {
         props => <SubcommunityThemeFormGroup {...props} formFieldName="themeID" />,
         { overwrite: true },
     );
+
+    addComponent("multi-subcommunity-input", MultiSubcommunityInput, { overwrite: true });
 }
