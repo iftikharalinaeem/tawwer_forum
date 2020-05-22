@@ -8,7 +8,7 @@
 namespace Vanilla\Theme\Controllers\Pages;
 
 use Garden\Web\Data;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Page;
 

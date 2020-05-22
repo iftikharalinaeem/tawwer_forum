@@ -4,8 +4,8 @@
  * @license GPL-2.0-only
  */
 
-use Vanilla\Models\ThemeModel;
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeServiceHelper;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSiteSection;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
@@ -32,7 +32,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
      */
     protected static $siteSectionProvider;
     /**
-     * @var ThemeModel;
+     * @var ThemeService;
      */
     protected static $themeModel;
 
@@ -46,8 +46,8 @@ class ThemeModelTests extends AbstractAPIv2Test {
         self::$config = static::container()->get(Gdn_Configuration::class);
         /** @var MockSiteSectionProvider $siteSectionProvider */
         self::$siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
-        /** @var ThemeModel self::$themeModel */
-        self::$themeModel = self::container()->get(ThemeModel::class);
+        /** @var ThemeService self::$themeModel */
+        self::$themeModel = self::container()->get(ThemeService::class);
     }
 
     /**
@@ -76,8 +76,8 @@ class ThemeModelTests extends AbstractAPIv2Test {
     public function testGetCurrentThemePreview() {
         self::$themeModel->setPreviewTheme('lavendermoon');
         $theme = self::$themeModel->getCurrentTheme();
-        /** @var ThemeModelHelper self::$themeModelHelper */
-        $themeModelHelper = self::container()->get(ThemeModelHelper::class);
+        /** @var ThemeServiceHelper self::$themeModelHelper */
+        $themeModelHelper = self::container()->get(ThemeServiceHelper::class);
         $themeModelHelper->cancelSessionPreviewTheme();
         $this->assertEquals('lavendermoon', $theme['themeID']);
     }
@@ -91,7 +91,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
 
         $theme = self::$themeModel->getCurrentTheme();
 
-        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $theme['themeID']);
+        $this->assertEquals(ThemeService::FALLBACK_THEME_KEY, $theme['themeID']);
     }
 
     /**
@@ -125,8 +125,8 @@ class ThemeModelTests extends AbstractAPIv2Test {
 
         $theme = self::$themeModel->setPreviewTheme($dbTheme["themeID"]);
 
-        /** @var ThemeModelHelper self::$themeModelHelper */
-        $themeModelHelper = self::container()->get(ThemeModelHelper::class);
+        /** @var ThemeServiceHelper self::$themeModelHelper */
+        $themeModelHelper = self::container()->get(ThemeServiceHelper::class);
         $themeModelHelper->cancelSessionPreviewTheme();
 
         $this->assertEquals($dbTheme["themeID"], $theme['themeID']);
@@ -165,7 +165,7 @@ class ThemeModelTests extends AbstractAPIv2Test {
 
         $themeAddon = self::$themeModel->getCurrentThemeAddon();
 
-        $this->assertEquals(ThemeModel::FALLBACK_THEME_KEY, $themeAddon->getKey());
+        $this->assertEquals(ThemeService::FALLBACK_THEME_KEY, $themeAddon->getKey());
     }
 
     /**

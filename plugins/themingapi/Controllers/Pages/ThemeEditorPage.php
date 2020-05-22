@@ -6,7 +6,7 @@
 
 namespace Vanilla\Theme\Controllers\Pages;
 
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 
 /**
  * Base page for the theme editor.

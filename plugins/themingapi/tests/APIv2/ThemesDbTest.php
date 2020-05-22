@@ -13,7 +13,7 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Garden\Container\Reference;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
 
 /**

@@ -13,7 +13,7 @@ use \Gdn_Request;
 use \Gdn_Database;
 use \Gdn_Plugin;
 use Gdn_Session as SessionInterface;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
 use Vanilla\ThemingApi\Models\ThemeModel as DbThemeModel;
 use Vanilla\ThemingApi\Models\ThemeRevisionModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
@@ -81,7 +81,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
      * @param \Garden\Container\Container $container Container to support dependency injection
      */
     public function container_init(\Garden\Container\Container $container) {
-        $container->rule(ThemeModel::class)
+        $container->rule(ThemeService::class)
             ->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)])
             ->addCall("setThemeManagePageUrl", ["/theme/theme-settings"])
         ;
