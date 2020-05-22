@@ -15,6 +15,7 @@ import qs from "qs";
 import { t } from "@vanilla/i18n/src";
 import { ITheme, IThemeAssets } from "@vanilla/library/src/scripts/theming/themeReducer";
 import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { DeepPartial } from "redux";
 const actionCreator = actionCreatorFactory("@@themeEditor");
 
 interface IGetThemeParams {
@@ -49,7 +50,7 @@ export default class ThemeEditorActions extends ReduxActions<IThemeEditorStoreSt
     public static initAssetsAC = actionCreator<{ themeID?: string | number }>("INIT_ASSETS");
     public initAssets = this.bindDispatch(ThemeEditorActions.initAssetsAC);
 
-    public static updateAssetsAC = actionCreator<Partial<IThemeForm>>("UPDATE_ASSETS");
+    public static updateAssetsAC = actionCreator<DeepPartial<IThemeForm>>("UPDATE_ASSETS");
     public updateAssets = this.bindDispatch(ThemeEditorActions.updateAssetsAC);
 
     public static clearSubmitAC = actionCreator("CLEAR_SUBMIT");
@@ -82,24 +83,11 @@ export default class ThemeEditorActions extends ReduxActions<IThemeEditorStoreSt
         const thunk = bindThunkAction(ThemeEditorActions.getTheme_ACs, async () => {
             const { themeID, revisionID } = options;
             const params = revisionID
-                ? { allowAddonVariables: false, revisionID: revisionID }
-                : { allowAddonVariables: false };
+                ? { allowAddonVariables: false, revisionID: revisionID, expand: true }
+                : { allowAddonVariables: false, expand: true };
             const response = await this.api.get(`/themes/${themeID}`, {
                 params: params,
             });
-
-            // KLUDGE - There is currently no get_edit endpoint.
-            const { assets } = response.data;
-
-            if ("styles" in assets) {
-                const stylesResponse = await this.api.get(`/themes/${themeID}/assets/styles.css`);
-                assets.styles = stylesResponse.data;
-            }
-
-            if ("javascript" in assets) {
-                const javascriptResponse = await this.api.get(`/themes/${themeID}/assets/javascript.js`);
-                assets.javascript = javascriptResponse.data;
-            }
 
             response.data.pageType = currentPageType;
 
@@ -125,20 +113,9 @@ export default class ThemeEditorActions extends ReduxActions<IThemeEditorStoreSt
         const { form } = this.getState().themeEditor;
         const { themeID, pageType } = this.getState().themeEditor.form;
 
-        const assets: any = {
-            header: form.assets.header,
-            footer: form.assets.footer,
-            styles: form.assets.styles,
-            javascript: form.assets.javascript,
-            variables: {
-                data: JSON.stringify((form.assets.variables as any).data),
-                type: "json",
-            },
-        };
-
         const request = {
             name: form.name,
-            assets: assets,
+            assets: form.assets,
         };
 
         let result: any;

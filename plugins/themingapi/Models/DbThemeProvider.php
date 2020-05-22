@@ -401,6 +401,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     private function createTheme(array $dbTheme, array $dbAssets): Theme {
         $dbAssets = array_column($dbAssets, null, 'assetKey');
 
+        $dbTheme['type'] = 'themeDB';
         $dbTheme['assets'] = $dbAssets;
         $dbTheme['version'] = crc32($dbTheme['dateUpdated']->format('Y-m-d H:i:s'));
         $theme = new Theme($dbTheme);

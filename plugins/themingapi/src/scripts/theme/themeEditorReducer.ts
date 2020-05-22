@@ -12,6 +12,7 @@ import ThemeEditorActions, { PageType } from "./ThemeEditorActions";
 import { ITheme, IThemeAssets, ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";
 import clone from "lodash/clone";
 import ThemeActions from "@vanilla/library/src/scripts/theming/ThemeActions";
+import merge from "lodash/merge";
 
 export interface IThemeExternalAsset {
     type: string;
@@ -40,9 +41,16 @@ export const INITIAL_ASSETS: IThemeAssets = {
         data: "",
         type: "html",
     },
-    javascript: "",
-    styles: "",
+    javascript: {
+        data: "",
+        type: "js",
+    },
+    styles: {
+        data: "",
+        type: "css",
+    },
     fonts: {
+        type: "json",
         data: [],
     },
     logo: {
@@ -53,7 +61,7 @@ export const INITIAL_ASSETS: IThemeAssets = {
         type: "",
         url: "",
     },
-    variables: { data: "", type: "" },
+    variables: { data: {}, type: "json" },
 };
 const INITIAL_STATE: IThemeState = {
     theme: {
@@ -101,10 +109,7 @@ export const themeEditorReducer = produce(
                 state.form = {
                     ...state.form,
                     ...payload,
-                    assets: {
-                        ...state.form.assets,
-                        ...payload.assets,
-                    },
+                    assets: merge({}, state.form.assets, payload.assets),
                     initialLoad: false,
                     edited: payload.edited ?? true,
                 };

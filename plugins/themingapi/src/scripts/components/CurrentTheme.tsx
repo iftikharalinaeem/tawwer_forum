@@ -12,11 +12,10 @@ import { ThemeEditorRoute } from "@themingapi/routes/themeEditorRoutes";
 import LinkAsButton from "@vanilla/library/src/scripts/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import currentThemeClasses from "@vanilla/library/src/scripts/theming/currentThemeStyles";
-import { IManageTheme } from "@vanilla/library/src/scripts/theming/ThemeActions";
-import { ThemeType } from "@vanilla/library/src/scripts/theming/themeReducer";
+import { ThemeType, ITheme } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 interface IProps {
-    currentTheme: IManageTheme;
+    currentTheme: ITheme;
 }
 
 export default function CurrentTheme(props: IProps) {
@@ -28,19 +27,7 @@ export default function CurrentTheme(props: IProps) {
             <DashboardHeaderBlock title={t("Themes")} />
             <div className={classes.root}>
                 <div className={classes.cardContainer}>
-                    <ThemePreviewCard
-                        noActions={true}
-                        globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
-                        globalBg={preview?.["global.mainColors.bg"] ?? undefined}
-                        globalFg={preview?.["global.mainColors.fg"] ?? undefined}
-                        titleBarBg={
-                            preview?.["global.mainColors.bg"] ?? preview?.["global.mainColors.primary"] ?? undefined
-                        }
-                        backgroundImage={preview?.["banner.outerBackground.image"] ?? undefined}
-                        titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
-                        previewImage={preview?.previewImage}
-                        isActiveTheme={true}
-                    />
+                    <ThemePreviewCard noActions={true} preview={preview} isActiveTheme={true} />
                 </div>
                 <CurrentThemeInfo
                     theme={currentTheme}
