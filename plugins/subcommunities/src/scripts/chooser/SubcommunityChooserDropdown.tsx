@@ -34,6 +34,37 @@ interface IProps {
     defaultSection?: SubcommunityChooserSection;
 }
 
+/**
+ * Subcommunity Chooser.
+ *
+ * There are a couple of variants to this:
+ *
+ * ## Scenario 1 - All same language
+ * - Flat list of all subcommunities.
+ *
+ * ## Scenerio 2 - All same product
+ * - Flat list of all subcommunities.
+ *
+ * ## Scenario 3 - Multiple products & multiple languages
+ * - 2 Tier system (language and product).
+ * - Which one is shown by default is configured by a variable.
+ *   @var subcommunityChooser.options.defaultSection - "locale" | "product"
+ * - When viewing products, only products available in the current locale will display.
+ * - When viewing locales all locales will display.
+ *   - If the current product is available in the displayed language, it will be a link to that subcommunity.
+ *   - Otherwise a forward arrow will go to the product section to choose an available product for that language.
+ *   - The user can navigate back with a back arrow or with the top tabs.
+ *
+ * ## Mobile
+ *
+ * - Actual dropdown is similar to the desktop one.
+ * - Displays as a modal when opened.
+ * - In Scenario 1 & 2, only 1 button will be displayed in the hamburger navigation.
+ * - In scenario 3, 2 buttons will be shown. One to open products, and one to open locales.
+ * - Button names:
+ *   - Locale Button -> currentSubcommunity.locale ?? "Languages"
+ *   - Products Button -> currentSubcommunity.name ?? "Products"
+ */
 export function SubcommunityChooserDropdown(props: IProps) {
     const subcommunity = useCurrentSubcommunity();
     const { options } = subcommunityChooserVariables();

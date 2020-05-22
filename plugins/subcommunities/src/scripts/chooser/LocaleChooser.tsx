@@ -26,43 +26,35 @@ export function LocaleChooser(props: IProps) {
 
     return (
         <div>
-            {subcommunitiesOrLocale
-                // .sort((a, b) => {
-                //     return a.localeID === currentLocale ? -1 : b.localeID === currentLocale ? 1 : 0;
-                // })
-                .map((localeOrSubcommunity, i) => {
-                    if ("subcommunityID" in localeOrSubcommunity) {
-                        const subcommunity = localeOrSubcommunity;
-                        return (
-                            <DropDownItemLink
-                                key={i}
-                                to={subcommunity.url}
-                                isChecked={subcommunity.locale === getCurrentLocale()}
-                            >
-                                <span className={classes.row}>
-                                    <LocaleDisplayer
-                                        localeContent={subcommunity.locale}
-                                        displayLocale={subcommunity.locale}
-                                    />
-                                </span>
-                            </DropDownItemLink>
-                        );
-                        // localeOrSubcommunity.
-                    } else {
-                        const locale = localeOrSubcommunity;
-                        return (
-                            <DropDownItemButton key={i} onClick={() => props.onChange(locale.localeKey)}>
-                                <span className={classes.row}>
-                                    <LocaleDisplayer
-                                        localeContent={locale.localeKey}
-                                        displayLocale={locale.localeKey}
-                                    />
-                                    <RightChevronIcon className={classes.rowArrow} />
-                                </span>
-                            </DropDownItemButton>
-                        );
-                    }
-                })}
+            {subcommunitiesOrLocale.map((localeOrSubcommunity, i) => {
+                if ("subcommunityID" in localeOrSubcommunity) {
+                    const subcommunity = localeOrSubcommunity;
+                    return (
+                        <DropDownItemLink
+                            key={i}
+                            to={subcommunity.url}
+                            isChecked={subcommunity.locale === getCurrentLocale()}
+                        >
+                            <span className={classes.row}>
+                                <LocaleDisplayer
+                                    localeContent={subcommunity.locale}
+                                    displayLocale={subcommunity.locale}
+                                />
+                            </span>
+                        </DropDownItemLink>
+                    );
+                } else {
+                    const locale = localeOrSubcommunity;
+                    return (
+                        <DropDownItemButton key={i} onClick={() => props.onChange(locale.localeKey)}>
+                            <span className={classes.row}>
+                                <LocaleDisplayer localeContent={locale.localeKey} displayLocale={locale.localeKey} />
+                                <RightChevronIcon className={classes.rowArrow} />
+                            </span>
+                        </DropDownItemButton>
+                    );
+                }
+            })}
         </div>
     );
 }
