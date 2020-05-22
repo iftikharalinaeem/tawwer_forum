@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { MultiLevelChooser, SubcommunityChooserSection } from "@subcommunities/chooser/SubcommunityChooser";
+import { MultiLevelChooser, SubcommunityChooserSection } from "@subcommunities/chooser/MultiLevelChooser";
 import {
     subcommunityChooserClasses,
     subcommunityChooserVariables,
@@ -23,7 +23,6 @@ import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@vanilla/library/src/scripts/layout/frame/FrameHeaderMinimal";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
-import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { SingleDepthChooser } from "@subcommunities/chooser/SingleDepthChooser";
 
 interface IProps {
