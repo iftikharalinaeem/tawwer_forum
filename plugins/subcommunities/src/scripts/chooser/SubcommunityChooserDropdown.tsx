@@ -35,11 +35,13 @@ interface IProps {
 
 export function SubcommunityChooserDropdown(props: IProps) {
     const subcommunity = useCurrentSubcommunity();
-    const [activeSection, setActiveSection] = useState<SubcommunityChooserSection>(props.defaultSection ?? "locale");
+    const { options } = subcommunityChooserVariables();
+    const [activeSection, setActiveSection] = useState<SubcommunityChooserSection>(
+        props.defaultSection ?? options.defaultSection ?? "locale",
+    );
     const buttonRef = useRef<HTMLButtonElement>(null);
     const [isOpen, setIsOpen] = useState(false);
     const availableLocales = useAvailableSubcommunityLocales();
-    const { options } = subcommunityChooserVariables();
     const classes = subcommunityChooserClasses();
     const forceIcon = options.forceIcon && !props.fullWidth;
     const { subcommunitiesByID } = useSubcommunities();
