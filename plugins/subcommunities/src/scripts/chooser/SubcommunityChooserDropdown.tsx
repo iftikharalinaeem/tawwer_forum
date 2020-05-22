@@ -1,0 +1,142 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import { SubcommunityChooser, SubcommunityChooserSection } from "@subcommunities/chooser/SubcommunityChooser";
+import {
+    subcommunityChooserClasses,
+    subcommunityChooserVariables,
+} from "@subcommunities/chooser/subcommunityChooserStyles";
+import {
+    useAvailableSubcommunityLocales,
+    useCurrentSubcommunity,
+    useSubcommunities,
+} from "@subcommunities/subcommunities/subcommunitySelectors";
+import { t, LocaleDisplayer } from "@vanilla/i18n";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@vanilla/library/src/scripts/flyouts/DropDown";
+import Button from "@vanilla/library/src/scripts/forms/Button";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
+import { DownTriangleIcon, GlobeIcon } from "@vanilla/library/src/scripts/icons/common";
+import Frame from "@vanilla/library/src/scripts/layout/frame/Frame";
+import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
+import { FrameHeaderMinimal } from "@vanilla/library/src/scripts/layout/frame/FrameHeaderMinimal";
+import classNames from "classnames";
+import React, { useRef, useState } from "react";
+
+interface IProps {
+    buttonType?: ButtonTypes;
+    fullWidth?: boolean;
+    fullWidthIcon?: React.ReactNode;
+    toggleName?: string;
+    buttonClass?: string;
+    defaultSection?: SubcommunityChooserSection;
+}
+
+export function SubcommunityChooserDropdown(props: IProps) {
+    const subcommunity = useCurrentSubcommunity();
+    const [activeSection, setActiveSection] = useState<SubcommunityChooserSection>(props.defaultSection ?? "locale");
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const availableLocales = useAvailableSubcommunityLocales();
+    const { options } = subcommunityChooserVariables();
+    const classes = subcommunityChooserClasses();
+    const forceIcon = options.forceIcon && !props.fullWidth;
+    const { subcommunitiesByID } = useSubcommunities();
+
+    if (!availableLocales || !options.enabled) {
+        return null;
+    }
+
+    const hasMultipleLocales = Object.values(availableLocales).length > 1;
+
+    let toggleName: React.ReactNode = <GlobeIcon />;
+
+    if (props.defaultSection && props.fullWidth) {
+        if (props.defaultSection === "product") {
+            toggleName = subcommunity?.name ?? t("Products");
+        } else {
+            if (subcommunity?.locale) {
+                toggleName = (
+                    <LocaleDisplayer localeContent={subcommunity.locale} displayLocale={subcommunity.locale} />
+                );
+            } else {
+                toggleName = t("Languages");
+            }
+        }
+    } else if (hasMultipleLocales && subcommunity && !forceIcon) {
+        toggleName = `${subcommunity.name} (${subcommunity.locale}) `;
+    }
+
+    if (props.fullWidth) {
+        toggleName = (
+            <>
+                {props.fullWidthIcon}
+                {toggleName}
+            </>
+        );
+    }
+
+    if (subcommunitiesByID.data) {
+        if (Object.entries(subcommunitiesByID.data).length === 0) {
+            return null;
+        }
+    }
+
+    return (
+        <DropDown
+            isVisible={isOpen}
+            onVisibilityChange={setIsOpen}
+            buttonRef={buttonRef}
+            isSmall
+            flyoutType={FlyoutType.FRAME}
+            buttonBaseClass={props.buttonType || ButtonTypes.STANDARD}
+            toggleButtonClassName={classNames(props.buttonClass)}
+            openDirection={DropDownOpenDirection.AUTO}
+            buttonContents={
+                <span className={classNames(classes.toggle, props.fullWidth && classes.toggleFullWidth)}>
+                    {toggleName}
+                    {!props.fullWidth && <DownTriangleIcon className={classNames(classes.toggleArrow)} />}
+                </span>
+            }
+        >
+            <Frame
+                header={
+                    <FrameHeaderMinimal
+                        onClose={() => {
+                            setIsOpen(false);
+                        }}
+                    >
+                        {hasMultipleLocales && (
+                            <>
+                                <Button
+                                    baseClass={activeSection === "locale" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
+                                    onClick={() => setActiveSection("locale")}
+                                >
+                                    {t("Languages")}
+                                </Button>
+                                <hr className={classes.headingDivider} />
+                            </>
+                        )}
+                        <Button
+                            baseClass={activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
+                            onClick={() => setActiveSection("product")}
+                        >
+                            {t("Products")}
+                        </Button>
+                    </FrameHeaderMinimal>
+                }
+                body={
+                    <FrameBody selfPadded className={classes.body}>
+                        <SubcommunityChooser
+                            activeSubcommunityID={subcommunity ? subcommunity.subcommunityID : undefined}
+                            activeSection={activeSection}
+                            setActiveSection={setActiveSection}
+                        />
+                    </FrameBody>
+                }
+                footer={null}
+            />
+        </DropDown>
+    );
+}

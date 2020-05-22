@@ -11,6 +11,7 @@ export interface ISubcommunity extends IApiDateInfo {
     siteSectionID: string;
     siteSectionGroup: string;
     name: string;
+    url: string;
     folder: string;
     categoryID: string | null;
     sort: number;
@@ -18,7 +19,4 @@ export interface ISubcommunity extends IApiDateInfo {
     productID: number | null;
     product?: IProduct;
     locale: string;
-    localeNames: {
-        [localeKey: string]: string;
-    };
 }

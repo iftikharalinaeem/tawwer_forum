@@ -6,10 +6,6 @@
 import getStore from "@library/redux/getStore";
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { getMeta, onReady } from "@library/utility/appUtils";
-import {
-    SubcommunityChooserDropdown,
-    SubcommunityChooserHamburgerGroup,
-} from "@subcommunities/chooser/SubcommunityChooser";
 import { ProductActions } from "@subcommunities/products/ProductActions";
 import multiSiteReducer from "@subcommunities/state/reducer";
 import { addHamburgerNavGroup } from "@vanilla/library/src/scripts/flyouts/Hamburger";
@@ -18,6 +14,8 @@ import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
 import { Devices, useDevice } from "@vanilla/library/src/scripts/layout/DeviceContext";
 import { addComponent } from "@vanilla/library/src/scripts/utility/componentRegistry";
 import React from "react";
+import { SubcommunityChooserDropdown } from "@subcommunities/chooser/SubcommunityChooserDropdown";
+import { SubcommunityChooserHamburgerGroup } from "@subcommunities/chooser/SubcommunityChooserHamburgerGroup";
 
 registerReducer("multisite", multiSiteReducer);
 

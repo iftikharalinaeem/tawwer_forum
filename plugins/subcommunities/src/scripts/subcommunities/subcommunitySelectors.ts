@@ -12,6 +12,7 @@ import { ISubcommunity } from "@subcommunities/subcommunities/subcommunityTypes"
 import { formatUrl, siteUrl } from "@library/utility/appUtils";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { useLocaleInfo, ILocale } from "@vanilla/i18n";
+import { Locale } from "moment";
 
 export function useSubcommunitiesState() {
     return useSelector((state: IMultiSiteStoreState) => {
@@ -123,4 +124,36 @@ export function useAvailableSubcommunityLocales(): ILocale[] | null {
 
     useDebugValue(result);
     return result;
+}
+
+type SubcommunityOrLocale = ISubcommunity | ILocale;
+
+export function useSubcommunitiesOrLocales(): SubcommunityOrLocale[] {
+    const { subcommunitiesByProductID } = useSubcommunities();
+    const locales = useAvailableSubcommunityLocales() ?? [];
+    const currentSubcommunity = useCurrentSubcommunity();
+
+    const subcommunitiesForCurrentProduct = currentSubcommunity?.productID
+        ? subcommunitiesByProductID?.data?.[currentSubcommunity.productID] ?? []
+        : [];
+
+    const results: SubcommunityOrLocale[] = [];
+
+    locales.forEach(locale => {
+        const matchingSubcommunity = subcommunitiesForCurrentProduct.find(subcommunity => {
+            if (subcommunity.locale === locale.localeKey) {
+                return subcommunity;
+            }
+        });
+
+        if (matchingSubcommunity) {
+            results.push(matchingSubcommunity);
+        } else {
+            results.push(locale);
+        }
+    });
+
+    useDebugValue(results);
+
+    return results;
 }

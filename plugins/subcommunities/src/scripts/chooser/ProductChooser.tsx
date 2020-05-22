@@ -3,18 +3,17 @@
  * @license Proprietary
  */
 
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
-import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { CheckIcon, LeftChevronCompactIcon } from "@library/icons/common";
-import Loader from "@library/loaders/Loader";
-import { siteUrl } from "@library/utility/appUtils";
-import { useProductsForLocale } from "@subcommunities/products/productSelectors";
-import React, { useRef, useLayoutEffect } from "react";
 import { subcommunityChooserClasses } from "@subcommunities/chooser/subcommunityChooserStyles";
-import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
+import { useProductsForLocale } from "@subcommunities/products/productSelectors";
 import { useAvailableSubcommunityLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
+import { getCurrentLocale, LocaleDisplayer } from "@vanilla/i18n";
+import DropDownItemButton from "@vanilla/library/src/scripts/flyouts/items/DropDownItemButton";
+import DropDownItemLink from "@vanilla/library/src/scripts/flyouts/items/DropDownItemLink";
+import DropDownItemSeparator from "@vanilla/library/src/scripts/flyouts/items/DropDownItemSeparator";
+import { LeftChevronCompactIcon } from "@vanilla/library/src/scripts/icons/common";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
+import React, { useLayoutEffect, useRef } from "react";
 
 interface IProps {
     forLocale: string;
@@ -30,7 +29,8 @@ interface IProps {
  */
 export function ProductChooser(props: IProps) {
     const options = useCommunityFilterContext();
-    const productsForLocale = useProductsForLocale(props.forLocale);
+    const locale = props.forLocale ?? getCurrentLocale();
+    const productsForLocale = useProductsForLocale(locale);
     const backButtonRef = useRef<HTMLButtonElement>(null);
     const availableLocales = useAvailableSubcommunityLocales();
 
@@ -62,14 +62,10 @@ export function ProductChooser(props: IProps) {
                 return (
                     <DropDownItemLink
                         key={`product${product ? product.productID : ""}-sub${community.subcommunityID}`}
-                        to={siteUrl("/" + community.folder)}
+                        to={community.url}
+                        isChecked={community.subcommunityID === props.activeSubcommunityID}
                     >
-                        <span className={classes.rowIndented}>
-                            {community.name}
-                            {community.subcommunityID === props.activeSubcommunityID && (
-                                <CheckIcon className={classes.check} />
-                            )}
-                        </span>
+                        <span className={props.onBack ? classes.rowIndented : classes.row}>{community.name}</span>
                     </DropDownItemLink>
                 );
             })}
