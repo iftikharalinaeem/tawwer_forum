@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { SubcommunityChooser, SubcommunityChooserSection } from "@subcommunities/chooser/SubcommunityChooser";
+import { MultiLevelChooser, SubcommunityChooserSection } from "@subcommunities/chooser/SubcommunityChooser";
 import {
     subcommunityChooserClasses,
     subcommunityChooserVariables,
@@ -13,7 +13,7 @@ import {
     useCurrentSubcommunity,
     useSubcommunities,
 } from "@subcommunities/subcommunities/subcommunitySelectors";
-import { t, LocaleDisplayer } from "@vanilla/i18n";
+import { t, LocaleDisplayer, getCurrentLocale } from "@vanilla/i18n";
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@vanilla/library/src/scripts/flyouts/DropDown";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
@@ -23,6 +23,8 @@ import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import { FrameHeaderMinimal } from "@vanilla/library/src/scripts/layout/frame/FrameHeaderMinimal";
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
+import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
+import { SingleDepthChooser } from "@subcommunities/chooser/SingleDepthChooser";
 
 interface IProps {
     buttonType?: ButtonTypes;
@@ -44,13 +46,15 @@ export function SubcommunityChooserDropdown(props: IProps) {
     const availableLocales = useAvailableSubcommunityLocales();
     const classes = subcommunityChooserClasses();
     const forceIcon = options.forceIcon && !props.fullWidth;
-    const { subcommunitiesByID } = useSubcommunities();
+    const { subcommunitiesByID, subcommunitiesByProductID } = useSubcommunities();
 
     if (!availableLocales || !options.enabled) {
         return null;
     }
 
     const hasMultipleLocales = Object.values(availableLocales).length > 1;
+    const hasMultipleProducts =
+        subcommunitiesByProductID.data && Object.keys(subcommunitiesByProductID.data).length > 1;
 
     let toggleName: React.ReactNode = <GlobeIcon />;
 
@@ -109,7 +113,7 @@ export function SubcommunityChooserDropdown(props: IProps) {
                             setIsOpen(false);
                         }}
                     >
-                        {hasMultipleLocales && (
+                        {hasMultipleProducts && hasMultipleLocales ? (
                             <>
                                 <Button
                                     baseClass={activeSection === "locale" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
@@ -118,23 +122,35 @@ export function SubcommunityChooserDropdown(props: IProps) {
                                     {t("Languages")}
                                 </Button>
                                 <hr className={classes.headingDivider} />
+                                <Button
+                                    baseClass={
+                                        activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT
+                                    }
+                                    onClick={() => setActiveSection("product")}
+                                >
+                                    {t("Products")}
+                                </Button>
                             </>
+                        ) : hasMultipleLocales ? (
+                            t("Languages")
+                        ) : (
+                            t("Products")
                         )}
-                        <Button
-                            baseClass={activeSection === "product" ? ButtonTypes.TEXT_PRIMARY : ButtonTypes.TEXT}
-                            onClick={() => setActiveSection("product")}
-                        >
-                            {t("Products")}
-                        </Button>
                     </FrameHeaderMinimal>
                 }
                 body={
                     <FrameBody selfPadded className={classes.body}>
-                        <SubcommunityChooser
-                            activeSubcommunityID={subcommunity ? subcommunity.subcommunityID : undefined}
-                            activeSection={activeSection}
-                            setActiveSection={setActiveSection}
-                        />
+                        {hasMultipleProducts && hasMultipleLocales ? (
+                            <MultiLevelChooser
+                                activeSubcommunityID={subcommunity ? subcommunity.subcommunityID : undefined}
+                                activeSection={activeSection}
+                                setActiveSection={setActiveSection}
+                            />
+                        ) : hasMultipleLocales ? (
+                            <SingleDepthChooser subcommunities={Object.values(subcommunitiesByProductID.data!)[0]} />
+                        ) : (
+                            <SingleDepthChooser subcommunities={Object.values(subcommunitiesByID.data!)} />
+                        )}
                     </FrameBody>
                 }
                 footer={null}

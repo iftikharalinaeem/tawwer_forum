@@ -5,20 +5,18 @@
 
 import { LocaleChooser } from "@subcommunities/chooser/LocaleChooser";
 import { ProductChooser } from "@subcommunities/chooser/ProductChooser";
-import { useAvailableSubcommunityLocales } from "@subcommunities/subcommunities/subcommunitySelectors";
-import { getCurrentLocale, useLocaleInfo } from "@vanilla/i18n";
+import { getCurrentLocale } from "@vanilla/i18n";
 import React, { useEffect, useState } from "react";
 
 export type SubcommunityChooserSection = "locale" | "product";
 
-export function SubcommunityChooser(props: {
+export function MultiLevelChooser(props: {
     activeSection: SubcommunityChooserSection;
     setActiveSection: (section: SubcommunityChooserSection) => void;
     activeSubcommunityID?: number;
 }) {
     const { activeSection, setActiveSection, activeSubcommunityID } = props;
     const [selectedLocale, setSelectedLocale] = useState<string | null>(null);
-    const availableLocales = useAvailableSubcommunityLocales();
 
     useEffect(() => {
         if (activeSection === "locale") {
@@ -26,12 +24,7 @@ export function SubcommunityChooser(props: {
         }
     }, [activeSection, setSelectedLocale]);
 
-    const { currentLocale } = useLocaleInfo();
     const [communityID] = useState<number | null>(null);
-
-    if (availableLocales && Object.values(availableLocales).length <= 1 && currentLocale) {
-        return <ProductChooser forLocale={currentLocale} communityID={communityID} />;
-    }
 
     if (activeSection === "product") {
         return (

@@ -48,7 +48,7 @@ export function useSubcommunities() {
             Object.values(subcommunitiesByID.data).forEach(subcommunity => {
                 const { productID } = subcommunity;
 
-                if (productID !== null) {
+                if (productID != null) {
                     // Check if we have the product already.
                     if (data[productID]) {
                         data[productID].push(subcommunity);
