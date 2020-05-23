@@ -5,6 +5,44 @@ import { CloseTinyIcon } from "@library/icons/common";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 
+function Participant() {
+    return (
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "green",
+                marginBottom: "19px",
+            }}
+        >
+            <span style={{ display: "inline-block", width: "40px", height: "40px", backgroundColor: "yellow" }}></span>{" "}
+            Clara Mary Green
+        </div>
+    );
+}
+
+function Participants() {
+    return (
+        <div style={{ marginLeft: "16px" }}>
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+            <Participant />
+        </div>
+    );
+}
+
 export default function EventParticipantsTabs() {
     const classes = eventsClasses();
 
@@ -34,6 +72,7 @@ export default function EventParticipantsTabs() {
                     paddingBottom: "13px",
                     fontWeight: "bold",
                     borderBottom: "solid 1px #dddee0",
+                    marginBottom: "5px",
                     // backgroundColor: "red",
                 }}
             >
@@ -43,57 +82,14 @@ export default function EventParticipantsTabs() {
                 {/* <Tab style={{ marginLeft: "4em" }}> Hello </Tab> */}
             </TabList>
             <TabPanels style={{ overflowY: "scroll", height: "75%" }}>
-                <TabPanel style={{ marginLeft: "16px" }}>
-                    <p>
-                        Even though he was rarely an experimenter, Poincaré recognizes and defends the importance of
-                        experimentation, which must remain a pillar of the scientific method. According to him, it is
-                        not necessary that mathematics incorporate physics into itself, but must develop as an asset
-                        unto itself. This asset would be above all a tool: in the words of Poincaré, mathematics is "the
-                        only language in which [physicists] could speak" to understand each other and to make themselves
-                        heard. This language of numbers seems elsewhere to reveal a unity hidden in the natural world,
-                        when there may well be only one part of mathematics that applies to theoretical physics. The
-                        primary objective of mathematical physics is not invention or discovery, but reformulation. It
-                        is an activity of synthesis, which permits one to assure the coherence of theories current at a
-                        given time. Poincaré recognized that it is impossible to systematize all of physics of a
-                        specific time period into one axiomatic theory. His ideas of a three dimensional space are given
-                        significance in this context.!
-                    </p>
-
-                    <p>
-                        Even though he was rarely an experimenter, Poincaré recognizes and defends the importance of
-                        experimentation, which must remain a pillar of the scientific method. According to him, it is
-                        not necessary that mathematics incorporate physics into itself, but must develop as an asset
-                        unto itself. This asset would be above all a tool: in the words of Poincaré, mathematics is "the
-                        only language in which [physicists] could speak" to understand each other and to make themselves
-                        heard. This language of numbers seems elsewhere to reveal a unity hidden in the natural world,
-                        when there may well be only one part of mathematics that applies to theoretical physics. The
-                        primary objective of mathematical physics is not invention or discovery, but reformulation. It
-                        is an activity of synthesis, which permits one to assure the coherence of theories current at a
-                        given time. Poincaré recognized that it is impossible to systematize all of physics of a
-                        specific time period into one axiomatic theory. His ideas of a three dimensional space are given
-                        significance in this context.!
-                    </p>
-
-                    <p>
-                        Even though he was rarely an experimenter, Poincaré recognizes and defends the importance of
-                        experimentation, which must remain a pillar of the scientific method. According to him, it is
-                        not necessary that mathematics incorporate physics into itself, but must develop as an asset
-                        unto itself. This asset would be above all a tool: in the words of Poincaré, mathematics is "the
-                        only language in which [physicists] could speak" to understand each other and to make themselves
-                        heard. This language of numbers seems elsewhere to reveal a unity hidden in the natural world,
-                        when there may well be only one part of mathematics that applies to theoretical physics. The
-                        primary objective of mathematical physics is not invention or discovery, but reformulation. It
-                        is an activity of synthesis, which permits one to assure the coherence of theories current at a
-                        given time. Poincaré recognized that it is impossible to systematize all of physics of a
-                        specific time period into one axiomatic theory. His ideas of a three dimensional space are given
-                        significance in this context.!
-                    </p>
+                <TabPanel>
+                    <Participants />
                 </TabPanel>
-                <TabPanel style={{ marginLeft: "16px" }}>
-                    <p>two!</p>
+                <TabPanel>
+                    <Participants />
                 </TabPanel>
-                <TabPanel style={{ marginLeft: "16px" }}>
-                    <p>three!</p>
+                <TabPanel>
+                    <Participants />
                 </TabPanel>
             </TabPanels>
             <div style={{ position: "absolute", textAlign: "center", bottom: "32px", left: "0", right: "0" }}>
