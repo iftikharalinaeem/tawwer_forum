@@ -460,6 +460,21 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins({ bottom: globalVars.gutter.half }),
     });
 
+    const participantsTabsRoot = style("participantsTabs", {
+        fontSize: globalVars.fonts.size.large,
+
+        // paddingLeft: "16px",
+        // paddingRight: "10px",
+        position: "relative",
+        // backgroundColor: "pink",
+        width: "516px",
+        height: "552px",
+        border: "solid 1px #dfe1e6",
+        // paddingBottom: "32px",
+        // display: "flex",
+        // flexDirection: "row",
+    });
+
     return {
         root,
         item,
@@ -499,5 +514,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         description,
         organizer,
         panelHeading,
+        participantsTabsRoot,
     };
 });
