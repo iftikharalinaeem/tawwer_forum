@@ -4,10 +4,11 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { CloseTinyIcon } from "@library/icons/common";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 
 function Participant() {
     return (
-        <div
+        <li
             style={{
                 display: "flex",
                 flexDirection: "row",
@@ -16,23 +17,21 @@ function Participant() {
                 marginBottom: "19px",
             }}
         >
-            <span
+            <UserPhoto
                 style={{
                     display: "inline-block",
-                    width: "40px",
-                    height: "40px",
-                    backgroundColor: "yellow",
                     marginRight: "16px",
                 }}
-            ></span>
-            Clara Mary Green
-        </div>
+                size={UserPhotoSize.MEDIUM}
+            />
+            Marie Curie
+        </li>
     );
 }
 
 function Participants() {
     return (
-        <div style={{ marginLeft: "16px" }}>
+        <ul style={{ marginLeft: "16px" }}>
             <Participant />
             <Participant />
             <Participant />
@@ -47,7 +46,7 @@ function Participants() {
             <Participant />
             <Participant />
             <Participant />
-        </div>
+        </ul>
     );
 }
 
