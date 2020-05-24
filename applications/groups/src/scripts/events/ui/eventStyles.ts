@@ -28,6 +28,7 @@ import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
+import { userSelect } from "@library/styles/styleHelpers";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -460,19 +461,70 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins({ bottom: globalVars.gutter.half }),
     });
 
-    const participantsTabsRoot = style("participantsTabs", {
+    const participantsTabsRoot = style("participantsTabsRoot", {
         fontSize: globalVars.fonts.size.large,
-
-        // paddingLeft: "16px",
-        // paddingRight: "10px",
         position: "relative",
-        // backgroundColor: "pink",
         width: "516px",
         height: "552px",
         border: "solid 1px #dfe1e6",
-        // paddingBottom: "32px",
-        // display: "flex",
-        // flexDirection: "row",
+    });
+
+    const participantsTabsList = style("participantsTabsList", {
+        height: "45px",
+        // paddingTop: "12px",
+        paddingBottom: "13px",
+        fontWeight: "bold",
+        borderBottom: "solid 1px #dddee0",
+        marginBottom: "5px",
+        $nest: {
+            "> *": {
+                // width: "106px",
+                paddingLeft: "0px",
+                marginRight: "50px",
+                paddingRight: "0px",
+                textAlign: "left",
+            },
+            ":first-child": {
+                marginLeft: "16px",
+            },
+        },
+    });
+
+    const participantsTabsTab = style("participantsTabsTab", {
+        height: "42px",
+        $nest: {
+            "&[data-selected]": {
+                borderBottom: `3px solid ${colorOut(globalVars.mainColors.primary)}`,
+            },
+        },
+    });
+
+    const participantsTabsPanels = style("participantsTabsPanels", {
+        overflowY: "scroll",
+        height: "75%",
+    });
+
+    const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
+        position: "absolute",
+        backgroundColor: "red",
+        right: "6px",
+        top: "10px",
+    });
+
+    const participantsTabsTopButton = style("participantsTabsTopButton", {
+        width: "24p",
+        height: "24px",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyItems: "center",
+    });
+
+    const participantsTabsBottomButtonWrapper = style("participantsTabsBottomButton", {
+        position: "absolute",
+        textAlign: "center",
+        bottom: "32px",
+        left: "0",
+        right: "0",
     });
 
     return {
@@ -515,5 +567,11 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         organizer,
         panelHeading,
         participantsTabsRoot,
+        participantsTabsList,
+        participantsTabsPanels,
+        participantsTabsTab,
+        participantsTabsTopButtonWrapper,
+        participantsTabsTopButton,
+        participantsTabsBottomButtonWrapper,
     };
 });
