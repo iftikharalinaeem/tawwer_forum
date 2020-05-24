@@ -48,23 +48,20 @@ export default function EventParticipantsTabs() {
 
     return (
         <Tabs className={classes.participantsTabsRoot}>
-            <Button
-                baseClass={ButtonTypes.CUSTOM}
-                style={{
-                    position: "absolute",
-                    // backgroundColor: "red",
-                    right: "6px",
-                    top: "10px",
-                    width: "24p",
-                    height: "24px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyItems: "center",
-                }}
-            >
-                <CloseTinyIcon />
-            </Button>
-
+            <div style={{ position: "absolute", backgroundColor: "red", right: "6px", top: "10px" }}>
+                <Button
+                    baseClass={ButtonTypes.CUSTOM}
+                    style={{
+                        width: "24p",
+                        height: "24px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyItems: "center",
+                    }}
+                >
+                    <CloseTinyIcon />
+                </Button>
+            </div>
             <TabList
                 style={{
                     height: "45px",
@@ -92,6 +89,7 @@ export default function EventParticipantsTabs() {
                     <Participants />
                 </TabPanel>
             </TabPanels>
+
             <div style={{ position: "absolute", textAlign: "center", bottom: "32px", left: "0", right: "0" }}>
                 <Button style={{ width: "208px" }}> Load more </Button>
             </div>
