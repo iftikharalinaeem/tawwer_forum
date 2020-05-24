@@ -16,7 +16,15 @@ function Participant() {
                 marginBottom: "19px",
             }}
         >
-            <span style={{ display: "inline-block", width: "40px", height: "40px", backgroundColor: "yellow" }}></span>{" "}
+            <span
+                style={{
+                    display: "inline-block",
+                    width: "40px",
+                    height: "40px",
+                    backgroundColor: "yellow",
+                    marginRight: "16px",
+                }}
+            ></span>
             Clara Mary Green
         </div>
     );
