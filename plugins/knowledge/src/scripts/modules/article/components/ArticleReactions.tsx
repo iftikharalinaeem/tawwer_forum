@@ -70,8 +70,6 @@ export function ArticleReactions(props: IProps) {
 
     const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || disableGuestVoting;
 
-    console.log(resultText);
-
     return (
         <section className={classes.frame}>
             <Heading title={title} className={classes.title} />
@@ -136,16 +134,14 @@ function ReactionButton(props: {
     );
 
     return (
-        <>
-            <Button
-                baseClass={checked ? ButtonTypes.PRIMARY : ButtonTypes.STANDARD}
-                disabled={isDisabled}
-                className={classes}
-                onClick={onClick}
-            >
-                {content}
-            </Button>
-        </>
+        <Button
+            baseClass={checked ? ButtonTypes.PRIMARY : ButtonTypes.STANDARD}
+            disabled={isDisabled}
+            className={classes}
+            onClick={onClick}
+        >
+            {content}
+        </Button>
     );
 }
 
