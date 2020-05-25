@@ -5,6 +5,18 @@
     {{ form.errors() }}
     {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Upload a placeholder image that will display when users do not have an image in their post.')) }}
 </div>
+<div class="padded image-link-choice">
+    {{ form.label(t('Catalogue image URL:')) }}
+    {{ form.radio('CatalogueDisplay.ImageLink', t('Discussion'), {'Value': 'Discussion', 'Default':  defaultImageLink, 'class':'choice'}) }}
+    {{ form.radio('CatalogueDisplay.ImageLink', t('Image'), {'Value': 'Image', 'Default': defaultImageLink, 'class':'choice'}) }}
+</div>
+<div class="padded">
+    {{ form.label(t('Additional classes'), 'CatalogueDisplay.AdditionalClasses') }}
+    {{ form.input('CatalogueDisplay.AdditionalClasses') }}
+    <div class="description info">
+        {{ t('Apply additional classes on catalogue image. Use space to separate each class.') }}
+    </div>
+</div>
 <div class="padded">
     {{ form.toggle('CatalogueDisplay.Masonry.Enabled', t('Use Masonry display')) }}
 </div>

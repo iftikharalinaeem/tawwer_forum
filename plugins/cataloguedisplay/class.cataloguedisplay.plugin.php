@@ -21,6 +21,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
 
     const MASONRY_ENABLED = false;
+    const IMAGE_LINK_DISCUSSION = 'Discussion';
+    const IMAGE_LINK_IMAGE = 'Image';
 
     /**
      * @var EventManager
@@ -162,7 +164,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 $sender->Form->removeFormValue('Photo');
             }
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
+            $imageLink = $sender->Form->getValue('CatalogueDisplay.ImageLink');
+            $additionalClasses = $sender->Form->getValue('CatalogueDisplay.AdditionalClasses');
             Gdn::config()->saveToConfig('CatalogueDisplay.Masonry.Enabled', $masonryEnabled);
+            Gdn::config()->saveToConfig('CatalogueDisplay.ImageLink', $imageLink);
+            Gdn::config()->saveToConfig('CatalogueDisplay.AdditionalClasses', $additionalClasses);
             $existingImage = $this->config->get('CatalogueDisplay.PlaceHolderImage');
             $request = Gdn::request();
             $tmpImageUrl = $request->post('Photo', null);
@@ -177,8 +183,19 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             }
         }
         $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', $this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
+        $sender->Form->setValue('CatalogueDisplay.AdditionalClasses', $this->config->get('CatalogueDisplay.AdditionalClasses',''));
+        $sender->setData('defaultImageLink',  $this->config->get('CatalogueDisplay.ImageLink', self::IMAGE_LINK_IMAGE));
         $sender->Form->setValue('Photo', $this->config->get('CatalogueDisplay.PlaceHolderImage', null));
         $sender->render('settings', '', 'plugins/cataloguedisplay');
+    }
+
+    /**
+     * Add CSS file to customize a bit the settings view.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_render_before_handler(SettingsController $sender) {
+        $sender->addCssFile('catalogue-settings.css', 'plugins/cataloguedisplay');
     }
 
     /**
@@ -268,7 +285,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $imgTag = null;
         $cssClassWrapper = [];
         $imgAttributes = ['class' => []];
-        $catalogueImgURL = discussionUrl($discussion);
+
         if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')
             || $this->config->get('Vanilla.Discussions.Layout') === 'table') {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
@@ -277,8 +294,20 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             $imgAttributes['class'] = ['catalogue-image'];
         }
 
+        $catalogueImgURL = null;
         // First extract image URL from inside the body.
         $imageUrl = $this->findImageUrl($discussion);
+        if ($imageUrl) {
+            $catalogueImgURL = $this->config->get(
+                'CatalogueDisplay.AdditionalClasses',
+                self::IMAGE_LINK_IMAGE
+            ) == self::IMAGE_LINK_DISCUSSION ? discussionUrl($discussion) : $imageUrl;
+        }
+
+        if ($imageUrl && $this->config->get('CatalogueDisplay.AdditionalClasses')) {
+            $additionalClasses = explode(' ', $this->config->get('CatalogueDisplay.AdditionalClasses')) ?: [];
+            $imgAttributes['class'] = array_merge($imgAttributes['class'], $additionalClasses);
+        }
 
         // If there is no image, look for the Placeholder Image saved in the config.
         $placeHolderUrl = $this->config->get('CatalogueDisplay.PlaceHolderImage');
@@ -286,6 +315,10 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             $imgAttributes['class'][] = 'placeholder-image';
             $imgAttributes['alt'] = $this->locale->translate('Placeholder');
             $imageUrl = $placeHolderUrl;
+            $catalogueImgURL = $this->config->get(
+                'CatalogueDisplay.AdditionalClasses',
+                self::IMAGE_LINK_IMAGE
+            ) == self::IMAGE_LINK_DISCUSSION ? discussionUrl($discussion) : '#';
         }
 
         $eventArguments['Discussion'] = $discussion;
