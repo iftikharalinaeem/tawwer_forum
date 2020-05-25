@@ -163,6 +163,13 @@ function WebhookAddEdit() {
                                 onChange={isChecked => handleIndividualEvents(isChecked, EventType.DISCUSSION)}
                             />
                             <DashboardCheckBox
+                                label={"Notifications"}
+                                className={webhookCSSClasses.eventRadio}
+                                checked={form.events.includes(EventType.NOTIFICATION)}
+                                disabled={form.events.includes(EventType.ALL)}
+                                onChange={isChecked => handleIndividualEvents(isChecked, EventType.NOTIFICATION)}
+                            />
+                            <DashboardCheckBox
                                 label={"Users"}
                                 className={webhookCSSClasses.eventRadio}
                                 checked={form.events.includes(EventType.USER)}

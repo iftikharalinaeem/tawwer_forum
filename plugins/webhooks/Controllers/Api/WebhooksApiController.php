@@ -312,7 +312,7 @@ class WebhooksApiController extends \AbstractApiController {
         ];
         $pingEvent = new PingEvent(PingEvent::ACTION_PING, $payload);
         $this->scheduler->addDispatchEventJob($pingEvent, $webhookConfig);
- 
+
         $result = $out->validate($payload);
         return $result;
     }
@@ -412,7 +412,7 @@ class WebhooksApiController extends \AbstractApiController {
                 'type' => 'array',
                 'items' => [
                     'type' => 'string',
-                    'enum' => ['*', 'comment', 'discussion', 'user'],
+                    'enum' => ['*', 'comment', 'discussion', 'notification', 'user'],
                 ]
             ],
             'url:s' => 'The target URL of the webhook.',
