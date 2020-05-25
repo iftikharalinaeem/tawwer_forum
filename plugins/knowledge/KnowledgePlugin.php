@@ -203,7 +203,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
      */
     public function base_afterDiscussionFilters_handler($sender) {
         if ($this->session->checkPermission('knowledge.kb.view')) {
-            echo '<li class="Knowledge">'.anchor(t('Help Menu', 'Help'), '/kb').'</li> ';
+            echo '<li class="Knowledge">'.anchor(sprite('SpKnowledge').' '.t('Help Menu', 'Help'), '/kb').'</li> ';
         }
     }
 
