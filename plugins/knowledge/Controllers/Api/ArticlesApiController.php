@@ -687,7 +687,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $row = $this->articleByID($id, true);
         $validReaction = true;
 
-        $isGuest = ($this->session->UserID === 0 || $body['insertUserID'] ?? null === 0);
+
+        $insertUserID = $body['insertUserID'] ?? null;
+        $isGuest = ($this->session->UserID === 0 || $insertUserID === 0);
         if ($isGuest) {
             $responseToken = $body["responseToken"] ?? false;
             $validReaction = $this->reCaptchaVerification($responseToken);
