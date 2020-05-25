@@ -18,6 +18,12 @@
     </div>
 </div>
 <div class="padded">
+    {{ form.toggle('CatalogueDisplay.OnlyOnCategory', t('Category only')) }}
+    <div class="description info">
+        {{ t('Display on category page only. Recent discussions list will not be affected.') }}
+    </div>
+</div>
+<div class="padded">
     {{ form.toggle('CatalogueDisplay.Masonry.Enabled', t('Use Masonry display')) }}
 </div>
 <div class="buttons form-footer">

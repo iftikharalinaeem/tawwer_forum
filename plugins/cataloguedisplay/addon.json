@@ -1,6 +1,6 @@
 {
     "name": "Catalogue Display",
-    "description": "Display discussions in a \"Catalogue\" format with the first image in the discussion displaying on the Discussions page.",
+    "description": "Display discussions in a \"Catalogue\" format with the first image in the discussion displaying on the Discussions/Category page.",
     "version": "1.0",
     "mobileFriendly": true,
     "license": "Proprietary",

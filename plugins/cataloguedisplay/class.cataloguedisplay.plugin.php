@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license proprietary
  */
 
@@ -15,11 +15,12 @@ use Vanilla\Web\TwigRenderTrait;
  * Class CatalogueDisplayPlugin
  *
  * Creates a "catalogue" style for viewing discussions.
- * This means that the first thumbnail in the Discussion is displayed when listed on the Category page.
+ * This means that the first thumbnail in the Discussion is displayed when listed on the Recent Discussions or the Category page.
  */
 class CatalogueDisplayPlugin extends Gdn_Plugin {
     use TwigRenderTrait;
 
+    const CATEGORY_ONLY = false;
     const MASONRY_ENABLED = false;
     const IMAGE_LINK_DISCUSSION = 'Discussion';
     const IMAGE_LINK_IMAGE = 'Image';
@@ -163,6 +164,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             if ($sender->Form->getFormValue('Photo', false) === '') {
                 $sender->Form->removeFormValue('Photo');
             }
+            $onlyOnCategory = $sender->Form->getValue('CatalogueDisplay.OnlyOnCategory');
+            Gdn::config()->saveToConfig('CatalogueDisplay.OnlyOnCategory', $onlyOnCategory);
             $masonryEnabled = $sender->Form->getValue('CatalogueDisplay.Masonry.Enabled');
             $imageLink = $sender->Form->getValue('CatalogueDisplay.ImageLink');
             $additionalClasses = $sender->Form->getValue('CatalogueDisplay.AdditionalClasses');
@@ -182,6 +185,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
                 Gdn::config()->saveToConfig(['CatalogueDisplay.PlaceHolderImage' => $tmpImageUrl]);
             }
         }
+        $sender->Form->setValue('CatalogueDisplay.OnlyOnCategory', $this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY));
         $sender->Form->setValue('CatalogueDisplay.Masonry.Enabled', $this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED));
         $sender->Form->setValue('CatalogueDisplay.AdditionalClasses', $this->config->get('CatalogueDisplay.AdditionalClasses',''));
         $sender->setData('defaultImageLink',  $this->config->get('CatalogueDisplay.ImageLink', self::IMAGE_LINK_IMAGE));
@@ -231,6 +235,41 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     /**
      * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
      *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_beforeDiscussionContent_handler(DiscussionsController $sender, array $args) {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table') {
+            return;
+        }
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY)) {
+            return;
+        }
+        $discussion = $args['Discussion'] ?? null;
+        if ($discussion) {
+            echo $this->displayCatalogueImage($discussion, true);
+        }
+    }
+
+    /**
+     * If the Discussions Layout is table, echo out the thumbnail (or placeholder).
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_beforeDiscussionTitle_handler(DiscussionsController $sender, array $args) {
+        $discussion = $args['Discussion'] ?? null;
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY)) {
+            return;
+        }
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
+            echo $this->displayCatalogueImage($discussion);
+        }
+    }
+
+    /**
+     * If the Discussions Layout is not table, echo out the thumbnail (or placeholder).
+     *
      * @param CategoriesController $sender
      * @param array $args
      */
@@ -240,7 +279,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
             return;
         }
         if ($discussion) {
-            echo $this->displayCatalogueImage($discussion);
+            $forceImageWrapper = !$this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED);
+            echo $this->displayCatalogueImage($discussion, $forceImageWrapper);
         }
     }
 
@@ -254,6 +294,22 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $discussion = $args['Discussion'] ?? null;
         if ($this->config->get('Vanilla.Discussions.Layout') === 'table' && $discussion) {
             echo $this->displayCatalogueImage($discussion);
+        }
+    }
+
+    /**
+     * Add the CSS class to "catalogue" displayed discussions in the discussion view.
+     *
+     * @param DiscussionsController $sender
+     * @param array $args
+     */
+    public function discussionsController_beforeDiscussionName_handler(DiscussionsController $sender, array $args) {
+        if ($this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY)) {
+            return;
+        }
+        $discussion = $args['Discussion'] ?? null;
+        if ($discussion && is_object($discussion) && $discussion->CatalogueDisplay) {
+            $args['CssClass'] .= ' CatalogueRow';
         }
     }
 
@@ -276,7 +332,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param object $discussion Discussion row.
      * @return null|string A photo tag, or a placeholder div to be displayed in place of a photo.
      */
-    public function displayCatalogueImage($discussion) {
+    public function displayCatalogueImage($discussion, bool $forceImageWrapper = false) {
         $catalogueDisplay = $discussion->CatalogueDisplay ?? false;
         if (!$catalogueDisplay) {
             return;
@@ -286,11 +342,11 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $cssClassWrapper = [];
         $imgAttributes = ['class' => []];
 
-        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')
-            || $this->config->get('Vanilla.Discussions.Layout') === 'table') {
+        if ($this->config->get('Vanilla.Discussions.Layout') === 'table' || $forceImageWrapper) {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
         }
-        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
+
+        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled', self::MASONRY_ENABLED)) {
             $imgAttributes['class'] = ['catalogue-image'];
         }
 
@@ -367,6 +423,17 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
     public function makeThumbnailCacheKey(int $discussionID): string {
         // Create the image URL from cache.
         return 'catalogueDisplay.thumbnailURL.'.$discussionID;
+    }
+
+    /**
+     * Implement catalogue display css on Recent Discussions list
+     *
+     * @param CategoriesController $sender
+     */
+    public function discussionsController_render_before(DiscussionsController $sender) {
+        if (!$this->config->get('CatalogueDisplay.OnlyOnCategory', self::CATEGORY_ONLY)) {
+            $sender->addCssFile('catalogue-style.css', 'plugins/cataloguedisplay');
+        }
     }
 
     /**
