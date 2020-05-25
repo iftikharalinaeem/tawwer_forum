@@ -269,7 +269,8 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
         $cssClassWrapper = [];
         $imgAttributes = ['class' => []];
         $catalogueImgURL = discussionUrl($discussion);
-        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
+        if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')
+            || $this->config->get('Vanilla.Discussions.Layout') === 'table') {
             $cssClassWrapper[] = 'catalogue-image-wrapper';
         }
         if (!$this->config->get('CatalogueDisplay.Masonry.Enabled')) {
