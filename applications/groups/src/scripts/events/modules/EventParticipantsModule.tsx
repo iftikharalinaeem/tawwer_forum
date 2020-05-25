@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EventParticipants } from "@groups/events/ui/EventParticipants";
+import EventParticipants from "@groups/events/ui/EventParticipants";
 import { useEventParticipants, useEventParticipantsByAttendance } from "../state/eventsHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";

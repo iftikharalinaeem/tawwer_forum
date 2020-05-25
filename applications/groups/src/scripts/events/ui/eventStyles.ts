@@ -117,6 +117,59 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const participantsTabsRoot = makeVars("participantsTabsRoot", {
+        fontSize: globalVars.fonts.size.large,
+        size: {
+            width: 516,
+            height: 552,
+        },
+        color: {
+            border: colorOut(globalVars.border.color),
+        },
+    });
+
+    const participantsTabsList = makeVars("participantsTabsList", {
+        height: 45,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        color: {
+            borderBottom: colorOut(globalVars.border.color),
+        },
+        marginBottom: 5,
+    });
+
+    const participantsTabsTab = makeVars("participantsTabsTab", {
+        height: 42,
+    });
+
+    const participantsTabsPanels = makeVars("participantsTabsPanels", {
+        height: "75%",
+    });
+
+    const participantItem = makeVars("participantItem", {
+        marginBottom: 19,
+    });
+
+    const participantName = makeVars("participantName", {
+        marginLeft: 16,
+    });
+
+    const participantsTabsTopButton = makeVars("participantsTabsTopButton", {
+        wrapper: {
+            right: 6,
+            top: 10,
+        },
+        size: {
+            width: 24,
+            height: 24,
+        },
+    });
+
+    const participantsTabsBottomButton = makeVars("participantsTabsBottomButton", {
+        wrapper: {
+            bottom: 32,
+        },
+    });
+
     return {
         compact,
         title,
@@ -127,6 +180,14 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         section,
         description,
         attendees,
+        participantsTabsRoot,
+        participantsTabsList,
+        participantsTabsTab,
+        participantsTabsPanels,
+        participantItem,
+        participantName,
+        participantsTabsTopButton,
+        participantsTabsBottomButton,
     };
 });
 
@@ -462,36 +523,33 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsRoot = style("participantsTabsRoot", {
-        fontSize: globalVars.fonts.size.large,
+        fontSize: vars.participantsTabsRoot.fontSize,
         position: "relative",
-        width: "516px",
-        height: "552px",
-        border: "solid 1px #dfe1e6",
+        width: vars.participantsTabsRoot.size.width,
+        height: vars.participantsTabsRoot.size.height,
+        border: `solid 1px ${vars.participantsTabsRoot.color.border}`,
     });
 
     const participantsTabsList = style("participantsTabsList", {
-        height: "45px",
-        // paddingTop: "12px",
-        paddingBottom: "13px",
-        fontWeight: "bold",
-        borderBottom: "solid 1px #dddee0",
-        marginBottom: "5px",
+        height: vars.participantsTabsList.height,
+        fontWeight: vars.participantsTabsList.fontWeight,
+        borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
+        marginBottom: vars.participantsTabsList.marginBottom,
         $nest: {
             "> *": {
-                // width: "106px",
-                paddingLeft: "0px",
-                marginRight: "50px",
-                paddingRight: "0px",
-                textAlign: "left",
+                paddingLeft: 0,
+                paddingRight: 0,
+                marginRight: 50,
             },
             ":first-child": {
-                marginLeft: "16px",
+                marginLeft: 16,
             },
         },
     });
 
     const participantsTabsTab = style("participantsTabsTab", {
-        height: "42px",
+        // Note height and the border height add up to the height of the list
+        height: vars.participantsTabsTab.height,
         $nest: {
             "&[data-selected]": {
                 borderBottom: `3px solid ${colorOut(globalVars.mainColors.primary)}`,
@@ -501,30 +559,45 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const participantsTabsPanels = style("participantsTabsPanels", {
         overflowY: "scroll",
-        height: "75%",
+        height: vars.participantsTabsPanels.height,
+    });
+
+    const participantList = style("participantsList", {
+        marginLeft: 16,
+    });
+
+    const participantItem = style("participantItem", {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: vars.participantItem.marginBottom,
+    });
+
+    const participantName = style("participantName", {
+        display: "inline-block",
+        marginLeft: vars.participantName.marginLeft,
     });
 
     const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
         position: "absolute",
-        backgroundColor: "red",
-        right: "6px",
-        top: "10px",
+        right: vars.participantsTabsTopButton.wrapper.right,
+        top: vars.participantsTabsTopButton.wrapper.top,
     });
 
     const participantsTabsTopButton = style("participantsTabsTopButton", {
-        width: "24p",
-        height: "24px",
         display: "inline-flex",
         alignItems: "center",
         justifyItems: "center",
+        width: vars.participantsTabsTopButton.size.width,
+        height: vars.participantsTabsTopButton.size.height,
     });
 
     const participantsTabsBottomButtonWrapper = style("participantsTabsBottomButton", {
         position: "absolute",
         textAlign: "center",
-        bottom: "32px",
-        left: "0",
-        right: "0",
+        left: 0,
+        right: 0,
+        bottom: vars.participantsTabsBottomButton.wrapper.bottom,
     });
 
     return {
@@ -569,6 +642,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         participantsTabsRoot,
         participantsTabsList,
         participantsTabsPanels,
+        participantItem,
+        participantList,
+        participantName,
         participantsTabsTab,
         participantsTabsTopButtonWrapper,
         participantsTabsTopButton,

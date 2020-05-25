@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { CloseTinyIcon } from "@library/icons/common";
@@ -6,60 +6,63 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
-function Participant() {
+function Participant({ user }) {
     const classes = eventsClasses();
     return (
-        <li
-            style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                // backgroundColor: "green",
-                marginBottom: "19px",
-            }}
-        >
-            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} />
-            <span
-                style={{
-                    display: "inline-block",
-                    marginLeft: "16px",
-                }}
-            >
-                Marie Curie
-            </span>
+        <li className={classes.participantItem}>
+            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
+            <span className={classes.participantName}>{user.name}</span>
         </li>
     );
 }
 
-function Participants() {
+function Participants({ participants }) {
+    const classes = eventsClasses();
     return (
-        <ul style={{ marginLeft: "16px" }}>
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
-            <Participant />
+        <ul className={classes.participantList}>
+            {participants &&
+                participants.map(participant => <Participant key={participant.userID} user={participant.user} />)}
         </ul>
     );
 }
 
-export default function EventParticipantsTabs() {
+export interface ParticipantData {
+    eventID: number;
+    userID: number;
+    user: {
+        userID: number;
+        name: string;
+        photoUrl: string;
+        attending: EventAttendance;
+    };
+}
+
+interface IProps {
+    yesParticipants: ParticipantData[];
+    maybeParticipants: ParticipantData[];
+    noParticipants: ParticipantData[];
+    closeClick?: () => void;
+}
+
+export default function EventParticipantsTabs(props: IProps) {
     const classes = eventsClasses();
+    const { yesParticipants, maybeParticipants, noParticipants, closeClick } = props;
+
+    const [tabIndex, setTabIndex] = useState(0);
+    const handleTabsChange = index => {
+        setTabIndex(index);
+    };
 
     return (
-        <Tabs className={classes.participantsTabsRoot}>
+        <Tabs defaultIndex={0} index={tabIndex} onChange={handleTabsChange} className={classes.participantsTabsRoot}>
             <div className={classes.participantsTabsTopButtonWrapper}>
-                <Button baseClass={ButtonTypes.CUSTOM} className={classes.participantsTabsTopButton}>
+                <Button
+                    onClick={closeClick}
+                    baseClass={ButtonTypes.CUSTOM}
+                    className={classes.participantsTabsTopButton}
+                >
                     <CloseTinyIcon />
                 </Button>
             </div>
@@ -70,18 +73,18 @@ export default function EventParticipantsTabs() {
             </TabList>
             <TabPanels className={classes.participantsTabsPanels}>
                 <TabPanel>
-                    <Participants />
+                    <Participants participants={yesParticipants} />
                 </TabPanel>
                 <TabPanel>
-                    <Participants />
+                    <Participants participants={maybeParticipants} />
                 </TabPanel>
                 <TabPanel>
-                    <Participants />
+                    <Participants participants={noParticipants} />
                 </TabPanel>
             </TabPanels>
 
             <div className={classes.participantsTabsBottomButtonWrapper}>
-                <Button style={{ width: "208px" }}> Load more </Button>
+                <Button style={{ width: 208 }}>Load more</Button>
             </div>
         </Tabs>
     );
