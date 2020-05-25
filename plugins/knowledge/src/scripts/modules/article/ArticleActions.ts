@@ -9,16 +9,17 @@ import {
     IArticleFragment,
     IDeleteArticleDraftRequest,
     IDeleteArticleDraftResponse,
+    IFeatureArticle,
     IGetArticleDraftRequest,
     IGetArticleDraftResponse,
     IGetArticleDraftsRequest,
     IGetArticleDraftsResponse,
     IGetArticleFromDiscussionRequest,
     IGetArticleFromDiscussionResponse,
-    IGetArticleRequestBody,
-    IGetArticleResponseBody,
     IGetArticleLocalesRequestBody,
     IGetArticleLocalesResponseBody,
+    IGetArticleRequestBody,
+    IGetArticleResponseBody,
     IPatchArticleDraftRequest,
     IPatchArticleDraftResponse,
     IPatchArticleRequestBody,
@@ -30,7 +31,6 @@ import {
     IPostArticleRequestBody,
     IPostArticleResponseBody,
     IRelatedArticle,
-    IFeatureArticle,
 } from "@knowledge/@types/api/article";
 import {
     IGetArticleRevisionsRequestBody,
@@ -50,8 +50,7 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
-import { ensureScript } from "@vanilla/dom-utils/src";
-import { getMeta } from "@library/utility/appUtils";
+import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -72,15 +71,6 @@ export interface IRelatedArticles {
     minimumArticles?: number;
 }
 
-interface IRecaptcha {
-    execute: (string) => string;
-}
-
-export async function ensureReCaptcha(siteKey: string): Promise<IRecaptcha | null> {
-    await ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
-    return { execute: siteKey => window.grecaptcha.execute(siteKey) };
-}
-
 /**
  * Actions for the article page.
  */
@@ -97,12 +87,12 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
 
             const currentUser = this.getState().users.current;
             if (currentUser.data?.userID === 0 || !currentUser) {
+                const reCaptcha = await ensureReCaptcha();
                 const siteKey = getMeta("reCaptchaKey");
-                const reCaptcha = await ensureReCaptcha(siteKey);
-                const responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
-
-                if (responseToken) {
-                    body.responseToken = responseToken;
+                try {
+                    body.responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
+                } catch (e) {
+                    console.log(e);
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);

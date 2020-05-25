@@ -684,11 +684,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
 
         // This is just check if article exists and knowledge base has status "published"
-        $row = $this->articleByID($id);
-
+        $row = $this->articleByID($id, true);
         $validReaction = true;
-        if ($body["responseToken"] ?? false) {
-            $validReaction = $this->reCaptchaVerification($body["responseToken"]);
+
+        $isGuest = ($this->session->UserID === 0 || $body['insertUserID'] ?? null === 0);
+        if ($isGuest) {
+            $responseToken = $body["responseToken"] ?? false;
+            $validReaction = $this->reCaptchaVerification($responseToken);
         }
 
         if ($validReaction) {
@@ -731,7 +733,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 $id,
                 $fields['insertUserID']
             );
-            $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
+
             $row['reactions'][] = [
                 'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
                 'yes' => (int)$reactionCounts['positiveCount'],
@@ -740,8 +742,31 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 'userReaction' => $newReactionValue,
             ];
             $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
+        } else {
+            $articleReaction = $body["helpful"] ?? null;
+
+            // fake counts if reCaptcha Challenge fails.
+            $reactionCounts = $this->articleReactionModel->getReactionCount($id);
+            $positiveCount = (int)$reactionCounts['positiveCount'] ?? 0;
+            $neutralCount =  (int)$reactionCounts['neutralCount'] ?? 0;
+            $total = (int)$reactionCounts['allCount'] ?? 0;
+
+            if ($articleReaction) {
+                $row['reactions'][] = [
+                    'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                    'yes' =>  ($articleReaction === ArticleReactionModel::YES) ?
+                        $positiveCount + 1 :
+                        $positiveCount,
+                    'no' => ($articleReaction === ArticleReactionModel::NO) ?
+                        $neutralCount + 1 :
+                        $neutralCount,
+                    'total' => $total + 1,
+                    'userReaction' => $articleReaction,
+                ];
+            }
         }
 
+        $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
 

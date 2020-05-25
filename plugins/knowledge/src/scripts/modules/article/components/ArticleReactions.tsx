@@ -9,15 +9,15 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import Translate from "@library/content/Translate";
-import { IUsersStoreState, isUserGuest } from "@library/features/users/userModel";
+import { isUserGuest, IUsersStoreState } from "@library/features/users/userModel";
 import Button from "@library/forms/Button";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import SmartLink from "@library/routing/links/SmartLink";
-import { t } from "@library/utility/appUtils";
+import { ensureReCaptcha, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api/article";
 import { CheckCompactIcon } from "@library/icons/common";
@@ -25,6 +25,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting, isSignedIn } = props;
+
     const classes = reactionClasses();
     const helpfulReactions = props.reactions.find(article => article.reactionType === ArticleReactionType.HELPFUL);
 
@@ -34,12 +35,13 @@ export function ArticleReactions(props: IProps) {
     }
 
     // Build the text for the view.
-    const { yes, total } = helpfulReactions;
+    let { yes, total } = helpfulReactions;
 
     let localeStorage = typeof localStorage !== "undefined" ? localStorage : false;
     let disableGuestVoting = !localeStorage;
 
     if (!isSignedIn && localeStorage) {
+        ensureReCaptcha();
         if (localeStorage) {
             try {
                 const hasVoted = localeStorage.getItem(`hasVoted-${props.articleID}`);
@@ -68,6 +70,8 @@ export function ArticleReactions(props: IProps) {
 
     const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || disableGuestVoting;
 
+    console.log(resultText);
+
     return (
         <section className={classes.frame}>
             <Heading title={title} className={classes.title} />
@@ -90,6 +94,7 @@ export function ArticleReactions(props: IProps) {
                 />
             </div>
             {disableGuestVoting && <SignInLink isSignedIn={props.isSignedIn} />}
+
             <Paragraph className={classes.resultText}>{resultText}</Paragraph>
         </section>
     );

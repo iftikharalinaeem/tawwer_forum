@@ -16,7 +16,7 @@ import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/navigation/NextPrevious";
-import { getMeta, t } from "@library/utility/appUtils";
+import { ensureReCaptcha, getMeta, t } from "@library/utility/appUtils";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle, IArticleLocale, IRelatedArticle } from "@knowledge/@types/api/article";
@@ -92,11 +92,6 @@ export default function ArticleLayout(props: IProps) {
     ) : (
         <OtherLanguages articleLocaleData={articlelocales} knowledgeBaseID={article.knowledgeBaseID} />
     );
-
-    const siteKey = getMeta("reCaptchaKey");
-    if (siteKey) {
-        ensureScript(`https://www.google.com/recaptcha/api.js?render=${siteKey}`);
-    }
 
     return (
         <>
