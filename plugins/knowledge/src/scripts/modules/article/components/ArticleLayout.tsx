@@ -16,7 +16,7 @@ import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/navigation/NextPrevious";
-import { ensureReCaptcha, getMeta, t } from "@library/utility/appUtils";
+import { t } from "@library/utility/appUtils";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle, IArticleLocale, IRelatedArticle } from "@knowledge/@types/api/article";
@@ -32,7 +32,7 @@ import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/Oth
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { ensureScript } from "@vanilla/dom-utils/src";
+import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
 
 interface IProps {
     useBackButton?: boolean;
