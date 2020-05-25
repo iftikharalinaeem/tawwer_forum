@@ -13,7 +13,7 @@ use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
-use Vanilla\Models\ThemeSectionModel;
+use Vanilla\THeme\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Robots;
 use Gdn_Session as SessionInterface;
