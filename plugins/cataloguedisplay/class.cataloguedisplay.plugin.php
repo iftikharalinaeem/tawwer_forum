@@ -140,8 +140,7 @@ class CatalogueDisplayPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_addEditCategory_handler(VanillaSettingsController $sender, array $args) {
-        $description = $this->locale->translate('Each discussion will show an uploaded image on the Category page. '
-            .'This only applies to categories with "Discussions" as the "Display As."');
+        $description = $this->locale->translate('Show an uploaded image on the Category page.');
         $sender->Data['_ExtendedFields']['CatalogueDisplay'] = [
             'Name' => 'CatalogueDisplay',
             'Label' => 'Catalogue Style',

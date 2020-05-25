@@ -3,7 +3,7 @@
 {{ form.open({'enctype': 'multipart/form-data'}) }}
 <div class="padded">
     {{ form.errors() }}
-    {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Upload a placeholder image that will display when users do not have an image in their post.')) }}
+    {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Upload a placeholder image for catalogue post.')) }}
 </div>
 <div class="padded image-link-choice">
     {{ form.label(t('Catalogue image URL:')) }}
@@ -14,13 +14,13 @@
     {{ form.label(t('Additional classes'), 'CatalogueDisplay.AdditionalClasses') }}
     {{ form.input('CatalogueDisplay.AdditionalClasses') }}
     <div class="description info">
-        {{ t('Apply additional classes on catalogue image. Use space to separate each class.') }}
+        {{ t('Apply additional classes on catalogue image.') }}
     </div>
 </div>
 <div class="padded">
     {{ form.toggle('CatalogueDisplay.OnlyOnCategory', t('Category only')) }}
     <div class="description info">
-        {{ t('Display on category page only. Recent discussions list will not be affected.') }}
+        {{ t('Display on category page only.') }}
     </div>
 </div>
 <div class="padded">
