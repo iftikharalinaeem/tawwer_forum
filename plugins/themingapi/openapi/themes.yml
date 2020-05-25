@@ -72,7 +72,7 @@ x-aliases:
       204:
         description: Success
     tags:
-      - Themes
+      - Theme Assets
     summary: Delete theme asset.
   StringPutAsset: &StringPutAsset
     parameters:
@@ -85,7 +85,7 @@ x-aliases:
     responses:
       <<: *StringAssetOut
     tags:
-      - Themes
+      - Theme Assets
     summary: Set theme asset or replace if already exists.
   HtmlPutAssetContentType: &HtmlPutAssetContentType
     <<: *StringPutAsset
@@ -143,7 +143,7 @@ x-aliases:
     responses:
       <<: *JsonAssetOut
     tags:
-      - Themes
+      - Theme Assets
     summary: Set theme asset or replace if already exists.
   JsonPutAssetContentType: &JsonPutAssetContentType
     <<: *JsonPutAsset
