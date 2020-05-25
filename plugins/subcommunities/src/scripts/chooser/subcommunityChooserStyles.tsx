@@ -10,6 +10,7 @@ import { colorOut, margins, paddings, unit } from "@library/styles/styleHelpers"
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { calc, percent, px } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { SubcommunityChooserSection } from "@subcommunities/chooser/MultiLevelChooser";
 
 export const subcommunityChooserVariables = useThemeCache(() => {
     const vars = variableFactory("subcommunityChooser");
@@ -17,6 +18,7 @@ export const subcommunityChooserVariables = useThemeCache(() => {
 
     const options = vars("options", {
         forceIcon: titleBarVars.navAlignment.alignment === "center",
+        defaultSection: "locale" as SubcommunityChooserSection,
         enabled: true,
     });
 

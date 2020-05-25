@@ -9,9 +9,10 @@ import { useSelector } from "react-redux";
 import { useEffect, useMemo, useDebugValue } from "react";
 import { LoadStatus, ILoadable } from "@library/@types/api/core";
 import { ISubcommunity } from "@subcommunities/subcommunities/subcommunityTypes";
-import { formatUrl, siteUrl } from "@library/utility/appUtils";
+import { formatUrl, siteUrl, getMeta } from "@library/utility/appUtils";
 import { useCommunityFilterContext } from "@subcommunities/CommunityFilterContext";
 import { useLocaleInfo, ILocale } from "@vanilla/i18n";
+import { Locale } from "moment";
 
 export function useSubcommunitiesState() {
     return useSelector((state: IMultiSiteStoreState) => {
@@ -47,7 +48,7 @@ export function useSubcommunities() {
             Object.values(subcommunitiesByID.data).forEach(subcommunity => {
                 const { productID } = subcommunity;
 
-                if (productID !== null) {
+                if (productID != null) {
                     // Check if we have the product already.
                     if (data[productID]) {
                         data[productID].push(subcommunity);
@@ -70,8 +71,8 @@ export function useSubcommunities() {
 }
 
 export function useCurrentSubcommunity() {
-    const webPath = formatUrl("");
-    const realRoot = siteUrl("");
+    const webPath = getMeta("context.basePath", "");
+    const realRoot = getMeta("context.host", "");
     const currentFolder = webPath.replace(realRoot, "").replace("/", "");
     const { subcommunitiesByID } = useSubcommunities();
 
@@ -123,4 +124,36 @@ export function useAvailableSubcommunityLocales(): ILocale[] | null {
 
     useDebugValue(result);
     return result;
+}
+
+type SubcommunityOrLocale = ISubcommunity | ILocale;
+
+export function useSubcommunitiesOrLocales(): SubcommunityOrLocale[] {
+    const { subcommunitiesByProductID } = useSubcommunities();
+    const locales = useAvailableSubcommunityLocales() ?? [];
+    const currentSubcommunity = useCurrentSubcommunity();
+
+    const subcommunitiesForCurrentProduct = currentSubcommunity?.productID
+        ? subcommunitiesByProductID?.data?.[currentSubcommunity.productID] ?? []
+        : [];
+
+    const results: SubcommunityOrLocale[] = [];
+
+    locales.forEach(locale => {
+        const matchingSubcommunity = subcommunitiesForCurrentProduct.find(subcommunity => {
+            if (subcommunity.locale === locale.localeKey) {
+                return subcommunity;
+            }
+        });
+
+        if (matchingSubcommunity) {
+            results.push(matchingSubcommunity);
+        } else {
+            results.push(locale);
+        }
+    });
+
+    useDebugValue(results);
+
+    return results;
 }
