@@ -185,7 +185,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
             $theme = $this->getTheme($themeID);
             $this->themeModel->setCurrentTheme($themeID);
 
-            $parentID = $theme->getParentThemeID();
+            $parentID = $theme->getParentTheme();
             if (!$parentID) {
                 $this->config->set('Garden.Theme', $parentID);
                 $this->config->set('Garden.MobileTheme', $parentID);
@@ -278,8 +278,8 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
      * @inheritdoc
      */
     public function postTheme(array $body): Theme {
-        $parentThemeID = $body['parentTheme'];
-        $parentTheme = $this->fsThemeProvider->getTheme($parentThemeID);
+        $parentTheme = $body['parentTheme'];
+        $parentTheme = $this->fsThemeProvider->getTheme($parentTheme);
         $body['revisionID'] = -1;
         $themeID = $this->themeModel->insert($body);
         $revisionID = $this->themeRevisionModel->insert([
