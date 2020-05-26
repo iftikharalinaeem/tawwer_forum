@@ -10,9 +10,10 @@ import { ProductSelectorFormGroup } from "@subcommunities/forms/ProductSelectorF
 import { getMeta } from "@library/utility/appUtils";
 import { SubcommunityThemeFormGroup } from "@subcommunities/forms/SubcommunityThemeFormGroup";
 import { MultiSubcommunityInput } from "@subcommunities/chooser/MultiSubcommunityInput";
+import { PocketSubcommunityChooser } from "@subcommunities/chooser/PocketSubcommunitiesChooser";
 
 const isProductIntgrationEnabled = getMeta("featureFlags.SubcommunityProducts.Enabled") === true;
-
+addComponent("pocket-subcommunity-chooser", PocketSubcommunityChooser);
 addComponent("product-integration-form-group", ProductIntegrationFormGroup, { overwrite: true });
 
 if (isProductIntgrationEnabled) {

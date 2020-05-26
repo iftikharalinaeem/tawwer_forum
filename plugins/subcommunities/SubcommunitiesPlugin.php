@@ -923,6 +923,48 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $request->setQueryItem('Target', '/');
         }
     }
+
+    /**
+     * Add fields to addedit form
+     * @param \SettingsController $sender
+     * @param array $args
+     */
+    function settingsController_additionalPocketFilterInputs_handler ($args) {
+        $Form = $args['form'];
+        echo $Form->react(
+            "SubcommunityIDs",
+            "pocket-subcommunity-chooser",
+            [
+                "tag" => "li",
+                "value" => $Form->getvalue("subcommunityIDs") ?? []
+            ]
+        );
+    }
+
+    /**
+     * Check if we can render pocket
+     * @param \SettingsController $sender
+     * @param array $args
+     */
+    function settingsController_AdditionalPocketFilters_handler ($args) {
+        $subcommunityIDs = $args["subcommunityIDs"];
+        if (!empty($subcommunityIDs)) {
+            if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
+                return false;
+            }
+            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
+            $currentSubcommunity = $subcommunitiesModel::getCurrent();
+            if (!$currentSubcommunity) {
+                return false;
+            }
+            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
+
+            $index = array_search($currentSubcommunityID, $subcommunityIDs);
+            if ($index === -1) {
+                return false;
+            }
+        }
+    }
 }
 
 if (!function_exists('commentUrl')) {
@@ -998,6 +1040,7 @@ if (!function_exists('discussionUrl')) {
             ->get(SubcommunitiesPlugin::class)
             ->subcommunityURL($categoryID, $path, $withDomain, $page, SubcommunitiesPlugin::URL_TYPE_DISCUSSION);
     }
+
 }
 
 if (!function_exists('categoryUrl')) {
