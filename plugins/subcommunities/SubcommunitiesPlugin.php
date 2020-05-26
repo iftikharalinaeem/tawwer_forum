@@ -923,6 +923,56 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             $request->setQueryItem('Target', '/');
         }
     }
+
+    /**
+     * Add multi role input to pocket filters.
+     *
+     * @param array $args
+     */
+    public function settingsController_additionalPocketFilterInputs_handler($args) {
+        $Form = $args['form'];
+        echo $Form->react(
+            "SubcommunityIDs",
+            "pocket-subcommunity-chooser",
+            [
+                "tag" => "li",
+                "value" => $Form->getvalue("SubcommunityIDs") ?? []
+            ]
+        );
+    }
+
+    /**
+     * Add some event handling for pocket rendering.
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     * @return bool
+     */
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+        $pocketData = $pocket->Data;
+
+        $subcommunityIDs = $pocketData['SubcommunityIDs'] ?? [];
+
+        // Check Subcommunities
+        if (!empty($subcommunityIDs)) {
+            $currentSubcommunity = SubcommunityModel::getCurrent();
+            if (!$currentSubcommunity) {
+                return false;
+            }
+            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
+            $match = array_search($currentSubcommunityID, $subcommunityIDs, false);
+            if (!$match) {
+                return false;
+            }
+        }
+
+        return $existingCanRender;
+    }
 }
 
 if (!function_exists('commentUrl')) {
@@ -998,6 +1048,7 @@ if (!function_exists('discussionUrl')) {
             ->get(SubcommunitiesPlugin::class)
             ->subcommunityURL($categoryID, $path, $withDomain, $page, SubcommunitiesPlugin::URL_TYPE_DISCUSSION);
     }
+
 }
 
 if (!function_exists('categoryUrl')) {
