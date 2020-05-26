@@ -149,7 +149,7 @@ class ThemingApiPlugin extends Gdn_Plugin {
             ->table("themeRevision")
             ->primaryKey("revisionID")
             ->column("themeID", "int", false, ["index"])
-            ->column("name", "varchar(15)", false)
+            ->column("name", "varchar(255)", false)
             ->column("insertUserID", "int", false)
             ->column("dateInserted", "datetime")
             ->set();

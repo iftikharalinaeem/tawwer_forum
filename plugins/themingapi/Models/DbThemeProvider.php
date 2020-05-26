@@ -113,6 +113,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
             if (isset($args['revisionID'])) {
                 $theme['revisionID'] = $args['revisionID'];
             }
+            $theme['revisionName'] = $this->themeRevisionModel->getName($theme['revisionID']);
             $assets = $this->themeAssetModel->get(
                 [
                     'themeID' => $themeKey,
@@ -158,6 +159,10 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
      */
     public function getThemeRevisions($themeID): array {
         $revisions = $this->themeModel->getRevisions($themeID);
+        $this->userModel->expandUsers(
+            $revisions,
+            ["insertUserID"]
+        );
         foreach ($revisions as &$revision) {
             $revision = $this->createTheme(
                 $revision,
@@ -170,10 +175,6 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
                 )
             );
         }
-        $this->userModel->expandUsers(
-            $revisions,
-            ["insertUserID"]
-        );
         return $revisions;
     }
 
@@ -319,11 +320,16 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         // Get the existing theme.
         $existingTheme = $this->getTheme($themeID);
 
-        if (($body['revisionID'] ?? -1) === -1) {
-            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
-        } elseif (!empty($body['revisionName'] ?? '')) {
-            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
+        if (isset($body['revisionID'])) {
+            // We are restoring a revision.
+            if (isset($body['revisionName'])) {
+                $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
+            }
+            $this->themeModel->update(['revisionID' => $body['revisionID']], ['themeID' => $themeID]);
+            return $this->getTheme($themeID, ['revisionID' => $body['revisionID']]);
         }
+
+        $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
         $this->themeModel->update($body, ['themeID' => $themeID]);
 
         $revisionID = $body["revisionID"];

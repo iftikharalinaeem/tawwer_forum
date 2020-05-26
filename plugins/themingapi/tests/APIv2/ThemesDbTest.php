@@ -6,14 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Gdn_Configuration;
-use Gdn_Request;
-use Gdn_Upload;
-use Vanilla\Addon;
-use Vanilla\AddonManager;
-use Garden\Container\Reference;
-use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Theme\FsThemeProvider;
 use Garden\Web\Exception\ClientException;
 
 /**
@@ -37,19 +29,19 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $response = $this->api()->post(
             "themes",
             [
-                'name'=>'custom theme',
+                'name' => 'custom theme',
                 'parentTheme' => 'test',
                 'parentVersion' => '1.0',
                 "assets" => [
-                            "header" => [
-                                "data" => "<div><!-- HEADER --></div>",
-                                "type" => "html"
-                            ],
-                            "footer" => [
-                                "data" => "<div><!-- FOOTER --></div>",
-                                 "type" => "html"
-                            ]
-                ]
+                    "header" => [
+                        "data" => "<div><!-- HEADER --></div>",
+                        "type" => "html",
+                    ],
+                    "footer" => [
+                        "data" => "<div><!-- FOOTER --></div>",
+                        "type" => "html",
+                    ],
+                ],
             ]
         );
         $this->assertEquals(201, $response->getStatusCode());
@@ -63,26 +55,26 @@ class ThemesDbTest extends AbstractAPIv2Test {
      */
     public function testPatchTheme() {
         $response = $this->api()->patch(
-            "themes/".self::$data['newTheme']['themeID'],
+            "themes/" . self::$data['newTheme']['themeID'],
             [
-                'name'=>'custom theme PATCHED',
+                'name' => 'custom theme PATCHED',
                 "assets" => [
                     "header" => [
                         "data" => "<div><!-- HEADER PATCHED --></div>",
-                        "type" => "html"
+                        "type" => "html",
                     ],
                     "footer" => [
                         "data" => "<div><!-- FOOTER --></div>",
-                        "type" => "html"
-                    ]
-                ]
+                        "type" => "html",
+                    ],
+                ],
             ]
         );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals('custom theme PATCHED', $body['name']);
-        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
     }
 
     /**
@@ -91,7 +83,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
      * @depends testPatchTheme
      */
     public function testThemeRevisions() {
-        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID'].'/revisions');
+        $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'] . '/revisions');
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
@@ -102,22 +94,22 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $this->assertTrue($body[1]['active']);
         $this->assertFalse($body[0]['active']);
 
-        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID']);
+        $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'], ['expand' => true]);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(self::$data['revisions']['patched']['revisionID'], $body['revisionID']);
-        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
 
         $response = $this->api()->get(
-            "themes/".self::$data['newTheme']['themeID'],
-            ['revisionID' => self::$data['revisions']['initial']['revisionID']]
+            "themes/" . self::$data['newTheme']['themeID'],
+            ['revisionID' => self::$data['revisions']['initial']['revisionID'], 'expand' => true]
         );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(self::$data['revisions']['initial']['revisionID'], $body['revisionID']);
-        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
     }
 
     /**
@@ -127,15 +119,15 @@ class ThemesDbTest extends AbstractAPIv2Test {
      */
     public function testThemeRevisionRestore() {
         $response = $this->api()->patch(
-            "themes/".self::$data['newTheme']['themeID'],
+            "themes/" . self::$data['newTheme']['themeID'],
             [
-                'revisionID' => self::$data['revisions']['initial']['revisionID']
+                'revisionID' => self::$data['revisions']['initial']['revisionID'],
             ]
         );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
 
-        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID'].'/revisions');
+        $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'] . '/revisions');
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
@@ -143,42 +135,271 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $this->assertTrue($body[0]['active']);
         $this->assertFalse($body[1]['active']);
 
-        $response = $this->api()->get("themes/".self::$data['newTheme']['themeID']);
+        $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'], ['expand' => true]);
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(self::$data['revisions']['initial']['revisionID'], $body['revisionID']);
-        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals("<div><!-- HEADER --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
 
         $response = $this->api()->get(
-            "themes/".self::$data['newTheme']['themeID'],
-            ['revisionID' => self::$data['revisions']['patched']['revisionID']]
+            "themes/" . self::$data['newTheme']['themeID'],
+            ['revisionID' => self::$data['revisions']['patched']['revisionID'], 'expand' => true]
         );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals(self::$data['revisions']['patched']['revisionID'], $body['revisionID']);
-        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
     }
 
     /**
      * Test PATCH endpoint used to rename revision
      *
-     * @depends testPostTheme
+     * @depends testThemeRevisions
      */
     public function testThemeRevisionRename() {
         $response = $this->api()->patch(
-            "themes/".self::$data['newTheme']['themeID'],
+            "themes/" . self::$data['newTheme']['themeID'],
             [
                 'revisionID' => self::$data['revisions']['patched']['revisionID'],
-                'revisionName' => 'rev 2020.001'
+                'revisionName' => 'updated revision name',
             ]
         );
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEquals('custom theme PATCHED', $body['name']);
-        $this->assertEquals('rev 2020.001', $body['revisionName']);
-        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']);
-        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']);
+        $this->assertEquals('updated revision name', $body['revisionName']);
+        $this->assertEquals("<div><!-- HEADER PATCHED --></div>", $body['assets']['header']['data']);
+        $this->assertEquals("<div><!-- FOOTER --></div>", $body['assets']['footer']['data']);
+    }
+
+
+    /**
+     * Test that putting and getting of assets works as expected.
+     *
+     * No extension provided for this.
+     *
+     * @param string $assetName
+     * @param array|string $assetData
+     * @param string $expectedContentType
+     *
+     * @dataProvider providePutGet
+     */
+    public function testPutGet(string $assetName, $assetData, string $expectedContentType = 'application/json; charset=utf-8') {
+        $theme = $this->api()->post('/themes', [
+            'name' => 'test theme',
+            'parentTheme' => 'theme-foundation',
+            'parentVersion' => '1.0.0',
+        ])->getBody();
+
+        $themeID = $theme['themeID'];
+
+        $url = "/themes/$themeID/assets/$assetName";
+        $this->api()->put($url, $assetData);
+        $response = $this->api()->get($url);
+        $this->assertEquals($expectedContentType, $response->getHeader('Content-Type'));
+        $body = $response->getBody();
+
+        if (is_array($body) && isset($body['url'])) {
+            unset($body['url']);
+        }
+
+        $this->assertEquals($assetData, $body);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function providePutGet(): array {
+        return [
+            'header' => [
+                'header',
+                [
+                    'data' => '<div>Hello header</div>',
+                    'type' => 'html',
+                ]
+            ],
+            'header.html' => [
+                'header.html',
+                '<div>Hello header</div>',
+                'text/html',
+            ],
+            'footer' => [
+                'footer',
+                [
+                    'data' => '<div>Hello footer</div>',
+                    'type' => 'html',
+                ]
+            ],
+            'footer.html' => [
+                'footer.html',
+                '<div>Hello footer</div>',
+                'text/html',
+            ],
+            'javascript' => [
+                'javascript',
+                [
+                    'data' => 'console.log("Hello world");',
+                    'type' => 'js',
+                ]
+            ],
+            'javascript.js' => [
+                'javascript.js',
+                'console.log("Hello world");',
+                'application/javascript',
+            ],
+            'styles' => [
+                'styles',
+                [
+                    'data' => 'console.log("Hello world");',
+                    'type' => 'css',
+                ]
+            ],
+            'styles.css' => [
+                'styles.css',
+                '.header { background: white }',
+                'text/css',
+            ],
+            'variables' => [
+                'variables',
+                [
+                    'data' => [
+                        'global' => [
+                            'colors' => [
+                                'bg' => "#fff"
+                            ]
+                        ]
+                    ],
+                    'type' => 'json',
+                ]
+            ],
+            'variables.json' => [
+                'variables.json',
+                [
+                    'global' => [
+                        'colors' => [
+                            'bg' => "#fff"
+                        ]
+                    ]
+                ],
+                'application/json',
+            ],
+            'scripts' => [
+                'scripts',
+                [
+                    'data' => [
+                        [ 'url' => 'https://cdn.js.com/jquery.js' ]
+                    ],
+                    'type' => 'json',
+                ]
+            ],
+            'scripts.json' => [
+                'scripts.json',
+                [
+                    [ 'url' => 'https://cdn.js.com/jquery.js' ]
+                ],
+                'application/json',
+            ],
+        ];
+    }
+
+    /**
+     * Test that we can patch variables.
+     */
+    public function testPatchVariables() {
+        $themeID = $this->createTheme();
+
+        $url = "/themes/$themeID/assets/variables.json";
+        $this->api()->put($url, ['hello' => 'world']);
+        $this->api()->patch($url, ['hello2' => 'world2']);
+        $this->api()->patch("/themes/$themeID/assets/variables", [
+            'type' => 'json',
+            'data' => [
+                'hello3' => 'world3',
+            ],
+        ]);
+
+        $result = $this->api()->get($url)->getBody();
+        $this->assertEquals([
+            'hello' => 'world',
+            'hello2' => 'world2',
+            'hello3' => 'world3',
+        ], $result);
+    }
+
+    /**
+     * Test that patching variables replaces arrays instead of merging them.
+     */
+    public function testPatchArrayMerge() {
+        $themeID = $this->createTheme();
+
+        $url = "/themes/$themeID/assets/variables.json";
+        $this->api()->put($url, [
+            'navLinks' => ['link1', 'link2'],
+        ]);
+        $this->api()->patch($url, [
+            'navLinks' => ['link3'],
+        ]);
+
+        $result = $this->api()->get($url)->getBody();
+        $this->assertEquals([
+            'navLinks' => ['link3'],
+        ], $result, 'Arrays are replaced instead of merged');
+    }
+
+    /**
+     * Test bad asset.
+     *
+     * @dataProvider provideBadAssets
+     */
+    public function testAssetInputValidationPost(string $assetName, $asset) {
+        $this->expectException(ClientException::class);
+        $themeID = $this->createTheme([
+            'assets' => [
+                $assetName => $asset,
+            ]
+        ]);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function provideBadAssets(): array {
+        return [
+            'bad type' => [
+                'variables',
+                [
+                    'type' => 'badType',
+                    'data' => 'asdfasdf',
+                ],
+            ],
+            'bad data' => [
+                'variables',
+                [
+                    'type' => 'json',
+                    'data' => 'asdfaasdf',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Create a theme and return the ID.
+     *
+     * @param array $overrides
+     *
+     * @return int The theme ID.
+     */
+    private function createTheme(array $overrides = []): int {
+        $theme = $this->api()->post('/themes', [
+            'name' => 'test theme',
+            'parentTheme' => 'theme-foundation',
+            'parentVersion' => '1.0.0',
+        ] + $overrides)->getBody();
+
+        $themeID = $theme['themeID'];
+        return $themeID;
     }
 }
