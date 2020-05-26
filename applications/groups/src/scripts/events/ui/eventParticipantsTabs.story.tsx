@@ -171,9 +171,10 @@ const no = [];
 export const ParticipantsTabs = () => {
     const [isVisible, setIsVisible] = useState(true);
 
-    // There is some discrepancy with the version rendered on the actual
-    // page, because we're using a different component for rendering
-    // the mock data. This is not a problem.
+    // Note we're using a different component for rendering
+    // the mock data, because the real component involves
+    // fetching as well.
+
     return (
         <EventParticipantsTabs
             isVisible={isVisible}

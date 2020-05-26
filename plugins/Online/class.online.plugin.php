@@ -257,15 +257,6 @@ class OnlinePlugin extends Gdn_Plugin {
             return;
         }
 
-        // If this is the first time this person is showing up, try to set a cookie and then return
-        // This prevents tracking bounces, as well as weeds out clients that don't support cookies.
-        $bounceCookieName = c('Garden.Cookie.Name') . '-Vv';
-        $bounceCookie = val($bounceCookieName, $_COOKIE);
-        if (!$bounceCookie) {
-            safeCookie($bounceCookieName, self::$now, self::$now + 1200, c('Garden.Cookie.Path', '/'));
-            return;
-        }
-
         // We are going to be checking one of two cookies and flipping them once every 10 minutes.
         $namePrimary = self::COOKIE_GUEST_PRIMARY;
         $nameSecondary = self::COOKIE_GUEST_SECONDARY;

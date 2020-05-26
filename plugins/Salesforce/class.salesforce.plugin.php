@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
 use Vanilla\Web\TwigRenderTrait;
 
 /**
@@ -676,6 +677,9 @@ class SalesforcePlugin extends Gdn_Plugin {
             $salesforce->reconnect();
         }
 
+        $format = Gdn::getContainer()->get(\Vanilla\Formatting\FormatService::class);
+        $body = $format->renderPlainText($content->Body, $content->Format);
+
         list($firstName, $lastName) = $this->getFirstNameLastName($user->Name);
         $data = [
             'DiscussionID' => $content->DiscussionID,
@@ -686,7 +690,7 @@ class SalesforcePlugin extends Gdn_Plugin {
             'Origin' => c('Salesforce.OriginValue', 'Vanilla'),
             'Options' => $salesforce->getCaseStatusOptions(),
             'Priorities' => $salesforce->getCasePriorityOptions(),
-            'Body' => Gdn_Format::textEx(Gdn_Format::to($content->Body, $content->Format)),
+            'Body' => $body,
             'Type' => $type,
             'CommentID' => val('CommentID', $content),
             'InsertUserID' => val('InsertUserID', $content),

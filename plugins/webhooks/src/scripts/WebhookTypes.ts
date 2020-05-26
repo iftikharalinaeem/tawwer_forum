@@ -31,6 +31,7 @@ export enum EventType {
     INDIVIDUAL = "individual",
     COMMENT = "comment",
     DISCUSSION = "discussion",
+    NOTIFICATION = "notification",
     USER = "user",
 }
 
