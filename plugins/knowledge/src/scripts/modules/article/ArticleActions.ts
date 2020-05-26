@@ -95,7 +95,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 try {
                     body.responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
                 } catch (e) {
-                    console.log(e);
+                    logError(e);
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
