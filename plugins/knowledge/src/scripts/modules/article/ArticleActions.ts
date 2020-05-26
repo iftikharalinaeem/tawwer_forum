@@ -52,6 +52,7 @@ import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search"
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
 import { logError } from "@vanilla/utils";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export const HELPFUL_EVENT = "X-Vanilla-Article-Voted";
 
@@ -99,14 +100,44 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
-            const userReaction = body.helpful === "yes" ? "Helpful" : "Not Helpful";
 
-            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: userReaction }));
+            const article = this.getState().knowledge.articles.articlesByID[articleID];
+            const knowledgeBase = this.getState().knowledge.knowledgeBases.knowledgeBasesByID.data?.[
+                article.knowledgeBaseID
+            ];
+            let data = this.reactionEventsFields(knowledgeBase, article, body.helpful);
+
+            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: data }));
 
             return response.data;
         })(params);
 
         return this.dispatch(apiThunk);
+    };
+
+    public reactionEventsFields = (knowledgeBase: IKnowledgeBase | undefined, article: IArticle, helpful: string) => {
+        const { articleID, name: articleName, url: articleUrl } = article;
+        const knowledgeBaseData = knowledgeBase
+            ? {
+                  knowledgeBaseID: knowledgeBase.knowledgeBaseID,
+                  knowledgeBaseName: knowledgeBase.name,
+                  knowledgeBaseUrl: knowledgeBase.url,
+              }
+            : {};
+
+        return {
+            article: {
+                articleID,
+                articleName,
+                articleUrl,
+            },
+            knowledgeBase: {
+                ...knowledgeBaseData,
+            },
+            userVote: {
+                vote: helpful,
+            },
+        };
     };
 
     public static getArticleACs = createAction.async<IGetArticleRequestBody, IGetArticleResponseBody, IApiError>(
