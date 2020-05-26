@@ -33,6 +33,4 @@ if (isProductIntgrationEnabled) {
         props => <SubcommunityThemeFormGroup {...props} formFieldName="themeID" />,
         { overwrite: true },
     );
-
-    addComponent("multi-subcommunity-input", MultiSubcommunityInput, { overwrite: true });
 }
