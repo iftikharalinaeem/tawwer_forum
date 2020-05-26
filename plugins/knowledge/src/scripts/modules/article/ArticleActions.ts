@@ -52,6 +52,7 @@ import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search"
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
 import { logError } from "@vanilla/utils";
+import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 
 export const HELPFUL_EVENT = "X-Vanilla-Article-Voted";
 
@@ -99,9 +100,14 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
-            const userReaction = body.helpful === "yes" ? "Helpful" : "Not Helpful";
 
-            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: userReaction }));
+            const article = this.getState().knowledge.articles.articlesByID[articleID];
+            const knowledgeBase = this.getState().knowledge.knowledgeBases.knowledgeBasesByID.data?.[
+                article.knowledgeBaseID
+            ];
+            let data = { knowledgeBase, article, vote: body.helpful };
+
+            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: data }));
 
             return response.data;
         })(params);
