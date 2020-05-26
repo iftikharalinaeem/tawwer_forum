@@ -6,55 +6,39 @@
 import React, { useState } from "react";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
-import { componentExists, getComponent } from "@library/utility/componentRegistry";
+import { MultiSubcommunityInput } from "./MultiSubcommunityInput";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
 
 const sanitizeValue = (value: any) => {
     if (Array.isArray(value)) {
         return value;
     } else {
-        return !value || value === "" ? [] : JSON.parse(value);
+        return !value || value === "" ? [] : value;
     }
 };
 
 export function PocketSubcommunityChooser(props) {
-    const componentName = "pocket-subcommunity-chooser";
-    const initialValues = sanitizeValue(props.value);
-    const [subcommunityIDs, setSubcommunityIDs] = useState(sanitizeValue(initialValues));
-
-    console.log("props: ", props);
-    console.log("initialValues: ", initialValues);
-    console.log("subcommunityIDs: ", subcommunityIDs);
-    console.log("componentExists(componentName): ", componentExists(componentName));
-    console.log("getComponent(componentName); ", getComponent(componentName));
-
-    // Must be after the useEffect and useState
-    let MultiSubcommunityInput;
-    if (componentExists(componentName)) {
-        MultiSubcommunityInput = getComponent(componentName);
-    } else {
-        return null;
-    }
+    const [subcommunityIDs, setSubcommunityIDs] = useState(sanitizeValue(props.value));
 
     return (
-        <DashboardFormGroup label={t("subcommunityIDs")} tag={"div"}>
-            {/*<div className="input-wrap">*/}
-            {/*    <MultiSubcommunityInput.Component*/}
-            {/*        value={subcommunityIDs ?? []}*/}
-            {/*        onChange={selectedSubCommunities => {*/}
-            {/*            setSubcommunityIDs(*/}
-            {/*                selectedSubCommunities.map(subCom => {*/}
-            {/*                    return parseInt(subCom.value);*/}
-            {/*                }),*/}
-            {/*            );*/}
-            {/*        }}*/}
-            {/*    />*/}
-            {/*</div>*/}
-            {/*<input name={props.fieldName} type={"hidden"} value={JSON.stringify(subcommunityIDs)} />*/}
-            {/*{!subcommunityIDs ||*/}
-            {/*    (subcommunityIDs.length === 0 && <input name={props.fieldName + []} type={"hidden"} value={[]} />)}*/}
-            {/*{subcommunityIDs.map((subComID, key) => {*/}
-            {/*    return <input key={key} name={props.fieldName + "[]"} type={"hidden"} value={subComID} />;*/}
-            {/*})}*/}
+        <DashboardFormGroup label={t("Subcommunities")} tag={"div"}>
+            <div className="input-wrap">
+                <MultiSubcommunityInput
+                    value={subcommunityIDs}
+                    onChange={selectedSubCommunities => {
+                        setSubcommunityIDs(
+                            selectedSubCommunities.map(subCom => {
+                                return parseInt(subCom.value.toString());
+                            }),
+                        );
+                    }}
+                />
+            </div>
+            {!subcommunityIDs ||
+                (subcommunityIDs.length === 0 && <input name={props.fieldName + []} type={"hidden"} value={[]} />)}
+            {subcommunityIDs.map((subComID, key) => {
+                return <input key={key} name={props.fieldName + "[]"} type={"hidden"} value={subComID} />;
+            })}
         </DashboardFormGroup>
     );
 }

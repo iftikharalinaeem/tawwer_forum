@@ -925,8 +925,8 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add fields to addedit form
-     * @param \SettingsController $sender
+     * Add multi role input to poket filters
+     *
      * @param array $args
      */
     function settingsController_additionalPocketFilterInputs_handler ($args) {
@@ -936,7 +936,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             "pocket-subcommunity-chooser",
             [
                 "tag" => "li",
-                "value" => $Form->getvalue("subcommunityIDs") ?? []
+                "value" => $Form->getvalue("SubcommunityIDs") ?? []
             ]
         );
     }
@@ -964,6 +964,44 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
                 return false;
             }
         }
+    }
+
+
+    /**
+     * Add some event handling for pocket rendering.
+     *
+     * @param bool $existingCanRender
+     * @param Pocket $pocket
+     * @param array $requestData
+     *
+     * @return bool
+     */
+    public function pocket_canRender_handler(bool $existingCanRender, Pocket $pocket, array $requestData): bool {
+        if (!$existingCanRender) {
+            return $existingCanRender;
+        }
+
+        
+//
+//        $testMode = Pocket::inTestMode($pocket);
+//        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
+//        $pocketData = $pocket->Data;
+//        $roleIDs = $pocketData['RoleIDs'] ?? [];
+//
+//        if (empty($roleIDs)) {
+//            return $existingCanRender;
+//        }
+//
+//        if ($testMode && $pocketAdmin) {
+//            return $existingCanRender;
+//        }
+//
+//        $intersections = array_intersect($this->getUserRoleIDs(), $roleIDs);
+//        if (count($intersections) === 0) {
+//            return false;
+//        }
+//
+//        return $existingCanRender;
     }
 }
 
