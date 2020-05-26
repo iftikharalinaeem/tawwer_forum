@@ -7,12 +7,14 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\EventManager;
+use Garden\Http\HttpClient;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
@@ -37,6 +39,7 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
+use Vanilla\ReCaptchaVerification;
 
 /**
  * API controller for managing the articles resource.
@@ -124,6 +127,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ExtendedContentFormatService */
     private $formatService;
 
+    /** @var ReCaptchaVerification */
+    private $reCaptchaVerification;
+
     /**
      * DI.
      * @inheritdoc
@@ -146,7 +152,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         KnowledgeApiController $knowledgeApiController,
         ArticlesApiHelper $articleHelper,
         \Gdn_Session $session,
-        ExtendedContentFormatService $formatService
+        ExtendedContentFormatService $formatService,
+        ReCaptchaVerification $reCaptchaVerification
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -166,6 +173,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->articleHelper = $articleHelper;
         $this->session = $session;
         $this->formatService = $formatService;
+        $this->reCaptchaVerification = $reCaptchaVerification;
+
     }
 
     /**
@@ -668,64 +677,103 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "foreignID:s?" => [
                 "description" => "Foreign id."
             ],
+            "responseToken:s?" => [
+                "description" => "The response provided from reCaptcha."
+            ],
         ], "in")->setDescription("Reaction about an article.");
+
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
 
         // This is just check if article exists and knowledge base has status "published"
-        $article = $this->articleByID($id);
+        $row = $this->articleByID($id, true);
+        $validReaction = true;
 
-        $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
-        $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        $mode = $this->articleHelper->getOperationMode();
-        if ($mode === Operation::MODE_DEFAULT) {
-            $fields['insertUserID'] = $this->session->UserID ?? $body['insertUserID'];
-            $fields['foreignID'] = '';
-        } else {
-            $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
-            $fields['foreignID'] = $body['foreignID'] ?? '';
+        $insertUserID = $body['insertUserID'] ?? null;
+        $isGuest = ($this->session->UserID === 0 || $insertUserID === 0);
+        if ($isGuest) {
+            $responseToken = $body["responseToken"] ?? false;
+            $validReaction = $this->reCaptchaVerification->siteVerifyV3($responseToken);
         }
 
+        if ($validReaction) {
+            $reactionValue = array_search($body[ArticleReactionModel::TYPE_HELPFUL], ArticleReactionModel::getHelpfulReactions());
+            $fields = ArticleReactionModel::getReactionFields($id, ArticleReactionModel::TYPE_HELPFUL, $reactionValue);
 
-        if (empty($fields['foreignID'])) {
-            $existingReactionValue = $this->articleReactionModel->getUserReaction(
+            $mode = $this->articleHelper->getOperationMode();
+            if ($mode === Operation::MODE_DEFAULT) {
+                $fields['insertUserID'] = $this->session->UserID ?? $body['insertUserID'];
+                $fields['foreignID'] = '';
+            } else {
+                $fields['insertUserID'] = $body['insertUserID'] ?? $this->session->UserID;
+                $fields['foreignID'] = $body['foreignID'] ?? '';
+            }
+
+            if (empty($fields['foreignID'])) {
+                $existingReactionValue = $this->articleReactionModel->getUserReaction(
+                    ArticleReactionModel::TYPE_HELPFUL,
+                    $id,
+                    $fields['insertUserID']
+                );
+            } else {
+                $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
+            }
+
+            if ($existingReactionValue !== null && $fields['insertUserID'] !== 0) {
+                throw new ClientException('You already reacted on this article before.');
+            }
+
+            $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
+
+            $this->reactionModel->insert($fields, $mode);
+
+            $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
+
+            $row = $this->articleByID($id, true);
+
+            $newReactionValue = $this->articleReactionModel->getUserReaction(
                 ArticleReactionModel::TYPE_HELPFUL,
                 $id,
                 $fields['insertUserID']
             );
+
+            $row['reactions'][] = [
+                'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                'yes' => (int)$reactionCounts['positiveCount'],
+                'no' => (int)$reactionCounts['neutralCount'],
+                'total' => (int)$reactionCounts['allCount'],
+                'userReaction' => $newReactionValue,
+            ];
+            $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
         } else {
-            $existingReactionValue = $this->articleReactionModel->getReactionByForeignID($fields['foreignID']);
+            $articleReaction = $body["helpful"] ?? null;
+
+            // fake counts if reCaptcha Challenge fails.
+            $reactionCounts = $this->articleReactionModel->getReactionCount($id);
+            $positiveCount = (int)$reactionCounts['positiveCount'] ?? 0;
+            $neutralCount =  (int)$reactionCounts['neutralCount'] ?? 0;
+            $total = (int)$reactionCounts['allCount'] ?? 0;
+
+            if ($articleReaction) {
+                $row['reactions'][] = [
+                    'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
+                    'yes' =>  ($articleReaction === ArticleReactionModel::YES) ?
+                        $positiveCount + 1 :
+                        $positiveCount,
+                    'no' => ($articleReaction === ArticleReactionModel::NO) ?
+                        $neutralCount + 1 :
+                        $neutralCount,
+                    'total' => $total + 1,
+                    'userReaction' => $articleReaction,
+                ];
+            }
         }
 
-        if ($existingReactionValue !== null && $fields['insertUserID'] !== 0) {
-            throw new ClientException('You already reacted on this article before.');
-        }
-
-        $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
-
-        $this->reactionModel->insert($fields, $mode);
-
-        $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
-
-        $row = $this->articleByID($id, true);
-
-        $newReactionValue = $this->articleReactionModel->getUserReaction(
-            ArticleReactionModel::TYPE_HELPFUL,
-            $id,
-            $fields['insertUserID']
-        );
-        $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
-        $row['reactions'][]  = [
-            'reactionType' => ArticleReactionModel::TYPE_HELPFUL,
-            'yes' => (int)$reactionCounts['positiveCount'],
-            'no' => (int)$reactionCounts['neutralCount'],
-            'total' => (int)$reactionCounts['allCount'],
-            'userReaction' => $newReactionValue,
-        ];
-        $this->eventManager->fire("afterArticleReact", $row, $newReactionValue);
+        $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row = $this->articleHelper->normalizeOutput($row);
         $result = $out->validate($row);
+
         return $result;
     }
 

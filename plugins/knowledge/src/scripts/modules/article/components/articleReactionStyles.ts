@@ -4,11 +4,12 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut, flexHelper, unit } from "@library/styles/styleHelpers";
+import { colorOut, flexHelper, margins, unit } from "@library/styles/styleHelpers";
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { GlobalsNumber } from "csstype";
 import { important, percent, px } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 export const reactionClasses = useThemeCache(() => {
     const style = styleFactory("articleReactions");
@@ -49,6 +50,23 @@ export const reactionClasses = useThemeCache(() => {
     const resultText = style("resultText", {
         fontSize: unit(vars.meta.text.fontSize),
         color: colorOut(vars.meta.text.color),
+        marginBottom: unit(12),
+    });
+
+    const reCaptchaText = style("reCaptchaText", {
+        fontSize: unit(vars.meta.text.fontSize),
+        color: colorOut(vars.meta.text.color),
+        maxWidth: percent(100),
+        width: unit(300),
+        ...margins({
+            horizontal: "auto",
+        }),
+    });
+
+    const reCaptchaContainer = style("reCaptchaContainer", {
+        textAlign: "center",
+        maxWidth: percent(100),
+        width: unit(300),
     });
 
     const signInText = style("signInText", {
@@ -63,6 +81,10 @@ export const reactionClasses = useThemeCache(() => {
         $nest: linkColors.$nest,
     });
 
+    cssOut(`.grecaptcha-badge`, {
+        visibility: "hidden",
+    });
+
     return {
         link,
         title,
@@ -73,5 +95,7 @@ export const reactionClasses = useThemeCache(() => {
         votingButtons,
         resultText,
         signInText,
+        reCaptchaText,
+        reCaptchaContainer,
     };
 });

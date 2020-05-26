@@ -9,16 +9,17 @@ import {
     IArticleFragment,
     IDeleteArticleDraftRequest,
     IDeleteArticleDraftResponse,
+    IFeatureArticle,
     IGetArticleDraftRequest,
     IGetArticleDraftResponse,
     IGetArticleDraftsRequest,
     IGetArticleDraftsResponse,
     IGetArticleFromDiscussionRequest,
     IGetArticleFromDiscussionResponse,
-    IGetArticleRequestBody,
-    IGetArticleResponseBody,
     IGetArticleLocalesRequestBody,
     IGetArticleLocalesResponseBody,
+    IGetArticleRequestBody,
+    IGetArticleResponseBody,
     IPatchArticleDraftRequest,
     IPatchArticleDraftResponse,
     IPatchArticleRequestBody,
@@ -30,7 +31,6 @@ import {
     IPostArticleRequestBody,
     IPostArticleResponseBody,
     IRelatedArticle,
-    IFeatureArticle,
 } from "@knowledge/@types/api/article";
 import {
     IGetArticleRevisionsRequestBody,
@@ -50,6 +50,10 @@ import { getCurrentLocale } from "@vanilla/i18n";
 import { all } from "bluebird";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
+import { logError } from "@vanilla/utils";
+
+export const HELPFUL_EVENT = "X-Vanilla-Article-Voted";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -60,6 +64,7 @@ const createAction = actionCreatorFactory("@@article");
 interface IHelpfulParams {
     articleID: number;
     helpful: "yes" | "no";
+    responseToken?: string;
 }
 
 export interface IRelatedArticles {
@@ -78,11 +83,29 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
     public static putReactACs = createAction.async<IHelpfulParams, IArticle, IApiError>("PUT_REACT");
 
     public reactHelpful = (params: IHelpfulParams) => {
-        const { articleID, ...body } = params;
+        const { articleID } = params;
+
         const apiThunk = bindThunkAction(ArticleActions.putReactACs, async () => {
+            let { ...body } = params;
+
+            const currentUser = this.getState().users.current;
+            if (currentUser.data?.userID === 0 || !currentUser) {
+                const reCaptcha = await ensureReCaptcha();
+                const siteKey = getMeta("reCaptchaKey");
+                try {
+                    body.responseToken = await Promise.resolve(reCaptcha?.execute(siteKey)).then(token => token);
+                } catch (e) {
+                    logError(e);
+                }
+            }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
+            const userReaction = body.helpful === "yes" ? "Helpful" : "Not Helpful";
+
+            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: userReaction }));
+
             return response.data;
         })(params);
+
         return this.dispatch(apiThunk);
     };
 
