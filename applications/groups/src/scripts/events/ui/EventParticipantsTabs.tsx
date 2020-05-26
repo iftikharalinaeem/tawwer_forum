@@ -4,42 +4,8 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { CloseTinyIcon } from "@library/icons/common";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import classNames from "classnames";
-import { EventAttendance, IEventParticipant } from "@groups/events/state/eventsTypes";
 import Modal from "@vanilla/library/src/scripts/modal/Modal";
 import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
-
-function Participant({ user }) {
-    const classes = eventsClasses();
-    return (
-        <li className={classes.participantItem}>
-            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
-            <span className={classes.participantName}>{user.name}</span>
-        </li>
-    );
-}
-
-function Participants({ participants }) {
-    const classes = eventsClasses();
-    return (
-        <ul className={classes.participantList}>
-            {participants &&
-                participants.map(participant => <Participant key={participant.userID} user={participant.user} />)}
-        </ul>
-    );
-}
-
-export interface IParticipantData {
-    eventID: number;
-    userID: number;
-    user: {
-        userID: number;
-        name: string;
-        photoUrl: string;
-        attending: EventAttendance;
-    };
-}
 
 interface IProps {
     isVisible: boolean;

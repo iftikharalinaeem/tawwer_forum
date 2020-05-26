@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import EventParticipantsTabs from "@groups/events/ui/EventParticipantsTabs";
+import EventParticipants from "@groups/events/ui/EventParticipants";
+import { t } from "@vanilla/i18n";
 
 export default {
     component: EventParticipantsTabs,
@@ -167,12 +169,29 @@ const maybe = [
 const no = [];
 
 export const ParticipantsTabs = () => {
+    const [isVisible, setIsVisible] = useState(true);
+
+    // There is some discrepancy with the version rendered on the actual
+    // page, because we're using a different component for rendering
+    // the mock data. This is not a problem.
     return (
         <EventParticipantsTabs
-            yesParticipants={yes}
-            maybeParticipants={maybe}
-            noParticipants={no}
-            closeClick={() => alert("close")}
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+            tabs={[
+                {
+                    title: t("Going"),
+                    body: <EventParticipants participants={yes} />,
+                },
+                {
+                    title: t("Maybe"),
+                    body: <EventParticipants participants={maybe} />,
+                },
+                {
+                    title: t("Not Going"),
+                    body: <EventParticipants participants={no} />,
+                },
+            ]}
         />
     );
 };
