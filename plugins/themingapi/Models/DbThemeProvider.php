@@ -238,7 +238,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function setAsset(int $themeID, string $assetKey, string $content): ThemeAsset {
+    public function setAsset($themeID, string $assetKey, string $content): ThemeAsset {
         $this->patchTheme($themeID, [
             'assets' => [
                 $assetKey => [
@@ -255,7 +255,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function sparseUpdateAsset(int $themeID, string $assetKey, string $data): Asset\ThemeAsset {
+    public function sparseUpdateAsset($themeID, string $assetKey, string $data): Asset\ThemeAsset {
         $existingAsset = $this->getTheme($themeID)->getAssets()[$assetKey] ?? null;
         if ($existingAsset instanceof Asset\JsonThemeAsset) {
             // Merge the 2 assets together.
@@ -316,7 +316,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function patchTheme(int $themeID, array $body): Theme {
+    public function patchTheme($themeID, array $body): Theme {
         // Get the existing theme.
         $existingTheme = $this->getTheme($themeID);
 
@@ -361,7 +361,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function deleteTheme(int $themeID) {
+    public function deleteTheme($themeID) {
         // check if theme exists
         try {
             $this->themeModel->selectSingle(['themeID' => $themeID]);
