@@ -40,15 +40,12 @@ export function EventAttendees(props: IProps) {
         switch (title) {
             case "Going":
                 return 0;
-                break;
             case "Maybe":
                 return 1;
-                break;
             case "Not going":
                 return 2;
             default:
                 return 0;
-                break;
         }
     };
 
