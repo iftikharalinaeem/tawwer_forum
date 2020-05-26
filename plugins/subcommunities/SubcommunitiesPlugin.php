@@ -925,7 +925,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add multi role input to poket filters
+     * Add multi role input to pocket filters.
      *
      * @param array $args
      */
