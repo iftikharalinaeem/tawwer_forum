@@ -33,7 +33,7 @@ li.CatalogueRow:after {
 }
 
 .DataList.Discussions .CatalogueRow.ItemDiscussion-withPhoto .Discussion.ItemContent{
-    padding-left: 0px;
+    padding-left: 0px!important;
 
 }
 
