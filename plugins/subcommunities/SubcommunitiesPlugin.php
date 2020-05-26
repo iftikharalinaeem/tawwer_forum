@@ -929,7 +929,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      *
      * @param array $args
      */
-    public function settingsController_additionalPocketFilterInputs_handler ($args) {
+    public function settingsController_additionalPocketFilterInputs_handler($args) {
         $Form = $args['form'];
         echo $Form->react(
             "SubcommunityIDs",
@@ -946,7 +946,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
      *
      * @param array $args
      */
-    function settingsController_additionalPocketFilters_handler ($args) {
+    public function settingsController_additionalPocketFilters_handler($args) {
         $subcommunityIDs = $args["subcommunityIDs"];
         if (!empty($subcommunityIDs)) {
             if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
