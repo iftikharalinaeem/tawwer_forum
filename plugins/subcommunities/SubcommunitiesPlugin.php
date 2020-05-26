@@ -942,32 +942,6 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Check if we can render pocket
-     *
-     * @param array $args
-     */
-    public function settingsController_additionalPocketFilters_handler($args) {
-        $subcommunityIDs = $args["subcommunityIDs"];
-        if (!empty($subcommunityIDs)) {
-            if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
-                return false;
-            }
-            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
-            $currentSubcommunity = $subcommunitiesModel::getCurrent();
-            if (!$currentSubcommunity) {
-                return false;
-            }
-            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
-
-            $index = array_search($currentSubcommunityID, $subcommunityIDs);
-            if ($index === -1) {
-                return false;
-            }
-        }
-    }
-
-
-    /**
      * Add some event handling for pocket rendering.
      *
      * @param bool $existingCanRender
