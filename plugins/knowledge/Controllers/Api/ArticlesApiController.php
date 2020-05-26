@@ -700,7 +700,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         if ($isGuest) {
             $responseToken = $body["responseToken"] ?? false;
             $privateKey = $this->config->get("RecaptchaV3.PrivateKey", '');
-            $validReaction = $this->reCaptchaVerification->siteVerify($privateKey, $responseToken);;
+            $validReaction = $this->reCaptchaVerification->siteVerify($privateKey, $responseToken);
         }
 
         if ($validReaction) {
@@ -980,25 +980,5 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $body = $firstRevisionSchema->validate($body);
         }
         return $body;
-    }
-
-    /**
-     * Verify that we have a valid response from reCaptchaV3.
-     *
-     * @param string $responseToken
-     * @return bool
-     */
-    private function reCaptchaVerification(string $responseToken): bool {
-        $httpClient = new HttpClient();
-        $reCaptchaResponse = $httpClient->post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            [
-                "secret" => $this->config->get("RecaptchaV3.PrivateKey", ''),
-                "response" => $responseToken,
-            ]
-        )->getBody();
-        $validReaction = $reCaptchaResponse["success"] ?? false;
-
-        return $validReaction;
     }
 }

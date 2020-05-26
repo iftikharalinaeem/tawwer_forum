@@ -1259,6 +1259,9 @@ class ArticlesTest extends AbstractResourceTest {
         return $role;
     }
 
+    /**
+     * Set Permissions for Guest Role.
+     */
     private function setPermissionsForGuest(): void {
         $this->api()->patch(
             '/roles/2',
@@ -1274,7 +1277,6 @@ class ArticlesTest extends AbstractResourceTest {
                     ]
                 ]
             ]
-        )
-        ;
+        );
     }
 }
