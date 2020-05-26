@@ -105,7 +105,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             const knowledgeBase = this.getState().knowledge.knowledgeBases.knowledgeBasesByID.data?.[
                 article.knowledgeBaseID
             ];
-            let data = this.reactionEventsFields(knowledgeBase, article, body.helpful);
+            let data = { knowledgeBase, article, vote: body.helpful };
 
             document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: data }));
 
@@ -113,31 +113,6 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
         })(params);
 
         return this.dispatch(apiThunk);
-    };
-
-    public reactionEventsFields = (knowledgeBase: IKnowledgeBase | undefined, article: IArticle, helpful: string) => {
-        const { articleID, name: articleName, url: articleUrl } = article;
-        const knowledgeBaseData = knowledgeBase
-            ? {
-                  knowledgeBaseID: knowledgeBase.knowledgeBaseID,
-                  knowledgeBaseName: knowledgeBase.name,
-                  knowledgeBaseUrl: knowledgeBase.url,
-              }
-            : {};
-
-        return {
-            article: {
-                articleID,
-                articleName,
-                articleUrl,
-            },
-            knowledgeBase: {
-                ...knowledgeBaseData,
-            },
-            userVote: {
-                vote: helpful,
-            },
-        };
     };
 
     public static getArticleACs = createAction.async<IGetArticleRequestBody, IGetArticleResponseBody, IApiError>(
