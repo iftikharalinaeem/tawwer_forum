@@ -29,6 +29,7 @@ import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
 import { userSelect } from "@library/styles/styleHelpers";
+import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -548,6 +549,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsTab = style("participantsTabsTab", {
+        ...buttonResetMixin(),
         // Note height and the border height add up to the height of the list
         height: vars.participantsTabsTab.height,
         $nest: {

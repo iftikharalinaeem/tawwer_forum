@@ -66,7 +66,7 @@ export interface IEventParticipant {
     attending: EventAttendance;
     dateInserted: string;
     eventID: number;
-    user?: IUserFragment;
+    user: IUserFragment;
     userID: number;
 }
 

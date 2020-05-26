@@ -7,6 +7,8 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
 import { EventAttendance, IEventParticipant } from "@groups/events/state/eventsTypes";
+import Modal from "@vanilla/library/src/scripts/modal/Modal";
+import ModalSizes from "@vanilla/library/src/scripts/modal/ModalSizes";
 
 function Participant({ user }) {
     const classes = eventsClasses();
@@ -40,60 +42,47 @@ export interface IParticipantData {
 }
 
 interface IProps {
-    yesParticipants: IEventParticipant[];
-    maybeParticipants: IEventParticipant[];
-    noParticipants: IEventParticipant[];
-    tabIndex: number;
-    handleTabsChange: (index: number) => void;
-    closeClick: () => void;
-    loadMore: () => void;
+    isVisible: boolean;
+    onClose: () => void;
+    tabs: Array<{
+        title: string;
+        body: React.ReactNode;
+    }>;
 }
 
 export default function EventParticipantsTabs(props: IProps) {
     const classes = eventsClasses();
-    const {
-        yesParticipants,
-        maybeParticipants,
-        noParticipants,
-        tabIndex,
-        handleTabsChange,
-        loadMore,
-        closeClick,
-    } = props;
+    const { onClose, tabs } = props;
+
+    const [tabIndex, setTabIndex] = useState(0);
 
     return (
-        <Tabs defaultIndex={0} index={tabIndex} onChange={handleTabsChange} className={classes.participantsTabsRoot}>
-            <div className={classes.participantsTabsTopButtonWrapper}>
-                <Button
-                    onClick={closeClick}
-                    baseClass={ButtonTypes.CUSTOM}
-                    className={classes.participantsTabsTopButton}
-                >
-                    <CloseTinyIcon />
-                </Button>
-            </div>
-            <TabList className={classes.participantsTabsList}>
-                <Tab className={classes.participantsTabsTab}>Going</Tab>
-                <Tab className={classes.participantsTabsTab}>Maybe</Tab>
-                <Tab className={classes.participantsTabsTab}>Not going</Tab>
-            </TabList>
-            <TabPanels className={classes.participantsTabsPanels}>
-                <TabPanel>
-                    <Participants participants={yesParticipants} />
-                </TabPanel>
-                <TabPanel>
-                    <Participants participants={maybeParticipants} />
-                </TabPanel>
-                <TabPanel>
-                    <Participants participants={noParticipants} />
-                </TabPanel>
-            </TabPanels>
-
-            <div className={classes.participantsTabsBottomButtonWrapper}>
-                <Button onClick={loadMore} style={{ width: 208 }}>
-                    Load more
-                </Button>
-            </div>
-        </Tabs>
+        <Modal isVisible={props.isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
+            <Tabs defaultIndex={0} index={tabIndex} onChange={setTabIndex} className={classes.participantsTabsRoot}>
+                <div className={classes.participantsTabsTopButtonWrapper}>
+                    <Button
+                        onClick={onClose}
+                        baseClass={ButtonTypes.ICON}
+                        className={classes.participantsTabsTopButton}
+                    >
+                        <CloseTinyIcon />
+                    </Button>
+                </div>
+                <TabList className={classes.participantsTabsList}>
+                    {tabs.map((tab, i) => {
+                        return (
+                            <Tab key={i} className={classes.participantsTabsTab}>
+                                {tab.title}
+                            </Tab>
+                        );
+                    })}
+                </TabList>
+                <TabPanels className={classes.participantsTabsPanels}>
+                    {tabs.map((tab, i) => {
+                        return <TabPanel key={i}>{tab.body}</TabPanel>;
+                    })}
+                </TabPanels>
+            </Tabs>
+        </Modal>
     );
 }
