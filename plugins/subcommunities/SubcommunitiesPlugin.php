@@ -989,8 +989,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
             if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
                 return false;
             }
-            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
-            $currentSubcommunity = $subcommunitiesModel::getCurrent();
+            $currentSubcommunity = SubcommunityModel::getCurrent();
             if (!$currentSubcommunity) {
                 return false;
             }
