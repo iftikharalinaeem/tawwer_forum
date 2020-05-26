@@ -17,11 +17,13 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ensureReCaptcha, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import React, { useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { ArticleReactionType, IArticleReaction } from "@knowledge/@types/api/article";
 import { CheckCompactIcon } from "@library/icons/common";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ArticleReactionsEvent } from "@knowledge/modules/article/components/ArticleReactionsEvent";
+import { userContentClasses } from "@library/content/userContentStyles";
 
 export function ArticleReactions(props: IProps) {
     const { isNoSubmitting, isYesSubmitting, isSignedIn } = props;
@@ -39,9 +41,27 @@ export function ArticleReactions(props: IProps) {
 
     let localeStorage = typeof localStorage !== "undefined" ? localStorage : false;
     let disableGuestVoting = !localeStorage;
+    let reCaptchaText = <></>;
 
     if (!isSignedIn && localeStorage) {
         ensureReCaptcha();
+
+        reCaptchaText = (
+            <div className={classNames(userContentClasses().root, classes.reCaptchaContainer)}>
+                <Paragraph className={classNames(classes.reCaptchaText)}>
+                    <Translate source="This site is protected by reCAPTCHA and the Google " />
+                    <Translate
+                        source="<0>Privacy Policy</0> and "
+                        c0={content => <a href="https://policies.google.com/privacy">{content}</a>}
+                    />
+                    <Translate
+                        source="<0>Terms of Service</0>"
+                        c0={content => <a href="https://policies.google.com/terms">{content}</a>}
+                    />
+                </Paragraph>
+            </div>
+        );
+
         if (localeStorage) {
             try {
                 const hasVoted = localeStorage.getItem(`hasVoted-${props.articleID}`);
@@ -63,7 +83,9 @@ export function ArticleReactions(props: IProps) {
         total < 1 ? (
             t("Be the first one to vote!")
         ) : (
-            <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
+            <>
+                <Translate source="<0 /> out of <1 /> people found this helpful" c0={yes} c1={total} />
+            </>
         );
 
     const title = userReaction !== null ? t("Thanks for your feedback!") : t("Was this article helpful?");
@@ -71,30 +93,33 @@ export function ArticleReactions(props: IProps) {
     const buttonsDisabled = isYesSubmitting || isNoSubmitting || userReaction !== null || disableGuestVoting;
 
     return (
-        <section className={classes.frame}>
-            <Heading title={title} className={classes.title} />
-            <div className={classes.votingButtons}>
-                <ReactionButton
-                    reactionData={helpfulReactions}
-                    title={t("Yes")}
-                    reactionValue="yes"
-                    isSubmitting={!!isYesSubmitting}
-                    isDisabled={buttonsDisabled}
-                    onClick={props.onYesClick}
-                />
-                <ReactionButton
-                    reactionData={helpfulReactions}
-                    title={t("No")}
-                    reactionValue="no"
-                    isSubmitting={!!isNoSubmitting}
-                    isDisabled={buttonsDisabled}
-                    onClick={props.onNoClick}
-                />
-            </div>
-            {disableGuestVoting && <SignInLink isSignedIn={props.isSignedIn} />}
-
-            <Paragraph className={classes.resultText}>{resultText}</Paragraph>
-        </section>
+        <>
+            <section className={classes.frame}>
+                <Heading title={title} className={classes.title} />
+                <div className={classes.votingButtons}>
+                    <ReactionButton
+                        reactionData={helpfulReactions}
+                        title={t("Yes")}
+                        reactionValue="yes"
+                        isSubmitting={!!isYesSubmitting}
+                        isDisabled={buttonsDisabled}
+                        onClick={props.onYesClick}
+                    />
+                    <ReactionButton
+                        reactionData={helpfulReactions}
+                        title={t("No")}
+                        reactionValue="no"
+                        isSubmitting={!!isNoSubmitting}
+                        isDisabled={buttonsDisabled}
+                        onClick={props.onNoClick}
+                    />
+                </div>
+                {disableGuestVoting && <SignInLink isSignedIn={props.isSignedIn} />}
+                <Paragraph className={classes.resultText}>{resultText}</Paragraph>
+                {reCaptchaText}
+            </section>
+            <ArticleReactionsEvent />
+        </>
     );
 }
 

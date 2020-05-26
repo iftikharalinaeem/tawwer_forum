@@ -51,6 +51,9 @@ import { all } from "bluebird";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
+import { logError } from "@vanilla/utils";
+
+export const HELPFUL_EVENT = "X-Vanilla-Article-Voted";
 
 export interface IArticleActionsProps {
     articleActions: ArticleActions;
@@ -96,8 +99,12 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
+
+            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: body.helpful }));
+
             return response.data;
         })(params);
+
         return this.dispatch(apiThunk);
     };
 

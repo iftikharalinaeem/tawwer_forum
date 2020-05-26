@@ -7,14 +7,17 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Database\Operation;
+use Vanilla\Formatting\FormatCompatibilityService;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Models\ReactionModel;
+use Vanilla\ReCaptchaVerification;
 
 /**
  * Test the /api/v2/articles endpoint.
@@ -1094,21 +1097,7 @@ class ArticlesTest extends AbstractResourceTest {
     public function testPutReactHelpfulAsGuest() {
         $article = $this->testPost();
 
-        $this->api()->patch(
-            '/roles/2',
-            [
-                'name' => 'Guest',
-                'permissions' => [
-                    [
-                        'type' => 'global',
-                        'permissions' => [
-                            'kb.view' => true,
-                            'articles.add' => false
-                        ]
-                    ]
-                ]
-            ]
-        );
+        $this->setPermissionsForGuest();
         $this->api()->setUserID(0);
 
         $body = $this->api()->put(
@@ -1121,6 +1110,89 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertEquals(0, $body['reactions'][0]['yes']);
         $this->assertEquals(1, $body['reactions'][0]['no']);
         $this->assertEquals(1, $body['reactions'][0]['total']);
+    }
+
+    /**
+     * Test PUT  /articles/<id>/react with ReCaptchaV3 failing.
+     */
+    public function testPutReactHelpfulWithReCaptchaFail() {
+
+        $article = $this->testPost();
+
+        $this->setPermissionsForGuest();
+        $this->api()->setUserID(0);
+
+        $actualReCaptchaVerification = static::container()->get(ReCaptchaVerification::class);
+        $mockReCaptchaVerification = $this->createMock(ReCaptchaVerification::class);
+        $mockReCaptchaVerification->method('siteVerify')
+            ->willReturn(false);
+        static::container()
+            ->setInstance(ReCaptchaVerification::class, $mockReCaptchaVerification);
+
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/react",
+            ['helpful' => 'yes']
+        )->getBody();
+
+        $this->assertEquals(1, $body['reactions'][0]['yes']);
+        $this->assertEquals(0, $body['reactions'][0]['no']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+
+        /** @var ArticleReactionModel $reactionModel */
+        $reactionModel= static::container()->get(ArticleReactionModel::class);
+
+        $reactionCount = $reactionModel->getReactionCount($article[$this->pk]);
+
+        $this->assertEquals(0, $reactionCount['positiveCount']);
+        $this->assertEquals(0, $reactionCount['neutralCount']);
+        $this->assertEquals(0, $reactionCount['allCount']);
+
+        // Restore back the actual format compat service.
+        static::container()
+            ->setInstance(ReCaptchaVerification::class, $actualReCaptchaVerification);
+    }
+
+    /**
+     * Test PUT  /articles/<id>/react with ReCaptchaV3.
+     */
+    public function testPutReactHelpfulWithReCaptcha() {
+
+        $article = $this->testPost();
+
+        $this->setPermissionsForGuest();
+        $this->api()->setUserID(0);
+
+        /** @var ReCaptchaVerification $actualReCaptchaVerification */
+        $actualReCaptchaVerification = static::container()->get(ReCaptchaVerification::class);
+        $mockReCaptchaVerification = $this->createMock(ReCaptchaVerification::class);
+        $mockReCaptchaVerification->method('siteVerify')
+            ->willReturn(true);
+        static::container()
+            ->setInstance(ReCaptchaVerification::class, $mockReCaptchaVerification);
+
+
+        $body = $this->api()->put(
+            "{$this->baseUrl}/{$article[$this->pk]}/react",
+            ['helpful' => 'no']
+        )->getBody();
+
+        $this->assertEquals(0, $body['reactions'][0]['yes']);
+        $this->assertEquals(1, $body['reactions'][0]['no']);
+        $this->assertEquals(1, $body['reactions'][0]['total']);
+
+        /** @var ArticleReactionModel $reactionModel */
+        $reactionModel= static::container()->get(ArticleReactionModel::class);
+
+        $reactionCount = $reactionModel->getReactionCount($article[$this->pk]);
+
+        $this->assertEquals(0, $reactionCount['positiveCount']);
+        $this->assertEquals(1, $reactionCount['neutralCount']);
+        $this->assertEquals(1, $reactionCount['allCount']);
+
+        // Restore back the actual format compat service.
+        static::container()
+            ->setInstance(ReCaptchaVerification::class, $actualReCaptchaVerification);
     }
 
     /**
@@ -1185,5 +1257,24 @@ class ArticlesTest extends AbstractResourceTest {
         )->getBody();
 
         return $role;
+    }
+
+    private function setPermissionsForGuest(): void {
+        $this->api()->patch(
+            '/roles/2',
+            [
+                'name' => 'Guest',
+                'permissions' => [
+                    [
+                        'type' => 'global',
+                        'permissions' => [
+                            'kb.view' => true,
+                            'articles.add' => false
+                        ]
+                    ]
+                ]
+            ]
+        )
+        ;
     }
 }

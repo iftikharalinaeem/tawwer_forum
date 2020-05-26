@@ -39,6 +39,7 @@ use Vanilla\Knowledge\Models\DiscussionArticleModel;
 use Garden\Web\Data;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
+use Vanilla\ReCaptchaVerification;
 
 /**
  * API controller for managing the articles resource.
@@ -129,6 +130,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var ReCaptchaVerification */
+    private $reCaptchaVerification;
+
     /**
      * DI.
      * @inheritdoc
@@ -152,7 +156,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ArticlesApiHelper $articleHelper,
         \Gdn_Session $session,
         ExtendedContentFormatService $formatService,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        ReCaptchaVerification $reCaptchaVerification
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -173,6 +178,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->session = $session;
         $this->formatService = $formatService;
         $this->config = $config;
+        $this->reCaptchaVerification = $reCaptchaVerification;
+
     }
 
     /**
@@ -692,7 +699,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $isGuest = ($this->session->UserID === 0 || $insertUserID === 0);
         if ($isGuest) {
             $responseToken = $body["responseToken"] ?? false;
-            $validReaction = $this->reCaptchaVerification($responseToken);
+            $privateKey = $this->config->get("RecaptchaV3.PrivateKey", '');
+            $validReaction = $this->reCaptchaVerification->siteVerify($privateKey, $responseToken);;
         }
 
         if ($validReaction) {
@@ -985,7 +993,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $reCaptchaResponse = $httpClient->post(
             'https://www.google.com/recaptcha/api/siteverify',
             [
-                "secret" => $this->config->get("Recaptcha.PrivateKey", ''),
+                "secret" => $this->config->get("RecaptchaV3.PrivateKey", ''),
                 "response" => $responseToken,
             ]
         )->getBody();
