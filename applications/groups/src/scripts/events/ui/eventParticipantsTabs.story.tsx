@@ -1,12 +1,12 @@
 import React from "react";
-import EventParticipantsTabs, { ParticipantData } from "@groups/events/ui/EventParticipantsTabs";
+import EventParticipantsTabs from "@groups/events/ui/EventParticipantsTabs";
 
 export default {
     component: EventParticipantsTabs,
     title: "Event Participants Tabs",
 };
 
-const yes: ParticipantData[] = [
+const yes = [
     {
         eventID: 2,
         userID: 1,
@@ -109,7 +109,7 @@ const yes: ParticipantData[] = [
     },
 ];
 
-const maybe: ParticipantData[] = [
+const maybe = [
     {
         eventID: 2,
         userID: 30,
@@ -164,7 +164,7 @@ const maybe: ParticipantData[] = [
     },
 ];
 
-const no: ParticipantData = [];
+const no = [];
 
 export const ParticipantsTabs = () => {
     return (

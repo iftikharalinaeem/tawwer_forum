@@ -6,7 +6,7 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
-import { EventAttendance } from "@groups/events/state/eventsTypes";
+import { EventAttendance, IEventParticipant } from "@groups/events/state/eventsTypes";
 
 function Participant({ user }) {
     const classes = eventsClasses();
@@ -28,7 +28,7 @@ function Participants({ participants }) {
     );
 }
 
-export interface ParticipantData {
+export interface IParticipantData {
     eventID: number;
     userID: number;
     user: {
@@ -40,20 +40,26 @@ export interface ParticipantData {
 }
 
 interface IProps {
-    yesParticipants: ParticipantData[];
-    maybeParticipants: ParticipantData[];
-    noParticipants: ParticipantData[];
-    closeClick?: () => void;
+    yesParticipants: IEventParticipant[];
+    maybeParticipants: IEventParticipant[];
+    noParticipants: IEventParticipant[];
+    tabIndex: number;
+    handleTabsChange: (index: number) => void;
+    closeClick: () => void;
+    loadMore: () => void;
 }
 
 export default function EventParticipantsTabs(props: IProps) {
     const classes = eventsClasses();
-    const { yesParticipants, maybeParticipants, noParticipants, closeClick } = props;
-
-    const [tabIndex, setTabIndex] = useState(0);
-    const handleTabsChange = index => {
-        setTabIndex(index);
-    };
+    const {
+        yesParticipants,
+        maybeParticipants,
+        noParticipants,
+        tabIndex,
+        handleTabsChange,
+        loadMore,
+        closeClick,
+    } = props;
 
     return (
         <Tabs defaultIndex={0} index={tabIndex} onChange={handleTabsChange} className={classes.participantsTabsRoot}>
@@ -84,7 +90,9 @@ export default function EventParticipantsTabs(props: IProps) {
             </TabPanels>
 
             <div className={classes.participantsTabsBottomButtonWrapper}>
-                <Button style={{ width: 208 }}>Load more</Button>
+                <Button onClick={loadMore} style={{ width: 208 }}>
+                    Load more
+                </Button>
             </div>
         </Tabs>
     );

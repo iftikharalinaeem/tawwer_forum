@@ -4,6 +4,7 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
+import { EventParticipantsByAttendanceModule } from "@groups/events/modules/EventParticipantsModule";
 import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
 import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
 import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
@@ -18,6 +19,7 @@ import { notEmpty, slugify } from "@vanilla/utils";
 import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions, useEventsActions } from "@groups/events/state/EventsActions";
+import { EventAttendance } from "../state/eventsTypes";
 
 export default function EventsPage() {
     const page = useQueryParamPage();
@@ -55,6 +57,7 @@ export default function EventsPage() {
 
     return (
         <>
+            <EventParticipantsByAttendanceModule eventID={2} />
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
