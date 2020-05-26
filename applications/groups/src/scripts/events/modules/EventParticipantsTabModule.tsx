@@ -11,11 +11,12 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
+    visible: boolean;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID } = props;
-    const [isVisible, setIsVisible] = useState(true);
+    const { eventID, visible } = props;
+    const [isVisible, setIsVisible] = useState(visible);
 
     return (
         <EventParticipantsTabs

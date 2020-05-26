@@ -17,9 +17,7 @@ import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { notEmpty, slugify } from "@vanilla/utils";
 import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
-import { IGetEventsQuery, EventsActions, useEventsActions } from "@groups/events/state/EventsActions";
-import { EventAttendance } from "../state/eventsTypes";
-import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
+import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
 
 export default function EventsPage() {
     const page = useQueryParamPage();
@@ -57,7 +55,6 @@ export default function EventsPage() {
 
     return (
         <>
-            <EventParticipantsTabModule eventID={2} />
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
             <EventFilter filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />

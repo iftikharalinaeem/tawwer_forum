@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import EventParticipantsTabs from "@groups/events/ui/EventParticipantsTabs";
 import EventParticipants from "@groups/events/ui/EventParticipants";
 import { t } from "@vanilla/i18n";
+import { IEventParticipant, EventAttendance } from "../state/eventsTypes";
 
 export default {
     component: EventParticipantsTabs,
     title: "Event Participants Tabs",
 };
 
-const yes = [
+const yes: IEventParticipant[] = [
     {
         eventID: 2,
         userID: 1,
@@ -16,8 +17,10 @@ const yes = [
             userID: 1,
             name: "Val",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -26,8 +29,10 @@ const yes = [
             userID: 2,
             name: "Tim",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/700/nH3YMJOEYZEM9.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -36,8 +41,10 @@ const yes = [
             userID: 3,
             name: "Mel",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/003/n1H8CMV9TD4QA.png",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -45,9 +52,11 @@ const yes = [
         user: {
             userID: 4,
             name: "Mysterious User",
-            photoUrl: null,
-            attending: "yes",
+            photoUrl: "",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -56,8 +65,10 @@ const yes = [
             userID: 5,
             name: "Val",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -66,8 +77,10 @@ const yes = [
             userID: 6,
             name: "Tim",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/700/nH3YMJOEYZEM9.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -76,8 +89,10 @@ const yes = [
             userID: 7,
             name: "Mel",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/003/n1H8CMV9TD4QA.png",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -86,8 +101,10 @@ const yes = [
             userID: 8,
             name: "Alex",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/914/nFDVYLAK3OF99.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -96,8 +113,10 @@ const yes = [
             userID: 9,
             name: "Val",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -106,12 +125,14 @@ const yes = [
             userID: 10,
             name: "Tim",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/700/nH3YMJOEYZEM9.jpg",
-            attending: "yes",
+            dateLastActive: null,
         },
+        attending: EventAttendance.GOING,
+        dateInserted: "",
     },
 ];
 
-const maybe = [
+const maybe: IEventParticipant[] = [
     {
         eventID: 2,
         userID: 30,
@@ -119,8 +140,10 @@ const maybe = [
             userID: 30,
             name: "Mel",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/003/n1H8CMV9TD4QA.png",
-            attending: "maybe",
+            dateLastActive: null,
         },
+        attending: EventAttendance.MAYBE,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -128,9 +151,11 @@ const maybe = [
         user: {
             userID: 40,
             name: "Mysterious User",
-            photoUrl: null,
-            attending: "maybe",
+            photoUrl: "",
+            dateLastActive: null,
         },
+        attending: EventAttendance.MAYBE,
+        dateInserted: "",
     },
     {
         eventID: 2,
@@ -139,8 +164,10 @@ const maybe = [
             userID: 50,
             name: "Val",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-            attending: "maybe",
+            dateLastActive: null,
         },
+        attending: EventAttendance.MAYBE,
+        dateInserted: "",
     },
 
     {
@@ -150,8 +177,10 @@ const maybe = [
             userID: 70,
             name: "Mel",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/003/n1H8CMV9TD4QA.png",
-            attending: "maybe",
+            dateLastActive: null,
         },
+        attending: EventAttendance.MAYBE,
+        dateInserted: "",
     },
 
     {
@@ -161,8 +190,10 @@ const maybe = [
             userID: 90,
             name: "Val",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-            attending: "maybe",
+            dateLastActive: null,
         },
+        attending: EventAttendance.MAYBE,
+        dateInserted: "",
     },
 ];
 

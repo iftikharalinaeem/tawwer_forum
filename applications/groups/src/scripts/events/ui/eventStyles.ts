@@ -485,6 +485,12 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         },
     });
 
+    const participantsPopUpButton = style("participantsPopUpButton", {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+    });
+
     const attendeePlus = style("attendeePlus", {
         ...fonts(vars.attendees.plus.font),
         lineHeight: unit(userPhotoVariables().sizing.medium),
@@ -642,6 +648,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendee,
         attendeeList,
         attendeePhoto,
+        participantsPopUpButton,
         attendeePlus,
         noAttendees,
         section,
