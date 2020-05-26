@@ -1124,7 +1124,7 @@ class ArticlesTest extends AbstractResourceTest {
 
         $actualReCaptchaVerification = static::container()->get(ReCaptchaVerification::class);
         $mockReCaptchaVerification = $this->createMock(ReCaptchaVerification::class);
-        $mockReCaptchaVerification->method('siteVerify')
+        $mockReCaptchaVerification->method('siteVerifyV3')
             ->willReturn(false);
         static::container()
             ->setInstance(ReCaptchaVerification::class, $mockReCaptchaVerification);
@@ -1166,7 +1166,7 @@ class ArticlesTest extends AbstractResourceTest {
         /** @var ReCaptchaVerification $actualReCaptchaVerification */
         $actualReCaptchaVerification = static::container()->get(ReCaptchaVerification::class);
         $mockReCaptchaVerification = $this->createMock(ReCaptchaVerification::class);
-        $mockReCaptchaVerification->method('siteVerify')
+        $mockReCaptchaVerification->method('siteVerifyV3')
             ->willReturn(true);
         static::container()
             ->setInstance(ReCaptchaVerification::class, $mockReCaptchaVerification);

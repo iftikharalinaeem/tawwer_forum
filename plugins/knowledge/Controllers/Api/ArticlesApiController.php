@@ -127,9 +127,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     /** @var ExtendedContentFormatService */
     private $formatService;
 
-    /** @var ConfigurationInterface */
-    private $config;
-
     /** @var ReCaptchaVerification */
     private $reCaptchaVerification;
 
@@ -156,7 +153,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ArticlesApiHelper $articleHelper,
         \Gdn_Session $session,
         ExtendedContentFormatService $formatService,
-        ConfigurationInterface $config,
         ReCaptchaVerification $reCaptchaVerification
     ) {
         $this->articleModel = $articleModel;
@@ -177,7 +173,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $this->articleHelper = $articleHelper;
         $this->session = $session;
         $this->formatService = $formatService;
-        $this->config = $config;
         $this->reCaptchaVerification = $reCaptchaVerification;
 
     }
@@ -699,8 +694,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $isGuest = ($this->session->UserID === 0 || $insertUserID === 0);
         if ($isGuest) {
             $responseToken = $body["responseToken"] ?? false;
-            $privateKey = $this->config->get("RecaptchaV3.PrivateKey", '');
-            $validReaction = $this->reCaptchaVerification->siteVerify($privateKey, $responseToken);
+            $validReaction = $this->reCaptchaVerification->siteVerifyV3($responseToken);
         }
 
         if ($validReaction) {

@@ -99,8 +99,9 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
                 }
             }
             const response = await this.api.put(`/articles/${articleID}/react`, body);
+            const userReaction = body.helpful === "yes" ? "Helpful" : "Not Helpful";
 
-            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: body.helpful }));
+            document.dispatchEvent(new CustomEvent(HELPFUL_EVENT, { detail: userReaction }));
 
             return response.data;
         })(params);
