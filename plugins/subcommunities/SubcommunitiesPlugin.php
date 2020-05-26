@@ -980,28 +980,28 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         if (!$existingCanRender) {
             return $existingCanRender;
         }
+        $pocketData = $pocket->Data;
 
-        
-//
-//        $testMode = Pocket::inTestMode($pocket);
-//        $pocketAdmin = checkPermission('Plugins.Pockets.Manage');
-//        $pocketData = $pocket->Data;
-//        $roleIDs = $pocketData['RoleIDs'] ?? [];
-//
-//        if (empty($roleIDs)) {
-//            return $existingCanRender;
-//        }
-//
-//        if ($testMode && $pocketAdmin) {
-//            return $existingCanRender;
-//        }
-//
-//        $intersections = array_intersect($this->getUserRoleIDs(), $roleIDs);
-//        if (count($intersections) === 0) {
-//            return false;
-//        }
-//
-//        return $existingCanRender;
+        $subcommunityIDs = $pocketData['SubcommunityIDs'] ?? [];
+
+        // Check Subcommunities
+        if (!empty($subcommunityIDs)) {
+            if (!c("Feature.SubcommunityProducts.Enabled")) { // If no subcommunities currently exist, but ids were saved, don't render
+                return false;
+            }
+            $subcommunitiesModel = Gdn::getContainer()->get(SubcommunityModel::class);
+            $currentSubcommunity = $subcommunitiesModel::getCurrent();
+            if (!$currentSubcommunity) {
+                return false;
+            }
+            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
+            $match = array_search($currentSubcommunityID, $subcommunityIDs, false);
+            if (!$match) {
+                return false;
+            }
+        }
+
+        return $existingCanRender;
     }
 }
 
