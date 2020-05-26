@@ -14,17 +14,23 @@ interface IProps {
         title: string;
         body: React.ReactNode;
     }>;
+    defaultIndex: number;
 }
 
 export default function EventParticipantsTabs(props: IProps) {
     const classes = eventsClasses();
-    const { onClose, tabs } = props;
+    const { onClose, tabs, isVisible, defaultIndex } = props;
 
-    const [tabIndex, setTabIndex] = useState(0);
+    const [tabIndex, setTabIndex] = useState(defaultIndex);
 
     return (
-        <Modal isVisible={props.isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
-            <Tabs defaultIndex={0} index={tabIndex} onChange={setTabIndex} className={classes.participantsTabsRoot}>
+        <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
+            <Tabs
+                defaultIndex={defaultIndex}
+                index={tabIndex}
+                onChange={setTabIndex}
+                className={classes.participantsTabsRoot}
+            >
                 <div className={classes.participantsTabsTopButtonWrapper}>
                     <Button
                         onClick={onClose}

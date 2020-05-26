@@ -208,6 +208,7 @@ export const ParticipantsTabs = () => {
 
     return (
         <EventParticipantsTabs
+            defaultIndex={0}
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}
             tabs={[

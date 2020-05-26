@@ -36,11 +36,32 @@ export function EventAttendees(props: IProps) {
 
     const extraCount = extra - maxCount;
 
-    const [visible, setVisible] = useState(false);
+    const setIndex = (title: string) => {
+        switch (title) {
+            case "Going":
+                return 0;
+                break;
+            case "Maybe":
+                return 1;
+                break;
+            case "Not going":
+                return 2;
+            default:
+                return 0;
+                break;
+        }
+    };
+
+    const [visibleModal, setVisibleModal] = useState(false);
 
     return (
         <section className={classNames(classes.section, props.className)}>
-            {visible && <EventParticipantsTabModule eventID={eventID} visible={visible} />}
+            <EventParticipantsTabModule
+                defaultIndex={setIndex(title)}
+                eventID={eventID}
+                visibleModal={visibleModal}
+                close={() => setVisibleModal(false)}
+            />
             {separator && <hr className={classes.separator} />}
             <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}
@@ -69,7 +90,7 @@ export function EventAttendees(props: IProps) {
                         <li className={classes.attendeePlus} key={data.length}>
                             <Button
                                 className={classes.participantsPopUpButton}
-                                onClick={() => setVisible(true)}
+                                onClick={() => setVisibleModal(true)}
                                 baseClass={ButtonTypes.ICON_COMPACT}
                             >
                                 <span style={{ display: "inline-block" }}>

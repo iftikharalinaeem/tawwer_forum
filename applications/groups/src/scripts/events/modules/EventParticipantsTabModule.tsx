@@ -11,17 +11,19 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
-    visible: boolean;
+    defaultIndex: number;
+    visibleModal: boolean;
+    close: () => void;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID, visible } = props;
-    const [isVisible, setIsVisible] = useState(visible);
+    const { eventID, close, visibleModal, defaultIndex } = props;
 
     return (
         <EventParticipantsTabs
-            isVisible={isVisible}
-            onClose={() => setIsVisible(false)}
+            defaultIndex={defaultIndex}
+            isVisible={visibleModal}
+            onClose={close}
             tabs={[
                 {
                     title: t("Going"),
