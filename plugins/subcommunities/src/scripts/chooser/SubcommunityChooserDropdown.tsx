@@ -177,7 +177,7 @@ export function SubcommunityChooserDropdown(props: IProps) {
                                 setActiveSection={setActiveSection}
                             />
                         ) : hasMultipleLocales ? (
-                            <SingleDepthChooser subcommunities={Object.values(subcommunitiesByProductID.data!)[0]} />
+                            <SingleDepthChooser subcommunities={Object.values(subcommunitiesByProductID.data!)[0]!} />
                         ) : (
                             <SingleDepthChooser subcommunities={Object.values(subcommunitiesByID.data!)} />
                         )}
