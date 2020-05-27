@@ -159,7 +159,7 @@ class EventsApiController extends AbstractApiController {
                 'name:s' => 'The name of the event.',
                 'body:s' => 'The HTML description of the event.',
                 'excerpt:s' => 'The description of the event.',
-                'location:s|n' => [
+                'location:s|n?' => [
                     'maxLength' => 255,
                     'description' => 'The location of the event.'
                 ],
@@ -306,7 +306,7 @@ class EventsApiController extends AbstractApiController {
                 'name',
                 'body',
                 'format' => new FormatSchema(true),
-                'location',
+                'location?',
                 'dateStarts',
                 'dateEnds'
             ])->add($this->fullEventSchema()),
@@ -749,7 +749,7 @@ class EventsApiController extends AbstractApiController {
                     'name',
                     'body',
                     'format' => new FormatSchema(),
-                    'location',
+                    'location?',
                     'dateStarts',
                     'dateEnds?',
                     'allDayEvent?',
