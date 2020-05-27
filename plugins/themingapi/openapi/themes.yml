@@ -162,6 +162,7 @@ x-aliases:
       200:
         content:
           application/json: *JsonContentType
+        description: Success
 paths:
   /themes:
     post:
