@@ -40,6 +40,7 @@ li.CatalogueRow:after {
 /**
 If the Discussion Photo plugin is turned on, hide the user's avatar on the catalogue page only.
  */
+li.CatalogueRow.ItemIdea .IndexPhoto,
 li.CatalogueRow .IndexPhoto {
     display: none;
 }
