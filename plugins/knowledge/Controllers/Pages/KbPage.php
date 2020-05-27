@@ -8,7 +8,6 @@
 namespace Vanilla\Knowledge\Controllers\Pages;
 
 use Exception;
-use Garden\EventManager;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
@@ -22,12 +21,9 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeCategoriesApiController;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Models\SiteMeta;
-use Vanilla\Models\ThemePreloadProvider;
+use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\DefaultSiteSection;
-use Vanilla\Web\Asset\AssetPreloadModel;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
