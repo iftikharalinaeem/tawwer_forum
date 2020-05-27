@@ -130,14 +130,18 @@ class NewEventsModule extends Gdn_Module {
             case self::MODE_UPCOMING:
                 return [
                     'dateEnds' => ">$dateNow",
+                    'sort' => 'dateStarts',
                 ];
             case self::MODE_PAST:
                 return [
                     'dateStarts' => "<$dateNow",
+                    'sort' => '-dateEnds',
                 ];
             case self::MODE_ALL:
             default:
-                return [];
+                return [
+                    'sort' => '-dateStarts',
+                ];
         }
     }
 }
