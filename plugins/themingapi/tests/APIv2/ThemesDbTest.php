@@ -339,12 +339,12 @@ class ThemesDbTest extends AbstractAPIv2Test {
             'navLinks' => ['link1', 'link2'],
         ]);
         $this->api()->patch($url, [
-            'navLinks' => ['link3'],
+            'navLinks' => ['link1.1'],
         ]);
 
         $result = $this->api()->get($url)->getBody();
         $this->assertEquals([
-            'navLinks' => ['link3'],
+            'navLinks' => ['link1.1', 'link2'],
         ], $result, 'Arrays are replaced instead of merged');
     }
 

@@ -121,7 +121,6 @@ class SearchTest extends AbstractAPIv2Test {
         $this->assertNotNull($item['body']);
         $this->assertNotNull($item['insertUser']);
         $this->assertIsArray($item['breadcrumbs']);
-        $this->assertInstanceOf(Breadcrumb::class, $item['breadcrumbs'][0]);
     }
 
     /**
