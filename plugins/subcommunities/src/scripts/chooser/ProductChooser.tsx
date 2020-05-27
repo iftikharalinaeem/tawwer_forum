@@ -51,7 +51,7 @@ export function ProductChooser(props: IProps) {
                     <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
                         <span className={classes.rowBack}>
                             <LeftChevronCompactIcon className={classes.rowArrow} />
-                            <LocaleDisplayer localeContent={props.forLocale} />
+                            <LocaleDisplayer localeContent={props.forLocale} displayLocale={props.forLocale} />
                         </span>
                     </DropDownItemButton>
                     <DropDownItemSeparator />

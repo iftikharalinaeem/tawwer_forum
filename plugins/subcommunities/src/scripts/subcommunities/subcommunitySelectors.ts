@@ -33,7 +33,7 @@ export function useSubcommunities() {
     const subcommunitiesByProductID = useMemo(() => {
         type ResultDataType = {
             [productID: number]: ISubcommunity[];
-            noProduct: ISubcommunity[];
+            noProduct?: ISubcommunity[];
         };
         const result: ILoadable<ResultDataType> = {
             status: subcommunitiesByID.status,
@@ -56,9 +56,13 @@ export function useSubcommunities() {
                         data[productID] = [subcommunity];
                     }
                 } else {
-                    data.noProduct.push(subcommunity);
+                    data.noProduct!.push(subcommunity);
                 }
             });
+
+            if (data.noProduct && data.noProduct.length === 0) {
+                delete data.noProduct;
+            }
 
             result.data = data;
         }
