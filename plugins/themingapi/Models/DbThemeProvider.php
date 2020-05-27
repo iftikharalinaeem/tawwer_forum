@@ -6,11 +6,13 @@
 
 namespace Vanilla\ThemingApi;
 
-use Gdn_Upload;
 use Vanilla\Addon;
+use Vanilla\Theme\Asset\ThemeAsset;
+use Vanilla\Theme\Theme;
 use Vanilla\Theme\ThemeProviderCleanupInterface;
 use Vanilla\Theme\ThemeProviderInterface;
-use Vanilla\Models\ThemeModel;
+use Vanilla\Theme\ThemeService;
+use Vanilla\Theme\ThemeProviderWriteInterface;
 use Vanilla\ThemingApi\Models\ThemeModel as ThemingModel;
 use Vanilla\ThemingApi\Models\ThemeAssetModel;
 use Vanilla\ThemingApi\Models\ThemeRevisionModel;
@@ -18,22 +20,15 @@ use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn_Request;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Models\FsThemeProvider;
+use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\Asset;
-use Vanilla\Theme\FontsAsset;
-use Vanilla\Theme\HtmlAsset;
-use Vanilla\Theme\JsonAsset;
-use Vanilla\Theme\StyleAsset;
-use Vanilla\Theme\ScriptsAsset;
-use Vanilla\Theme\JavascriptAsset;
-use Vanilla\Theme\ImageAsset;
-use Vanilla\Models\ThemeModelHelper;
+use Vanilla\Theme\ThemeServiceHelper;
 use UserModel;
 
 /**
  * Class DbThemeProvider
  */
-class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInterface {
+class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInterface, ThemeProviderWriteInterface {
 
     const SELECT_FIELDS = ['themeID', 'parentTheme', 'name', 'current', 'dateUpdated', 'dateInserted', 'revisionID'];
 
@@ -52,9 +47,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
      */
     private $themeRevisionModel;
 
-
-
-    /** @var ThemeModelHelper */
+    /** @var ThemeServiceHelper */
     private $themeHelper;
 
     /** @var ConfigurationInterface */
@@ -76,7 +69,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
      * @param ThemingModel $themeModel
      * @param ConfigurationInterface $config
      * @param Gdn_Request $request
-     * @param ThemeModelHelper $themeHelper
+     * @param ThemeServiceHelper $themeHelper
      * @param FsThemeProvider $fsThemeProvider
      * @param ThemeRevisionModel $themeRevisionModel
      * @param UserModel $userModel
@@ -86,7 +79,7 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         ThemingModel $themeModel,
         ConfigurationInterface $config,
         Gdn_Request $request,
-        ThemeModelHelper $themeHelper,
+        ThemeServiceHelper $themeHelper,
         FsThemeProvider $fsThemeProvider,
         ThemeRevisionModel $themeRevisionModel,
         UserModel $userModel
@@ -104,14 +97,14 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function themeKeyType(): int {
-        return self::TYPE_DB;
+    public function handlesThemeID($themeID): bool {
+        return is_numeric($themeID);
     }
 
     /**
      * @inheritdoc
      */
-    public function getThemeWithAssets($themeKey, array $args = []): array {
+    public function getTheme($themeKey, array $args = []): Theme {
         try {
             $theme = $this->themeModel->selectSingle(
                 ['themeID' => $themeKey],
@@ -120,28 +113,23 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
             if (isset($args['revisionID'])) {
                 $theme['revisionID'] = $args['revisionID'];
             }
-            $res = $this->normalizeTheme(
-                $theme,
-                $this->themeAssetModel->get(
-                    [
-                        'themeID' => $themeKey,
-                        'revisionID' => $theme['revisionID']
-                    ],
-                    ['select' => ['assetKey', 'data']]
-                )
+            $theme['revisionName'] = $this->themeRevisionModel->getName($theme['revisionID']);
+            $assets = $this->themeAssetModel->get(
+                [
+                    'themeID' => $themeKey,
+                    'revisionID' => $theme['revisionID'],
+                ],
+                ['select' => ['assetKey', 'data']]
             );
-        } catch (NoResultsException $e) {
-            throw new NotFoundException('Theme with ID: ' . $themeKey . ' not found!');
-        }
 
-        return $res;
+            return $this->createTheme($theme, $assets);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Theme');
+        }
     }
 
     /**
-     * Check if a theme exists.
-     *
-     * @param string| int $themeKey
-     * @return bool
+     * @inheritdoc
      */
     public function themeExists($themeKey): bool {
         $themeExists = true;
@@ -154,39 +142,37 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAllThemes(): array {
         $dbThemes = $this->themeModel->get();
 
         $allDbThemes = [];
         foreach ($dbThemes as $dbTheme) {
-            $allDbThemes[] = $this->getThemeWithAssets($dbTheme["themeID"]);
+            $allDbThemes[] = $this->getTheme($dbTheme["themeID"]);
         }
         return $allDbThemes;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function getThemeRevisions(int $themeID): array {
+    public function getThemeRevisions($themeID): array {
         $revisions = $this->themeModel->getRevisions($themeID);
+        $this->userModel->expandUsers(
+            $revisions,
+            ["insertUserID"]
+        );
         foreach ($revisions as &$revision) {
-            $revision = $this->normalizeTheme(
+            $revision = $this->createTheme(
                 $revision,
                 $this->themeAssetModel->get(
                     [
                         'themeID' => $themeID,
-                        'revisionID' => $revision['revisionID']
+                        'revisionID' => $revision['revisionID'],
                     ],
                     ['select' => ['assetKey', 'data']]
                 )
-            );
-        }
-        if (isset($revisions[0]['insertUserID'])) {
-            $this->userModel->expandUsers(
-                $revisions,
-                ["insertUserID"]
             );
         }
         return $revisions;
@@ -195,117 +181,48 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function postTheme(array $body): array {
-
-        $body['revisionID'] = -1;
-        $themeID = $this->themeModel->insert($body);
-        $revisionID = $this->themeRevisionModel->insert([
-            'themeID' => $themeID,
-            'name' => 'rev 1'
-        ]);
-        $body['revisionID'] = $revisionID;
-        $this->themeModel->update(
-            ['revisionID' => $revisionID],
-            ['themeID' => $themeID]
-        );
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => self::SELECT_FIELDS]);
-
-        $assets = $body['assets'] ?? [];
-        foreach ($assets as $assetKey => $assetData) {
-                $data = $assetData['data'] ?? $assetData;
-                $this->setAsset(
-                    $themeID,
-                    $revisionID,
-                    $assetKey,
-                    $data
-                );
-        }
-
-        $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
-        return $this->normalizeTheme($theme, $themeAssets);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function patchTheme(int $themeID, array $body): array {
-        //check if theme exists
+    public function setCurrentTheme($themeID): Theme {
         try {
-            $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
-        } catch (NoResultsException $e) {
-            throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
-        }
+            $theme = $this->getTheme($themeID);
+            $this->themeModel->setCurrentTheme($themeID);
 
-        if (($body['revisionID'] ?? -1) === -1) {
-            $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
-        } elseif (!empty($body['revisionName'] ?? '')) {
-            $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
-        }
-        $theme = $this->themeModel->update($body, ['themeID' => $themeID]);
-
-        $revisionID = $body["revisionID"];
-        $assets = $body['assets'] ?? [];
-        foreach ($assets as $assetKey => $assetData) {
-            $data = $assetData['data'] ?? $assetData;
-            $this->setAsset($themeID, $revisionID, $assetKey, $data);
-        }
-
-        $theme = $this->themeModel->selectSingle(
-            [
-                'themeID' => $themeID,
-                'revisionID' => $revisionID
-            ],
-            ['select' => self::SELECT_FIELDS]
-        );
-        $theme['revisionName'] = $this->themeRevisionModel->getName($revisionID);
-
-        $themeAssets = $this->themeAssetModel->getLatestByThemeID($themeID);
-        return $this->normalizeTheme(
-            $theme,
-            $themeAssets
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteTheme(int $themeID) {
-        //check if theme exists
-        try {
-            $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
-        } catch (NoResultsException $e) {
-            throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
-        }
-        $this->themeModel->delete(['themeID' => $themeID]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setCurrent($themeID): array {
-        try {
-            $theme = $this->themeModel->setCurrentTheme($themeID);
-            $res = $this->normalizeTheme(
-                $theme,
-                $this->themeAssetModel->get(
-                    [
-                        'themeID' => $themeID,
-                        'revisionID' => $theme['revisionID']
-                    ],
-                    ['select' => ['assetKey', 'data']]
-                )
-            );
-
-            if (!empty($theme['parentTheme'])) {
-                $this->config->set('Garden.Theme', $theme['parentTheme']);
-                $this->config->set('Garden.MobileTheme', $theme['parentTheme']);
+            $parentID = $theme->getParentTheme();
+            if (!$parentID) {
+                $this->config->set('Garden.Theme', $parentID);
+                $this->config->set('Garden.MobileTheme', $parentID);
             }
             $this->config->set('Garden.CurrentTheme', $themeID);
+            return $theme;
         } catch (NoResultsException $e) {
-            throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
+            throw new NotFoundException('Theme');
         }
-        return $res;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMasterThemeKey($themeID): string {
+        try {
+            $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
+        } catch (NoResultsException $e) {
+            $theme['parentTheme'] = ThemeService::FALLBACK_THEME_KEY;
+        }
+        $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
+        return $parentTheme->getKey();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPreviewTheme($themeID, int $revisionID = null): Theme {
+        $theme = $this->getTheme($themeID, ['revisionID' => $revisionID]);
+        $this->themeHelper->setSessionPreviewTheme($theme);
+        return $theme;
+    }
+
+    ///
+    /// ThemeProviderCleanupInterface
+    ///
 
     /**
      * @inheritdoc
@@ -314,107 +231,41 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         $this->themeModel->resetCurrentTheme();
     }
 
+    ///
+    /// ThemeProviderWriteInterface
+    ///
+
     /**
-     * Reset current db theme when file based theme activated
-     *
-     * @deprecated
+     * @inheritdoc
      */
-    public function resetCurrent() {
-        $this->afterCurrentProviderChange();
+    public function setAsset($themeID, string $assetKey, string $content): ThemeAsset {
+        $this->patchTheme($themeID, [
+            'assets' => [
+                $assetKey => [
+                    'data' => $content,
+                ]
+            ],
+        ]);
+
+        // Updated asset.
+        $updatedAsset = $this->getTheme($themeID)->getAssets()[$assetKey];
+        return $updatedAsset;
     }
 
     /**
      * @inheritdoc
      */
-
-    public function setPreviewTheme($themeID, int $revisionID = null): array {
-        $this->themeHelper->setSessionPreviewTheme($themeID, $this, $revisionID);
-        if (!empty($themeID)) {
-            $args = [];
-            if (!empty($revisionID)) {
-                $args['revisionID'] = $revisionID;
-            }
-            $theme = $this->getThemeWithAssets($themeID, $args);
-        } else {
-            $theme = $this->getCurrent();
-        }
-        return $theme;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrent(): ?array {
-        try {
-            $theme = $this->themeModel->selectSingle(['current' => 1]);
-        } catch (NoResultsException $e) {
-            return null;
+    public function sparseUpdateAsset($themeID, string $assetKey, string $data): Asset\ThemeAsset {
+        $existingAsset = $this->getTheme($themeID)->getAssets()[$assetKey] ?? null;
+        if ($existingAsset instanceof Asset\JsonThemeAsset) {
+            // Merge the 2 assets together.
+            $existingData = $existingAsset->getValue();
+            $newData = json_decode($data, true);
+            $data = array_replace_recursive($existingData, $newData);
+            $data = json_encode($data, JSON_UNESCAPED_UNICODE);
         }
 
-        return $this->normalizeTheme(
-            $theme,
-            $this->themeAssetModel->get(['themeID' => $theme['themeID']], ['select' => ['assetKey', 'data']])
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
-        $asset = $this->themeAssetModel->setAsset($themeID, $revisionID, $assetKey, $data);
-        return [$assetKey => $this->generateAsset($assetKey, $asset['data'])];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function sparseAsset(int $themeID, int $revisionID, string $assetKey, string $data): array {
-        $flat = flattenArray('^|^', json_decode($this->getAssetData($themeID, $assetKey), true));
-        $assetData = flattenArray('^|^', json_decode($data, true));
-        foreach ($assetData as $key => $val) {
-            $flat[$key] = $val;
-        }
-        $data = json_encode(unflattenArray('^|^', $flat));
-        $asset = $this->themeAssetModel->setAsset($themeID, $assetKey, $data);
-        return [$assetKey => $this->generateAsset($assetKey, $asset['data'])];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAssetData($themeKey, string $assetKey, int $revisionID = null): string {
-        try {
-            if (is_null($revisionID)) {
-                $revisionID = $this->themeModel->getRevisionID($themeKey);
-            }
-            $asset = $this->themeAssetModel->getAsset($themeKey, $revisionID, $assetKey);
-            $content = $asset['data'];
-        } catch (NoResultsException $e) {
-            $content = ThemeModel::ASSET_LIST[$assetKey]['default'] ?? '';
-            if ($assetKey === ThemeModel::JAVASCRIPT) {
-                // when some asset is not defined on DB level yet
-                // lets check if parent theme template has it implemented and substitute it
-                // if we need to reset parent asset empty asset should be posted
-                $content = $this->getParentAssetData($themeKey, $assetKey);
-            }
-        }
-        return $content;
-    }
-
-    /**
-     * Get parent theme asset data
-     *
-     * @param int $themeID Theme id
-     * @param string $assetKey Asset key
-     * @return string Asset data (content)
-     */
-    private function getParentAssetData(int $themeID, string $assetKey): string {
-        $content = '';
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID]);
-        if (!empty($theme['parentTheme'])) {
-            $content = $this->fsThemeProvider->getAssetData($theme['parentTheme'], $assetKey);
-        }
-        return $content;
+        return $this->setAsset($themeID, $assetKey, $data);
     }
 
     /**
@@ -427,148 +278,151 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
     /**
      * @inheritdoc
      */
-    public function getMasterThemeKey($themeID): string {
-        try {
-            $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'parentTheme']]);
-        } catch (NoResultsException $e) {
-            $theme['parentTheme'] = ThemeModel::FALLBACK_THEME_KEY;
+    public function postTheme(array $body): Theme {
+        $parentTheme = $body['parentTheme'];
+        $parentTheme = $this->fsThemeProvider->getTheme($parentTheme);
+        $body['revisionID'] = -1;
+        $themeID = $this->themeModel->insert($body);
+        $revisionID = $this->themeRevisionModel->insert([
+            'themeID' => $themeID,
+            'name' => 'rev 1',
+        ]);
+        $body['revisionID'] = $revisionID;
+        $this->themeModel->update(
+            ['revisionID' => $revisionID],
+            ['themeID' => $themeID]
+        );
+
+        $assets = $body['assets'] ?? [];
+
+        $insertedAssets = [];
+        foreach ($assets as $assetKey => $assetData) {
+            $data = $assetData['data'];
+            $this->themeAssetModel->setAsset(
+                $themeID,
+                $revisionID,
+                $assetKey,
+                $data
+            );
+            $insertedAssets[] = $assetKey;
         }
-        $parentTheme = $this->fsThemeProvider->getThemeAddon($theme['parentTheme']);
-        return $parentTheme->getKey();
+
+        // Add in any missing assets from the previous revision.
+        $this->copyForwardAssetsIntoRevision($parentTheme, $themeID, $revisionID, $insertedAssets);
+
+        return $this->getTheme($themeID);
     }
 
     /**
      * @inheritdoc
      */
-    public function getName($themeID): string {
-        $theme = $this->themeModel->selectSingle(['themeID' => $themeID], ['select' => ['themeID', 'name']]);
-        return $theme['name'];
-    }
+    public function patchTheme($themeID, array $body): Theme {
+        // Get the existing theme.
+        $existingTheme = $this->getTheme($themeID);
 
-    /**
-     * Normalize theme with assets response
-     *
-     * @param array $theme
-     * @param array $assets
-     * @return array
-     */
-    private function normalizeTheme(array $theme, array $assets): array {
-        $assets = array_combine(array_column($assets, 'assetKey'), array_column($assets, 'data'));
-
-        $res = [
-            "assets" => $assets,
-            'themeID' => $theme['themeID'],
-            'name' => $theme['name'],
-            'parentTheme' => $theme['parentTheme'] ?? null,
-            'current' => $theme['current'],
-            'type' => 'themeDB',
-            'version' => $theme['version'] ?? crc32($theme['dateUpdated']->format('Y-m-d H:i:s')),
-            'revisionID' => $theme['revisionID'],
-        ];
-        if (isset($theme['active'])) {
-            $res['active'] = $theme['active'] === 1;
-        }
-        if (isset($theme['revisionName'])) {
-            $res['revisionName'] = $theme['revisionName'];
+        if (isset($body['revisionID'])) {
+            // We are restoring a revision.
+            if (isset($body['revisionName'])) {
+                $this->themeRevisionModel->update(['name' => $body['revisionName']], ['revisionID' => $body['revisionID']]);
+            }
+            $this->themeModel->update(['revisionID' => $body['revisionID']], ['themeID' => $themeID]);
+            return $this->getTheme($themeID, ['revisionID' => $body['revisionID']]);
         }
 
-        if (isset($theme['dateInserted'])) {
-            $res['dateInserted'] = $theme['dateInserted'];
+        $body['revisionID'] = $this->themeRevisionModel->create($themeID, $body['revisionName'] ?? '');
+        $this->themeModel->update($body, ['themeID' => $themeID]);
+
+        $revisionID = $body["revisionID"];
+        $assets = $body['assets'] ?? [];
+
+        $insertedAssets = [];
+        // Insert the new assets.
+        foreach ($assets as $assetKey => $assetData) {
+            $insertedAssets[] = $assetKey;
+            $data = $assetData['data'] ?? $assetData;
+            $this->themeAssetModel->setAsset($themeID, $revisionID, $assetKey, $data);
         }
-        if (isset($theme['insertUserID'])) {
-            $res['insertUserID'] = $theme['insertUserID'];
-        }
-        $res["assets"] = $this->getDefaultAssets($theme);
-        $primaryAssets = array_intersect_key(
-            $assets,
-            array_flip(array_keys(ThemeModel::ASSET_LIST))
+
+        // Add in any missing assets from the previous revision.
+        $this->copyForwardAssetsIntoRevision($existingTheme, $themeID, $revisionID, $insertedAssets);
+
+        $theme = $this->themeModel->selectSingle(
+            [
+                'themeID' => $themeID,
+                'revisionID' => $revisionID,
+            ],
+            ['select' => self::SELECT_FIELDS]
         );
+        $theme['revisionName'] = $this->themeRevisionModel->getName($revisionID);
 
-        foreach ($primaryAssets as $assetKey => $asset) {
-            if ($asset !== null) {
-                $res["assets"][$assetKey] = $this->generateAsset($assetKey, $asset);
-            } else {
-                unset($res['assets'][$assetKey]);
+        return $this->getTheme($themeID);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteTheme($themeID) {
+        // check if theme exists
+        try {
+            $this->themeModel->selectSingle(['themeID' => $themeID]);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException('Theme with ID: ' . $themeID . ' not found!');
+        }
+        $this->themeModel->delete(['themeID' => $themeID]);
+    }
+
+    ///
+    /// Utilities
+    ///
+
+    /**
+     * Copy assets out of an existing theme into a new theme revision.
+     *
+     * @param Theme $theme The existing theme.
+     * @param int $insertThemeID The themeID to insert into.
+     * @param int $insertRevisionID The revisionID to insert into.
+     * @param array $alreadyInsertedAssets Asset names that have already been inserted. These will be skipped.
+     */
+    private function copyForwardAssetsIntoRevision(Theme $theme, int $insertThemeID, int $insertRevisionID, array $alreadyInsertedAssets) {
+        /**
+         * @var string $assetName
+         * @var Asset\ThemeAsset $asset
+         */
+        foreach ($theme->getAssets() as $assetName => $asset) {
+            if (in_array($assetName, $alreadyInsertedAssets)) {
+                continue;
             }
-        }
 
-        // Fix these linked assets to be links.
-        if ($res['assets'][ThemeModel::STYLES] ?? false) {
-            $res["assets"][ThemeModel::STYLES] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/styles.css');
+            $this->themeAssetModel->setAsset($insertThemeID, $insertRevisionID, $assetName, $asset->__toString());
         }
+    }
 
-        if ($res["assets"][ThemeModel::JAVASCRIPT] ?? false) {
-            $res["assets"][ThemeModel::JAVASCRIPT] = $this->request->getSimpleUrl('/api/v2/themes/'.$theme['themeID'].'/assets/javascript.js');
-        }
+    /**
+     * Combine a theme array and asset array into a theme data class.
+     *
+     * @param array $dbTheme
+     * @param array $dbAssets
+     * @return Theme
+     */
+    private function createTheme(array $dbTheme, array $dbAssets): Theme {
+        $dbAssets = array_column($dbAssets, null, 'assetKey');
 
-        $logos = [
-            "logo" => "Garden.Logo",
-            "mobileLogo" => "Garden.MobileLogo",
-        ];
-        foreach ($logos as $logoName => $logoConfig) {
-            if ($logo = $this->config->get($logoConfig)) {
-                $logoUrl = Gdn_Upload::url($logo);
-                $res["assets"][$logoName] = new ImageAsset($logoUrl);
-            }
-        }
+        $dbTheme['type'] = 'themeDB';
+        $dbTheme['assets'] = $dbAssets;
+        $dbTheme['version'] = crc32($dbTheme['dateUpdated']->format('Y-m-d H:i:s'));
+        $theme = new Theme($dbTheme);
 
-        $parentTheme = isset($theme['parentTheme']) ? $this->fsThemeProvider->getThemeAddon($theme['parentTheme']) : null;
-        if (!($parentTheme instanceof Addon)) {
-            $res['preview']['info']['Warning'] = ['type' => 'string', 'info' => 'Parent theme ('.$theme['parentTheme'].') is not valid'];
+        $preview = $theme->getPreview();
+        $parentAddon = isset($dbTheme) ? $this->fsThemeProvider->getThemeAddon($dbTheme['parentTheme']) : null;
+        if (!($parentAddon instanceof Addon)) {
+            $preview->addInfo('string', 'Warning', 'Parent theme ('.$dbTheme['parentTheme'].') is not valid');
+            $theme->setAddon($this->fsThemeProvider->getThemeAddon(ThemeService::FALLBACK_THEME_KEY));
         } else {
-            $res['preview']['info']['Template'] = ['type' => 'string', 'info' => $parentTheme->getInfoValue('name')];
+            $theme->setAddon($parentAddon);
+            $preview->addInfo('string', 'Template', $parentAddon->getName());
         }
-        $res['preview']['info']['Created'] = ['type' => 'date', 'info' => $theme['dateInserted']->format('Y-m-d H:i:s')];
-        $res['preview']['info']['Updated'] = ['type' => 'date', 'info' => $theme['dateUpdated']->format('Y-m-d H:i:s')];
-
-        return $res;
-    }
-
-    /**
-     * Get default assets
-     *
-     * @param array $theme
-     * @return array
-     */
-    public function getDefaultAssets(array $theme): array {
-        $assets = [];
-        foreach (\Vanilla\Models\ThemeModel::ASSET_LIST as $assetKey => $assetDefinition) {
-            $assets[$assetKey] =  $this->generateAsset($assetKey, $assetDefinition['default']);
-        }
-
-        return $assets;
-    }
-
-    /**
-     * Generate an asset object, given an asset array.
-     *
-     * @param string $key
-     * @param string $data
-     * @return Asset
-     */
-    private function generateAsset(string $key, ?string $data): ?Asset {
-        if (!$data) {
-            return null;
-        }
-        $type = ThemeModel::ASSET_LIST[$key]["type"];
-
-        switch ($type) {
-            case "html":
-                return new HtmlAsset($data);
-            case "json":
-                if ($key === ThemeModel::FONTS) {
-                    return new FontsAsset(json_decode($data, true));
-                } elseif ($key === ThemeModel::SCRIPTS) {
-                    return new ScriptsAsset(json_decode($data, true));
-                } else {
-                    return new JsonAsset($data);
-                }
-            case "js":
-                return new JavascriptAsset($data);
-            case "css":
-                return new StyleAsset($data);
-            default:
-                return null;
-        }
+        $preview->addInfo('date', 'Created', $dbTheme['dateInserted']->format('Y-m-d H:i:s'));
+        $preview->addInfo('date', 'Updated', $dbTheme['dateUpdated']->format('Y-m-d H:i:s'));
+        return $theme;
     }
 }

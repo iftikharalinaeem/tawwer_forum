@@ -201,10 +201,10 @@ export default function ThemeEditorPage(props: IProps) {
                 contents: (
                     <TextEditor
                         language={"css"}
-                        value={assets.styles}
+                        value={assets.styles?.data}
                         onChange={(event, newValue) => {
                             updateAssets({
-                                assets: { styles: newValue },
+                                assets: { styles: { data: newValue, type: "css" } },
                             });
                         }}
                     />
@@ -216,10 +216,10 @@ export default function ThemeEditorPage(props: IProps) {
                 contents: (
                     <TextEditor
                         language={"javascript"}
-                        value={assets.javascript}
+                        value={assets.javascript?.data}
                         onChange={(event, newValue) => {
                             updateAssets({
-                                assets: { javascript: newValue },
+                                assets: { javascript: { data: newValue, type: "js" } },
                             });
                         }}
                     />

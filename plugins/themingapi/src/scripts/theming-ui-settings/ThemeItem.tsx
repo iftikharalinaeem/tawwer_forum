@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IManageTheme, useThemeActions, PreviewStatusType } from "@vanilla/library/src/scripts/theming/ThemeActions";
+import { useThemeActions, PreviewStatusType } from "@vanilla/library/src/scripts/theming/ThemeActions";
 import ThemePreviewCard from "@library/theming/ThemePreviewCard";
 import React, { useEffect, useState } from "react";
 import { t, translate } from "@vanilla/i18n";
@@ -15,9 +15,10 @@ import classNames from "classnames";
 import ModalConfirm from "@vanilla/library/src/scripts/modal/ModalConfirm";
 import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
 import { ThemePreviewTitle } from "@vanilla/library/src/scripts/theming/ThemePreviewTitle";
+import { ITheme } from "@vanilla/library/src/scripts/theming/themeReducer";
 
 interface IProps {
-    theme: IManageTheme;
+    theme: ITheme;
     className?: string;
 }
 
@@ -91,13 +92,7 @@ export function ThemeItem(props: IProps) {
                     onCopy={ThemeEditorRoute.url({ templateName: themeID })}
                     onRevision={ThemeRevisionsRoute.url({ themeID: themeID })}
                     onPreview={handlePreview}
-                    globalPrimary={preview?.["global.mainColors.primary"] ?? undefined}
-                    globalBg={preview?.["global.mainColors.bg"] ?? undefined}
-                    globalFg={preview?.["global.mainColors.fg"] ?? undefined}
-                    titleBarBg={preview?.["global.mainColors.primary"] ?? undefined}
-                    backgroundImage={preview?.["banner.outerBackground.image"] ?? undefined}
-                    titleBarFg={preview?.["global.mainColors.fg"] ?? undefined}
-                    previewImage={preview?.previewImage}
+                    preview={props.theme.preview}
                     canCopy={props.theme.type !== "themeDB"}
                     canDelete={props.theme.type === "themeDB"}
                     canEdit={props.theme.type === "themeDB"}

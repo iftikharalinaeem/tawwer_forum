@@ -54,7 +54,7 @@ export default function ThemeBuilderPanel() {
                         sendMessage?.(forceVariablesAC);
                     }
                 }}
-                rawThemeVariables={variables}
+                rawThemeVariables={variables ?? {}}
             >
                 <div className={classes.root}>
                     <ActivePanelContextProvider>

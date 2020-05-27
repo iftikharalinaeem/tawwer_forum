@@ -18,13 +18,16 @@ import { PlusIcon } from "@vanilla/library/src/scripts/icons/common";
 import { manageThemingClasses } from "@themingapi/theming-ui-settings/manageThemingStyles";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
+import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
+import { notEmpty } from "@vanilla/utils";
 
 export default function ManageThemingPage(props) {
     const themeSettingsState = useThemeSettingsState();
     const actions = useThemeActions();
+    const { themes: themesLoadable } = themeSettingsState;
 
     useEffect(() => {
-        if (themeSettingsState.themes.status === LoadStatus.PENDING) {
+        if (themesLoadable.status === LoadStatus.PENDING) {
             actions.getAllThemes();
         }
     });
@@ -61,7 +64,7 @@ export default function ManageThemingPage(props) {
         </DashboardHelpAsset>
     );
 
-    if (!themeSettingsState.themes.data || themeSettingsState.themes.status === LoadStatus.LOADING) {
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(themesLoadable.status)) {
         return (
             <>
                 <Loader />
@@ -70,7 +73,16 @@ export default function ManageThemingPage(props) {
         );
     }
 
-    const { currentTheme, templates, themes } = themeSettingsState.themes.data;
+    if (!themesLoadable.data || themesLoadable.error) {
+        return (
+            <>
+                <ErrorMessages errors={[themesLoadable.error].filter(notEmpty)} />
+                {helpAsset}
+            </>
+        );
+    }
+
+    const { currentTheme, templates, themes } = themesLoadable.data;
     const classes = manageThemingClasses();
 
     return (
