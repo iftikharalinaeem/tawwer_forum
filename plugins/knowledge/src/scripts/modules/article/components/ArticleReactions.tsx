@@ -73,7 +73,7 @@ export function ArticleReactions(props: IProps) {
                     if (userReactionType === "yes") {
                         yes = yes + 1;
                     }
-                    total = total + 1;
+                    total = total === 0 ? 1 : total + 1;
                 }
             } catch (e) {
                 disableGuestVoting = true;
