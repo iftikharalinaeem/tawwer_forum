@@ -351,6 +351,9 @@ class ThemesDbTest extends AbstractAPIv2Test {
     /**
      * Test bad asset.
      *
+     * @param string $assetName
+     * @param mixed $asset
+     *
      * @dataProvider provideBadAssets
      */
     public function testAssetInputValidationPost(string $assetName, $asset) {
