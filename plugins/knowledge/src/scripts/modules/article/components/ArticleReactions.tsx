@@ -71,9 +71,9 @@ export function ArticleReactions(props: IProps) {
                     const userReactionType = hasVoted === "yes" ? "yes" : "no";
                     helpfulReactions.userReaction = userReactionType;
                     if (userReactionType === "yes") {
-                        yes = yes + 1;
+                        yes = total === 1 ? 1 : yes + 1;
                     }
-                    total = total === 0 ? 1 : total + 1;
+                    total = total === 1 ? 1 : total + 1;
                 }
             } catch (e) {
                 disableGuestVoting = true;
