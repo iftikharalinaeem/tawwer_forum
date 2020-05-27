@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import React, { useState } from "react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { eventsClasses } from "@groups/events/ui/eventStyles";

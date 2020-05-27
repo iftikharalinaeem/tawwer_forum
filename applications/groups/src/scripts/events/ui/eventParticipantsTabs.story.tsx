@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import React, { useState } from "react";
 import EventParticipantsTabs from "@groups/events/ui/EventParticipantsTabs";
 import EventParticipants from "@groups/events/ui/EventParticipants";

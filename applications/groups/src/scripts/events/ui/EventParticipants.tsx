@@ -1,3 +1,8 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 import React from "react";
 import { IEventParticipant } from "@groups/events/state/eventsTypes";
 import { t } from "@vanilla/i18n";
