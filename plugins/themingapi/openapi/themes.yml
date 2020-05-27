@@ -37,6 +37,7 @@ x-aliases:
                 type: string
                 description: Absolute URL of the resource.
                 example: "https://site.com/api/v2/themes/:themeID/assets/:assetName.ext?v=faasdf42d"
+      description: Success
   JsonAssetIn: &JsonAssetIn
     description: An asset to be inserted.
     type: object
@@ -101,6 +102,7 @@ x-aliases:
       200:
         content:
           text/html: *HtmlContentType
+        description: Success
   JsPutAssetContentType: &JsPutAssetContentType
     <<: *StringPutAsset
     requestBody:
@@ -115,6 +117,7 @@ x-aliases:
       200:
         content:
           application/javascript: *JsContentType
+        description: Success
   CssPutAssetContentType: &CssPutAssetContentType
     <<: *StringPutAsset
     requestBody:
@@ -132,6 +135,7 @@ x-aliases:
       200:
         content:
           text/css: *CssContentType
+        description: Success
   JsonPutAsset: &JsonPutAsset
     parameters:
       - *ThemeIDParam
