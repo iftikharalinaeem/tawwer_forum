@@ -28,6 +28,8 @@ import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
+import { userSelect } from "@library/styles/styleHelpers";
+import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
@@ -116,6 +118,59 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const participantsTabsRoot = makeVars("participantsTabsRoot", {
+        fontSize: globalVars.fonts.size.large,
+        size: {
+            width: 516,
+            height: 552,
+        },
+        color: {
+            border: colorOut(globalVars.border.color),
+        },
+    });
+
+    const participantsTabsList = makeVars("participantsTabsList", {
+        height: 45,
+        fontWeight: globalVars.fonts.weights.semiBold,
+        color: {
+            borderBottom: colorOut(globalVars.border.color),
+        },
+        marginBottom: 5,
+    });
+
+    const participantsTabsTab = makeVars("participantsTabsTab", {
+        height: 42,
+    });
+
+    const participantsTabsPanels = makeVars("participantsTabsPanels", {
+        height: "75%",
+    });
+
+    const participantItem = makeVars("participantItem", {
+        marginBottom: 19,
+    });
+
+    const participantName = makeVars("participantName", {
+        marginLeft: 16,
+    });
+
+    const participantsTabsTopButton = makeVars("participantsTabsTopButton", {
+        wrapper: {
+            right: 6,
+            top: 10,
+        },
+        size: {
+            width: 24,
+            height: 24,
+        },
+    });
+
+    const participantsTabsBottomButton = makeVars("participantsTabsBottomButton", {
+        wrapper: {
+            bottom: 32,
+        },
+    });
+
     return {
         compact,
         title,
@@ -126,6 +181,14 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         section,
         description,
         attendees,
+        participantsTabsRoot,
+        participantsTabsList,
+        participantsTabsTab,
+        participantsTabsPanels,
+        participantItem,
+        participantName,
+        participantsTabsTopButton,
+        participantsTabsBottomButton,
     };
 });
 
@@ -422,6 +485,12 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         },
     });
 
+    const participantsPopUpButton = style("participantsPopUpButton", {
+        display: "flex",
+        alignItems: "center",
+        flexDirection: "column",
+    });
+
     const attendeePlus = style("attendeePlus", {
         ...fonts(vars.attendees.plus.font),
         lineHeight: unit(userPhotoVariables().sizing.medium),
@@ -470,6 +539,85 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins({ bottom: globalVars.gutter.half }),
     });
 
+    const participantsTabsRoot = style("participantsTabsRoot", {
+        fontSize: vars.participantsTabsRoot.fontSize,
+        position: "relative",
+        width: vars.participantsTabsRoot.size.width,
+        height: vars.participantsTabsRoot.size.height,
+        border: `solid 1px ${vars.participantsTabsRoot.color.border}`,
+    });
+
+    const participantsTabsList = style("participantsTabsList", {
+        height: vars.participantsTabsList.height,
+        fontWeight: vars.participantsTabsList.fontWeight,
+        borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
+        marginBottom: vars.participantsTabsList.marginBottom,
+        $nest: {
+            "> *": {
+                paddingLeft: 0,
+                paddingRight: 0,
+                marginRight: 50,
+            },
+            ":first-child": {
+                marginLeft: 16,
+            },
+        },
+    });
+
+    const participantsTabsTab = style("participantsTabsTab", {
+        ...buttonResetMixin(),
+        // Note height and the border height add up to the height of the list
+        height: vars.participantsTabsTab.height,
+        $nest: {
+            "&[data-selected]": {
+                borderBottom: `3px solid ${colorOut(globalVars.mainColors.primary)}`,
+            },
+        },
+    });
+
+    const participantsTabsPanels = style("participantsTabsPanels", {
+        overflowY: "scroll",
+        height: vars.participantsTabsPanels.height,
+    });
+
+    const participantList = style("participantsList", {
+        marginLeft: 16,
+    });
+
+    const participantItem = style("participantItem", {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: vars.participantItem.marginBottom,
+    });
+
+    const participantName = style("participantName", {
+        display: "inline-block",
+        marginLeft: vars.participantName.marginLeft,
+    });
+
+    const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
+        position: "absolute",
+        right: vars.participantsTabsTopButton.wrapper.right,
+        top: vars.participantsTabsTopButton.wrapper.top,
+    });
+
+    const participantsTabsTopButton = style("participantsTabsTopButton", {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyItems: "center",
+        width: vars.participantsTabsTopButton.size.width,
+        height: vars.participantsTabsTopButton.size.height,
+    });
+
+    const participantsTabsBottomButtonWrapper = style("participantsTabsBottomButton", {
+        position: "absolute",
+        textAlign: "center",
+        left: 0,
+        right: 0,
+        bottom: vars.participantsTabsBottomButton.wrapper.bottom,
+    });
+
     return {
         root,
         item,
@@ -500,6 +648,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendee,
         attendeeList,
         attendeePhoto,
+        participantsPopUpButton,
         attendeePlus,
         noAttendees,
         section,
@@ -509,5 +658,15 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         description,
         organizer,
         panelHeading,
+        participantsTabsRoot,
+        participantsTabsList,
+        participantsTabsPanels,
+        participantItem,
+        participantList,
+        participantName,
+        participantsTabsTab,
+        participantsTabsTopButtonWrapper,
+        participantsTabsTopButton,
+        participantsTabsBottomButtonWrapper,
     };
 });

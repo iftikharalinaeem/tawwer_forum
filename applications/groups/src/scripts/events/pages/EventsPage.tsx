@@ -15,7 +15,7 @@ import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
 import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { notEmpty, slugify } from "@vanilla/utils";
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
 
@@ -38,6 +38,7 @@ export default function EventsPage() {
 
     const eventList = useEventsList(eventQuery);
     const eventParent = useEventParentRecord({ parentRecordType, parentRecordID });
+
     const classes = eventsClasses();
     if (
         [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventList.status) ||

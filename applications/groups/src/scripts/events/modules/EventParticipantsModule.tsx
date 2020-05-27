@@ -1,0 +1,64 @@
+/**
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+import EventParticipants from "@groups/events/ui/EventParticipants";
+import { eventsClasses } from "@groups/events/ui/eventStyles";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import Button from "@vanilla/library/src/scripts/forms/Button";
+import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
+import { notEmpty } from "@vanilla/utils";
+import React, { useState } from "react";
+import { EventsActions, useEventsActions } from "../state/EventsActions";
+import { useEventParticipantsByAttendance } from "../state/eventsHooks";
+import { EventAttendance } from "../state/eventsTypes";
+
+interface IProps {
+    eventID: number;
+    attendanceStatus: EventAttendance;
+}
+
+export function EventParticipantsModule(props: IProps) {
+    const { eventID } = props;
+    const { getEventParticipantsByAttendance } = useEventsActions();
+
+    const [page, setPage] = useState(1);
+
+    const query = {
+        eventID,
+        page,
+        limit: EventsActions.DEFAULT_PARTICIPANTS_LIMIT,
+        attending: props.attendanceStatus,
+    };
+
+    const participants = useEventParticipantsByAttendance(query);
+
+    const loadMore = () => {
+        setPage(page + 1);
+        getEventParticipantsByAttendance({ ...query, page: page + 1 });
+    };
+
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(participants.status) && !participants.data) {
+        return <Loader />;
+    }
+
+    if (!participants.data || participants.error) {
+        return <ErrorMessages errors={[participants.error].filter(notEmpty)} />;
+    }
+
+    const classes = eventsClasses();
+    return (
+        <>
+            <EventParticipants participants={participants.data.participants} />
+            {participants.data.pagination.next && (
+                <div className={classes.participantsTabsBottomButtonWrapper}>
+                    <Button onClick={loadMore} style={{ width: 208 }}>
+                        Load more
+                    </Button>
+                </div>
+            )}
+        </>
+    );
+}

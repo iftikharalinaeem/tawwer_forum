@@ -5,12 +5,20 @@
 
 import { useSelector } from "react-redux";
 import { IEventsStoreState } from "@groups/events/state/EventsReducer";
-import { IGetEventsQuery, useEventsActions, IGetEventParentRecordQuery } from "@groups/events/state/EventsActions";
+import {
+    IGetEventsQuery,
+    useEventsActions,
+    IGetEventParentRecordQuery,
+    IGetEventParticipantsQuery,
+    IGetEventParticipantsByAttendanceQuery,
+} from "@groups/events/state/EventsActions";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { useEffect, useReducer, useCallback } from "react";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { useLocation } from "react-router";
+import { action } from "@storybook/addon-actions";
+import { original } from "immer";
 
 export function useEventsState() {
     return useSelector((state: IEventsStoreState) => {
@@ -38,6 +46,51 @@ export function useEventsList(params: IGetEventsQuery) {
         // Using the hash instead of the object
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [status, actions, hash]);
+
+    return existingResult;
+}
+
+export function useEventParticipants(query: IGetEventParticipantsQuery) {
+    const actions = useEventsActions();
+
+    const existingResult = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.participantsByEventID[query.eventID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+
+    const { status } = existingResult;
+
+    useEffect(() => {
+        if ([LoadStatus.PENDING].includes(status)) {
+            actions.getEventParticipants(query);
+        }
+    }, [status, actions, query]);
+
+    return existingResult;
+}
+
+export function useEventParticipantsByAttendance(query: IGetEventParticipantsByAttendanceQuery) {
+    const actions = useEventsActions();
+    const { eventID, attending } = query;
+    const hash = stableObjectHash({ eventID, attending });
+
+    const existingResult = useSelector((state: IEventsStoreState) => {
+        return (
+            state.events.participantsByAttendanceByEventID[hash] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
+    });
+
+    const { status } = existingResult;
+    useEffect(() => {
+        if ([LoadStatus.PENDING].includes(status)) {
+            actions.getEventParticipantsByAttendance(query);
+        }
+    }, [status, actions, query]);
 
     return existingResult;
 }

@@ -66,8 +66,21 @@ export interface IEventParticipant {
     attending: EventAttendance;
     dateInserted: string;
     eventID: number;
-    user?: IUserFragment;
+    user: IUserFragment;
     userID: number;
+}
+
+export interface IEventParticipantList {
+    eventID: number;
+    pagination: ILinkPages;
+    participants: IEventParticipant[];
+}
+
+export interface IEventParticipantsByAttendance {
+    eventID: number;
+    attending: EventAttendance;
+    pagination: ILinkPages;
+    participants: IEventParticipant[];
 }
 
 export interface IEventWithParticipants {

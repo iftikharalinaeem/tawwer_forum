@@ -97,6 +97,7 @@ export function EventDetails(props: IProps) {
             </div>
 
             <EventAttendees
+                eventID={event.eventID}
                 data={props.going!}
                 title={t("Going")}
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
@@ -104,6 +105,7 @@ export function EventDetails(props: IProps) {
                 separator={true}
             />
             <EventAttendees
+                eventID={event.eventID}
                 emptyMessage={t("Nobody is on the fence right now.")}
                 data={props.maybe!}
                 title={t("Maybe")}
@@ -111,6 +113,7 @@ export function EventDetails(props: IProps) {
                 separator={true}
             />
             <EventAttendees
+                eventID={event.eventID}
                 emptyMessage={t("Nobody has declined the invitation so far.")}
                 data={props.notGoing!}
                 title={t("Not going")}
