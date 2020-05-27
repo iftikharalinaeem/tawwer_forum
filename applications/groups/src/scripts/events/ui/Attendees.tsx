@@ -88,7 +88,7 @@ export function EventAttendees(props: IProps) {
                             <Button
                                 className={classes.participantsPopUpButton}
                                 onClick={() => setVisibleModal(true)}
-                                baseClass={ButtonTypes.ICON_COMPACT}
+                                baseClass={ButtonTypes.TEXT}
                             >
                                 <span style={{ display: "inline-block" }}>
                                     +<NumberFormatted value={extraCount} />
