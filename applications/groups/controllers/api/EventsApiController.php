@@ -376,6 +376,7 @@ class EventsApiController extends AbstractApiController {
                 'enum' => [
                     'dateInserted', '-dateInserted',
                     'dateStarts', '-dateStarts',
+                    'dateEnds', '-dateEnds'
                 ],
                 'description' => 'Sort the results by the specified field. The default sort order is ascending.'
                     .'Prefixing the field with "-" will sort using a descending order.',

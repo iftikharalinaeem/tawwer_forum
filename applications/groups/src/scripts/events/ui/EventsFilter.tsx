@@ -22,14 +22,18 @@ export function useDatesForEventFilter(filter: EventFilterTypes): Partial<IGetEv
     }, []);
     switch (filter) {
         case EventFilterTypes.ALL:
-            return {};
+            return {
+                sort: "-dateStarts",
+            };
         case EventFilterTypes.PAST:
             return {
                 dateStarts: `<${dateNow}`,
+                sort: "-dateEnds",
             };
         case EventFilterTypes.UPCOMING:
             return {
                 dateEnds: `>${dateNow}`,
+                sort: "dateStarts",
             };
     }
 }

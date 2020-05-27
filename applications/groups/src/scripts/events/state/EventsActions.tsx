@@ -41,6 +41,7 @@ export interface IGetEventsQuery {
     parentRecordID: number;
     dateStarts?: string;
     dateEnds?: string;
+    sort?: string;
     page: number;
     limit: number;
 }
