@@ -139,7 +139,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const participantsTabsTab = makeVars("participantsTabsTab", {
-        height: 42,
+        height: 43,
     });
 
     const participantsTabsPanels = makeVars("participantsTabsPanels", {
@@ -489,6 +489,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
+        marginLeft: 20,
     });
 
     const attendeePlus = style("attendeePlus", {
