@@ -104,8 +104,8 @@ class BreadcrumbsTranslationTest extends KbApiTestCase {
         $this->assertArrayHasKey('breadcrumbs', $r);
         $breadcrumbs = $r['breadcrumbs'];
         foreach ($breadcrumbs as $breadcrumb) {
-            $url = $breadcrumb->getUrl();
-            $name = $breadcrumb->getName();
+            $url = $breadcrumb['url'];
+            $name = $breadcrumb['name'];
             // check that site section url slug applied correctly
             $this->assertGreaterThan(1, strpos($url, '/'.$locale.'/kb/'));
             if ($locale !== $kb['sourceLocale'] &&
