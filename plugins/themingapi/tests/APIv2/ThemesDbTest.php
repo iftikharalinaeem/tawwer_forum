@@ -218,6 +218,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                 [
                     'data' => '<div>Hello header</div>',
                     'type' => 'html',
+                    'content-type' => 'text/html',
                 ]
             ],
             'header.html' => [
@@ -230,6 +231,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                 [
                     'data' => '<div>Hello footer</div>',
                     'type' => 'html',
+                    'content-type' => 'text/html',
                 ]
             ],
             'footer.html' => [
@@ -242,6 +244,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                 [
                     'data' => 'console.log("Hello world");',
                     'type' => 'js',
+                    'content-type' => 'application/javascript',
                 ]
             ],
             'javascript.js' => [
@@ -254,6 +257,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                 [
                     'data' => 'console.log("Hello world");',
                     'type' => 'css',
+                    'content-type' => 'text/css',
                 ]
             ],
             'styles.css' => [
@@ -272,6 +276,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                         ]
                     ],
                     'type' => 'json',
+                    'content-type' => 'application/json',
                 ]
             ],
             'variables.json' => [
@@ -292,6 +297,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                         [ 'url' => 'https://cdn.js.com/jquery.js' ]
                     ],
                     'type' => 'json',
+                    'content-type' => 'application/json',
                 ]
             ],
             'scripts.json' => [
@@ -300,6 +306,7 @@ class ThemesDbTest extends AbstractAPIv2Test {
                     [ 'url' => 'https://cdn.js.com/jquery.js' ]
                 ],
                 'application/json',
+                'content-type' => 'application/json',
             ],
         ];
     }
