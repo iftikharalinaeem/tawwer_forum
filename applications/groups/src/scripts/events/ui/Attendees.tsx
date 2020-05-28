@@ -83,7 +83,7 @@ export function EventAttendees(props: IProps) {
                             </li>
                         );
                     })}
-                    {extraCount > 0 && (
+                    {extraCount + 100 > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
                             <Button
                                 className={classes.participantsPopUpButton}
@@ -91,7 +91,8 @@ export function EventAttendees(props: IProps) {
                                 baseClass={ButtonTypes.TEXT}
                             >
                                 <span style={{ display: "inline-block" }}>
-                                    +<NumberFormatted value={extraCount} />
+                                    {/* +<NumberFormatted value={extraCount} /> */}
+                                    ... all attendees
                                 </span>
                             </Button>
                         </li>
