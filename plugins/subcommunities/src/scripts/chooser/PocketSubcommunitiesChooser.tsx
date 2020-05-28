@@ -8,6 +8,7 @@ import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { t } from "@vanilla/i18n/src";
 import { MultiSubcommunityInput } from "./MultiSubcommunityInput";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
 const sanitizeValue = (value: any) => {
     if (Array.isArray(value)) {
@@ -24,6 +25,8 @@ export function PocketSubcommunityChooser(props) {
         <DashboardFormGroup label={t("Subcommunities")} tag={"div"}>
             <div className="input-wrap">
                 <MultiSubcommunityInput
+                    showIndicator={true}
+                    className={dashboardClasses().tokenInput}
                     value={subcommunityIDs}
                     onChange={selectedSubCommunities => {
                         setSubcommunityIDs(
