@@ -958,20 +958,18 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
         $subcommunityIDs = $pocketData['SubcommunityIDs'] ?? [];
 
-        // Check Subcommunities
-        if (!empty($subcommunityIDs)) {
-            $currentSubcommunity = SubcommunityModel::getCurrent();
-            if (!$currentSubcommunity) {
-                return false;
-            }
-            $currentSubcommunityID = $currentSubcommunity["SubcommunityID"];
-            $match = array_search($currentSubcommunityID, $subcommunityIDs, false);
-            if (!$match) {
-                return false;
-            }
+        if (empty($subcommunityIDs)) {
+            return false;
         }
 
-        return $existingCanRender;
+        $currentSubcommunity = SubcommunityModel::getCurrent();
+        if (empty($currentSubcommunity)) {
+            return false;
+        }
+
+        $currentSubcommunityID = strval($currentSubcommunity["SubcommunityID"]);
+        $result = array_search($currentSubcommunityID, $subcommunityIDs, true) !== false;
+        return (bool) $result;
     }
 }
 
