@@ -542,9 +542,17 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $inSchema
      * @param array $query The request query.
      * @param array $rows Raw result.
-     * @return array
+     * @param bool $single Whether the call is necessarily for a single discussion.
+     * @return mixed
      */
-    public function discussionsApiController_getOutput(array $result, DiscussionsApiController $sender, Schema $inSchema, array $query, array $rows) {
+    public function discussionsApiController_getOutput(
+        array $result,
+        DiscussionsApiController $sender,
+        Schema $inSchema,
+        array $query,
+        array $rows,
+        bool $single = false
+    ) {
         $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
 
         // Put the $result and $row data in arrays if they aren't already.
@@ -566,8 +574,9 @@ class ReactionsPlugin extends Gdn_Plugin {
             });
         }
 
-        // If there's only one discussion, remove it from the nesting array.
-        $result = count($result) === 1 ? $result[0] : $result;
+        // If there's only one discussion and the call is not for a single discussion, remove it from the nesting array.
+        // Maintains backward compatibility.
+        $result = count($result) === 1 && !$single ? $result[0] : $result;
         return $result;
     }
 
