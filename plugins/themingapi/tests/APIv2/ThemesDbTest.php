@@ -396,6 +396,52 @@ class ThemesDbTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test bad asset.
+     *
+     * @param string $assetName
+     * @param mixed $asset
+     *
+     * @dataProvider provideBadAssetsPut
+     */
+    public function testAssetInputValidationPutAsset(string $assetName, $asset) {
+        $themeID = $this->createTheme([]);
+
+        $this->expectException(ClientException::class);
+        $this->api()->put("/api/v2/themes/$themeID/assets/$assetName", $asset);
+    }
+
+    /**
+     * @return array
+     */
+    public function provideBadAssetsPut(): array {
+        return [
+            'bad type' => [
+                'variables',
+                [
+                    'type' => 'badType',
+                    'data' => 'asdfasdf',
+                ],
+            ],
+            'bad data' => [
+                'variables',
+                [
+                    'type' => 'json',
+                    'data' => 'asdfaasdf',
+                ],
+            ],
+            'bad json' => [
+                'variables.json',
+                'asasdfasdf'
+            ],
+            'bad json 2' => [
+                'variables.json',
+                '{asdf  asdf ['
+            ],
+        ];
+    }
+
+
+    /**
      * Create a theme and return the ID.
      *
      * @param array $overrides
