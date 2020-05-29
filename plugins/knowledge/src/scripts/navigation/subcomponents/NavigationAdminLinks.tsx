@@ -101,9 +101,7 @@ export default function NavigationAdminLinks(props: IProps) {
     } else {
         content = (
             <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
-                {props.showDivider && (
-                    <hr role="separator" className={classNames("siteNavAdminLinks-divider", classes.divider)} />
-                )}
+                {props.showDivider && <hr className={classNames("siteNavAdminLinks-divider", classes.divider)} />}
                 <h3 className="sr-only">{t("Admin Links")}</h3>
                 <li className={classNames("siteNavAdminLinks-item", classes.item)}>
                     <OrganizeCategoriesRoute.Link

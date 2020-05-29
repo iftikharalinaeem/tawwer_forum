@@ -91,7 +91,7 @@ export default function NavigationManagerToolBar(props: IProps) {
                     buttonContents
                 )}
             </div>
-            <hr role="separator" className={classes.separator} />
+            <hr className={classes.separator} />
         </div>
     );
 }
