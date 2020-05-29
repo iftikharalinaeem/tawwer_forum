@@ -6,6 +6,8 @@
  */
 
 // Define the plugin:
+use Vanilla\Models\AddonModel;
+
 $PluginInfo['vfoptions'] = array(
     'Name' => 'VF.com Admin Options',
     'Description' => 'VF.com admin options.',
@@ -609,12 +611,9 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addonInfo['oldType'] ?? null;
-                if ($type === 'application') {
-                    Gdn::applicationManager()->enableApplication($addonInfo['keyRaw'], null);
-                } else {
-                    Gdn::pluginManager()->enablePlugin($addonName, null);
-                }
+                /** @var AddonModel $addonModel */
+                $addonModel = Gdn::getContainer()->get(AddonModel::class);
+                $addonModel->enable($addon);
                 $sender->informMessage(sprintf(t('%s Enabled.'), val('name', $addonInfo, t('Addon'))));
 
             } catch (Exception $ex) {
@@ -651,12 +650,9 @@ pageTracker._trackPageview();
             $addonInfo = $addon->getInfo();
             $addonInfo['IconUrl'] = $addon->getIcon();
             try {
-                $type = $addonInfo['oldType'] ?? null;
-                if ($type === 'application') {
-                    Gdn::applicationManager()->disableApplication($addonName, NULL);
-                } else {
-                    Gdn::pluginManager()->disablePlugin($addonName, NULL);
-                }
+                /** @var AddonModel $addonModel */
+                $addonModel = Gdn::getContainer()->get(AddonModel::class);
+                $addonModel->disable($addon);
                 $sender->informMessage(sprintf(t('%s Disabled.'), val('name', $addonInfo, t('Addon'))));
 
             } catch (Exception $ex) {
