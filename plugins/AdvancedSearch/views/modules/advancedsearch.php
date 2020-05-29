@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) { exit(); } ?>
-<div class="AdvancedSearch <?php echo getIncomingValue('adv') ? 'Open' : ''; ?>">
+<div class="AdvancedSearch <?php echo getIncomingValue('adv') ? 'Open' : ''; ?>" role="search">
     <?php
     $Form = new Gdn_Form();
     $Form = $this->Form;
