@@ -51,6 +51,8 @@ export function EventAttendees(props: IProps) {
 
     const [visibleModal, setVisibleModal] = useState(false);
 
+    const openModal = () => setVisibleModal(true);
+
     return (
         <section className={classNames(classes.section, props.className)}>
             <EventParticipantsTabModule
@@ -75,25 +77,24 @@ export function EventAttendees(props: IProps) {
                                 })}
                                 key={i}
                             >
-                                <UserPhoto
-                                    size={UserPhotoSize.MEDIUM}
-                                    className={classes.attendeePhoto}
-                                    userInfo={user}
-                                />
+                                <Button baseClass={ButtonTypes.TEXT} onClick={openModal}>
+                                    <UserPhoto
+                                        size={UserPhotoSize.MEDIUM}
+                                        className={classes.attendeePhoto}
+                                        userInfo={user}
+                                    />
+                                </Button>
                             </li>
                         );
                     })}
-                    {extraCount + 100 > 0 && (
+                    {extraCount > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
                             <Button
                                 className={classes.participantsPopUpButton}
-                                onClick={() => setVisibleModal(true)}
+                                onClick={openModal}
                                 baseClass={ButtonTypes.TEXT}
                             >
-                                <span style={{ display: "inline-block" }}>
-                                    {/* +<NumberFormatted value={extraCount} /> */}
-                                    ... all attendees
-                                </span>
+                                <span style={{ display: "inline-block" }}>... all attendees</span>
                             </Button>
                         </li>
                     )}
