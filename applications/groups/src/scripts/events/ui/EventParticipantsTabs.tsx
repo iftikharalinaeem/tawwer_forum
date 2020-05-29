@@ -33,7 +33,7 @@ export default function EventParticipantsTabs(props: IProps) {
     }, [isVisible]);
 
     return (
-        <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
+        <Modal scrollable={true} isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
             <Tabs index={tabIndex} onChange={setTabIndex} className={classes.participantsTabsRoot}>
                 <div className={classes.participantsTabsTopButtonWrapper}>
                     <Button

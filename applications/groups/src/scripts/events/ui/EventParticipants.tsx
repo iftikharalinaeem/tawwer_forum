@@ -9,6 +9,7 @@ import { t } from "@vanilla/i18n";
 import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import { eventsClasses } from "./eventStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import Button from "@vanilla/library/src/scripts/forms/Button";
 
 interface IProps {
     participants: IEventParticipant[];
@@ -43,5 +44,20 @@ export default function EventParticipants({ participants }: IProps) {
         );
     }
 
-    return <Participants participants={participants} />;
+    return (
+        <>
+            <Participants participants={participants} />
+            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 35 }}>
+                <Button style={{ width: 208 }}>Load more</Button>
+            </div>
+
+            {/* {participants.data.pagination.next && (
+                <div className={classes.participantsTabsBottomButtonWrapper}>
+                    <Button onClick={loadMore} style={{ width: 208 }}>
+                        Load more
+                    </Button>
+                </div>
+            )} */}
+        </>
+    );
 }

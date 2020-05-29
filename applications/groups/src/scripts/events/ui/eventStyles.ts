@@ -23,7 +23,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { calc, important, percent, translateY } from "csx";
+import { calc, important, percent, translateY, color } from "csx";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
@@ -142,9 +142,10 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         height: 43,
     });
 
-    const participantsTabsPanels = makeVars("participantsTabsPanels", {
-        height: "75%",
-    });
+    // const participantsTabsPanels = makeVars("participantsTabsPanels", {
+    //     height: "90%",
+    //     backgroundColor: "red",
+    // });
 
     const participantItem = makeVars("participantItem", {
         marginBottom: 19,
@@ -184,7 +185,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         participantsTabsRoot,
         participantsTabsList,
         participantsTabsTab,
-        participantsTabsPanels,
+        // participantsTabsPanels,
         participantItem,
         participantName,
         participantsTabsTopButton,
@@ -546,11 +547,17 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         position: "relative",
         width: vars.participantsTabsRoot.size.width,
         height: vars.participantsTabsRoot.size.height,
-        border: `solid 1px ${vars.participantsTabsRoot.color.border}`,
+        // border: `solid 1px ${vars.participantsTabsRoot.color.border}`,
     });
 
     const participantsTabsList = style("participantsTabsList", {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 999,
         height: vars.participantsTabsList.height,
+        backgroundColor: colorOut(globalVars.mainColors.bg),
         fontWeight: vars.participantsTabsList.fontWeight,
         borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
         marginBottom: vars.participantsTabsList.marginBottom,
@@ -578,12 +585,15 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsPanels = style("participantsTabsPanels", {
-        overflowY: "scroll",
-        height: vars.participantsTabsPanels.height,
+        // overflowY: "scroll",
+        // height: vars.participantsTabsPanels.height,
+        // backgroundColor: "red",
+        marginTop: 50,
     });
 
     const participantList = style("participantsList", {
         marginLeft: 16,
+        // marginTop: 45,
     });
 
     const participantItem = style("participantItem", {
@@ -599,9 +609,12 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
-        position: "absolute",
+        position: "fixed",
+        zIndex: 1001,
         right: vars.participantsTabsTopButton.wrapper.right,
-        top: vars.participantsTabsTopButton.wrapper.top,
+        // top: vars.participantsTabsTopButton.wrapper.top,
+        top: 10,
+        // backgroundColor: "blue",
     });
 
     const participantsTabsTopButton = style("participantsTabsTopButton", {

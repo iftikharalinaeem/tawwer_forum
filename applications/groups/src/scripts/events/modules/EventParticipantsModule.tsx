@@ -52,13 +52,13 @@ export function EventParticipantsModule(props: IProps) {
     return (
         <>
             <EventParticipants participants={participants.data.participants} />
-            {participants.data.pagination.next && (
+            {/* {participants.data.pagination.next && (
                 <div className={classes.participantsTabsBottomButtonWrapper}>
                     <Button onClick={loadMore} style={{ width: 208 }}>
                         Load more
                     </Button>
                 </div>
-            )}
+            )} */}
         </>
     );
 }
