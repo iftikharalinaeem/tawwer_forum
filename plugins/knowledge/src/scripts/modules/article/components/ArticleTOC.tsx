@@ -48,13 +48,13 @@ export default class ArticleTOC extends React.Component<IProps> {
             });
 
         return (
-            <nav className={classNames("panelList", "tableOfContents", classesPanelList.root)}>
+            <div className={classNames("panelList", "tableOfContents", classesPanelList.root)}>
                 <Heading
                     title={t("On This Page")}
                     className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
                 />
                 <ul className={classNames("panelList-items", classesPanelList.items)}>{contents}</ul>
-            </nav>
+            </div>
         );
     }
 

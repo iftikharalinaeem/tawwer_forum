@@ -16,7 +16,6 @@ import { ArticlesWidget } from "@knowledge/widgets/ArticlesWidget";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import Banner from "@library/banner/Banner";
-import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import { ComposeIcon } from "@library/icons/common";
@@ -129,26 +128,28 @@ export default function HelpCenterHome(props: IProps) {
 
     return (
         <>
-            {titleBarAndBanner}
-            <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-            <HelpCenterNavigation
-                data={navData.data.navigation}
-                rootCategory={navData.data.rootCategory}
-                kbID={knowledgeBaseID}
-            />
-            <ArticlesWidget
-                title={t("Featured Articles", "Recommended Articles")}
-                maxItemCount={4}
-                containerOptions={{
-                    maxColumnCount: 1,
-                    borderType: "navLinks",
-                    viewAll: {
-                        to: `/kb/articles?recommended=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`,
-                    },
-                }}
-                params={widgetParams}
-            />
-            <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
+            <main>
+                {titleBarAndBanner}
+                <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
+                <HelpCenterNavigation
+                    data={navData.data.navigation}
+                    rootCategory={navData.data.rootCategory}
+                    kbID={knowledgeBaseID}
+                />
+                <ArticlesWidget
+                    title={t("Featured Articles", "Recommended Articles")}
+                    maxItemCount={4}
+                    containerOptions={{
+                        maxColumnCount: 1,
+                        borderType: "navLinks",
+                        viewAll: {
+                            to: `/kb/articles?recommended=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`,
+                        },
+                    }}
+                    params={widgetParams}
+                />
+                <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
+            </main>
         </>
     );
 }
