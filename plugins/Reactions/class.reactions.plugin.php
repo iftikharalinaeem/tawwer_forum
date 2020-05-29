@@ -574,9 +574,9 @@ class ReactionsPlugin extends Gdn_Plugin {
             });
         }
 
-        // If there's only one discussion and the call is not for a single discussion, remove it from the nesting array.
+        // If there's only one discussion and the call is for a single discussion, remove it from the nesting array.
         // Maintains backward compatibility.
-        $result = count($result) === 1 && $single ? $result[0] : $result;
+        $result = $single ? $result[0] : $result;
         return $result;
     }
 
