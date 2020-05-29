@@ -149,7 +149,7 @@ class SitemapPage extends KbPage {
                 $article['url'] = $this->articleModel->url($article);
                 $article['dateUpdated'] = $article['dateUpdated']->format('c');
             } catch (\Exception $e) {
-                $articleID = $args['articleID'];
+                $articleID = $article['articleID'];
                 trigger_error("Failed to add article '$articleID' to the sitemap.", E_USER_NOTICE);
                 continue;
             }
