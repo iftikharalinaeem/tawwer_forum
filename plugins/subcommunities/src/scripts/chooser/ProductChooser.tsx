@@ -45,7 +45,7 @@ export function ProductChooser(props: IProps) {
 
     const classes = subcommunityChooserClasses();
     return (
-        <div>
+        <ul>
             {props.onBack && Object.values(availableLocales).length > 1 && (
                 <>
                     <DropDownItemButton buttonRef={backButtonRef} onClick={props.onBack}>
@@ -69,6 +69,6 @@ export function ProductChooser(props: IProps) {
                     </DropDownItemLink>
                 );
             })}
-        </div>
+        </ul>
     );
 }
