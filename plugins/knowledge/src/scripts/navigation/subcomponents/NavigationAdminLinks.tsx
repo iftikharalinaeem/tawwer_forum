@@ -100,41 +100,43 @@ export default function NavigationAdminLinks(props: IProps) {
         );
     } else {
         content = (
-            <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
+            <>
                 {props.showDivider && <hr className={classNames("siteNavAdminLinks-divider", classes.divider)} />}
                 <h3 className="sr-only">{t("Admin Links")}</h3>
-                <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    <OrganizeCategoriesRoute.Link
-                        className={classNames(classes.link)}
-                        data={{ kbID: knowledgeBase.knowledgeBaseID }}
-                    >
-                        {organize(classes.linkIcon)}
-                        {t("Organize Categories")}
-                    </OrganizeCategoriesRoute.Link>
-                </li>
-                <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    {isDisabled ? (
-                        <ToolTip
-                            label={
-                                <Translate
-                                    source="You can only add categories in the source locale: <0/>."
-                                    c0={
-                                        <LocaleDisplayer
-                                            localeContent={sourceLocale || " "}
-                                            displayLocale={sourceLocale || " "}
-                                        />
-                                    }
-                                />
-                            }
-                            ariaLabel={"You can only add categories in the source locale."}
+                <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
+                    <li className={classNames("siteNavAdminLinks-item", classes.item)}>
+                        <OrganizeCategoriesRoute.Link
+                            className={classNames(classes.link)}
+                            data={{ kbID: knowledgeBase.knowledgeBaseID }}
                         >
-                            <span>{newCategoryButton}</span>
-                        </ToolTip>
-                    ) : (
-                        newCategoryButton
-                    )}
-                </li>
-            </ul>
+                            {organize(classes.linkIcon)}
+                            {t("Organize Categories")}
+                        </OrganizeCategoriesRoute.Link>
+                    </li>
+                    <li className={classNames("siteNavAdminLinks-item", classes.item)}>
+                        {isDisabled ? (
+                            <ToolTip
+                                label={
+                                    <Translate
+                                        source="You can only add categories in the source locale: <0/>."
+                                        c0={
+                                            <LocaleDisplayer
+                                                localeContent={sourceLocale || " "}
+                                                displayLocale={sourceLocale || " "}
+                                            />
+                                        }
+                                    />
+                                }
+                                ariaLabel={"You can only add categories in the source locale."}
+                            >
+                                <span>{newCategoryButton}</span>
+                            </ToolTip>
+                        ) : (
+                            newCategoryButton
+                        )}
+                    </li>
+                </ul>
+            </>
         );
     }
 
