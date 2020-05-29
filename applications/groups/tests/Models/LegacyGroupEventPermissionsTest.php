@@ -52,11 +52,11 @@ class LegacyGroupEventPermissionsTest extends AbstractAPIv2Test {
         $event = $this->createEvent();
 
         // Success returns true.
-        $this->assertTrue(@$model->checkPermission('Edit', $group['groupID']));
+        $this->assertTrue(@$model->checkPermission('Edit', $event['eventID']));
 
         $this->api()->setUserID($user2['userID']);
-        $this->assertFalse(@$model->checkPermission('Edit', $group['groupID']));
+        $this->assertFalse(@$model->checkPermission('Edit', $event['eventID']));
 
-        $this->assertEquals('You aren\'t allowed to edit this event.', @$model->checkPermission('Edit.Reason', $group['groupID']));
+        $this->assertEquals('You aren\'t allowed to edit this event.', @$model->checkPermission('Edit.Reason', $event['eventID']));
     }
 }
