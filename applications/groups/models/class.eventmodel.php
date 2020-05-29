@@ -411,7 +411,7 @@ class EventModel extends Gdn_Model {
             return true;
         } catch (Exception $e) {
             // This is a legacy function an used to return the "reason" why the permission failed as a string.
-            if ($isReason) {
+            if (!$isReason) {
                 trigger_error("Invalid event permission $permission.");
                 return false;
             } else {

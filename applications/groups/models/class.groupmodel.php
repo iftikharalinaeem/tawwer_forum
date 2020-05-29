@@ -342,7 +342,7 @@ class GroupModel extends Gdn_Model {
             return true;
         } catch (Exception $e) {
             // This is a legacy function an used to return the "reason" why the permission failed as a string.
-            if ($isReason) {
+            if (!$isReason) {
                 trigger_error("Invalid group permission $permission.");
                 return false;
             } else {
