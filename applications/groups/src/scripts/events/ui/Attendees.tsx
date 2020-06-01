@@ -96,7 +96,11 @@ export function EventAttendees(props: IProps) {
                                 baseClass={ButtonTypes.TEXT}
                             >
                                 <span style={{ display: "inline-block" }}>
-                                    +<NumberFormatted value={extraCount} title={t("View all attendees")} />
+                                    +
+                                    <NumberFormatted
+                                        value={extraCount}
+                                        title={t(`View all ${title.toLocaleLowerCase()} attendees`)}
+                                    />
                                 </span>
                             </Button>
                         </li>
