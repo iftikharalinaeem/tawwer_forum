@@ -16,7 +16,6 @@ import { ArticlesWidget } from "@knowledge/widgets/ArticlesWidget";
 import { LoadStatus } from "@library/@types/api/core";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import Banner from "@library/banner/Banner";
-import Permission from "@library/features/users/Permission";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import { ComposeIcon } from "@library/icons/common";
@@ -152,23 +151,25 @@ export default function HelpCenterHome(props: IProps) {
         <>
             {titleBarAndBanner}
             <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-            {articleWidgetPlacement === ArticleWidgetPlacement.ABOVE && (
-                <>
-                    {articleWidget}
-                    {hasRecommended && (
-                        <Container fullGutter narrow>
-                            <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
-                        </Container>
-                    )}
-                </>
-            )}
-            <HelpCenterNavigation
-                data={navData.data.navigation}
-                rootCategory={navData.data.rootCategory}
-                kbID={knowledgeBaseID}
-            />
-            {articleWidgetPlacement === ArticleWidgetPlacement.BELOW && articleWidget}
-            <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
+            <main>
+                {articleWidgetPlacement === ArticleWidgetPlacement.ABOVE && (
+                    <>
+                        {articleWidget}
+                        {hasRecommended && (
+                            <Container fullGutter narrow>
+                                <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
+                            </Container>
+                        )}
+                    </>
+                )}
+                <HelpCenterNavigation
+                    data={navData.data.navigation}
+                    rootCategory={navData.data.rootCategory}
+                    kbID={knowledgeBaseID}
+                />
+                {articleWidgetPlacement === ArticleWidgetPlacement.BELOW && articleWidget}
+                <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
+            </main>
         </>
     );
 }

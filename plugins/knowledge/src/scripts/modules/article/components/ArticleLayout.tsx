@@ -28,11 +28,10 @@ import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles"
 import { PanelBackground } from "@library/layout/PanelBackground";
 import RelatedArticles from "@knowledge/modules/article/components/RelatedArticles";
 import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
-import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
+import OtherLanguagesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { BannerContextProvider } from "@vanilla/library/src/scripts/banner/BannerContext";
 
 interface IProps {
     useBackButton?: boolean;
@@ -88,7 +87,7 @@ export default function ArticleLayout(props: IProps) {
     );
 
     const otherLanguagesComponent = !articlelocales ? (
-        <OtherLangaugesPlaceHolder />
+        <OtherLanguagesPlaceHolder />
     ) : (
         <OtherLanguages articleLocaleData={articlelocales} knowledgeBaseID={article.knowledgeBaseID} />
     );

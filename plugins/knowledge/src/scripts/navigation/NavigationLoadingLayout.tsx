@@ -23,7 +23,7 @@ import { panelBackgroundVariables } from "@vanilla/library/src/scripts/layout/pa
 import { typographyClasses } from "@vanilla/library/src/scripts/styles/typographyStyles";
 import ScrollLock from "react-scrolllock";
 import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlaceholder";
-import OtherLangaugesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
+import OtherLanguagesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
@@ -117,7 +117,7 @@ export default function NavigationLoadingLayout(props: IProps) {
                             <>
                                 {device !== Devices.MOBILE && device !== Devices.TABLET && (
                                     <PanelWidget>
-                                        <OtherLangaugesPlaceHolder />
+                                        <OtherLanguagesPlaceHolder />
                                     </PanelWidget>
                                 )}
                             </>

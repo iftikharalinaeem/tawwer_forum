@@ -17,6 +17,7 @@ import { knowledgeBaseNoIcon } from "@knowledge/icons/common";
 import { tileClasses } from "@library/features/tiles/tileStyles";
 import Tiles from "@library/features/tiles/Tiles";
 import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
+import { useBannerContext } from "@library/banner/BannerContext";
 
 /**
  * Component representing a list of visible knowledge bases.
@@ -29,6 +30,7 @@ import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
  */
 function KnowledgeBaseList(props: IProps) {
     const { requestKnowledgeBases, knowledgeBases, loadStatus, className, columns } = props;
+    const { renderedH1 } = useBannerContext();
 
     useEffect(() => {
         if (loadStatus === LoadStatus.PENDING) {
@@ -55,7 +57,7 @@ function KnowledgeBaseList(props: IProps) {
     return (
         <Tiles
             title={t("Choose a subcommunity")}
-            titleLevel={1}
+            titleLevel={renderedH1 ? 2 : 1}
             hiddenTitle={true}
             items={knowledgeBases.filter(kb => !kb.isUniversalSource)}
             emptyMessage={t("No knowledge bases found.")}
