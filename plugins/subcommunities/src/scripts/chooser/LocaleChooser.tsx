@@ -22,10 +22,9 @@ export function LocaleChooser(props: IProps) {
     const subcommunitiesOrLocale = useSubcommunitiesOrLocales();
 
     const classes = subcommunityChooserClasses();
-    const currentLocale = getCurrentLocale();
 
     return (
-        <div>
+        <ul>
             {subcommunitiesOrLocale.map((localeOrSubcommunity, i) => {
                 if ("subcommunityID" in localeOrSubcommunity) {
                     const subcommunity = localeOrSubcommunity;
@@ -55,6 +54,6 @@ export function LocaleChooser(props: IProps) {
                     );
                 }
             })}
-        </div>
+        </ul>
     );
 }

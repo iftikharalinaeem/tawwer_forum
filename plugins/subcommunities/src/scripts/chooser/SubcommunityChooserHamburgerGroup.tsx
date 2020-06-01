@@ -29,7 +29,7 @@ export function SubcommunityChooserHamburgerGroup() {
 
     return (
         <>
-            <DropDownItemSeparator />
+            <hr className={dropDownClasses().separator} />
             {hasMultipleLocales && (
                 <SubcommunityChooserDropdown
                     defaultSection="locale"
