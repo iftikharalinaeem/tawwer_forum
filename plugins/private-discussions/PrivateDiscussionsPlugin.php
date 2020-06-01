@@ -37,7 +37,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @return mixed
      */
     public function getStripEmbeds() {
-        return $this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
+        return (bool)$this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
     }
 
     /**

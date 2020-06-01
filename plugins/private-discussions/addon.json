@@ -1,7 +1,7 @@
 {
     "name": "Private Discussions",
     "key": "private-discussions",
-    "description": "{{TBD}}",
+    "description": "Display restricted discussion view for guests.",
     "version": "1.0",
     "type": "addon",
     "priority": 1100,
