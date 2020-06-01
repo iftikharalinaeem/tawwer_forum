@@ -13,6 +13,7 @@ use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
 use Vanilla\Knowledge\Models\NavigationCacheProcessor;
+use Vanilla\Theme\ThemeSectionModel;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 
 $container = \Gdn::getContainer();
@@ -49,3 +50,6 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
     ->rule(TranslationPropertyModel::class) // If the plugins not enabled it doesn't matter, since just a rule.
     ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
 ;
+
+$container->rule(ThemeSectionModel::class)
+    ->addCall('registerModernSection', [t('Knowledge Base')]);
