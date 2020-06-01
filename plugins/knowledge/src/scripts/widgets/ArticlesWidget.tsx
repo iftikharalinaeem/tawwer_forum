@@ -14,6 +14,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { loaderClasses } from "@vanilla/library/src/scripts/loaders/loaderStyles";
 import { IHomeWidgetItemProps } from "@vanilla/library/src/scripts/homeWidget/HomeWidgetItem";
+import { articleWidgetOptions } from "@knowledge/widgets/articleWidgetOptions";
 
 interface IProps {
     containerOptions?: IHomeWidgetContainerOptions;
@@ -47,5 +48,7 @@ export function ArticlesWidget(props: IProps) {
         return null;
     }
 
-    return <HomeWidget {...props} itemData={mappedItemData} />;
+    const options = articleWidgetOptions(props);
+
+    return <HomeWidget {...props} {...options} itemData={mappedItemData} />;
 }
