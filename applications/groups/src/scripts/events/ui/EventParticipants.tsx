@@ -13,6 +13,8 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 
 interface IProps {
     participants: IEventParticipant[];
+    loadMore: () => void;
+    showLoadMore: number | undefined;
 }
 
 function Participant({ user }) {
@@ -35,7 +37,10 @@ function Participants({ participants }) {
     );
 }
 
-export default function EventParticipants({ participants }: IProps) {
+export default function EventParticipants(props: IProps) {
+    const { participants, loadMore, showLoadMore } = props;
+    const classes = eventsClasses();
+
     if (participants.length === 0) {
         return (
             <FrameBody>
@@ -47,17 +52,13 @@ export default function EventParticipants({ participants }: IProps) {
     return (
         <>
             <Participants participants={participants} />
-            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 35 }}>
-                <Button style={{ width: 208 }}>Load more</Button>
-            </div>
-
-            {/* {participants.data.pagination.next && (
+            {showLoadMore && (
                 <div className={classes.participantsTabsBottomButtonWrapper}>
                     <Button onClick={loadMore} style={{ width: 208 }}>
                         Load more
                     </Button>
                 </div>
-            )} */}
+            )}
         </>
     );
 }

@@ -51,14 +51,11 @@ export function EventParticipantsModule(props: IProps) {
     const classes = eventsClasses();
     return (
         <>
-            <EventParticipants participants={participants.data.participants} />
-            {/* {participants.data.pagination.next && (
-                <div className={classes.participantsTabsBottomButtonWrapper}>
-                    <Button onClick={loadMore} style={{ width: 208 }}>
-                        Load more
-                    </Button>
-                </div>
-            )} */}
+            <EventParticipants
+                showLoadMore={participants.data.pagination.next}
+                loadMore={loadMore}
+                participants={participants.data.participants}
+            />
         </>
     );
 }

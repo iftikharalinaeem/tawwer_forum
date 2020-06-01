@@ -219,15 +219,17 @@ export const ParticipantsTabs = () => {
             tabs={[
                 {
                     title: t("Going"),
-                    body: <EventParticipants participants={yes} />,
+                    body: <EventParticipants showLoadMore={undefined} loadMore={() => undefined} participants={yes} />,
                 },
                 {
                     title: t("Maybe"),
-                    body: <EventParticipants participants={maybe} />,
+                    body: (
+                        <EventParticipants showLoadMore={undefined} loadMore={() => undefined} participants={maybe} />
+                    ),
                 },
                 {
                     title: t("Not Going"),
-                    body: <EventParticipants participants={no} />,
+                    body: <EventParticipants showLoadMore={undefined} loadMore={() => undefined} participants={no} />,
                 },
             ]}
         />
