@@ -33,6 +33,10 @@ x-aliases:
             type: object
             properties:
               <<: *StringAssetInProperties
+              content-type:
+                description: The content-type of the asset.
+                type: string
+                example: text/html
               url:
                 type: string
                 description: Absolute URL of the resource.
@@ -61,6 +65,10 @@ x-aliases:
             type: object
             properties:
               <<: *JsonAssetInProperties
+              content-type:
+                description: The content-type of the asset.
+                type: string
+                example: application/json
               url:
                 type: string
                 description: Absolute URL of the resource.
