@@ -490,7 +490,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         alignItems: "center",
         flexDirection: "column",
         marginLeft: 20,
-        marginBottom: 8,
     });
 
     const attendeePlus = style("attendeePlus", {
