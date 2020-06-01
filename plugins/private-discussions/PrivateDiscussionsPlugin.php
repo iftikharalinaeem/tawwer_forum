@@ -11,7 +11,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Class PrivateDiscussionsPlugin
  *
- * {{TBD}}
+ * Display restricted discussion for guests.
  */
 class PrivateDiscussionsPlugin extends \Gdn_Plugin {
 

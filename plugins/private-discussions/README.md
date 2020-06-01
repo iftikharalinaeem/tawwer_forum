@@ -1,4 +1,4 @@
 # Private Discussions
 
-{{TBD}}
+Display restricted discussion for guests.
 
