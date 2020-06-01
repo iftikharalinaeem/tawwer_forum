@@ -113,9 +113,6 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
             ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
         ;
-
-        $container->rule(ThemeSectionModel::class)
-            ->addCall('registerModernSection', [t('Knowledge Base')]);
     }
 
     /**
