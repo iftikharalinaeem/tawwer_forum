@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { IOutlineItem } from "@knowledge/@types/api/article";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { articleTOCClasses } from "@knowledge/modules/article/components/articleTOCStyles";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 
 interface IProps {
     items: IOutlineItem[];
@@ -46,15 +47,20 @@ export default class ArticleTOC extends React.Component<IProps> {
                     </li>
                 );
             });
+        const titleID = uniqueIDFromPrefix("articleTOC");
 
         return (
-            <div className={classNames("panelList", "tableOfContents", classesPanelList.root)}>
+            <nav
+                aria-labelledby={titleID}
+                className={classNames("panelList", "tableOfContents", classesPanelList.root)}
+            >
                 <Heading
+                    id={titleID}
                     title={t("On This Page")}
                     className={classNames(classesPanelList.title, "panelList-title", "tableOfContents-title")}
                 />
                 <ul className={classNames("panelList-items", classesPanelList.items)}>{contents}</ul>
-            </div>
+            </nav>
         );
     }
 

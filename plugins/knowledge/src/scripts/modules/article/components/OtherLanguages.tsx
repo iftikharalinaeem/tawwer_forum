@@ -10,7 +10,7 @@ import Heading from "@library/layout/Heading";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
-import { useUniqueID } from "@library/utility/idUtils";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 import { LocaleDisplayer, useLocaleInfo } from "@vanilla/i18n";
 import classNames from "classnames";
 import * as React from "react";
@@ -19,7 +19,7 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 
-export interface IOtherLangaugesProps {
+export interface IOtherLanguagesProps {
     articleLocaleData: IArticleLocale[];
     dateUpdated?: string;
     knowledgeBaseID: number;
@@ -28,7 +28,7 @@ export interface IOtherLangaugesProps {
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default function OtherLangauges(props: IOtherLangaugesProps) {
+export default function OtherLanguages(props: IOtherLanguagesProps) {
     const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
     const kb = useKnowledgeBase(props.knowledgeBaseID);
@@ -71,7 +71,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
     const activeOption = options.find(option => option.value === currentLocale);
 
     return showOtherLanguages ? (
-        <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
+        <nav aria-labelledby={titleID} className={classNames("otherLanguages", "panelList", classesPanelList.root)}>
             <Heading
                 title={t("Other Languages")}
                 className={classNames("panelList-title", classesPanelList.title)}
@@ -87,7 +87,7 @@ export default function OtherLangauges(props: IOtherLangaugesProps) {
                 renderLeft={false}
                 offsetPadding={true}
             />
-        </div>
+        </nav>
     ) : (
         <></>
     );
