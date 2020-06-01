@@ -31,6 +31,10 @@ import SearchContext from "@vanilla/library/src/scripts/contexts/SearchContext";
 import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchProvider";
 import { UniversalKnowledgeWidget } from "@knowledge/knowledge-bases/UniversalKnowledgeWidget";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
+import { articleWidgetOptions, ArticleWidgetPlacement } from "@knowledge/widgets/articleWidgetOptions";
+import Container from "@vanilla/library/src/scripts/layout/components/Container";
+import { layoutVariables } from "@vanilla/library/src/scripts/layout/panelLayoutStyles";
+import { navLinksClasses } from "@vanilla/library/src/scripts/navigation/navLinksStyles";
 
 interface IProps {
     knowledgeBase: IKnowledgeBase;
@@ -126,28 +130,44 @@ export default function HelpCenterHome(props: IProps) {
     const hasNavigation =
         navData.data.navigation.groups.length > 0 || navData.data.navigation.ungroupedItems.length > 0;
 
+    const articleWidgetPlacement = articleWidgetOptions().helpCenterPlacement;
+    const articleWidget = (
+        <Container fullGutter>
+            <ArticlesWidget
+                title={t("Featured Articles", "Recommended Articles")}
+                containerOptions={{
+                    maxWidth: layoutVariables().contentSizes.narrow,
+                    borderType: "navLinks",
+                    viewAll: {
+                        to: `/kb/articles?recommended=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`,
+                    },
+                }}
+                params={widgetParams}
+            />
+        </Container>
+    );
+
     return (
         <>
+            {titleBarAndBanner}
+            <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
             <main>
-                {titleBarAndBanner}
-                <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
+                {articleWidgetPlacement === ArticleWidgetPlacement.ABOVE && (
+                    <>
+                        {articleWidget}
+                        {hasRecommended && (
+                            <Container fullGutter narrow>
+                                <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
+                            </Container>
+                        )}
+                    </>
+                )}
                 <HelpCenterNavigation
                     data={navData.data.navigation}
                     rootCategory={navData.data.rootCategory}
                     kbID={knowledgeBaseID}
                 />
-                <ArticlesWidget
-                    title={t("Featured Articles", "Recommended Articles")}
-                    maxItemCount={4}
-                    containerOptions={{
-                        maxColumnCount: 1,
-                        borderType: "navLinks",
-                        viewAll: {
-                            to: `/kb/articles?recommended=true&knowledgeBaseID=${knowledgeBase.knowledgeBaseID}`,
-                        },
-                    }}
-                    params={widgetParams}
-                />
+                {articleWidgetPlacement === ArticleWidgetPlacement.BELOW && articleWidget}
                 <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
             </main>
         </>
