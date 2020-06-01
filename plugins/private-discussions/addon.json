@@ -4,7 +4,6 @@
     "description": "{{TBD}}",
     "version": "1.0",
     "type": "addon",
-    "hidden": true,
     "priority": 1100,
     "authors": [
         {
