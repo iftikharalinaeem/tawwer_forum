@@ -62,7 +62,11 @@ export function EventAttendees(props: IProps) {
                 close={() => setVisibleModal(false)}
             />
             {separator && <hr className={classes.separator} />}
-            <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
+            <HeadingTag className={classes.sectionTitle}>
+                <Button baseClass={ButtonTypes.TEXT} onClick={openModal}>
+                    {title}
+                </Button>
+            </HeadingTag>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}
             {!empty && (
                 <ul className={classes.attendeeList}>
@@ -94,7 +98,9 @@ export function EventAttendees(props: IProps) {
                                 onClick={openModal}
                                 baseClass={ButtonTypes.TEXT}
                             >
-                                <span style={{ display: "inline-block" }}>... all attendees</span>
+                                <span style={{ display: "inline-block" }}>
+                                    +<NumberFormatted value={extraCount} />
+                                </span>
                             </Button>
                         </li>
                     )}
