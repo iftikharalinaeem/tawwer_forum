@@ -129,6 +129,10 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    const participantsTabsPanels = makeVars("participantsTabsPanels", {
+        marginTop: 50,
+    });
+
     const participantsTabsList = makeVars("participantsTabsList", {
         height: 45,
         fontWeight: globalVars.fonts.weights.semiBold,
@@ -163,7 +167,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const participantsTabsBottomButton = makeVars("participantsTabsBottomButton", {
         wrapper: {
-            bottom: 32,
+            bottom: 35,
         },
     });
 
@@ -178,6 +182,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         description,
         attendees,
         participantsTabsRoot,
+        participantsTabsPanels,
         participantsTabsList,
         participantsTabsTab,
         participantItem,
@@ -577,7 +582,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsPanels = style("participantsTabsPanels", {
-        marginTop: 50,
+        marginTop: vars.participantsTabsPanels.marginTop,
     });
 
     const participantList = style("participantsList", {
@@ -600,7 +605,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         position: "fixed",
         zIndex: 1001,
         right: vars.participantsTabsTopButton.wrapper.right,
-        top: 10,
+        top: vars.participantsTabsTopButton.wrapper.top,
     });
 
     const participantsTabsTopButton = style("participantsTabsTopButton", {
@@ -615,7 +620,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
-        marginBottom: 35,
+        marginBottom: vars.participantsTabsBottomButton.wrapper.bottom,
     });
 
     return {
