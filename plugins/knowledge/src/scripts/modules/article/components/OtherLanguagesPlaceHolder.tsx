@@ -14,7 +14,7 @@ import { PanelWidget } from "@library/layout/PanelLayout";
 /**
  * Implements "other languages" DropDown for articles.
  */
-export default function OtherLangaugesPlaceHolder() {
+export default function OtherLanguagesPlaceHolder() {
     const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
     const classesPanelList = panelListClasses();

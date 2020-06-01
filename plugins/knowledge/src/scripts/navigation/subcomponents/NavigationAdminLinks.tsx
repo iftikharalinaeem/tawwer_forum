@@ -25,6 +25,7 @@ import DropDownItemLink from "@vanilla/library/src/scripts/flyouts/items/DropDow
 import DropDownItemButton from "@vanilla/library/src/scripts/flyouts/items/DropDownItemButton";
 import { dropDownClasses } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
+import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
     className?: string;
@@ -46,6 +47,8 @@ export default function NavigationAdminLinks(props: IProps) {
     const currentLocale = getCurrentLocale();
     const sourceLocale = knowledgeBase.sourceLocale;
     const isDisabled = sourceLocale !== currentLocale;
+    const adminLinksTitle = useUniqueID("adminLinksTitle");
+    const classesDropdown = dropDownClasses();
 
     let newCategoryButton = (
         <Button
@@ -90,53 +93,59 @@ export default function NavigationAdminLinks(props: IProps) {
     if (props.inHamburger) {
         content = (
             <>
-                <DropDownItemSeparator />
-                <DropDownItemLink to={OrganizeCategoriesRoute.url({ kbID: knowledgeBase.knowledgeBaseID })}>
-                    {organize(dropDownClasses().actionIcon)}
-                    {t("Organize Categories")}
-                </DropDownItemLink>
-                {newCategoryButton}
+                <hr className={classesDropdown.separator} />
+                <ul>
+                    <DropDownItemLink to={OrganizeCategoriesRoute.url({ kbID: knowledgeBase.knowledgeBaseID })}>
+                        {organize(classesDropdown.actionIcon)}
+                        {t("Organize Categories")}
+                    </DropDownItemLink>
+                    {newCategoryButton}
+                </ul>
             </>
         );
     } else {
         content = (
-            <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
-                {props.showDivider && (
-                    <hr role="separator" className={classNames("siteNavAdminLinks-divider", classes.divider)} />
-                )}
-                <h3 className="sr-only">{t("Admin Links")}</h3>
-                <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    <OrganizeCategoriesRoute.Link
-                        className={classNames(classes.link)}
-                        data={{ kbID: knowledgeBase.knowledgeBaseID }}
-                    >
-                        {organize(classes.linkIcon)}
-                        {t("Organize Categories")}
-                    </OrganizeCategoriesRoute.Link>
-                </li>
-                <li className={classNames("siteNavAdminLinks-item", classes.item)}>
-                    {isDisabled ? (
-                        <ToolTip
-                            label={
-                                <Translate
-                                    source="You can only add categories in the source locale: <0/>."
-                                    c0={
-                                        <LocaleDisplayer
-                                            localeContent={sourceLocale || " "}
-                                            displayLocale={sourceLocale || " "}
+            <>
+                {props.showDivider && <hr className={classNames("siteNavAdminLinks-divider", classes.divider)} />}
+                <nav aria-describedby={adminLinksTitle}>
+                    <h3 id={adminLinksTitle} className="sr-only">
+                        {t("Admin Links")}
+                    </h3>
+                    <ul className={classNames("siteNavAdminLinks", props.className, classes.root)}>
+                        <li className={classNames("siteNavAdminLinks-item", classes.item)}>
+                            <OrganizeCategoriesRoute.Link
+                                className={classNames(classes.link)}
+                                data={{ kbID: knowledgeBase.knowledgeBaseID }}
+                            >
+                                {organize(classes.linkIcon)}
+                                {t("Organize Categories")}
+                            </OrganizeCategoriesRoute.Link>
+                        </li>
+                        <li className={classNames("siteNavAdminLinks-item", classes.item)}>
+                            {isDisabled ? (
+                                <ToolTip
+                                    label={
+                                        <Translate
+                                            source="You can only add categories in the source locale: <0/>."
+                                            c0={
+                                                <LocaleDisplayer
+                                                    localeContent={sourceLocale || " "}
+                                                    displayLocale={sourceLocale || " "}
+                                                />
+                                            }
                                         />
                                     }
-                                />
-                            }
-                            ariaLabel={"You can only add categories in the source locale."}
-                        >
-                            <span>{newCategoryButton}</span>
-                        </ToolTip>
-                    ) : (
-                        newCategoryButton
-                    )}
-                </li>
-            </ul>
+                                    ariaLabel={"You can only add categories in the source locale."}
+                                >
+                                    <span>{newCategoryButton}</span>
+                                </ToolTip>
+                            ) : (
+                                newCategoryButton
+                            )}
+                        </li>
+                    </ul>
+                </nav>
+            </>
         );
     }
 

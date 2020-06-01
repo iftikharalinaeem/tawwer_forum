@@ -11,10 +11,9 @@ import KnowledgeBasePage from "@knowledge/pages/KnowledgeBasePage";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
-import Container from "@library/layout/components/Container";
 import Loader from "@library/loaders/Loader";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { t, getSiteSection, formatUrl } from "@library/utility/appUtils";
+import { t, getSiteSection } from "@library/utility/appUtils";
 import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
@@ -75,18 +74,20 @@ const HomePage = (props: IProps) => {
                 <></>
             </DocumentTitle>
             <TitleBar useMobileBackButton={false} />
-            <Banner title={title} />
-            <KnowledgeBaseList />
-            <ArticlesWidget
-                title={t("Recommended Articles")}
-                maxItemCount={maxItems}
-                containerOptions={{
-                    maxWidth: tilesVariables().calculatedMaxWidth,
-                    maxColumnCount: recommendedColumnCount,
-                    viewAll: { to: "/kb/articles?recommended=true" },
-                }}
-                params={widgetParams}
-            />
+            <main className="page-minHeight">
+                <Banner title={title} />
+                <KnowledgeBaseList />
+                <ArticlesWidget
+                    title={t("Recommended Articles")}
+                    maxItemCount={maxItems}
+                    containerOptions={{
+                        maxWidth: tilesVariables().calculatedMaxWidth,
+                        maxColumnCount: recommendedColumnCount,
+                        viewAll: { to: "/kb/articles?recommended=true" },
+                    }}
+                    params={widgetParams}
+                />
+            </main>
         </>
     );
 };
