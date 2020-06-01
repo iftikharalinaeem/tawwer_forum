@@ -1,0 +1,24 @@
+{
+    "name": "Private Discussions",
+    "key": "private-discussions",
+    "description": "{{TBD}}",
+    "version": "1.0",
+    "type": "addon",
+    "hidden": true,
+    "priority": 1100,
+    "authors": [
+        {
+            "name": "Isis Graziatto",
+            "email": "isis.g@vanillaforums.com"
+        },
+        {
+          "name": "Dani M",
+          "email": "dani.m@vanillaforums.com"
+        }
+    ],
+  "settingsUrl": "/settings/privatediscussions",
+  "settingsPermission": "Garden.Settings.Manage",
+    "require": {
+        "vanilla": ">=3.0"
+    }
+}
