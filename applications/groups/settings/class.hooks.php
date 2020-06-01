@@ -1175,7 +1175,11 @@ class GroupsHooks extends Gdn_Plugin {
         if (!empty($sender->data('Group.GroupID'))) {
             $groupID = isset($sender->Data['Group']['GroupID']) ? $sender->Data['Group']['GroupID'] : null;
         } elseif (!empty($sender->data('Discussion.GroupID'))) {
-            $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : null;
+            if (is_array($sender->Data['Discussion'])) {
+                $groupID = isset($sender->Data['Discussion']['GroupID']) ? $sender->Data['Discussion']['GroupID'] : null;
+            } else {
+                $groupID = $sender->Data['Discussion']->GroupID ?? null;
+            }
         }
 
         if (!$groupID) {

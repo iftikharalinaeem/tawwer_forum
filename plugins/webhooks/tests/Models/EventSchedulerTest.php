@@ -59,7 +59,7 @@ class EventSchedulerTest extends TestCase {
             ["foo" => "bar"]
         );
         $body = [
-            "action" => "mockdiscussion_add",
+            "action" => "mockdiscussion_" . MockDiscussionEvent::ACTION_INSERT,
             "payload" => $event->getPayload(),
             "sender" => $this->userProvider->getGeneratedFragment(\UserModel::GENERATED_FRAGMENT_KEY_GUEST),
             "site" => [
