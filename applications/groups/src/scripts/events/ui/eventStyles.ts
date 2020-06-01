@@ -142,11 +142,6 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         height: 43,
     });
 
-    // const participantsTabsPanels = makeVars("participantsTabsPanels", {
-    //     height: "90%",
-    //     backgroundColor: "red",
-    // });
-
     const participantItem = makeVars("participantItem", {
         marginBottom: 19,
     });
@@ -185,7 +180,6 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         participantsTabsRoot,
         participantsTabsList,
         participantsTabsTab,
-        // participantsTabsPanels,
         participantItem,
         participantName,
         participantsTabsTopButton,
@@ -618,11 +612,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsBottomButtonWrapper = style("participantsTabsBottomButton", {
-        // position: "absolute",
-        // textAlign: "center",
-        // left: 0,
-        // right: 0,
-        // bottom: vars.participantsTabsBottomButton.wrapper.bottom,
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
