@@ -31,6 +31,6 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      */
     public function settingsController_privatediscussions_create(\Gdn_Controller $sender) {
         $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Title', t('Category Consent Settings'));
+        $sender->setData('Title', t('Private Discussions Settings'));
     }
 }
