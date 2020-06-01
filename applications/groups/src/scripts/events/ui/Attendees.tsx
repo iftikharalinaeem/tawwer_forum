@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import { EventParticipantsTabModule } from "../modules/EventParticipantsTabModule";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 import Button from "@vanilla/library/src/scripts/forms/Button";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
@@ -95,7 +96,7 @@ export function EventAttendees(props: IProps) {
                                 baseClass={ButtonTypes.TEXT}
                             >
                                 <span style={{ display: "inline-block" }}>
-                                    +<NumberFormatted value={extraCount} title={"View all attendees"} />
+                                    +<NumberFormatted value={extraCount} title={t("View all attendees")} />
                                 </span>
                             </Button>
                         </li>
