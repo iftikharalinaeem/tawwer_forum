@@ -184,16 +184,13 @@ class EventsApiController extends AbstractApiController {
                 'updateUser?' => $this->getUserFragmentSchema(),
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "permissions?" => new InstanceValidatorSchema(EventPermissions::class),
-                'category?' => $this->getCategoryFragmentSchema(),
-                'group?' => SchemaFactory::get(GroupFragmentSchema::class, "GroupFragmentSchema"),
+                "parentRecord?" => $this->parentRecordSchema(),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
 
         return $schema;
     }
-
-
 
     /**
      * Get an event.
@@ -490,7 +487,9 @@ class EventsApiController extends AbstractApiController {
 
                 if (isset($query['requireDescendants'])) {
                     $descendantIDs = $this->categoryModel->getCategoryDescendantIDs($parentRecordID);
-                    $where['e.ParentRecordID'] = array_unique(array_merge($where['e.ParentRecordID'], $descendantIDs));
+                    if ($descendantIDs) {
+                        $where['e.ParentRecordID'] = array_unique(array_merge($where['e.ParentRecordID'], $descendantIDs));
+                    }
                 }
             }
             $where['e.ParentRecordType'] = $query['parentRecordType'];
@@ -521,10 +520,10 @@ class EventsApiController extends AbstractApiController {
 
         if ($this->isExpandField('parentRecord', $query['expand'])) {
             if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
-                $this->categoryModel->expandCategories($rows);
+                $this->categoryModel->expandCategories($rows, 'parentRecord');
             }
             if ($parentRecordType === EventModel::PARENT_TYPE_GROUP) {
-                $this->groupModel->expandGroup($rows);
+                $this->groupModel->expandGroup($rows, 'parentRecord');
             }
         }
         foreach ($rows as &$row) {
@@ -611,12 +610,20 @@ class EventsApiController extends AbstractApiController {
             $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
         }
 
-        if ($dbRecord['Category'] ?? false) {
-            $dbRecord['Category']['url'] = categoryUrl($dbRecord['Category']);
-        }
+        // If we have a parentRecord to expand.
+        if ($dbRecord['parentRecord'] ?? false) {
+            if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_CATEGORY) {
+                $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['CategoryID'] ?? null;
+                $dbRecord['parentRecord']['recordType'] = 'category';
+                $dbRecord['parentRecord']['url'] = categoryUrl($dbRecord['parentRecord']);
 
-        if ($dbRecord['group'] ?? false) {
-            $dbRecord['group']['url'] = groupUrl($dbRecord['group']);
+            }
+
+            if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
+                $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['GroupID'] ?? null;
+                $dbRecord['parentRecord']['recordType'] = 'group';
+                $dbRecord['parentRecord']['url'] = groupUrl($dbRecord['parentRecord']);
+            }
         }
 
         $dbRecord['url'] = $this->eventModel->eventUrl($dbRecord);
@@ -872,6 +879,28 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $this->schema($postEventSchema, 'in');
+    }
+
+    /**
+     * Get an event schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function parentRecordSchema() {
+        static $parentRecordSchema;
+
+        if ($parentRecordSchema === null) {
+            $parentRecordSchema = $this->schema(
+                Schema::parse([
+                    'recordType:s',
+                    'recordID:i',
+                    'name:s',
+                    'url:s'
+                ])
+            );
+        }
+
+        return $this->schema($parentRecordSchema, 'in');
     }
 
     /**

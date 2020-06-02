@@ -1719,8 +1719,9 @@ class GroupModel extends Gdn_Model {
      * Expand Groups.
      *
      * @param array $rows
+     * @param string $field
      */
-    public function expandGroup(array &$rows) {
+    public function expandGroup(array &$rows, string $field ='group') {
         if (count($rows) === 0) {
             // Nothing to do here.
             return;
@@ -1728,7 +1729,7 @@ class GroupModel extends Gdn_Model {
         reset($rows);
         $single = is_string(key($rows));
 
-        $populate = function (array &$row) {
+        $populate = function (array &$row, string $field) {
             $groupID = $row['GroupID'] ?? $row['ParentRecordID'] ?? false;
             if ($groupID) {
                 try {
@@ -1739,7 +1740,8 @@ class GroupModel extends Gdn_Model {
                     }
 
                     if ($group) {
-                        $row['group'] = $group;
+
+                        $row[$field] = $group;
                     }
                 } catch (NoResultsException $e) {
                     logException($e);
@@ -1749,10 +1751,10 @@ class GroupModel extends Gdn_Model {
         };
 
         if ($single) {
-            $populate($rows);
+            $populate($rows, $field);
         } else {
             foreach ($rows as &$row) {
-                $populate($row);
+                $populate($row, $field);
             }
         }
     }
