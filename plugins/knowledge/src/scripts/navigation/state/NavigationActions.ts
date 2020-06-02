@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 const createAction = actionCreatorFactory("@@navigation");
 import { useMemo, useCallback } from "react";
 import apiv2 from "@library/apiv2";
+import { getOnlyTranslated } from "@knowledge/state/getOnlyTranslated";
 
 /**
  * Redux actions for knowledge base navigation data.
@@ -64,7 +65,9 @@ export default class NavigationActions extends ReduxActions<IKnowledgeAppStoreSt
 
         const apiThunk = bindThunkAction(NavigationActions.getNavigationFlatACs, async () => {
             const locale = getCurrentLocale();
-            const response = await this.api.get(`/knowledge-bases/${knowledgeBaseID}/navigation-flat?locale=${locale}`);
+            const response = await this.api.get(`/knowledge-bases/${knowledgeBaseID}/navigation-flat`, {
+                params: { locale, "only-translated": getOnlyTranslated() },
+            });
             return response.data;
         })({ knowledgeBaseID });
 

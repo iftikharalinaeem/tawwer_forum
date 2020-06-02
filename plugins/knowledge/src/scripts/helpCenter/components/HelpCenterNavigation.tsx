@@ -39,7 +39,7 @@ export default function HelpCenterNavigation(props: IProps) {
                         className={classNames(innerProps.className, navLinksClasses().noItemLink)}
                         data={{ knowledgeBaseID: props.kbID, knowledgeCategoryID: innerProps.recordID }}
                     >
-                        {t("Create an Article.")}
+                        {t("Create Article", "Create an Article")}.
                     </EditorRoute.Link>
                 </KbPermission>
             </span>

@@ -196,6 +196,12 @@ export default class ArticleModel implements ReduxReducer<IArticleState> {
                     // Their active state is now undefined.
                     nextState.revisionFragmentsByID = {};
                     nextState.revisionsByID = {};
+                    // Clear out the article list cache. We don't know where it went.
+                    nextState.articleListsByParamHash = {};
+                    break;
+                case ArticleActions.POST_ARTICLE_RESPONSE:
+                    // Clear out the article list cache. We don't know where it went.
+                    nextState.articleListsByParamHash = {};
                     break;
                 case ArticleActions.GET_ARTICLE_REVISIONS_RESPONSE:
                     const revisions = action.payload.data;
@@ -368,6 +374,10 @@ export function hashArticleListParams(params: ISearchRequestBody): number {
 }
 
 export function useArticleList(params: ISearchRequestBody, skip?: boolean) {
+    if (params.knowledgeCategoryID) {
+        params.knowledgeCategoryIDs = [params.knowledgeCategoryID];
+    }
+
     const hash = hashArticleListParams(params);
     const actions = useArticleActions();
 

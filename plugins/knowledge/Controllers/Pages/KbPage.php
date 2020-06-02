@@ -154,6 +154,16 @@ abstract class KbPage extends ThemedPage {
     }
 
     /**
+     * Get for the current user whether not we want to display only-translated content.
+     *
+     * @return bool
+     */
+    protected function getOnlyTranslated(): bool {
+        // Currently defaults to true. This may be dynamically determined in the future.
+        return true;
+    }
+
+    /**
      * Disable site section validation for the page.
      *
      * @return $this
@@ -254,12 +264,15 @@ abstract class KbPage extends ThemedPage {
      * @param array $params Parameters to pass to the search endpoint.
      */
     protected function preloadArticleList(array $params) {
+        if (!isset($params['only-translated'])) {
+            $params['only-translated'] = $this->getOnlyTranslated();
+        }
         try {
             $result = $this->rootApi->get_search($params);
 
             $this->addReduxAction(new ReduxAction(ActionConstants::GET_ARTICLE_LIST, Data::box([
                 'body' => $result,
-                'pagination' => $result->getMeta('paging')
+                'pagination' => $result->getMeta('paging'),
             ]), $params));
         } catch (Exception $e) {
             $this->addReduxAction(new ReduxAction(
@@ -283,8 +296,8 @@ abstract class KbPage extends ThemedPage {
         $options = [
             "knowledgeBaseID" => $knowledgeBaseID,
             "locale" => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
+            "only-translated" => $this->getOnlyTranslated(),
         ];
-
 
         $navigation = $this->kbApi->get_navigationFlat($knowledgeBaseID, $options);
         $this->addReduxAction(new ReduxAction(
