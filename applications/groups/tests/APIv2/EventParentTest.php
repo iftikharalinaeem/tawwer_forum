@@ -235,9 +235,10 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test GET /events with parentRecordType of Category.
+     * Test GET /events with parentRecordType of Category  null parentRecordID.
      */
     public function testGetEventCategoryRecordTypeAll() {
+        $this->clearEvents(\EventModel::PARENT_TYPE_CATEGORY);
         $category1 = $this->createCategory();
         $this->createEvent();
 
@@ -265,9 +266,10 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test GET /events with parentRecordType of Category.
+     * Test GET /events with parentRecordType of Group  and null parentRecordID.
      */
     public function testGetEventGroupRecordTypeAll() {
+        $this->clearEvents(\EventModel::PARENT_TYPE_GROUP);
         $group1 = $this->createGroup();
         $this->createEvent();
 
@@ -295,7 +297,7 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test GET /events with parentRecordType of Category.
+     * Test GET /events with parentRecordType of Category with it's descendants.
      */
     public function testGetEventCategoryRecordTypeRequireDescendants() {
         $category1 = $this->createCategory();
@@ -305,7 +307,7 @@ class EventParentTest extends AbstractAPIv2Test {
 
         $category3 = $this->createCategory(['parentCategoryID' => $category2['categoryID']]);
         $this->createEvent();
-        
+
         $events = $this->api()->get(
             "/events",
             [

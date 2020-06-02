@@ -139,6 +139,24 @@ trait GroupsAndEventsApiTestTrait {
     }
 
     /**
+     * Clear out existing events.
+     *
+     * @param string $parentRecordType
+     * @param array $options
+     */
+    public function clearEvents($parentRecordType = '', $options = []) {
+        /** @var \EventModel $model */
+        $model = \Gdn::getContainer()->get(\EventModel::class);
+        $where = [
+            "parentRecordType" =>  $parentRecordType
+        ];
+
+        $where = array_merge($where, $options);
+
+        $model->delete($where);
+    }
+
+    /**
      * Clear the in memory cache of group permissions.
      */
     protected function clearGroupMemoryCache() {
