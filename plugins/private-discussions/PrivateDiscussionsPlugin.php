@@ -9,6 +9,7 @@ namespace Vanilla\Plugins\PrivateDiscussions;
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
 use \DOMXPath;
+
 /**
  * Class PrivateDiscussionsPlugin
  *
@@ -27,6 +28,8 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
 
     /**
      * PrivateDiscussionsPlugin constructor.
+     *
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(ConfigurationInterface $configuration) {
         parent::__construct();
@@ -94,16 +97,16 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Massage the data and switch the view.
      *
-     * @param $sender
+     * @param \DiscussionController $sender
      */
-    public function discussionController_render_before($sender) {
-        if (!$sender->CategoryID) {
-            redirectTo('/entry/signin');
-        }
+    public function discussionController_render_before( $sender) {
         $canViewCategory = \Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
         // return if the user is signed in or cannot view the category.
         if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
             return;
+        }
+        if (!$sender->CategoryID) {
+            redirectTo('/entry/signin');
         }
         $discussionBody = $sender->Data['Discussion']->Body;
         $discussionFormat = $sender->Data['Discussion']->Format;
@@ -115,6 +118,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             $data = $this->stripEmbeds($data);
             //send to the view.
         }
+
     }
 
     /**
