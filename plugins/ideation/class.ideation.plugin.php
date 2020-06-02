@@ -2228,7 +2228,7 @@ if (!function_exists('getReactionButtonHtml')) {
      * @return string HTML representation of the ideation reactions (up and down votes).
      */
     function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '', $discussionName, $voteUp) {
-        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', t($voteUp ? "Vote Up" : "Vote Down"), $discussionName);
+        $accessibleLabel = accessibleLabel('%s for discussion: "%s"', [t($voteUp ? "Vote Up" : "Vote Down"), $discussionName]);
         return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow" aria-label="'.$accessibleLabel.'"><span class="arrow arrow-'.$urlCode.'"></span> <span class="idea-label">'.$label.'</span></a>';
     }
 }
