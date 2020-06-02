@@ -338,7 +338,7 @@ describe("EditorPageActions", () => {
             mockApi
                 .onPost(`/articles`)
                 .replyOnce(201, article)
-                .onGet("/knowledge-bases/1/navigation-flat?locale=en")
+                .onGet("/knowledge-bases/1/navigation-flat?locale=en&only-translated=true")
                 .replyOnce(200, []);
             applyAnyFallbackError(mockApi);
             const pushLocationSpy = jest.fn();
@@ -389,7 +389,7 @@ describe("EditorPageActions", () => {
             mockApi
                 .onPatch(`/articles/${article.articleID}`)
                 .replyOnce(200, article)
-                .onGet("/knowledge-bases/1/navigation-flat?locale=en")
+                .onGet("/knowledge-bases/1/navigation-flat?locale=en&only-translated=true")
                 .replyOnce(200, []);
             void (await editorPageActions.publish(history, () => {}));
 
@@ -431,7 +431,7 @@ describe("EditorPageActions", () => {
             mockApi
                 .onPost(`/articles`)
                 .replyOnce(201, article)
-                .onGet("/knowledge-bases/1/navigation-flat?locale=en")
+                .onGet("/knowledge-bases/1/navigation-flat?locale=en&only-translated=true")
                 .replyOnce(200, [])
                 .onGet("/articles/1", { params: { locale: "en", expand: "all" } })
                 .replyOnce(200, article);
