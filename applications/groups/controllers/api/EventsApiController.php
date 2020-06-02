@@ -406,7 +406,7 @@ class EventsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions', 'parentRecord']),
+            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions', 'parentRecordID']),
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
@@ -518,7 +518,7 @@ class EventsApiController extends AbstractApiController {
             $this->eventModel->expandPermissions($rows);
         }
 
-        if ($this->isExpandField('parentRecord', $query['expand'])) {
+        if ($this->isExpandField('parentRecordID', $query['expand'])) {
             if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
                 $this->categoryModel->expandCategories($rows, 'parentRecord');
             }
