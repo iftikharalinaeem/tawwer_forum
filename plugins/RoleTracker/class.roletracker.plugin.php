@@ -380,7 +380,10 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             if (in_array($tagData['TagID'], $tagIDs)) {
                 $tagFullName = htmlspecialchars(t($tagData['FullName']));
                 $tagName = htmlspecialchars(strtolower(t($tagData['Name'])));
-                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow class="Tag tag-tracker tag-'.$tagName.'-tracker" title="'.$linksTitle.'">'.$tagFullName.'</a> ';
+
+                $accessibleLabel = accessibleLabel('%s for discussion: "%s"', sprintf('Tagged with "%s"', $tagName), $discussion->Name);
+
+                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow aria-label="'. $accessibleLabel . '" class="Tag tag-tracker tag-'.$tagName.'-tracker" title="'.$linksTitle.'">'.$tagFullName.'</a> ';
 
             }
         }

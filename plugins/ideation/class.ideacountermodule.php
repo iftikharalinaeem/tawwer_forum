@@ -144,7 +144,7 @@ class IdeaCounterModule extends Gdn_Module {
     public function toString() {
         if ($this->prepare()) {
             ob_start();
-            renderCounterBox($this->counter, $this->useDownVotes, $this->showVotes, $this->ideaUpReactionSlug, $this->ideaDownReactionSlug);
+            renderCounterBox($this->counter, $this->useDownVotes, $this->showVotes, $this->ideaUpReactionSlug, $this->ideaDownReactionSlug, $this->discussion->Name);
             $box = ob_get_contents();
             ob_end_clean();
             return $box;
@@ -158,7 +158,7 @@ class IdeaCounterModule extends Gdn_Module {
  * Outputs a counter that includes voting buttons.
  */
 if (!function_exists('renderCounterBox')) {
-    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
+    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug, $discussionName) { ?>
         <div class="idea-counter-module <?php echo val('state', $counter).' '.val('cssClass', $counter); ?>">
             <div class="idea-counter-box">
                 <?php echo getScoreHtml(val('score', $counter)); ?>
@@ -166,9 +166,9 @@ if (!function_exists('renderCounterBox')) {
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php
-                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug), 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
+                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug), 'data-reaction="'.strtolower($ideaUpReactionSlug).'"', $discussionName, true);
                             if ($useDownVotes) {
-                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug), 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
+                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug), 'data-reaction="'.strtolower($ideaDownReactionSlug).'"', $discussionName, true);
                             }
                             ?>
                         </span>
