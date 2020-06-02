@@ -30,10 +30,12 @@ import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { media } from "typestyle";
 import { userSelect } from "@library/styles/styleHelpers";
 import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonStyles";
+import { iconVariables } from "@vanilla/library/src/scripts/icons/iconStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("dateTime", forcedVars);
     const globalVars = globalVariables();
+    const iconVars = iconVariables();
 
     const compact = makeVars("compact", {
         gutter: globalVars.gutter.size,
@@ -143,15 +145,15 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const participantsTabsTab = makeVars("participantsTabsTab", {
-        height: 43,
+        height: participantsTabsList.height - 2, //subtract the border heights
     });
 
     const participantItem = makeVars("participantItem", {
-        marginBottom: 19,
+        marginBottom: 12,
     });
 
     const participantName = makeVars("participantName", {
-        marginLeft: 16,
+        marginLeft: globalVars.gutter.size,
     });
 
     const participantsTabsTopButton = makeVars("participantsTabsTopButton", {
@@ -160,8 +162,8 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             top: 10,
         },
         size: {
-            width: 24,
-            height: 24,
+            width: iconVars.standard.width,
+            height: iconVars.standard.height,
         },
     });
 
@@ -552,7 +554,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         top: 0,
         left: 0,
         right: 0,
-        zIndex: 999,
+        zIndex: 1,
         height: vars.participantsTabsList.height,
         backgroundColor: colorOut(globalVars.mainColors.bg),
         fontWeight: vars.participantsTabsList.fontWeight,
@@ -562,10 +564,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
             "> *": {
                 paddingLeft: 0,
                 paddingRight: 0,
-                marginRight: 50,
+                marginRight: globalVars.gutter.size * 3,
             },
             ":first-child": {
-                marginLeft: 16,
+                marginLeft: globalVars.gutter.size,
             },
         },
     });
@@ -586,7 +588,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantList = style("participantsList", {
-        marginLeft: 16,
+        marginLeft: globalVars.gutter.size,
     });
 
     const participantItem = style("participantItem", {
@@ -603,7 +605,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
         position: "fixed",
-        zIndex: 1001,
+        zIndex: 2,
         right: vars.participantsTabsTopButton.wrapper.right,
         top: vars.participantsTabsTopButton.wrapper.top,
     });
