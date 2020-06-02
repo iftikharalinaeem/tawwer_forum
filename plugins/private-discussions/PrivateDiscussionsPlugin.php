@@ -94,9 +94,9 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Massage the data and switch the view.
      *
-     * @param \DiscussionController $sender
+     * @param $sender
      */
-    public function discussionController_render_before(\DiscussionController $sender) {
+    public function discussionController_render_before($sender) {
         if (!$sender->CategoryID) {
             redirectTo('/entry/signin');
         }
