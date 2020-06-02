@@ -8,6 +8,7 @@ namespace Vanilla\Plugins\PrivateDiscussions;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
+use \DOMXPath;
 /**
  * Class PrivateDiscussionsPlugin
  *
@@ -93,9 +94,9 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Massage the data and switch the view.
      *
-     * @param $sender
+     * @param \DiscussionController $sender
      */
-    public function discussionController_render_before($sender) {
+    public function discussionController_render_before(\DiscussionController $sender) {
         if (!$sender->CategoryID) {
             redirectTo('/entry/signin');
         }
@@ -104,11 +105,34 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
             return;
         }
-
-        //$userID = \Gdn::session()->UserID;
-        $data = \Gdn::formatService()->renderHTML($sender->Data['Discussion']->Body, \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
+        $discussionBody = $sender->Data['Discussion']->Body;
+        $discussionFormat = $sender->Data['Discussion']->Format;
+        $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
         if ($this->getStripEmbeds()) {
-            $this->stripImages($data);
+            $data = $this->stripEmbeds($data);
+            //send to the view.
         }
+    }
+
+    /**
+     * Strip embeds from the data string.
+     *
+     * @param string $data
+     * @return string Massaged data
+     */
+    private function stripEmbeds(string $data) {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->loadHTML($data);
+        $xpath = new DomXPath($dom);
+        $classname='embedExternal embedImage';
+        $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
+
+        if($table = $xpath_results->item(0)){
+            $table ->parentNode->removeChild($table);
+            $str = $dom->saveHTML();
+            $data = $str;
+        }
+        return $data;
     }
 }
