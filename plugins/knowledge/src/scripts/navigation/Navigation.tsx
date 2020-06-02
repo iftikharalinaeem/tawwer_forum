@@ -24,6 +24,8 @@ import { DropDownPanelNav } from "@vanilla/library/src/scripts/flyouts/panelNav/
 import { useArticleList } from "@knowledge/modules/article/ArticleModel";
 import { DropDownNavPanelPlaceholder } from "@knowledge/navigation/DropDownNavPanelPlaceholder";
 import { t } from "@vanilla/i18n/src";
+import { ISearchRequestBody } from "@knowledge/@types/api/search";
+import { getOnlyTranslated } from "@knowledge/state/getOnlyTranslated";
 
 /**
  * Data connect navigation component for knowledge base.
@@ -195,12 +197,13 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
 }
 
 function useCurrentCategoryNav(knowledgeCategoryID?: number | null) {
-    const queryParams = {
+    const queryParams: ISearchRequestBody = {
         knowledgeCategoryID: knowledgeCategoryID ?? undefined,
         siteSectionGroup: getSiteSection().sectionGroup === "vanilla" ? undefined : getSiteSection().sectionGroup,
         locale: getSiteSection().contentLocale,
         page: 1,
         limit: 10,
+        "only-translated": getOnlyTranslated(),
     };
     const articles = useArticleList(queryParams, !knowledgeCategoryID);
     const { data, status } = articles;

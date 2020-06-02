@@ -37,6 +37,7 @@ export interface ISearchRequestBody {
     insertUserIDs?: number[];
     updateUserIDs?: number[];
     knowledgeBaseID?: number;
+    knowledgeCategoryIDs?: number[]; // should be converted to categoryID's if using /knowledge/search
     knowledgeCategoryID?: number; // should be converted to categoryID's if using /knowledge/search
     statuses?: PublishStatus[];
     expand?: string[];
@@ -46,6 +47,7 @@ export interface ISearchRequestBody {
     locale?: string;
     siteSectionGroup?: string;
     featured?: boolean;
+    "only-translated"?: boolean;
 }
 
 export type ISearchResponseBody = ISearchResult[];

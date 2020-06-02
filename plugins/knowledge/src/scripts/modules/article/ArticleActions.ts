@@ -53,6 +53,7 @@ import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerMod
 import { ensureReCaptcha, getMeta } from "@library/utility/appUtils";
 import { logError } from "@vanilla/utils";
 import { IKnowledgeBase } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
+import { getOnlyTranslated } from "@knowledge/state/getOnlyTranslated";
 
 export const HELPFUL_EVENT = "X-Vanilla-Article-Voted";
 
@@ -208,6 +209,7 @@ export default class ArticleActions extends ReduxActions<IKnowledgeAppStoreState
             includeSubcategories: true,
             limit,
             page,
+            "only-translated": getOnlyTranslated(),
         };
         return this.dispatchApi("get", `/articles`, ArticleActions.getArticlesACs, query);
     };
