@@ -107,6 +107,9 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         }
         $discussionBody = $sender->Data['Discussion']->Body;
         $discussionFormat = $sender->Data['Discussion']->Format;
+        if (!$discussionBody || !$discussionFormat) {
+            return;
+        }
         $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
         if ($this->getStripEmbeds()) {
             $data = $this->stripEmbeds($data);
