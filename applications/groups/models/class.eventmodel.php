@@ -486,9 +486,6 @@ class EventModel extends Gdn_Model {
      * @param string $permission One of EventPermissions::VIEW or EventPermissions::CREATE
      * @param string $parentRecordType
      * @param int|array $parentRecordID
-     * @throws ForbiddenException
-     * @throws NotFoundException
-     * @throws PermissionException
      */
     public function checkParentEventPermission(string $permission, string $parentRecordType, $parentRecordID) {
         $hasPermission = false;
@@ -516,7 +513,6 @@ class EventModel extends Gdn_Model {
                 throw new NotFoundException('Category');
             }
             throw new PermissionException('Vanilla.Events.Manage');
-
         } else {
             $permissions = new EventPermissions();
             throw new ForbiddenException($permissions->getDefaultReasonForPermission(EventPermissions::CREATE));

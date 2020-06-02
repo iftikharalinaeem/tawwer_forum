@@ -437,13 +437,12 @@ class EventsApiController extends AbstractApiController {
                     $recordID
                 );
             }
-        }  elseif($parentRecordID) {
+        }  elseif ($parentRecordID) {
             $this->eventModel->checkParentEventPermission(
                 EventPermissions::VIEW,
                 $parentRecordType,
                 $parentRecordID
             );
-
         }
 
         // Sorting
@@ -881,7 +880,7 @@ class EventsApiController extends AbstractApiController {
      * @param array $group
      * @return bool
      */
-    private function checkGroupAccess(array $group): bool{
+    private function checkGroupAccess(array $group): bool {
         $hasAccess = true;
         $groupPrivacy = $group['Privacy'];
         $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret') ? 'Member' : 'Access';
