@@ -6,12 +6,17 @@
 
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Groups\Models\GroupPermissions;
 
 /**
  * Class GroupModel
  */
 class GroupModel extends Gdn_Model {
+
+    const CACHE_KEY = 'Groups';
+
+    const CACHE_TTL = 600;
 
     const RECORD_TYPE = "group";
 
@@ -30,6 +35,10 @@ class GroupModel extends Gdn_Model {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var Gdn_Cache $cache */
+    private $cache;
+
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -38,6 +47,7 @@ class GroupModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('Group');
         $this->session = \Gdn::getContainer()->get(\Gdn_Session::class);
+        $this->cache = \Gdn::getContainer()->get(Gdn_Cache::class);
         $this->fireEvent('Init');
     }
 
@@ -286,7 +296,7 @@ class GroupModel extends Gdn_Model {
      *
      * @return bool Whether or not the user has the permission.
      */
-    public function hasGroupPermission(string $permission, int $groupID, int $userID = null): bool {
+    public function hasGroupPermission(string $permission, $groupID, int $userID = null): bool {
         $permissions = $this->calculatePermissionsForGroup($groupID, $userID);
         return $permissions->hasPermission($permission);
     }
@@ -298,7 +308,7 @@ class GroupModel extends Gdn_Model {
      * @param int $groupID The ID of the group to check.
      * @param int|null $userID
      */
-    public function checkGroupPermission(string $permission, int $groupID, int $userID = null) {
+    public function checkGroupPermission(string $permission, $groupID, int $userID = null) {
         $permissions = $this->calculatePermissionsForGroup($groupID, $userID);
         $permissions->checkPermission($permission);
     }
@@ -1703,6 +1713,48 @@ class GroupModel extends Gdn_Model {
         }
 
         return $total;
+    }
+
+    /**
+     * Expand Groups.
+     *
+     * @param array $rows
+     */
+    public function expandGroup(array &$rows) {
+        if (count($rows) === 0) {
+            // Nothing to do here.
+            return;
+        }
+        reset($rows);
+        $single = is_string(key($rows));
+
+        $populate = function (array &$row) {
+            $groupID = $row['GroupID'] ?? $row['ParentRecordID'] ?? false;
+            if ($groupID) {
+                try {
+                    $cacheKey = self::CACHE_KEY.'-'.$groupID;
+                    if (!($group = $this->cache->get($cacheKey))) {
+                        $group = $this->getID($groupID);
+                        $this->cache->store($cacheKey, $group, self::CACHE_TTL);
+                    }
+
+                    if ($group) {
+                        $row['group'] = $group;
+                    }
+                } catch (NoResultsException $e) {
+                    logException($e);
+                }
+            }
+
+        };
+
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
+            }
+        }
     }
 
 }

@@ -93,12 +93,12 @@ trait GroupsAndEventsApiTestTrait {
     public function createCategory(array $overrides = []): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
         $name = "Test Category $salt";
-        $categoryID = $overrides['parentID'] ?? $this->lastInsertedCategoryID;
+        $categoryID = $overrides['parentCategoryID'] ?? $this->lastInsertedCategoryID;
 
         $params = $overrides + [
                 'customPermissions' => false,
                 'displayAs' => 'discussions',
-                'parentID' => $categoryID,
+                'parentCategoryID' => $categoryID,
                 'name' => $name,
                 'urlCode' => slugify($name)
             ];

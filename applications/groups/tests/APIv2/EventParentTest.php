@@ -235,6 +235,97 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test GET /events with parentRecordType of Category.
+     */
+    public function testGetEventCategoryRecordTypeAll() {
+        $category1 = $this->createCategory();
+        $this->createEvent();
+
+        $category2 = $this->createCategory();
+        $this->createEvent();
+
+        $category3 = $this->createCategory();
+        $this->createEvent();
+
+
+        $events = $this->api()->get(
+            "/events",
+            [
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
+            ]
+        )->getBody();
+
+        $parentRecordIDs = array_column($events, 'parentRecordID');
+
+        $this->assertEquals(3, count($events));
+        $this->assertContains($category1['categoryID'], $parentRecordIDs);
+        $this->assertContains($category2['categoryID'], $parentRecordIDs);
+        $this->assertContains($category3['categoryID'], $parentRecordIDs);
+        $this->assertEquals(3, count($parentRecordIDs));
+    }
+
+    /**
+     * Test GET /events with parentRecordType of Category.
+     */
+    public function testGetEventGroupRecordTypeAll() {
+        $group1 = $this->createGroup();
+        $this->createEvent();
+
+        $group2 = $this->createGroup();
+        $this->createEvent();
+
+        $group3 = $this->createGroup();
+        $this->createEvent();
+
+
+        $events = $this->api()->get(
+            "/events",
+            [
+                "parentRecordType" => \EventModel::PARENT_TYPE_GROUP,
+            ]
+        )->getBody();
+
+        $parentRecordIDs = array_column($events, 'parentRecordID');
+
+        $this->assertEquals(3, count($events));
+        $this->assertContains($group1['groupID'], $parentRecordIDs);
+        $this->assertContains($group2['groupID'], $parentRecordIDs);
+        $this->assertContains($group3['groupID'], $parentRecordIDs);
+        $this->assertEquals(3, count($parentRecordIDs));
+    }
+
+    /**
+     * Test GET /events with parentRecordType of Category.
+     */
+    public function testGetEventCategoryRecordTypeRequireDescendants() {
+        $category1 = $this->createCategory();
+
+        $category2 = $this->createCategory(['parentCategoryID' => $category1['categoryID']]);
+        $this->createEvent();
+
+        $category3 = $this->createCategory(['parentCategoryID' => $category2['categoryID']]);
+        $this->createEvent();
+        
+        $events = $this->api()->get(
+            "/events",
+            [
+                "parentRecordID" => $category1['categoryID'],
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
+                "requireDescendants" => true
+
+            ]
+        )->getBody();
+
+        $parentRecordIDs = array_column($events, 'parentRecordID');
+
+        $this->assertEquals(2, count($events));
+        $this->assertContains($category2['categoryID'], $parentRecordIDs);
+        $this->assertContains($category3['categoryID'], $parentRecordIDs);
+        $this->assertEquals(2, count($parentRecordIDs));
+    }
+
+
+    /**
      * Make sure we get proper permission errors when we can't access a category.
      */
     public function testGetEventsCategoryPermissionError() {
