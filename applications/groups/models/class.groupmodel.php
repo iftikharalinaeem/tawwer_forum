@@ -1721,7 +1721,7 @@ class GroupModel extends Gdn_Model {
      * @param array $rows
      * @param string $field
      */
-    public function expandGroup(array &$rows, string $field ='group') {
+    public function expandGroup(array &$rows, string $field = 'group') {
         if (count($rows) === 0) {
             // Nothing to do here.
             return;
@@ -1740,14 +1740,12 @@ class GroupModel extends Gdn_Model {
                     }
 
                     if ($group) {
-
                         $row[$field] = $group;
                     }
                 } catch (NoResultsException $e) {
                     logException($e);
                 }
             }
-
         };
 
         if ($single) {

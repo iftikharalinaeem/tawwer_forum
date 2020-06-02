@@ -434,7 +434,7 @@ class EventsApiController extends AbstractApiController {
                     $recordID
                 );
             }
-        }  elseif ($parentRecordID) {
+        } elseif ($parentRecordID) {
             $this->eventModel->checkParentEventPermission(
                 EventPermissions::VIEW,
                 $parentRecordType,
@@ -616,7 +616,6 @@ class EventsApiController extends AbstractApiController {
                 $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['CategoryID'] ?? null;
                 $dbRecord['parentRecord']['recordType'] = 'category';
                 $dbRecord['parentRecord']['url'] = categoryUrl($dbRecord['parentRecord']);
-
             }
 
             if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
