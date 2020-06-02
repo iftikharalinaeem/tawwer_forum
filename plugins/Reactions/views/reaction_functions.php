@@ -173,7 +173,7 @@ if (!function_exists('ReactionButton')) {
             $dataAttr = "data-reaction=\"$urlCode2\"";
         }
 
-        $discussionName = $row["Name"] ?? $row->Name;
+        $discussionName = is_array($row) ? $row["Name"] : $row->Name;
 
         $upAccessibleLabel = accessibleLabel('%s for discussion: "%s"', t("Vote Up"), $discussionName);
         $downAccessibleLabel = accessibleLabel('%s for discussion: "%s"', t("Vote Down"), $discussionName);
