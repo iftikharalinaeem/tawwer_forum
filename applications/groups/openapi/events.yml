@@ -435,10 +435,24 @@ components:
                 type: boolean
             type: object
           type: array
-        category:
-          $ref: '#/components/schemas/CategoryFragment'
-        group:
-          $ref: '#/components/schemas/GroupFragment'
+        parentRecord:
+          description: The a fragment of the parent record.
+          items:
+            properties:
+              recordType:
+                description: Type of record (ie. group/category).
+                type: string
+              recordID:
+                description: The record ID.
+                type: integer
+              name:
+                description: The name of the record.
+                type: string
+              url:
+                description: The url associated to the record.
+                type: string
+            type: object
+          type: array
         url:
           description: The full URL to the event.
           type: string
