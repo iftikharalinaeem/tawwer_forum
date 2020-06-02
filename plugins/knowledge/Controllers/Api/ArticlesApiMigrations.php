@@ -150,9 +150,15 @@ trait ArticlesApiMigration {
         ], "in")->setDescription("Get article by its alias.");
         $out = $this->articleSchema("out");
         $query = $in->validate($query);
+        $alias = $encoded = implode('/', array_map(
+            function ($str) {
+                return rawurlencode(rawurldecode($str));
+            },
+            explode('/', $query['alias'])
+        ));
 
         try {
-            $articleID = $this->pageRouteAliasModel->getRecordID(ArticleModel::RECORD_TYPE, $query['alias']);
+            $articleID = $this->pageRouteAliasModel->getRecordID(ArticleModel::RECORD_TYPE, $alias);
         } catch (NoResultsException $e) {
             throw new NotFoundException("Article with alias: ".$query['alias'].' not found.');
         }
