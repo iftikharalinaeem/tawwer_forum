@@ -7,7 +7,7 @@
 namespace Vanilla\Plugins\PrivateDiscussions;
 
 use Vanilla\Contracts\ConfigurationInterface;
-
+use \DOMDocument;
 /**
  * Class PrivateDiscussionsPlugin
  *
@@ -22,7 +22,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     const WORDCOUNT_DEFAULT = 100;
 
     /** @var bool */
-    const STRIPEMBEDS_DEFAULT = false;
+    const STRIPEMBEDS_DEFAULT = true;
 
     /**
      * PrivateDiscussionsPlugin constructor.
@@ -78,5 +78,37 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         ]);
 
         $configurationModule->renderAll();
+    }
+
+    /**
+     * Adds a dispatcher block exception for discussion page.
+     *
+     * @param \Gdn_Dispatcher $sender
+     * @param \ Gdn_Dispatcher $args
+     */
+    public function gdn_Dispatcher_BeforeBlockDetect_Handler($sender, $args) {
+        $args['BlockExceptions']['#^discussion(/)#']  = \Gdn_Dispatcher::BLOCK_NEVER;
+    }
+
+    /**
+     * Massage the data and switch the view.
+     *
+     * @param $sender
+     */
+    public function discussionController_render_before($sender) {
+        if (!$sender->CategoryID) {
+            redirectTo('/entry/signin');
+        }
+        $canViewCategory = \Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
+        // return if the user is signed in or cannot view the category.
+        if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
+            return;
+        }
+
+        //$userID = \Gdn::session()->UserID;
+        $data = \Gdn::formatService()->renderHTML($sender->Data['Discussion']->Body, \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
+        if ($this->getStripEmbeds()) {
+            $this->stripImages($data);
+        }
     }
 }
