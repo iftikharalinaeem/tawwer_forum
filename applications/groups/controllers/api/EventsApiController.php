@@ -365,6 +365,14 @@ class EventsApiController extends AbstractApiController {
                     // Add option for both
                 ],
             ],
+            'attendingStatus:s?' =>[
+                'enum' => [
+                    'yes',
+                    'no',
+                    'maybe'
+                ],
+                'description' => 'Filter events by users attending status',
+            ],
             'dateStarts:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by start dates',
                 'x-filter' => [
@@ -408,7 +416,7 @@ class EventsApiController extends AbstractApiController {
 
         $groupID = $query['groupID'] ?? null;
         $parentRecordType = $query['parentRecordType'] ?? null;
-        $parentRecordID = $query['parentRecordID'] ?? null;
+        $parentRecordID = $groupID ?? $query['parentRecordID'] ?? null;
 
         // for backwards compatibility use the groupID supplied as the parentID
         $query['parentRecordType'] = ($groupID) ? EventModel::PARENT_TYPE_GROUP : $parentRecordType;
@@ -491,6 +499,10 @@ class EventsApiController extends AbstractApiController {
 
         if ($query['allDayEvent'] ?? null) {
             $where['e.AllDayEvent'] = 1;
+        }
+
+        if ($query['attendingStatus'] ?? false) {
+            $where['ue.Attending'] = $query['attendingStatus'];
         }
 
         $where['UserID'] = $userID;

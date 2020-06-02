@@ -358,6 +358,52 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test GET /events with attendingStatus filter.
+     */
+    public function testGetEventsFilterByAttendingStatus() {
+        $this->createCategory();
+        $event1 = $this->createEvent();
+        $event2 = $this->createEvent();
+        $event3 = $this->createEvent();
+
+        $this->api()->post(
+            "/events/${event1['eventID']}/participants",
+            [
+                "attending" => 'yes'
+            ]
+        )->getBody();
+
+        $this->api()->post(
+            "/events/${event2['eventID']}/participants",
+            [
+                "attending" => 'yes'
+            ]
+        )->getBody();
+
+        $this->api()->post(
+            "/events/${event3['eventID']}/participants",
+            [
+                "attending" => 'no'
+            ]
+        )->getBody();
+
+        $events = $this->api()->get(
+            "/events",
+            [
+                "parentRecordType" => \EventModel::PARENT_TYPE_CATEGORY,
+                "parentRecordID" => $this->lastInsertedCategoryID,
+                "attendingStatus" => 'yes'
+            ]
+        )->getBody();
+
+        $eventIDs = array_column($events, 'eventID');
+
+        $this->assertEquals(2, count($events));
+        $this->assertContains($event1['eventID'], $eventIDs);
+        $this->assertContains($event2['eventID'], $eventIDs);
+    }
+
+    /**
      * Test that we get proper permission errors when fetching a group we can't access.
      *
      * @param string $groupPrivacy
