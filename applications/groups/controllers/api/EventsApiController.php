@@ -173,6 +173,7 @@ class EventsApiController extends AbstractApiController {
                     'description' => 'Is the participant attending the event.',
                 ],
                 'userID:i?' => 'The users ID',
+                'attendees:?' => $this->attendeesSchema(),
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -210,13 +211,40 @@ class EventsApiController extends AbstractApiController {
         $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        if ($this->isExpandField('breadcrumbs', $query['expand'] ?? false)) {
-            $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+        $expand = $query['expand'] ?? false;
+
+        if ($expand) {
+            if ($this->isExpandField('breadcrumbs', $expand)) {
+                $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+            }
+
+            if ($this->isExpandField('permissions', $expand)) {
+                $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
+            }
+
+            if ($this->isExpandField('attendees.yes', $expand) ||
+                $this->isExpandField('attendees.no', $expand) ||
+                $this->isExpandField('attendees.no', $expand)
+            ) {
+                $where = [];
+
+                if (in_array('attendees.yes', $expand)) {
+                    $where[] = 'yes';
+                }
+
+                if (in_array('attendees.no', $expand)) {
+                    $where[] = 'no';
+                }
+
+                if (in_array('attendees.maybe', $expand))  {
+                    $where[] = 'maybe';
+                }
+
+                $allAttendees = $this->eventModel->getAttendingUsers($id, $where);
+                $event['attendees'] = $this->expandEventAttendees($allAttendees);
+            }
         }
 
-        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
-            $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
-        }
 
         $result = $this->normalizeEventOutput($event);
         return $out->validate($result);
@@ -336,7 +364,7 @@ class EventsApiController extends AbstractApiController {
         return $this->schema([
             'id:i' => 'The event ID.',
             'userID:i?' => 'The users ID',
-            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions'])
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions', 'attendees.yes', 'attendees.no', 'attendees.maybe'])
         ], 'in');
     }
 
@@ -903,6 +931,30 @@ class EventsApiController extends AbstractApiController {
     }
 
     /**
+     * Get attendees schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function attendeesSchema() {
+        static $attendeesSchema;
+
+        if ($attendeesSchema === null) {
+            $attendeesSchema = $this->schema(
+                Schema::parse([
+                    'attendingYes:a?' => $this->getUserFragmentSchema(),
+                    'attendingYesCount:i?',
+                    'attendingNo:a?' => $this->getUserFragmentSchema(),
+                    'attendingNoCount:i?',
+                    'attendingMaybe:a?' => $this->getUserFragmentSchema(),
+                    'attendingMaybeCount:i?'
+                ])
+            );
+        }
+
+        return $this->schema($attendeesSchema, 'in');
+    }
+
+    /**
      * Check if user has access based on privacy.
      *
      * @param array $group
@@ -917,5 +969,68 @@ class EventsApiController extends AbstractApiController {
             $hasAccess = false;
         }
         return $hasAccess;
+    }
+
+    /**
+     * Add the user fragments for attendees.
+     *
+     * @param array $attendees
+     * @param int $count
+     */
+    private function addUserFragments(array &$attendees, int $count) {
+        $count = ($count > 10) ? 10 : $count;
+        for ($i = 0; $i < $count; $i++) {
+            $this->userModel->expandUsers($attendees, ['UserID']);
+        }
+    }
+
+    /**
+     * Expand event attendees.
+     *
+     * @param array $allAttendees
+     * @return array
+     */
+    private function expandEventAttendees(array $allAttendees): array {
+        $attendeesYes = [];
+        $attendeesNo = [];
+        $attendeesMaybe = [];
+
+        foreach ($allAttendees as $attendee) {
+            $attendingStatus = $attendee['Attending'] ?? null;
+            if ($attendingStatus === 'Yes') {
+                $attendeesYes[] = $attendee;
+            }
+            if ($attendingStatus === 'No') {
+                $attendeesNo[] = $attendee;
+            }
+            if ($attendingStatus === 'Maybe') {
+                $attendeesMaybe[] = $attendee;
+            }
+        }
+
+        $yesCount = 0;
+        if ($attendeesYes) {
+            $yesCount = count($attendeesYes);
+            $this->addUserFragments($attendeesYes, $yesCount);
+        }
+        $noCount = 0;
+        if ($attendeesNo) {
+            $noCount = count($attendeesNo);
+            $this->addUserFragments($attendeesNo, $noCount);
+        }
+        $maybeCount = 0;
+        if ($attendeesMaybe) {
+            $maybeCount = count($attendeesMaybe);
+            $this->addUserFragments($attendeesMaybe, $maybeCount);
+        }
+
+        $event['attendingYes'] = array_column($attendeesYes, 'User') ?? [];
+        $event['attendingYesCount'] = $yesCount;
+        $event['attendingNo'] = array_column($attendeesNo, 'User') ?? [];
+        $event['attendingNoCount'] = $noCount;
+        $event['attendingMaybe'] = array_column($attendeesMaybe, 'User') ?? [];
+        $event['attendingMaybeCount'] = $maybeCount;
+
+        return $event;
     }
 }

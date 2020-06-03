@@ -599,6 +599,29 @@ class EventModel extends Gdn_Model {
     }
 
     /**
+     * Get list of attending users.
+     *
+     * @param int $eventID
+     * @param array $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getAttendingUsers(int $eventID, array $where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
+        return $this->SQL
+            ->select()
+            ->from('UserEvent')
+            ->where('EventId', $eventID)
+            ->whereIn('Attending', $where)
+            ->orderBy($orderFields, $orderDirection)
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+    }
+
+
+    /**
      * Check if a User is invited to an Event.
      *
      * @param integer $userID

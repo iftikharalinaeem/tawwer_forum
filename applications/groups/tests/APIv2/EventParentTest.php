@@ -451,6 +451,17 @@ class EventParentTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test the counts are correct for event attendees.
+     */
+    public function testGetEventsWithExpandAttendees() {
+        $this->createCategory();
+        $this->createEvent();
+
+
+
+    }
+
+    /**
      * Test GET/ events with dateStarts filter.
      *
      * @param array $dates
