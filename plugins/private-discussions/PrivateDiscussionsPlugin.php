@@ -8,6 +8,7 @@ namespace Vanilla\Plugins\PrivateDiscussions;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
+use \DOMXPath;
 
 /**
  * Class PrivateDiscussionsPlugin
@@ -27,6 +28,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
 
     /**
      * PrivateDiscussionsPlugin constructor.
+     *
      * @param ConfigurationInterface $configuration
      */
     public function __construct(ConfigurationInterface $configuration) {
@@ -88,29 +90,33 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @param \Gdn_Dispatcher $sender
      * @param \ Gdn_Dispatcher $args
      */
-    public function gdn_Dispatcher_beforeBlockDetect_handler($sender, $args) {
+    public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^discussion(/)#']  = \Gdn_Dispatcher::BLOCK_NEVER;
     }
 
     /**
      * Massage the data and switch the view.
      *
-     * @param $sender
+     * @param \DiscussionController $sender
      */
     public function discussionController_render_before($sender) {
-        if (!$sender->CategoryID) {
-            redirectTo('/entry/signin');
-        }
         $canViewCategory = \Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
         // return if the user is signed in or cannot view the category.
         if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
             return;
         }
-
-        //$userID = \Gdn::session()->UserID;
-        $data = \Gdn::formatService()->renderHTML($sender->Data['Discussion']->Body, \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
+        if (!$sender->CategoryID) {
+            redirectTo('/entry/signin');
+        }
+        $discussionBody = $sender->Data['Discussion']->Body;
+        $discussionFormat = $sender->Data['Discussion']->Format;
+        if (!$discussionBody || !$discussionFormat) {
+            return;
+        }
+        $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
         if ($this->getStripEmbeds()) {
-            $this->stripImages($data);
+            $data = $this->stripEmbeds($data);
+            //send to the view.
         }
 
         //unset panel modules
@@ -119,5 +125,27 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         //render view override
         $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
         $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
+    }
+
+    /**
+     * Strip embeds from the data string.
+     *
+     * @param string $data
+     * @return string Massaged data
+     */
+    private function stripEmbeds(string $data) {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        $dom->loadHTML($data);
+        $xpath = new DomXPath($dom);
+        $classname='embedExternal embedImage';
+        $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
+
+        if ($table = $xpath_results->item(0)) {
+            $table ->parentNode->removeChild($table);
+            $str = $dom->saveHTML();
+            $data = $str;
+        }
+        return $data;
     }
 }
