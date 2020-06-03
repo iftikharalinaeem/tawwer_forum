@@ -227,7 +227,17 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url($urlCode);
 
-        $locale = $knowledgeBase['locale'] ?? $knowledgeBase['sourceLocale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        // If a knowledge-base has only one site-section. Make sure we build the url with the right locale.
+        $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
+        if (count($siteSections) === 1) {
+            $siteSection = reset($siteSections);
+            $knowledgeBase['locale'] = $siteSection->getContentLocale();
+        }
+
+        $locale = $knowledgeBase['locale'] ??
+            $knowledgeBase['sourceLocale'] ??
+            $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+
         $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/" . $slug);
         return $result;
@@ -344,7 +354,16 @@ MESSAGE
      */
     public function selectFragmentForCategoryID(int $categoryID, string $locale = null) {
         $rows = $this->sql()
-            ->select('kb.knowledgeBaseID, kb.rootCategoryID, kb.name, kb.urlCode, kb.viewType, kb.status, kb.sourceLocale')
+            ->select(
+                'kb.knowledgeBaseID, 
+                kb.rootCategoryID, 
+                kb.name, 
+                kb.urlCode, 
+                kb.viewType, 
+                kb.status, 
+                kb.sourceLocale, 
+                kb.siteSectionGroup'
+            )
             ->from('knowledgeCategory kc')
             ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = kc.knowledgeBaseID')
             ->where('kc.knowledgeCategoryID', $categoryID)
