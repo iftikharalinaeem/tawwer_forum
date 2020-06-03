@@ -125,17 +125,18 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
                 $data = $this->stripEmbeds($data, $dom);
                 //send to the view.
             }
+            // remove images when using advanced editor.
             $data = $this->stripImages($dom);
-            //trim to word count
+            // trim to word count
             $data = $this->stripText($data, $dom);
 
-            //set data back to the controller
+            // set data back to the controller
             $sender->Data['Discussion']->Body = $data;
 
-            //unset panel modules
+            // unset panel modules
             $sender->Assets['Panel'] = [];
 
-            //render view override
+            // render view override
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
         }
