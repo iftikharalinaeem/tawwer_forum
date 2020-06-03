@@ -6,6 +6,7 @@
 
 namespace Vanilla\Plugins\PrivateDiscussions;
 
+use stdClass;
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
 use \DOMXPath;
@@ -201,5 +202,24 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         }
 
         return $limit;
+    }
+}
+
+if (!function_exists('formatBody')) {
+    /**
+     * Override this function to return the Body as is since it has already been formatted
+     *
+     * Event argument for $object will be 'Comment' or 'Discussion'.
+     *
+     * @param stdClass $object Comment or discussion.
+     * @return string Parsed body.
+     * @since 2.1
+     */
+    function formatBody($object) {
+        \Gdn::controller()->fireEvent('BeforeCommentBody');
+        $object->FormatBody = $object->Body;
+        \Gdn::controller()->fireEvent('AfterCommentFormat');
+
+        return $object->FormatBody;
     }
 }
