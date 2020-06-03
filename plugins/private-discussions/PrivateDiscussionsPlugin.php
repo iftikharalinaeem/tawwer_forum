@@ -122,8 +122,11 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
                 $data = $this->stripEmbeds($data);
                 //send to the view.
             }
-
+            //trim to word count
             $data = $this->stripText($data);
+
+            //set data back to the controller
+            $sender->Data['Discussion']->Body = $data;
 
             //unset panel modules
             $sender->Assets['Panel'] = [];
