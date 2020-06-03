@@ -159,7 +159,6 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * Prepare the html string.
      *
      * @param string $data
-     * @param int $limit
      * @return string The minified string with its html tags.
      */
     private function stripText(string $data) :string {
@@ -179,27 +178,25 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @return int Return limit used to count remaining tags.
      */
     private function stripTextRecursive($element, int $limit) :int {
-        if($limit > 0) {
+        if ($limit > 0) {
             // Nodetype text
-            if($element->nodeType == 3) {
+            if ($element->nodeType == 3) {
                 $limit -= strlen($element->nodeValue);
-                if($limit < 0) {
+                if ($limit < 0) {
                     $element->nodeValue = substr($element->nodeValue, 0, strlen($element->nodeValue) + $limit);
                 }
-            }
-            else {
-                for($i = 0; $i < $element->childNodes->length; $i++) {
-                    if($limit > 0) {
+            } else {
+                for ($i = 0; $i < $element->childNodes->length; $i++) {
+                    if ($limit > 0) {
                         $limit = $this->stripTextrecursive($element->childNodes->item($i), $limit);
-                    }
-                    else {
+                    } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;
                     }
                 }
             }
         }
+
         return $limit;
     }
 }
-
