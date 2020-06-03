@@ -15,6 +15,11 @@
         flex-direction: column;
     }
 
+    .Button {
+        min-width: 79px;
+        text-align: center;
+    }
+
     .SigninButtonWrap,
     .RegisterWrap {
         display: flex;
@@ -27,7 +32,6 @@
 
     .SinginInfo,
     .RegisterInfo {
-        flex-basis: 100%;
         margin: {
             left: 6px;
             right: 6px;
