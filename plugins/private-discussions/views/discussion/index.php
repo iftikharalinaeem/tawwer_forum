@@ -1,4 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
 $Session = Gdn::session();
 include $this->fetchViewLocation('helper_functions', 'discussion');
 
