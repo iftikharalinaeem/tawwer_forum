@@ -26,14 +26,19 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /** @var bool */
     const STRIPEMBEDS_DEFAULT = true;
 
+    /** @var \Gdn_Session */
+    private $session;
+
     /**
      * PrivateDiscussionsPlugin constructor.
      *
      * @param ConfigurationInterface $configuration
+     * @param \Gdn_Session $session
      */
-    public function __construct(ConfigurationInterface $configuration) {
+    public function __construct(ConfigurationInterface $configuration, \Gdn_Session $session) {
         parent::__construct();
         $this->config = $configuration;
+        $this->session = $session;
     }
 
     /**
@@ -100,31 +105,30 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @param \DiscussionController $sender
      */
     public function discussionController_render_before($sender) {
-        $canViewCategory = \Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
-        // return if the user is signed in or cannot view the category.
-        if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
-            return;
-        }
-        if (!$sender->CategoryID) {
-            redirectTo('/entry/signin');
-        }
-        $discussionBody = $sender->Data['Discussion']->Body;
-        $discussionFormat = $sender->Data['Discussion']->Format;
-        if (!$discussionBody || !$discussionFormat) {
-            return;
-        }
-        $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
-        if ($this->getStripEmbeds()) {
-            $data = $this->stripEmbeds($data);
-            //send to the view.
-        }
+        $canViewCategory = $this->session->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
+        // private communities is enable but guest has view permission
+        if (!$this->session->isValid() && $canViewCategory && (bool)c('Garden.PrivateCommunity')) {
+            if (!$sender->CategoryID) {
+                redirectTo('/entry/signin');
+            }
+            $discussionBody = $sender->Data['Discussion']->Body;
+            $discussionFormat = $sender->Data['Discussion']->Format;
+            if (!$discussionBody || !$discussionFormat) {
+                return;
+            }
+            $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
+    //        if ($this->getStripEmbeds()) {
+    //            $data = $this->stripEmbeds($data);
+    //            //send to the view.
+    //        }
 
-        //unset panel modules
-        $sender->Assets['Panel'] = [];
+            //unset panel modules
+            $sender->Assets['Panel'] = [];
 
-        //render view override
-        $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
-        $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
+            //render view override
+            $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
+            $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
+        }
     }
 
     /**
