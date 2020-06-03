@@ -119,20 +119,25 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             }
 
             $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
+            $dom = new DOMDocument();
+            $dom->preserveWhiteSpace = false;
+            @$dom->loadHTML($data);
             if ($this->getStripEmbeds()) {
-                $data = $this->stripEmbeds($data);
+                $data = $this->stripEmbeds($data, $dom);
                 //send to the view.
             }
-            //trim to word count
-            $data = $this->stripText($data);
+            // remove images when using advanced editor.
+            $data = $this->stripImages($dom);
+            // trim to word count
+            $data = $this->stripText($data, $dom);
 
-            //set data back to the controller
+            // set data back to the controller
             $sender->Data['Discussion']->Body = $data;
 
-            //unset panel modules
+            // unset panel modules
             $sender->Assets['Panel'] = [];
 
-            //render view override
+            // render view override
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
         }
@@ -142,16 +147,13 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * Strip embeds from the data string.
      *
      * @param string $data
+     * @param DOMDocument $dom
      * @return string Massaged data
      */
-    private function stripEmbeds(string $data) {
-        $dom = new DOMDocument();
-        $dom->preserveWhiteSpace = false;
-        $dom->loadHTML($data);
+    private function stripEmbeds(string $data, DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
         $classname='embedExternal embedImage';
         $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
-
         if ($table = $xpath_results->item(0)) {
             $table ->parentNode->removeChild($table);
             $str = $dom->saveHTML();
@@ -159,15 +161,35 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         }
         return $data;
     }
+
+    /**
+     * Strip images.
+     *
+     * @param DOMDocument $dom
+     * @return string Data stripped of images.
+     */
+    private function stripImages($dom) {
+        $images = $dom->getElementsByTagName('img');
+        $imgs = [];
+        foreach ($images as $img) {
+            $imgs[] = $img;
+        }
+        foreach ($imgs as $img) {
+            $img->parentNode->removeChild($img);
+        }
+        $data = $dom->saveHTML();
+        return  $data;
+    }
+
     /**
      * Prepare the html string.
      *
      * @param string $data
+     * @param DOMDocument $dom
      * @return string The minified string with its html tags.
      */
-    private function stripText(string $data) :string {
+    private function stripText(string $data, DOMDocument $dom) :string {
         $limit = $this->getWordCount();
-        $dom = new DOMDocument();
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
         $this->stripTextRecursive($dom->documentElement, $limit);
         $minifiedDiscussion = substr($dom->saveHTML($dom->documentElement), 5, -6);
@@ -200,7 +222,6 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
                 }
             }
         }
-
         return $limit;
     }
 }
