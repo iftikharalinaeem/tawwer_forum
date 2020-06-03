@@ -430,14 +430,14 @@ class EventsApiController extends AbstractApiController {
             foreach ($parentRecordIDs as $recordID) {
                 $this->eventModel->checkParentEventPermission(
                     EventPermissions::VIEW,
-                    $parentRecordType,
+                    $query['parentRecordType'],
                     $recordID
                 );
             }
         } elseif ($parentRecordID) {
             $this->eventModel->checkParentEventPermission(
                 EventPermissions::VIEW,
-                $parentRecordType,
+                $query['parentRecordType'],
                 $parentRecordID
             );
         }
