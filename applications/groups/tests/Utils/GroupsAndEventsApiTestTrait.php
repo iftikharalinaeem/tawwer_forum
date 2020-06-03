@@ -93,12 +93,12 @@ trait GroupsAndEventsApiTestTrait {
     public function createCategory(array $overrides = []): array {
         $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
         $name = "Test Category $salt";
-        $categoryID = $overrides['parentID'] ?? $this->lastInsertedCategoryID;
+        $categoryID = $overrides['parentCategoryID'] ?? $this->lastInsertedCategoryID;
 
         $params = $overrides + [
                 'customPermissions' => false,
                 'displayAs' => 'discussions',
-                'parentID' => $categoryID,
+                'parentCategoryID' => $categoryID,
                 'name' => $name,
                 'urlCode' => slugify($name)
             ];
@@ -136,6 +136,24 @@ trait GroupsAndEventsApiTestTrait {
         $result = $this->api()->post('/events', $params)->getBody();
         $this->lastInsertedEventID = $result['eventID'];
         return $result;
+    }
+
+    /**
+     * Clear out existing events.
+     *
+     * @param string $parentRecordType
+     * @param array $options
+     */
+    public function clearEvents($parentRecordType = '', $options = []) {
+        /** @var \EventModel $model */
+        $model = \Gdn::getContainer()->get(\EventModel::class);
+        $where = [
+            "parentRecordType" =>  $parentRecordType
+        ];
+
+        $where = array_merge($where, $options);
+
+        $model->delete($where);
     }
 
     /**
