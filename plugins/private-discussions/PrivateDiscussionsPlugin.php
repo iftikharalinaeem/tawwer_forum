@@ -6,10 +6,8 @@
 
 namespace Vanilla\Plugins\PrivateDiscussions;
 
-use Gdn_Theme;
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
-use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class PrivateDiscussionsPlugin
@@ -17,8 +15,6 @@ use Vanilla\Web\TwigRenderTrait;
  * Display restricted discussion for guests.
  */
 class PrivateDiscussionsPlugin extends \Gdn_Plugin {
-
-    use TwigRenderTrait;
 
     /** @var string */
     const ADDON_PATH = 'plugins/private-discussions';
@@ -31,6 +27,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
 
     /**
      * PrivateDiscussionsPlugin constructor.
+     * @param ConfigurationInterface $configuration
      */
     public function __construct(ConfigurationInterface $configuration) {
         parent::__construct();
@@ -113,7 +110,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         //$userID = \Gdn::session()->UserID;
         $data = \Gdn::formatService()->renderHTML($sender->Data['Discussion']->Body, \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
         if ($this->getStripEmbeds()) {
-            //$this->stripImages($data);
+            $this->stripImages($data);
         }
 
         //unset panel modules
