@@ -54,7 +54,7 @@ export default function CategoriesLayout(props: IProps) {
     const pageContent =
         results.length > 0 ? (
             <>
-                <ResultList results={props.results} />
+                <ResultList results={props.results} headingLevel={2} />
                 <SimplePager url={category.url + "/p:page:"} pages={pages} />
             </>
         ) : (
