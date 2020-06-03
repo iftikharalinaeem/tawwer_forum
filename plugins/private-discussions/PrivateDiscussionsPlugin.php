@@ -90,7 +90,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @param \Gdn_Dispatcher $sender
      * @param \ Gdn_Dispatcher $args
      */
-    public function gdn_Dispatcher_BeforeBlockDetect_Handler($sender, $args) {
+    public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^discussion(/)#']  = \Gdn_Dispatcher::BLOCK_NEVER;
     }
 
@@ -99,7 +99,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      *
      * @param \DiscussionController $sender
      */
-    public function discussionController_render_before( $sender) {
+    public function discussionController_render_before($sender) {
         $canViewCategory = \Gdn::session()->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
         // return if the user is signed in or cannot view the category.
         if ((int)\Gdn::session()->isValid() || !$canViewCategory) {
@@ -119,6 +119,12 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             //send to the view.
         }
 
+        //unset panel modules
+        $sender->Assets['Panel'] = [];
+
+        //render view override
+        $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
+        $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
     }
 
     /**
@@ -135,7 +141,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         $classname='embedExternal embedImage';
         $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
 
-        if($table = $xpath_results->item(0)){
+        if ($table = $xpath_results->item(0)) {
             $table ->parentNode->removeChild($table);
             $str = $dom->saveHTML();
             $data = $str;

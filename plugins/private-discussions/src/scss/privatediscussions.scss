@@ -1,0 +1,36 @@
+/*!
+ * @author Isis (igraziatto) Graziatto <isis.g@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+.MessageList.Discussion + .GuestBox {
+    .GuestBox-title,
+    .GuestBox-beforeSignInButton {
+        display: none;
+    }
+
+    .P {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .SigninButtonWrap,
+    .RegisterWrap {
+        display: flex;
+        align-items: center;
+        margin: {
+            top: 3px;
+            bottom: 3px;
+        }
+    }
+
+    .SinginInfo,
+    .RegisterInfo {
+        flex-basis: 100%;
+        margin: {
+            left: 6px;
+            right: 6px;
+        }
+    }
+}
