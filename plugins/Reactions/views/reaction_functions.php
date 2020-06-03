@@ -176,8 +176,8 @@ if (!function_exists('ReactionButton')) {
 
         $discussionName = is_array($row) ? $row["Name"] : $row->Name;
 
-        $upAccessibleLabel= @HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Up"), $discussionName]);
-        $downAccessibleLabel= @HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Down"), $discussionName]);
+        $upAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Up"), $discussionName]);
+        $downAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Down"), $discussionName]);
 
 
         if ($permissionClass && $permissionClass !== 'Positive' && !checkPermission('Garden.Moderation.Manage')) {
