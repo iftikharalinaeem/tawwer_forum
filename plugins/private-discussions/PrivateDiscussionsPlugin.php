@@ -119,20 +119,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             }
 
             $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
-            $dom = new DOMDocument();
-            $dom->preserveWhiteSpace = false;
-            @$dom->loadHTML($data);
-            if ($this->getStripEmbeds()) {
-                $data = $this->stripEmbeds($data, $dom);
-                //send to the view.
-            }
-            // remove images when using advanced editor.
-            $data = $this->stripImages($dom);
-            // trim to word count
-            $data = $this->stripText($data, $dom);
-
-            // set data back to the controller
-            $sender->Data['Discussion']->Body = $data;
+            $this->massageData($data, $sender);
 
             // unset panel modules
             $sender->Assets['Panel'] = [];
@@ -144,6 +131,28 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     }
 
     /**
+     * Massage the data.
+     *
+     * @param string $data
+     * @param \DiscussionController $sender
+     */
+    private function massageData(string $data, $sender) {
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = false;
+        @$dom->loadHTML($data);
+        if ($this->getStripEmbeds()) {
+            $this->stripEmbeds($data, $dom);
+        }
+
+        // remove images when using advanced editor.
+        $data = $this->stripImages($dom);
+        // trim to word count
+        $data = $this->stripText($data, $dom);
+        // set data back to the controller
+        $sender->Data['Discussion']->Body = $data;
+    }
+
+    /**
      * Strip embeds from the data string.
      *
      * @param string $data
@@ -152,6 +161,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      */
     private function stripEmbeds(string $data, DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
+        // emebeded images class.
         $classname='embedExternal embedImage';
         $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
         if ($table = $xpath_results->item(0)) {
@@ -168,14 +178,14 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @param DOMDocument $dom
      * @return string Data stripped of images.
      */
-    private function stripImages($dom) {
-        $images = $dom->getElementsByTagName('img');
-        $imgs = [];
-        foreach ($images as $img) {
-            $imgs[] = $img;
+    private function stripImages(DOMDocument $dom) {
+        $domImages = $dom->getElementsByTagName('img');
+        $imagesArray = [];
+        foreach ($domImages as $domImage) {
+            $imagesArray[] = $domImage;
         }
-        foreach ($imgs as $img) {
-            $img->parentNode->removeChild($img);
+        foreach ($imagesArray as $domImage) {
+            $domImage->parentNode->removeChild($domImage);
         }
         $data = $dom->saveHTML();
         return  $data;
