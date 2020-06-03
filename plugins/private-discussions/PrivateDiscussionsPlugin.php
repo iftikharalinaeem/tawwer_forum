@@ -6,14 +6,19 @@
 
 namespace Vanilla\Plugins\PrivateDiscussions;
 
+use Gdn_Theme;
 use Vanilla\Contracts\ConfigurationInterface;
 use \DOMDocument;
+use Vanilla\Web\TwigRenderTrait;
+
 /**
  * Class PrivateDiscussionsPlugin
  *
  * Display restricted discussion for guests.
  */
 class PrivateDiscussionsPlugin extends \Gdn_Plugin {
+
+    use TwigRenderTrait;
 
     /** @var string */
     const ADDON_PATH = 'plugins/private-discussions';
@@ -86,7 +91,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @param \Gdn_Dispatcher $sender
      * @param \ Gdn_Dispatcher $args
      */
-    public function gdn_Dispatcher_BeforeBlockDetect_Handler($sender, $args) {
+    public function gdn_Dispatcher_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^discussion(/)#']  = \Gdn_Dispatcher::BLOCK_NEVER;
     }
 
@@ -108,7 +113,14 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         //$userID = \Gdn::session()->UserID;
         $data = \Gdn::formatService()->renderHTML($sender->Data['Discussion']->Body, \Vanilla\Formatting\Formats\HtmlFormat::FORMAT_KEY);
         if ($this->getStripEmbeds()) {
-            $this->stripImages($data);
+            //$this->stripImages($data);
         }
+
+        //unset panel modules
+        $sender->Assets['Panel'] = [];
+
+        //render view override
+        $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
+        $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
     }
 }
