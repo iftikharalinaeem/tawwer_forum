@@ -145,11 +145,11 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Strip embeds from the data string.
      *
-     * @param DOMDocument $dom
      * @param string $data
+     * @param DOMDocument $dom
      * @return string Massaged data
      */
-    private function stripEmbeds(string $data, $dom) {
+    private function stripEmbeds(string $data, DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
         $classname='embedExternal embedImage';
         $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
@@ -168,13 +168,12 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * @return string Data stripped of images.
      */
     private function stripImages($dom) {
-        // Here we strip all the img tags in the document
         $images = $dom->getElementsByTagName('img');
         $imgs = [];
-        foreach($images as $img) {
+        foreach ($images as $img) {
             $imgs[] = $img;
         }
-        foreach($imgs as $img) {
+        foreach ($imgs as $img) {
             $img->parentNode->removeChild($img);
         }
         $data = $dom->saveHTML();
@@ -184,11 +183,11 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Prepare the html string.
      *
-     * @param DOMDocument $dom
      * @param string $data
+     * @param DOMDocument $dom
      * @return string The minified string with its html tags.
      */
-    private function stripText(string $data, $dom) :string {
+    private function stripText(string $data, DOMDocument $dom) :string {
         $limit = $this->getWordCount();
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
         $this->stripTextRecursive($dom->documentElement, $limit);
