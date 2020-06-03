@@ -119,6 +119,8 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             //send to the view.
         }
 
+        $data = $this->stripText($data);
+
         //unset panel modules
         $sender->Assets['Panel'] = [];
 
@@ -148,4 +150,51 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         }
         return $data;
     }
+    /**
+     * Prepare the html string.
+     *
+     * @param string $data
+     * @param int $limit
+     * @return string The minified string with its html tags.
+     */
+    private function stripText(string $data) :string {
+        $limit = $this->getWordCount();
+        $dom = new DOMDocument();
+        $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
+        $this->stripTextRecursive($dom->documentElement, $limit);
+        $minifiedDiscussion = substr($dom->saveHTML($dom->documentElement), 5, -6);
+        return $minifiedDiscussion;
+    }
+
+    /**
+     * Strip text recursively while ignoring html tags.
+     *
+     * @param mixed $element
+     * @param int $limit
+     * @return int Return limit used to count remaining tags.
+     */
+    private function stripTextRecursive($element, int $limit) :int {
+        if($limit > 0) {
+            // Nodetype text
+            if($element->nodeType == 3) {
+                $limit -= strlen($element->nodeValue);
+                if($limit < 0) {
+                    $element->nodeValue = substr($element->nodeValue, 0, strlen($element->nodeValue) + $limit);
+                }
+            }
+            else {
+                for($i = 0; $i < $element->childNodes->length; $i++) {
+                    if($limit > 0) {
+                        $limit = $this->stripTextrecursive($element->childNodes->item($i), $limit);
+                    }
+                    else {
+                        $element->removeChild($element->childNodes->item($i));
+                        $i--;
+                    }
+                }
+            }
+        }
+        return $limit;
+    }
 }
+
