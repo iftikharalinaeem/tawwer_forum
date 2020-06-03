@@ -229,9 +229,11 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         // If a knowledge-base has only one site-section. Make sure we build the url with the right locale.
         $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
-        if (count($siteSections) === 1) {
-            $siteSection = reset($siteSections);
-            $knowledgeBase['locale'] = $siteSection->getContentLocale();
+        if ($siteSections) {
+            if (count($siteSections) === 1) {
+                $siteSection = reset($siteSections);
+                $knowledgeBase['locale'] = $siteSection->getContentLocale();
+            }
         }
 
         $locale = $knowledgeBase['locale'] ??
