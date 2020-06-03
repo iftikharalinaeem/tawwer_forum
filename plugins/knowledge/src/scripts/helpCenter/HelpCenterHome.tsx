@@ -148,28 +148,26 @@ export default function HelpCenterHome(props: IProps) {
     );
 
     return (
-        <>
+        <main className="page-minHeight">
             {titleBarAndBanner}
             <AnalyticsData data={knowledgeBase} uniqueKey={knowledgeBaseID} />
-            <main>
-                {articleWidgetPlacement === ArticleWidgetPlacement.ABOVE && (
-                    <>
-                        {articleWidget}
-                        {hasRecommended && (
-                            <Container fullGutter narrow>
-                                <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
-                            </Container>
-                        )}
-                    </>
-                )}
-                <HelpCenterNavigation
-                    data={navData.data.navigation}
-                    rootCategory={navData.data.rootCategory}
-                    kbID={knowledgeBaseID}
-                />
-                {articleWidgetPlacement === ArticleWidgetPlacement.BELOW && articleWidget}
-                <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
-            </main>
-        </>
+            {articleWidgetPlacement === ArticleWidgetPlacement.ABOVE && (
+                <>
+                    {articleWidget}
+                    {hasRecommended && (
+                        <Container fullGutter narrow>
+                            <hr className={classNames(navLinksClasses().separatorIndependant)}></hr>
+                        </Container>
+                    )}
+                </>
+            )}
+            <HelpCenterNavigation
+                data={navData.data.navigation}
+                rootCategory={navData.data.rootCategory}
+                kbID={knowledgeBaseID}
+            />
+            {articleWidgetPlacement === ArticleWidgetPlacement.BELOW && articleWidget}
+            <UniversalKnowledgeWidget kb={knowledgeBase} hasTopSeparator={hasRecommended || hasNavigation} />
+        </main>
     );
 }
