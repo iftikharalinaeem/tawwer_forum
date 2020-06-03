@@ -14,7 +14,7 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 interface IProps {
     participants: IEventParticipant[];
     loadMore: () => void;
-    showLoadMore: number | undefined;
+    showLoadMore?: number;
 }
 
 function Participant({ user }) {

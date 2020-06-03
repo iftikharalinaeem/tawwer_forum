@@ -50,7 +50,20 @@ export function EventAttendees(props: IProps) {
         }
     };
 
-    // const [visibleModal, setVisibleModal] = useState(false);
+    const getTooltipText = (title: string) => {
+        switch (title.toLocaleLowerCase()) {
+            case "going":
+                return "View all going attendees";
+            case "maybe":
+                return "View all maybe attendees";
+            case "not going":
+                return "View all not going attendees";
+            default:
+                return "View all";
+        }
+    };
+    const tooltipText = getTooltipText(title);
+
     const initialState = { visibleModal: false, goingPage: 1, maybePage: 1, notGoingPage: 1 };
     const reducer = (state, action) => {
         switch (action.type) {
@@ -108,10 +121,7 @@ export function EventAttendees(props: IProps) {
                             >
                                 <span style={{ display: "inline-block" }}>
                                     +
-                                    <NumberFormatted
-                                        value={extraCount}
-                                        title={t(`View all ${title.toLocaleLowerCase()} attendees`)}
-                                    />
+                                    <NumberFormatted value={extraCount} title={t(tooltipText)} />
                                 </span>
                             </Button>
                         </li>

@@ -137,6 +137,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const participantsTabsList = makeVars("participantsTabsList", {
         height: 45,
+        bottom: 2,
         fontWeight: globalVars.fonts.weights.semiBold,
         color: {
             borderBottom: colorOut(globalVars.border.color),
@@ -145,7 +146,10 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const participantsTabsTab = makeVars("participantsTabsTab", {
-        height: participantsTabsList.height - 2, //subtract the border heights
+        height: participantsTabsList.height - participantsTabsList.bottom, //subtract the border heights
+        border: {
+            bottom: 3,
+        },
     });
 
     const participantItem = makeVars("participantItem", {
@@ -578,7 +582,9 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         height: vars.participantsTabsTab.height,
         $nest: {
             "&[data-selected]": {
-                borderBottom: `3px solid ${colorOut(globalVars.mainColors.primary)}`,
+                borderBottom: `${vars.participantsTabsTab.border.bottom}px solid ${colorOut(
+                    globalVars.mainColors.primary,
+                )}`,
             },
         },
     });
