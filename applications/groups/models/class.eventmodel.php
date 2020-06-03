@@ -613,7 +613,7 @@ class EventModel extends Gdn_Model {
         return $this->SQL
             ->select()
             ->from('UserEvent')
-            ->where('EventId', $eventID)
+            ->where('EventID', $eventID)
             ->whereIn('Attending', $where)
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
