@@ -3,6 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  *
+ * @fileoverview
  * Idea Counter Module
  */
 
@@ -50,7 +51,12 @@ class IdeaCounterModule extends Gdn_Module {
      */
     protected static $instance;
 
-    function __construct() {}
+    /**
+     * IdeaCounterModule constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
 
     /**
      * Return the singleton instance of this class. Should be used instead of instantiating a new IdeaCounterModule
@@ -66,6 +72,8 @@ class IdeaCounterModule extends Gdn_Module {
     }
 
     /**
+     * Set discussion
+     *
      * @param object|array $discussion The discussion to render the counter module for.
      * @return IdeaCounterModule $this
      */
@@ -147,7 +155,14 @@ class IdeaCounterModule extends Gdn_Module {
     public function toString() {
         if ($this->prepare()) {
             ob_start();
-            renderCounterBox($this->counter, $this->useDownVotes, $this->showVotes, $this->ideaUpReactionSlug, $this->ideaDownReactionSlug, $this->discussion->Name);
+            renderCounterBox(
+                $this->counter,
+                $this->useDownVotes,
+                $this->showVotes,
+                $this->ideaUpReactionSlug,
+                $this->ideaDownReactionSlug,
+                $this->discussion->Name
+            );
             $box = ob_get_contents();
             ob_end_clean();
             return $box;
@@ -180,13 +195,20 @@ if (!function_exists('renderCounterBox')) {
                             echo getReactionButtonHtml(
                                 'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter),
                                 val('upUrl', $counter),
-                                $ideaUpReactionSlug, strtolower($ideaUpReactionSlug),
-                                'data-reaction="'.strtolower($ideaUpReactionSlug).'"', $discussionName,
+                                $ideaUpReactionSlug,
+                                strtolower($ideaUpReactionSlug),
+                                'data-reaction="'.strtolower($ideaUpReactionSlug).'"',
+                                $discussionName,
                                 true
                             );
                             if ($useDownVotes) {
-                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug),
-                                    'data-reaction="'.strtolower($ideaDownReactionSlug).'"', $discussionName,
+                                echo getReactionButtonHtml(
+                                    'ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter),
+                                    val('downUrl', $counter),
+                                    $ideaDownReactionSlug,
+                                    strtolower($ideaDownReactionSlug),
+                                    'data-reaction="'.strtolower($ideaDownReactionSlug).'"',
+                                    $discussionName,
                                     true
                                 );
                             }
