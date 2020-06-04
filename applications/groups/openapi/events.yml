@@ -379,6 +379,27 @@ components:
           minLength: 1
           nullable: true
           type: string
+        attending.yes.users:
+          items:
+            $ref: '#/components/schemas/UserFragment'
+          type: array
+        attending.yes.count:
+          description: The number of users who rsvp'd yes.
+          type: integer
+        attending.no.users:
+          items:
+            $ref: '#/components/schemas/UserFragment'
+          type: array
+        attending.no.count:
+          description: The number of users who rsvp'd no.
+          type: integer
+        attending.maybe.users:
+          items:
+            $ref: '#/components/schemas/UserFragment'
+          type: array
+        attending.maybe.count:
+          description: The number of users who rsvp'd maybe.
+          type: integer
         insertUserID:
           description: The id of the user who created the event.
           type: integer
