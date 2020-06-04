@@ -139,7 +139,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         $dom->preserveWhiteSpace = false;
         @$dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
-            $this->stripEmbeds($data, $dom);
+            $this->stripEmbeds($dom);
         }
         // remove images when using advanced editor.
         $data = $this->stripImages($dom);
@@ -151,11 +151,10 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Strip embeds from the data string.
      *
-     * @param string $data
      * @param DOMDocument $dom
      * @return string Massaged data
      */
-    private function stripEmbeds(string $data, DOMDocument $dom) :string {
+    private function stripEmbeds(DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
         // embed classes.
         $embedClasses = ['embedExternal embedImage', 'js-embed embedResponsive'];
