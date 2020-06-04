@@ -6,7 +6,8 @@
     "key": "groups",
     "type": "addon",
     "priority": 10,
-    "name": "Groups and Events",
+    "name": "Groups",
+    "displayName": "Groups and Events",
     "settingsUrl": "/settings/groups",
     "authors": [
         {

@@ -82,9 +82,24 @@ paths:
       - description: |
           Record ID of the parent where the event was created
         in: query
-        name: parentRecordType
-        required: true
+        name: parentRecordID
         schema:
+          type: string
+      - description: |
+          Fetch the events in children of the parent.
+        in: query
+        name: requireDescendants
+        schema:
+          type: boolean
+      - description: |
+          Fitler by users attending status.
+        in: query
+        name: attendingStatus
+        schema:
+          enum:
+          - yes
+          - no
+          - maybe
           type: string
       - description: |
           Desired number of items per page.
@@ -396,12 +411,51 @@ components:
                 type: string
             type: object
           type: array
+        permissions:
+          description: The users permissions for the events.
+          items:
+            properties:
+              organizer:
+                description: Event Organizer.
+                type: boolean
+              create:
+                description: Can the user create events.
+                type: boolean
+              edit:
+                description: Can the user edit events.
+                type: boolean
+              member:
+                description: Is the user a memeber of the group.
+                type: boolean
+              view:
+                description: Can the user view events.
+                type: boolean
+              attend:
+                description: Can the user attend events.
+                type: boolean
+            type: object
+          type: array
+        parentRecord:
+          description: The a fragment of the parent record.
+          items:
+            properties:
+              recordType:
+                description: Type of record (ie. group/category).
+                type: string
+              recordID:
+                description: The record ID.
+                type: integer
+              name:
+                description: The name of the record.
+                type: string
+              url:
+                description: The url associated to the record.
+                type: string
+            type: object
+          type: array
         url:
           description: The full URL to the event.
           type: string
-        userID:
-          description: The user ID of the participant.
-          type: integer
       required:
         - eventID
         - parentRecordType

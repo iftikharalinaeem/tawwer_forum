@@ -434,7 +434,7 @@ class EventModel extends Gdn_Model {
      * @param int $parentRecordID
      * @return bool
      */
-    public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
+    public function canCreateEvents(string $parentRecordType, $parentRecordID): bool {
         switch ($parentRecordType) {
             case GroupRecordType::TYPE:
                 if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
@@ -467,7 +467,7 @@ class EventModel extends Gdn_Model {
      * @param int $parentRecordID
      * @return bool
      */
-    public function canViewEvents(string $parentRecordType, int $parentRecordID): bool {
+    public function canViewEvents(string $parentRecordType, $parentRecordID): bool {
         switch ($parentRecordType) {
             case GroupRecordType::TYPE:
                 return $this->groupModel->hasGroupPermission(GroupPermissions::VIEW, $parentRecordID);
@@ -485,9 +485,9 @@ class EventModel extends Gdn_Model {
      *
      * @param string $permission One of EventPermissions::VIEW or EventPermissions::CREATE
      * @param string $parentRecordType
-     * @param int $parentRecordID
+     * @param int|array $parentRecordID
      */
-    public function checkParentEventPermission(string $permission, string $parentRecordType, int $parentRecordID) {
+    public function checkParentEventPermission(string $permission, string $parentRecordType, $parentRecordID) {
         $hasPermission = false;
         if ($permission === EventPermissions::VIEW) {
             $hasPermission = $this->canViewEvents($parentRecordType, $parentRecordID);
@@ -507,7 +507,7 @@ class EventModel extends Gdn_Model {
         if ($groupIsSecret) {
             throw new NotFoundException('Group');
         } elseif ($parentRecordType === ForumCategoryRecordType::TYPE) {
-            // Check that the category exists.
+            // Check that the category exists
             $category = $this->categoryModel::categories($parentRecordID);
             if (!$category) {
                 throw new NotFoundException('Category');

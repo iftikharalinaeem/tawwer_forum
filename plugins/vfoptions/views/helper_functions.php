@@ -2,7 +2,7 @@
 
 function writeAddonMediaItem($addonName, $info, $isEnabled) {
   $slug = Gdn_Format::url(strtolower($addonName));
-  $name = val('Name', $info, val('name', $info, $addonName));
+  $name = $info['DisplayName'] ?? $info['displayName'] ?? $info['Name'] ?? $info['name'] ?? $addonName;
   $description = Gdn_Format::html(val('Description', $info, val('description', $info)));
   $icon = val('IconUrl', $info);
 

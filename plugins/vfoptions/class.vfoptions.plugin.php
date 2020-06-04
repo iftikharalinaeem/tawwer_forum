@@ -425,12 +425,12 @@ pageTracker._trackPageview();
 
         // Kludge on the Groups app
         // Apps are misnamed for some reason.
-        $groupsApp = $availableApps['Groups and Events'] ?? null;
+        $groupsApp = $availableApps['Groups'] ?? null;
         if ($groupsApp) {
             $availablePlugins['groups'] = $groupsApp;
         }
 
-        $groupsApp = $enabledApps['Groups and Events'] ?? null;
+        $groupsApp = $enabledApps['Groups'] ?? null;
         if ($groupsApp) {
             $enabledPlugins['groups'] = $groupsApp;
         }

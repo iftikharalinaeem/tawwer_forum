@@ -18,6 +18,7 @@ import { ThemeBuilderUpload } from "@vanilla/library/src/scripts/forms/themeEdit
 import { useThemeBuilder } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeBuilderContext";
 import { ActivePanelChooser } from "@themingapi/theme/ActivePanelChooser";
 import { ActiveVariablePanel } from "@themingapi/theme/ActivePanelContext";
+import { ThemeInputText } from "@vanilla/library/src/scripts/forms/themeEditor/ThemeInputText";
 
 export function ThemeBuilderSectionTitleBar() {
     const { rawThemeVariables, setVariableValue } = useThemeBuilder();
@@ -98,6 +99,9 @@ export function ThemeBuilderSectionTitleBar() {
                             },
                         ]}
                     />
+                </ThemeBuilderBlock>
+                <ThemeBuilderBlock label={t("Url")}>
+                    <ThemeInputText placeholder="https://" varKey={"navigation.logo.url"} />
                 </ThemeBuilderBlock>
             </ThemeBuilderSection>
             <ThemeBuilderSection label={t("Navigation")}>
