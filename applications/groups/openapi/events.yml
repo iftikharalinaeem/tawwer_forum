@@ -381,28 +381,22 @@ components:
           type: string
         attending.yes.users:
           items:
-            properties:
-              $ref: '#/components/schemas/UserFragment'
-            type: array
-          type: object
+            $ref: '#/components/schemas/UserFragment'
+          type: array
         attending.yes.count:
           description: The number of users who rsvp'd yes.
           type: integer
         attending.no.users:
           items:
-            properties:
-              $ref: '#/components/schemas/UserFragment'
-            type: array
-          type: object
+            $ref: '#/components/schemas/UserFragment'
+          type: array
         attending.no.count:
           description: The number of users who rsvp'd no.
           type: integer
         attending.maybe.users:
           items:
-            properties:
-              $ref: '#/components/schemas/UserFragment'
-            type: array
-          type: object
+            $ref: '#/components/schemas/UserFragment'
+          type: array
         attending.maybe.count:
           description: The number of users who rsvp'd maybe.
           type: integer
