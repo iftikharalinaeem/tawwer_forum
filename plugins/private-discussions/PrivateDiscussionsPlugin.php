@@ -119,7 +119,10 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             }
 
             $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
-            $this->massageData($data, $sender);
+            $massagedData = $this->massageData($data, $sender);
+
+            // set data back to the controller
+            $sender->Data['Discussion']->Body = $massagedData;
 
             // unset panel modules
             $sender->Assets['Panel'] = [];
@@ -148,8 +151,8 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         $data = $this->stripImages($dom);
         // trim to word count
         $data = $this->stripText($data, $dom);
-        // set data back to the controller
-        $sender->Data['Discussion']->Body = $data;
+
+        return $data;
     }
 
     /**
