@@ -228,7 +228,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
         $slug = \Gdn_Format::url($urlCode);
 
         $knowledgeBaseSourceLocale = $knowledgeBase['sourceLocale'] ?? null;
-        $locale = $knowledgeBase['locale'] ?? $knowledgeBase['sourceLocale'];
+        $locale = $knowledgeBase['locale'] ?? $knowledgeBaseSourceLocale;
 
         // If the kb's source locale is different from the queried locale, check if there's a matching site-section.
         // If there isn't build the url off of the sourceLocale.
