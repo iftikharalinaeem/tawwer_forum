@@ -234,9 +234,9 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
-                $limit -= strlen($element->nodeValue);
+                $limit -= str_word_count($element->data);
                 if ($limit < 0) {
-                    $element->nodeValue = substr($element->nodeValue, 0, strlen($element->nodeValue) + $limit);
+                    $element->nodeValue = substr($element->nodeValue, 0, str_word_count($element->data));
                 }
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
