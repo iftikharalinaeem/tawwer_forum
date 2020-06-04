@@ -1,5 +1,7 @@
 <?php
 /**
+ * @author Isis Graziatto <isis.g@vanillaforums.com>
+ * @author Dani M <danim@vanillaforums.com>
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
@@ -143,6 +145,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             // render view override
             Gdn_Theme::section('DiscussionRestricted');
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
+            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'index,nofollow']);
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
         }
     }
