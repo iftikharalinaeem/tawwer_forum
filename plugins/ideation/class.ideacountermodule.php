@@ -190,6 +190,10 @@ if (!function_exists('renderCounterBox')) {
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php
+                            /**
+                             * Output reactions
+                             */
+
                             echo getReactionButtonHtml(
                                 'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter),
                                 val('upUrl', $counter),
