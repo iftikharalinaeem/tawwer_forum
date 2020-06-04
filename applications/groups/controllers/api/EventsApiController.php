@@ -233,7 +233,6 @@ class EventsApiController extends AbstractApiController {
                 $this->isExpandField('attendees.no', $expand) ||
                 $this->isExpandField('attendees.no', $expand)
             ) {
-
                 $attendingUsers = [];
                 $where = [];
                 $options = [
@@ -243,29 +242,30 @@ class EventsApiController extends AbstractApiController {
                 ];
 
                 if (in_array('attendees.yes', $expand)) {
-                    $attendingUsers['yes'] = $this->eventModel->getAttendingUsers($id,
-                        ['Attending' => 'yes' ],
+                    $attendingUsers['yes'] = $this->eventModel->getAttendingUsers(
+                        $id, ['Attending' => 'yes' ],
                         $options
                     );
                     $where[] = 'yes';
                 }
 
                 if (in_array('attendees.no', $expand)) {
-                    $attendingUsers['no'] = $this->eventModel->getAttendingUsers($id,
+                    $attendingUsers['no'] = $this->eventModel->getAttendingUsers(
+                        $id,
                         ['Attending' => 'no' ],
                         $options
                     );
                     $where[] = 'no';
                 }
 
-                if (in_array('attendees.maybe', $expand))  {
-                    $attendingUsers['maybe'] = $this->eventModel->getAttendingUsers($id,
+                if (in_array('attendees.maybe', $expand)) {
+                    $attendingUsers['maybe'] = $this->eventModel->getAttendingUsers(
+                        $id,
                         ['Attending' => 'maybe' ],
                         $options
                     );
                     $where[] = 'maybe';
                 }
-
 
                 $counts = $this->eventModel->getAttendingCounts($id, $where);
                 $eventAttendees = $this->expandEventAttendees($attendingUsers, $counts);
@@ -997,7 +997,6 @@ class EventsApiController extends AbstractApiController {
      * @return array
      */
     private function expandEventAttendees(array $attendingUsers, array $counts): array {
-
         $attendeeData = [];
 
         if ($attendingUsers['yes'] ?? false) {
@@ -1018,12 +1017,11 @@ class EventsApiController extends AbstractApiController {
 
         if ($attendingUsers['maybe'] ?? false) {
             $maybeCount = count($attendingUsers['maybe'] );
-            $this->addUserFragments($attendingUsers['maybe'] , $maybeCount);
-            $attendeeData['attending.maybe.users'] = array_column($attendingUsers['maybe'] , 'User') ?? [];
+            $this->addUserFragments($attendingUsers['maybe'], $maybeCount);
+            $attendeeData['attending.maybe.users'] = array_column($attendingUsers['maybe'], 'User') ?? [];
             $index = array_search('Maybe', array_column($counts, 'Attending'));
             $attendeeData['attending.maybe.count'] = $counts[$index]['count'] ?? 0;
         }
-
         return $attendeeData;
     }
 }
