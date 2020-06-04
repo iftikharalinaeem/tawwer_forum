@@ -157,8 +157,15 @@ class IdeaCounterModule extends Gdn_Module {
 if (!function_exists('renderCounterBox')) {
     /**
      * Outputs a counter that includes voting buttons.
+     * @param int $counter
+     * @param int $useDownVotes
+     * @param bool $showVotes
+     * @param string $ideaUpReactionSlug
+     * @param string $ideaDownReactionSlug
+     * @param string $discussionName
      */
-    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug, $discussionName) { ?>
+    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug, $discussionName) {
+        ?>
         <div class="idea-counter-module <?php echo val('state', $counter).' '.val('cssClass', $counter); ?>">
             <div class="idea-counter-box">
                 <?php echo getScoreHtml(val('score', $counter)); ?>
