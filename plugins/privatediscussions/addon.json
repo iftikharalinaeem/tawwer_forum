@@ -1,10 +1,10 @@
 {
     "name": "Private Discussions",
-    "key": "private-discussions",
+    "key": "privatediscussions",
     "description": "Display restricted discussion for guests.",
     "version": "1.0",
     "type": "addon",
-    "priority": 1000,
+    "priority": 1100,
     "authors": [
         {
             "name": "Isis Graziatto",

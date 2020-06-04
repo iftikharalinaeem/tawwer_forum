@@ -41,7 +41,7 @@ if ($this->data('Page') == 1) {
     echo '</div>'; // close discussion wrap
 }
 
-$guestModule = new GuestModule('', 'plugins/private-discussions');
+$guestModule = new GuestModule('', 'plugins/privatediscussions');
 $guestModule->MessageCode = '';
 $guestModule->MessageDefault = '';
 echo $guestModule;
