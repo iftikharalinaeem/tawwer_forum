@@ -227,18 +227,29 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url($urlCode);
 
-        // If a knowledge-base has only one site-section. Make sure we build the url with the right locale.
-        $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
-        if ($siteSections) {
-            if (count($siteSections) === 1) {
-                $siteSection = reset($siteSections);
-                $knowledgeBase['locale'] = $siteSection->getContentLocale();
+        // If the kb's source locale is different from the queried locale, check if there's a matching site-section.
+        //  If there isn't build the url off of the sourceLocale.
+        if ($knowledgeBase['sourceLocale'] !== $knowledgeBase['locale']) {
+            $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
+            if ($siteSections) {
+                $siteSectionsLocales = [];
+                foreach ($siteSections as $siteSection) {
+                    $siteSectionsLocales[] = $siteSection->getContentLocale();
+                }
+                $localeAvailable = in_array($knowledgeBase['locale'], $siteSectionsLocales);
+                if (!$localeAvailable) {
+                    $knowledgeBase['locale'] = $knowledgeBase['sourceLocale'];
+                }
+            } else {
+                // no site-sections use the sourceLocale.
+                $knowledgeBase['locale'] = $knowledgeBase['sourceLocale'];
             }
         }
 
         $locale = $knowledgeBase['locale'] ??
             $knowledgeBase['sourceLocale'] ??
             $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+
 
         $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/" . $slug);
