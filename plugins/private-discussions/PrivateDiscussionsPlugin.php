@@ -117,16 +117,12 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             if (!$discussionBody || !$discussionFormat) {
                 return;
             }
-
             $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
-            $massagedData = $this->massageData($data, $sender);
-
+            $massagedData = $this->massageData($data);
             // set data back to the controller
             $sender->Data['Discussion']->Body = $massagedData;
-
             // unset panel modules
             $sender->Assets['Panel'] = [];
-
             // render view override
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
@@ -137,21 +133,18 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      * Massage the data.
      *
      * @param string $data
-     * @param \DiscussionController $sender
      */
-    private function massageData(string $data, $sender) {
+    private function massageData(string $data) {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         @$dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
             $this->stripEmbeds($data, $dom);
         }
-
         // remove images when using advanced editor.
         $data = $this->stripImages($dom);
         // trim to word count
         $data = $this->stripText($data, $dom);
-
         return $data;
     }
 
@@ -164,13 +157,15 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      */
     private function stripEmbeds(string $data, DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
-        // embedded images class.
-        $className='embedExternal embedImage';
-        $xpathQuery = $xpath->query(".//*[contains(@class, '$className')]");
-        if ($dataItem = $xpathQuery->item(0)) {
-            $dataItem->parentNode->removeChild($dataItem);
-            $data = $dom->saveHTML();
+        // embed classes.
+        $embedClasses = ['embedExternal embedImage', 'js-embed embedResponsive'];
+        foreach($embedClasses as $embedClass) {
+            $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClass')]");
+            if ($dataItem = $xpathQuery->item(0)) {
+                $dataItem->parentNode->removeChild($dataItem);
+            }
         }
+        $data = $dom->saveHTML();
         return $data;
     }
 
