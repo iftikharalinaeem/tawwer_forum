@@ -116,7 +116,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
         $args['BlockExceptions']['#^discussion(/)#']  = Gdn_Dispatcher::BLOCK_NEVER;
-        $args['BlockExceptions']['#^robots.txt#']  = Gdn_Dispatcher::BLOCK_NEVER;
+        $args['BlockExceptions']['#^robots(/|$|\.txt)#']  = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
     /**
