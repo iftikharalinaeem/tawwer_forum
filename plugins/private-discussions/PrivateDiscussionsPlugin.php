@@ -161,13 +161,12 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
      */
     private function stripEmbeds(string $data, DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
-        // emebeded images class.
-        $classname='embedExternal embedImage';
-        $xpath_results = $xpath->query(".//*[contains(@class, '$classname')]");
-        if ($table = $xpath_results->item(0)) {
-            $table ->parentNode->removeChild($table);
-            $str = $dom->saveHTML();
-            $data = $str;
+        // embedded images class.
+        $className='embedExternal embedImage';
+        $xpathQuery = $xpath->query(".//*[contains(@class, '$className')]");
+        if ($dataItem = $xpathQuery->item(0)) {
+            $dataItem->parentNode->removeChild($dataItem);
+            $data = $dom->saveHTML();
         }
         return $data;
     }
