@@ -14,7 +14,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /** @var string */
-    const ADDON_PATH = 'plugins/private-discussions';
+    const ADDON_PATH = 'plugins/privatediscussions';
 
     /** @var int */
     const WORDCOUNT_DEFAULT = 100;
@@ -42,9 +42,19 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /**
      * Run once on enable.
-     * Enable discussionSiteMaps feature flag.
+     *
+     * @return void
      */
     public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Run on utility/update.
+     *
+     * @return void
+     */
+    public function structure() {
         $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
     }
 
@@ -131,6 +141,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             // unset panel modules
             $sender->Assets['Panel'] = [];
             // render view override
+            Gdn_Theme::section('DiscussionRestricted');
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
         }
@@ -241,7 +252,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
 if (!function_exists('formatBody')) {
     /**
-     * Override this function to return the Body as is since it has already been formatted
+     * Override this function to return the Body as is since if it
      *
      * Event argument for $object will be 'Comment' or 'Discussion'.
      *
@@ -251,7 +262,11 @@ if (!function_exists('formatBody')) {
      */
     function formatBody($object) {
         Gdn::controller()->fireEvent('BeforeCommentBody');
-        $object->FormatBody = $object->Body;
+        if (Gdn_Theme::inSection('DiscussionRestricted')) {
+            $object->FormatBody = $object->Body;
+        } else {
+            $object->FormatBody = Gdn_Format::to($object->Body, $object->Format);
+        }
         Gdn::controller()->fireEvent('AfterCommentFormat');
 
         return $object->FormatBody;
