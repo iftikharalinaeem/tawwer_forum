@@ -227,28 +227,32 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url($urlCode);
 
+        $knowledgeBaseSourceLocale = $knowledgeBase['sourceLocale'] ?? null;
+        $locale = $knowledgeBase['locale'] ?? $knowledgeBase['sourceLocale'];
+
         // If the kb's source locale is different from the queried locale, check if there's a matching site-section.
-        //  If there isn't build the url off of the sourceLocale.
-        if ($knowledgeBase['sourceLocale'] !== $knowledgeBase['locale']) {
+        // If there isn't build the url off of the sourceLocale.
+        if ($locale && ($knowledgeBaseSourceLocale !== $locale)) {
             $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
             if ($siteSections) {
                 $siteSectionsLocales = [];
                 foreach ($siteSections as $siteSection) {
                     $siteSectionsLocales[] = $siteSection->getContentLocale();
                 }
-                $localeAvailable = in_array($knowledgeBase['locale'], $siteSectionsLocales);
+                $localeAvailable = in_array($locale, $siteSectionsLocales);
                 if (!$localeAvailable) {
-                    $knowledgeBase['locale'] = $knowledgeBase['sourceLocale'];
+                    $locale = $knowledgeBaseSourceLocale;
                 }
             } else {
                 // no site-sections use the sourceLocale.
-                $knowledgeBase['locale'] = $knowledgeBase['sourceLocale'];
+                $locale = $knowledgeBaseSourceLocale;
             }
         }
 
-        $locale = $knowledgeBase['locale'] ??
-            $knowledgeBase['sourceLocale'] ??
-            $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        // if for some reason it doesn't exist fall back to the current site-section locale.
+        if (!$locale) {
+           $locale = $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        }
 
 
         $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
