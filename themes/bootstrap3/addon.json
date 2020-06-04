@@ -4,7 +4,6 @@
     "version": "2.5.7",
     "url": "https://github.com/kasperisager/vanilla-bootstrap",
     "license": "MIT",
-    "hidden": true,
     "options": {
         "styles": {
             "default": "%s_default",
