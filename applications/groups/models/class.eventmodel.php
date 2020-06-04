@@ -604,18 +604,21 @@ class EventModel extends Gdn_Model {
      *
      * @param int $eventID
      * @param array $where
-     * @param string $orderFields
-     * @param string $orderDirection
-     * @param bool $limit
-     * @param int $offset
+     * @param array $options
+     *
      * @return array
      */
-    public function getAttendingUsers(int $eventID, array $where = [], $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
+    public function getAttendingUsers(int $eventID, array $where = [], $options = []): array {
+        $orderFields = $options['orderFields'] ?? '';
+        $orderDirection = $options['orderDirection']  ?? 'asc';
+        $limit = $options['limit'] ?? false;
+        $offset = $options['offset'] ?? 0;
+
         return $this->SQL
             ->select()
             ->from('UserEvent')
             ->where('EventID', $eventID)
-            ->whereIn('Attending', $where)
+            ->where('Attending', $where)
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
             ->get()->resultArray();

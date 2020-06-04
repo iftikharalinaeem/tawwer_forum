@@ -32,6 +32,8 @@ class EventsApiController extends AbstractApiController {
 
     use FormatCompatTrait;
 
+    const ATTENDEE_USER_LIMIT = 10;
+
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
 
@@ -231,26 +233,40 @@ class EventsApiController extends AbstractApiController {
                 $this->isExpandField('attendees.no', $expand) ||
                 $this->isExpandField('attendees.no', $expand)
             ) {
+
+                $attendingUsers = [];
                 $where = [];
+                $options = [
+                    'orderFields' => '',
+                    'orderDirection' => 'asc',
+                    'limit' =>  self::ATTENDEE_USER_LIMIT,
+                ];
 
                 if (in_array('attendees.yes', $expand)) {
+                    $attendingUsers['yes'] = $this->eventModel->getAttendingUsers($id,
+                        ['Attending' => 'yes' ],
+                        $options
+                    );
                     $where[] = 'yes';
                 }
 
                 if (in_array('attendees.no', $expand)) {
+                    $attendingUsers['no'] = $this->eventModel->getAttendingUsers($id,
+                        ['Attending' => 'no' ],
+                        $options
+                    );
                     $where[] = 'no';
                 }
 
                 if (in_array('attendees.maybe', $expand))  {
+                    $attendingUsers['maybe'] = $this->eventModel->getAttendingUsers($id,
+                        ['Attending' => 'maybe' ],
+                        $options
+                    );
                     $where[] = 'maybe';
                 }
 
-                $attendingUsers = $this->eventModel->getAttendingUsers($id,
-                    $where,
-                    $orderFields = '',
-                    $orderDirection = 'asc',
-                    $limit = 10
-                );
+
                 $counts = $this->eventModel->getAttendingCounts($id, $where);
                 $eventAttendees = $this->expandEventAttendees($attendingUsers, $counts);
                 if ($eventAttendees) {
@@ -976,50 +992,34 @@ class EventsApiController extends AbstractApiController {
     /**
      * Expand event attendees.
      *
-     * @param array $allAttendees
+     * @param array $attendingUsers
      * @param array $counts
      * @return array
      */
-    private function expandEventAttendees(array $allAttendees, array $counts): array {
-        $attendeesYes = [];
-        $attendeesNo = [];
-        $attendeesMaybe = [];
-
-        foreach ($allAttendees as $attendee) {
-            $attendingStatus = $attendee['Attending'] ?? null;
-            if ($attendingStatus === 'Yes') {
-                $attendeesYes[] = $attendee;
-            }
-            if ($attendingStatus === 'No') {
-                $attendeesNo[] = $attendee;
-            }
-            if ($attendingStatus === 'Maybe') {
-                $attendeesMaybe[] = $attendee;
-            }
-        }
+    private function expandEventAttendees(array $attendingUsers, array $counts): array {
 
         $attendeeData = [];
 
-        if ($attendeesYes) {
-            $yesCount = count($attendeesYes);
-            $this->addUserFragments($attendeesYes, $yesCount);
-            $attendeeData['attending.yes.users'] = array_column($attendeesYes, 'User') ?? [];
+        if ($attendingUsers['yes'] ?? false) {
+            $yesCount = count($attendingUsers['yes']);
+            $this->addUserFragments($attendingUsers['yes'], $yesCount);
+            $attendeeData['attending.yes.users'] = array_column($attendingUsers['yes'], 'User') ?? [];
             $index = array_search('Yes', array_column($counts, 'Attending'));
             $attendeeData['attending.yes.count'] = $counts[$index]['count'] ?? 0;
         }
 
-        if ($attendeesNo) {
-            $noCount = count($attendeesNo);
-            $this->addUserFragments($attendeesNo, $noCount);
-            $attendeeData['attending.no.users'] = array_column($attendeesNo, 'User') ?? [];
+        if ($attendingUsers['no'] ?? false) {
+            $noCount = count($attendingUsers['no']);
+            $this->addUserFragments($attendingUsers['no'], $noCount);
+            $attendeeData['attending.no.users'] = array_column($attendingUsers['no'], 'User') ?? [];
             $index = array_search('No', array_column($counts, 'Attending'));
             $attendeeData['attending.no.count'] = $counts[$index]['count'] ?? 0;
         }
 
-        if ($attendeesMaybe) {
-            $maybeCount = count($attendeesMaybe);
-            $this->addUserFragments($attendeesMaybe, $maybeCount);
-            $attendeeData['attending.maybe.users'] = array_column($attendeesMaybe, 'User') ?? [];
+        if ($attendingUsers['maybe'] ?? false) {
+            $maybeCount = count($attendingUsers['maybe'] );
+            $this->addUserFragments($attendingUsers['maybe'] , $maybeCount);
+            $attendeeData['attending.maybe.users'] = array_column($attendingUsers['maybe'] , 'User') ?? [];
             $index = array_search('Maybe', array_column($counts, 'Attending'));
             $attendeeData['attending.maybe.count'] = $counts[$index]['count'] ?? 0;
         }
