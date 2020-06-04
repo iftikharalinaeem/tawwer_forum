@@ -5,6 +5,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\HtmlUtils;
 
 /**
  * Ideation Plugin
@@ -1767,8 +1768,9 @@ EOT
         $urlCode2 = strtolower($urlCode);
         $url = url("/react/discussion/$urlCode2?id=$id&selfreact=true");
         $dataAttr = "data-reaction=\"$urlCode2\"";
-
-        return getReactionButtonHtml($linkClass, $url, $label, $urlCode2, $dataAttr);
+        $discussionName = $discussion->Name;
+        $voteUp = strtolower($urlCode) === "up";
+        return getReactionButtonHtml($linkClass, $url, $label, $urlCode2, $dataAttr, $discussionName, $voteUp);
     }
 
     /**
@@ -2223,10 +2225,19 @@ if (!function_exists('getReactionButtonHtml')) {
      * @param string $label The reaction's label.
      * @param string $urlCode The url code of the reaction to be appended to the arrow css class.
      * @param string $dataAttr The data attribute for the reaction (used in reaction javascript).
+     * @param string $discussionName The discussion name
+     * @param bool $voteUp The direction
      * @return string HTML representation of the ideation reactions (up and down votes).
      */
-    function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '') {
-        return '<a class="Hijack idea-button '.$cssClass.'" href="'.$url.'" title="'.$label.'" '.$dataAttr.' rel="nofollow"><span class="arrow arrow-'.$urlCode.'"></span> <span class="idea-label">'.$label.'</span></a>';
+    function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '', $discussionName = null, $voteUp = null) {
+        $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($voteUp ? "Vote Up" : "Vote Down"), $discussionName]);
+        return '<a class="Hijack idea-button '.$cssClass.'"
+            href="'.$url.'"
+            title="'.$label.'" '.$dataAttr.'
+            rel="nofollow"
+            aria-label="'.$accessibleLabel.'"
+            ><span class="arrow arrow-'.$urlCode.'"
+            ></span> <span class="idea-label">'.$label.'</span></a>';
     }
 }
 
@@ -2267,6 +2278,7 @@ if (!function_exists('getStatusTagHtml')) {
             $statusCode = htmlspecialchars($statusName);
         }
         $statusCssClass = slugify($statusName);
+
         return ' <a href="'.url('/discussions/tagged/'.$statusCode).'" class="MItem MItem-'.$statusCssClass.' IdeationTag"><span class="Tag Status-Tag-'.$statusCssClass.'">'.$statusName.'</span></a> ';
     }
 }

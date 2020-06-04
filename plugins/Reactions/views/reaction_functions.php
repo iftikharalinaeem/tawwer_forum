@@ -11,6 +11,7 @@
 if (!defined('APPLICATION')) {
     exit();
 }
+use Vanilla\Utility\HtmlUtils;
 
 if (!function_exists('FormatScore')) {
     /**
@@ -173,13 +174,19 @@ if (!function_exists('ReactionButton')) {
             $dataAttr = "data-reaction=\"$urlCode2\"";
         }
 
+        $discussionName = is_array($row) ? $row["Name"] : $row->Name;
+
+        $upAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Up"), $discussionName]);
+        $downAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Down"), $discussionName]);
+
+
         if ($permissionClass && $permissionClass !== 'Positive' && !checkPermission('Garden.Moderation.Manage')) {
             $result = <<<EOT
-<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
+<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" aria-label="$upAccessibleLabel" title="$label" rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 EOT;
         } else {
             $result = <<<EOT
-<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
+<a class="Hijack ReactButton $linkClass" href="$url" tabindex="0" aria-label="$downAccessibleLabel" title="$label" $dataAttr rel="nofollow"><span class="ReactSprite $spriteClass"></span> $countHtml<span class="ReactLabel">$label</span></a>
 
 EOT;
         }

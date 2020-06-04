@@ -1,12 +1,11 @@
 <?php
 /**
- * Idea Counter Module
+ * @copyright 2009-2020 Vanilla Forums Inc.
+ * @license Proprietary
  */
 
 /**
  * Class IdeaCounterModule
- *
- *
  */
 class IdeaCounterModule extends Gdn_Module {
 
@@ -47,7 +46,12 @@ class IdeaCounterModule extends Gdn_Module {
      */
     protected static $instance;
 
-    function __construct() {}
+    /**
+     * IdeaCounterModule constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+    }
 
     /**
      * Return the singleton instance of this class. Should be used instead of instantiating a new IdeaCounterModule
@@ -63,6 +67,8 @@ class IdeaCounterModule extends Gdn_Module {
     }
 
     /**
+     * Set discussion
+     *
      * @param object|array $discussion The discussion to render the counter module for.
      * @return IdeaCounterModule $this
      */
@@ -144,7 +150,14 @@ class IdeaCounterModule extends Gdn_Module {
     public function toString() {
         if ($this->prepare()) {
             ob_start();
-            renderCounterBox($this->counter, $this->useDownVotes, $this->showVotes, $this->ideaUpReactionSlug, $this->ideaDownReactionSlug);
+            renderCounterBox(
+                $this->counter,
+                $this->useDownVotes,
+                $this->showVotes,
+                $this->ideaUpReactionSlug,
+                $this->ideaDownReactionSlug,
+                $this->discussion->Name
+            );
             $box = ob_get_contents();
             ob_end_clean();
             return $box;
@@ -158,7 +171,18 @@ class IdeaCounterModule extends Gdn_Module {
  * Outputs a counter that includes voting buttons.
  */
 if (!function_exists('renderCounterBox')) {
-    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug) { ?>
+    /**
+     * Outputs a counter that includes voting buttons.
+     *
+     * @param int $counter
+     * @param int $useDownVotes
+     * @param bool $showVotes
+     * @param string $ideaUpReactionSlug
+     * @param string $ideaDownReactionSlug
+     * @param string $discussionName
+     */
+    function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug, $discussionName) {
+        ?>
         <div class="idea-counter-module <?php echo val('state', $counter).' '.val('cssClass', $counter); ?>">
             <div class="idea-counter-box">
                 <?php echo getScoreHtml(val('score', $counter)); ?>
@@ -166,9 +190,29 @@ if (!function_exists('renderCounterBox')) {
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php
-                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug), 'data-reaction="'.strtolower($ideaUpReactionSlug).'"');
+                            /**
+                             * Output reactions
+                             */
+
+                            echo getReactionButtonHtml(
+                                'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter),
+                                val('upUrl', $counter),
+                                $ideaUpReactionSlug,
+                                strtolower($ideaUpReactionSlug),
+                                'data-reaction="'.strtolower($ideaUpReactionSlug).'"',
+                                $discussionName,
+                                true
+                            );
                             if ($useDownVotes) {
-                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug), 'data-reaction="'.strtolower($ideaDownReactionSlug).'"');
+                                echo getReactionButtonHtml(
+                                    'ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter),
+                                    val('downUrl', $counter),
+                                    $ideaDownReactionSlug,
+                                    strtolower($ideaDownReactionSlug),
+                                    'data-reaction="'.strtolower($ideaDownReactionSlug).'"',
+                                    $discussionName,
+                                    true
+                                );
                             }
                             ?>
                         </span>
