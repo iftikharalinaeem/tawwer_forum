@@ -232,7 +232,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         // If the kb's source locale is different from the queried locale, check if there's a matching site-section.
         // If there isn't build the url off of the sourceLocale.
-        if ($locale && ($knowledgeBaseSourceLocale !== $locale)) {
+        if ($knowledgeBaseSourceLocale !== $locale) {
             $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
             if ($siteSections) {
                 $siteSectionsLocales = [];
