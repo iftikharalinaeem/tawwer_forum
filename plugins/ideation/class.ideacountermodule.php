@@ -154,10 +154,10 @@ class IdeaCounterModule extends Gdn_Module {
     }
 }
 
-/**
- * Outputs a counter that includes voting buttons.
- */
 if (!function_exists('renderCounterBox')) {
+    /**
+     * Outputs a counter that includes voting buttons.
+     */
     function renderCounterBox($counter, $useDownVotes, $showVotes, $ideaUpReactionSlug, $ideaDownReactionSlug, $discussionName) { ?>
         <div class="idea-counter-module <?php echo val('state', $counter).' '.val('cssClass', $counter); ?>">
             <div class="idea-counter-box">
@@ -166,9 +166,16 @@ if (!function_exists('renderCounterBox')) {
                     <div class="vote idea-menu">
                         <span class="idea-buttons">
                             <?php
-                            echo getReactionButtonHtml('ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug), 'data-reaction="'.strtolower($ideaUpReactionSlug).'"', $discussionName, true);
+                            echo getReactionButtonHtml(
+                                'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug),
+                                'data-reaction="'.strtolower($ideaUpReactionSlug).'"', $discussionName,
+                                true
+                            );
                             if ($useDownVotes) {
-                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug), 'data-reaction="'.strtolower($ideaDownReactionSlug).'"', $discussionName, true);
+                                echo getReactionButtonHtml('ReactButton-'.$ideaDownReactionSlug.' '.val('downCssClass', $counter), val('downUrl', $counter), $ideaDownReactionSlug, strtolower($ideaDownReactionSlug),
+                                    'data-reaction="'.strtolower($ideaDownReactionSlug).'"', $discussionName,
+                                    true
+                                );
                             }
                             ?>
                         </span>

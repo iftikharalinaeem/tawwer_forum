@@ -382,11 +382,14 @@ class RoleTrackerPlugin extends Gdn_Plugin {
             if (in_array($tagData['TagID'], $tagIDs)) {
                 $tagFullName = htmlspecialchars(t($tagData['FullName']));
                 $tagName = htmlspecialchars(strtolower(t($tagData['Name'])));
-
-                $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [sprintf('Tagged with "%s"', $tagName), is_array($discussion) ? $discussion["Name"] : $discussion->Name]);
-
+                $accessibleLabel= HtmlUtils::accessibleLabel(
+                    '%s for discussion: "%s"',
+                    [
+                        sprintf('Tagged with "%s"', $tagName),
+                        is_array($discussion) ? $discussion["Name"] : $discussion->Name
+                    ]
+                );
                 echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow aria-label="'. $accessibleLabel . '" class="Tag tag-tracker tag-'.$tagName.'-tracker" title="'.$linksTitle.'">'.$tagFullName.'</a> ';
-
             }
         }
     }
