@@ -7,6 +7,7 @@
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Navigation\GroupRecordType;
@@ -618,6 +619,26 @@ class EventModel extends Gdn_Model {
             ->orderBy($orderFields, $orderDirection)
             ->limit($limit, $offset)
             ->get()->resultArray();
+    }
+
+    /**
+     * Get the counts for users attending an event.
+     *
+     * @param int $eventID
+     * @param array $where
+     * @return array
+     */
+    public function getAttendingCounts(int $eventID, array $where): array {
+        $in = "'". implode("','", $where) . "'";
+        $query = "select Attending, count(EventID) as count 
+            from GDN_UserEvent 
+            where eventID = ${eventID} 
+            and Attending In (${in}) 
+            Group By Attending;";
+
+        $result = $this->SQL->query($query)->resultArray();
+
+        return $result;
     }
 
 
