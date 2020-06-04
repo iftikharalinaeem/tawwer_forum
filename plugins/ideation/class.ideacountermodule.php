@@ -167,6 +167,9 @@ class IdeaCounterModule extends Gdn_Module {
     }
 }
 
+/**
+ * Outputs a counter that includes voting buttons.
+ */
 if (!function_exists('renderCounterBox')) {
     /**
      * Outputs a counter that includes voting buttons.
