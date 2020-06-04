@@ -4,19 +4,14 @@
  * @license Proprietary
  */
 
-namespace Vanilla\Plugins\PrivateDiscussions;
-
-use stdClass;
 use Vanilla\Contracts\ConfigurationInterface;
-use \DOMDocument;
-use \DOMXPath;
 
 /**
  * Class PrivateDiscussionsPlugin
  *
- * Display restricted discussion for guests.
+ * Display restricted discussion view for guests.
  */
-class PrivateDiscussionsPlugin extends \Gdn_Plugin {
+class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /** @var string */
     const ADDON_PATH = 'plugins/private-discussions';
@@ -27,19 +22,30 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /** @var bool */
     const STRIPEMBEDS_DEFAULT = true;
 
-    /** @var \Gdn_Session */
+    /** @var bool */
+    const FEATURE_DISCUSSIONSITEMAPS_DEFAULT = true;
+
+    /** @var Gdn_Session */
     private $session;
 
     /**
      * PrivateDiscussionsPlugin constructor.
      *
      * @param ConfigurationInterface $configuration
-     * @param \Gdn_Session $session
+     * @param Gdn_Session $session
      */
-    public function __construct(ConfigurationInterface $configuration, \Gdn_Session $session) {
+    public function __construct(ConfigurationInterface $configuration, Gdn_Session $session) {
         parent::__construct();
         $this->config = $configuration;
         $this->session = $session;
+    }
+
+    /**
+     * Run once on enable.
+     * Enable discussionSiteMaps feature flag.
+     */
+    public function setup() {
+        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
     }
 
     /**
@@ -62,9 +68,9 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Plugin settings page.
      *
-     * @param \SettingsController $sender
+     * @param SettingsController $sender
      */
-    public function settingsController_privatediscussions_create(\Gdn_Controller $sender) {
+    public function settingsController_privatediscussions_create(Gdn_Controller $sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', t('Private Discussions Settings'));
 
@@ -73,7 +79,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateRequired', 'Word Count is required');
         }
 
-        $configurationModule = new \ConfigurationModule($sender);
+        $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
             'Plugins.PrivateDiscussions.StripEmbeds' => [
                 'LabelCode' => 'Strip Embeds',
@@ -93,17 +99,18 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
     /**
      * Adds a dispatcher block exception for discussion page.
      *
-     * @param \Gdn_Dispatcher $sender
-     * @param \ Gdn_Dispatcher $args
+     * @param Gdn_Dispatcher $sender
+     * @param Gdn_Dispatcher $args
      */
     public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
-        $args['BlockExceptions']['#^discussion(/)#']  = \Gdn_Dispatcher::BLOCK_NEVER;
+        $args['BlockExceptions']['#^discussion(/)#']  = Gdn_Dispatcher::BLOCK_NEVER;
+        $args['BlockExceptions']['#^robots.txt#']  = Gdn_Dispatcher::BLOCK_NEVER;
     }
 
     /**
      * Massage the data and switch the view.
      *
-     * @param \DiscussionController $sender
+     * @param DiscussionController $sender
      */
     public function discussionController_render_before($sender) {
         $canViewCategory = $this->session->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
@@ -117,7 +124,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
             if (!$discussionBody || !$discussionFormat) {
                 return;
             }
-            $data = \Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
+            $data = Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
             $massagedData = $this->massageData($data);
             // set data back to the controller
             $sender->Data['Discussion']->Body = $massagedData;
@@ -158,7 +165,7 @@ class PrivateDiscussionsPlugin extends \Gdn_Plugin {
         $xpath = new DomXPath($dom);
         // embed classes.
         $embedClasses = ['embedExternal embedImage', 'js-embed embedResponsive'];
-        foreach($embedClasses as $embedClass) {
+        foreach ($embedClasses as $embedClass) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClass')]");
             if ($dataItem = $xpathQuery->item(0)) {
                 $dataItem->parentNode->removeChild($dataItem);
@@ -243,9 +250,9 @@ if (!function_exists('formatBody')) {
      * @since 2.1
      */
     function formatBody($object) {
-        \Gdn::controller()->fireEvent('BeforeCommentBody');
+        Gdn::controller()->fireEvent('BeforeCommentBody');
         $object->FormatBody = $object->Body;
-        \Gdn::controller()->fireEvent('AfterCommentFormat');
+        Gdn::controller()->fireEvent('AfterCommentFormat');
 
         return $object->FormatBody;
     }
