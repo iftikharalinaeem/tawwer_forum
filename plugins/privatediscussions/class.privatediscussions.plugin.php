@@ -126,7 +126,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($sender) {
         $canViewCategory = $this->session->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
-        // private communities is enable but guest has view permission
+        // private communities is enabled but guest has view permission
         if (!$this->session->isValid() && $canViewCategory && (bool)c('Garden.PrivateCommunity')) {
             if (!$sender->CategoryID) {
                 redirectTo('/entry/signin');
@@ -161,9 +161,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         @$dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
             $this->stripEmbeds($dom);
+            $data = $this->stripImages($dom);
         }
-        // remove images when using advanced editor.
-        $data = $this->stripImages($dom);
         // trim to word count
         $data = $this->stripText($data, $dom);
         return $data;
@@ -178,7 +177,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     private function stripEmbeds(DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
         // embed classes.
-        $embedClasses = ['js-embed', ' embedResponsive', 'embedExternal', 'embedImage'];
+        $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage'];
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
             $dataItem = $xpathQuery->item(0);
