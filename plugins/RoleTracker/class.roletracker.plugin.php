@@ -389,7 +389,10 @@ class RoleTrackerPlugin extends Gdn_Plugin {
                         is_array($discussion) ? $discussion["Name"] : $discussion->Name
                     ]
                 );
-                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'" nofollow aria-label="'. $accessibleLabel . '" class="Tag tag-tracker tag-'.$tagName.'-tracker" title="'.$linksTitle.'">'.$tagFullName.'</a> ';
+                echo ' <a href="'.url('/roletracker/jump/'.val('DiscussionID', $discussion)).'"
+                    nofollow aria-label="'. $accessibleLabel . '"
+                    class="Tag tag-tracker tag-'.$tagName.'-tracker"
+                    title="'.$linksTitle.'">'.$tagFullName.'</a> ';
             }
         }
     }

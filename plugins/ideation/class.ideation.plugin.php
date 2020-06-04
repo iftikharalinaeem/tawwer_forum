@@ -2225,10 +2225,11 @@ if (!function_exists('getReactionButtonHtml')) {
      * @param string $label The reaction's label.
      * @param string $urlCode The url code of the reaction to be appended to the arrow css class.
      * @param string $dataAttr The data attribute for the reaction (used in reaction javascript).
+     * @param string $discussionName The discussion name
      * @param bool $voteUp The direction
      * @return string HTML representation of the ideation reactions (up and down votes).
      */
-    function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '', $discussionName, $voteUp) {
+    function getReactionButtonHtml($cssClass, $url, $label, $urlCode, $dataAttr = '', $discussionName = null, $voteUp = null) {
         $accessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t($voteUp ? "Vote Up" : "Vote Down"), $discussionName]);
         return '<a class="Hijack idea-button '.$cssClass.'"
             href="'.$url.'"

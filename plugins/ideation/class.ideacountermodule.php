@@ -1,5 +1,8 @@
 <?php
 /**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ *
  * Idea Counter Module
  */
 
@@ -157,6 +160,7 @@ class IdeaCounterModule extends Gdn_Module {
 if (!function_exists('renderCounterBox')) {
     /**
      * Outputs a counter that includes voting buttons.
+     *
      * @param int $counter
      * @param int $useDownVotes
      * @param bool $showVotes
@@ -174,7 +178,9 @@ if (!function_exists('renderCounterBox')) {
                         <span class="idea-buttons">
                             <?php
                             echo getReactionButtonHtml(
-                                'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter), val('upUrl', $counter), $ideaUpReactionSlug, strtolower($ideaUpReactionSlug),
+                                'ReactButton-'.$ideaUpReactionSlug.' '.val('upCssClass', $counter),
+                                val('upUrl', $counter),
+                                $ideaUpReactionSlug, strtolower($ideaUpReactionSlug),
                                 'data-reaction="'.strtolower($ideaUpReactionSlug).'"', $discussionName,
                                 true
                             );
