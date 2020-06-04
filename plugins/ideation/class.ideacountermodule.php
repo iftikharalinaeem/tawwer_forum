@@ -2,14 +2,10 @@
 /**
  * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
- *
- * Idea Counter Module
  */
 
 /**
  * Class IdeaCounterModule
- *
- *
  */
 class IdeaCounterModule extends Gdn_Module {
 
