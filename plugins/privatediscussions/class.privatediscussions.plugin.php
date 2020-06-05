@@ -158,7 +158,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     private function massageData(string $data) {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
-        @$dom->loadHTML($data);
+        $dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
             $this->stripEmbeds($dom);
             $data = $this->stripImages($dom);
@@ -180,15 +180,19 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap'];
         foreach ($embedClasses as $key => $value) {
             $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
-            $dataItem = $xpathQuery->item(0);
-            if ($dataItem) {
-                $dataItem->parentNode->removeChild($dataItem);
+            $xpathDivQuery = $xpath->query("//div[@data-embedjson]");
+            $dataClassItem = $xpathQuery->item(0);
+            $dataDivItem = $xpathDivQuery->item(0);
+            if ($dataClassItem) {
+                $dataClassItem->parentNode->removeChild($dataClassItem);
+            } elseif ($dataDivItem) {
+                $dataDivItem->parentNode->removeChild($dataDivItem);
             }
         }
         $data = $dom->saveHTML();
         return $data;
     }
-
+    
     /**
      * Strip images.
      *
