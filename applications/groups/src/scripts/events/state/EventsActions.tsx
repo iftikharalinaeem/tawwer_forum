@@ -38,7 +38,7 @@ type IEventPostParticipant = {
 };
 export interface IGetEventsQuery {
     parentRecordType: string;
-    parentRecordID: number;
+    parentRecordID?: number;
     dateStarts?: string;
     dateEnds?: string;
     sort?: string;
