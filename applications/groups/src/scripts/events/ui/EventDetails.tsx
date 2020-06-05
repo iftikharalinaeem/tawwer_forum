@@ -21,8 +21,8 @@ import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
 
 interface IAttendees {
-    users: IUserFragment[] | undefined,
-    count: number | undefined,
+    users: IUserFragment[] | undefined;
+    count: number | undefined;
 }
 
 interface IProps {
