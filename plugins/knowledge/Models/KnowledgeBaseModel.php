@@ -251,7 +251,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         // if for some reason it doesn't exist fall back to the current site-section locale.
         if (!$locale) {
-           $locale = $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+            $locale = $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
         }
 
 
