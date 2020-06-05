@@ -153,7 +153,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     /**
      * Massage the data.
      *
-     * @param string $data
+     * @param string $data The data string
+     * @return string $data The Massaged data string
      */
     private function massageData(string $data) {
         $dom = new DOMDocument();
@@ -172,7 +173,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * Strip embeds from the data string.
      *
      * @param DOMDocument $dom
-     * @return string Massaged data
+     * @return string Data without the embeds
      */
     private function stripEmbeds(DOMDocument $dom) :string {
         $xpath = new DomXPath($dom);
@@ -192,9 +193,9 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $data = $dom->saveHTML();
         return $data;
     }
-    
+
     /**
-     * Strip images.
+     * Strip images tags.
      *
      * @param DOMDocument $dom
      * @return string Data stripped of images.
@@ -217,18 +218,18 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param string $data
      * @param DOMDocument $dom
-     * @return string The minified string with its html tags.
+     * @return string The minified text with its html tags.
      */
     private function stripText(string $data, DOMDocument $dom) :string {
         $limit = $this->getWordCount();
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
         $this->stripTextRecursive($dom->documentElement, $limit);
-        $minifiedDiscussion = substr($dom->saveHTML($dom->documentElement), 5, -6);
-        return $minifiedDiscussion;
+        $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
+        return $minifiedText;
     }
 
     /**
-     * Strip text recursively while ignoring html tags.
+     * Strip text recursively while preserving html format.
      *
      * @param mixed $element
      * @param int $limit
