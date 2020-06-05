@@ -24,6 +24,7 @@ import { FrameHeaderMinimal } from "@vanilla/library/src/scripts/layout/frame/Fr
 import classNames from "classnames";
 import React, { useRef, useState } from "react";
 import { SingleDepthChooser } from "@subcommunities/chooser/SingleDepthChooser";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     buttonType?: ButtonTypes;
@@ -86,7 +87,12 @@ export function SubcommunityChooserDropdown(props: IProps) {
     const hasMultipleProducts =
         subcommunitiesByProductID.data && Object.keys(subcommunitiesByProductID.data).length > 1;
 
-    let toggleName: React.ReactNode = <GlobeIcon />;
+    let toggleName: React.ReactNode = (
+        <>
+            <ScreenReaderContent>{t("Global Navigation")}</ScreenReaderContent>
+            <GlobeIcon aria-hidden={"true"} />
+        </>
+    );
 
     if (props.defaultSection && props.fullWidth) {
         if (props.defaultSection === "product") {
