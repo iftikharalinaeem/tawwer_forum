@@ -959,7 +959,7 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
         $subcommunityIDs = $pocketData['SubcommunityIDs'] ?? [];
 
         if (empty($subcommunityIDs)) {
-            return false;
+            return $existingCanRender;
         }
 
         $currentSubcommunity = SubcommunityModel::getCurrent();
