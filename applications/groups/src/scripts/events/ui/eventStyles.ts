@@ -137,7 +137,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const participantsTabsList = makeVars("participantsTabsList", {
         height: 45,
-        bottom: 2,
+        bottom: 3,
         fontWeight: globalVars.fonts.weights.semiBold,
         color: {
             borderBottom: colorOut(globalVars.border.color),
@@ -146,8 +146,9 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const participantsTabsTab = makeVars("participantsTabsTab", {
-        height: participantsTabsList.height - participantsTabsList.bottom, //subtract the border heights
+        height: participantsTabsList.height, //- participantsTabsList.bottom, //subtract the border heights
         border: {
+            top: 3,
             bottom: 3,
         },
     });
@@ -163,7 +164,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const participantsTabsTopButton = makeVars("participantsTabsTopButton", {
         wrapper: {
             right: 6,
-            top: 10,
+            top: 0,
         },
         size: {
             width: iconVars.standard.width,
@@ -559,15 +560,15 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         left: 0,
         right: 0,
         zIndex: 1,
-        height: vars.participantsTabsList.height,
+        // height: vars.participantsTabsList.height,
         backgroundColor: colorOut(globalVars.mainColors.bg),
         fontWeight: vars.participantsTabsList.fontWeight,
         borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
         marginBottom: vars.participantsTabsList.marginBottom,
         $nest: {
             "> *": {
-                paddingLeft: 0,
-                paddingRight: 0,
+                // paddingLeft: 0,
+                // paddingRight: 0,
                 marginRight: globalVars.gutter.size * 3,
             },
             ":first-child": {
@@ -580,6 +581,8 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...buttonResetMixin(),
         // Note height and the border height add up to the height of the list
         height: vars.participantsTabsTab.height,
+        borderTop: "3px solid ${colorOut(globalVars.elementaryColors.transparent)}",
+        borderBottom: "3px solid ${colorOut(globalVars.elementaryColors.transparent)}",
         $nest: {
             "&[data-selected]": {
                 borderBottom: `${vars.participantsTabsTab.border.bottom}px solid ${colorOut(
@@ -614,6 +617,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         zIndex: 2,
         right: vars.participantsTabsTopButton.wrapper.right,
         top: vars.participantsTabsTopButton.wrapper.top,
+        backgroundColor: "red",
+        height: vars.participantsTabsList.height, //- vars.participantsTabsList.bottom,
+        display: "flex",
+        alignItems: "center",
     });
 
     const participantsTabsTopButton = style("participantsTabsTopButton", {
