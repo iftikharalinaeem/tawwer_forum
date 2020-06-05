@@ -15,7 +15,7 @@
             }
 
             if (isset($Row['ImageUrls'][0])){
-                echo '<div class="ImgExt">'.img($Row['ImageUrls'][0], $Row["ImageAttrs"][0]).'</div>';
+                echo '<div class="ImgExt">'.img($Row['ImageUrls'][0], !empty($Row["ImageAttrs"][0]) ?? []).'</div>';
             }
             ?>
             <div class="Media-Body">
