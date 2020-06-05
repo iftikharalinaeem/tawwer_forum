@@ -6,6 +6,7 @@
 var userTokens = {
   start: function() {
     var input = $('.Tokens-User');
+    var translate = window.gdn.translate;
     if (input.length) {
       var author = input.val();
       if (author && author.length) {
@@ -18,7 +19,7 @@ var userTokens = {
       }
 
       input.tokenInput(gdn.url('/user/tagsearch'), {
-        hintText: gdn.definition("TagHint", "Start to type..."),
+        hintText: translate("TagHint", "Start to type..."),
         tokenValue: 'name',
         searchingText: '', // search text gives flickery ux, don't like
         searchDelay: 300,
@@ -27,7 +28,7 @@ var userTokens = {
         prePopulate: author,
         animateDropdown: false,
         allowTabOut: true,
-        ariaLabel: gdn.definition("Invite"),
+        ariaLabel: translate("Invite"),
       });
     }
   }
