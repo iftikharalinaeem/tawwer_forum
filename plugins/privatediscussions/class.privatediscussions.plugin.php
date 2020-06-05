@@ -93,15 +93,15 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
         $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
-            'Plugins.PrivateDiscussions.StripEmbeds' => [
-                'LabelCode' => 'Strip Embeds',
-                'Control' => 'Toggle',
-                'Default' => self::STRIPEMBEDS_DEFAULT
-            ],
             'Plugins.PrivateDiscussions.WordCount' => [
                 'LabelCode' => 'Word Count',
                 'Control' => 'TextBox',
                 'Default' => self::WORDCOUNT_DEFAULT
+            ],
+            'Plugins.PrivateDiscussions.StripEmbeds' => [
+                'LabelCode' => 'Strip Embeds',
+                'Control' => 'Toggle',
+                'Default' => self::STRIPEMBEDS_DEFAULT
             ]
         ]);
 
@@ -126,8 +126,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function discussionController_render_before($sender) {
         $canViewCategory = $this->session->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
-        // private communities is enabled but guest has view permission
-        if (!$this->session->isValid() && $canViewCategory && (bool)c('Garden.PrivateCommunity')) {
+        // guest has view permission
+        if (!$this->session->isValid() && $canViewCategory) {
             if (!$sender->CategoryID) {
                 redirectTo('/entry/signin');
             }
@@ -140,12 +140,15 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             $massagedData = $this->massageData($data);
             // set data back to the controller
             $sender->Data['Discussion']->Body = $massagedData;
-            // unset panel modules
-            $sender->Assets['Panel'] = [];
+            // unset panel guestModule
+            unset($sender->Assets['Panel']['GuestModule']);
             // render view override
             Gdn_Theme::section('DiscussionRestricted');
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
-            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'index,nofollow']);
+            // Private Communities is enabled
+            if ((bool)c('Garden.PrivateCommunity')) {
+                $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'index,nofollow']);
+            }
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
         }
     }

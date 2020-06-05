@@ -15,15 +15,6 @@ echo '<div class="MessageList Discussion">';
 echo '<!-- Page Title -->
 <div id="Item_0" class="PageTitle">';
 
-echo '<div class="Options">';
-
-$this->fireEvent('BeforeDiscussionOptions');
-writeBookmarkLink();
-echo getDiscussionOptionsDropdown();
-writeAdminCheck();
-
-echo '</div>';
-
 echo '<h1>'.$this->data('Discussion.Name').'</h1>';
 
 echo "</div>\n\n";

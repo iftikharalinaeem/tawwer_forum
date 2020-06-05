@@ -5,6 +5,7 @@
     "version": "1.0",
     "type": "addon",
     "priority": 1100,
+    "hidden": true,
     "authors": [
         {
             "name": "Isis Graziatto",

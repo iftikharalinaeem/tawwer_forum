@@ -2,7 +2,7 @@
 
 This addon displays a restricted discussion view for guests.
 
-The restricted view is only triggered if "Private Communities" is enabled and the "guest" role has discussion view permission.
+The restricted view is only triggered if the "guest" role has discussion view permission.
 
 The retricted view differs from the default view where:
 
@@ -37,11 +37,7 @@ The retricted view differs from the default view where:
 
 ### Troubleshooting:
 
-**I enabled the addon but guests are redirected to the signin page when trying to access a discussion.**
+**I enabled the addon but guests can see the whole discussion/are redirected to the signin page.**
 
+- Getting redirected to the signin page mean "Private Communities" is enabled.
 - Make sure the roles "guest" has discussion view permission on that category.
-
-**I enabled the addon but guests can see the whole discussion.**
-
-- Make sure the setting "Private Communities" is enabled. You should find this setting under: Dashboard > Roles & Permissions.
-
