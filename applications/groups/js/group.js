@@ -26,7 +26,8 @@ var userTokens = {
         maxLength: 25,
         prePopulate: author,
         animateDropdown: false,
-        allowTabOut: true
+        allowTabOut: true,
+        ariaLabel: gdn.definition("Invite"),
       });
     }
   }

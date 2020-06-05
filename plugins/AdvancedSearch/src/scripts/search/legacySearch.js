@@ -180,6 +180,7 @@ jQuery(document).ready(function($) {
         prePopulate: author,
         animateDropdown: false,
         allowTabOut: true,
+        ariaLabel: gdn.definition("Author"),
     });
 
     /// Tag token input.
@@ -215,5 +216,6 @@ jQuery(document).ready(function($) {
         prePopulate: tags,
         animateDropdown: false,
         allowTabOut: true,
+        ariaLabel: gdn.definition("Tags"),
     });
 });
