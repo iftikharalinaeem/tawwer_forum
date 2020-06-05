@@ -17,6 +17,7 @@ import {
     IFont,
     negativeUnit,
     unit,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { borders, EMPTY_BORDER, IBorderStyles, singleBorder } from "@library/styles/styleHelpersBorders";
 import { margins, paddings } from "@library/styles/styleHelpersSpacing";
@@ -381,7 +382,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const dropDown = style("dropDown", {
-        ...lineHeightAdjustment(),
         $nest: {
             [`& .${selectBoxClasses().toggle}`]: {
                 marginLeft: "auto",
@@ -430,6 +430,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
         display: "block",
         textAlign: "right",
+    });
+
+    const filterRoot = style("filterRoot", {
+        ...flexHelper().middle(),
     });
 
     const filter = style("filter", {
@@ -644,6 +648,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         viewMore,
         filter,
         filterLabel,
+        filterRoot,
         details,
         separator,
         attendee,

@@ -7,12 +7,19 @@ import RouteHandler from "@library/routing/RouteHandler";
 import { getMeta } from "@library/utility/appUtils";
 import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
 
-function getEventPath(path: string = "") {
+export function getEventPath(path: string = "") {
     const newEventPage = getMeta("themeFeatures.NewEventsPage", false);
     const base = newEventPage ? "events" : "new-events";
 
     return `/${base}${path}`;
 }
+
+export const EventsHomeRoute = new RouteHandler(
+    () => import(/* webpackChunkName: "events/pages/EventsHomePage" */ "@groups/events/pages/EventsHomePage"),
+    [getEventPath("/:parentRecordType(\\w+)")],
+    (data?: { parentRecordType: string }) => getEventPath(`/${data?.parentRecordType}`),
+    EventsPagePlaceholder,
+);
 
 export const EventsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "events/pages/EventsPage" */ "@groups/events/pages/EventsPage"),
@@ -24,10 +31,10 @@ export const EventsRoute = new RouteHandler(
 
 export const EventRoute = new RouteHandler(
     () => import(/* webpackChunkName: "events/pages/EventPage" */ "@groups/events/pages/EventPage"),
-    getEventPath("/:id"),
+    getEventPath("/:id(\\d+)(-[^/]+)"),
     (data: { id: number }) => getEventPath(`/${data.id}`),
 );
 
 export function getEventsRoutes() {
-    return [EventsRoute.route, EventRoute.route];
+    return [EventsRoute.route, EventRoute.route, EventsHomeRoute.route];
 }

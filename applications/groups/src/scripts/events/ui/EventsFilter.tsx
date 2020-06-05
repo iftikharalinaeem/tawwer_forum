@@ -9,6 +9,7 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IGetEventsQuery } from "@groups/events/state/EventsActions";
+import classNames from "classnames";
 
 export enum EventFilterTypes {
     ALL = "all",
@@ -41,6 +42,7 @@ export function useDatesForEventFilter(filter: EventFilterTypes): Partial<IGetEv
 interface IProps {
     filter: EventFilterTypes;
     onFilterChange: (newFilter: EventFilterTypes) => void;
+    className?: string;
 }
 
 /**
@@ -59,7 +61,7 @@ export default function EventFilter(props: IProps) {
     const id = uniqueIDFromPrefix("attendanceFilter");
     const classes = eventsClasses();
     return (
-        <div className={classes.filter}>
+        <div className={classNames(classes.filterRoot, props.className)}>
             <span id={id} className={classes.filterLabel}>
                 {t("View")}:
             </span>

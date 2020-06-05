@@ -22,11 +22,28 @@ class NewEventsController extends AbstractEventsController {
      * @param string|null $parentRecordID
      */
     public function index(?string $parentRecordTypeOrID = null, ?string $parentRecordID = null) {
-        if ($parentRecordID === null) {
-            $this->renderSingleEvent($parentRecordTypeOrID);
+        $parentRecordTypeOrIDParsed = GroupModel::idFromSlug($parentRecordTypeOrID);
+        if ($parentRecordID === null && is_int($parentRecordTypeOrIDParsed)) {
+            $this->renderSingleEvent($parentRecordTypeOrIDParsed);
+        } elseif ($parentRecordID === null) {
+            $this->renderEventsHomepage($parentRecordTypeOrID);
         } else {
             $this->renderEventsList($parentRecordTypeOrID, $parentRecordID);
         }
+    }
+
+    public function renderEventsHomepage($parentRecordType) {
+        Gdn_Theme::section('NewEventList');
+
+//        $newEventModule = new NewEventModule();
+//        $newEventModule->parentRecordType = $parentRecordType;
+//        $this->addModule($newEventModule, 'Panel');
+        $this->addModule(new DiscussionFilterModule($this));
+
+        $this->title(t('Events Home'));
+//        $this->applyBreadcrumbs($parentRecordType, $parentRecordID);
+        $this->addBreadcrumb(t('Events Home'), $this->canonicalUrl());
+        $this->render('index');
     }
 
     /**
@@ -38,7 +55,8 @@ class NewEventsController extends AbstractEventsController {
     private function renderEventsList(?string $parentRecordType, ?string $parentRecordID) {
         Gdn_Theme::section('NewEventList');
 
-        [$parentRecordType, $parentRecordID] = $this->validateParentRecords($parentRecordType ?: 'category', $parentRecordID ?? -1);
+        [$parentRecordType, $parentRecordID] = $this->validateParentRecords($parentRecordType ?: 'category', $parentRecordID);
+
         $this->canonicalUrl($this->eventModel->eventParentUrl($parentRecordType, $parentRecordID));
 
         // Make sure category banner works.

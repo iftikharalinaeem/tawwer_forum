@@ -4,7 +4,8 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
-import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
+import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
+import { useEventsListFilterQuery } from "@groups/events/pages/useEventsListFilterQuery";
 import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
 import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
@@ -20,11 +21,11 @@ import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
 
 export default function EventsPage() {
-    const page = useQueryParamPage();
     const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
     const parentRecordType = params.parentRecordType ?? "category";
     const parentRecordID = params.parentRecordID !== null ? parseInt(params.parentRecordID!) : -1;
 
+    const page = useQueryParamPage();
     const { filter, changeFilter } = useEventsListFilterQuery(page);
 
     const dateQuery = useDatesForEventFilter(filter);
@@ -56,7 +57,7 @@ export default function EventsPage() {
     return (
         <>
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
-            <EventFilter filter={filter} onFilterChange={changeFilter} />
+            <EventFilter className={classes.filter} filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
             <SimplePager
                 url={formatUrl(
