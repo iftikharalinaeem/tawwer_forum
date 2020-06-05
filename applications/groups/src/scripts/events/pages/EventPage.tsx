@@ -42,42 +42,26 @@ export default function EventPage() {
         return <ErrorPage error={eventWithParticipants.error} />;
     }
 
-    let { participants, event } = eventWithParticipants.data;
+    let { event } = eventWithParticipants.data;
 
     const organizer = event.insertUser;
     const crumbs = event.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
-    const going: IUserFragment[] = participants
-        .filter(participant => {
-            if (participant.attending === "yes") {
-                return participant.user;
-            }
-        })
-        .map(participant => {
-            return participant.user;
-        })
-        .filter(notEmpty);
-    const notGoing: IUserFragment[] = participants
-        .filter(participant => {
-            if (participant.attending === "no") {
-                return participant.user;
-            }
-        })
-        .map(participant => {
-            return participant.user;
-        })
-        .filter(notEmpty);
-    const maybe: IUserFragment[] = participants
-        .filter(participant => {
-            if (participant.attending === "maybe") {
-                return participant.user;
-            }
-        })
-        .map(participant => {
-            return participant.user;
-        })
-        .filter(notEmpty);
+    const going = {
+        users: event.attendingYesUsers,
+        count: event.attendingYesCount,
+    };
+
+    const notGoing = {
+        users: event.attendingNoUsers,
+        count: event.attendingNoCount,
+    };
+
+    const maybe = {
+        users: event.attendingMaybeUsers,
+        count: event.attendingMaybeCount,
+    };
 
     return (
         <Container>

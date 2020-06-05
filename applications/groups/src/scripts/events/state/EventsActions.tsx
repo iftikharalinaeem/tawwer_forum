@@ -191,7 +191,6 @@ export class EventsActions extends ReduxActions {
         const thunk = bindThunkAction(EventsActions.getEventACs, async () => {
             const [eventResponse, participantResponse] = await Promise.all([
                 this.api.get(`/events/${eventID}?expand[]=all`),
-                this.api.get(`/events/${eventID}/participants?expand=true`),
             ]);
 
             const result: IEventWithParticipants = {

@@ -175,12 +175,12 @@ class EventsApiController extends AbstractApiController {
                     'description' => 'Is the participant attending the event.',
                 ],
                 'userID:i?' => 'The users ID',
-                'attending.yes.users:a?' => $this->getUserFragmentSchema(),
-                'attending.yes.count:i?',
-                'attending.no.users:a?' => $this->getUserFragmentSchema(),
-                'attending.no.count:i?',
-                'attending.maybe.users:a?' => $this->getUserFragmentSchema(),
-                'attending.maybe.count:i?',
+                'attendingYesUsers:a?' => $this->getUserFragmentSchema(),
+                'attendingYesCount:i?',
+                'attendingNoUsers:a?' => $this->getUserFragmentSchema(),
+                'attendingNoCount:i?',
+                'attendingMaybeUsers:a?' => $this->getUserFragmentSchema(),
+                'attendingMaybeCount:i?',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -241,7 +241,7 @@ class EventsApiController extends AbstractApiController {
                     'limit' =>  self::ATTENDEE_USER_LIMIT,
                 ];
 
-                if (in_array('attendees.yes', $expand)) {
+                if (in_array('attendees.yes', $expand) || in_array('all', $expand)) {
                     $attendingUsers['yes'] = $this->eventModel->getAttendingUsers(
                         $id,
                         ['Attending' => 'yes'],
@@ -250,7 +250,7 @@ class EventsApiController extends AbstractApiController {
                     $where[] = 'yes';
                 }
 
-                if (in_array('attendees.no', $expand)) {
+                if (in_array('attendees.no', $expand) || in_array('all', $expand)) {
                     $attendingUsers['no'] = $this->eventModel->getAttendingUsers(
                         $id,
                         ['Attending' => 'no'],
@@ -259,7 +259,7 @@ class EventsApiController extends AbstractApiController {
                     $where[] = 'no';
                 }
 
-                if (in_array('attendees.maybe', $expand)) {
+                if (in_array('attendees.maybe', $expand) || in_array('all', $expand)) {
                     $attendingUsers['maybe'] = $this->eventModel->getAttendingUsers(
                         $id,
                         ['Attending' => 'maybe'],
@@ -1003,25 +1003,25 @@ class EventsApiController extends AbstractApiController {
         if ($attendingUsers['yes'] ?? false) {
             $yesCount = count($attendingUsers['yes']);
             $this->addUserFragments($attendingUsers['yes'], $yesCount);
-            $attendeeData['attending.yes.users'] = array_column($attendingUsers['yes'], 'User') ?? [];
+            $attendeeData['attendingYesUsers'] = array_column($attendingUsers['yes'], 'User') ?? [];
             $index = array_search('Yes', array_column($counts, 'Attending'));
-            $attendeeData['attending.yes.count'] = $counts[$index]['count'] ?? 0;
+            $attendeeData['attendingYesCount'] = $counts[$index]['count'] ?? 0;
         }
 
         if ($attendingUsers['no'] ?? false) {
             $noCount = count($attendingUsers['no']);
             $this->addUserFragments($attendingUsers['no'], $noCount);
-            $attendeeData['attending.no.users'] = array_column($attendingUsers['no'], 'User') ?? [];
+            $attendeeData['attendingNoUsers'] = array_column($attendingUsers['no'], 'User') ?? [];
             $index = array_search('No', array_column($counts, 'Attending'));
-            $attendeeData['attending.no.count'] = $counts[$index]['count'] ?? 0;
+            $attendeeData['attendingNoCount'] = $counts[$index]['count'] ?? 0;
         }
 
         if ($attendingUsers['maybe'] ?? false) {
             $maybeCount = count($attendingUsers['maybe']);
             $this->addUserFragments($attendingUsers['maybe'], $maybeCount);
-            $attendeeData['attending.maybe.users'] = array_column($attendingUsers['maybe'], 'User') ?? [];
+            $attendeeData['attendingMaybeUsers'] = array_column($attendingUsers['maybe'], 'User') ?? [];
             $index = array_search('Maybe', array_column($counts, 'Attending'));
-            $attendeeData['attending.maybe.count'] = $counts[$index]['count'] ?? 0;
+            $attendeeData['attendingMaybeCount'] = $counts[$index]['count'] ?? 0;
         }
         return $attendeeData;
     }
