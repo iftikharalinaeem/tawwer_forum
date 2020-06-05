@@ -6,21 +6,21 @@
  */
 
 use Garden\Schema\Schema;
-use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
-use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
+use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\Community\Schemas\GroupFragmentSchema;
 use Vanilla\DateFilterSchema;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Groups\Models\EventPermissions;
-use Vanilla\Groups\Models\GroupPermissions;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\FormatSchema;
+use Vanilla\SchemaFactory;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\CapitalCaseScheme;
 use Vanilla\Utility\InstanceValidatorSchema;
@@ -31,6 +31,8 @@ use Vanilla\Utility\InstanceValidatorSchema;
 class EventsApiController extends AbstractApiController {
 
     use FormatCompatTrait;
+
+    const ATTENDEE_USER_LIMIT = 10;
 
     /** @var CapitalCaseScheme */
     private $capitalCaseScheme;
@@ -47,6 +49,9 @@ class EventsApiController extends AbstractApiController {
     /** @var UserModel */
     private $userModel;
 
+    /** @var CategoryModel */
+    private $categoryModel;
+
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
@@ -62,13 +67,15 @@ class EventsApiController extends AbstractApiController {
         GroupModel $groupModel,
         UserModel $userModel,
         BreadcrumbModel $breadcrumbModel,
-        FormatService $formatService
+        FormatService $formatService,
+        CategoryModel $categoryModel
     ) {
         $this->eventModel = $eventModel;
         $this->groupModel = $groupModel;
         $this->userModel = $userModel;
         $this->breadcrumbModel =  $breadcrumbModel;
         $this->formatService = $formatService;
+        $this->categoryModel = $categoryModel;
 
         $this->camelCaseScheme = new CamelCaseScheme();
         $this->capitalCaseScheme = new CapitalCaseScheme();
@@ -168,6 +175,12 @@ class EventsApiController extends AbstractApiController {
                     'description' => 'Is the participant attending the event.',
                 ],
                 'userID:i?' => 'The users ID',
+                'attending.yes.users:a?' => $this->getUserFragmentSchema(),
+                'attending.yes.count:i?',
+                'attending.no.users:a?' => $this->getUserFragmentSchema(),
+                'attending.no.count:i?',
+                'attending.maybe.users:a?' => $this->getUserFragmentSchema(),
+                'attending.maybe.count:i?',
                 'dateStarts:dt' => 'When the event starts.',
                 'dateEnds:dt|n' => 'When the event ends.',
                 'allDayEvent:b?' => 'Event taking the full day',
@@ -179,6 +192,7 @@ class EventsApiController extends AbstractApiController {
                 'updateUser?' => $this->getUserFragmentSchema(),
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "permissions?" => new InstanceValidatorSchema(EventPermissions::class),
+                "parentRecord?" => $this->parentRecordSchema(),
                 'url:s' => 'The full URL to the event.',
             ], 'Event');
         }
@@ -204,12 +218,62 @@ class EventsApiController extends AbstractApiController {
         $this->eventModel->checkEventPermission(EventPermissions::VIEW, $id);
         $this->userModel->expandUsers($event, ['InsertUserID', 'UpdateUserID']);
 
-        if ($this->isExpandField('breadcrumbs', $query['expand'] ?? false)) {
-            $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
-        }
+        $expand = $query['expand'] ?? false;
 
-        if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
-            $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
+        if ($expand) {
+            if ($this->isExpandField('breadcrumbs', $expand)) {
+                $event['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new EventRecordType($id));
+            }
+
+            if ($this->isExpandField('permissions', $expand)) {
+                $event['permissions'] = $this->eventModel->calculatePermissionsForEvent($id);
+            }
+
+            if ($this->isExpandField('attendees.yes', $expand) ||
+                $this->isExpandField('attendees.no', $expand) ||
+                $this->isExpandField('attendees.no', $expand)
+            ) {
+                $attendingUsers = [];
+                $where = [];
+                $options = [
+                    'orderFields' => '',
+                    'orderDirection' => 'asc',
+                    'limit' =>  self::ATTENDEE_USER_LIMIT,
+                ];
+
+                if (in_array('attendees.yes', $expand)) {
+                    $attendingUsers['yes'] = $this->eventModel->getAttendingUsers(
+                        $id,
+                        ['Attending' => 'yes'],
+                        $options
+                    );
+                    $where[] = 'yes';
+                }
+
+                if (in_array('attendees.no', $expand)) {
+                    $attendingUsers['no'] = $this->eventModel->getAttendingUsers(
+                        $id,
+                        ['Attending' => 'no'],
+                        $options
+                    );
+                    $where[] = 'no';
+                }
+
+                if (in_array('attendees.maybe', $expand)) {
+                    $attendingUsers['maybe'] = $this->eventModel->getAttendingUsers(
+                        $id,
+                        ['Attending' => 'maybe'],
+                        $options
+                    );
+                    $where[] = 'maybe';
+                }
+
+                $counts = $this->eventModel->getAttendingCounts($id, $where);
+                $eventAttendees = $this->expandEventAttendees($attendingUsers, $counts);
+                if ($eventAttendees) {
+                    $event = $event + $eventAttendees;
+                }
+            }
         }
 
         $result = $this->normalizeEventOutput($event);
@@ -330,7 +394,7 @@ class EventsApiController extends AbstractApiController {
         return $this->schema([
             'id:i' => 'The event ID.',
             'userID:i?' => 'The users ID',
-            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions'])
+            'expand?' => ApiUtils::getExpandDefinition(['breadcrumbs', 'permissions', 'attendees.yes', 'attendees.no', 'attendees.maybe'])
         ], 'in');
     }
 
@@ -338,23 +402,31 @@ class EventsApiController extends AbstractApiController {
      * List events.
      *
      * @param array $query
-     * @return array
+     * @return Data
      */
     public function index(array $query) {
-
         $this->permission('Garden.SignIn.Allow');
 
         $query['userID'] = $query['userID'] ?? $this->getSession()->UserID;
 
         $in = $this->schema([
             'groupID:i?' => 'Filter by group ID.',
-            'parentRecordID:i' => 'Parent where the event was created',
+            'parentRecordID:i?' => 'Parent where the event was created',
             'parentRecordType:s' => [
                 'ID of the Parent where the event was created',
                 'enum' => [
                     EventModel::PARENT_TYPE_GROUP,
                     EventModel::PARENT_TYPE_CATEGORY
+                    // Add option for both
                 ],
+            ],
+            'attendingStatus:s?' =>[
+                'enum' => [
+                    'yes',
+                    'no',
+                    'maybe'
+                ],
+                'description' => 'Filter events by users attending status',
             ],
             'dateStarts:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by start dates',
@@ -371,7 +443,7 @@ class EventsApiController extends AbstractApiController {
                 ],
             ]),
             'allDayEvent:b?' => 'If the event is all day' ,
-            'userID:i' => 'The users ID',
+            'requireDescendants:b?' => 'Get the parents descendants',
             'sort:s?' => [
                 'enum' => [
                     'dateInserted', '-dateInserted',
@@ -392,13 +464,14 @@ class EventsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions']),
+            'expand?' => ApiUtils::getExpandDefinition(['users', 'permissions', 'parentRecordID']),
         ], 'in')->setDescription('List events.');
         $out = $this->schema([':a' => $this->fullEventSchema()], 'out');
 
+
         $groupID = $query['groupID'] ?? null;
         $parentRecordType = $query['parentRecordType'] ?? null;
-        $parentRecordID = $query['parentRecordID'] ?? null;
+        $parentRecordID = $groupID ?? $query['parentRecordID'] ?? null;
 
         // for backwards compatibility use the groupID supplied as the parentID
         $query['parentRecordType'] = ($groupID) ? EventModel::PARENT_TYPE_GROUP : $parentRecordType;
@@ -406,12 +479,26 @@ class EventsApiController extends AbstractApiController {
 
         $query = $in->validate($query);
 
-        // Check permissions for our filters.
-        $this->eventModel->checkParentEventPermission(
-            EventPermissions::VIEW,
-            $query['parentRecordType'],
-            $query['parentRecordID']
-        );
+        $userID = Gdn::session()->UserID;
+
+        $parentRecordIDs = [];
+        if (!$parentRecordID) {
+            $parentRecordIDs = $this->getParentRecordIDs($parentRecordType, $userID);
+            // Check permissions for our filters.
+            foreach ($parentRecordIDs as $recordID) {
+                $this->eventModel->checkParentEventPermission(
+                    EventPermissions::VIEW,
+                    $query['parentRecordType'],
+                    $recordID
+                );
+            }
+        } elseif ($parentRecordID) {
+            $this->eventModel->checkParentEventPermission(
+                EventPermissions::VIEW,
+                $query['parentRecordType'],
+                $parentRecordID
+            );
+        }
 
         // Sorting
         $sortField = '';
@@ -429,45 +516,52 @@ class EventsApiController extends AbstractApiController {
         // Filters
         $where = ApiUtils::queryToFilters($in, $query);
 
-        if ($query['parentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
-            if ($query['parentRecordID']) {
-                $group = $this->groupModel->getID($query['parentRecordID']);
-                $groupPrivacy = $group['Privacy'];
-                $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret' ) ?  'Member' :  'Access';
-                $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
-                if (!$this->groupModel->checkGroupPermission($access, $query['parentRecordID']) && !$isAdmin) {
-                    // Use an impossible GroupID, so the same result is met as if a non-existent group ID is provided.
-                    $where['GroupID'] = -1;
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP) {
+            if (!$parentRecordIDs) {
+                $group = $this->groupModel->getID($parentRecordID);
+                if ($group) {
+                    $recordID = $this->checkGroupAccess($group) ? $group['GroupID'] : -1;
                 } else {
-                    $where['e.ParentRecordType'] = $query['parentRecordType'];
-                    $where['e.ParentRecordID'] =  $query['parentRecordID'];
+                    $recordID = -1;
                 }
+                $where['e.ParentRecordID'] =  $recordID;
+            } elseif ($parentRecordIDs) {
+                $where['e.ParentRecordID'] =  $parentRecordIDs;
             }
-        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
-            if ($query['parentRecordID']) {
-                /** @var CategoryModel $categoryModel */
-                $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+            $where['e.ParentRecordType'] = $query['parentRecordType'];
 
-                $parentIDs = [-1, $query['parentRecordID']];
+        } elseif ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+            if ($parentRecordIDs) {
+                $where['e.ParentRecordID'] = $parentRecordIDs;
+            } elseif ($parentRecordID) {
+                $parentIDs = [-1, $parentRecordID];
                 // get all parent category IDs up to the root.
-                $ancestors = $categoryModel::getAncestors($query['parentRecordID'], true);
+                $ancestors = CategoryModel::getAncestors($parentRecordID, true);
                 if ($ancestors) {
                     $parentIDs = array_unique(array_merge($parentIDs, array_column($ancestors, 'CategoryID')));
                 }
 
-                // check the permission based on the category.
                 $where['e.ParentRecordID'] = $parentIDs;
-                $where['e.ParentRecordType'] = $query['parentRecordType'];
+
+                if (isset($query['requireDescendants'])) {
+                    $descendantIDs = $this->categoryModel->getCategoryDescendantIDs($parentRecordID);
+                    if ($descendantIDs) {
+                        $where['e.ParentRecordID'] = array_unique(array_merge($where['e.ParentRecordID'], $descendantIDs));
+                    }
+                }
             }
+            $where['e.ParentRecordType'] = $query['parentRecordType'];
         }
 
         if ($query['allDayEvent'] ?? null) {
             $where['e.AllDayEvent'] = 1;
         }
 
-        if ($query['userID'] ?? null) {
-            $where['UserID'] = $query['userID'];
+        if ($query['attendingStatus'] ?? false) {
+            $where['ue.Attending'] = $query['attendingStatus'];
         }
+
+        $where['UserID'] = $userID;
 
         // Data
         $rows = [];
@@ -481,6 +575,15 @@ class EventsApiController extends AbstractApiController {
         if ($this->isExpandField('permissions', $query['expand'] ?? false)) {
             $this->eventModel->expandPermissions($rows);
         }
+
+        if ($this->isExpandField('parentRecordID', $query['expand'])) {
+            if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+                $this->categoryModel->expandCategories($rows, 'parentRecord');
+            }
+            if ($parentRecordType === EventModel::PARENT_TYPE_GROUP) {
+                $this->groupModel->expandGroup($rows, 'parentRecord');
+            }
+        }
         foreach ($rows as &$row) {
             $row = $this->normalizeEventOutput($row);
         }
@@ -490,6 +593,32 @@ class EventsApiController extends AbstractApiController {
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/events", $query, $in);
 
         return new Data($result, ['paging' => $paging]);
+    }
+
+    /**
+     * Get parentRecordIDs for all the users events.
+     *
+     * @param string $parentRecordType
+     * @param int $userID
+     * @return array
+     */
+    public function getParentRecordIDs(string $parentRecordType, int $userID):array {
+        $recordIDs = [];
+
+        if ($parentRecordType === EventModel::PARENT_TYPE_GROUP) {
+            $groups = $this->groupModel->getByUser($userID);
+            foreach ($groups as &$group) {
+                $group['GroupID'] = $this->checkGroupAccess($group) ?  $group['GroupID'] : -1;
+            }
+            $recordIDs = array_column($groups, 'GroupID');
+        }
+
+        if ($parentRecordType === EventModel::PARENT_TYPE_CATEGORY) {
+            $categories = $this->categoryModel->getFiltered()->resultArray();
+            $recordIDs = array_column($categories, 'CategoryID');
+        }
+
+        return $recordIDs;
     }
 
     /**
@@ -537,6 +666,21 @@ class EventsApiController extends AbstractApiController {
         if (isset($dbRecord['Attending'])) {
             $dbRecord['Attending'] = $this->camelCaseScheme->convert($dbRecord['Attending']);
             $dbRecord['Attending'] = $dbRecord['Attending'] === 'invited' ? null : $dbRecord['Attending'];
+        }
+
+        // If we have a parentRecord to expand.
+        if ($dbRecord['parentRecord'] ?? false) {
+            if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_CATEGORY) {
+                $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['CategoryID'] ?? null;
+                $dbRecord['parentRecord']['recordType'] = 'category';
+                $dbRecord['parentRecord']['url'] = categoryUrl($dbRecord['parentRecord']);
+            }
+
+            if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_GROUP) {
+                $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['GroupID'] ?? null;
+                $dbRecord['parentRecord']['recordType'] = 'group';
+                $dbRecord['parentRecord']['url'] = groupUrl($dbRecord['parentRecord']);
+            }
         }
 
         $dbRecord['url'] = $this->eventModel->eventUrl($dbRecord);
@@ -792,5 +936,93 @@ class EventsApiController extends AbstractApiController {
         }
 
         return $this->schema($postEventSchema, 'in');
+    }
+
+    /**
+     * Get an event schema with minimal add/edit fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function parentRecordSchema() {
+        static $parentRecordSchema;
+
+        if ($parentRecordSchema === null) {
+            $parentRecordSchema = $this->schema(
+                Schema::parse([
+                    'recordType:s',
+                    'recordID:i',
+                    'name:s',
+                    'url:s'
+                ])
+            );
+        }
+
+        return $this->schema($parentRecordSchema, 'in');
+    }
+
+    /**
+     * Check if user has access based on privacy.
+     *
+     * @param array $group
+     * @return bool
+     */
+    private function checkGroupAccess(array $group): bool {
+        $hasAccess = true;
+        $groupPrivacy = $group['Privacy'];
+        $access = ($groupPrivacy === 'Private' || $groupPrivacy === 'Secret') ? 'Member' : 'Access';
+        $isAdmin = Gdn::Session()->CheckPermission('Garden.Settings.Manage');
+        if (!$this->groupModel->checkGroupPermission($access, $group['GroupID']) && !$isAdmin) {
+            $hasAccess = false;
+        }
+        return $hasAccess;
+    }
+
+    /**
+     * Add the user fragments for attendees.
+     *
+     * @param array $attendees
+     * @param int $count
+     */
+    private function addUserFragments(array &$attendees, int $count) {
+        $count = ($count > 10) ? 10 : $count;
+        for ($i = 0; $i < $count; $i++) {
+            $this->userModel->expandUsers($attendees, ['UserID']);
+        }
+    }
+
+    /**
+     * Expand event attendees.
+     *
+     * @param array $attendingUsers
+     * @param array $counts
+     * @return array
+     */
+    private function expandEventAttendees(array $attendingUsers, array $counts): array {
+        $attendeeData = [];
+
+        if ($attendingUsers['yes'] ?? false) {
+            $yesCount = count($attendingUsers['yes']);
+            $this->addUserFragments($attendingUsers['yes'], $yesCount);
+            $attendeeData['attending.yes.users'] = array_column($attendingUsers['yes'], 'User') ?? [];
+            $index = array_search('Yes', array_column($counts, 'Attending'));
+            $attendeeData['attending.yes.count'] = $counts[$index]['count'] ?? 0;
+        }
+
+        if ($attendingUsers['no'] ?? false) {
+            $noCount = count($attendingUsers['no']);
+            $this->addUserFragments($attendingUsers['no'], $noCount);
+            $attendeeData['attending.no.users'] = array_column($attendingUsers['no'], 'User') ?? [];
+            $index = array_search('No', array_column($counts, 'Attending'));
+            $attendeeData['attending.no.count'] = $counts[$index]['count'] ?? 0;
+        }
+
+        if ($attendingUsers['maybe'] ?? false) {
+            $maybeCount = count($attendingUsers['maybe']);
+            $this->addUserFragments($attendingUsers['maybe'], $maybeCount);
+            $attendeeData['attending.maybe.users'] = array_column($attendingUsers['maybe'], 'User') ?? [];
+            $index = array_search('Maybe', array_column($counts, 'Attending'));
+            $attendeeData['attending.maybe.count'] = $counts[$index]['count'] ?? 0;
+        }
+        return $attendeeData;
     }
 }

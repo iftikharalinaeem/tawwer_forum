@@ -92,6 +92,9 @@ class AdvancedSearchPlugin extends Gdn_Plugin {
     }
 
     public function quickSearch($title, $get = []) {
+        if (Gdn::themeFeatures()->useDataDrivenTheme()) {
+            return;
+        }
         $form = new Gdn_Form();
         $form->Method = 'get';
 

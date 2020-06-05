@@ -12,6 +12,15 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+// For a brief period of time, the groups key was getting saved incorrectly.
+// We're going to fix it here.
+
+$config = Gdn::config();
+if ($badNameValue = $config->get('EnabledApplications.Groups and Events')) {
+    $config->saveToConfig('EnabledApplications.Groups', $badNameValue);
+    $config->removeFromConfig('EnabledApplications.Groups and Events');
+}
+
 $Sql = Gdn::sql();
 $St = Gdn::structure();
 

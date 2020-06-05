@@ -208,7 +208,7 @@ function writeGroupButtons($group = null) {
     /** @var GroupModel $groupModel */
     $groupModel = \Gdn::getContainer()->get(GroupModel::class);
 
-    if (Gdn::session()->isValid() && !$groupModel->hasGroupPermission(GroupPermissions::MEMBER, $group['groupID'])) {
+    if (Gdn::session()->isValid() && !$groupModel->hasGroupPermission(GroupPermissions::MEMBER, $group['GroupID'])) {
         if (groupPermission('Join', $group)) {
             echo ' '.anchor(t('Join this Group'), groupUrl($group, 'join'), 'Button Primary Group-JoinButton Popup').' ';
         } else {

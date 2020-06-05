@@ -7,6 +7,7 @@
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Navigation\GroupRecordType;
@@ -434,7 +435,7 @@ class EventModel extends Gdn_Model {
      * @param int $parentRecordID
      * @return bool
      */
-    public function canCreateEvents(string $parentRecordType, int $parentRecordID): bool {
+    public function canCreateEvents(string $parentRecordType, $parentRecordID): bool {
         switch ($parentRecordType) {
             case GroupRecordType::TYPE:
                 if ($this->groupModel->hasGroupPermission(GroupPermissions::LEADER, $parentRecordID)) {
@@ -467,7 +468,7 @@ class EventModel extends Gdn_Model {
      * @param int $parentRecordID
      * @return bool
      */
-    public function canViewEvents(string $parentRecordType, int $parentRecordID): bool {
+    public function canViewEvents(string $parentRecordType, $parentRecordID): bool {
         switch ($parentRecordType) {
             case GroupRecordType::TYPE:
                 return $this->groupModel->hasGroupPermission(GroupPermissions::VIEW, $parentRecordID);
@@ -485,9 +486,9 @@ class EventModel extends Gdn_Model {
      *
      * @param string $permission One of EventPermissions::VIEW or EventPermissions::CREATE
      * @param string $parentRecordType
-     * @param int $parentRecordID
+     * @param int|array $parentRecordID
      */
-    public function checkParentEventPermission(string $permission, string $parentRecordType, int $parentRecordID) {
+    public function checkParentEventPermission(string $permission, string $parentRecordType, $parentRecordID) {
         $hasPermission = false;
         if ($permission === EventPermissions::VIEW) {
             $hasPermission = $this->canViewEvents($parentRecordType, $parentRecordID);
@@ -507,7 +508,7 @@ class EventModel extends Gdn_Model {
         if ($groupIsSecret) {
             throw new NotFoundException('Group');
         } elseif ($parentRecordType === ForumCategoryRecordType::TYPE) {
-            // Check that the category exists.
+            // Check that the category exists
             $category = $this->categoryModel::categories($parentRecordID);
             if (!$category) {
                 throw new NotFoundException('Category');
@@ -597,6 +598,52 @@ class EventModel extends Gdn_Model {
 
         return $this->SQL->getWhere('UserEvent', $where, $orderFields, $orderDirection, $limit, $offset)->resultArray();
     }
+
+    /**
+     * Get list of attending users.
+     *
+     * @param int $eventID
+     * @param array $where
+     * @param array $options
+     *
+     * @return array
+     */
+    public function getAttendingUsers(int $eventID, array $where = [], $options = []): array {
+        $orderFields = $options['orderFields'] ?? '';
+        $orderDirection = $options['orderDirection']  ?? 'asc';
+        $limit = $options['limit'] ?? false;
+        $offset = $options['offset'] ?? 0;
+
+        return $this->SQL
+            ->select()
+            ->from('UserEvent')
+            ->where('EventID', $eventID)
+            ->where('Attending', $where)
+            ->orderBy($orderFields, $orderDirection)
+            ->limit($limit, $offset)
+            ->get()->resultArray();
+    }
+
+    /**
+     * Get the counts for users attending an event.
+     *
+     * @param int $eventID
+     * @param array $where
+     * @return array
+     */
+    public function getAttendingCounts(int $eventID, array $where): array {
+        $in = "'". implode("','", $where) . "'";
+        $query = "select Attending, count(EventID) as count 
+            from GDN_UserEvent 
+            where eventID = ${eventID} 
+            and Attending In (${in}) 
+            Group By Attending;";
+
+        $result = $this->SQL->query($query)->resultArray();
+
+        return $result;
+    }
+
 
     /**
      * Check if a User is invited to an Event.

@@ -12,4 +12,8 @@ class TripleAThemeHooks extends Gdn_Plugin {
     public function base_render_before($sender) {
         $sender->addDefinition('swiperAutoplay', c('Garden.ThemeOptions.SwiperAutoplay', 5000));
     }
+
+    public function editorPlugin_getJSDefinitions_handler($sender) {
+        Gdn::controller()->addDefinition('editorWysiwygCSS', asset('themes/triple-a/design/wysiwyg.css'));
+    }
 }

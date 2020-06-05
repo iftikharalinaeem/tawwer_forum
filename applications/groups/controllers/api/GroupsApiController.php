@@ -242,6 +242,7 @@ class GroupsApiController extends AbstractApiController {
         return $schema;
     }
 
+
     /**
      * Get a group by its numeric ID.
      *
