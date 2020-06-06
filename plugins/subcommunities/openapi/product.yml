@@ -106,9 +106,7 @@ paths:
                     content:
                         'application/json':
                             schema:
-                                items:
-                                    $ref: '#/components/schemas/Product'
-                                type: object
+                                $ref: '#/components/schemas/Product'
                     description: Success
                 '409':
                     description: Product is associated with a subcommunity.
