@@ -9,11 +9,11 @@ paths:
                   name: status
                   required: false
                   schema:
+                      type: string
                       default: published
                       enum:
                           - deleted
                           - published
-                      type: string
                 - description: Locale that the knowledge bases' names and descriptions should be represented in. If fields are not translated the non-translated versions will be returned.
                   in: query
                   name: locale
@@ -481,14 +481,14 @@ components:
                     description: name of the site section,
                     type: string
                 app:
-                    items:
+                    type: object
+                    properties:
                         knowledgebase:
                             description: Is knowledge available in this site section.
                             type: boolean
                         forum:
                             description: Is forum available in this site section.
                             type: boolean
-                    type: object
             required:
                 - basePath
                 - contentLocale
