@@ -103,6 +103,24 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Checks if embeds needs to be stripped.
+     *
+     * @return bool
+     */
+    public function getStripEmbeds() {
+        return $this->stripEmbeds;
+    }
+
+    /**
+     * Returns the word count limit.
+     *
+     * @return int
+     */
+    public function getWordCount() {
+        return $this->wordCount;
+    }
+
+    /**
      * Adds a dispatcher block exception for discussion page.
      *
      * @param Gdn_Dispatcher $sender
@@ -157,12 +175,12 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->loadHTML($data);
-        if ($this->stripEmbeds) {
+        if ($this->getStripEmbeds()) {
             $this->stripEmbeds($dom);
             $data = $this->stripImages($dom);
         }
         // trim to word count
-        $data = $this->stripText($data, $dom, $this->wordCount);
+        $data = $this->stripText($data, $dom, $this->getWordCount());
         return $data;
     }
 
