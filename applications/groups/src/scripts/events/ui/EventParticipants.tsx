@@ -22,9 +22,9 @@ function Participant({ user }) {
     const classes = eventsClasses();
     const participantsClasses = eventParticipantsClasses();
     return (
-        <li className={participantsClasses.participantItem}>
+        <li className={participantsClasses.item}>
             <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
-            <span className={participantsClasses.participantName}>{user.name}</span>
+            <span className={participantsClasses.name}>{user.name}</span>
         </li>
     );
 }
@@ -32,7 +32,7 @@ function Participant({ user }) {
 function Participants({ participants }) {
     const participantsClasses = eventParticipantsClasses();
     return (
-        <ul className={participantsClasses.participantList}>
+        <ul className={participantsClasses.list}>
             {participants &&
                 participants.map(participant => <Participant key={participant.userID} user={participant.user} />)}
         </ul>
@@ -55,7 +55,7 @@ export default function EventParticipants(props: IProps) {
         <>
             <Participants participants={participants} />
             {showLoadMore && (
-                <div className={participantsClasses.participantsTabsBottomButtonWrapper}>
+                <div className={participantsClasses.tabsBottomButtonWrapper}>
                     <Button onClick={loadMore} style={{ width: 208 }}>
                         Load more
                     </Button>

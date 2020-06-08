@@ -34,26 +34,22 @@ export default function EventParticipantsTabs(props: IProps) {
 
     return (
         <Modal scrollable={true} isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={props.onClose}>
-            <Tabs index={tabIndex} onChange={setTabIndex} className={classes.participantsTabsRoot}>
-                <div className={classes.participantsTabsTopButtonWrapper}>
-                    <Button
-                        onClick={onClose}
-                        baseClass={ButtonTypes.ICON}
-                        className={classes.participantsTabsTopButton}
-                    >
+            <Tabs index={tabIndex} onChange={setTabIndex} className={classes.tabsRoot}>
+                <div className={classes.tabsTopButtonWrapper}>
+                    <Button onClick={onClose} baseClass={ButtonTypes.ICON} className={classes.tabsTopButton}>
                         <CloseTinyIcon />
                     </Button>
                 </div>
-                <TabList className={classes.participantsTabsList}>
+                <TabList className={classes.tabsList}>
                     {tabs.map((tab, i) => {
                         return (
-                            <Tab key={i} className={classes.participantsTabsTab}>
+                            <Tab key={i} className={classes.tabsTab}>
                                 {tab.title}
                             </Tab>
                         );
                     })}
                 </TabList>
-                <TabPanels className={classes.participantsTabsPanels}>
+                <TabPanels className={classes.tabsPanels}>
                     {tabs.map((tab, i) => {
                         return <TabPanel key={i}>{tab.body}</TabPanel>;
                     })}

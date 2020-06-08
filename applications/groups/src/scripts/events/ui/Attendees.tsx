@@ -3,6 +3,7 @@
  * @license Proprietary
  */
 import { eventsClasses } from "@groups/events/ui/eventStyles";
+import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsStyles";
 import { IUserFragment } from "@library/@types/api/users";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
@@ -33,6 +34,7 @@ export function EventAttendees(props: IProps) {
     const { eventID, data, maxCount = 10, extra = 0, separator = false, depth = 2, title, emptyMessage } = props;
     const empty = data.length === 0;
     const classes = eventsClasses();
+    const participantsClasses = eventParticipantsClasses();
     const HeadingTag = `h${depth}` as "h1";
 
     const extraCount = extra - maxCount;
@@ -115,7 +117,7 @@ export function EventAttendees(props: IProps) {
                     {extraCount > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
                             <Button
-                                className={classes.participantsPopUpButton}
+                                className={participantsClasses.popUpButton}
                                 onClick={openModal}
                                 baseClass={ButtonTypes.TEXT}
                             >
