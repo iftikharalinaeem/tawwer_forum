@@ -137,9 +137,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      */
     public function discussionController_render_before($sender) {
-        $canViewCategory = DiscussionModel::categoryPermissions();
         // guest has view permission
-        if (!$this->session->isValid() && $canViewCategory) {
+        if (!$this->session->isValid()) {
             if (!$sender->CategoryID) {
                 redirectTo('/entry/signin');
             }
