@@ -3,15 +3,17 @@
  * @license Proprietary
  */
 import { eventsClasses } from "@groups/events/ui/eventStyles";
+import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsStyles";
 import { IUserFragment } from "@library/@types/api/users";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import { EventParticipantsTabModule } from "../modules/EventParticipantsTabModule";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 import Button from "@vanilla/library/src/scripts/forms/Button";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
@@ -32,6 +34,7 @@ export function EventAttendees(props: IProps) {
     const { eventID, data, maxCount = 10, extra = 0, separator = false, depth = 2, title, emptyMessage } = props;
     const empty = data.length === 0;
     const classes = eventsClasses();
+    const participantsClasses = eventParticipantsClasses();
     const HeadingTag = `h${depth}` as "h1";
 
     const extraCount = extra - maxCount;
@@ -49,15 +52,41 @@ export function EventAttendees(props: IProps) {
         }
     };
 
-    const [visibleModal, setVisibleModal] = useState(false);
+    const getTooltipText = (title: string) => {
+        switch (title.toLocaleLowerCase()) {
+            case "going":
+                return "View all going attendees";
+            case "maybe":
+                return "View all maybe attendees";
+            case "not going":
+                return "View all not going attendees";
+            default:
+                return "View all";
+        }
+    };
+    const tooltipText = getTooltipText(title);
+
+    const initialState = { visibleModal: false, goingPage: 1, maybePage: 1, notGoingPage: 1 };
+    const reducer = (state, action) => {
+        switch (action.type) {
+            case "set_visible_modal":
+                return { ...state, visibleModal: action.visible };
+            default:
+                return state;
+        }
+    };
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
+    const openModal = () => dispatch({ type: "set_visible_modal", visible: true });
 
     return (
         <section className={classNames(classes.section, props.className)}>
             <EventParticipantsTabModule
                 defaultIndex={setIndex(title)}
                 eventID={eventID}
-                visibleModal={visibleModal}
-                close={() => setVisibleModal(false)}
+                visibleModal={state.visibleModal}
+                close={() => dispatch({ type: "set_visible_modal", visible: false })}
             />
             {separator && <hr className={classes.separator} />}
             <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
@@ -75,23 +104,26 @@ export function EventAttendees(props: IProps) {
                                 })}
                                 key={i}
                             >
-                                <UserPhoto
-                                    size={UserPhotoSize.MEDIUM}
-                                    className={classes.attendeePhoto}
-                                    userInfo={user}
-                                />
+                                <Button baseClass={ButtonTypes.TEXT} onClick={openModal}>
+                                    <UserPhoto
+                                        size={UserPhotoSize.MEDIUM}
+                                        className={classes.attendeePhoto}
+                                        userInfo={user}
+                                    />
+                                </Button>
                             </li>
                         );
                     })}
                     {extraCount > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
                             <Button
-                                className={classes.participantsPopUpButton}
-                                onClick={() => setVisibleModal(true)}
+                                className={participantsClasses.popUpButton}
+                                onClick={openModal}
                                 baseClass={ButtonTypes.TEXT}
                             >
                                 <span style={{ display: "inline-block" }}>
-                                    +<NumberFormatted value={extraCount} />
+                                    +
+                                    <NumberFormatted value={extraCount} title={t(tooltipText)} />
                                 </span>
                             </Button>
                         </li>

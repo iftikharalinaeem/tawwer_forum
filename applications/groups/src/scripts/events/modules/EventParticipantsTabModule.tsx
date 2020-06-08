@@ -4,7 +4,7 @@
  */
 
 import EventParticipantsTabs from "@groups/events/ui/EventParticipantsTabs";
-import React, { useState } from "react";
+import React from "react";
 import { EventParticipantsModule } from "@groups/events/modules/EventParticipantsModule";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { t } from "@vanilla/i18n";

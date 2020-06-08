@@ -56,7 +56,8 @@ const yes: IEventParticipant[] = [
         userID: 4,
         user: {
             userID: 4,
-            name: "Mysterious User",
+            name:
+                "Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User",
             photoUrl: "",
             dateLastActive: null,
         },
@@ -68,7 +69,8 @@ const yes: IEventParticipant[] = [
         userID: 5,
         user: {
             userID: 5,
-            name: "Val",
+            name:
+                "Vallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
             dateLastActive: null,
         },
@@ -219,15 +221,15 @@ export const ParticipantsTabs = () => {
             tabs={[
                 {
                     title: t("Going"),
-                    body: <EventParticipants participants={yes} />,
+                    body: <EventParticipants loadMore={() => undefined} participants={yes} />,
                 },
                 {
                     title: t("Maybe"),
-                    body: <EventParticipants participants={maybe} />,
+                    body: <EventParticipants loadMore={() => undefined} participants={maybe} />,
                 },
                 {
                     title: t("Not Going"),
-                    body: <EventParticipants participants={no} />,
+                    body: <EventParticipants loadMore={() => undefined} participants={no} />,
                 },
             ]}
         />
