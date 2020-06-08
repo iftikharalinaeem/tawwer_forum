@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 
 /**
@@ -32,17 +33,30 @@ class NewEventsController extends AbstractEventsController {
         }
     }
 
-    public function renderEventsHomepage($parentRecordType) {
+    /**
+     * Render the events homepage.
+     *
+     * @param string|null $parentRecordType
+     */
+    public function renderEventsHomepage(?string $parentRecordType) {
+        $this->permission('Garden.SignIn.Allow');
+
+        if (!$parentRecordType) {
+            return redirectTo('/events/category', 302);
+        }
+
+        if (!in_array($parentRecordType, self::ALLOWED_PARENT_RECORD_TYPES)) {
+            throw new NotFoundException();
+        }
+
         Gdn_Theme::section('NewEventList');
 
-//        $newEventModule = new NewEventModule();
-//        $newEventModule->parentRecordType = $parentRecordType;
-//        $this->addModule($newEventModule, 'Panel');
+        $newDiscussionModule = new NewDiscussionModule($this);
+        $this->addModule($newDiscussionModule);
         $this->addModule(new DiscussionFilterModule($this));
 
-        $this->title(t('Events Home'));
-//        $this->applyBreadcrumbs($parentRecordType, $parentRecordID);
-        $this->addBreadcrumb(t('Events Home'), $this->canonicalUrl());
+        $this->title(t('Events'));
+        $this->addBreadcrumb(t('Events'), $this->canonicalUrl());
         $this->render('index');
     }
 
