@@ -124,6 +124,7 @@
 })(window, jQuery);
 
 jQuery(document).ready(function($) {
+    var translate = window.gdn.translate;
     /// Search box autocomplete.
     if ($.fn.searchAutocomplete && gdn.definition("searchAutocomplete", true) != "0") {
         $(".AdvancedSearch #Form_search,.SiteSearch #Form_Search,.js-search").searchAutocomplete();
@@ -170,8 +171,8 @@ jQuery(document).ready(function($) {
     }
 
     $author.tokenInput(gdn.url("/user/tagsearch"), {
-        hintText: gdn.definition("TagHint", "Start to type..."),
-        noResultsText: gdn.definition("TagNoResults", "No results"),
+        hintText: translate("TagHint", "Start to type..."),
+        noResultsText: translate("TagNoResults", "No results"),
         tokenValue: "name",
         searchingText: "", // search text gives flickery ux, don't like
         searchDelay: 300,
@@ -180,6 +181,7 @@ jQuery(document).ready(function($) {
         prePopulate: author,
         animateDropdown: false,
         allowTabOut: true,
+        ariaLabel: translate("Author"),
     });
 
     /// Tag token input.
@@ -205,8 +207,8 @@ jQuery(document).ready(function($) {
     }
 
     $tags.tokenInput(gdn.url("/tags/search?id=0&type=0"), {
-        hintText: gdn.definition("TagHint", "Start to type..."),
-        noResultsText: gdn.definition("TagNoResults", "No results"),
+        hintText: translate("TagHint", "Start to type..."),
+        noResultsText: translate("TagNoResults", "No results"),
         //      tokenValue: 'name',
         searchingText: "",
         searchDelay: 300,
@@ -215,5 +217,6 @@ jQuery(document).ready(function($) {
         prePopulate: tags,
         animateDropdown: false,
         allowTabOut: true,
+        ariaLabel: translate("Tags"),
     });
 });
