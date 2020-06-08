@@ -998,7 +998,14 @@ class EventsApiController extends AbstractApiController {
      * @return array
      */
     private function expandEventAttendees(array $attendingUsers, array $counts): array {
-        $attendeeData = [];
+        $attendeeData = [
+            'attendingYesUsers' => [],
+            'attendingYesCount' => 0,
+            'attendingNoUsers' => [],
+            'attendingNoCount' => 0,
+            'attendingMaybeUsers' => [],
+            'attendingMaybeCount' => 0
+        ];
 
         if ($attendingUsers['yes'] ?? false) {
             $yesCount = count($attendingUsers['yes']);
@@ -1023,6 +1030,7 @@ class EventsApiController extends AbstractApiController {
             $index = array_search('Maybe', array_column($counts, 'Attending'));
             $attendeeData['attendingMaybeCount'] = $counts[$index]['count'] ?? 0;
         }
+
         return $attendeeData;
     }
 }

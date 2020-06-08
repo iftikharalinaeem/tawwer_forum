@@ -38,12 +38,12 @@ export interface IEvent {
     dateInserted: string;
     dateUpdated?: string;
     attending: EventAttendance | null;
-    attendingYesUsers?: IUserFragment[];
-    attendingYesCount?: number;
-    attendingNoUsers?: IUserFragment[];
-    attendingNoCount?: number;
-    attendingMaybeUsers?: IUserFragment[];
-    attendingMaybeCount?: number;
+    attendingYesUsers: IUserFragment[];
+    attendingYesCount: number;
+    attendingNoUsers: IUserFragment[];
+    attendingNoCount: number;
+    attendingMaybeUsers: IUserFragment[];
+    attendingMaybeCount: number;
     insertUser: IUserFragment;
     updatedUser: IUserFragment;
     groupID?: number;
@@ -91,4 +91,5 @@ export interface IEventParticipantsByAttendance {
 
 export interface IEventWithParticipants {
     event: IEvent;
+    participants: IEventParticipant[];
 }

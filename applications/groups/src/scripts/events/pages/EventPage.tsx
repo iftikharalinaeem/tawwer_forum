@@ -7,7 +7,6 @@ import { useEvent, useEventAttendance } from "@groups/events/state/eventsHooks";
 import { EventDetails } from "@groups/events/ui/EventDetails";
 import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
 import { LoadStatus } from "@library/@types/api/core";
-import { IUserFragment } from "@library/@types/api/users";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
@@ -17,8 +16,7 @@ import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
-import { notEmpty } from "@vanilla/utils";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { PageHeading } from "@library/layout/PageHeading";
 
@@ -44,24 +42,22 @@ export default function EventPage() {
 
     let { event } = eventWithParticipants.data;
 
-    const organizer = event.insertUser;
-    const crumbs = event.breadcrumbs;
-    const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
-
-    const going = {
+    let going = {
         users: event.attendingYesUsers,
         count: event.attendingYesCount,
     };
-
-    const notGoing = {
+    let maybe = {
+        users: event.attendingMaybeUsers,
+        count: event.attendingMaybeCount,
+    };
+    let notGoing = {
         users: event.attendingNoUsers,
         count: event.attendingNoCount,
     };
 
-    const maybe = {
-        users: event.attendingMaybeUsers,
-        count: event.attendingMaybeCount,
-    };
+    const organizer = event.insertUser;
+    const crumbs = event.breadcrumbs;
+    const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
     return (
         <Container>

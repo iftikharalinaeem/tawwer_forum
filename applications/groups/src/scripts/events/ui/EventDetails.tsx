@@ -12,7 +12,7 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
 
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";

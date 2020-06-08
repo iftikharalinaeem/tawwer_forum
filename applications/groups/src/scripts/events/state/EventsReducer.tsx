@@ -5,12 +5,12 @@
 
 import { EventsActions } from "@groups/events/state/EventsActions";
 import {
+    EventAttendance,
     IEventList,
     IEventParentRecord,
-    IEventWithParticipants,
-    EventAttendance,
     IEventParticipantList,
     IEventParticipantsByAttendance,
+    IEventWithParticipants,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -226,13 +226,55 @@ export const eventsReducer = produce(
                 const modifiedUserID = payload.result.userID;
                 const modifiedAttendingStatus = payload.result.attending;
 
-                // Modify the participants.
-                const { event, participants } = existingEvent.data;
+                // Modify the participants and counts
+                let { event, participants } = existingEvent.data;
+
+                const previousAttendingStatus = event.attending;
                 event.attending = modifiedAttendingStatus;
+
+                // Increment the events attendance base on the posted status.
+                switch (modifiedAttendingStatus) {
+                    case EventAttendance.GOING:
+                        event.attendingYesCount = event.attendingYesCount ? event.attendingYesCount + 1 : 1;
+                        event.attendingYesUsers.push(payload.result.user);
+                        break;
+                    case EventAttendance.MAYBE:
+                        event.attendingMaybeCount = event.attendingMaybeCount ? event.attendingMaybeCount + 1 : 1;
+                        event.attendingMaybeUsers.push(payload.result.user);
+                        break;
+                    case EventAttendance.NOT_GOING:
+                        event.attendingMaybeCount = event.attendingNoCount ? event.attendingNoCount + 1 : 1;
+                        event.attendingNoUsers.push(payload.result.user);
+                        break;
+                }
 
                 let wasAdded = false;
                 for (const participant of participants) {
                     if (participant.userID === modifiedUserID) {
+                        // if the participant changed his status adjust the event accordingly
+                        switch (previousAttendingStatus) {
+                            case EventAttendance.GOING:
+                                event.attendingYesCount = event.attendingYesCount ? event.attendingYesCount - 1 : 0;
+                                event.attendingYesUsers = event.attendingYesUsers.filter(attendee => {
+                                    return attendee.userID !== modifiedUserID;
+                                });
+                                break;
+                            case EventAttendance.MAYBE:
+                                event.attendingMaybeCount = event.attendingMaybeCount
+                                    ? event.attendingMaybeCount - 1
+                                    : 0;
+                                event.attendingMaybeUsers = event.attendingMaybeUsers.filter(attendee => {
+                                    return attendee.userID !== modifiedUserID;
+                                });
+                                break;
+                            case EventAttendance.NOT_GOING:
+                                event.attendingMaybeCount = event.attendingNoCount ? event.attendingNoCount - 1 : 0;
+                                event.attendingNoUsers = event.attendingNoUsers.filter(attendee => {
+                                    return attendee.userID !== modifiedUserID;
+                                });
+                                break;
+                        }
+
                         participant.attending = modifiedAttendingStatus;
                         wasAdded = true;
                         break;
