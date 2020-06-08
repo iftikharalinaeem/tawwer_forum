@@ -131,18 +131,18 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const participantsTabsPanels = makeVars("participantsTabsPanels", {
-        marginTop: 50,
-    });
-
     const participantsTabsList = makeVars("participantsTabsList", {
         height: 45,
-        bottom: 3,
+        // bottom: 3,
         fontWeight: globalVars.fonts.weights.semiBold,
         color: {
             borderBottom: colorOut(globalVars.border.color),
         },
-        marginBottom: 5,
+        // marginBottom: 10,
+    });
+
+    const participantsTabsPanels = makeVars("participantsTabsPanels", {
+        marginTop: participantsTabsList.height,
     });
 
     const participantsTabsTab = makeVars("participantsTabsTab", {
@@ -163,7 +163,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const participantsTabsTopButton = makeVars("participantsTabsTopButton", {
         wrapper: {
-            right: 6,
+            right: 0,
             top: 0,
         },
         size: {
@@ -550,39 +550,54 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const participantsTabsRoot = style("participantsTabsRoot", {
         fontSize: vars.participantsTabsRoot.fontSize,
         position: "relative",
-        width: vars.participantsTabsRoot.size.width,
+        // width: vars.participantsTabsRoot.size.width,
         height: vars.participantsTabsRoot.size.height,
     });
 
-    const participantsTabsList = style("participantsTabsList", {
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1,
-        // height: vars.participantsTabsList.height,
-        backgroundColor: colorOut(globalVars.mainColors.bg),
-        fontWeight: vars.participantsTabsList.fontWeight,
-        borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
-        marginBottom: vars.participantsTabsList.marginBottom,
-        $nest: {
-            "> *": {
-                // paddingLeft: 0,
-                // paddingRight: 0,
-                marginRight: globalVars.gutter.size * 3,
-            },
-            ":first-child": {
-                marginLeft: globalVars.gutter.size,
+    const participantsTabsList = style(
+        "participantsTabsList",
+        {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: colorOut(globalVars.mainColors.bg),
+            fontWeight: vars.participantsTabsList.fontWeight,
+            borderBottom: `solid 1px ${vars.participantsTabsList.color.borderBottom}`,
+
+            // marginBottom: vars.participantsTabsList.marginBottom,
+            $nest: {
+                "> *": {
+                    // paddingLeft: 0,
+                    // paddingRight: 0,
+                    marginLeft: globalVars.gutter.size * 3,
+                },
+                ":first-child": {
+                    marginLeft: globalVars.gutter.size,
+                },
             },
         },
-    });
+        mediaQueries.xs({
+            $nest: {
+                "> *": {
+                    marginLeft: globalVars.gutter.size * 1,
+                },
+            },
+        }),
+    );
 
     const participantsTabsTab = style("participantsTabsTab", {
         ...buttonResetMixin(),
         // Note height and the border height add up to the height of the list
+        // backgroundColor: "red",
         height: vars.participantsTabsTab.height,
-        borderTop: "3px solid ${colorOut(globalVars.elementaryColors.transparent)}",
-        borderBottom: "3px solid ${colorOut(globalVars.elementaryColors.transparent)}",
+        borderTop: `3px solid ${colorOut(globalVars.elementaryColors.transparent)}`,
+        // borderTop: "3px solid red",
+        borderBottom: `3px solid ${colorOut(globalVars.elementaryColors.transparent)}`,
         $nest: {
             "&[data-selected]": {
                 borderBottom: `${vars.participantsTabsTab.border.bottom}px solid ${colorOut(
@@ -593,11 +608,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const participantsTabsPanels = style("participantsTabsPanels", {
-        marginTop: vars.participantsTabsPanels.marginTop,
+        marginTop: vars.participantsTabsPanels.marginTop + globalVars.gutter.size,
+        // backgroundColor: "green",
     });
 
     const participantList = style("participantsList", {
         marginLeft: globalVars.gutter.size,
+        marginRight: globalVars.gutter.size,
     });
 
     const participantItem = style("participantItem", {
@@ -605,11 +622,14 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         flexDirection: "row",
         alignItems: "center",
         marginBottom: vars.participantItem.marginBottom,
+        // backgroundColor: "pink",
+        flexWrap: "nowrap",
     });
 
     const participantName = style("participantName", {
-        display: "inline-block",
-        marginLeft: vars.participantName.marginLeft,
+        display: "inline-flex",
+        marginLeft: globalVars.gutter.size,
+        width: calc(`100% - ${unit(userPhotoVariables().sizing.medium)}`),
     });
 
     const participantsTabsTopButtonWrapper = style("participantsTabsTopButtonWrapper", {
@@ -617,14 +637,18 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         zIndex: 2,
         right: vars.participantsTabsTopButton.wrapper.right,
         top: vars.participantsTabsTopButton.wrapper.top,
-        backgroundColor: "red",
+        // backgroundColor: "red",
         height: vars.participantsTabsList.height, //- vars.participantsTabsList.bottom,
+        width: vars.participantsTabsList.height,
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
     });
 
     const participantsTabsTopButton = style("participantsTabsTopButton", {
         display: "inline-flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyItems: "center",
         width: vars.participantsTabsTopButton.size.width,

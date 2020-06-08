@@ -56,7 +56,8 @@ const yes: IEventParticipant[] = [
         userID: 4,
         user: {
             userID: 4,
-            name: "Mysterious User",
+            name:
+                "Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User Mysterious User",
             photoUrl: "",
             dateLastActive: null,
         },
@@ -68,7 +69,8 @@ const yes: IEventParticipant[] = [
         userID: 5,
         user: {
             userID: 5,
-            name: "Val",
+            name:
+                "Vallllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",
             photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
             dateLastActive: null,
         },
