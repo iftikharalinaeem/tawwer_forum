@@ -42,6 +42,8 @@ export default function EventsHomePage({ loading }: any) {
                 tabType={TabsTypes.BROWSE}
                 largeTabs
                 extendContainer
+                includeBorder={false}
+                includeVerticalPadding={false}
                 extraButtons={<EventFilter filter={filter} onFilterChange={changeFilter} />}
                 onChange={newTab => {
                     const newSearch = new URLSearchParams(location.search);
