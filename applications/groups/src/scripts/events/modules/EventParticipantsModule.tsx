@@ -4,9 +4,7 @@
  */
 
 import EventParticipants from "@groups/events/ui/EventParticipants";
-import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Button from "@vanilla/library/src/scripts/forms/Button";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { notEmpty } from "@vanilla/utils";
@@ -48,7 +46,6 @@ export function EventParticipantsModule(props: IProps) {
         return <ErrorMessages errors={[participants.error].filter(notEmpty)} />;
     }
 
-    const classes = eventsClasses();
     return (
         <>
             <EventParticipants

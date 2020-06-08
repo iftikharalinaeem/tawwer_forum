@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
-import { eventsClasses } from "@groups/events/ui/eventStyles";
+import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsStyles";
 import { CloseTinyIcon } from "@library/icons/common";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -23,7 +23,7 @@ interface IProps {
 }
 
 export default function EventParticipantsTabs(props: IProps) {
-    const classes = eventsClasses();
+    const classes = eventParticipantsClasses();
     const { onClose, tabs, isVisible, defaultIndex } = props;
 
     const [tabIndex, setTabIndex] = useState(defaultIndex);

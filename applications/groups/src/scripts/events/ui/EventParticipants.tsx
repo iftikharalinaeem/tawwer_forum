@@ -8,6 +8,7 @@ import { IEventParticipant } from "@groups/events/state/eventsTypes";
 import { t } from "@vanilla/i18n";
 import FrameBody from "@vanilla/library/src/scripts/layout/frame/FrameBody";
 import { eventsClasses } from "./eventStyles";
+import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 
@@ -19,18 +20,19 @@ interface IProps {
 
 function Participant({ user }) {
     const classes = eventsClasses();
+    const participantsClasses = eventParticipantsClasses();
     return (
-        <li className={classes.participantItem}>
+        <li className={participantsClasses.participantItem}>
             <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
-            <span className={classes.participantName}>{user.name}</span>
+            <span className={participantsClasses.participantName}>{user.name}</span>
         </li>
     );
 }
 
 function Participants({ participants }) {
-    const classes = eventsClasses();
+    const participantsClasses = eventParticipantsClasses();
     return (
-        <ul className={classes.participantList}>
+        <ul className={participantsClasses.participantList}>
             {participants &&
                 participants.map(participant => <Participant key={participant.userID} user={participant.user} />)}
         </ul>
@@ -39,7 +41,7 @@ function Participants({ participants }) {
 
 export default function EventParticipants(props: IProps) {
     const { participants, loadMore, showLoadMore } = props;
-    const classes = eventsClasses();
+    const participantsClasses = eventParticipantsClasses();
 
     if (participants.length === 0) {
         return (
@@ -53,7 +55,7 @@ export default function EventParticipants(props: IProps) {
         <>
             <Participants participants={participants} />
             {showLoadMore && (
-                <div className={classes.participantsTabsBottomButtonWrapper}>
+                <div className={participantsClasses.participantsTabsBottomButtonWrapper}>
                     <Button onClick={loadMore} style={{ width: 208 }}>
                         Load more
                     </Button>
