@@ -17,6 +17,8 @@ import React from "react";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import EventAttendanceDropDown from "@groups/events/ui/EventAttendanceDropDown";
 import { FromToDateTime } from "@library/content/FromToDateTime";
+import { t } from "@vanilla/i18n";
+import { useUniqueID } from "@vanilla/library/src/scripts/utility/idUtils";
 
 interface IProps {
     event: IEvent;
@@ -37,6 +39,8 @@ export function Event(props: IProps) {
     const attendanceWidth = `${eventsVariables().spacing.attendanceOffset + (props.longestCharCount || 0)}ex`;
     const showAttendance = event.attending && event.attending !== EventAttendance.RSVP;
     const showMetas = event.location || !props.compact || showAttendance;
+
+    const locationID = useUniqueID("eventLocation");
 
     return (
         <li className={classNames(classes.item, props.className)}>
@@ -82,11 +86,26 @@ export function Event(props: IProps) {
                                             )}
                                         />
                                     )}
-                                    {event.location && <div className={classes.meta}>{event.location}</div>}
+                                    {event.location && (
+                                        <div className={classes.meta}>
+                                            <label className={classes.metaLabel} htmlFor={locationID}>
+                                                {t("Location")}:
+                                            </label>
+                                            <span id={locationID}>{event.location}</span>
+                                        </div>
+                                    )}
                                     {!props.compact && (
                                         <div className={classNames(classes.meta, classes.metaDate)}>
-                                            <FromToDateTime dateStarts={event.dateStarts} dateEnds={event.dateEnds} />
+                                            <FromToDateTime
+                                                dateStarts={event.dateStarts}
+                                                dateEnds={event.allDayEvent ? undefined : event.dateEnds}
+                                            />
                                         </div>
+                                    )}
+                                    {event.parentRecord && (
+                                        <SmartLink className={classes.meta} to={event.parentRecord.url}>
+                                            <strong>{event.parentRecord.name}</strong>
+                                        </SmartLink>
                                     )}
                                 </div>
                             )}
