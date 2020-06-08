@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import { EventFilterTypes, useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
+import { EventFilterTypes, useEventQueryForFilter } from "@groups/events/ui/EventsFilter";
 import { useEventsList } from "@groups/events/state/eventsHooks";
-import { EventsActions } from "@groups/events/state/EventsActions";
+import { EventsActions, IGetEventsQuery } from "@groups/events/state/EventsActions";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
@@ -14,8 +14,9 @@ import { notEmpty } from "@vanilla/utils";
 import { EventList } from "@groups/events/ui/EventList";
 import { t } from "@vanilla/i18n";
 import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
-import { formatUrl } from "@vanilla/library/src/scripts/utility/appUtils";
+import { formatUrl, getSiteSection } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
+import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 
 interface IProps {
     parentRecordType: string;
@@ -25,16 +26,23 @@ interface IProps {
 
 export function EventsHomePageTab(props: IProps) {
     const { parentRecordType, page, filterType } = props;
-    const dateQuery = useDatesForEventFilter(filterType);
-    // const eventsList = useEventsList({ parentRecordType, page, ...dateQuery, limit: EventsActions.DEFAULT_LIMIT });
-    const eventsList = useEventsList({ parentRecordType, page, ...dateQuery, limit: 1 });
+    const dateQuery = useEventQueryForFilter(filterType);
+
+    const siteSection = getSiteSection();
+    const query: IGetEventsQuery = { parentRecordType, page, ...dateQuery, limit: EventsActions.DEFAULT_LIMIT };
+    if (props.parentRecordType === "category" && siteSection.attributes.CategoryID) {
+        query.parentRecordID = siteSection.attributes.CategoryID;
+        query.requireDescendants = true;
+    }
+
+    const eventsList = useEventsList(query);
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(eventsList.status)) {
         return <EventListPlaceholder count={10} />;
     }
 
     if (!eventsList.data || eventsList.error) {
-        return <ErrorMessages errors={[eventsList.error].filter(notEmpty)} />;
+        return <CoreErrorMessages apiError={eventsList.error} />;
     }
 
     return (
