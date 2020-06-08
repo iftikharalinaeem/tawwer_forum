@@ -30,6 +30,15 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     /** @var Gdn_Session */
     private $session;
 
+    /** @var int */
+    private $wordCount;
+
+    /** @var bool */
+    private $stripEmbeds;
+
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
      * PrivateDiscussionsPlugin constructor.
      *
@@ -40,6 +49,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         parent::__construct();
         $this->config = $configuration;
         $this->session = $session;
+        $this->wordCount = $this->config->get('Plugins.PrivateDiscussions.WordCount', self::WORDCOUNT_DEFAULT);
+        $this->stripEmbeds = (bool)$this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
     }
 
     /**
@@ -58,23 +69,6 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function structure() {
         $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
-    }
-
-    /**
-     * Return StripEmbeds
-     * @return mixed
-     */
-    public function getStripEmbeds() {
-        return (bool)$this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
-    }
-
-    /**
-     * Return WordCount
-     *
-     * @return mixed
-     */
-    public function getWordCount() {
-        return $this->config->get('Plugins.PrivateDiscussions.WordCount', self::WORDCOUNT_DEFAULT);
     }
 
     /**
@@ -115,8 +109,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param Gdn_Dispatcher $args
      */
     public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
-        $args['BlockExceptions']['#^discussion(/)#']  = Gdn_Dispatcher::BLOCK_NEVER;
-        $args['BlockExceptions']['#^robots(/|$|\.txt)#']  = Gdn_Dispatcher::BLOCK_NEVER;
+        $sender->addBlockException('#^discussion(/)#', Gdn_Dispatcher::BLOCK_NEVER);
+        $sender->addBlockException('#^robots(/|$|\.txt)#', Gdn_Dispatcher::BLOCK_NEVER);
     }
 
     /**
@@ -125,7 +119,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      */
     public function discussionController_render_before($sender) {
-        $canViewCategory = $this->session->checkPermission('Vanilla.Discussions.View', true, 'Category', $sender->CategroyID);
+        $canViewCategory = DiscussionModel::categoryPermissions();
         // guest has view permission
         if (!$this->session->isValid() && $canViewCategory) {
             if (!$sender->CategoryID) {
@@ -163,12 +157,12 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->loadHTML($data);
-        if ($this->getStripEmbeds()) {
+        if ($this->stripEmbeds) {
             $this->stripEmbeds($dom);
             $data = $this->stripImages($dom);
         }
         // trim to word count
-        $data = $this->stripText($data, $dom);
+        $data = $this->stripText($data, $dom, $this->wordCount);
         return $data;
     }
 
@@ -221,12 +215,12 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      *
      * @param string $data
      * @param DOMDocument $dom
+     * @param int $wordCount
      * @return string The minified text with its html tags.
      */
-    private function stripText(string $data, DOMDocument $dom) :string {
-        $limit = $this->getWordCount();
+    private function stripText(string $data, DOMDocument $dom, int $wordCount) :string {
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
-        $this->stripTextRecursive($dom->documentElement, $limit);
+        $this->stripTextRecursive($dom->documentElement, $wordCount);
         $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
         return $minifiedText;
     }
