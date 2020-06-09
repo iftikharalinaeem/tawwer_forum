@@ -16,13 +16,15 @@ import { EventAttendance } from "../state/eventsTypes";
 interface IProps {
     eventID: number;
     attendanceStatus: EventAttendance;
+    page: number;
+    setPage: (number) => void;
 }
 
 export function EventParticipantsModule(props: IProps) {
-    const { eventID } = props;
+    const { eventID, page, setPage } = props;
     const { getEventParticipantsByAttendance } = useEventsActions();
 
-    const [page, setPage] = useState(1);
+    // const [page, setPage] = useState(1);
 
     const query = {
         eventID,

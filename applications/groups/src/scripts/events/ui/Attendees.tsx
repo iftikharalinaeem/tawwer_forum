@@ -67,10 +67,17 @@ export function EventAttendees(props: IProps) {
     const tooltipText = getTooltipText(title);
 
     const initialState = { visibleModal: false, goingPage: 1, maybePage: 1, notGoingPage: 1 };
+
     const reducer = (state, action) => {
         switch (action.type) {
             case "set_visible_modal":
                 return { ...state, visibleModal: action.visible };
+            case "set_going_page":
+                return { ...state, goingPage: action.page };
+            case "set_maybe_page":
+                return { ...state, maybePage: action.page };
+            case "set_not_going_page":
+                return { ...state, notGoingPage: action.page };
             default:
                 return state;
         }
@@ -84,9 +91,9 @@ export function EventAttendees(props: IProps) {
         <section className={classNames(classes.section, props.className)}>
             <EventParticipantsTabModule
                 defaultIndex={setIndex(title)}
+                state={state}
                 eventID={eventID}
-                visibleModal={state.visibleModal}
-                close={() => dispatch({ type: "set_visible_modal", visible: false })}
+                dispatch={dispatch}
             />
             {separator && <hr className={classes.separator} />}
             <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>

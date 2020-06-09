@@ -12,30 +12,55 @@ import { t } from "@vanilla/i18n";
 interface IProps {
     eventID: number;
     defaultIndex: number;
-    visibleModal: boolean;
-    close: () => void;
+    // visibleModal: boolean;
+    // pages: {};
+    state: any;
+    dispatch: (value: any) => void;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID, close, visibleModal, defaultIndex } = props;
+    const { eventID, defaultIndex, dispatch, state } = props;
+    const { visibleModal, goingPage, notGoingPage, maybePage } = state;
+    console.log(state);
 
     return (
         <EventParticipantsTabs
             defaultIndex={defaultIndex}
             isVisible={visibleModal}
-            onClose={close}
+            onClose={() => dispatch({ type: "set_visible_modal", visible: false })}
             tabs={[
                 {
                     title: t("Going"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.GOING} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={goingPage}
+                            setPage={page => dispatch({ type: "set_going_page", page: page })}
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.GOING}
+                        />
+                    ),
                 },
                 {
                     title: t("Maybe"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.MAYBE} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={maybePage}
+                            setPage={page => dispatch({ type: "set_maybe_page", page: page })}
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.MAYBE}
+                        />
+                    ),
                 },
                 {
                     title: t("Not Going"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.NOT_GOING} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={notGoingPage}
+                            setPage={page => dispatch({ type: "set_not_going_page", page: page })}
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.NOT_GOING}
+                        />
+                    ),
                 },
             ]}
         />
