@@ -68,7 +68,10 @@ paths:
             responses:
                 "201":
                     headers:
-                        $ref: "#/components/schemas/ArticleRehostResponseHeaders"
+                        x-file-rehosted-success-count:
+                            $ref: "#/components/headers/x-file-rehosted-success-count"
+                        x-file-rehosted-failed-count:
+                            $ref: "#/components/headers/x-file-rehosted-failed-count"
                     content:
                         "application/json":
                             schema:
@@ -377,7 +380,10 @@ paths:
             responses:
                 "200":
                     headers:
-                        $ref: "#/components/schemas/ArticleRehostResponseHeaders"
+                        x-file-rehosted-success-count:
+                            $ref: "#/components/headers/x-file-rehosted-success-count"
+                        x-file-rehosted-failed-count:
+                            $ref: "#/components/headers/x-file-rehosted-failed-count"
                     content:
                         "application/json":
                             schema:
@@ -1002,7 +1008,7 @@ paths:
                   name: minimumArticles
                   schema:
                       type: integer
-                - descriptions: limit of articles to return
+                - description: limit of articles to return
                   in: query
                   name: limit
                   schema:
@@ -1089,6 +1095,15 @@ components:
                                 type: string
                         example: { 'aliases': [ 'category/discussion-migrated-from/forum/', 'another-url/for-the-same/article' ]}
             required: true
+    headers:
+        x-file-rehosted-success-count:
+            description: Number of images and attachments that were successfully rehosted.
+            schema:
+                type: integer
+        x-file-rehosted-failed-count:
+            description: Number of images and attachments that were unable to be rehosted.
+            schema:
+                type: integer
     schemas:
         ArticleRehostFiles:
             description: >
@@ -1103,17 +1118,9 @@ components:
                 requestHeaders:
                     description: Headers to pass when fetching the remote resources. Primary use case is authentication.
                     type: array
-                    items: string
+                    items:
+                        type: string
                     example: ["Authorization: Basic cHc0czFaZ05tRkQyUjZSTA="]
-        ArticleRehostResponseHeaders:
-            x-file-rehosted-success-count:
-                description: Number of images and attachments that were successfully rehosted.
-                schema:
-                    type: integer
-            x-file-rehosted-failed-count:
-                description: Number of images and attachments that were unable to be rehosted.
-                schema:
-                    type: integer
         Article:
             properties:
                 articleID:
