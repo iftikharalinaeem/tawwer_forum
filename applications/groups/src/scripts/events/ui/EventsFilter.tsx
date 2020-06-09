@@ -9,14 +9,18 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { IGetEventsQuery } from "@groups/events/state/EventsActions";
+import classNames from "classnames";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
+import { EventAttendance } from "@groups/events/state/eventsTypes";
 
 export enum EventFilterTypes {
     ALL = "all",
     UPCOMING = "upcoming",
     PAST = "past",
+    MINE = "mine",
 }
 
-export function useDatesForEventFilter(filter: EventFilterTypes): Partial<IGetEventsQuery> {
+export function useEventQueryForFilter(filter: EventFilterTypes): Partial<IGetEventsQuery> {
     const dateNow = useMemo(() => {
         return new Date().toISOString();
     }, []);
@@ -35,12 +39,19 @@ export function useDatesForEventFilter(filter: EventFilterTypes): Partial<IGetEv
                 dateEnds: `>${dateNow}`,
                 sort: "dateStarts",
             };
+        default:
+            return {
+                attendingStatus: EventAttendance.GOING,
+                dateEnds: `>${dateNow}`,
+                sort: "dateStarts",
+            };
     }
 }
 
 interface IProps {
     filter: EventFilterTypes;
     onFilterChange: (newFilter: EventFilterTypes) => void;
+    className?: string;
 }
 
 /**
@@ -53,17 +64,19 @@ export default function EventFilter(props: IProps) {
         { name: t("All"), value: EventFilterTypes.ALL },
         { name: t("Upcoming Events"), value: EventFilterTypes.UPCOMING },
         { name: t("Past Events"), value: EventFilterTypes.PAST },
+        { name: t("My Events"), value: EventFilterTypes.MINE },
     ];
 
     const activeOption = options.find(option => option.value === filter);
     const id = uniqueIDFromPrefix("attendanceFilter");
     const classes = eventsClasses();
     return (
-        <div className={classes.filter}>
+        <div className={classNames(classes.filterRoot, props.className)}>
             <span id={id} className={classes.filterLabel}>
                 {t("View")}:
             </span>
             <SelectBox
+                buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
                 className={eventsClasses().dropDown}
                 widthOfParent={false}
                 options={options}

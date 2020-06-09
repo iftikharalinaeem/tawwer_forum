@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 
 /**
@@ -22,11 +23,41 @@ class NewEventsController extends AbstractEventsController {
      * @param string|null $parentRecordID
      */
     public function index(?string $parentRecordTypeOrID = null, ?string $parentRecordID = null) {
-        if ($parentRecordID === null) {
-            $this->renderSingleEvent($parentRecordTypeOrID);
+        $parentRecordTypeOrIDParsed = GroupModel::idFromSlug($parentRecordTypeOrID);
+        if ($parentRecordID === null && is_int($parentRecordTypeOrIDParsed)) {
+            $this->renderSingleEvent($parentRecordTypeOrIDParsed);
+        } elseif ($parentRecordID === null) {
+            $this->renderEventsHomepage($parentRecordTypeOrID);
         } else {
             $this->renderEventsList($parentRecordTypeOrID, $parentRecordID);
         }
+    }
+
+    /**
+     * Render the events homepage.
+     *
+     * @param string|null $parentRecordType
+     */
+    public function renderEventsHomepage(?string $parentRecordType) {
+        $this->permission('Garden.SignIn.Allow');
+
+        if (!$parentRecordType) {
+            return redirectTo('/events/category', 302);
+        }
+
+        if (!in_array($parentRecordType, self::ALLOWED_PARENT_RECORD_TYPES)) {
+            throw new NotFoundException();
+        }
+
+        Gdn_Theme::section('NewEventList');
+
+        $newDiscussionModule = new NewDiscussionModule($this);
+        $this->addModule($newDiscussionModule);
+        $this->addModule(new DiscussionFilterModule($this));
+
+        $this->title(t('Events'));
+        $this->addBreadcrumb(t('Events'), $this->canonicalUrl());
+        $this->render('index');
     }
 
     /**
@@ -38,7 +69,8 @@ class NewEventsController extends AbstractEventsController {
     private function renderEventsList(?string $parentRecordType, ?string $parentRecordID) {
         Gdn_Theme::section('NewEventList');
 
-        [$parentRecordType, $parentRecordID] = $this->validateParentRecords($parentRecordType ?: 'category', $parentRecordID ?? -1);
+        [$parentRecordType, $parentRecordID] = $this->validateParentRecords($parentRecordType ?: 'category', $parentRecordID);
+
         $this->canonicalUrl($this->eventModel->eventParentUrl($parentRecordType, $parentRecordID));
 
         // Make sure category banner works.

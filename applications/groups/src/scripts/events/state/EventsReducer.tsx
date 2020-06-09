@@ -221,10 +221,10 @@ export const eventsReducer = produce(
             };
 
             // Attempt to update an already fetch event participation status.
+            const modifiedAttendingStatus = payload.result.attending;
             const existingEvent = nextState.eventsByID[payload.result.eventID];
             if (existingEvent && existingEvent.data) {
                 const modifiedUserID = payload.result.userID;
-                const modifiedAttendingStatus = payload.result.attending;
 
                 // Modify the participants.
                 const { event, participants } = existingEvent.data;
@@ -241,6 +241,17 @@ export const eventsReducer = produce(
 
                 if (!wasAdded) {
                     participants.push(payload.result);
+                }
+            }
+
+            // Loop through existing events lists.
+            for (const [key, list] of Object.entries(nextState.eventsLists)) {
+                if (list.data) {
+                    for (const event of list.data.events) {
+                        if (event.eventID === payload.result.eventID) {
+                            event.attending = modifiedAttendingStatus;
+                        }
+                    }
                 }
             }
 

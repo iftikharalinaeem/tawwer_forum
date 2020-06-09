@@ -4,9 +4,10 @@
  */
 
 import { EventsModule } from "@groups/events/modules/EventsModule";
-import { EventsPagePlaceholder, useEventsListFilterQuery } from "@groups/events/pages/EventsPagePlaceholder";
+import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
+import { useEventsListFilterQuery } from "@groups/events/pages/useEventsListFilterQuery";
 import { useEventParentRecord, useEventsList, useQueryParamPage } from "@groups/events/state/eventsHooks";
-import EventFilter, { useDatesForEventFilter } from "@groups/events/ui/EventsFilter";
+import EventFilter, { useEventQueryForFilter } from "@groups/events/ui/EventsFilter";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { LoadStatus } from "@library/@types/api/core";
 import { PageHeading } from "@library/layout/PageHeading";
@@ -18,22 +19,25 @@ import { notEmpty, slugify } from "@vanilla/utils";
 import React, { useState } from "react";
 import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
+import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
+import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 
 export default function EventsPage() {
-    const page = useQueryParamPage();
     const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
     const parentRecordType = params.parentRecordType ?? "category";
     const parentRecordID = params.parentRecordID !== null ? parseInt(params.parentRecordID!) : -1;
 
+    const page = useQueryParamPage();
     const { filter, changeFilter } = useEventsListFilterQuery(page);
 
-    const dateQuery = useDatesForEventFilter(filter);
+    const dateQuery = useEventQueryForFilter(filter);
     const eventQuery: IGetEventsQuery = {
         ...dateQuery,
         parentRecordType,
         parentRecordID,
         limit: EventsActions.DEFAULT_LIMIT,
         page,
+        requireDescendants: true,
     };
 
     const eventList = useEventsList(eventQuery);
@@ -48,7 +52,7 @@ export default function EventsPage() {
     }
 
     if (!eventList.data || !eventParent.data || eventList.error || eventParent.error) {
-        return <ErrorMessages errors={[eventList.error, eventParent.error].filter(notEmpty)} />;
+        return <CoreErrorMessages apiError={eventList.error ?? eventParent.error} />;
     }
 
     const parentRecordSlug = slugify(eventParent.data.name);
@@ -56,7 +60,7 @@ export default function EventsPage() {
     return (
         <>
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
-            <EventFilter filter={filter} onFilterChange={changeFilter} />
+            <EventFilter className={classes.filter} filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
             <SimplePager
                 url={formatUrl(

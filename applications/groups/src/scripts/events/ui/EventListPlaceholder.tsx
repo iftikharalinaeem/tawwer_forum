@@ -16,7 +16,7 @@ export function EventListPlaceholder(props: IProps) {
     return (
         <div className={classes.list}>
             {Array.from(new Array(props.count ?? 5)).map((_, i) => {
-                return <EventPlaceholder key={i} />;
+                return <EventPlaceholder key={i} className={i === 0 ? "isFirst" : undefined} />;
             })}
         </div>
     );

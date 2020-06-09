@@ -17,9 +17,10 @@ import {
     IFont,
     negativeUnit,
     unit,
+    flexHelper,
 } from "@library/styles/styleHelpers";
 import { borders, EMPTY_BORDER, IBorderStyles, singleBorder } from "@library/styles/styleHelpersBorders";
-import { margins, paddings } from "@library/styles/styleHelpersSpacing";
+import { margins, paddings, extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
@@ -55,11 +56,11 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const spacing = makeVars("spacing", {
-        contentSpacer: globalVars.gutter.half - 4, // Cheated for alignment
-        attendanceOffset: 5,
+        contentSpacer: globalVars.gutter.half - 6, // Cheated for alignment
+        attendanceOffset: 6,
         padding: {
             vertical: 20,
-            horizontal: 5,
+            horizontal: 6,
         },
     });
 
@@ -146,6 +147,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
 
     const empty = style("empty", {
         display: "block",
+        borderBottom: singleBorder(),
+        borderTop: singleBorder(),
+        ...paddings({
+            ...vars.spacing.padding,
+            horizontal: vars.spacing.padding.horizontal * 2,
+        }),
+        ...extendItemContainer(vars.spacing.padding.horizontal * 2),
     });
 
     const list = style("list", {
@@ -279,8 +287,12 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
             lineHeight: globalVars.lineHeights.meta,
         }),
         ...margins({
-            right: globalVars.meta.spacing.default * 2,
+            right: globalVars.meta.spacing.default * 4,
         }),
+    });
+
+    const metaLabel = style("metaLabel", {
+        marginRight: globalVars.gutter.quarter,
     });
 
     const metaDate = style(
@@ -322,7 +334,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     });
 
     const dropDown = style("dropDown", {
-        ...lineHeightAdjustment(),
         $nest: {
             [`& .${selectBoxClasses().toggle}`]: {
                 marginLeft: "auto",
@@ -373,8 +384,13 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         textAlign: "right",
     });
 
+    const filterRoot = style("filterRoot", {
+        ...flexHelper().middle(),
+    });
+
     const filter = style("filter", {
         marginBottom: globalVars.gutter.half,
+        justifyContent: "flex-start",
     });
     const filterLabel = style("filterLabel", {
         marginRight: globalVars.gutter.quarter,
@@ -488,6 +504,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         metas,
         meta,
         metaDate,
+        metaLabel,
         metaAttendance,
         empty,
         attendance,
@@ -499,6 +516,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         viewMore,
         filter,
         filterLabel,
+        filterRoot,
         details,
         separator,
         attendee,

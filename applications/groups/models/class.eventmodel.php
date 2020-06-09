@@ -74,7 +74,7 @@ class EventModel extends Gdn_Model {
 
         $eventPath = $themeFeatures->allFeatures()['NewEventsPage'] ? "/events/$eventID-$slug" : "/event/$eventID-$slug";
         $siteSectionPath = $this->getSiteSectionPathForParentRecord($parentRecordType, $parentRecordID);
-        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath, true);
         return $result;
     }
 
@@ -633,10 +633,10 @@ class EventModel extends Gdn_Model {
      */
     public function getAttendingCounts(int $eventID, array $where): array {
         $in = "'". implode("','", $where) . "'";
-        $query = "select Attending, count(EventID) as count 
-            from GDN_UserEvent 
-            where eventID = ${eventID} 
-            and Attending In (${in}) 
+        $query = "select Attending, count(EventID) as count
+            from GDN_UserEvent
+            where eventID = ${eventID}
+            and Attending In (${in})
             Group By Attending;";
 
         $result = $this->SQL->query($query)->resultArray();
