@@ -3,20 +3,17 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { EventFilterTypes, useEventQueryForFilter } from "@groups/events/ui/EventsFilter";
-import { useEventsList } from "@groups/events/state/eventsHooks";
 import { EventsActions, IGetEventsQuery } from "@groups/events/state/EventsActions";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import { EventsPagePlaceholder } from "@groups/events/pages/EventsPagePlaceholder";
-import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
-import { notEmpty } from "@vanilla/utils";
+import { useEventsList } from "@groups/events/state/eventsHooks";
 import { EventList } from "@groups/events/ui/EventList";
+import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
+import { EventFilterTypes, useEventQueryForFilter } from "@groups/events/ui/EventsFilter";
 import { t } from "@vanilla/i18n";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
 import SimplePager from "@vanilla/library/src/scripts/navigation/SimplePager";
 import { formatUrl, getSiteSection } from "@vanilla/library/src/scripts/utility/appUtils";
-import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
-import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
+import React from "react";
 
 interface IProps {
     parentRecordType: string;

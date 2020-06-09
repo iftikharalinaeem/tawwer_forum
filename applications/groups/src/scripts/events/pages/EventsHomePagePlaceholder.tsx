@@ -16,7 +16,6 @@ export function EventsHomePagePlaceholder() {
             <div style={{ display: "flex", justifyContent: "flex-start" }}>
                 <LoadingRectange height={25} width={150} style={{ marginRight: 44 }} />
                 <LoadingRectange height={25} width={120} />
-                {/* <LoadingSpacer width={6} height={14} /> */}
                 <LoadingRectange height={20} width={75} style={{ marginLeft: "auto" }} />
             </div>
             <LoadingSpacer height={20} />
