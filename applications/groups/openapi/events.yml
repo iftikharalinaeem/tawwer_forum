@@ -379,25 +379,25 @@ components:
           minLength: 1
           nullable: true
           type: string
-        attending.yes.users:
+        attendingYesUsers:
           items:
             $ref: '#/components/schemas/UserFragment'
           type: array
-        attending.yes.count:
+        attendingYesCount:
           description: The number of users who rsvp'd yes.
           type: integer
-        attending.no.users:
+        attendingNoUsers:
           items:
             $ref: '#/components/schemas/UserFragment'
           type: array
-        attending.no.count:
+        attendingNoCount:
           description: The number of users who rsvp'd no.
           type: integer
-        attending.maybe.users:
+        attendingMaybeUsers:
           items:
             $ref: '#/components/schemas/UserFragment'
           type: array
-        attending.maybe.count:
+        attendingMaybeCount:
           description: The number of users who rsvp'd maybe.
           type: integer
         insertUserID:
