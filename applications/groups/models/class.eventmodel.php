@@ -632,14 +632,13 @@ class EventModel extends Gdn_Model {
      * @return array
      */
     public function getAttendingCounts(int $eventID, array $where): array {
-        $in = "'". implode("','", $where) . "'";
-        $query = "select Attending, count(EventID) as count
-            from GDN_UserEvent
-            where eventID = ${eventID}
-            and Attending In (${in})
-            Group By Attending;";
-
-        $result = $this->SQL->query($query)->resultArray();
+        $result = $this->SQL->select('Attending')
+            ->select('EventID', 'count', 'count')
+            ->from('UserEvent')
+            ->groupBy('Attending')
+            ->whereIn('Attending', $where)
+            ->where('EventID', $eventID)
+            ->get()->resultArray();
 
         return $result;
     }

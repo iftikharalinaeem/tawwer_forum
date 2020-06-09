@@ -12,7 +12,7 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
 
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
@@ -20,12 +20,17 @@ import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
 
+interface IAttendees {
+    users: IUserFragment[] | undefined;
+    count: number | undefined;
+}
+
 interface IProps {
     event: IEvent;
     organizer: string;
-    going?: IUserFragment[] | undefined;
-    maybe?: IUserFragment[] | undefined;
-    notGoing?: IUserFragment[] | undefined;
+    going?: IAttendees;
+    maybe?: IAttendees;
+    notGoing?: IAttendees;
     onChange: (data: any) => void;
     loadingAttendance?: EventAttendance;
 }
@@ -35,7 +40,7 @@ interface IProps {
  */
 export function EventDetails(props: IProps) {
     const classes = eventsClasses();
-    const { event } = props;
+    const { event, going, maybe, notGoing } = props;
 
     return (
         <div className={classes.details}>
@@ -98,26 +103,26 @@ export function EventDetails(props: IProps) {
 
             <EventAttendees
                 eventID={event.eventID}
-                data={props.going!}
+                data={going?.users}
                 title={t("Going")}
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
-                extra={props.going?.length}
+                extra={going?.count}
                 separator={true}
             />
             <EventAttendees
                 eventID={event.eventID}
                 emptyMessage={t("Nobody is on the fence right now.")}
-                data={props.maybe!}
+                data={maybe?.users}
                 title={t("Maybe")}
-                extra={props.maybe?.length}
+                extra={maybe?.count}
                 separator={true}
             />
             <EventAttendees
                 eventID={event.eventID}
                 emptyMessage={t("Nobody has declined the invitation so far.")}
-                data={props.notGoing!}
+                data={notGoing?.users}
                 title={t("Not going")}
-                extra={props.notGoing?.length}
+                extra={notGoing?.count}
                 separator={true}
             />
         </div>

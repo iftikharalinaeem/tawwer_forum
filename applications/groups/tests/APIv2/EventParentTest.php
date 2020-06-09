@@ -466,9 +466,9 @@ class EventParentTest extends AbstractAPIv2Test {
             ['expand' => ['attendees.yes', 'attendees.no', 'attendees.maybe']]
         )->getBody();
 
-        $this->assertEquals(10, $event['attending.yes.count']);
-        $this->assertEquals(5, $event['attending.no.count']);
-        $this->assertEquals(3, $event['attending.maybe.count']);
+        $this->assertEquals(10, $event['attendingYesCount']);
+        $this->assertEquals(5, $event['attendingNoCount']);
+        $this->assertEquals(3, $event['attendingMaybeCount']);
     }
 
     /**
