@@ -38,12 +38,14 @@ type IEventPostParticipant = {
 };
 export interface IGetEventsQuery {
     parentRecordType: string;
-    parentRecordID: number;
+    parentRecordID?: number;
     dateStarts?: string;
     dateEnds?: string;
     sort?: string;
     page: number;
     limit: number;
+    requireDescendants?: boolean;
+    attendingStatus?: EventAttendance;
 }
 
 export interface IGetEventParticipantsQuery {

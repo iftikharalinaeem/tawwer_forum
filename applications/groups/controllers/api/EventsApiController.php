@@ -14,6 +14,7 @@ use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Community\Schemas\GroupFragmentSchema;
 use Vanilla\DateFilterSchema;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Groups\Models\EventPermissions;
@@ -209,6 +210,7 @@ class EventsApiController extends AbstractApiController {
      */
     public function get($id, array $query) {
         $this->permission();
+
         $query['UserID'] = $query['userID'] ?? $this->getSession()->UserID;
         $this->idParamEventSchema()->setDescription('Get an event.');
         $out = $this->schema($this->fullEventSchema(), 'out');
@@ -673,7 +675,7 @@ class EventsApiController extends AbstractApiController {
             if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_CATEGORY) {
                 $dbRecord['parentRecord']['recordID'] = $dbRecord['parentRecord']['CategoryID'] ?? null;
                 $dbRecord['parentRecord']['recordType'] = 'category';
-                $dbRecord['parentRecord']['url'] = categoryUrl($dbRecord['parentRecord']);
+                $dbRecord['parentRecord']['url'] = ($dbRecord['parentRecord']['Url'] ?? null) ?: categoryUrl($dbRecord['parentRecord'], '', true);
             }
 
             if ($dbRecord['ParentRecordType'] === EventModel::PARENT_TYPE_GROUP) {

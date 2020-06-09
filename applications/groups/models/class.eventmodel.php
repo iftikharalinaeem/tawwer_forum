@@ -74,7 +74,7 @@ class EventModel extends Gdn_Model {
 
         $eventPath = $themeFeatures->allFeatures()['NewEventsPage'] ? "/events/$eventID-$slug" : "/event/$eventID-$slug";
         $siteSectionPath = $this->getSiteSectionPathForParentRecord($parentRecordType, $parentRecordID);
-        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath);
+        $result = \Gdn::request()->getSimpleUrl($siteSectionPath . $eventPath, true);
         return $result;
     }
 
@@ -632,7 +632,6 @@ class EventModel extends Gdn_Model {
      * @return array
      */
     public function getAttendingCounts(int $eventID, array $where): array {
-
         $result = $this->SQL->select('Attending')
             ->select('EventID', 'count', 'count')
             ->from('UserEvent')
@@ -640,8 +639,6 @@ class EventModel extends Gdn_Model {
             ->whereIn('Attending', $where)
             ->where('EventID', $eventID)
             ->get()->resultArray();
-
-
 
         return $result;
     }

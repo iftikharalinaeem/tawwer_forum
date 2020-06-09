@@ -35,9 +35,9 @@ $Session = Gdn::session();
                echo $this->Form->errors();
 //               $CommentOptions = array('MultiLine' => TRUE, 'format' => getValueR('Comment.Format', $this));
                $this->fireEvent('BeforeBodyField');
-               
-               echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'tabindex' => 1]);
-               
+
+               echo $this->Form->bodyBox('Body', ['Table' => 'Comment', 'tabindex' => 0]);
+
                echo '<div class="CommentOptions List Inline">';
 //               $this->fireEvent('AfterBodyField');
                echo '</div>';

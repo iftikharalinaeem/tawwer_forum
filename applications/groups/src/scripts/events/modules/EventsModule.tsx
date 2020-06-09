@@ -19,17 +19,13 @@ interface IProps {
 
 export function EventsModule(props: IProps) {
     const events = useEventsList(props.query);
-    const eventParent = useEventParentRecord(props.query);
 
-    if (
-        [LoadStatus.PENDING, LoadStatus.LOADING].includes(events.status) ||
-        [LoadStatus.PENDING, LoadStatus.LOADING].includes(eventParent.status)
-    ) {
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(events.status)) {
         return <EventListPlaceholder count={5} />;
     }
 
-    if (!events.data || !eventParent.data || events.error || eventParent.error) {
-        return <ErrorMessages errors={[events.error, eventParent.error].filter(notEmpty)} />;
+    if (!events.data || events.error) {
+        return <ErrorMessages errors={[events.error].filter(notEmpty)} />;
     }
 
     return <EventList hideIfEmpty={true} events={events.data.events} />;

@@ -14,8 +14,9 @@
                 echo $Photo;
             }
 
-            if (isset($Row['ImageUrls'][0])){
-                echo '<div class="ImgExt">'.img($Row['ImageUrls'][0]).'</div>';
+            if (isset($Row['images'][0])){
+                $image = $Row['images'][0];
+                echo '<div class="ImgExt">'.img($image["url"], ["alt" => $image['alt']] ?? []).'</div>';
             }
             ?>
             <div class="Media-Body">

@@ -14,7 +14,7 @@ import {
 } from "@groups/events/state/EventsActions";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import { useEffect, useReducer, useCallback } from "react";
+import { useEffect, useReducer, useCallback, useDebugValue } from "react";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { useLocation } from "react-router";
 import { action } from "@storybook/addon-actions";
@@ -134,6 +134,8 @@ export function useEvent(eventID: number) {
             actions.getEventByID(eventID);
         }
     }, [status, actions, eventID]);
+
+    useDebugValue(existingResult);
 
     return existingResult;
 }

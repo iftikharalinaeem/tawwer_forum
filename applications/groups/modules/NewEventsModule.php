@@ -40,7 +40,7 @@ class NewEventsModule extends Gdn_Module {
     public function __construct() {
         parent::__construct();
         $this->eventModel = \Gdn::getContainer()->get(EventModel::class);
-        $this->eventApi = \Gdn::getContainer()->getArgs(EventsApiController::class);
+        $this->eventApi = \Gdn::getContainer()->get(EventsApiController::class);
 
         // Try to get the contextual category ID if it exists.
         $controller = \Gdn::controller();
@@ -79,6 +79,7 @@ class NewEventsModule extends Gdn_Module {
             $events = $this->eventApi->index(array_merge($this->getDateFiltersForMode(), [
                 'parentRecordType' => $this->parentRecordType,
                 'parentRecordID' => $this->parentRecordID,
+                'requireDescendants' => true,
                 'expand' => true,
             ]));
 
@@ -87,11 +88,9 @@ class NewEventsModule extends Gdn_Module {
                 return $this->renderTwig('@groups/EmptyNewEventsModule.twig', (array) $this);
             }
 
-            $parentUrl = $this->eventModel->eventParentUrl($this->parentRecordType, $this->parentRecordID);
-
             $props = [
                 'events' => $events,
-                'viewMoreLink' => $parentUrl,
+                'viewMoreLink' => \Gdn::request()->url("/events/".$this->parentRecordType, true),
                 'title'=> $this->getTitleForMode(),
             ];
 

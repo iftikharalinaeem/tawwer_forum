@@ -48,6 +48,7 @@ export interface IEvent {
     updatedUser: IUserFragment;
     groupID?: number;
     url: string;
+    parentRecord?: IParentRecordFragment;
     permissions?: Record<EventPermissionName, boolean>;
     breadcrumbs: ICrumb[];
 }
@@ -55,6 +56,13 @@ export interface IEvent {
 export interface IEventList {
     events: IEvent[];
     pagination: ILinkPages;
+}
+
+interface IParentRecordFragment {
+    name: string;
+    recordID: number;
+    recordType: string;
+    url: string;
 }
 
 export interface IEventParentRecord {
