@@ -12,13 +12,14 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React from "react";
+import React, { useReducer } from "react";
 import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
 
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
+import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
 
 interface IProps {
     event: IEvent;
@@ -37,8 +38,36 @@ export function EventDetails(props: IProps) {
     const classes = eventsClasses();
     const { event } = props;
 
+    const initialState = {
+        visibleModal: false,
+        goingPage: 1,
+        maybePage: 1,
+        notGoingPage: 1,
+        defaultTabIndex: undefined,
+    };
+
+    const reducer = (state, action) => {
+        switch (action.type) {
+            case "set_visible_modal":
+                return { ...state, visibleModal: action.visible };
+            case "set_going_page":
+                return { ...state, goingPage: action.page };
+            case "set_maybe_page":
+                return { ...state, maybePage: action.page };
+            case "set_not_going_page":
+                return { ...state, notGoingPage: action.page };
+            case "set_default_tab_index":
+                return { ...state, defaultTabIndex: action.index };
+            default:
+                return state;
+        }
+    };
+
+    const [state, dispatch] = useReducer(reducer, initialState);
+
     return (
         <div className={classes.details}>
+            <EventParticipantsTabModule state={state} eventID={event.eventID} dispatch={dispatch} />
             <DataList
                 data={[
                     {
@@ -103,6 +132,7 @@ export function EventDetails(props: IProps) {
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
                 extra={props.going?.length}
                 separator={true}
+                dispatch={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
@@ -111,6 +141,7 @@ export function EventDetails(props: IProps) {
                 title={t("Maybe")}
                 extra={props.maybe?.length}
                 separator={true}
+                dispatch={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
@@ -119,6 +150,7 @@ export function EventDetails(props: IProps) {
                 title={t("Not going")}
                 extra={props.notGoing?.length}
                 separator={true}
+                dispatch={dispatch}
             />
         </div>
     );

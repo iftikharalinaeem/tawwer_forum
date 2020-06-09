@@ -25,13 +25,25 @@ interface IProps {
     maxCount?: number;
     emptyMessage?: string;
     className?: string;
+    dispatch: (value: any) => void;
 }
 
 /**
  * Component for displaying an event details
  */
 export function EventAttendees(props: IProps) {
-    const { eventID, data, maxCount = 10, extra = 0, separator = false, depth = 2, title, emptyMessage } = props;
+    const {
+        eventID,
+        data,
+        maxCount = 10,
+        extra = 0,
+        separator = false,
+        depth = 2,
+        title,
+        emptyMessage,
+        dispatch,
+    } = props;
+
     const empty = data.length === 0;
     const classes = eventsClasses();
     const participantsClasses = eventParticipantsClasses();
@@ -66,35 +78,13 @@ export function EventAttendees(props: IProps) {
     };
     const tooltipText = getTooltipText(title);
 
-    const initialState = { visibleModal: false, goingPage: 1, maybePage: 1, notGoingPage: 1 };
-
-    const reducer = (state, action) => {
-        switch (action.type) {
-            case "set_visible_modal":
-                return { ...state, visibleModal: action.visible };
-            case "set_going_page":
-                return { ...state, goingPage: action.page };
-            case "set_maybe_page":
-                return { ...state, maybePage: action.page };
-            case "set_not_going_page":
-                return { ...state, notGoingPage: action.page };
-            default:
-                return state;
-        }
+    const openModal = () => {
+        dispatch({ type: "set_visible_modal", visible: true });
+        dispatch({ type: "set_default_tab_index", index: setIndex(title) });
     };
-
-    const [state, dispatch] = useReducer(reducer, initialState);
-
-    const openModal = () => dispatch({ type: "set_visible_modal", visible: true });
 
     return (
         <section className={classNames(classes.section, props.className)}>
-            <EventParticipantsTabModule
-                defaultIndex={setIndex(title)}
-                state={state}
-                eventID={eventID}
-                dispatch={dispatch}
-            />
             {separator && <hr className={classes.separator} />}
             <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}

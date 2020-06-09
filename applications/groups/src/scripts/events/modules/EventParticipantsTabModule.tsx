@@ -11,21 +11,17 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
-    defaultIndex: number;
-    // visibleModal: boolean;
-    // pages: {};
     state: any;
     dispatch: (value: any) => void;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID, defaultIndex, dispatch, state } = props;
-    const { visibleModal, goingPage, notGoingPage, maybePage } = state;
-    console.log(state);
+    const { eventID, dispatch, state } = props;
+    const { visibleModal, goingPage, notGoingPage, maybePage, defaultTabIndex } = state;
 
     return (
         <EventParticipantsTabs
-            defaultIndex={defaultIndex}
+            defaultIndex={defaultTabIndex}
             isVisible={visibleModal}
             onClose={() => dispatch({ type: "set_visible_modal", visible: false })}
             tabs={[

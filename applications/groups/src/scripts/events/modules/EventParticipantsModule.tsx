@@ -8,7 +8,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
 import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { notEmpty } from "@vanilla/utils";
-import React, { useState } from "react";
+import React from "react";
 import { EventsActions, useEventsActions } from "../state/EventsActions";
 import { useEventParticipantsByAttendance } from "../state/eventsHooks";
 import { EventAttendance } from "../state/eventsTypes";
@@ -17,14 +17,12 @@ interface IProps {
     eventID: number;
     attendanceStatus: EventAttendance;
     page: number;
-    setPage: (number) => void;
+    setPage: (page: number) => void;
 }
 
 export function EventParticipantsModule(props: IProps) {
     const { eventID, page, setPage } = props;
     const { getEventParticipantsByAttendance } = useEventsActions();
-
-    // const [page, setPage] = useState(1);
 
     const query = {
         eventID,
