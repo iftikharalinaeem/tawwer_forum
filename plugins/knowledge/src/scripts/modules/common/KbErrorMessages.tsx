@@ -32,13 +32,13 @@ export default function KbErrorMessages(props: IKbErrorMessageProps) {
     };
     const { message, messageAsParagraph, description } = error;
     return (
-        <main className={classNames(classes.root, props.className)}>
+        <div className={classNames(classes.root, props.className)}>
             {error.icon}
             {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
             {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
             {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
             {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
-        </main>
+        </div>
     );
 }
 
