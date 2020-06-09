@@ -18,7 +18,7 @@ gulp.task('compile', function () {
     .pipe($.size({showFiles: true}));
 });
 
-gulp.task('rename', ['compile'], function() {
+gulp.task('rename', gulp.series('compile'), function() {
   return gulp.src([
     'design/themes/*.css'
   ])
@@ -29,7 +29,7 @@ gulp.task('rename', ['compile'], function() {
     .pipe(gulp.dest('design'));
 });
 
-gulp.task('styles', ['rename'], function() {
+gulp.task('styles', gulp.series('rename'), function() {
   return del([
     'design/themes'
   ]);
@@ -50,7 +50,7 @@ gulp.task('scripts', function () {
     .pipe($.size({showFiles: true}));
 });
 
-gulp.task('default', ['styles', 'scripts']);
+gulp.task('default', gulp.series('styles', 'scripts'));
 
 gulp.task('watch',  function () {
   $.livereload.listen();
