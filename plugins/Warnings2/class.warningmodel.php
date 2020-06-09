@@ -62,7 +62,7 @@ class WarningModel extends UserNoteModel {
         $activity = [
             'ActivityType' => 'Warning',
             'ActivityUserID' => $warnerIdentity,
-            'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
+            'HeadlineFormat' => t('HeadlineFormat.Warning.ToUser.Popup', 'You\'ve been <a href="{Url,html}" class="Popup">warned</a>.'),
             'RecordType' => $warning['RecordType'],
             'RecordID' => $warning['RecordID'],
             'Story' => $warning['Body'],
