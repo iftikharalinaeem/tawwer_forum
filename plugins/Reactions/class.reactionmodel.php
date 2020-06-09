@@ -1100,6 +1100,9 @@ class ReactionModel extends Gdn_Model {
             }
         }
 
+        // Clear LogCount's cache
+        LogModel::clearOperationCountCache($reactionUrlCode);
+
         ReactionsPlugin::instance()->EventArguments = [
             'RecordType' => $recordType,
             'RecordID' => $iD,

@@ -17,7 +17,7 @@ import { t } from "@vanilla/i18n";
 
 interface IProps {
     eventID: number;
-    data: IUserFragment[];
+    data?: IUserFragment[] | undefined;
     title: string;
     extra: number | undefined;
     separator?: boolean;
@@ -34,7 +34,7 @@ interface IProps {
 export function EventAttendees(props: IProps) {
     const {
         eventID,
-        data,
+        data = [],
         maxCount = 10,
         extra = 0,
         separator = false,
@@ -43,8 +43,7 @@ export function EventAttendees(props: IProps) {
         emptyMessage,
         dispatch,
     } = props;
-
-    const empty = data.length === 0;
+    const empty = data?.length === 0;
     const classes = eventsClasses();
     const participantsClasses = eventParticipantsClasses();
     const HeadingTag = `h${depth}` as "h1";

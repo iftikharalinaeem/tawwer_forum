@@ -21,12 +21,17 @@ import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
 import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
 
+interface IAttendees {
+    users: IUserFragment[] | undefined;
+    count: number | undefined;
+}
+
 interface IProps {
     event: IEvent;
     organizer: string;
-    going?: IUserFragment[] | undefined;
-    maybe?: IUserFragment[] | undefined;
-    notGoing?: IUserFragment[] | undefined;
+    going?: IAttendees;
+    maybe?: IAttendees;
+    notGoing?: IAttendees;
     onChange: (data: any) => void;
     loadingAttendance?: EventAttendance;
 }
@@ -36,7 +41,7 @@ interface IProps {
  */
 export function EventDetails(props: IProps) {
     const classes = eventsClasses();
-    const { event } = props;
+    const { event, going, maybe, notGoing } = props;
 
     const initialState = {
         visibleModal: false,
@@ -127,28 +132,28 @@ export function EventDetails(props: IProps) {
 
             <EventAttendees
                 eventID={event.eventID}
-                data={props.going!}
+                data={going?.users}
                 title={t("Going")}
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
-                extra={props.going?.length}
+                extra={going?.count}
                 separator={true}
                 dispatch={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
                 emptyMessage={t("Nobody is on the fence right now.")}
-                data={props.maybe!}
+                data={maybe?.users}
                 title={t("Maybe")}
-                extra={props.maybe?.length}
+                extra={maybe?.count}
                 separator={true}
                 dispatch={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
                 emptyMessage={t("Nobody has declined the invitation so far.")}
-                data={props.notGoing!}
+                data={notGoing?.users}
                 title={t("Not going")}
-                extra={props.notGoing?.length}
+                extra={notGoing?.count}
                 separator={true}
                 dispatch={dispatch}
             />
