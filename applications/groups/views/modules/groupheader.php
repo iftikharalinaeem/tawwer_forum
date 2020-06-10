@@ -12,14 +12,22 @@ $hasBanner = val('Banner', $this->group);
     if ($this->showButtons) {
     $buttons = getGroupButtons($this->group);
 
-    if ($buttons) { ?>
-        <div class="Buttons Button-Controls Group-Buttons">
-            <?php foreach ($buttons as $button) { ?>
-                <a class="Button <?php echo val('cssClass', $button); ?>" href="<?php echo val('url', $button) ?>"
-                     role="button"><?php echo val('text', $button); ?></a>
-            <?php } ?>
-        </div>
-    <?php } ?>
+
+    $buttonGroup = "";
+    if ($buttons) {
+        foreach ($buttons as $button) {
+            $buttonGroup .= "<a class='Button " . val('cssClass', $button) . "' href='" . val('url', $button) . "' role='button'>" . val('text', $button) . "</a>";
+        }
+        if (!empty($buttonGroup)) {
+            $buttonGroup = "<div class='Buttons Button-Controls Group-Buttons'>" . $buttonGroup . "</div>";
+        }
+    }
+
+    $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
+
+    if (!$dataDriven) {
+        echo $buttonGroup;
+    } ?>
     <div class="Group-Header-Info">
         <h1 class="Group-Title"><?php echo anchor(htmlspecialchars(val('Name', $this->group)), groupUrl($this->group)); ?></h1>
         <?php
@@ -33,5 +41,8 @@ $hasBanner = val('Banner', $this->group);
             echo $meta;
         } ?>
     </div>
+    <?php if ($dataDriven) {
+        echo $buttonGroup;
+    } ?>
 </div>
 <?php } ?>
