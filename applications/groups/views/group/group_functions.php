@@ -281,7 +281,7 @@ function writeGroupOptionsButton($options = []) {
           echo wrap(anchor($option['Text'], $option['Url'], val('CssClass', $option, $code)), 'li');
      }
      echo '</ul>';
-     echo '<a class="NavButton Handle Button GroupOptionsTitle" title="'.t('Options').'">'.t('Options').' '.
+     echo '<a class="NavButton Handle Button GroupOptionsTitle" title="'.t('Options').'"><span class="sr-only">'.t('Options').'</span> '.
           sprite('Sprite', 'SpDropdownHandle').'</a>';
      echo '</div>';
 }
