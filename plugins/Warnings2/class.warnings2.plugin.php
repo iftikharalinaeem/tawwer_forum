@@ -142,7 +142,7 @@ class Warnings2Plugin extends Gdn_Plugin {
             '<span class="ReactSprite ReactWarn"></span> ' . t('Warn'),
             '/profile/warn?' . http_build_query($args),
             'ReactButton ReactButton-Warn Popup',
-            ['title' => t('Warn')]
+            ['title' => t('Warn'), 'role' => 'button']
         );
         return $result;
     }

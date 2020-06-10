@@ -174,10 +174,20 @@ if (!function_exists('ReactionButton')) {
             $dataAttr = "data-reaction=\"$urlCode2\"";
         }
 
-        $discussionName = is_array($row) ? $row["Name"] : $row->Name;
+        // Defaults to discussion type
+        $targetName = is_array($row) ? $row["Name"] : $row->Name;
+        $template = '%s for discussion: "%s"';
+        if ($recordType === "comment") {
+            $template = t('%s comment by user: "%s"');
+            $targetName = "";
+        } elseif ($recordType === "activity") {
+            $discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
+            $discussion = $discussionModel->getID(is_array($row) ? $row["DiscussionID"] : $row->DiscussionID, DATASET_TYPE_ARRAY);
+            $targetName = $discussion["Name"];
+        }
 
-        $upAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Up"), $discussionName]);
-        $downAccessibleLabel= HtmlUtils::accessibleLabel('%s for discussion: "%s"', [t("Vote Down"), $discussionName]);
+        $upAccessibleLabel= HtmlUtils::accessibleLabel($template, [$label, $targetName]);
+        $downAccessibleLabel= HtmlUtils::accessibleLabel($template, [$label, $targetName]);
 
 
         if ($permissionClass && $permissionClass !== 'Positive' && !checkPermission('Garden.Moderation.Manage')) {
