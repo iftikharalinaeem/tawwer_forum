@@ -2235,6 +2235,7 @@ if (!function_exists('getReactionButtonHtml')) {
             href="'.$url.'"
             title="'.$label.'" '.$dataAttr.'
             rel="nofollow"
+            role="button"
             aria-label="'.$accessibleLabel.'"
             ><span class="arrow arrow-'.$urlCode.'"
             ></span> <span class="idea-label">'.$label.'</span></a>';
