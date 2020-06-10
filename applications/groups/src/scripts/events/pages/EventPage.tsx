@@ -40,7 +40,7 @@ export default function EventPage() {
         return <ErrorPage error={eventWithParticipants.error} />;
     }
 
-    let { event } = eventWithParticipants.data;
+    const event = eventWithParticipants.data;
 
     let going = {
         users: event.attendingYesUsers,

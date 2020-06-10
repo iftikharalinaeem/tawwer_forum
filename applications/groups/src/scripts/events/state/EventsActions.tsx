@@ -178,7 +178,7 @@ export class EventsActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
-    public static readonly getEventACs = createAction.async<{ eventID: number }, IEventWithParticipants, IApiError>(
+    public static readonly getEventACs = createAction.async<{ eventID: number }, IEvent, IApiError>(
         "GET_EVENT_WITH_PARTICIPANTS",
     );
     public static readonly deleteEvent_ACS = createAction.async<{ eventID: number }, null, IApiError>("DELETE_EVENT");
@@ -191,16 +191,8 @@ export class EventsActions extends ReduxActions {
 
     public getEventByID = (eventID: number) => {
         const thunk = bindThunkAction(EventsActions.getEventACs, async () => {
-            const [eventResponse, participantResponse] = await Promise.all([
-                this.api.get(`/events/${eventID}?expand[]=all`),
-                this.api.get(`/events/${eventID}/participants?expand=true`),
-            ]);
-
-            const result: IEventWithParticipants = {
-                event: eventResponse.data,
-                participants: participantResponse.data,
-            };
-            return result;
+            const response = await this.api.get(`/events/${eventID}?expand[]=all`);
+            return response.data;
         })({ eventID });
         return this.dispatch(thunk);
     };

@@ -96,8 +96,3 @@ export interface IEventParticipantsByAttendance {
     pagination: ILinkPages;
     participants: IEventParticipant[];
 }
-
-export interface IEventWithParticipants {
-    event: IEvent;
-    participants: IEventParticipant[];
-}
