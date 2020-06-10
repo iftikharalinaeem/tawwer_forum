@@ -362,6 +362,9 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         ];
     }
 
+    /**
+     * Test the that proper url is generated for a kb.
+     */
     public function testKbURLGeneration() {
         $record = $this->record(__FUNCTION__);
         $record["viewType"] = "help";

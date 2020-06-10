@@ -254,7 +254,6 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
             $locale = $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
         }
 
-
         $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/" . $slug);
         return $result;
