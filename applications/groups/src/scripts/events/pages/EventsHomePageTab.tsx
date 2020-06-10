@@ -27,8 +27,8 @@ export function EventsHomePageTab(props: IProps) {
 
     const siteSection = getSiteSection();
     const query: IGetEventsQuery = { parentRecordType, page, ...dateQuery, limit: EventsActions.DEFAULT_LIMIT };
-    if (props.parentRecordType === "category" && siteSection.attributes.CategoryID) {
-        query.parentRecordID = siteSection.attributes.CategoryID;
+    if (props.parentRecordType === "category" && siteSection.attributes.categoryID) {
+        query.parentRecordID = siteSection.attributes.categoryID;
         query.requireDescendants = true;
     }
 

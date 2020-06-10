@@ -95,7 +95,7 @@ class EventModel extends Gdn_Model {
             // Go through the sections to find the correct one.
             $sections = $sectionModel->getAll();
             foreach ($sections as $section) {
-                if ($section->getAttributes()['CategoryID'] === $parentRecordID) {
+                if ($section->getAttributes()['categoryID'] === $parentRecordID) {
                     $siteSectionPath = $section->getBasePath();
                     break;
                 }
