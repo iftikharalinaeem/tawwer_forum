@@ -88,7 +88,7 @@ class SubcommunitySiteSection implements SiteSectionInterface {
         $this->defaultRoute = $router->parseRoute($configDefaultController);
 
         if (isset($subcommunity['CategoryID'])) {
-            $this->attributes['CategoryID'] = $subcommunity['CategoryID'];
+            $this->attributes['categoryID'] = $subcommunity['CategoryID'];
 
             if ($this->defaultRoute['Destination'] === 'categories') {
                 $internalCategoryIDPath = "categories/" . $subcommunity['CategoryID'];
