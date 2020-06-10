@@ -9,8 +9,7 @@ import NumberFormatted from "@library/content/NumberFormatted";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Paragraph from "@library/layout/Paragraph";
 import classNames from "classnames";
-import React, { useState, useReducer } from "react";
-import { EventParticipantsTabModule } from "../modules/EventParticipantsTabModule";
+import React from "react";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { t } from "@vanilla/i18n";
@@ -46,7 +45,6 @@ export function EventAttendees(props: IProps) {
     } = props;
     const empty = data?.length === 0;
     const classes = eventsClasses();
-    const participantsClasses = eventParticipantsClasses();
     const HeadingTag = `h${depth}` as "h1";
 
     const extraCount = extra - maxCount;
@@ -97,7 +95,7 @@ export function EventAttendees(props: IProps) {
                         return (
                             <li
                                 className={classNames(classes.attendee, {
-                                    isLast: i === data.length - 1,
+                                    isLast: i === data.length - 1 || i === maxCount - 1,
                                 })}
                                 key={i}
                             >
@@ -113,11 +111,7 @@ export function EventAttendees(props: IProps) {
                     })}
                     {extraCount > 0 && (
                         <li className={classes.attendeePlus} key={data.length}>
-                            <Button
-                                className={participantsClasses.popUpButton}
-                                onClick={openModal}
-                                baseClass={ButtonTypes.TEXT}
-                            >
+                            <Button onClick={openModal} baseClass={ButtonTypes.TEXT}>
                                 <span style={{ display: "inline-block" }}>
                                     +
                                     <NumberFormatted value={extraCount} title={t(tooltipText)} />

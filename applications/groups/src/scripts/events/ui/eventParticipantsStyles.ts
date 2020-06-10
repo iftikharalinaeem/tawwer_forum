@@ -83,13 +83,6 @@ export const eventParticipantsClasses = useThemeCache((props: { compact?: boolea
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
 
-    const popUpButton = style("popUpButton", {
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        marginLeft: 20,
-    });
-
     const tabsRoot = style("tabsRoot", {
         fontSize: vars.tabsRoot.fontSize,
         position: "relative",
@@ -204,6 +197,5 @@ export const eventParticipantsClasses = useThemeCache((props: { compact?: boolea
         tabsTopButtonWrapper,
         tabsTopButton,
         tabsBottomButtonWrapper,
-        popUpButton,
     };
 });
