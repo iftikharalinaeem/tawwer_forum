@@ -14,6 +14,7 @@ import { EventParticipantsTabModule } from "../modules/EventParticipantsTabModul
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { t } from "@vanilla/i18n";
+import { IEventDetailActionType } from "@groups/events/ui/EventDetails";
 
 interface IProps {
     eventID: number;
@@ -25,7 +26,7 @@ interface IProps {
     maxCount?: number;
     emptyMessage?: string;
     className?: string;
-    dispatch: (value: any) => void;
+    dispatchDetail: (value: any) => void;
 }
 
 /**
@@ -41,7 +42,7 @@ export function EventAttendees(props: IProps) {
         depth = 2,
         title,
         emptyMessage,
-        dispatch,
+        dispatchDetail,
     } = props;
     const empty = data?.length === 0;
     const classes = eventsClasses();
@@ -50,7 +51,7 @@ export function EventAttendees(props: IProps) {
 
     const extraCount = extra - maxCount;
 
-    const setIndex = (title: string) => {
+    const getIndex = (title: string) => {
         switch (title) {
             case "Going":
                 return 0;
@@ -78,8 +79,8 @@ export function EventAttendees(props: IProps) {
     const tooltipText = getTooltipText(title);
 
     const openModal = () => {
-        dispatch({ type: "set_visible_modal", visible: true });
-        dispatch({ type: "set_default_tab_index", index: setIndex(title) });
+        dispatchDetail({ type: IEventDetailActionType.SET_VISIBLE_MODAL, visible: true });
+        dispatchDetail({ type: IEventDetailActionType.SET_DEFAULT_TAB_INDEX, index: getIndex(title) });
     };
 
     return (

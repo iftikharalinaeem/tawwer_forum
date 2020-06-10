@@ -8,29 +8,32 @@ import React from "react";
 import { EventParticipantsModule } from "@groups/events/modules/EventParticipantsModule";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { t } from "@vanilla/i18n";
+import { IEventDetailState, IEventDetailActionType } from "@groups/events/ui/EventDetails";
 
 interface IProps {
     eventID: number;
-    state: any;
-    dispatch: (value: any) => void;
+    detailState: IEventDetailState;
+    dispatchDetail: (value: any) => void;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID, dispatch, state } = props;
-    const { visibleModal, goingPage, notGoingPage, maybePage, defaultTabIndex } = state;
+    const { eventID, dispatchDetail, detailState } = props;
+    const { visibleModal, goingPage, notGoingPage, maybePage, defaultTabIndex } = detailState;
 
     return (
         <EventParticipantsTabs
             defaultIndex={defaultTabIndex}
             isVisible={visibleModal}
-            onClose={() => dispatch({ type: "set_visible_modal", visible: false })}
+            onClose={() => dispatchDetail({ type: IEventDetailActionType.SET_VISIBLE_MODAL, visible: false })}
             tabs={[
                 {
                     title: t("Going"),
                     body: (
                         <EventParticipantsModule
                             page={goingPage}
-                            setPage={page => dispatch({ type: "set_going_page", page: page })}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_GOING_PAGE, page: page })
+                            }
                             eventID={eventID}
                             attendanceStatus={EventAttendance.GOING}
                         />
@@ -41,7 +44,9 @@ export function EventParticipantsTabModule(props: IProps) {
                     body: (
                         <EventParticipantsModule
                             page={maybePage}
-                            setPage={page => dispatch({ type: "set_maybe_page", page: page })}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_MAYBE_PAGE, page: page })
+                            }
                             eventID={eventID}
                             attendanceStatus={EventAttendance.MAYBE}
                         />
@@ -52,7 +57,9 @@ export function EventParticipantsTabModule(props: IProps) {
                     body: (
                         <EventParticipantsModule
                             page={notGoingPage}
-                            setPage={page => dispatch({ type: "set_not_going_page", page: page })}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_NOT_GOING_PAGE, page: page })
+                            }
                             eventID={eventID}
                             attendanceStatus={EventAttendance.NOT_GOING}
                         />
