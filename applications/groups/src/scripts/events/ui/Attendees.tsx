@@ -14,6 +14,7 @@ import { EventParticipantsTabModule } from "../modules/EventParticipantsTabModul
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import { t } from "@vanilla/i18n";
+import { IEventDetailActionType } from "@groups/events/ui/EventDetails";
 
 interface IProps {
     eventID: number;
@@ -25,13 +26,24 @@ interface IProps {
     maxCount?: number;
     emptyMessage?: string;
     className?: string;
+    dispatchDetail: (value: any) => void;
 }
 
 /**
  * Component for displaying an event details
  */
 export function EventAttendees(props: IProps) {
-    const { eventID, data = [], maxCount = 10, extra = 0, separator = false, depth = 2, title, emptyMessage } = props;
+    const {
+        eventID,
+        data = [],
+        maxCount = 10,
+        extra = 0,
+        separator = false,
+        depth = 2,
+        title,
+        emptyMessage,
+        dispatchDetail,
+    } = props;
     const empty = data?.length === 0;
     const classes = eventsClasses();
     const participantsClasses = eventParticipantsClasses();
@@ -39,7 +51,7 @@ export function EventAttendees(props: IProps) {
 
     const extraCount = extra - maxCount;
 
-    const setIndex = (title: string) => {
+    const getIndex = (title: string) => {
         switch (title) {
             case "Going":
                 return 0;
@@ -66,28 +78,13 @@ export function EventAttendees(props: IProps) {
     };
     const tooltipText = getTooltipText(title);
 
-    const initialState = { visibleModal: false, goingPage: 1, maybePage: 1, notGoingPage: 1 };
-    const reducer = (state, action) => {
-        switch (action.type) {
-            case "set_visible_modal":
-                return { ...state, visibleModal: action.visible };
-            default:
-                return state;
-        }
+    const openModal = () => {
+        dispatchDetail({ type: IEventDetailActionType.SET_VISIBLE_MODAL, visible: true });
+        dispatchDetail({ type: IEventDetailActionType.SET_DEFAULT_TAB_INDEX, index: getIndex(title) });
     };
-
-    const [state, dispatch] = useReducer(reducer, initialState);
-
-    const openModal = () => dispatch({ type: "set_visible_modal", visible: true });
 
     return (
         <section className={classNames(classes.section, props.className)}>
-            <EventParticipantsTabModule
-                defaultIndex={setIndex(title)}
-                eventID={eventID}
-                visibleModal={state.visibleModal}
-                close={() => dispatch({ type: "set_visible_modal", visible: false })}
-            />
             {separator && <hr className={classes.separator} />}
             <HeadingTag className={classes.sectionTitle}>{title}</HeadingTag>
             {empty && <Paragraph className={classes.noAttendees}>{emptyMessage}</Paragraph>}

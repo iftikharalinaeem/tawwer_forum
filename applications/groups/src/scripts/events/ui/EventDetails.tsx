@@ -12,13 +12,13 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
 import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
-import React, { useEffect, useState } from "react";
+import React, { useReducer } from "react";
 import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
-
 import SmartLink from "@vanilla/library/src/scripts/routing/links/SmartLink";
 import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
+import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -42,8 +42,11 @@ export function EventDetails(props: IProps) {
     const classes = eventsClasses();
     const { event, going, maybe, notGoing } = props;
 
+    const [state, dispatch] = useEventDetailReducer();
+
     return (
         <div className={classes.details}>
+            <EventParticipantsTabModule detailState={state} eventID={event.eventID} dispatchDetail={dispatch} />
             <DataList
                 data={[
                     {
@@ -108,6 +111,7 @@ export function EventDetails(props: IProps) {
                 emptyMessage={t("Nobody has confirmed their attendance yet.")}
                 extra={going?.count}
                 separator={true}
+                dispatchDetail={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
@@ -116,6 +120,7 @@ export function EventDetails(props: IProps) {
                 title={t("Maybe")}
                 extra={maybe?.count}
                 separator={true}
+                dispatchDetail={dispatch}
             />
             <EventAttendees
                 eventID={event.eventID}
@@ -124,7 +129,70 @@ export function EventDetails(props: IProps) {
                 title={t("Not going")}
                 extra={notGoing?.count}
                 separator={true}
+                dispatchDetail={dispatch}
             />
         </div>
     );
+}
+
+export interface IEventDetailState {
+    visibleModal: boolean;
+    goingPage: number;
+    maybePage: number;
+    notGoingPage: number;
+    defaultTabIndex: number;
+}
+
+export enum IEventDetailActionType {
+    SET_VISIBLE_MODAL = "set_visible_modal",
+    SET_GOING_PAGE = "set_going_page",
+    SET_NOT_GOING_PAGE = "set_not_going_page",
+    SET_MAYBE_PAGE = "set_maybe_page",
+    SET_DEFAULT_TAB_INDEX = "set_default_tab_index",
+}
+
+type EventDetailAction =
+    | {
+          type: IEventDetailActionType.SET_VISIBLE_MODAL;
+          visible: boolean;
+      }
+    | {
+          type:
+              | IEventDetailActionType.SET_GOING_PAGE
+              | IEventDetailActionType.SET_MAYBE_PAGE
+              | IEventDetailActionType.SET_NOT_GOING_PAGE;
+          page: number;
+      }
+    | {
+          type: IEventDetailActionType.SET_DEFAULT_TAB_INDEX;
+          index: number;
+      };
+
+function useEventDetailReducer() {
+    const initialState: IEventDetailState = {
+        visibleModal: false,
+        goingPage: 1,
+        maybePage: 1,
+        notGoingPage: 1,
+        defaultTabIndex: 0,
+    };
+
+    const reducer = (state: IEventDetailState, action: EventDetailAction) => {
+        switch (action.type) {
+            case IEventDetailActionType.SET_VISIBLE_MODAL:
+                return { ...state, visibleModal: action.visible };
+            case IEventDetailActionType.SET_GOING_PAGE:
+                return { ...state, goingPage: action.page };
+            case IEventDetailActionType.SET_MAYBE_PAGE:
+                return { ...state, maybePage: action.page };
+            case IEventDetailActionType.SET_NOT_GOING_PAGE:
+                return { ...state, notGoingPage: action.page };
+            case IEventDetailActionType.SET_DEFAULT_TAB_INDEX:
+                return { ...state, defaultTabIndex: action.index };
+            default:
+                return state;
+        }
+    };
+
+    return useReducer(reducer, initialState);
 }

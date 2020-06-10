@@ -8,34 +8,62 @@ import React from "react";
 import { EventParticipantsModule } from "@groups/events/modules/EventParticipantsModule";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { t } from "@vanilla/i18n";
+import { IEventDetailState, IEventDetailActionType } from "@groups/events/ui/EventDetails";
 
 interface IProps {
     eventID: number;
-    defaultIndex: number;
-    visibleModal: boolean;
-    close: () => void;
+    detailState: IEventDetailState;
+    dispatchDetail: (value: any) => void;
 }
 
 export function EventParticipantsTabModule(props: IProps) {
-    const { eventID, close, visibleModal, defaultIndex } = props;
+    const { eventID, dispatchDetail, detailState } = props;
+    const { visibleModal, goingPage, notGoingPage, maybePage, defaultTabIndex } = detailState;
 
     return (
         <EventParticipantsTabs
-            defaultIndex={defaultIndex}
+            defaultIndex={defaultTabIndex}
             isVisible={visibleModal}
-            onClose={close}
+            onClose={() => dispatchDetail({ type: IEventDetailActionType.SET_VISIBLE_MODAL, visible: false })}
             tabs={[
                 {
                     title: t("Going"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.GOING} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={goingPage}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_GOING_PAGE, page: page })
+                            }
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.GOING}
+                        />
+                    ),
                 },
                 {
                     title: t("Maybe"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.MAYBE} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={maybePage}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_MAYBE_PAGE, page: page })
+                            }
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.MAYBE}
+                        />
+                    ),
                 },
                 {
                     title: t("Not Going"),
-                    body: <EventParticipantsModule eventID={eventID} attendanceStatus={EventAttendance.NOT_GOING} />,
+                    body: (
+                        <EventParticipantsModule
+                            page={notGoingPage}
+                            setPage={page =>
+                                dispatchDetail({ type: IEventDetailActionType.SET_NOT_GOING_PAGE, page: page })
+                            }
+                            eventID={eventID}
+                            attendanceStatus={EventAttendance.NOT_GOING}
+                        />
+                    ),
                 },
             ]}
         />
