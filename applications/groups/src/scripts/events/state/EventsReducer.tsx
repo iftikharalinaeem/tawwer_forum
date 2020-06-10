@@ -11,7 +11,6 @@ import {
     IEventParentRecord,
     IEventParticipantList,
     IEventParticipantsByAttendance,
-    IEventWithParticipants,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";

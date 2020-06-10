@@ -9,7 +9,6 @@ import { actionCreatorFactory } from "typescript-fsa";
 import {
     IEventList,
     IEventParentRecord,
-    IEventWithParticipants,
     IEvent,
     IEventParticipant,
     EventAttendance,
