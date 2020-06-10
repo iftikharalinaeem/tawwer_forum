@@ -356,9 +356,42 @@ class KnowledgeBasesTest extends AbstractResourceTest {
         return [
             ['mockSiteSectionGroup-1', 3],
             ['mockSiteSectionGroup-2', 1],
-            ['mockSiteSectionGroup-3', 0],
+            ['mockSiteSectionGroup-4', 0],
             ['all', 9],
             [null, 9],
         ];
+    }
+
+    /**
+     * Test the that proper url is generated for a kb.
+     */
+    public function testKbURLGeneration() {
+        $record = $this->record(__FUNCTION__);
+        $record["viewType"] = "help";
+        $record["sortArticles"] = "dateInsertedDesc";
+        $record['siteSectionGroup'] = 'mockSiteSectionGroup-3';
+        $record['sourceLocale'] = 'ru';
+
+        $knowledgeBase = $this->api()->post(
+            $this->baseUrl,
+            $record
+        )->getBody();
+
+        $response = $this->api()->get(
+            $this->baseUrl,
+            ['locale' => 'en']
+        )->getBody();
+
+        $index = array_search(
+            $knowledgeBase['knowledgeBaseID'],
+            array_column($response, 'knowledgeBaseID')
+        );
+
+
+        $this->assertEquals($knowledgeBase['knowledgeBaseID'], $response[$index]['knowledgeBaseID']);
+        $this->assertEquals(
+            'http://vanilla.test/knowledgebasestest/single-ru/kb/kb-url-code46',
+            $response[$index]['url']
+        );
     }
 }

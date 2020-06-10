@@ -227,7 +227,33 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
 
         $slug = \Gdn_Format::url($urlCode);
 
-        $locale = $knowledgeBase['locale'] ?? $knowledgeBase['sourceLocale'] ?? $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        $knowledgeBaseSourceLocale = $knowledgeBase['sourceLocale'] ?? null;
+        $locale = $knowledgeBase['locale'] ?? $knowledgeBaseSourceLocale;
+
+        // If the kb's source locale is different from the queried locale, check if there's a matching site-section.
+        // If there isn't build the url off of the sourceLocale.
+        if ($locale && ($knowledgeBaseSourceLocale !== $locale)) {
+            $siteSections = $this->siteSectionModel->getForSectionGroup($knowledgeBase['siteSectionGroup']);
+            if ($siteSections) {
+                $siteSectionsLocales = [];
+                foreach ($siteSections as $siteSection) {
+                    $siteSectionsLocales[] = $siteSection->getContentLocale();
+                }
+                $localeAvailable = in_array($locale, $siteSectionsLocales);
+                if (!$localeAvailable) {
+                    $locale = $knowledgeBaseSourceLocale;
+                }
+            } else {
+                // no site-sections use the sourceLocale.
+                $locale = $knowledgeBaseSourceLocale;
+            }
+        }
+
+        // if for some reason it doesn't exist fall back to the current site-section locale.
+        if (!$locale) {
+            $locale = $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
+        }
+
         $siteSectionSlug = $this->getSiteSectionSlug($knowledgeBase['knowledgeBaseID'], $locale);
         $result = \Gdn::request()->getSimpleUrl($siteSectionSlug . "/kb/" . $slug);
         return $result;
@@ -344,7 +370,16 @@ MESSAGE
      */
     public function selectFragmentForCategoryID(int $categoryID, string $locale = null) {
         $rows = $this->sql()
-            ->select('kb.knowledgeBaseID, kb.rootCategoryID, kb.name, kb.urlCode, kb.viewType, kb.status, kb.sourceLocale')
+            ->select(
+                'kb.knowledgeBaseID, 
+                kb.rootCategoryID, 
+                kb.name, 
+                kb.urlCode, 
+                kb.viewType, 
+                kb.status, 
+                kb.sourceLocale, 
+                kb.siteSectionGroup'
+            )
             ->from('knowledgeCategory kc')
             ->leftJoin('knowledgeBase kb', 'kb.knowledgeBaseID = kc.knowledgeBaseID')
             ->where('kc.knowledgeCategoryID', $categoryID)
