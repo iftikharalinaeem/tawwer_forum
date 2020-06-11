@@ -183,7 +183,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function commentsApiController_getFilters() {
         if (!$this->session->isValid()) {
-            throw forbiddenException(t('You must sign in to view comments.'));
+            throw forbiddenException(t('view comments'));
         }
     }
 
