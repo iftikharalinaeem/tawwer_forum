@@ -52,4 +52,4 @@ $container->rule(\Vanilla\Site\SiteSectionModel::class)
 ;
 
 $container->rule(ThemeSectionModel::class)
-    ->addCall('registerModernSection', [t('Knowledge Base')]);
+    ->addCall('registerModernSection', ['Knowledge Base']);
