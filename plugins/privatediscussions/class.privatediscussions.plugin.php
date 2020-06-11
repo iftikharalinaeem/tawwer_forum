@@ -177,6 +177,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         if (!$this->session->isValid()) {
             throw new Exception(t('You must sign in to view comments.'), 403);
         }
+
+        
     }
 
     /**
