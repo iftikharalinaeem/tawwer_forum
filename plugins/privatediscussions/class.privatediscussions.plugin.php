@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author Isis Graziatto <isis.g@vanillaforums.com>
  * @author Dani M <danim@vanillaforums.com>
