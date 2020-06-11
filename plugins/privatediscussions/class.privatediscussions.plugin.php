@@ -27,9 +27,6 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     /** @var bool */
     const FEATURE_SITEMAPS_DEFAULT = true;
 
-    /** @var bool */
-    const FEATURE_QNA_DEFAULT = true;
-
     /** @var Gdn_Session */
     private $session;
 
@@ -72,7 +69,6 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     public function structure() {
         $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_SITEMAPS_DEFAULT);
-        $this->config->set('Feature.DiscussionQnATag.Enabled', self::FEATURE_QNA_DEFAULT);
     }
 
     /**
