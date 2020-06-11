@@ -25,7 +25,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     const STRIPEMBEDS_DEFAULT = true;
 
     /** @var bool */
-    const FEATURE_DISCUSSIONSITEMAPS_DEFAULT = true;
+    const FEATURE_SITEMAPS_DEFAULT = true;
 
     /** @var Gdn_Session */
     private $session;
@@ -50,7 +50,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $this->config = $configuration;
         $this->session = $session;
         $this->wordCount = $this->config->get('Plugins.PrivateDiscussions.WordCount', self::WORDCOUNT_DEFAULT);
-        $this->stripEmbeds = (bool)$this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
+        $this->stripEmbeds = (bool) $this->config->get('Plugins.PrivateDiscussions.StripEmbeds', self::STRIPEMBEDS_DEFAULT);
     }
 
     /**
@@ -68,7 +68,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @return void
      */
     public function structure() {
-        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
+        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_SITEMAPS_DEFAULT);
     }
 
     /**
@@ -81,19 +81,29 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Private Discussions Settings'));
 
         if ($sender->Form->authenticatedPostBack()) {
-            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateInteger', 'Word Count must be numeric');
-            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateRequired', 'Word Count is required');
+            $sender->Form->validateRule(
+                'Plugins.PrivateDiscussions.WordCount',
+                'function:ValidateInteger',
+                sprintf(t('%s is required'), 'Word Count')
+            );
+            $sender->Form->validateRule(
+                'Plugins.PrivateDiscussions.WordCount',
+                'function:ValidateRequired',
+                sprintf(t('%s must be numeric'), 'Word Count')
+            );
         }
 
         $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
             'Plugins.PrivateDiscussions.WordCount' => [
                 'LabelCode' => 'Word Count',
+                'Description' => t('Truncate the initial discussion text to this many words.'),
                 'Control' => 'TextBox',
                 'Default' => self::WORDCOUNT_DEFAULT
             ],
             'Plugins.PrivateDiscussions.StripEmbeds' => [
                 'LabelCode' => 'Strip Embeds',
+                'Description' => t('Strip images and videos out of posts.'),
                 'Control' => 'Toggle',
                 'Default' => self::STRIPEMBEDS_DEFAULT
             ]
@@ -147,6 +157,9 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             if (!$discussionBody || !$discussionFormat) {
                 return;
             }
+            if (isset($sender->Data['Comments'])) {
+                unset($sender->Data['Comments']);
+            }
             $data = Gdn::formatService()->renderHTML($discussionBody, $discussionFormat);
             $massagedData = $this->massageData($data);
             // set data back to the controller
@@ -155,12 +168,22 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             unset($sender->Assets['Panel']['GuestModule']);
             // render view override
             Gdn_Theme::section('DiscussionRestricted');
-            $sender->addCssFile('privatediscussions.css', self::ADDON_PATH.'/design');
+            $sender->addCssFile('privatediscussions.css', self::ADDON_PATH . '/design');
             // Private Communities is enabled
             if ((bool)c('Garden.PrivateCommunity')) {
                 $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'index,nofollow']);
             }
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
+        }
+    }
+
+    /**
+     * Override permissions to prevent guest to see comments
+     * @throws Exception Even with Discussion.View permission guests cannot see comments.
+     */
+    public function commentsApiController_getFilters() {
+        if (!$this->session->isValid()) {
+            throw forbiddenException(t('view comments'));
         }
     }
 
@@ -189,7 +212,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param DOMDocument $dom
      * @return string Data without the embeds
      */
-    private function stripEmbeds(DOMDocument $dom) :string {
+    private function stripEmbeds(DOMDocument $dom): string {
         $xpath = new DomXPath($dom);
         // embed classes.
         $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap'];
@@ -235,7 +258,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param int $wordCount
      * @return string The minified text with its html tags.
      */
-    private function stripText(string $data, DOMDocument $dom, int $wordCount) :string {
+    private function stripText(string $data, DOMDocument $dom, int $wordCount): string {
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
         $this->stripTextRecursive($dom->documentElement, $wordCount);
         $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
@@ -249,7 +272,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param int $limit
      * @return int Return limit used to count remaining tags.
      */
-    private function stripTextRecursive($element, int $limit) :int {
+    private function stripTextRecursive($element, int $limit): int {
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
