@@ -1,7 +1,7 @@
 {
     "name": "Private Discussions",
     "key": "privatediscussions",
-    "description": "Display restricted discussion for guests.",
+    "description": "Allows you to show a restricted version of discussions to guests with a call to action asking them to sign in or register.",
     "version": "1.0",
     "type": "addon",
     "priority": 1100,

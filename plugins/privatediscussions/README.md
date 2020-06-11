@@ -1,6 +1,6 @@
 # Private Discussions
 
-This addon displays a restricted discussion view for guests.
+Allows you to show a restricted version of discussions to guests with a call to action asking them to sign in or register.
 
 The restricted view is only triggered if the "guest" role has discussion view permission.
 

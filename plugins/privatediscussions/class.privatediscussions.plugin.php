@@ -82,21 +82,21 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $sender->setData('Title', t('Private Discussions Settings'));
 
         if ($sender->Form->authenticatedPostBack()) {
-            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateInteger', 'Word Count must be numeric');
-            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateRequired', 'Word Count is required');
+            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateInteger', t('Word Count must be numeric'));
+            $sender->Form->validateRule('Plugins.PrivateDiscussions.WordCount', 'function:ValidateRequired', t('Word Count is required'));
         }
 
         $configurationModule = new ConfigurationModule($sender);
         $configurationModule->initialize([
             'Plugins.PrivateDiscussions.WordCount' => [
-                'LabelCode' => 'Word Count',
-                'Description' => 'Truncate the initial discussion text to this many words.',
+                'LabelCode' => t('Word Count'),
+                'Description' => t('Truncate the initial discussion text to this many words.'),
                 'Control' => 'TextBox',
                 'Default' => self::WORDCOUNT_DEFAULT
             ],
             'Plugins.PrivateDiscussions.StripEmbeds' => [
-                'LabelCode' => 'Strip Embeds',
-                'Description' => 'Strip images and videos out of posts.',
+                'LabelCode' => t('Strip Embeds'),
+                'Description' => t('Strip images and videos out of posts.'),
                 'Control' => 'Toggle',
                 'Default' => self::STRIPEMBEDS_DEFAULT
             ]
