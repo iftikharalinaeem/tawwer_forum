@@ -7,6 +7,7 @@
  */
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\Html\DomUtils;
 
 /**
  * Class PrivateDiscussionsPlugin
@@ -26,6 +27,9 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /** @var bool */
     const FEATURE_DISCUSSIONSITEMAPS_DEFAULT = true;
+
+    /** @var array */
+    const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
 
     /** @var Gdn_Session */
     private $session;
@@ -179,6 +183,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /**
      * Override permissions to prevent guest to see comments
+     *
+     * @throws Exception
      */
     public function commentsApiController_getFilters() {
         if (!$this->session->isValid()) {
@@ -192,105 +198,18 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param string $data The data string
      * @return string $data The Massaged data string
      */
-    private function massageData(string $data) {
+    private function massageData(string $data): string {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
-            $this->stripEmbeds($dom);
-            $data = $this->stripImages($dom);
+            DomUtils::stripEmbeds($dom, self::EMBED_CLASSES);
+            DomUtils::stripImages($dom);
         }
         // trim to word count
-        $data = $this->stripText($data, $dom, $this->getWordCount());
-        return $data;
-    }
-
-    /**
-     * Strip embeds from the data string.
-     *
-     * @param DOMDocument $dom
-     * @return string Data without the embeds
-     */
-    private function stripEmbeds(DOMDocument $dom): string {
-        $xpath = new DomXPath($dom);
-        // embed classes.
-        $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap'];
-        foreach ($embedClasses as $key => $value) {
-            $xpathQuery = $xpath->query(".//*[contains(@class, '$embedClasses[$key]')]");
-            $xpathDivQuery = $xpath->query("//div[@data-embedjson]");
-            $dataClassItem = $xpathQuery->item(0);
-            $dataDivItem = $xpathDivQuery->item(0);
-            if ($dataClassItem) {
-                $dataClassItem->parentNode->removeChild($dataClassItem);
-            } elseif ($dataDivItem) {
-                $dataDivItem->parentNode->removeChild($dataDivItem);
-            }
-        }
+        DomUtils::truncateWords($dom, $this->getWordCount());
         $data = $dom->saveHTML();
         return $data;
-    }
-
-    /**
-     * Strip images tags.
-     *
-     * @param DOMDocument $dom
-     * @return string Data stripped of images.
-     */
-    private function stripImages(DOMDocument $dom) {
-        $domImages = $dom->getElementsByTagName('img');
-        $imagesArray = [];
-        foreach ($domImages as $domImage) {
-            $imagesArray[] = $domImage;
-        }
-        foreach ($imagesArray as $domImage) {
-            $domImage->parentNode->removeChild($domImage);
-        }
-        $data = $dom->saveHTML();
-        return  $data;
-    }
-
-    /**
-     * Prepare the html string.
-     *
-     * @param string $data
-     * @param DOMDocument $dom
-     * @param int $wordCount
-     * @return string The minified text with its html tags.
-     */
-    private function stripText(string $data, DOMDocument $dom, int $wordCount): string {
-        $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
-        $this->stripTextRecursive($dom->documentElement, $wordCount);
-        $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
-        return $minifiedText;
-    }
-
-    /**
-     * Strip text recursively while preserving html format.
-     *
-     * @param mixed $element
-     * @param int $limit
-     * @return int Return limit used to count remaining tags.
-     */
-    private function stripTextRecursive($element, int $limit): int {
-        if ($limit > 0) {
-            // Nodetype text
-            if ($element->nodeType == 3) {
-                $limit -= str_word_count($element->data);
-                if ($limit < 0) {
-                    $element->nodeValue = substr($element->nodeValue, 0, str_word_count($element->data));
-                }
-            } else {
-                for ($i = 0; $i < $element->childNodes->length; $i++) {
-                    if ($limit > 0) {
-                        $limit = $this->stripTextrecursive($element->childNodes->item($i), $limit);
-                    } else {
-                        $element->removeChild($element->childNodes->item($i));
-                        $i--;
-                    }
-                }
-            }
-        }
-        return $limit;
     }
 }
 
