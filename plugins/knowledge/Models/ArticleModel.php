@@ -6,6 +6,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
+use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Gdn_Session;
@@ -459,14 +460,14 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @param array $article An article row, joined with fields from a revision. A standard article row will not work.
      * @param bool $withDomain
      * @return string
-     * @throws \Exception If the row does not contain a valid ID or name.
+     * @throws Exception If the row does not contain a valid ID or name.
      */
     public function url(array $article, bool $withDomain = true): string {
         $name = $article["name"] ?? null;
         $articleID = $article["articleID"] ?? null;
 
         if (!$name || !$articleID) {
-            throw new \Exception('Invalid article row.');
+            throw new Exception('Invalid article row.');
         }
         if (array_key_exists("queryLocale", $article) && isset($article["queryLocale"])) {
             $article["locale"] = ($article["queryLocale"] === $article["locale"]) ? $article["locale"] : $article["queryLocale"];
@@ -483,17 +484,39 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      * @param array $article An array with just 2 filed required: name, articleID.
      *
      * @return string
-     * @throws \Exception If the row does not contain a valid ID or name.
+     * @throws Exception If the row does not contain a valid ID or name.
      */
     public function getSlug(array $article): string {
         $name = $article["name"] ?? null;
         $articleID = $article["articleID"] ?? null;
 
         if (!$name || !$articleID) {
-            throw new \Exception('Invalid article row.');
+            throw new Exception('Invalid article row.');
         }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
         return $slug;
+    }
+
+    /**
+     * Override Parent delete method.
+     *
+     * Deleting an article is never permitted
+     * Use the PATCH /articles/id to change the
+     * published status of the article.
+     *
+     * @param array $where
+     * @param array $options
+     * @return bool
+     * @throws Exception Deleting article is not permitted.
+     */
+    public function delete(array $where = [], $options = []): bool {
+        $isTest = $options['isTest'] ?? false;
+        if (!$isTest) {
+            throw new Exception('Delete article action is not permitted');
+        } else {
+            parent::delete($where);
+        }
+        return true;
     }
 }

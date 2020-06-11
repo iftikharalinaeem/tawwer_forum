@@ -96,8 +96,6 @@ class KnowledgeCategoriesApiController extends AbstractApiController {
         if (!$this->knowledgeBaseModel->isRootCategory($id)) {
             if ($row["articleCount"] < 1 && $row["childCategoryCount"] < 1) {
                 $this->knowledgeCategoryModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-                $this->articleModel->delete(["knowledgeCategoryID" => $row["knowledgeCategoryID"]]);
-
                 if (!empty($row['parentID']) && ($row['parentID'] !== -1)) {
                     $this->knowledgeCategoryModel->updateCounts($row['parentID']);
                 }

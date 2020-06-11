@@ -136,7 +136,7 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
      * @throws Exception If an error occurred while performing the necessary database queries.
      */
     private function resetNavigation() {
-        $this->articleModel->delete(["articleID >" => 0]);
+        $this->articleModel->delete(["articleID >" => 0], ["isTest" => true]);
         $this->articles = [];
 
         $this->knowledgeCategoryModel->delete(["knowledgeCategoryID >" => 0]);
