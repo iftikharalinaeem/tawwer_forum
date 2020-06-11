@@ -14,8 +14,7 @@ use Vanilla\Contracts\ConfigurationInterface;
  *
  * Display restricted discussion view for guests.
  */
-class PrivateDiscussionsPlugin extends Gdn_Plugin
-{
+class PrivateDiscussionsPlugin extends Gdn_Plugin {
 
     /** @var string */
     const ADDON_PATH = 'plugins/privatediscussions';
@@ -47,8 +46,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param ConfigurationInterface $configuration
      * @param Gdn_Session $session
      */
-    public function __construct(ConfigurationInterface $configuration, Gdn_Session $session)
-    {
+    public function __construct(ConfigurationInterface $configuration, Gdn_Session $session) {
         parent::__construct();
         $this->config = $configuration;
         $this->session = $session;
@@ -61,8 +59,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @return void
      */
-    public function setup()
-    {
+    public function setup() {
         $this->structure();
     }
 
@@ -71,8 +68,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @return void
      */
-    public function structure()
-    {
+    public function structure() {
         $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
     }
 
@@ -81,8 +77,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @param SettingsController $sender
      */
-    public function settingsController_privatediscussions_create(Gdn_Controller $sender)
-    {
+    public function settingsController_privatediscussions_create(Gdn_Controller $sender) {
         $sender->permission('Garden.Settings.Manage');
         $sender->setData('Title', t('Private Discussions Settings'));
 
@@ -115,8 +110,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @return bool
      */
-    public function getStripEmbeds()
-    {
+    public function getStripEmbeds() {
         return $this->stripEmbeds;
     }
 
@@ -125,8 +119,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @return int
      */
-    public function getWordCount()
-    {
+    public function getWordCount() {
         return $this->wordCount;
     }
 
@@ -136,8 +129,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param Gdn_Dispatcher $sender
      * @param Gdn_Dispatcher $args
      */
-    public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args)
-    {
+    public function gdn_dispatcher_beforeBlockDetect_handler($sender, $args) {
         $sender->addBlockException('#^discussion(/)#', Gdn_Dispatcher::BLOCK_NEVER);
         $sender->addBlockException('#^robots(/|$|\.txt)#', Gdn_Dispatcher::BLOCK_NEVER);
     }
@@ -147,8 +139,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      *
      * @param DiscussionController $sender
      */
-    public function discussionController_render_before($sender)
-    {
+    public function discussionController_render_before($sender) {
         // guest has view permission
         if (!$this->session->isValid()) {
             if (!$sender->CategoryID) {
@@ -182,8 +173,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
     /**
      * Override permissions to prevent guest to see comments
      */
-    public function commentsApiController_getFilters()
-    {
+    public function commentsApiController_getFilters() {
         if (!$this->session->isValid()) {
             throw new Exception(t('You must sign in to view comments.'), 403);
         }
@@ -195,8 +185,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param string $data The data string
      * @return string $data The Massaged data string
      */
-    private function massageData(string $data)
-    {
+    private function massageData(string $data) {
         $dom = new DOMDocument();
         $dom->preserveWhiteSpace = false;
         $dom->loadHTML($data);
@@ -215,8 +204,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param DOMDocument $dom
      * @return string Data without the embeds
      */
-    private function stripEmbeds(DOMDocument $dom): string
-    {
+    private function stripEmbeds(DOMDocument $dom): string {
         $xpath = new DomXPath($dom);
         // embed classes.
         $embedClasses = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap'];
@@ -241,8 +229,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param DOMDocument $dom
      * @return string Data stripped of images.
      */
-    private function stripImages(DOMDocument $dom)
-    {
+    private function stripImages(DOMDocument $dom) {
         $domImages = $dom->getElementsByTagName('img');
         $imagesArray = [];
         foreach ($domImages as $domImage) {
@@ -263,8 +250,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param int $wordCount
      * @return string The minified text with its html tags.
      */
-    private function stripText(string $data, DOMDocument $dom, int $wordCount): string
-    {
+    private function stripText(string $data, DOMDocument $dom, int $wordCount): string {
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
         $this->stripTextRecursive($dom->documentElement, $wordCount);
         $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
@@ -278,8 +264,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin
      * @param int $limit
      * @return int Return limit used to count remaining tags.
      */
-    private function stripTextRecursive($element, int $limit): int
-    {
+    private function stripTextRecursive($element, int $limit): int {
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
@@ -312,8 +297,7 @@ if (!function_exists('formatBody')) {
      * @return string Parsed body.
      * @since 2.1
      */
-    function formatBody($object)
-    {
+    function formatBody($object) {
         Gdn::controller()->fireEvent('BeforeCommentBody');
         if (Gdn_Theme::inSection('DiscussionRestricted')) {
             $object->FormatBody = $object->Body;
