@@ -1,5 +1,5 @@
 {
-    "name": "assets",
+    "name": "@vanilla/addon-groups",
     "private": true,
     "devDependencies": {
         "bower": "*",
