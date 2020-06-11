@@ -25,7 +25,10 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     const STRIPEMBEDS_DEFAULT = true;
 
     /** @var bool */
-    const FEATURE_DISCUSSIONSITEMAPS_DEFAULT = true;
+    const FEATURE_SITEMAPS_DEFAULT = true;
+
+    /** @var bool */
+    const FEATURE_QNA_DEFAULT = true;
 
     /** @var Gdn_Session */
     private $session;
@@ -68,7 +71,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @return void
      */
     public function structure() {
-        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
+        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_SITEMAPS_DEFAULT);
+        $this->config->set('Feature.DiscussionQnATag.Enabled', self::FEATURE_QNA_DEFAULT);
     }
 
     /**
