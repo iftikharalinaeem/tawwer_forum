@@ -163,7 +163,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             Gdn_Theme::section('DiscussionRestricted');
             $sender->addCssFile('privatediscussions.css', self::ADDON_PATH . '/design');
             // Private Communities is enabled
-            if ((bool) c('Garden.PrivateCommunity')) {
+            if ((bool)c('Garden.PrivateCommunity')) {
                 $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'index,nofollow']);
             }
             $sender->View = $sender->fetchViewLocation('index', 'discussion', self::ADDON_PATH);
