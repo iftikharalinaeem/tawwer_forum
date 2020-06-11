@@ -32,6 +32,7 @@ The retricted view differs from the default view where:
 
 - Settings can be modified on the community configuration.
 - This addon enabled the feature flag `Feature.discussionSiteMaps.Enabled` by default.
+- This addon enabled the feature flag `Feature.DiscussionQnATag.Enabled` by default.
 
 
 
