@@ -262,6 +262,7 @@ class GroupModel extends Gdn_Model {
                 case 'invitation':
                     $reason = t('You have a pending invitation to join this group.');
                     $permissions
+                        ->setPermission(GroupPermissions::ACCESS, true)
                         ->setPermission(GroupPermissions::JOIN, true)
                         ->setPermission(GroupPermissions::APPLY, false, $reason)
                     ;
@@ -762,16 +763,15 @@ class GroupModel extends Gdn_Model {
                 $model = new ConversationModel();
 
                 $groupURL = groupUrl($group);
+                $groupName = $group['Name'];
 
-                $args = [
-                    'Name' => htmlspecialchars($group['Name']),
-                    'Url' => $groupURL,
-
-                ];
+                $bodyString = t("You've been invited to join {Name}.");
+                $bodyString = str_replace('{Name}', '%s', $bodyString);
+                $body = sprintf($bodyString, "<a href='$groupURL'>$groupName</a>");
 
                 $row = [
-                    'Subject' => formatString(t('Please join my group.'), $args),
-                    'Body' => formatString(t("You've been invited to join {Name}."), $args),
+                    'Subject' => sprintf(t('Please join my group: %s'), $groupName),
+                    'Body' => $body,
                     'Format' => 'Html',
                     'RecipientUserID' => $validUserIDs,
                     'Type' => 'invite',
