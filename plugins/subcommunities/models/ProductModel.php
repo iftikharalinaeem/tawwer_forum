@@ -12,17 +12,14 @@ use Garden\Schema\Schema;
 use Gdn_Router as Router;
 use Vanilla\Contracts\ConfigurationInterface;
 use Gdn_Session;
+use Vanilla\Models\FullRecordCacheModel;
 
 /**
  * A model for managing products.
  */
-class ProductModel extends \Vanilla\Models\PipelineModel {
+class ProductModel extends FullRecordCacheModel {
 
     const FEATURE_FLAG = 'SubcommunityProducts';
-
-    const CACHE_KEY = 'SubcommunityProducts';
-
-    const CACHE_TTL = 600;
 
     /** @var Gdn_Session */
     private $session;
@@ -32,9 +29,6 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
 
     /** @var ConfigurationInterface $config */
     private $config;
-
-    /** @var \Gdn_Cache $cache */
-    private $cache;
 
     /** @var Schema */
     public $productSchema;
@@ -49,14 +43,12 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
     public function __construct(
         Gdn_Session $session,
         Router $router,
-        ConfigurationInterface $config,
-        \Gdn_Cache $cache
+        ConfigurationInterface $config
     ) {
         parent::__construct("product");
         $this->session = $session;
         $this->config = $config;
         $this->router = $router;
-        $this->cache = $cache;
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
         $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
             ->setUpdateFields(["dateUpdated"]);
@@ -99,11 +91,8 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
         $populate = function (array &$row) {
             if (array_key_exists('ProductID', $row) && !is_null($row['ProductID'])) {
                 try {
-                    $cacheKey = self::CACHE_KEY.'-'.$row['ProductID'];
-                    if (!($product = $this->cache->get($cacheKey))) {
-                        $product = $this->selectSingle(["productID" => $row['ProductID']]);
-                        $this->cache->store($cacheKey, $product, self::CACHE_TTL);
-                    }
+                    $where = ['productID' => $row['ProductID']];
+                    $product = $this->selectSingle($where);
                     if ($product) {
                         $row['product'] = $product;
                     }
@@ -124,32 +113,6 @@ class ProductModel extends \Vanilla\Models\PipelineModel {
                 $populate($row);
             }
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
-        $res = parent::insert($set, $mode);
-        if (!empty($res)) {
-            $cacheKey = self::CACHE_KEY.'-'.$res;
-            $this->cache->remove($cacheKey);
-        }
-        return $res;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
-        $res = parent::update($set, $where, $mode);
-        if ($res) {
-            $products = $this->get($where,['select' => ['productID']]);
-            foreach ($products as $product) {
-                $this->cache->remove(self::CACHE_KEY.'-'.$product['productID']);
-            }
-        }
-        return $res;
     }
 
     /**
