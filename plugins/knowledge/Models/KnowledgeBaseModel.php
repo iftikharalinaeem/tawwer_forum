@@ -305,14 +305,15 @@ MESSAGE
      * @return int
      */
     public function selectActiveKBCount(): int {
-        $result = $this->sql()
-            ->select('DISTINCT knowledgeBaseID', 'COUNT', 'count')
-            ->from('knowledgeBase')
-            ->where('status', self::STATUS_PUBLISHED)
-            ->get()->nextRow(DATASET_TYPE_ARRAY)
-        ;
-
-        return $result['count'];
+        return $this->modelCache->getCachedOrHydrate(['totalCount' => true], function () {
+            $result = $this->createSql()
+                ->select('DISTINCT knowledgeBaseID', 'COUNT', 'count')
+                ->from('knowledgeBase')
+                ->where('status', self::STATUS_PUBLISHED)
+                ->get()->firstRow(DATASET_TYPE_ARRAY)
+            ;
+            return $result['count'];
+        });
     }
 
     /**
