@@ -112,10 +112,6 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
      * @throws Exception Deleting article is not permitted.
      */
     public function delete(array $where = [], $options = []): bool {
-        $isTest = $options['isTest'] ?? false;
-        if (!$isTest) {
-            throw new Exception('Delete article action is not permitted');
-        }
-        return true;
+        throw new Exception('Delete article action is not permitted');
     }
 }
