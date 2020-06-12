@@ -13,19 +13,18 @@ use Gdn_Session;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
-use Garden\Schema\Validation;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Permissions;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
-use PermissionModel;
 use Vanilla\Exception\PermissionException;
 use UserModel;
 
 /**
  * A model for managing knowledge bases.
  */
-class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
+class KnowledgeBaseModel extends FullRecordCacheModel {
     // Record type for knowledge categories.
     const RECORD_TYPE = "knowledgeBase";
     const RECORD_ID_FIELD = "knowledgeBaseID";
@@ -197,7 +196,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      */
     public function getAllowedRoles(string $junctionTable, int $foreignID, string $permission): array {
         // Generic part of query
-        $sql = $this->sql();
+        $sql = $this->createSql();
         $sql->from('Permission p')
             ->select('PermissionID', 'COUNT')
             ->select('r.RoleID')
