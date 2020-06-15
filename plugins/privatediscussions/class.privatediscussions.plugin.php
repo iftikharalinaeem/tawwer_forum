@@ -184,7 +184,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     /**
      * Override permissions to prevent guest to see comments
      *
-     * @throws Exception
+     * @throws Exception Even with Discussion.View permission guests cannot see comments.
      */
     public function commentsApiController_getFilters() {
         if (!$this->session->isValid()) {
@@ -207,7 +207,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             DomUtils::stripImages($dom);
         }
         // trim to word count
-        DomUtils::truncateWords($dom, $this->getWordCount());
+        DomUtils::trimWords($dom, $this->getWordCount());
         $data = $dom->saveHTML();
         return $data;
     }
