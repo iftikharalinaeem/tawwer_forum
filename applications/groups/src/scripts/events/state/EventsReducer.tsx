@@ -6,11 +6,11 @@
 import { EventsActions } from "@groups/events/state/EventsActions";
 import {
     EventAttendance,
+    IEvent,
     IEventList,
     IEventParentRecord,
     IEventParticipantList,
     IEventParticipantsByAttendance,
-    IEventWithParticipants,
 } from "@groups/events/state/eventsTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
@@ -21,7 +21,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 export interface IEventsState {
     eventsLists: Record<string, ILoadable<IEventList>>;
     eventParentRecords: Record<string, ILoadable<IEventParentRecord>>;
-    eventsByID: Record<number, ILoadable<IEventWithParticipants>>;
+    eventsByID: Record<number, ILoadable<IEvent>>;
     partipateStatusByEventID: Record<number, ILoadable<{ attending: EventAttendance }>>;
     deleteStatusesByID: Record<number, ILoadable<{}>>;
     participantsByEventID: Record<number, ILoadable<IEventParticipantList>>;
@@ -227,7 +227,7 @@ export const eventsReducer = produce(
                 const modifiedUserID = payload.result.userID;
 
                 // Modify the participants and counts
-                let { event, participants } = existingEvent.data;
+                let event = existingEvent.data;
 
                 const previousAttendingStatus = event.attending;
                 event.attending = modifiedAttendingStatus;
@@ -248,41 +248,28 @@ export const eventsReducer = produce(
                         break;
                 }
 
-                let wasAdded = false;
-                for (const participant of participants) {
-                    if (participant.userID === modifiedUserID) {
-                        // if the participant changed his status adjust the event accordingly
-                        switch (previousAttendingStatus) {
-                            case EventAttendance.GOING:
-                                event.attendingYesCount = event.attendingYesCount ? event.attendingYesCount - 1 : 0;
-                                event.attendingYesUsers = event.attendingYesUsers.filter(attendee => {
-                                    return attendee.userID !== modifiedUserID;
-                                });
-                                break;
-                            case EventAttendance.MAYBE:
-                                event.attendingMaybeCount = event.attendingMaybeCount
-                                    ? event.attendingMaybeCount - 1
-                                    : 0;
-                                event.attendingMaybeUsers = event.attendingMaybeUsers.filter(attendee => {
-                                    return attendee.userID !== modifiedUserID;
-                                });
-                                break;
-                            case EventAttendance.NOT_GOING:
-                                event.attendingMaybeCount = event.attendingNoCount ? event.attendingNoCount - 1 : 0;
-                                event.attendingNoUsers = event.attendingNoUsers.filter(attendee => {
-                                    return attendee.userID !== modifiedUserID;
-                                });
-                                break;
-                        }
-
-                        participant.attending = modifiedAttendingStatus;
-                        wasAdded = true;
-                        break;
+                if (previousAttendingStatus) {
+                    // if the participant changed his status adjust the event accordingly
+                    switch (previousAttendingStatus) {
+                        case EventAttendance.GOING:
+                            event.attendingYesCount = event.attendingYesCount ? event.attendingYesCount - 1 : 0;
+                            event.attendingYesUsers = event.attendingYesUsers.filter(attendee => {
+                                return attendee.userID !== modifiedUserID;
+                            });
+                            break;
+                        case EventAttendance.MAYBE:
+                            event.attendingMaybeCount = event.attendingMaybeCount ? event.attendingMaybeCount - 1 : 0;
+                            event.attendingMaybeUsers = event.attendingMaybeUsers.filter(attendee => {
+                                return attendee.userID !== modifiedUserID;
+                            });
+                            break;
+                        case EventAttendance.NOT_GOING:
+                            event.attendingMaybeCount = event.attendingNoCount ? event.attendingNoCount - 1 : 0;
+                            event.attendingNoUsers = event.attendingNoUsers.filter(attendee => {
+                                return attendee.userID !== modifiedUserID;
+                            });
+                            break;
                     }
-                }
-
-                if (!wasAdded) {
-                    participants.push(payload.result);
                 }
             }
 
