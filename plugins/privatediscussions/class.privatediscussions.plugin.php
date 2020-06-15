@@ -26,7 +26,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     const STRIPEMBEDS_DEFAULT = true;
 
     /** @var bool */
-    const FEATURE_DISCUSSIONSITEMAPS_DEFAULT = true;
+    const FEATURE_SITEMAPS_DEFAULT = true;
 
     /** @var array */
     const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
@@ -72,7 +72,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @return void
      */
     public function structure() {
-        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_DISCUSSIONSITEMAPS_DEFAULT);
+        $this->config->set('Feature.discussionSiteMaps.Enabled', self::FEATURE_SITEMAPS_DEFAULT);
     }
 
     /**
@@ -182,13 +182,11 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Override permissions to prevent guest to see comments
-     *
      * @throws Exception Even with Discussion.View permission guests cannot see comments.
      */
     public function commentsApiController_getFilters() {
         if (!$this->session->isValid()) {
-            throw new Exception(t('You must sign in to view comments.'), 403);
+            throw forbiddenException(t('view comments'));
         }
     }
 

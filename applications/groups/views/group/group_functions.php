@@ -347,6 +347,7 @@ function writeGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLin
     if (!$group) {
          $group = Gdn::controller()->data('Group');
     }
+    $dataDriven = \Gdn::themeFeatures()->useDataDrivenTheme();
     if (val('Icon', $group)) {
          $icon = val('Icon', $group);
     } else {
@@ -358,7 +359,11 @@ function writeGroupIcon($group = false, $class = 'Group-Icon', $addChangeIconLin
         $groupModel = \Gdn::getContainer()->get(GroupModel::class);
          if ($addChangeIconLink && $groupModel->hasGroupPermission(GroupPermissions::EDIT, $group['GroupID'])) {
               $output .= '';
-              $output .= anchor('<span class="icon icon-camera"></span>'.t('Change Icon'), groupUrl($group, 'groupicon'), 'ChangePicture');
+              $contents = '<span class="icon icon-camera"></span>'.t('Change Icon');
+              if ($dataDriven) {
+                  $contents = "<span class='ChangePicture-Text'>" . $contents . "</span>";
+              }
+              $output .= anchor($contents, groupUrl($group, 'groupicon'), 'ChangePicture',  ["aria-label" => t("Change Picture")]);
          }
          $output .= img(Gdn_Upload::url($icon), ['class' => $class]);
 

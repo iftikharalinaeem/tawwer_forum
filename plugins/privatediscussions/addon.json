@@ -6,6 +6,7 @@
     "type": "addon",
     "priority": 1100,
     "hidden": true,
+    "icon": "privatediscussions.png",
     "authors": [
         {
             "name": "Isis Graziatto",
