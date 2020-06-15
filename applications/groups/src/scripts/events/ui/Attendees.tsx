@@ -62,19 +62,7 @@ export function EventAttendees(props: IProps) {
         }
     };
 
-    const getTooltipText = (title: string) => {
-        switch (title.toLocaleLowerCase()) {
-            case "going":
-                return "View all going attendees";
-            case "maybe":
-                return "View all maybe attendees";
-            case "not going":
-                return "View all not going attendees";
-            default:
-                return "View all";
-        }
-    };
-    const tooltipText = getTooltipText(title);
+    const tooltipText = "View all attendees";
 
     const openModal = () => {
         dispatchDetail({ type: IEventDetailActionType.SET_VISIBLE_MODAL, visible: true });

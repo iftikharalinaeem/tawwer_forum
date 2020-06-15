@@ -11,6 +11,10 @@ import { eventsClasses } from "./eventStyles";
 import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Button from "@vanilla/library/src/scripts/forms/Button";
+import SmartLink from "@library/routing/links/SmartLink";
+import { makeProfileUrl } from "@library/utility/appUtils";
+import ProfileLink from "@library/navigation/ProfileLink";
+import { metasClasses } from "@library/styles/metasStyles";
 
 interface IProps {
     participants: IEventParticipant[];
@@ -20,12 +24,13 @@ interface IProps {
 
 function Participant({ user }) {
     const classes = eventsClasses();
+
     const participantsClasses = eventParticipantsClasses();
     return (
-        <li className={participantsClasses.item}>
+        <ProfileLink username={user.name} className={participantsClasses.item}>
             <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
             <span className={participantsClasses.name}>{user.name}</span>
-        </li>
+        </ProfileLink>
     );
 }
 
