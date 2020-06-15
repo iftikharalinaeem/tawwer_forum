@@ -273,12 +273,13 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @return int Return limit used to count remaining tags.
      */
     private function stripTextRecursive($element, int $limit): int {
+        $wordCount = $limit;
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
                 $limit -= str_word_count($element->data);
                 if ($limit < 0) {
-                    $element->nodeValue = substr($element->nodeValue, 0, str_word_count($element->data));
+                    $element->nodeValue = implode(' ', array_slice(explode(' ', $element->data), 0, $wordCount));
                 }
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
