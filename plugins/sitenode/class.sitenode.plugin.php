@@ -740,7 +740,12 @@ class SiteNodePlugin extends Gdn_Plugin {
 
                 trace($user, 'hubSSO');
 
+                $config = Gdn::config();
+                $autoConnect = $config->get("Garden.Registration.AutoConnect");
+                $config->set("Garden.Registration.AutoConnect", true, true, false);
                 $user_id = Gdn::userModel()->connect($user['UniqueID'], self::PROVIDER_KEY, $user);
+                $config->set("Garden.Registration.AutoConnect", $autoConnect, true, false);
+
                 trace($user_id, 'user ID');
                 if ($user_id) {
                     // Add additional authentication.
@@ -805,8 +810,7 @@ class SiteNodePlugin extends Gdn_Plugin {
 
         saveToConfig([
             'Garden.Cookie.Name' => self::NODE_COOKIE,
-            'Garden.Cookie.Path' => $path,
-            'Garden.Registration.AutoConnect' => true,
+            'Garden.Cookie.Path' => $path
         ], '', false);
     }
 
