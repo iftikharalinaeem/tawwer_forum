@@ -39,13 +39,15 @@ class ProductModel extends FullRecordCacheModel {
      * @param Gdn_Session $session
      * @param Router $router
      * @param ConfigurationInterface $config
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         Gdn_Session $session,
         Router $router,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("product");
+        parent::__construct("product", $cache);
         $this->session = $session;
         $this->config = $config;
         $this->router = $router;
