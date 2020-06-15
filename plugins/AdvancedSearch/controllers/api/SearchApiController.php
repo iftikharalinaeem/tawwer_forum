@@ -247,38 +247,48 @@ class SearchApiController extends AbstractApiController {
         // Paging
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
+        $data = [];
         if ($this->searchModel instanceof SphinxSearchModel) {
-            $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api')['SearchResults'] ?? [];
-            if (!$data) {
+            $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
+            $searchResults = $data['SearchResults'] ?? [];
+            if (!$searchResults) {
                 $sphinx = $this->searchModel->sphinxClient();
                 if ($sphinx->getLastError()) {
                     throw new ServerException($sphinx->getLastError(), 500);
                 }
             }
         } else {
-            $data = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
+            $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
+            $data['RecordCount'] = count($searchResults);
         }
 
-        $data = $this->preNormalizeOutputs($data);
+        $searchResults = $this->preNormalizeOutputs($searchResults);
 
         // Expand associated rows.
         $this->userModel->expandUsers(
-            $data,
+            $searchResults,
             $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
 
-        $data = array_map(function ($record) use ($query) {
+        $searchResults = array_map(function ($record) use ($query) {
             return $this->normalizeOutput(
                 $record,
                 $query['expandBody'],
                 $this->isExpandField('breadcrumbs', $query['expand'])
             );
-        }, $data);
+        }, $searchResults);
 
-        $result = $out->validate($data);
+        $result = $out->validate($searchResults);
 
-        return new Data($result);
+        $recordCount = $data['RecordCount'] ?? 0;
+
+        return new Data(
+            $result,
+            [
+                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
+            ]
+        );
     }
 
     /**
