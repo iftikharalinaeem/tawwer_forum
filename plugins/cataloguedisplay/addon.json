@@ -4,6 +4,7 @@
     "version": "1.0",
     "mobileFriendly": true,
     "license": "Proprietary",
+    "icon": "catalogue_display.png",
     "key": "cataloguedisplay",
     "settingsUrl": "/settings/cataloguedisplay",
     "type": "addon",
