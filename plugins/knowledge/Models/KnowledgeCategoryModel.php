@@ -61,14 +61,16 @@ class KnowledgeCategoryModel extends FullRecordCacheModel {
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         Gdn_Session $session,
         KnowledgeBaseModel $knowledgeBaseModel,
         SiteSectionModel $siteSectionModel,
-        TranslationModel $translationModel
+        TranslationModel $translationModel,
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("knowledgeCategory");
+        parent::__construct("knowledgeCategory", $cache);
 
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;

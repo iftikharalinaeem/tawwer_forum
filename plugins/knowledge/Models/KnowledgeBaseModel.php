@@ -83,14 +83,16 @@ class KnowledgeBaseModel extends FullRecordCacheModel {
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
      * @param UserModel $userModel
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         Gdn_Session $session,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        UserModel $userModel
+        UserModel $userModel,
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("knowledgeBase");
+        parent::__construct("knowledgeBase", $cache);
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
