@@ -7,6 +7,8 @@
 use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Container\Container;
 use Vanilla\Adapters\SphinxClient;
+use Vanilla\Sphinx\Search\SphinxQueryBuilder;
+use Vanilla\Sphinx\Search\SphinxRanks;
 
 /**
  * Sphinx Search Model
@@ -55,25 +57,9 @@ class SphinxSearchModel extends \SearchModel {
 
         $this->useDeltas = c('Plugins.Sphinx.UseDeltas');
 
-        self::$ranker['score'] = [
-            'items'     => [-5, 0, 1, 3, 5, 10, 19],
-            'add'       => -1,
-            'weight'    => 1
-        ];
+        self::$ranker['score'] = SphinxRanks::getScoreRanking();
 
-        self::$ranker['dateinserted'] = [
-            'items' => [
-                strtotime('-2 years'),
-                strtotime('-1 year'),
-                strtotime('-6 months'),
-                strtotime('-3 months'),
-                strtotime('-1 month'),
-                strtotime('-1 week'),
-                strtotime('-1 day')
-            ],
-            'add' => -4,
-            'weight' => 1
-        ];
+        self::$ranker['dateinserted'] = SphinxRanks::getDateRanking();
 
         parent::__construct();
     }
@@ -89,14 +75,6 @@ class SphinxSearchModel extends \SearchModel {
             }
         }
         return $i + 1;
-    }
-
-    public function addTypeInfo($type, $getCallback, $indexCallback = null) {
-        if (!is_numeric($type)) {
-            $type = array_search($type, $this->types);
-        }
-
-        $this->typeInfo[$type] = ['GetCallback' => $getCallback, 'IndexCallback' => $indexCallback];
     }
 
     /**
@@ -231,6 +209,15 @@ class SphinxSearchModel extends \SearchModel {
         return $result;
     }
 
+    /**
+     * Perform an advanced search query.
+     *
+     * @param array $search
+     * @param int $offset
+     * @param int $limit
+     * @param bool $clean
+     * @return array
+     */
     public function advancedSearch($search, $offset = 0, $limit = 10, $clean = true) {
         /** @var SphinxClient */
         $sphinx = $this->sphinxClient();
@@ -247,31 +234,29 @@ class SphinxSearchModel extends \SearchModel {
         }
 
         $doSearch = $search['dosearch'];
-        $filtered = false;
         $indexes = $this->indexes();
         $query = '';
         $terms = [];
 
+        $queryBuilder = new SphinxQueryBuilder($sphinx);
         if (isset($search['search'])) {
-            list($query, $terms) = $this->splitTags($search['search']);
+            $queryBuilder->whereText($search['search']);
         }
-        $this->setSort($sphinx, $terms, $search);
+        $queryBuilder->setSort($search['sort'] ?? null);
 
         // Set the filters based on the search.
         if (isset($search['cat'])) {
-           if ($search['cat'] === false) {
-              $catFilterValues = [$searchDirty['cat']];
-           } else {
-              $catFilterValues = (array) $search['cat'];
-           }
-           $sphinx->setFilter('CategoryID', $catFilterValues);
-           $filtered &= (count($catFilterValues) > 0);
+            if ($search['cat'] === false && isset($searchDirty['cat'])) {
+                $catFilterValues = [$searchDirty['cat']];
+            } else {
+                $catFilterValues = (array) $search['cat'];
+            }
+            $queryBuilder->setFilter('CategoryID', $catFilterValues);
         }
 
         if (isset($search['timestamp-from'])) {
-            $sphinx->setFilterRange('DateInserted', $search['timestamp-from'], $search['timestamp-to']);
-            $filtered = true;
-        } else if (isset($search['date-filters'])) {
+            $queryBuilder->setFilterRange('DateInserted', $search['timestamp-from'], $search['timestamp-to']);
+        } elseif (isset($search['date-filters'])) {
             $dtZone = new DateTimeZone('UTC');
 
             $fromDate = array_shift($search['date-filters']);
@@ -287,32 +272,21 @@ class SphinxSearchModel extends \SearchModel {
                 $adjustedTo->setTimezone($dtZone);
             }
 
-            $sphinx->setFilterRange('DateInserted', $adjustedFrom->getTimestamp(), $adjustedTo->getTimestamp());
-            $filtered = true;
+            $queryBuilder->setFilterRange('DateInserted', $adjustedFrom->getTimestamp(), $adjustedTo->getTimestamp());
         }
 
         if (isset($search['title'])) {
             $indexes = $this->indexes(['Discussion']);
-            list($titleQuery, $titleTerms) = $this->splitTags($search['title']);
-            $query .= ' @name ' . $titleQuery;
-            $terms = array_merge($terms, $titleTerms);
+            $queryBuilder->whereText($search['title'], '@name');
         }
 
         if (isset($search['users'])) {
-            $sphinx->setFilter('InsertUserID', array_column($search['users'], 'UserID'));
-            $filtered = true;
+            $queryBuilder->setFilter('InsertUserID', array_column($search['users'], 'UserID'));
         }
 
         if (isset($search['tags'])) {
-            if (val('tags-op', $search) == 'and') {
-                foreach ($search['tags'] as $row) {
-                    $sphinx->setFilter('Tags', (array) $row['TagID']);
-                }
-            } else {
-                $sphinx->setFilter('Tags', array_column($search['tags'], 'TagID'));
-            }
-
-            $filtered = true;
+            $tagIDs = array_column($search['tags'], 'TagID');
+            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxQueryBuilder::FILTER_OP_OR);
         }
 
         if (isset($search['types'])) {
@@ -320,34 +294,34 @@ class SphinxSearchModel extends \SearchModel {
             $idxWeights = [];
             $values = [];
             /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
-           foreach ($search['types'] as $recordType) {
+            foreach ($search['types'] as $recordType) {
                 $indexes[] = $idxName = $recordType->getIndexName();
                 $idxWeights[$idxName] = $recordType->getIndexWeight();
                 $values[] = $recordType->getDType();
             }
 
-            $sphinx->setFilter('dtype', $values);
+            $queryBuilder->setFilter('dtype', $values);
             $indexes = $this->indexes($indexes);
             $idxWeights = $this->dbIndexNames($idxWeights);
-            $sphinx->setIndexWeights($idxWeights);
+            $queryBuilder->setIndexWeights($idxWeights);
         }
 
         if (isset($search['discussionid'])) {
-            $sphinx->setFilter('DiscussionID', (array) $search['discussionid']);
+            $queryBuilder->setFilter('DiscussionID', (array) $search['discussionid']);
         }
 
         if ($search['group']) {
-            $sphinx->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
+            $queryBuilder->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
         }
 
         $results['Search'] = $search;
 
         if ($doSearch) {
-            if ($filtered && empty($query)) {
-                $sphinx->setRankingMode(SphinxClient::RANK_PROXIMITY);
+            if ($queryBuilder && empty($query)) {
+                $queryBuilder->setRankingMode(SphinxClient::RANK_PROXIMITY);
             }
-            $results = $this->doSearch($sphinx, $query, $indexes);
-            $results['SearchTerms'] = array_unique($terms);
+            $results = $this->doSearch($sphinx, $queryBuilder->getQuery(), $indexes);
+            $results['SearchTerms'] = $queryBuilder->getTerms();
         } else {
             $results = ['SearchResults' => [], 'RecordCount' => 0, 'SearchTerms' => $terms];
         }
@@ -355,50 +329,57 @@ class SphinxSearchModel extends \SearchModel {
         return $results;
     }
 
+    /**
+     * Do a more minimal autocomplete.
+     *
+     * @param array $search
+     * @param int $limit
+     * @return array
+     */
     public function autoComplete($search, $limit = 10) {
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits(0, $limit, 100);
         $search = Search::cleanSearch($search);
 
+        $queryBuilder = new SphinxQueryBuilder($sphinx);
+
         $str = $search['search'];
-        list ($query, $terms) = $this->splitTags($str);
+        $queryBuilder->whereText($str);
 
         if (isset($search['cat'])) {
-            $sphinx->setFilter('CategoryID', (array) $search['cat']);
+            $queryBuilder->setFilter('CategoryID', (array) $search['cat']);
         }
         if (isset($search['discussionid'])) {
-            $sphinx->setFilter('DiscussionID', (array) $search['discussionid']);
+            $queryBuilder->setFilter('DiscussionID', (array) $search['discussionid']);
         }
         if (isset($search['tags'])) {
-            if (val('tags-op', $search) == 'and') {
-                foreach ($search['tags'] as $trow) {
-                    $sphinx->setFilter('Tags', (array) $trow['TagID']);
-                }
-            } else {
-                $sphinx->setFilter('Tags', array_column($search['tags'], 'TagID'));
+            $tagIDs = array_column($search['tags'], 'TagID');
+            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxQueryBuilder::FILTER_OP_OR);
+        }
+
+        $queryBuilder->setSort($search['sort'] ?? null);
+
+        // Build indexes.
+        $dtypes = [];
+        $indexes = [];
+        if (empty($search['types'])) {
+            /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
+            foreach ($this->searchRecordTypeProvider->getAll() as $recordType) {
+                $indexes[] = $recordType->getIndexName();
+                $dtypes[] = $recordType->getDType();
+            }
+        } else {
+            /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
+            foreach ($search['types'] as $recordType) {
+                $indexes[] = $recordType->getIndexName();
+                $dtypes[] = $recordType->getDType();
             }
         }
-       $dtypes = [];
-       $indexes = [];
-        if (empty($search['types'])) {
-              /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
-              foreach ($this->searchRecordTypeProvider->getAll() as $recordType) {
-                 $indexes[] = $recordType->getIndexName();
-                 $dtypes[] = $recordType->getDType();
-              }
-        } else {
-           /** @var \Vanilla\Contracts\Search\SearchRecordTypeInterface $recordType */
-           foreach ($search['types'] as $recordType) {
-              $indexes[] = $recordType->getIndexName();
-              $dtypes[] = $recordType->getDType();
-           }
-        }
-       $sphinx->setFilter('dtype', $dtypes);
-       $indexes = $this->indexes($indexes);
+        $queryBuilder->setFilter('dtype', $dtypes);
 
-        $this->setSort($sphinx, $terms, $search);
-        $results = $this->doSearch($sphinx, $query, $indexes);
-        $results['SearchTerms'] = $terms;
+        $indexes = $this->indexes($indexes);
+        $results = $this->doSearch($sphinx, $queryBuilder->getQuery(), $indexes);
+        $results['SearchTerms'] = $queryBuilder->getTerms();
 
         return $results;
     }
@@ -417,12 +398,12 @@ class SphinxSearchModel extends \SearchModel {
 
         $search = Search::cleanSearch($search);
 
+        $queryBuilder = new SphinxQueryBuilder($sphinx);
         $str = $search['search'];
-        list ($query, $terms) = $this->splitTags($str);
-
-        $this->setSort($sphinx, $terms, $search);
-        $results = $this->doSearch($sphinx, $query, $indexes);
-        $results['SearchTerms'] = $terms;
+        $queryBuilder->whereText($str);
+        $queryBuilder->setSort($search['sort'] ?? null);
+        $results = $this->doSearch($sphinx, $queryBuilder->getQuery(), $indexes);
+        $results['SearchTerms'] = $queryBuilder->getTerms();
 
         return $results;
     }
@@ -584,60 +565,9 @@ class SphinxSearchModel extends \SearchModel {
         return $results['SearchResults'];
     }
 
-    /**
-     * Set soritng for Sphinx object
-     *
-     * @param SphinxClient $sphinx
-     * @param array $terms
-     * @param array $search
-     */
-    public function setSort($sphinx, $terms, $search) {
-        if (!isset($search['sort'])) {
-            $sphinx->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-            $sphinx->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
-        } elseif (val('sort', $search) === 'date' || (count($terms) < 2 && val('sort', $search) !== 'relevance')) {
-            // If there is just one search term then we really want to just sort by date.
-            $sphinx->setSelect('*, (dateinserted + 1) as sort');
-            $sphinx->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
-        } else {
-            $funcs = [];
-            foreach (self::$ranker as $field => $row) {
-                $items = $row['items'];
-                $weight = $row['weight'];
-                $add = $row['add'];
-
-                $func = "interval($field, " . implode(', ', $items) . ")";
-                if ($add > 0) {
-                    $func = "($func +$add)";
-                } elseif ($add < 0) {
-                    $func = "($func $add)";
-                }
-
-                if ($weight != 1) {
-                    $func .= " * $weight";
-                }
-
-                $funcs[] = "$func";
-            }
-            $maxScore = self::maxScore();
-
-            if ($maxScore > 0) {
-                $mult = 1 / $maxScore;
-
-                $fullfunc = implode(' + ', $funcs);
-                $sort = "(($fullfunc) * $mult + 1) * WEIGHT()";
-                trace($sort, 'sort');
-
-                $sphinx->setSelect("*, $sort as sort");
-
-                $sphinx->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
-            }
-        }
-    }
-
     public static function addNotes(&$row, $terms) {
         $map = ['score' => ['Score', 'score'], 'dateinserted' => ['DateInserted', 'date']];
-        $maxscore = self::maxScore();
+        $maxscore = SphinxRanks::getMaxScore();
 
         if ($maxscore == 0) {
             return '';
@@ -648,7 +578,7 @@ class SphinxSearchModel extends \SearchModel {
         $totalInt = 0;
 
         foreach (self::$ranker as $name => $info) {
-            list($field, $label) = $map[$name];
+            [$field, $label] = $map[$name];
 
             $val = $row[$field];
             if ($name == 'dateinserted') {
@@ -666,123 +596,6 @@ class SphinxSearchModel extends \SearchModel {
 
         $notes[] = "mult: " . round($mult);
         return implode(' ', $notes);
-    }
-
-    protected static function maxScore() {
-        $maxScore = 0;
-        foreach (self::$ranker as $field => $row) {
-            $items = $row['items'];
-            $weight = $row['weight'];
-            $add = $row['add'];
-            $maxScore += $weight * (count($items) + $add);
-        }
-
-        return $maxScore;
-    }
-
-    public function splitTags($search) {
-        $sphinx = $this->sphinxClient();
-        $search = preg_replace('`\s`', ' ', $search);
-        $tokens = preg_split('`([\s"+=-])`', $search, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $tokens = array_filter($tokens);
-        $inquote = false;
-        $inword = false;
-
-        $queries = [];
-        $terms = [];
-        $query = ['', '', ''];
-
-        $hasops = false; // whether or not search has operators
-
-        foreach ($tokens as $c) {
-            // Figure out where to push the token.
-            switch ($c) {
-                case '+':
-                case '-':
-                case '=':
-                    if ($inquote || $inword) {
-                        $query[1] .= $c;
-                    } elseif (!$query[0]) {
-                        $query[0] .= $c;
-                    } else {
-                        $query[1] .= $c;
-                    }
-                    $hasops = true;
-                    break;
-                case '"':
-                    if ($inquote) {
-                        $query[2] = $c;
-                        $inquote = false;
-                        $inword = false;
-                    } else {
-                        $query[0] .= $c;
-                        $inquote = true;
-                    }
-                    $hasops = true;
-                    break;
-                case ' ':
-                    if ($inquote) {
-                        $query[1] .= $c;
-                    } else {
-                        $inword = false;
-                    }
-                    break;
-                default:
-                    $query[1] .= $c;
-                    $inword = true;
-                    break;
-            }
-
-            // Now split the query into terms and move on.
-            if ($query[2] || ($query[1] && !$inquote && !$inword)) {
-                $queries[] = $query[0] . $sphinx->escapeString($query[1]) . $query[2];
-                $terms[] = $query[1];
-                $query = ['', '', ''];
-            }
-        }
-        // Account for someone missing their last quote.
-        if ($inquote && $query[1]) {
-            $queries[] = $query[0] . $sphinx->escapeString($query[1]) . '"';
-            $terms[] = $query[1];
-        } elseif ($inword && $query[1]) {
-            $queries[] = $query[0] . $sphinx->escapeString($query[1]);
-            $terms[] = $query[1];
-        }
-
-        // Now we need to convert the queries into sphinx syntax.
-        $firstmod = false; // whether first term had a modifier.
-        $finalqueries = [];
-        $quorums = [];
-
-        foreach ($queries as $i => $query) {
-            $c = substr($query, 0, 1);
-            if ($c == '+') {
-                $finalqueries[] = substr($query, 1);
-                $firstmod = $i == 0;
-            } elseif ($c == '-' || $c == '=') {
-                $finalqueries[] = $c . substr($query, 1);
-                $firstmod = $i == 0;
-            } elseif ($c == '"') {
-                if (!$firstmod && count($finalqueries) > 0) {
-                    $query = '| ' . $query;
-                }
-                $finalqueries[] = $query;
-            } else {
-                // Collect this term into a list for the quorum operator.
-                $quorums[] = $query;
-            }
-        }
-        // Calculate the quorum.
-        if (count($quorums) <= 2) {
-            $quorum = implode(' ', $quorums);
-        } else {
-            $quorum = '"' . implode(' ', $quorums) . '"/' . round(count($quorums) * .6); // must have at least 60% of search terms
-        }
-
-        $finalquery = implode(' ', $finalqueries) . ' ' . $quorum;
-
-//      return array($search, array_unique($terms));
-        return [trim($finalquery), array_unique($terms)];
     }
 
 }
