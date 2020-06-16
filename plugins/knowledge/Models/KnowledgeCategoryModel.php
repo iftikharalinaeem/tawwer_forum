@@ -11,6 +11,7 @@ use Garden\Schema\ValidationException;
 use Gdn_Session;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
@@ -19,7 +20,7 @@ use Vanilla\Contracts\Site\TranslationProviderInterface;
 /**
  * A model for managing knowledge categories.
  */
-class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
+class KnowledgeCategoryModel extends FullRecordCacheModel {
     const RECORD_TYPE = 'knowledgeCategory';
 
     const RECORD_ID_FIELD = 'knowledgeCategoryID';
@@ -60,14 +61,16 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         Gdn_Session $session,
         KnowledgeBaseModel $knowledgeBaseModel,
         SiteSectionModel $siteSectionModel,
-        TranslationModel $translationModel
+        TranslationModel $translationModel,
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("knowledgeCategory");
+        parent::__construct("knowledgeCategory", $cache);
 
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
@@ -178,11 +181,18 @@ class KnowledgeCategoryModel extends \Vanilla\Models\PipelineModel {
      * @throws NoResultsException If no record was found for the given ID.
      */
     public function selectSingleFragment(int $categoryID, string $locale = null): KbCategoryFragment {
-        $rows = $this->sql()
-            ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
-            ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)
-            ->resultArray()
-        ;
+        $rows = $this->modelCache->getCachedOrHydrate(
+            [
+                'isFragment' => true,
+                'categoryID' => $categoryID,
+            ],
+            function () use ($categoryID) {
+                return $this->createSql()
+                    ->select('knowledgeCategoryID, knowledgeBaseID, parentID, sort, name')
+                    ->getWhere($this->getTable(), ['knowledgeCategoryID' => $categoryID], null, null, 1)
+                    ->resultArray();
+            }
+        );
 
         if (empty($rows)) {
             throw new NoResultsException("Could not find category fragment for id $categoryID");
