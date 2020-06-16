@@ -28,9 +28,6 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
     /** @var bool */
     const FEATURE_SITEMAPS_DEFAULT = true;
 
-    /** @var array */
-    const EMBED_CLASSES = ['js-embed', 'embedResponsive', 'embedExternal', 'embedImage', 'VideoWrap', 'iframe'];
-
     /** @var Gdn_Session */
     private $session;
 
@@ -201,7 +198,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
         $dom->preserveWhiteSpace = false;
         $dom->loadHTML($data);
         if ($this->getStripEmbeds()) {
-            DomUtils::stripEmbeds($dom, self::EMBED_CLASSES);
+            DomUtils::stripEmbeds($dom);
             DomUtils::stripImages($dom);
         }
         // trim to word count
