@@ -5,6 +5,7 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
+use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Data;
@@ -57,6 +58,8 @@ class SearchApiController extends AbstractApiController {
      * @param DiscussionModel $discussionModel
      * @param SearchModel $searchModel
      * @param UserModel $userModel
+     * @param SearchRecordTypeProviderInterface $searchRecordTypeProvider
+     * @param BreadcrumbModel $breadcrumbModel
      */
     public function __construct(
         CommentModel $commentModel,
@@ -70,7 +73,7 @@ class SearchApiController extends AbstractApiController {
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
         $this->userModel = $userModel;
-        $this->searchRecordTypeProvider =$searchRecordTypeProvider;
+        $this->searchRecordTypeProvider = $searchRecordTypeProvider;
         $this->breadcrumbModel = $breadcrumbModel;
     }
 
@@ -166,9 +169,21 @@ class SearchApiController extends AbstractApiController {
                     'description' => 'Set the scope of the search to a specific category.',
                     'x-search-scope' => true,
                 ],
+                "knowledgeBaseID:i?" => [
+                    'description' => 'Unique ID of a knowledge base. Results will be relative to this value.',
+                     'x-search-scope' => true,
+                ],
+                'knowledgeCategoryIDs:a?' => [
+                    'description' => 'Set the scope of the search to a specific category.',
+                    'x-search-scope' => true,
+                ],
                 'followedCategories:b?' => [
                     'default' => false,
                     'description' => 'Set the scope of the search to followed categories only.',
+                    'x-search-scope' => true,
+                ],
+                "featured:b?" => [
+                    'description' => "Search for featured articles only. Default: false",
                     'x-search-scope' => true,
                 ],
                 'includeChildCategories:b?' => [
@@ -207,6 +222,18 @@ class SearchApiController extends AbstractApiController {
                         'processor' => [DateFilterSchema::class, 'dateFilterField'],
                     ],
                 ]),
+                'statuses:a?' => [
+                    'description' => 'Article statuses array to filter results.',
+                    'x-search-scope' => true
+                ],
+                "locale:s?" => [
+                    'description' => 'The locale articles are published in.',
+                    'x-search-scope' => true
+                ],
+                'siteSectionGroup:s?' => [
+                    'description' => 'The site-section-group articles are associated to',
+                    'x-search-scope' => true
+                ],
                 'tags:a?' => [
                     'items' => ['type' => 'string'],
                     'style' => 'form',
@@ -217,6 +244,17 @@ class SearchApiController extends AbstractApiController {
                     'default' => 'or',
                     'description' => 'Tags search condition.',
                     'enum' => ['and', 'or'],
+                ],
+                "sort:s?" => [
+                    "description" => "Sort option to order search results.",
+                    "enum" => [
+                        "name",
+                        "-name",
+                        "dateInserted",
+                        "-dateInserted",
+                        "dateFeatured",
+                        "-dateFeatured",
+                    ]
                 ],
                 'page:i?' => [
                     'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
@@ -239,6 +277,7 @@ class SearchApiController extends AbstractApiController {
         $out = $this->schema([':a' => $fullSchema], 'out');
 
         $query = $in->validate($query);
+
         if (isset($query['dateInserted'])) {
             $query['dateFilters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
         }
@@ -311,9 +350,9 @@ class SearchApiController extends AbstractApiController {
             'insertUserIDs' => 'users',
             'tags' => 'tags',
             'tagOperator' => 'tags-op',
+            'knowledgeBaseID' => 'knowledgebaseid'
         ];
         $recordTypes = $this->searchRecordTypeProvider->getAll();
-
 
         $result = [
             'types' => [],
@@ -357,7 +396,6 @@ class SearchApiController extends AbstractApiController {
                 $result[$to] = $value;
             }
         }
-
         return $result;
     }
 
