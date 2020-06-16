@@ -48,7 +48,6 @@ class SphinxSearchModel extends \SearchModel {
      *
      * @param SearchRecordTypeProviderInterface $searchRecordTypeProvider
      * @param Container $container
-     * @param EventManager $eventManager
      */
     public function __construct(SearchRecordTypeProviderInterface $searchRecordTypeProvider, Container $container) {
         // Bit of a kludge, but we need these functions even if advanced search is disabled.
