@@ -155,6 +155,7 @@ export const eventParticipantsClasses = useThemeCache((props: { compact?: boolea
         display: "inline-flex",
         marginLeft: globalVars.gutter.size,
         width: calc(`100% - ${unit(userPhotoVariables().sizing.medium)}`),
+        fontSize: globalVars.fonts.size.large,
     });
 
     const tabsTopButtonWrapper = style("tabsTopButtonWrapper", {
