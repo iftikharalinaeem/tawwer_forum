@@ -184,7 +184,7 @@ class SearchApiController extends AbstractApiController {
                 ],
                 "featured:b?" => [
                     'description' => "Search for featured articles only. Default: false",
-                    'x-search-scope' => true,
+                    'x-search-filter' => true,
                 ],
                 'includeChildCategories:b?' => [
                     'default' => false,
@@ -224,7 +224,7 @@ class SearchApiController extends AbstractApiController {
                 ]),
                 'statuses:a?' => [
                     'description' => 'Article statuses array to filter results.',
-                    'x-search-scope' => true
+                    'x-search-filter' => true
                 ],
                 "locale:s?" => [
                     'description' => 'The locale articles are published in.',

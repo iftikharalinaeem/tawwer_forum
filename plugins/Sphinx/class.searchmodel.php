@@ -348,7 +348,6 @@ class SphinxSearchModel extends \SearchModel {
         $eventManager = Gdn::getContainer()->get(EventManager::class);
         $sphinx = $eventManager->fireFilter('searchModel_setKnowledgeFilters', $sphinx, $search);
 
-
         $results['Search'] = $search;
 
         if ($doSearch) {
