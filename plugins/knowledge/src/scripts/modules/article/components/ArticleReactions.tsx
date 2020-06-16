@@ -51,12 +51,9 @@ export function ArticleReactions(props: IProps) {
                 <Paragraph className={classNames(classes.reCaptchaText)}>
                     <Translate source="This site is protected by reCAPTCHA and the Google " />
                     <Translate
-                        source="<0>Privacy Policy</0> and "
+                        source="<0>Privacy Policy</0> and <1>Terms of Service</1>"
                         c0={content => <a href="https://policies.google.com/privacy">{content}</a>}
-                    />
-                    <Translate
-                        source="<0>Terms of Service</0>"
-                        c0={content => <a href="https://policies.google.com/terms">{content}</a>}
+                        c1={content => <a href="https://policies.google.com/terms">{content}</a>}
                     />
                 </Paragraph>
             </div>
