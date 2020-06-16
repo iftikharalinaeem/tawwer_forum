@@ -236,7 +236,7 @@ class SphinxSearchModel extends \SearchModel {
     }
 
     public function advancedSearch($search, $offset = 0, $limit = 10, $clean = true) {
-        /** @var  */
+        /** @var SphinxClient */
         $sphinx = $this->sphinxClient();
         $sphinx->setLimits($offset, $limit, self::$maxResults);
 
