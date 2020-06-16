@@ -8,6 +8,7 @@ namespace Vanilla\Knowledge\Controllers\Api;
 
 use AbstractApiController;
 use Garden\Schema\Schema;
+use Vanilla\Adapters\SphinxClient;
 use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Garden\SphinxTrait;
 use Garden\Web\Exception\ClientException;
@@ -363,16 +364,7 @@ class KnowledgeApiController extends AbstractApiController {
     protected function defineArticlesQuery() {
         $articleIndexes = [self::TYPE_ARTICLE];
         if (isset($this->query['statuses'])) {
-            if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
-                $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
-            };
-            $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
-            $statuses = array_map(
-                function ($status) {
-                    return array_search($status, self::ARTICLE_STATUSES);
-                },
-                $this->query['statuses']
-            );
+            [$articleIndexes, $statuses] = $this->getStatusFilters($articleIndexes);
             $this->sphinx->setFilter('status', $statuses);
         } else {
             $this->sphinx->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
@@ -385,22 +377,7 @@ class KnowledgeApiController extends AbstractApiController {
             $this->sphinx->setFilter('updateUserID', $this->query['updateUserIDs']);
         }
         if (isset($this->query['knowledgeBaseID'])) {
-            $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(
-                [
-                    "targetKnowledgeBaseID" => $this->query['knowledgeBaseID']
-                ]
-            );
-            if ($knowledgeUniversalContent) {
-                $knowledgeBaseIDs = array_column($knowledgeUniversalContent, "sourceKnowledgeBaseID");
-            }
-            $knowledgeBaseIDs[] = $this->query['knowledgeBaseID'];
-            $knowledgeCategories = array_column(
-                $this->knowledgeCategoryModel->get(
-                    ['knowledgeBaseID' => $knowledgeBaseIDs],
-                    ['select' => ['knowledgeCategoryID']]
-                ),
-                'knowledgeCategoryID'
-            );
+            $knowledgeCategories = $this->getKnowledgeCategories();
             $this->prepareKnowledgeCategoryFilter($knowledgeCategories);
         }
         if (isset($this->query['knowledgeCategoryIDs'])) {
@@ -469,19 +446,7 @@ class KnowledgeApiController extends AbstractApiController {
      */
     private function setKnowledgeCategoryFilter() {
         if (!$this->session->checkPermission('Garden.Settings.Manage')) {
-            $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
-            $knowledgeCategories = array_column(
-                $this->knowledgeCategoryModel->get(
-                    ['knowledgeBaseID' => $kbs['knowledgeBaseID']],
-                    ['select' => ['knowledgeCategoryID']]
-                ),
-                'knowledgeCategoryID'
-            );
-            if (empty($this->knowledgeCategories)) {
-                $filterIDs = $knowledgeCategories;
-            } else {
-                $filterIDs = array_intersect($this->knowledgeCategories, $knowledgeCategories);
-            }
+            $filterIDs = $this->filterKnowledgeBases();
             $this->sphinx->setFilter('knowledgeCategoryID', $filterIDs);
         } else {
             if (!is_null($this->knowledgeCategories)) {
@@ -731,6 +696,53 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
+     * Apply filters for knowledge queries.
+     *
+     * @param SphinxAdapter $sphinxClient
+     * @param array $query
+     *
+     * @return SphinxAdapter
+     */
+    public function applySearchFilters(SphinxClient $sphinxClient, array $query = []) {
+        $this->query = $query;
+        if ($query['knowledgeBaseID'] ?? []) {
+            $knowledgeCategoryIDs = $this->getKnowledgeCategories();
+            $this->prepareKnowledgeCategoryFilter($knowledgeCategoryIDs);
+        }
+
+        if ($query['knowledgeCategoryID'] ?? []) {
+            $this->prepareKnowledgeCategoryFilter($this->query['knowledgeCategoryIDs']);
+        }
+
+        if (!$this->session->checkPermission('Garden.Settings.Manage')) {
+            $filterIDs = $this->filterKnowledgeBases();
+            $sphinxClient->setFilter('knowledgeCategoryID', $filterIDs);
+        } else {
+            if (!is_null($this->knowledgeCategories)) {
+                $sphinxClient->setFilter('knowledgeCategoryID', $this->knowledgeCategories);
+            }
+        }
+
+        if ($this->query['locale'] ?? []) {
+            $sphinxClient->setFilterString('locale', $this->query['locale']);
+        } else {
+            $siteSection = $this->siteSectionModel->getCurrentSiteSection();
+            $sphinxClient->setFilterString('locale', $siteSection->getContentLocale());
+        }
+        if (isset($this->query['siteSectionGroup'])) {
+            $sphinxClient->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
+        }
+
+        if ($this->query['featured'] ?? false) {
+            $sphinxClient->setFilter('featured', [1]);
+            $sphinxClient->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
+        }
+        
+
+       return $sphinxClient;
+    }
+
+    /**
      * Prepare default schema array for "in" schema
      *
      * @return array
@@ -778,5 +790,71 @@ class KnowledgeApiController extends AbstractApiController {
                 'maximum' => 100,
             ],
         ];
+    }
+
+    /**
+     * Get all the knowledge-categories for query
+     *
+     * @return array
+     */
+    protected function getKnowledgeCategories(): array {
+        $knowledgeUniversalContent = $this->knowledgeUniversalSourceModel->get(
+            [
+                "targetKnowledgeBaseID" => $this->query['knowledgeBaseID'],
+            ]
+        );
+        if ($knowledgeUniversalContent) {
+            $knowledgeBaseIDs = array_column($knowledgeUniversalContent, "sourceKnowledgeBaseID");
+        }
+        $knowledgeBaseIDs[] = $this->query['knowledgeBaseID'];
+        $knowledgeCategories = array_column(
+            $this->knowledgeCategoryModel->get(
+                ['knowledgeBaseID' => $knowledgeBaseIDs],
+                ['select' => ['knowledgeCategoryID']]
+            ),
+            'knowledgeCategoryID'
+        );
+
+        return $knowledgeCategories;
+    }
+
+    /**
+     * @return array
+     */
+    private function filterKnowledgeBases(): array {
+        $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
+        $knowledgeCategories = array_column(
+            $this->knowledgeCategoryModel->get(
+                ['knowledgeBaseID' => $kbs['knowledgeBaseID']],
+                ['select' => ['knowledgeCategoryID']]
+            ),
+            'knowledgeCategoryID'
+        );
+        if (empty($this->knowledgeCategories)) {
+            $filterIDs = $knowledgeCategories;
+        } else {
+            $filterIDs = array_intersect($this->knowledgeCategories, $knowledgeCategories);
+        }
+
+        return $filterIDs;
+    }
+
+    /**
+     * @param array $articleIndexes
+     * @return array
+     */
+    protected function getStatusFilters(array $articleIndexes): array {
+        if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
+            $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
+        };
+        $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
+        $statuses = array_map(
+            function ($status) {
+                return array_search($status, self::ARTICLE_STATUSES);
+            },
+            $this->query['statuses']
+        );
+
+        return [$articleIndexes, $statuses];
     }
 }
