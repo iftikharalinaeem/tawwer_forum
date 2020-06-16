@@ -5,7 +5,6 @@
     "version": "1.0",
     "type": "addon",
     "priority": 1100,
-    "hidden": true,
     "icon": "privatediscussions.png",
     "authors": [
         {
