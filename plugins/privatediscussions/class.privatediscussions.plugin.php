@@ -260,7 +260,8 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      */
     private function stripText(string $data, DOMDocument $dom, int $wordCount): string {
         $dom->loadHTML(mb_convert_encoding("<div>{$data}</div>", "HTML-ENTITIES", "UTF-8"), LIBXML_HTML_NOIMPLIED);
-        $this->stripTextRecursive($dom->documentElement, $wordCount);
+        $limit = $wordCount;
+        $this->stripTextRecursive($dom->documentElement, $limit , $wordCount);
         $minifiedText = substr($dom->saveHTML($dom->documentElement), 5, -6);
         return $minifiedText;
     }
@@ -269,11 +270,11 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * Strip text recursively while preserving html format.
      *
      * @param mixed $element
-     * @param int $limit
+     * @param int $limit Word count counter
+     * @param int $wordCount Word Count
      * @return int Return limit used to count remaining tags.
      */
-    private function stripTextRecursive($element, int $limit): int {
-        $wordCount = $limit;
+    private function stripTextRecursive($element, int $limit, $wordCount): int {
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
@@ -284,7 +285,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
             } else {
                 for ($i = 0; $i < $element->childNodes->length; $i++) {
                     if ($limit > 0) {
-                        $limit = $this->stripTextrecursive($element->childNodes->item($i), $limit);
+                        $limit = $this->stripTextrecursive($element->childNodes->item($i), $limit, $wordCount);
                     } else {
                         $element->removeChild($element->childNodes->item($i));
                         $i--;
