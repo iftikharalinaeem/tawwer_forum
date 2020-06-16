@@ -274,7 +274,7 @@ class PrivateDiscussionsPlugin extends Gdn_Plugin {
      * @param int $wordCount Word Count
      * @return int Return limit used to count remaining tags.
      */
-    private function stripTextRecursive($element, int $limit, $wordCount): int {
+    private function stripTextRecursive($element, int $limit, int $wordCount): int {
         if ($limit > 0) {
             // Nodetype text
             if ($element->nodeType == 3) {
