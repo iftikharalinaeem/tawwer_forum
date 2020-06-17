@@ -54,6 +54,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      */
     public function testSearchByyKnowledgeBaseID() {
         $knowledgeBase = $this->createKnowledgeBase();
+        Gdn::database()->sql()->truncate('article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'unique', 'unique article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'another article', 'another one');
         self::sphinxReindex();
@@ -78,6 +79,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      */
     public function testSearchByyKnowledgeBaseIDWithName() {
         $knowledgeBase = $this->createKnowledgeBase();
+        Gdn::database()->sql()->truncate('article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'not unique', 'unique article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'not unique', 'unique article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'another article', 'another one');
@@ -99,6 +101,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      */
     public function testSearchKnowledgeBaseWithLocale() {
         $knowledgeBase = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-1']);
+        Gdn::database()->sql()->truncate('article');
         $article = $this->articleRecord(
             $knowledgeBase["rootCategoryID"],
             "Article to be translated "
