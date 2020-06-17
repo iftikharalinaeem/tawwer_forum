@@ -33,6 +33,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      * Prepare knowledge base data for tests and reindex Sphinx indexes.
      */
     public function testData() {
+        saveToConfig('Plugins.Sphinx.UseDeltas', true);
         $router = self::container()->get(\Gdn_Router::class);
         $defaultSection = new DefaultSiteSection(new MockConfig(), $router);
         $siteSectionProvider = new MockSiteSectionProvider($defaultSection);
