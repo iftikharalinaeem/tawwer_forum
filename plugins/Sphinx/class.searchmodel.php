@@ -7,8 +7,10 @@
 use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Container\Container;
 use Vanilla\Adapters\SphinxClient;
-use Vanilla\Sphinx\Search\SphinxQueryBuilder;
+use Vanilla\Sphinx\Search\SearchModelSphinxQuery;
+use Vanilla\Sphinx\Search\SphinxQueryConstants;
 use Vanilla\Sphinx\Search\SphinxRanks;
+use Vanilla\Sphinx\Search\SphinxSearchQuery;
 
 /**
  * Sphinx Search Model
@@ -238,7 +240,7 @@ class SphinxSearchModel extends \SearchModel {
         $query = '';
         $terms = [];
 
-        $queryBuilder = new SphinxQueryBuilder($sphinx);
+        $queryBuilder = new SearchModelSphinxQuery($sphinx);
         if (isset($search['search'])) {
             $queryBuilder->whereText($search['search']);
         }
@@ -277,7 +279,7 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['title'])) {
             $indexes = $this->indexes(['Discussion']);
-            $queryBuilder->whereText($search['title'], '@name');
+            $queryBuilder->whereText($search['title'], ['name']);
         }
 
         if (isset($search['users'])) {
@@ -286,7 +288,7 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['tags'])) {
             $tagIDs = array_column($search['tags'], 'TagID');
-            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxQueryBuilder::FILTER_OP_OR);
+            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxSearchQuery::FILTER_OP_OR);
         }
 
         if (isset($search['types'])) {
@@ -341,7 +343,7 @@ class SphinxSearchModel extends \SearchModel {
         $sphinx->setLimits(0, $limit, 100);
         $search = Search::cleanSearch($search);
 
-        $queryBuilder = new SphinxQueryBuilder($sphinx);
+        $queryBuilder = new SearchModelSphinxQuery($sphinx);
 
         $str = $search['search'];
         $queryBuilder->whereText($str);
@@ -354,7 +356,7 @@ class SphinxSearchModel extends \SearchModel {
         }
         if (isset($search['tags'])) {
             $tagIDs = array_column($search['tags'], 'TagID');
-            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxQueryBuilder::FILTER_OP_OR);
+            $queryBuilder->setFilter('Tags', $tagIDs, false, $search['tags-op'] ?? SphinxSearchQuery::FILTER_OP_OR);
         }
 
         $queryBuilder->setSort($search['sort'] ?? null);
@@ -398,7 +400,7 @@ class SphinxSearchModel extends \SearchModel {
 
         $search = Search::cleanSearch($search);
 
-        $queryBuilder = new SphinxQueryBuilder($sphinx);
+        $queryBuilder = new SearchModelSphinxQuery($sphinx);
         $str = $search['search'];
         $queryBuilder->whereText($str);
         $queryBuilder->setSort($search['sort'] ?? null);

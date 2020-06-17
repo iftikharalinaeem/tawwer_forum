@@ -36,8 +36,6 @@ class Search {
         });
         $doSearch = false;
 
-        $enableAllTypes = (count($search) === 1 && isset($search['search']));
-
         /// Author ///
         if (isset($search['author'])) {
             $usernames = explode(',', $search['author']);
@@ -57,9 +55,6 @@ class Search {
         }
 
         /// Category ///
-        $categoryFilter = [];
-        $archived = $search['archived'] ?? 0;
-        $followedCats = $search['followedcats'] ?? 0;
         $categoryID = $search['cat'] ?? null;
         if ('all' === $categoryID) {
             $categoryID = null;
@@ -82,59 +77,24 @@ class Search {
                 ],
         ];
 
+        $categoryID = $args['categoryID'] ?? $categoryID;
+
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
         $args = $eventManager->fireFilter('advancedSearchPlugin_beforeSearch', $args);
 
-        $categoryID = $args['categoryID'] ?? $categoryID;
-        $search['subcats'] = $args['search']['subcats'] ?? $search['subcats'];
-
-        if (!$categoryID) {
-            switch ($archived) {
-                case 1:
-                    // Include both, do nothing.
-                    break;
-                case 2:
-                    // Only archive.
-                    $categoryFilter['Archived'] = 1;
-                    break;
-                case 0:
-                default:
-                    // Not archived.
-                    $categoryFilter['Archived'] = 0;
-            }
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+        $search['cat'] = $categoryModel->getSearchCategoryIDs(
+            $categoryID,
+            $search['followedcats'] ?? null,
+            $args['search']['subcats'] ?? $search['subcats'] ?? false,
+            $search['archived'] ?? null
+        );
+        if (empty($search['cat'])) {
+            $search['cat'] = false;
         }
-        $categories = CategoryModel::getByPermission('Discussions.View', null, $categoryFilter);
-        $categories[0] = true; // allow uncategorized too.
-        $categoryIDs = array_keys($categories);
-
-        Gdn::pluginManager()->fireAs('Search')->fireEvent('AllowedCategories', ['CategoriesID' => &$categoryIDs]);
-
-        $categories = array_intersect_key($categories, array_flip($categoryIDs));
-
-        if ($followedCats) {
-            $categories = array_filter($categories, function($category) {
-                if ($category === true) {
-                    return true;
-                }
-                return $category['Followed'];
-            });
-            $categoryIDs = array_keys($categories);
-        }
-
-        if ($categoryID) {
-            touchValue('subcats', $search, 0);
-            if ($search['subcats']) {
-                $categoryID = array_column(CategoryModel::getSubtree($categoryID), 'CategoryID');
-                trace($categoryID, 'cats');
-            }
-
-            $categoryID = array_intersect((array)$categoryID, $categoryIDs);
-            $search['cat'] = empty($categoryID) ? false : $categoryID;
-        } else {
-            $search['cat'] = $categoryIDs;
-            unset($search['subcategories']);
-        }
+        unset($search['subcategories']);
 
         /// Date ///
         if (isset($search['date'])) {

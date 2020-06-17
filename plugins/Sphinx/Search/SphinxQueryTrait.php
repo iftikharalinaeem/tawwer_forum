@@ -13,19 +13,10 @@ use Vanilla\Search\SearchQuery;
 /**
  * Class for building applying a sphinx search query.
  */
-final class SphinxQueryBuilder {
-
-    const SORT_DATE = 'date';
-    const SORT_RELEVANCE = 'relevance';
-
-    const FILTER_OP_OR = 'or';
-    const FILTER_OP_AND = 'and';
-
-    /** @var SphinxClient */
-    private $sphinxClient;
+trait SphinxQueryTrait {
 
     /** @var string */
-    private $query;
+    private $query = '';
 
     /** @var string[] The search terms that were split out. */
     private $terms = [];
@@ -34,13 +25,9 @@ final class SphinxQueryBuilder {
     private $isFiltered = false;
 
     /**
-     * Constructor.
-     *
-     * @param SphinxClient $sphinxClient
+     * Apply the sphinx client.
      */
-    public function __construct(SphinxClient $sphinxClient) {
-        $this->sphinxClient = $sphinxClient;
-    }
+    abstract protected function getSphinxClient(): SphinxClient;
 
     ///
     /// Query Building.
@@ -50,19 +37,18 @@ final class SphinxQueryBuilder {
      * Apply a query where some text is matched.
      *
      * @param string $text The text to search.
-     * @param string $prefix A prefix before the search keywords. Eg. `@name`
+     * @param string[] $fieldNames A prefix before the search keywords. Eg. `name`
      *
      * @return $this
      */
-    public function whereText(string $text, string $prefix = ''): SphinxQueryBuilder {
+    public function whereText(string $text, array $fieldNames = []) {
         [$query, $terms] = self::prepareSearchText($text);
 
-        $prefix = ' ' . trim($prefix) . ' ';
-        $this->query .= $prefix . $query;
+        $fieldNames = empty($fieldNames) ? '*' : '(' . implode(",", $fieldNames) . ')';
+        $this->query = " @$fieldNames ($query)";
         $this->terms = array_merge($this->terms, $terms);
         return $this;
     }
-
 
     /**
      * Apply a sort mode the query.
@@ -72,18 +58,18 @@ final class SphinxQueryBuilder {
      *
      * @return $this
      */
-    public function setSort(?string $sort = null, ?array $forTerms = null): SphinxQueryBuilder {
+    public function setSort(?string $sort = null, ?array $forTerms = null) {
         $hasMultipleTerms = count($forTerms ?? $this->terms) > 1;
 
         if ($sort === null) {
-            $this->sphinxClient->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-            $this->sphinxClient->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
-        } elseif ($sort === self::SORT_DATE || (!$hasMultipleTerms && $sort !== self::SORT_RELEVANCE)) {
+            $this->getSphinxClient()->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
+            $this->getSphinxClient()->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
+        } elseif ($sort === SphinxQueryConstants::SORT_DATE || (!$hasMultipleTerms && $sort !== SphinxQueryConstants::SORT_RELEVANCE)) {
             // If there is just one search term then we really want to just sort by date.
-            $this->sphinxClient->setSelect('*, (dateinserted + 1) as sort');
-            $this->sphinxClient->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
+            $this->getSphinxClient()->setSelect('*, (dateinserted + 1) as sort');
+            $this->getSphinxClient()->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
         } else {
-            SphinxRanks::applyCustomRankFunction($this->sphinxClient);
+            SphinxRanks::applyCustomRankFunction($this->getSphinxClient());
         }
 
         return $this;
@@ -99,13 +85,18 @@ final class SphinxQueryBuilder {
      *
      * @return $this
      */
-    public function setFilter(string $attribute, array $values, bool $exclude = false, string $filterOp = self::FILTER_OP_OR): SphinxQueryBuilder {
-        if ($filterOp === self::FILTER_OP_AND) {
+    public function setFilter(
+        string $attribute,
+        array $values,
+        bool $exclude = false,
+        string $filterOp = SphinxSearchQuery::FILTER_OP_OR
+    ) {
+        if ($filterOp === SphinxSearchQuery::FILTER_OP_AND) {
             foreach ($values as $value) {
-                $this->sphinxClient->setFilter($attribute, $value);
+                $this->getSphinxClient()->setFilter($attribute, $value);
             }
         } else {
-            $this->sphinxClient->setFilter($attribute, $values, $exclude);
+            $this->getSphinxClient()->setFilter($attribute, $values, $exclude);
         }
         if (count($values) > 0) {
             $this->isFiltered = true;
@@ -122,8 +113,8 @@ final class SphinxQueryBuilder {
      *
      * @return $this
      */
-    public function setGroupBy(string $attribute, string $func, string $groupSort = "@group desc"): SphinxQueryBuilder {
-        $this->sphinxClient->setGroupBy($attribute, $func, $groupSort);
+    public function setGroupBy(string $attribute, string $func, string $groupSort = "@group desc") {
+        $this->getSphinxClient()->setGroupBy($attribute, $func, $groupSort);
         return $this;
     }
 
@@ -137,8 +128,8 @@ final class SphinxQueryBuilder {
      *
      * @return $this
      */
-    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false): SphinxQueryBuilder {
-        $this->sphinxClient->setFilterRange($attribute, $min, $max, $exclude);
+    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
+        $this->getSphinxClient()->setFilterRange($attribute, $min, $max, $exclude);
         $this->isFiltered = true;
         return $this;
     }
@@ -148,10 +139,10 @@ final class SphinxQueryBuilder {
      *
      * @param array $weights Associative array of key value pairs: (string)indexName => (int)weight
      *
-     * @return SphinxQueryBuilder
+     * @return SphinxQueryTrait
      */
-    public function setIndexWeights(array $weights): SphinxQueryBuilder {
-        $this->sphinxClient->setIndexWeights($weights);
+    public function setIndexWeights(array $weights) {
+        $this->getSphinxClient()->setIndexWeights($weights);
         return $this;
     }
 
@@ -164,8 +155,8 @@ final class SphinxQueryBuilder {
      *
      * @return $this
      */
-    public function setRankingMode(int $ranker, string $rankExpr = ""): SphinxQueryBuilder {
-        $this->sphinxClient->setRankingMode($ranker, $rankExpr);
+    public function setRankingMode(int $ranker, string $rankExpr = "") {
+        $this->getSphinxClient()->setRankingMode($ranker, $rankExpr);
         return $this;
     }
 
@@ -193,17 +184,6 @@ final class SphinxQueryBuilder {
     ///
     /// Static Utilities.
     ///
-
-    /**
-     * Constructor for use with method chaining.
-     *
-     * @param SphinxClient $sphinxClient
-     *
-     * @return SphinxQueryBuilder
-     */
-    public static function fromClient(SphinxClient $sphinxClient): SphinxQueryBuilder {
-        return new SphinxQueryBuilder($sphinxClient);
-    }
 
     /**
      * Prepare string values for sphinx query builder.
