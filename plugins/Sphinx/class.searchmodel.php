@@ -4,6 +4,7 @@
  * @license Proprietary
  */
 
+use Garden\EventManager;
 use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Container\Container;
 use Vanilla\Adapters\SphinxClient;
@@ -45,6 +46,8 @@ class SphinxSearchModel extends \SearchModel {
     /**
      * Constructor
      *
+     * @param SearchRecordTypeProviderInterface $searchRecordTypeProvider
+     * @param Container $container
      */
     public function __construct(SearchRecordTypeProviderInterface $searchRecordTypeProvider, Container $container) {
         // Bit of a kludge, but we need these functions even if advanced search is disabled.
@@ -339,6 +342,10 @@ class SphinxSearchModel extends \SearchModel {
         if ($search['group']) {
             $sphinx->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
         }
+
+        /** @var EventManager $eventManager */
+        $eventManager = Gdn::getContainer()->get(EventManager::class);
+        $sphinx = $eventManager->fireFilter('searchModel_setKnowledgeFilters', $sphinx, $search);
 
         $results['Search'] = $search;
 

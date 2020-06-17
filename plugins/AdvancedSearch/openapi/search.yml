@@ -18,6 +18,7 @@ paths:
         schema:
           items:
             enum:
+            - article
             - discussion
             - comment
             - group
@@ -31,6 +32,7 @@ paths:
         schema:
           items:
             enum:
+            - article
             - discussion
             - comment
             - question
@@ -79,9 +81,46 @@ paths:
           default: false
           type: boolean
       - description: |
+          Filter the records by KnowledgeBase ID
+        in: query
+        name: knowledgeBaseID
+        schema:
+          type: integer
+        x-search-scope: true
+      - description: |
+          Filter the records by KnowledgeCategory ID
+        in: query
+        name: knowledgeCategoryIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        x-search-scope: true
+      - description: |
           Filter the records by matching part of their name.
         in: query
         name: name
+        schema:
+          type: string
+        x-search-filter: true
+      - description: |
+          Filter the records by their featured status.
+        in: query
+        name: featured
+        schema:
+          type: boolean
+        x-search-filter: true
+      - description: |
+          Filter the records by their locale.
+        in: query
+        name: locale
+        schema:
+          type: string
+        x-search-filter: true
+      - description: |
+          Filter the records by their site-section-group.
+        in: query
+        name: siteSiteSectionGroup
         schema:
           type: string
         x-search-filter: true
