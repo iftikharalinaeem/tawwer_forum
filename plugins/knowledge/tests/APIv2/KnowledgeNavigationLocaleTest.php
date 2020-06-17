@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Exception;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
@@ -136,7 +137,7 @@ class KnowledgeNavigationLocaleTest extends AbstractAPIv2Test {
      * @throws Exception If an error occurred while performing the necessary database queries.
      */
     private function resetNavigation() {
-        $this->articleModel->delete(["articleID >" => 0]);
+        Gdn::database()->sql()->truncate('article');
         $this->articles = [];
 
         $this->knowledgeCategoryModel->delete(["knowledgeCategoryID >" => 0]);

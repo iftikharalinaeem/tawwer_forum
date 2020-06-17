@@ -8,8 +8,10 @@
 namespace Vanilla\Knowledge;
 
 use Garden\Container\Reference;
+use Vanilla\Adapters\SphinxClient;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
@@ -216,6 +218,22 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $types = $schema->getField('properties.type.enum');
         $types[] = 'article';
         $schema->setField('properties.type.enum', $types);
+    }
+
+    /**
+     * Set filters for search endpoint.
+     *
+     * @param SphinxClient $sphinx
+     * @param array $args
+     */
+    public function searchModel_setKnowledgeFilters_handler(SphinxClient $sphinx, array $args) {
+        if ($args['knowledgebaseid'] ?? []) {
+            $args['knowledgeBaseID'] = $args['knowledgebaseid'];
+        }
+        /** @var KnowledgeApiController $knowledgeApiController */
+        $knowledgeApiController = \Gdn::getContainer()->get(KnowledgeApiController::class);
+        $sphinx = $knowledgeApiController->applySearchFilters($sphinx, $args);
+        return $sphinx;
     }
 
     /**

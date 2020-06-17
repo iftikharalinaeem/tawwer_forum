@@ -13,19 +13,18 @@ use Gdn_Session;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Garden\Web\Exception\NotFoundException;
-use Garden\Schema\Validation;
+use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Permissions;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Site\TranslationModel;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
-use PermissionModel;
 use Vanilla\Exception\PermissionException;
 use UserModel;
 
 /**
  * A model for managing knowledge bases.
  */
-class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
+class KnowledgeBaseModel extends FullRecordCacheModel {
     // Record type for knowledge categories.
     const RECORD_TYPE = "knowledgeBase";
     const RECORD_ID_FIELD = "knowledgeBaseID";
@@ -84,14 +83,16 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      * @param SiteSectionModel $siteSectionModel
      * @param TranslationModel $translationModel
      * @param UserModel $userModel
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         Gdn_Session $session,
         SiteSectionModel $siteSectionModel,
         TranslationModel $translationModel,
-        UserModel $userModel
+        UserModel $userModel,
+        \Gdn_Cache $cache
     ) {
-        parent::__construct("knowledgeBase");
+        parent::__construct("knowledgeBase", $cache);
         $this->session = $session;
         $this->siteSectionModel = $siteSectionModel;
         $this->translation = $translationModel->getContentTranslationProvider();
@@ -197,7 +198,7 @@ class KnowledgeBaseModel extends \Vanilla\Models\PipelineModel {
      */
     public function getAllowedRoles(string $junctionTable, int $foreignID, string $permission): array {
         // Generic part of query
-        $sql = $this->sql();
+        $sql = $this->createSql();
         $sql->from('Permission p')
             ->select('PermissionID', 'COUNT')
             ->select('r.RoleID')
@@ -306,14 +307,15 @@ MESSAGE
      * @return int
      */
     public function selectActiveKBCount(): int {
-        $result = $this->sql()
-            ->select('DISTINCT knowledgeBaseID', 'COUNT', 'count')
-            ->from('knowledgeBase')
-            ->where('status', self::STATUS_PUBLISHED)
-            ->get()->nextRow(DATASET_TYPE_ARRAY)
-        ;
-
-        return $result['count'];
+        return $this->modelCache->getCachedOrHydrate(['totalCount' => true], function () {
+            $result = $this->createSql()
+                ->select('DISTINCT knowledgeBaseID', 'COUNT', 'count')
+                ->from('knowledgeBase')
+                ->where('status', self::STATUS_PUBLISHED)
+                ->get()->firstRow(DATASET_TYPE_ARRAY)
+            ;
+            return $result['count'];
+        });
     }
 
     /**

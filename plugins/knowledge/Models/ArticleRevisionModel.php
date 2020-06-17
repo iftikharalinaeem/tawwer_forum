@@ -6,7 +6,7 @@
 
 namespace Vanilla\Knowledge\Models;
 
-use Garden\Web\Exception\ClientException;
+use Exception;
 use Gdn_Session;
 use Vanilla\Database\Operation;
 
@@ -46,7 +46,7 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
      * Update the published revision on an article.
      *
      * @param int $articleRevisionID
-     * @throws \Exception If a general database error is encountered while updating the rows.
+     * @throws Exception If a general database error is encountered while updating the rows.
      * @throws \Garden\Schema\ValidationException If row field updates fail validating against the schema.
      * @throws \Vanilla\Exception\Database\NoResultsException If the revision's article could not be found.
      */
@@ -99,5 +99,19 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
             self::STATUS_TRANSLATION_OUT_TO_DATE,
             self::STATUS_TRANSLATION_UP_TO_DATE
         ];
+    }
+
+    /**
+     * Deleting an article revision is never permitted.
+     * Use the PATCH /articles/id to change the
+     * published status of the article.
+     *
+     * @param array $where
+     * @param array $options
+     * @return bool
+     * @throws Exception Deleting article is not permitted.
+     */
+    public function delete(array $where = [], $options = []): bool {
+        throw new Exception('Delete article action is not permitted');
     }
 }
