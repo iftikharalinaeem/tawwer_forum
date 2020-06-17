@@ -737,9 +737,8 @@ class KnowledgeApiController extends AbstractApiController {
             $sphinxClient->setFilter('featured', [1]);
             $sphinxClient->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
         }
-        
 
-       return $sphinxClient;
+        return $sphinxClient;
     }
 
     /**
@@ -840,6 +839,8 @@ class KnowledgeApiController extends AbstractApiController {
     }
 
     /**
+     * Get the article status Filters.
+     *
      * @param array $articleIndexes
      * @return array
      */
