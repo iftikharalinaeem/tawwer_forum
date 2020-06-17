@@ -15,6 +15,7 @@ use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
+use Vanilla\Knowledge\Models\SearchRecordTypeArticleDeleted;
 use Vanilla\THeme\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\Robots;
@@ -101,6 +102,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall("addVariableProvider", [new Reference(KnowledgeVariablesProvider::class)])
             ->rule(SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypeArticle()])
+            ->addCall('setType', [new SearchRecordTypeArticleDeleted()])
             ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
             ->addCall('add', [new Reference(\Vanilla\Site\Application::class, ['knowledge-base', ['kb']])])
 
@@ -230,6 +232,10 @@ class KnowledgePlugin extends \Gdn_Plugin {
         if ($args['knowledgebaseid'] ?? []) {
             $args['knowledgeBaseID'] = $args['knowledgebaseid'];
         }
+        if ($args['sitesectiongroup'] ?? []) {
+            $args['siteSectionGroup'] = $args['sitesectiongroup'];
+        }
+
         /** @var KnowledgeApiController $knowledgeApiController */
         $knowledgeApiController = \Gdn::getContainer()->get(KnowledgeApiController::class);
         $sphinx = $knowledgeApiController->applySearchFilters($sphinx, $args);
