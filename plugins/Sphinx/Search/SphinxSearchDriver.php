@@ -9,6 +9,7 @@ namespace Vanilla\Sphinx\Search;
 
 use Vanilla\Adapters\SphinxClient;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\SearchOptions;
@@ -61,7 +62,8 @@ class SphinxSearchDriver extends AbstractSearchDriver {
 
         $sphinxClient->setLimits($options->getOffset(), $options->getLimit(), self::MAX_RESULTS);
 
-        $indexes = $this->getIndexNames();
+        $indexes = $this->getIndexNames($query);
+
         $search = $sphinxClient->query($query->getQuery(), implode(' ', $indexes));
         if (!is_array($search)) {
             $error = $sphinxClient->getLastError();
@@ -84,18 +86,21 @@ class SphinxSearchDriver extends AbstractSearchDriver {
     /**
      * Get index names.
      *
-     * @param string[]|null $types
+     * @param SphinxSearchQuery $query
      *
      * @return string[]
      */
-    public function getIndexNames(?array $types = null): array {
+    public function getIndexNames(SphinxSearchQuery $query): array {
         $prefix = str_replace(['-'], '_', c('Database.Name')) . '_';
-
         $result = [];
+
+        $types = $query->getQueryParameter('recordTypes', null);
+
+        /** @var SearchRecordTypeInterface $recordType */
         foreach ($this->sphinxDTypeRecordProvider->getAll() as $recordType) {
             $indexName = $recordType->getIndexName();
 
-            if ($types !== null && !in_array($indexName, $types)) {
+            if ($types !== null && !in_array($recordType->getApiTypeKey(), $types)) {
                 continue;
             }
 
