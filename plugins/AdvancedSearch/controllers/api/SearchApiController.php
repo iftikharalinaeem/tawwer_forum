@@ -16,6 +16,8 @@ use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchService;
 use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
@@ -50,19 +52,20 @@ class SearchApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var SearchService */
+    private $searchService;
+
     /**
      * SearchApiController constructor.
      *
-     * @param CommentModel $commentModel
-     * @param DiscussionModel $discussionModel
-     * @param SearchModel $searchModel
-     * @param UserModel $userModel
+     * @inheritdoc
      */
     public function __construct(
         CommentModel $commentModel,
         DiscussionModel $discussionModel,
         SearchModel $searchModel,
         UserModel $userModel,
+        SearchService $searchService,
         SearchRecordTypeProviderInterface $searchRecordTypeProvider,
         BreadcrumbModel $breadcrumbModel
     ) {
@@ -70,6 +73,7 @@ class SearchApiController extends AbstractApiController {
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
         $this->userModel = $userModel;
+        $this->searchService = $searchService;
         $this->searchRecordTypeProvider =$searchRecordTypeProvider;
         $this->breadcrumbModel = $breadcrumbModel;
     }
@@ -238,6 +242,8 @@ class SearchApiController extends AbstractApiController {
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
 
+        $serviceSchema = $this->searchService->buildQuerySchema();
+
         $query = $in->validate($query);
         if (isset($query['dateInserted'])) {
             $query['dateFilters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
@@ -245,24 +251,27 @@ class SearchApiController extends AbstractApiController {
         $search = $this->normalizeSearch($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
 
-        $data = [];
-        if ($this->searchModel instanceof SphinxSearchModel) {
-            $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
-            $searchResults = $data['SearchResults'] ?? [];
-            if (!$searchResults) {
-                $sphinx = $this->searchModel->sphinxClient();
-                if ($sphinx->getLastError()) {
-                    throw new ServerException($sphinx->getLastError(), 500);
-                }
-            }
-        } else {
-            $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
-            $data['RecordCount'] = count($searchResults);
-        }
+        $searchResults = $this->searchService->search($query, new SearchOptions($offset, $limit));
 
-        $searchResults = $this->preNormalizeOutputs($searchResults);
+//
+//        $data = [];
+//        if ($this->searchModel instanceof SphinxSearchModel) {
+//            $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
+//            $searchResults = $data['SearchResults'] ?? [];
+//            if (!$searchResults) {
+//                $sphinx = $this->searchModel->sphinxClient();
+//                if ($sphinx->getLastError()) {
+//                    throw new ServerException($sphinx->getLastError(), 500);
+//                }
+//            }
+//        } else {
+//            $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
+//            $data['RecordCount'] = count($searchResults);
+//        }
+//
+//        $searchResults = $this->preNormalizeOutputs($searchResults);
 
         // Expand associated rows.
         $this->userModel->expandUsers(
@@ -270,21 +279,20 @@ class SearchApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
+//        $searchResults = array_map(function ($record) use ($query) {
+//            return $this->normalizeOutput(
+//                $record,
+//                $query['expandBody'],
+//                $this->isExpandField('breadcrumbs', $query['expand'])
+//            );
+//        }, $searchResults);
 
-        $searchResults = array_map(function ($record) use ($query) {
-            return $this->normalizeOutput(
-                $record,
-                $query['expandBody'],
-                $this->isExpandField('breadcrumbs', $query['expand'])
-            );
-        }, $searchResults);
+//        $result = $out->validate($searchResults);
 
-        $result = $out->validate($searchResults);
-
-        $recordCount = $data['RecordCount'] ?? 0;
+        $recordCount = $searchResults->getResultCount();
 
         return new Data(
-            $result,
+            $searchResults,
             [
                 'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
             ]
