@@ -13,7 +13,6 @@ use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\SearchOptions;
-use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResults;
 
 /**
