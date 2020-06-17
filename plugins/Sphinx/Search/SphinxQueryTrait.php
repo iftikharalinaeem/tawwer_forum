@@ -108,12 +108,12 @@ trait SphinxQueryTrait {
      * Set groupBy and groupFunc attributes
      *
      * @param string $attribute
-     * @param string $func
+     * @param int $func
      * @param string $groupSort
      *
      * @return $this
      */
-    public function setGroupBy(string $attribute, string $func, string $groupSort = "@group desc") {
+    public function setGroupBy(string $attribute, int $func, string $groupSort = "@group desc") {
         $this->getSphinxClient()->setGroupBy($attribute, $func, $groupSort);
         return $this;
     }

@@ -60,6 +60,7 @@ class SphinxSearchDriver extends AbstractSearchDriver {
         $query = new SphinxSearchQuery($sphinxClient, $this->getSearchTypes(), $queryData);
 
         $sphinxClient->setLimits($options->getOffset(), $options->getLimit(), self::MAX_RESULTS);
+        $query->setSort(SphinxQueryConstants::SORT_RELEVANCE);
 
         $indexes = $this->getIndexNames($query);
 

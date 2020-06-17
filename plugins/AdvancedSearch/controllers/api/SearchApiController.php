@@ -143,6 +143,7 @@ class SearchApiController extends AbstractApiController {
         $in = $this
             ->searchService
             ->buildQuerySchema()
+            ->merge($this->getCommonIndexSchema())
             ->addValidator('', [$this, 'searchScopeValidator'])
         ;
 
@@ -257,22 +258,8 @@ class SearchApiController extends AbstractApiController {
                     'description' => 'Tags search condition.',
                     'enum' => ['and', 'or'],
                 ],
-                'page:i?' => [
-                    'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                    'default' => 1,
-                    'minimum' => 1,
-                ],
-                'limit:i?' => [
-                    'description' => 'Desired number of items per page.',
-                    'default' => self::LIMIT_DEFAULT,
-                    'minimum' => 1,
-                    'maximum' => self::LIMIT_MAXIMUM,
-                ],
-                'expandBody:b?' => [
-                    'default' => true,
-                ],
-                'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
             ], ['SearchIndex', 'in'])
+            ->merge($this->getCommonIndexSchema())
             ->addValidator('', [$this, 'searchScopeValidator'])
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
@@ -327,6 +314,31 @@ class SearchApiController extends AbstractApiController {
                 'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
             ]
         );
+    }
+
+    /**
+     * Get common schema for the search indexes.
+     *
+     * @return Schema
+     */
+    private function getCommonIndexSchema(): Schema {
+        return Schema::parse([
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => self::LIMIT_DEFAULT,
+                'minimum' => 1,
+                'maximum' => self::LIMIT_MAXIMUM,
+            ],
+            'expandBody:b?' => [
+                'default' => true,
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
+        ]);
     }
 
     /**
