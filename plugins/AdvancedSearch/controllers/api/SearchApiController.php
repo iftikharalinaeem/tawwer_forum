@@ -350,7 +350,8 @@ class SearchApiController extends AbstractApiController {
             'insertUserIDs' => 'users',
             'tags' => 'tags',
             'tagOperator' => 'tags-op',
-            'knowledgeBaseID' => 'knowledgebaseid'
+            'knowledgeBaseID' => 'knowledgebaseid',
+            'locale' => 'locale'
         ];
         $recordTypes = $this->searchRecordTypeProvider->getAll();
 
