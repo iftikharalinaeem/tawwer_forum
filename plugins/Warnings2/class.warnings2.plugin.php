@@ -1205,6 +1205,11 @@ class Warnings2Plugin extends Gdn_Plugin {
         $body = json_encode($data, JSON_UNESCAPED_UNICODE);
         $form->setValue('Body', $body);
         $form->setValue('Format', 'Rich');
+
+        //if "ForceWysiwyg" is enabled, prevent Wysiwyg from being forced just for this form.
+        if (class_exists(EditorPlugin::class) && c('Garden.InputFormatter') == 'Wysiwyg' && (bool)c('Plugins.editor.ForceWysiwyg')) {
+            Gdn::config()->saveToConfig('Plugins.editor.ForceWysiwyg', false, false);
+        }
     }
 
     /**
