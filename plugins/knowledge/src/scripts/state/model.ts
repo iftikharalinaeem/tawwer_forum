@@ -27,6 +27,7 @@ import { IRouteState } from "@knowledge/routes/RouteReducer";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { DeepPartial, Reducer } from "redux";
 import { IServerState } from "@knowledge/server/serverReducer";
+import { IUnifySearchPageState } from "@knowledge/modules/search/unifySearchPageReducer";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
@@ -49,6 +50,7 @@ export interface IKbState {
     categoriesPage: ICategoriesPageState;
     locationPicker: ILocationPickerState;
     searchPage: ISearchPageState;
+    unifySearchPage: IUnifySearchPageState;
     navigation: INavigationStoreState;
     route: IRouteState;
     knowledgeBases: IKnowledgeBasesState;

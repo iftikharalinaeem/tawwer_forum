@@ -142,7 +142,9 @@ function useSearchContextValueSync() {
     const extraValues = getQueryValuesForDomain(form.domain);
     const { location } = useHistory();
     const queryString = location.search;
+    console.log(queryString);
     const initialForm = qs.parse(queryString.replace(/^\?/, ""));
+    console.log(initialForm);
 
     if (initialForm.knowledgeBaseID && !form.kb) {
         form.kb = { label: "", value: initialForm.knowledgeBaseID };
@@ -151,6 +153,7 @@ function useSearchContextValueSync() {
     if (extraValues.knowledgeBaseID || form.kb) {
         extraValues.siteSectionGroup = undefined;
     }
+    console.log(extraValues);
 
     useEffect(() => {
         updateForm(extraValues);
