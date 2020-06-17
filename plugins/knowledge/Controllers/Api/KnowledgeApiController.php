@@ -725,10 +725,8 @@ class KnowledgeApiController extends AbstractApiController {
 
         if ($this->query['locale'] ?? []) {
             $sphinxClient->setFilterString('locale', $this->query['locale']);
-        } else {
-            $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-            $sphinxClient->setFilterString('locale', $siteSection->getContentLocale());
         }
+
         if (isset($this->query['siteSectionGroup'])) {
             $sphinxClient->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
