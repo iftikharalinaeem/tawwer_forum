@@ -26,8 +26,6 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
     /** @var string The resource route. */
     protected $kbArticlesUrl = "/articles";
 
-    /** @var array $targetKBs prepared for tests */
-    protected static $knowledgeBases;
 
     /** @var array addons */
     protected static $addons = ['vanilla', 'translationsapi', 'sphinx', 'knowledge', 'advancedsearch'];
@@ -42,7 +40,6 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
         self::container()
             ->setInstance(SiteSectionProviderInterface::class, $siteSectionProvider);
 
-        $this->prepareData();
         self::sphinxReindex();
         if (!self::$sphinxReindexed) {
             $this->fail('Can\'t reindex Sphinx indexes!'."\n".end(self::$dockerResponse));
@@ -51,18 +48,18 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
     }
 
     /**
-     * Search with an id of an knowledge-base that has no content.
-     * Only Universal content should appear.
+     * Search with an id of an knowledge-base
      *
      * @depends testData
      */
     public function testSearchByyKnowledgeBaseID() {
-        $this->articleRecord(self::$knowledgeBases[0]['rootCategoryID'], 'unqiue', 'unique article');
-        $this->articleRecord(self::$knowledgeBases[0]['rootCategoryID'], 'another article', 'another one');
+        $knowledgeBase = $this->createKnowledgeBase();
+        $this->articleRecord($knowledgeBase['rootCategoryID'], 'unique', 'unique article');
+        $this->articleRecord($knowledgeBase['rootCategoryID'], 'another article', 'another one');
         self::sphinxReindex();
         $params = [
             'query' => 'unique',
-            'knowledgeBaseID' => self::$knowledgeBases[0]['knowledgeBaseID']
+            'knowledgeBaseID' => $knowledgeBase['knowledgeBaseID']
         ];
         $response = $this->api()->get('/search?', $params);
         $this->assertEquals(200, $response->getStatusCode());
@@ -70,24 +67,24 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
         $results = $response->getBody();
 
         $this->assertEquals(1, count($results));
-        $this->assertEquals('unqiue', $results[0]['name']);
+        $this->assertEquals('unique', $results[0]['name']);
     }
 
 
     /**
-     * Search with an id of an knowledge-base that has no content.
-     * Only Universal content should appear.
+     * Search with an name of an article.
      *
      * @depends testData
      */
     public function testSearchByyKnowledgeBaseIDWithName() {
-        $this->articleRecord(self::$knowledgeBases[0]['rootCategoryID'], 'not unique', 'unique article');
-        $this->articleRecord(self::$knowledgeBases[0]['rootCategoryID'], 'not unique', 'unique article');
-        $this->articleRecord(self::$knowledgeBases[0]['rootCategoryID'], 'another article', 'another one');
+        $knowledgeBase = $this->createKnowledgeBase();
+        $this->articleRecord($knowledgeBase['rootCategoryID'], 'not unique', 'unique article');
+        $this->articleRecord($knowledgeBase['rootCategoryID'], 'not unique', 'unique article');
+        $this->articleRecord($knowledgeBase['rootCategoryID'], 'another article', 'another one');
         self::sphinxReindex();
         $params = [
             'name' => 'not unique',
-            'knowledgeBaseID' => self::$knowledgeBases[0]['knowledgeBaseID']
+            'knowledgeBaseID' => $knowledgeBase['knowledgeBaseID']
         ];
         $response = $this->api()->get('/search?', $params);
         $this->assertEquals(200, $response->getStatusCode());
@@ -95,6 +92,48 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
         $results = $response->getBody();
 
         $this->assertEquals(2, count($results));
+    }
+
+    /**
+     * Search with a specific locale.
+     */
+    public function testSearchKnowledgeBaseWithLocale() {
+        $knowledgeBase = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-1']);
+        $article = $this->articleRecord(
+            $knowledgeBase["rootCategoryID"],
+            "Article to be translated "
+        );
+        $article2 = $this->articleRecord(
+            $knowledgeBase["rootCategoryID"],
+            "Article not translated "
+        );
+        $article3 = $this->articleRecord(
+            $knowledgeBase["rootCategoryID"],
+            "Article not translated "
+        );
+
+        $record = [
+            'name' => 'Article to be translated in fr',
+            'body' => json_encode([["insert" => "Hello World"]]),
+            'format' => 'rich',
+            'locale' => 'fr',
+            'knowledgeCategoryID' =>  $knowledgeBase["rootCategoryID"],
+        ];
+
+        $this->api()->patch($this->kbArticlesUrl . '/' . $article['articleID'], $record);
+        self::sphinxReindex();
+
+        $params = [
+            'query' => 'Article',
+            'knowledgeBaseID' => $knowledgeBase['knowledgeBaseID'],
+            'locale' => 'fr',
+        ];
+        $response = $this->api()->get('/search?', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(1, count($results));
     }
 
 
@@ -116,15 +155,5 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
             "format" => "rich",
         ];
         return $this->createArticle($params);
-    }
-
-    /**
-     * Prepare some knowledgeBases for test.
-     */
-    protected function prepareData() {
-        for ($i = 0; $i < 4; $i++) {
-            $knowledgeBase = $this->createKnowledgeBase();
-            self::$knowledgeBases[] = $knowledgeBase;
-        }
     }
 }
