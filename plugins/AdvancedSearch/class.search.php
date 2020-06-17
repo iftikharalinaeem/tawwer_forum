@@ -135,6 +135,8 @@ class Search {
             $search['cat'] = $categoryIDs;
             unset($search['subcategories']);
         }
+        // Always add category 0 to surface KB articles.
+        $search['cat'][] = '0';
 
         /// Date ///
         if (isset($search['date'])) {
