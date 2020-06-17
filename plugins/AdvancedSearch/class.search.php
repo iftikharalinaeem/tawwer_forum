@@ -137,9 +137,7 @@ class Search {
         }
 
         // Always add category 0 to surface KB articles.
-        if (!in_array('0', $search['cat'])) {
             $search['cat'][] = '0';
-        }
 
         /// Date ///
         if (isset($search['date'])) {
