@@ -474,7 +474,7 @@ class SearchApiController extends AbstractApiController {
 
         $includeFirstImage = $expandParams['extractImage'] ?? false;
         if ($includeFirstImage && isset($searchRecord['Summary'])) {
-            $images = Gdn::formatService()->parseImageUrls($searchRecord['Summary'],  $searchRecord['Format']);
+            $images = Gdn::formatService()->parseImageUrls($searchRecord['Summary'], $searchRecord['Format']);
 
             if ($images && count($images) >= 1) {
                 $schemaRecord['imageUrl'] = $images[0];
