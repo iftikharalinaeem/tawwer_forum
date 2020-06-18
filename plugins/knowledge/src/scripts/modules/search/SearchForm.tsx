@@ -78,7 +78,6 @@ function SearchForm(props: IProps) {
                 <QueryString value={form} defaults={queryParamDefaults} />
                 <PanelLayout
                     className="hasLargePadding"
-                    leftTop={isFullWidth && <PanelEmptyColumn />}
                     middleTop={
                         <>
                             <PanelWidget>

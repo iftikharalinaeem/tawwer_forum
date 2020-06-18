@@ -66,7 +66,7 @@ export function SearchFormFilters(props: IProps) {
                 accessibleTitle={t("Search in:")}
                 groupName="advancedSearchDomain"
                 setData={(domain: SearchDomain) => updateForm({ domain })}
-                activeTab={form.domain || SearchDomain.EVERYWHERE}
+                activeItem={form.domain || SearchDomain.EVERYWHERE}
                 childClass="advancedSearchDomain-tab"
             >
                 <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />
