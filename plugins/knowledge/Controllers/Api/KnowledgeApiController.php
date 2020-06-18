@@ -724,25 +724,22 @@ class KnowledgeApiController extends AbstractApiController {
             }
         }
 
-        if (isset($this->query['statuses'])) {
+        if ($this->query['statuses'] ?? []) {
             [$articleIndexes, $statuses] = $this->getStatusFilters();
             $sphinxClient->setFilter('status', $statuses);
-        } else {
-            $sphinxClient->setFilter('status', [array_search(ArticleModel::STATUS_PUBLISHED, self::ARTICLE_STATUSES)]);
         }
-
-
+        
         if ($this->query['locale'] ?? []) {
             $sphinxClient->setFilterString('locale', $this->query['locale']);
         }
 
-        if (isset($this->query['siteSectionGroup'])) {
+        if ($this->query['siteSectionGroup'] ?? []) {
             $sphinxClient->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
 
         if ($this->query['featured'] ?? false) {
             $sphinxClient->setFilter('featured', [1]);
-           // $sphinxClient->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
+            $sphinxClient->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
         }
 
         return $sphinxClient;
