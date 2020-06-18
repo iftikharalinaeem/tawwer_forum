@@ -19,6 +19,7 @@ import classNames from "classnames";
 import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
 import { RadioInputsAsButtonGroup } from "@library/forms/radioAsButtons/RadioInputsAsButtonGroup";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
+import { buttonTabClasses } from "@library/forms/buttonTabs/buttonTabStyles";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -71,10 +72,11 @@ export function EventDetails(props: IProps) {
             />
             <EventPermission event={event} permission={EventPermissionName.ATTEND}>
                 <RadioInputsAsButtonGroup
-                    activeItem={(props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP).toString()}
+                    activeItem={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
                     accessibleTitle={t("Are you going?")}
                     setData={props.onChange}
                     className={classes.attendanceSelector}
+                    classes={buttonTabClasses()}
                 >
                     <>
                         <RadioInputAsButton
