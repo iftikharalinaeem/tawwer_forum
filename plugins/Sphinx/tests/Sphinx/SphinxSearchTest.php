@@ -87,7 +87,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 
         /** @var SearchApiController $searchAPIController */
         $searchAPIController = static::container()->get('SearchApiController');
-        self::$searchResultSchema = $searchAPIController->fullSchema();
 
         $session->end();
     }
@@ -106,9 +105,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         $results = $response->getBody();
 
         $this->assertEquals(1, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
         $this->assertRowsEqual(['recordType' => 'discussion'], $results[0]);
     }
 
@@ -126,9 +122,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         $results = $response->getBody();
 
         $this->assertEquals(1, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
         $this->assertRowsEqual(['recordType' => 'comment'], $results[0]);
     }
 
@@ -147,9 +140,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 
         // Should return 2 both: discussion and comment for it
         $this->assertEquals(2, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
     }
 
     /**
@@ -185,9 +175,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         // Correct value is 2.
         // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
     }
 
     /**
@@ -224,9 +211,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         // Correct value is 2.
         // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
     }
 
     /**
@@ -245,9 +229,5 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         // Correct value is 2.
         // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
-        foreach ($results as $result) {
-            self::$searchResultSchema->validate($result);
-        }
     }
-
 }
