@@ -193,6 +193,8 @@ paths:
             enum:
             - insertUser
             - breadcrumbs
+            - excerpt
+            - extractImage
             type: string
           type: array
         style: form
@@ -219,6 +221,9 @@ components:
           description: The content of the record.
           minLength: 1
           nullable: true
+          type: string
+        excerpt:
+          description: An excerpt of the record.
           type: string
         categoryID:
           description: The category containing the record.
@@ -278,6 +283,9 @@ components:
           description: The user that updated the record.
           nullable: true
           type: integer
+        imageUrl:
+          description: The url of the first image in the record.
+          type: string
         breadcrumbs:
           description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
           items:
