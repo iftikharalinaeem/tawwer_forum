@@ -14,7 +14,6 @@ import Checkbox from "@library/forms/Checkbox";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import Heading from "@library/layout/Heading";
-import RadioTabs from "@library/forms/radioTabs/RadioTabs";
 import MultiUserInput from "@library/features/users/MultiUserInput";
 import Permission from "@library/features/users/Permission";
 import * as React from "react";
@@ -23,7 +22,6 @@ import { buttonClasses } from "@library/forms/buttonStyles";
 import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import DateRange from "@library/forms/DateRange";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
-import RadioTab from "@library/forms/radioTabs/RadioTab";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
@@ -62,15 +60,15 @@ export function SearchFormFilters(props: IProps) {
                     title={t("Filter Results")}
                 />
             )}
-            <RadioTabs
-                accessibleTitle={t("Search in:")}
-                groupName="advancedSearchDomain"
-                setData={(domain: SearchDomain) => updateForm({ domain })}
-                activeItem={form.domain || SearchDomain.EVERYWHERE}
-            >
-                <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />
-                <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />
-            </RadioTabs>
+            {/*<RadioTabs*/}
+            {/*    accessibleTitle={t("Search in:")}*/}
+            {/*    groupName="advancedSearchDomain"*/}
+            {/*    setData={(domain: SearchDomain) => updateForm({ domain })}*/}
+            {/*    activeItem={form.domain || SearchDomain.EVERYWHERE}*/}
+            {/*>*/}
+            {/*    <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />*/}
+            {/*    <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />*/}
+            {/*</RadioTabs>*/}
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
