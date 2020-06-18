@@ -277,7 +277,6 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      * @param int $categoryID
      * @param string $name
      * @param string $body
-     * @param bool $featured
      *
      * @return array
      */
