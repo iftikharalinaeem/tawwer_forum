@@ -37,5 +37,4 @@ class SphinxSearchQuery extends SearchQuery {
     protected function getSphinxClient(): SphinxClient {
         return $this->sphinxClient;
     }
-    
 }
