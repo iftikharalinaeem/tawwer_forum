@@ -17,9 +17,9 @@ import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
 import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
-import { RadioInputsAsButtonGroup } from "@library/forms/radioAsButtons/RadioInputsAsButtonGroup";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
-import { buttonTabClasses } from "@library/forms/buttonTabs/buttonTabStyles";
+import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
+import { radioInputAsButtonClasses } from "@vanilla/library/src/scripts/forms/radioAsButtons/radioInputAsTab.styles";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -71,12 +71,11 @@ export function EventDetails(props: IProps) {
                 caption={t("Event Details")}
             />
             <EventPermission event={event} permission={EventPermissionName.ATTEND}>
-                <RadioInputsAsButtonGroup
+                <RadioGroup
                     activeItem={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
                     accessibleTitle={t("Are you going?")}
                     setData={props.onChange}
-                    className={classes.attendanceSelector}
-                    classes={buttonTabClasses()}
+                    classes={radioInputAsButtonClasses()}
                 >
                     <>
                         <RadioInputAsButton
@@ -99,7 +98,7 @@ export function EventDetails(props: IProps) {
                             className={"isLast"}
                         />
                     </>
-                </RadioInputsAsButtonGroup>
+                </RadioGroup>
             </EventPermission>
 
             <div className={classes.section}>
