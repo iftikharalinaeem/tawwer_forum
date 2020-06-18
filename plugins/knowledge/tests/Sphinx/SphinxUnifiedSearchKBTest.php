@@ -97,6 +97,58 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
     }
 
     /**
+     * Search for deleted article.
+     *
+     * @depends testData
+     */
+    public function testSearchByStatusDeleted() {
+        $knowledgeBase = $this->createKnowledgeBase();
+        Gdn::database()->sql()->truncate('article');
+        $article = $this->articleRecord($knowledgeBase['rootCategoryID'], 'article to be deleted', 'article to be deleted');
+        $article2 = $this->articleRecord($knowledgeBase['rootCategoryID'], 'article to be deleted', 'article to be deleted');
+
+        $this->api()->patch('/articles/'.$article['articleID'].'/status', ["status" => "deleted" ]);
+
+        self::sphinxReindex();
+        $params = [
+            'query' => 'article to be deleted',
+            'statuses' => ['deleted'],
+        ];
+        $response = $this->api()->get('/search?', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(1, count($results));
+    }
+
+    /**
+     * Search for article status.
+     *
+     * @depends testData
+     */
+    public function testSearchByStatuses() {
+        $knowledgeBase = $this->createKnowledgeBase();
+        Gdn::database()->sql()->truncate('article');
+        $article = $this->articleRecord($knowledgeBase['rootCategoryID'], 'article to be deleted', 'article to be deleted');
+        $article2 = $this->articleRecord($knowledgeBase['rootCategoryID'], 'article to be published', 'article to be published');
+
+        $this->api()->patch('/articles/'.$article['articleID'].'/status', ["status" => "deleted" ]);
+
+        self::sphinxReindex();
+        $params = [
+            'query' => 'article to be',
+            'statuses' => ['published','deleted'],
+        ];
+        $response = $this->api()->get('/search?', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(2, count($results));
+    }
+
+    /**
      * Search with a specific locale.
      */
     public function testSearchKnowledgeBaseWithLocale() {
@@ -139,6 +191,85 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
         $this->assertEquals(1, count($results));
     }
 
+    /**
+     * Search by featured article.
+     *
+     * @depends testData
+     */
+    public function testSearchByFeaturedArticle() {
+        $knowledgeBase = $this->createKnowledgeBase();
+        Gdn::database()->sql()->truncate('article');
+
+        $article = $this->articleRecord($knowledgeBase['rootCategoryID'], 'featured article', 'featured article');
+        $article2 = $this->articleRecord($knowledgeBase['rootCategoryID'], 'not featured 1', 'not featured');
+        $article3 = $this->articleRecord($knowledgeBase['rootCategoryID'], 'not featured 2', 'not featured');
+
+        $this->api()->put(
+            $this->kbArticlesUrl . '/'. $article['articleID'] . '/featured',
+            ['featured' => true]
+        );
+
+        self::sphinxReindex();
+        $params = [
+            'query' => 'featured',
+            'featured' => true,
+        ];
+        $response = $this->api()->get('/search?', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(1, count($results));
+    }
+
+    /**
+     * Search with a specific locale.
+     */
+    public function testSearchBySiteSectionGroup() {
+        $knowledgeBase1 = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-1']);
+        $knowledgeBase2 = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-2']);
+
+        Gdn::database()->sql()->truncate('article');
+        $article = $this->articleRecord(
+            $knowledgeBase1["rootCategoryID"],
+            "Article in KB1"
+        );
+        $article2 = $this->articleRecord(
+            $knowledgeBase1["rootCategoryID"],
+            "Article in KB1"
+        );
+        $article3 = $this->articleRecord(
+            $knowledgeBase2["rootCategoryID"],
+            "Article not translated "
+        );
+        $article4 = $this->articleRecord(
+            $knowledgeBase2["rootCategoryID"],
+            "Article not translated "
+        );
+
+        $record = [
+            'name' => '"Article in KB1 translated in fr',
+            'body' => json_encode([["insert" => "Hello World"]]),
+            'format' => 'rich',
+            'locale' => 'fr',
+            'knowledgeCategoryID' =>  $knowledgeBase1["rootCategoryID"],
+        ];
+
+        $this->api()->patch($this->kbArticlesUrl . '/' . $article['articleID'], $record);
+        self::sphinxReindex();
+
+        $params = [
+            'query' => 'Article',
+            'siteSectionGroup' => 'mockSiteSectionGroup-1'
+        ];
+        $response = $this->api()->get('/search?', $params);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $this->assertEquals(3, count($results));
+    }
+
 
     /**
      * Provide article record.
@@ -149,7 +280,11 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      *
      * @return array
      */
-    private function articleRecord(int $categoryID, string $name = 'default name', string $body = 'Hello World') {
+    private function articleRecord(
+        int $categoryID,
+        string $name = 'default name',
+        string $body = 'Hello World'
+    ) {
         $helloWorldBody = json_encode([["insert" => $body]]);
         $params = [
             "knowledgeCategoryID" => $categoryID,
