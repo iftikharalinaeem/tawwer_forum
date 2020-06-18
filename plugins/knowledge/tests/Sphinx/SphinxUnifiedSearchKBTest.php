@@ -284,8 +284,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
     private function articleRecord(
         int $categoryID,
         string $name = 'default name',
-        string $body = 'Hello World',
-        bool $featured = false
+        string $body = 'Hello World'
     ) {
         $helloWorldBody = json_encode([["insert" => $body]]);
         $params = [
@@ -293,7 +292,6 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
             "name" => $name,
             "body" => $helloWorldBody,
             "format" => "rich",
-            "featured" => $featured
         ];
         return $this->createArticle($params);
     }
