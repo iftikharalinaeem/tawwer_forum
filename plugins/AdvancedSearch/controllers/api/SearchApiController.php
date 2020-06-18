@@ -223,8 +223,9 @@ class SearchApiController extends AbstractApiController {
                     ],
                 ]),
                 'statuses:a?' => [
+                    'items' => ['type' => 'string'],
                     'description' => 'Article statuses array to filter results.',
-                    'x-search-filter' => true
+                    'x-search-filter' => true,
                 ],
                 "locale:s?" => [
                     'description' => 'The locale articles are published in.',
@@ -309,14 +310,15 @@ class SearchApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
-
         $searchResults = array_map(function ($record) use ($query) {
+            $expand = $query['expand'] ?? [];
             return $this->normalizeOutput(
                 $record,
                 $query['expandBody'],
-                $this->isExpandField('breadcrumbs', $query['expand'])
+                $this->isExpandField('breadcrumbs', $expand)
             );
         }, $searchResults);
+
 
         $result = $out->validate($searchResults);
 
@@ -351,7 +353,10 @@ class SearchApiController extends AbstractApiController {
             'tags' => 'tags',
             'tagOperator' => 'tags-op',
             'knowledgeBaseID' => 'knowledgebaseid',
-            'locale' => 'locale'
+            'locale' => 'locale',
+            'statuses' => 'statuses',
+            'featured' => 'featured',
+            'siteSectionGroup' => 'siteSectionGroup'
         ];
         $recordTypes = $this->searchRecordTypeProvider->getAll();
 
