@@ -91,9 +91,11 @@ export function SearchFormFilters(props: IProps) {
             />
             <DateRange
                 onStartChange={(date: string) => {
+                    console.log(date);
                     updateForm({ startDate: date });
                 }}
                 onEndChange={(date: string) => {
+                    console.log(date);
                     updateForm({ endDate: date });
                 }}
                 start={form.startDate}

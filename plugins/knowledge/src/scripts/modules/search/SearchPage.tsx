@@ -20,8 +20,8 @@ export class SearchPage extends React.Component<IProps> {
     public render() {
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
-                {/* <SearchForm /> */}
-                <UnifySearchForm />
+                <SearchForm />
+                {/* <UnifySearchForm /> */}
             </PageLoader>
         );
     }

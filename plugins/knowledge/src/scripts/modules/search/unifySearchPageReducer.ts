@@ -11,15 +11,16 @@ import produce from "immer";
 import { useSelector } from "react-redux";
 import { reducerWithInitialState } from "typescript-fsa-reducers";
 import UnifySearchPageActions from "@knowledge/modules/search/UnifySearchPageActions";
-import { IUnifySearchResponseBody } from "@knowledge/@types/api/unifySearch";
+import { IUnifySearchResponseBody, IUnifySearchRequestBody } from "@knowledge/@types/api/unifySearch";
 
 export enum UnifySearchDomain {
     DISCUSSIONS = "discussions",
     ARTICLES = "articles",
     CATEGORIES_AND_GROUPS = "categories_and_groups",
-    EVERYWHERE = "everywhere",
+    ALL_CONTENT = "all_content",
 }
 
+// Checkout UnifySearchPageActions ALL_FORM, DISCUSSIONS_FORM, ARTICLES_FORM
 export interface IUnifySearchFormState {
     // These fields belong to all
     query?: string;
@@ -27,8 +28,6 @@ export interface IUnifySearchFormState {
     authors?: IComboBoxOption[];
     startDate?: string;
     endDate?: string;
-    includeDeleted?: boolean;
-    page?: number;
 
     // These fields belong to discussions
     categoryID?: number;
@@ -39,29 +38,32 @@ export interface IUnifySearchFormState {
 
     // These fields belong to knowledge base
     knowledgeBaseID?: number;
+    includeDeleted?: boolean;
 }
 
 export interface IUnifySearchPageState {
     form: IUnifySearchFormState;
+    query: IUnifySearchRequestBody;
     results: ILoadable<IUnifySearchResponseBody>;
     pages: ILinkPages;
 }
 
 export const INITIAL_SEARCH_FORM: IUnifySearchFormState = {
     query: "",
-    title: undefined,
-    authors: [],
-    startDate: undefined,
-    endDate: undefined,
-    includeDeleted: true,
+};
+
+const INITIAL_SEARCH_QUERY: IUnifySearchRequestBody = {
+    query: "",
+    recordTypes: [UnifySearchDomain.ALL_CONTENT],
     page: 1,
 };
 
 export const INITIAL_SEARCH_STATE: IUnifySearchPageState = {
+    form: INITIAL_SEARCH_FORM,
+    query: INITIAL_SEARCH_QUERY,
     results: {
         status: LoadStatus.PENDING,
     },
-    form: INITIAL_SEARCH_FORM,
     pages: {},
 };
 
@@ -72,18 +74,20 @@ export const unifySearchPageReducer = produce(
                 ...nextState.form,
                 ...payload,
             };
+            nextState.query = UnifySearchPageActions.toQuery(nextState.form);
+
             return nextState;
         })
         .case(UnifySearchPageActions.setUnifyFormAC, (nextState, payload) => {
             nextState.form = { ...payload };
+            nextState.query = UnifySearchPageActions.toQuery(nextState.form);
+
             return nextState;
         })
         .case(UnifySearchPageActions.getUnifySearchACs.started, (nextState, payload) => {
             nextState.results.status = LoadStatus.LOADING;
+            nextState.query = payload;
 
-            if (payload.page !== null) {
-                nextState.form.page = payload.page;
-            }
             return nextState;
         })
         .case(UnifySearchPageActions.getUnifySearchACs.done, (nextState, payload) => {
