@@ -17,7 +17,7 @@ export interface ISearchInButton {
 }
 
 interface IProps {
-    activeItem?: number | string;
+    activeItem?: any;
     setData: (data: number | string) => void;
     filters: ISearchInButton[];
     endFilters?: ISearchInButton[]; // At the end, separated by vertical line
@@ -37,17 +37,13 @@ export function SearchIn(props: IProps) {
         <RadioInputsAsButtonGroup accessibleTitle={t("Search in:")} setData={setData} activeItem={activeItem}>
             <>
                 {filters.map((filter, i) => {
-                    return (
-                        <RadioInputAsButton key={i} {...filter} active={!!activeItem && filter.data === activeItem} />
-                    );
+                    return <RadioInputAsButton key={i} {...filter} />;
                 })}
                 {hasEndFilters && (
                     <>
                         <span className={classes.separator} role="separator" />
                         {endFilters.map((filter, i) => {
-                            return (
-                                <RadioInputAsButton {...filter} active={!!activeItem && filter.data === activeItem} />
-                            );
+                            return <RadioInputAsButton key={i} {...filter} />;
                         })}
                     </>
                 )}
