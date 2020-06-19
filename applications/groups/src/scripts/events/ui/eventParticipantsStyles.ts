@@ -14,7 +14,7 @@ import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonStyle
 import { iconVariables } from "@vanilla/library/src/scripts/icons/iconStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const makeVars = variableFactory("dateTime", forcedVars);
+    const makeVars = variableFactory("eventParticipants", forcedVars);
     const globalVars = globalVariables();
     const iconVars = iconVariables();
 
@@ -78,7 +78,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 });
 
 export const eventParticipantsClasses = useThemeCache((props: { compact?: boolean } = {}) => {
-    const style = styleFactory("events");
+    const style = styleFactory("eventParticipants");
     const vars = eventsVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutVariables().mediaQueries();
@@ -149,6 +149,7 @@ export const eventParticipantsClasses = useThemeCache((props: { compact?: boolea
         alignItems: "center",
         marginBottom: vars.item.marginBottom,
         flexWrap: "nowrap",
+        color: colorOut(globalVars.mainColors.fg),
     });
 
     const name = style("name", {

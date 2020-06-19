@@ -26,11 +26,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { calc, important, percent, translateY, color } from "csx";
 import { EventAttendance } from "@groups/events/state/eventsTypes";
-import { textLinkCSS } from "@dashboard/compatibilityStyles/textLinkStyles";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { media } from "typestyle";
-import { userSelect } from "@library/styles/styleHelpers";
-import { buttonResetMixin } from "@vanilla/library/src/scripts/forms/buttonStyles";
 import { iconVariables } from "@vanilla/library/src/scripts/icons/iconStyles";
 
 export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -326,13 +322,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         }),
     );
 
-    const attendanceSelector = style("attendanceSelector", {
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexWrap: "nowrap",
-    });
-
     const dropDown = style("dropDown", {
         $nest: {
             [`& .${selectBoxClasses().toggle}`]: {
@@ -512,7 +501,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         dropDown,
         attendanceClass,
         attendanceStamp,
-        attendanceSelector,
         viewMore,
         filter,
         filterLabel,
