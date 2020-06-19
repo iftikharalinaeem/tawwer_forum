@@ -1,7 +1,11 @@
 <?php
+/**
+ * @author Alexandre (Daazku) Chouinard
+ */
 
 namespace Vanilla\Inf\Search;
 
+use Exception;
 use Firebase\JWT\JWT;
 
 /**
@@ -9,21 +13,32 @@ use Firebase\JWT\JWT;
  *
  * Class AbstractSearchApiInformationProvider
  */
-abstract class AbstractSearchApiInformationProvider
-{
+abstract class AbstractSearchApiInformationProvider {
     /**
      * The base URL to the API.
      *
      * @return string
      */
-    public abstract function getBaseUrl(): string;
+    abstract public function getBaseUrl(): string;
 
     /**
-     * The secret used to encrypt the JWT.
+     * Return the auth JWT.
+     *
+     * It has a TTL of 10 seconds so it should be crafted as late as possible :).
      *
      * @return string
+     *
+     * @throws Exception When something goes wrong.
      */
-    protected abstract function getSecret(): string;
+    final public function getAuthJWT() {
+        $timestamp = time();
+        $fullPayload = $this->getTokenPayload() + [
+                'iat' => $timestamp,
+                'exp' => $timestamp + 10,
+            ];
+
+        return JWT::encode($fullPayload, $this->getSecret(), 'HS512');
+    }
 
     /**
      * Returns information needed by the API.
@@ -33,22 +48,12 @@ abstract class AbstractSearchApiInformationProvider
      *
      * @return array
      */
-    protected abstract function getTokenPayload(): array;
+    abstract protected function getTokenPayload(): array;
 
     /**
-     * Return the auth JWT.
-     *
-     * It has a TTL of 10 seconds so it should be crafted as late as possible :).
+     * The secret used to encrypt the JWT.
      *
      * @return string
      */
-    public final function getAuthJWT()
-    {
-        $timestamp = time();
-        $fullPayload = $this->getTokenPayload() + [
-            'iat' => $timestamp,
-            'exp' => $timestamp + 10,
-        ];
-        return JWT::encode($fullPayload, $this->getSecret(), 'HS512');
-    }
+    abstract protected function getSecret(): string;
 }

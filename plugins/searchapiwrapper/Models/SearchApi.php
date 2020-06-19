@@ -1,13 +1,20 @@
 <?php
+/**
+ * @author Alexandre (Daazku) Chouinard
+ */
 
 namespace Vanilla\Inf\Search;
 
+use Exception;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use Garden\Http\HttpResponseException;
 
-class SearchApi
-{
+/**
+ * Class SearchApi
+ */
+class SearchApi {
+
     const INDEX_ALIAS_ARTICLE = '{{idx:article}}';
     const INDEX_ALIAS_ARTICLE_REVISION = '{{idx:articleRevision}}';
     const INDEX_ALIAS_CATEGORY = '{{idx:category}}';
@@ -44,8 +51,13 @@ class SearchApi
      */
     private $configurationProvider;
 
-    public function __construct(HttpClient $httpClient, AbstractSearchApiInformationProvider $searchApiConfigurationProvider)
-    {
+    /**
+     * SearchApi constructor.
+     *
+     * @param HttpClient $httpClient
+     * @param AbstractSearchApiInformationProvider $searchApiConfigurationProvider
+     */
+    public function __construct(HttpClient $httpClient, AbstractSearchApiInformationProvider $searchApiConfigurationProvider) {
         $httpClient->setBaseUrl($searchApiConfigurationProvider->getBaseUrl());
         $httpClient->setDefaultHeaders([
             'content-type' => 'application/json',
@@ -59,6 +71,8 @@ class SearchApi
      * Get Authorization header
      *
      * @return string[]
+     *
+     * @throws Exception When something goes wrong.
      */
     private function getAuthorizationHeader() {
         return [
@@ -71,7 +85,8 @@ class SearchApi
      *
      * @param HttpResponse $response
      * @return array Microservice JSON decoded response
-     * @throws HttpResponseException
+     *
+     * @throws HttpResponseException When something goes wrong.
      */
     private function handleResponse(HttpResponse $response): array {
         if (!$response->isSuccessful()) {
@@ -87,10 +102,10 @@ class SearchApi
      * @param array $indexesAlias
      * @param array $searchPayload
      * @return array Microservice JSON decoded response (contains ES result)
-     * @throws HttpResponseException
+     *
+     * @throws Exception When something goes wrong.
      */
-    public function search(array $indexesAlias, array $searchPayload): array
-    {
+    public function search(array $indexesAlias, array $searchPayload): array {
         $body = [
             'indexesAlias' => $indexesAlias,
             'searchPayload' => $searchPayload,
@@ -110,10 +125,10 @@ class SearchApi
      * @param array $documents
      *
      * @return array Microservice JSON decoded response (contains ES result)
-     * @throws HttpResponseException
+     *
+     * @throws Exception When something goes wrong.
      */
-    public function index(string $indexAlias, string $documentIdField, array $documents): array
-    {
+    public function index(string $indexAlias, string $documentIdField, array $documents): array {
         $body = [
             'indexAlias' => $indexAlias,
             'documentIdField' => $documentIdField,
@@ -127,14 +142,16 @@ class SearchApi
     }
 
     /**
+     * Delete documents.
+     *
      * @param string $indexAlias
      * @param array $documentsId
      *
      * @return array Microservice JSON decoded response (contains ES result)
-     * @throws HttpResponseException
+     *
+     * @throws Exception When something goes wrong.
      */
-    public function delete(string $indexAlias, array $documentsId): array
-    {
+    public function delete(string $indexAlias, array $documentsId): array {
         $body = [
             'indexAlias' => $indexAlias,
             'documentsId' => $documentsId,
