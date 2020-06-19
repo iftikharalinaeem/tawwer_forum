@@ -139,7 +139,7 @@ function SearchForm(props: IProps) {
                                     needsPageTitle={false}
                                 />
                             </PanelWidget>
-                            <SearchInFilter setData={setData} activeItem={data} filters={dummmyFilters} />
+                            {/*<SearchInFilter setData={setData} activeItem={data} filters={dummmyFilters} />*/}
                             {isMobile && (
                                 <PanelWidget>
                                     <Drawer title={t("Filter Results")}>
