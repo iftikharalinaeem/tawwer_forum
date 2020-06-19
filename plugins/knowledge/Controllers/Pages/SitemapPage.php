@@ -144,16 +144,19 @@ class SitemapPage extends KbPage {
             ],
             $options
         );
-        foreach ($articles as &$article) {
+
+        foreach ($articles as $key => &$article) {
             try {
                 $article['url'] = $this->articleModel->url($article);
                 $article['dateUpdated'] = $article['dateUpdated']->format('c');
             } catch (\Exception $e) {
                 $articleID = $article['articleID'];
+                unset($articles[$key]);
                 trigger_error("Failed to add article '$articleID' to the sitemap.", E_USER_NOTICE);
                 continue;
             }
         }
+
         return new Data(
             $this->renderKbView('seo/pages/sitemap.twig', ['pages' => $articles]),
             ['CONTENT_TYPE' => 'text/xml;charset=UTF-8']
