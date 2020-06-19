@@ -4,33 +4,34 @@ Add the following code to `conf/bootstrap.after.php` and replace the parts that 
 ```php
 <?php
 
-use Vanilla\Inf\Search\AbstractSearchApiInformationProvider;
-
-class DevSearchApiInformationProvider extends AbstractSearchApiInformationProvider
-{
-    public function getBaseUrl(): string
+if (config('EnabledPlugins.searchapiwrapper')) {
+    class DevSearchApiInformationProvider extends Vanilla\Inf\Search\AbstractSearchApiInformationProvider
     {
-        return 'https://ms-vanilla-search-api-dev.v-fabric.net/api/v1.0/';
+        public function getBaseUrl(): string
+        {
+            return 'https://ms-vanilla-search-api-dev.v-fabric.net/api/v1.0/';
+        }
+
+        protected function getSecret(): string
+        {
+            // Replace this. Look for the secret in 1Password
+            return '{{DEV_SEARCH_API_SECRET}}';
+        }
+
+        protected function getTokenPayload(): array
+        {
+            return [
+                // Set whatever int you want here. Check the cluster forehand to not use the same as another dev.
+                'accountId' => {{ACCOUNT_ID}},
+                'siteId' =>{{SITE_ID}},
+            ];
+        }
     }
 
-    protected function getSecret(): string
-    {
-        // Replace this. Look for the secret in 1Password
-        return '{{DEV_SEARCH_API_SECRET}}';
-    }
-
-    protected function getTokenPayload(): array
-    {
-        return [
-            'accountId' => {{ACCOUNT_ID}},
-            'siteId' => {{SITE_ID}},
-        ];
-    }
+    $dic->rule(Vanilla\Inf\Search\AbstractSearchApiInformationProvider::class)
+        ->setClass(DevSearchApiInformationProvider::class)
+    ;
 }
-
-$dic->rule(AbstractSearchApiInformationProvider::class)
-    ->setClass(DevSearchApiInformationProvider::class)
-;
 ```
 
 # How to use
