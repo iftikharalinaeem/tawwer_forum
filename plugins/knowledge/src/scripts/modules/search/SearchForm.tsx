@@ -54,6 +54,7 @@ import {
 import { SearchPanelFilter } from "@vanilla/library/src/scripts/search/panels/SearchPanelFilter.story";
 import { SearchFilterPanelArticles } from "@vanilla/library/src/scripts/search/panels/FilterPanelArticles";
 import { FilterPanelAll } from "@vanilla/library/src/scripts/search/panels/FilterPanelAll";
+import { SearchFilterPanelDiscussions } from "@vanilla/library/src/scripts/search/panels/FilterPanelDiscussions";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
@@ -74,6 +75,21 @@ function SearchForm(props: IProps) {
         }, 800),
         [unifySearch],
     );
+
+    let currentFilter: React.ReactNode = null;
+
+    switch (form.domain) {
+        case UnifySearchDomain.ARTICLES:
+            currentFilter = <SearchFilterPanelArticles />;
+            break;
+        case UnifySearchDomain.DISCUSSIONS:
+            currentFilter = <SearchFilterPanelDiscussions />;
+            break;
+        case UnifySearchDomain.ALL_CONTENT:
+        default:
+            currentFilter = <FilterPanelAll />;
+            break;
+    }
 
     return (
         <DocumentTitle title={form.query ? form.query : t("Search Results")}>
@@ -142,21 +158,13 @@ function SearchForm(props: IProps) {
                             />
                             {isMobile && (
                                 <PanelWidget>
-                                    <Drawer title={t("Filter Results")}>
-                                        <FilterPanelAll />
-                                    </Drawer>
+                                    <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
                                 </PanelWidget>
                             )}
                         </>
                     }
                     middleBottom={<SearchFormResults />}
-                    rightTop={
-                        !isMobile && (
-                            <PanelWidget>
-                                <SearchFormFilters />
-                            </PanelWidget>
-                        )
-                    }
+                    rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>
         </DocumentTitle>
