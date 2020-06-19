@@ -96,11 +96,13 @@ paths:
         in: query
         name: attendingStatus
         schema:
-          enum:
-          - yes
-          - no
-          - maybe
-          type: string
+          items:
+            enum:
+            - yes
+            - no
+            - maybe
+            type: string
+          type: array
       - description: |
           Desired number of items per page.
         in: query

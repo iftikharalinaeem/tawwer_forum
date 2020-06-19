@@ -44,7 +44,7 @@ export interface IGetEventsQuery {
     page: number;
     limit: number;
     requireDescendants?: boolean;
-    attendingStatus?: EventAttendance;
+    attendingStatus?: EventAttendance[];
 }
 
 export interface IGetEventParticipantsQuery {

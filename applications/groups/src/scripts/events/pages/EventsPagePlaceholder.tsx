@@ -10,6 +10,7 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import { t } from "@vanilla/i18n";
 import { EventListPlaceholder } from "@groups/events/ui/EventListPlaceholder";
 import { useEventsListFilterQuery } from "./useEventsListFilterQuery";
+import { LoadingRectange } from "@library/loaders/LoadingRectangle";
 
 export function EventsPagePlaceholder() {
     const classes = eventsClasses();
@@ -17,7 +18,7 @@ export function EventsPagePlaceholder() {
 
     return (
         <>
-            <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <LoadingRectange height={32} width={300} className={classes.pageTitle} />
             <EventFilter className={classes.filter} filter={filter} onFilterChange={changeFilter} />
             <EventListPlaceholder count={10} />
         </>
