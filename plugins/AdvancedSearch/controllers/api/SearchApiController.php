@@ -145,7 +145,6 @@ class SearchApiController extends AbstractApiController {
             ->searchService
             ->buildQuerySchema()
             ->merge($this->getCommonIndexSchema())
-            ->addValidator('', [$this, 'searchScopeValidator'])
         ;
 
         $query = $in->validate($query);
@@ -157,7 +156,7 @@ class SearchApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $searchResults,
-            $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'insertUserID'])
         );
 
         $recordCount = $searchResults->getResultCount();
@@ -299,7 +298,6 @@ class SearchApiController extends AbstractApiController {
             ['SearchIndex', 'in']
         )
             ->merge($this->getCommonIndexSchema())
-            ->addValidator('', [$this, 'searchScopeValidator'])
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
 
@@ -381,32 +379,6 @@ class SearchApiController extends AbstractApiController {
             ],
             'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
         ]);
-    }
-
-    /**
-     * Custom validator to ensure that a search has a scope or filter.
-     *
-     * @param mixed $data
-     * @param ValidationField $field
-     *
-     * @return bool
-     */
-    public function searchScopeValidator($data, ValidationField $field) {
-        $schemaDefinition = $field->getField()['properties'];
-        foreach ($data as $name => $value) {
-            if (!empty($value) &&
-                (isset($schemaDefinition[$name]['x-search-scope']) || isset($schemaDefinition[$name]['x-search-filter']))
-            ) {
-                return true;
-            }
-        }
-
-        $field->addError('missingField', [
-            'messageCode' => 'You need to specify either a scope or a filter.',
-            'required' => true,
-        ]);
-
-        return false;
     }
 
     /**
