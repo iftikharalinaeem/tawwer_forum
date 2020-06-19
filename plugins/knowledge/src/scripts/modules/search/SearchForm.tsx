@@ -8,7 +8,6 @@ import { SearchFormFilters } from "@knowledge/modules/search/SearchFormFilters";
 import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import { SearchFormResults } from "@knowledge/modules/search/SearchFormResults";
 import { useSearchPageActions } from "@knowledge/modules/search/SearchPageActions";
-import { INITIAL_SEARCH_FORM, useSearchPageData } from "@knowledge/modules/search/searchPageReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
 import SearchBar from "@library/features/search/SearchBar";
@@ -26,7 +25,7 @@ import debounce from "lodash/debounce";
 import qs from "qs";
 import * as React from "react";
 import { useEffect, useCallback, useState } from "react";
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import PageTitle from "@knowledge/modules/common/PageTitle";
@@ -37,40 +36,31 @@ import { iconClasses } from "@library/icons/iconStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { PageHeading } from "@library/layout/PageHeading";
 import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
-import { SearchFilterAll, TypeArticles, TypeCategoriesAndGroups, TypeDiscussions } from "@library/icons/searchIcons";
+import {
+    SearchFilterAllIcon,
+    TypeArticlesIcon,
+    TypeCategoriesAndGroupsIcon,
+    TypeDiscussionsIcon,
+} from "@library/icons/searchIcons";
+import UnifySearchPageActions, { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
+import pickBy from "lodash/pickBy";
+import pick from "lodash/pick";
+import { notEmpty } from "@vanilla/utils";
+import {
+    INITIAL_SEARCH_FORM,
+    UnifySearchDomain,
+    useSearchPageData,
+} from "@knowledge/modules/search/unifySearchPageReducer";
+import { SearchPanelFilter } from "@vanilla/library/src/scripts/search/panels/SearchPanelFilter.story";
+import { SearchFilterPanelArticles } from "@vanilla/library/src/scripts/search/panels/FilterPanelArticles";
+import { FilterPanelAll } from "@vanilla/library/src/scripts/search/panels/FilterPanelAll";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
 }
 
-// START - Placeholder data/functions for the search filters
-const dummmyFilters: ISearchInButton[] = [
-    {
-        label: t("All Content"),
-        icon: <SearchFilterAll />,
-        data: "all",
-    },
-    {
-        label: t("Discussions"),
-        icon: <TypeDiscussions />,
-        data: "discussions",
-    },
-    {
-        label: t("Articles"),
-        icon: <TypeArticles />,
-        data: "articles",
-    },
-    {
-        label: t("Categories & Groups"),
-        icon: <TypeCategoriesAndGroups />,
-        data: "categoriesAndGroups",
-    },
-];
-const [data, setData] = useState("all");
-
-// END - Placeholder data/functions for the search filters
-
 function SearchForm(props: IProps) {
+    const { unifySearch, updateForm } = useUnifySearchPageActions();
     const { form, results } = useSearchPageData();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
@@ -78,32 +68,19 @@ function SearchForm(props: IProps) {
     useQueryParamSynchronization();
     useSearchContextValueSync();
 
-    const { search, updateForm } = useSearchPageActions();
     const debouncedSearch = useCallback(
         debounce(() => {
-            search();
+            unifySearch();
         }, 800),
-        [search],
+        [unifySearch],
     );
-
-    let knowledgeBase = form.kb || form.knowledgeBaseID;
-    let knowledgeBaseID = form.kb?.value || form.knowledgeBaseID;
-
-    let queryParam = knowledgeBase ? "kb" : "siteSectionGroup";
-    let queryValue =
-        queryParam === "kb" ? { label: form.kb?.label, value: knowledgeBaseID } : getSiteSection().sectionGroup;
-
-    const queryParamDefaults = {
-        ...INITIAL_SEARCH_FORM,
-        [queryParam]: queryValue,
-    };
 
     return (
         <DocumentTitle title={form.query ? form.query : t("Search Results")}>
             <TitleBar title={t("Search")} />
             <Banner isContentBanner />
             <Container>
-                <QueryString value={form} defaults={queryParamDefaults} />
+                <QueryString value={form} defaults={INITIAL_SEARCH_FORM} />
                 <PanelLayout
                     className="hasLargePadding"
                     middleTop={
@@ -139,11 +116,34 @@ function SearchForm(props: IProps) {
                                     needsPageTitle={false}
                                 />
                             </PanelWidget>
-                            {/*<SearchInFilter setData={setData} activeItem={data} filters={dummmyFilters} />*/}
+                            <SearchInFilter
+                                setData={newDomain => {
+                                    updateForm({ domain: newDomain as UnifySearchDomain });
+                                    unifySearch();
+                                }}
+                                activeItem={form.domain}
+                                filters={[
+                                    {
+                                        label: t("All Content"),
+                                        icon: <SearchFilterAllIcon />,
+                                        data: UnifySearchDomain.ALL_CONTENT,
+                                    },
+                                    {
+                                        label: t("Discussions"),
+                                        icon: <TypeDiscussionsIcon />,
+                                        data: UnifySearchDomain.DISCUSSIONS,
+                                    },
+                                    {
+                                        label: t("Articles"),
+                                        icon: <TypeArticlesIcon />,
+                                        data: UnifySearchDomain.ARTICLES,
+                                    },
+                                ]}
+                            />
                             {isMobile && (
                                 <PanelWidget>
                                     <Drawer title={t("Filter Results")}>
-                                        <SearchFormFilters hideTitle={true} />
+                                        <FilterPanelAll />
                                     </Drawer>
                                 </PanelWidget>
                             )}
@@ -172,58 +172,32 @@ function useSearchContextValueSync() {
     const queryString = location.search;
     const initialForm = qs.parse(queryString.replace(/^\?/, ""));
 
-    if (initialForm.knowledgeBaseID && !form.kb) {
-        form.kb = { label: "", value: initialForm.knowledgeBaseID };
-    }
+    // if (initialForm.knowledgeBaseID && !form.kb) {
+    //     form.kb = { label: "", value: initialForm.knowledgeBaseID };
+    // }
 
-    if (extraValues.knowledgeBaseID || form.kb) {
-        extraValues.siteSectionGroup = undefined;
-    }
+    // if (extraValues.knowledgeBaseID || form.kb) {
+    //     extraValues.siteSectionGroup = undefined;
+    // }
 
-    useEffect(() => {
-        updateForm(extraValues);
-    }, [updateForm, extraValues]);
+    // useEffect(() => {
+    //     updateForm(extraValues);
+    // }, [updateForm, extraValues]);
 }
 
 function useQueryParamSynchronization() {
-    const { updateForm, search, reset } = useSearchPageActions();
-    const { updateQueryValuesForDomain } = useSearchFilters();
-    const { location } = useHistory();
-    const queryString = location.search;
-    /**
-     * Initialize the form values from a query string.
-     *
-     * Many of these values can be a bit of a PITA the put together manually, but all form values are persisted there.
-     *
-     * @param queryString The query string to initialize from.
-     */
+    const { updateForm: updateForm, unifySearch } = useUnifySearchPageActions();
+    const location = useLocation();
+
     useEffect(() => {
-        const initialForm = qs.parse(queryString.replace(/^\?/, ""));
-
-        if ("authors" in initialForm) {
-            initialForm.authors.map(option => {
-                option.value = Number.parseInt(option.value, 10);
-            });
-        }
-
-        if ("includeDeleted" in initialForm) {
-            initialForm.includeDeleted = JSON.parse(initialForm.includeDeleted);
-        }
-
-        updateForm(initialForm);
-
-        if (initialForm.siteSectionGroup) {
-            const initialDomain = initialForm.domain || INITIAL_SEARCH_FORM.domain;
-            // Syncing back to provider.
-            updateQueryValuesForDomain(initialDomain, { siteSectionGroup: initialForm.siteSectionGroup });
-        }
-        void search();
-
-        // Cleanup when we leave the page.
-        return () => {
-            reset();
-        };
-    }, []); // Only run when we first initilize the page.
+        const { search } = location;
+        const queryForm = qs.parse(search.replace(/^\?/, ""));
+        const form = pickBy(pick(queryForm, UnifySearchPageActions.ALL_FORM_ENTRIES), notEmpty);
+        updateForm(form);
+        unifySearch();
+        // Only for first initialization.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 }
 
 export default withSearch(SearchForm);

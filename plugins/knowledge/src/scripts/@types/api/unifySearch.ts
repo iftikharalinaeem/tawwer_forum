@@ -6,24 +6,23 @@
 
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { PublishStatus } from "@library/@types/api/core";
+import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 
 export interface IUnifySearchResponseBody {
-    url?: string;
-    body?: string;
-    categoryID?: number;
-    commentID?: number;
-    dateInserted?: string;
-    dateUpdated?: string;
-    discussionID?: number;
-    groupID?: number;
-    insertUserID?: number;
-    name?: string;
-    recordID?: number;
-    recordType?: string;
+    url: string;
+    body: string;
+    dateInserted: string;
+    dateUpdated: string;
+    insertUserID: number;
+    insertUser: IUserFragment;
+    name: string;
+    recordID: number;
+    recordType: string;
     score?: number;
-    type?: string;
-    updateUserID?: number;
-    breadcrumbs?: ICrumb[];
+    type: string;
+    updateUserID: number;
+    breadcrumbs: ICrumb[];
+    status?: PublishStatus;
 }
 
 export interface IUnifySearchRequestBody {

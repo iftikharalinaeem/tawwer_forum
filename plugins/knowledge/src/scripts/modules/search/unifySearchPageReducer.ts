@@ -39,28 +39,26 @@ export interface IUnifySearchFormState {
     // These fields belong to knowledge base
     knowledgeBaseID?: number;
     includeDeleted?: boolean;
+    domain: UnifySearchDomain;
+
+    // Pagination
+    page: number;
 }
 
 export interface IUnifySearchPageState {
     form: IUnifySearchFormState;
-    query: IUnifySearchRequestBody;
     results: ILoadable<IUnifySearchResponseBody>;
     pages: ILinkPages;
 }
 
 export const INITIAL_SEARCH_FORM: IUnifySearchFormState = {
     query: "",
-};
-
-const INITIAL_SEARCH_QUERY: IUnifySearchRequestBody = {
-    query: "",
-    recordTypes: UnifySearchPageActions.getRecordType(UnifySearchDomain.ALL_CONTENT),
+    domain: UnifySearchDomain.ALL_CONTENT,
     page: 1,
 };
 
 export const INITIAL_SEARCH_STATE: IUnifySearchPageState = {
     form: INITIAL_SEARCH_FORM,
-    query: INITIAL_SEARCH_QUERY,
     results: {
         status: LoadStatus.PENDING,
     },
@@ -69,30 +67,16 @@ export const INITIAL_SEARCH_STATE: IUnifySearchPageState = {
 
 export const unifySearchPageReducer = produce(
     reducerWithInitialState<IUnifySearchPageState>(INITIAL_SEARCH_STATE)
-        .case(UnifySearchPageActions.updateUnifyFormAC, (nextState, payload) => {
+        .case(UnifySearchPageActions.updateFormAC, (nextState, payload) => {
             nextState.form = {
                 ...nextState.form,
-                ...payload.entry,
-            };
-            nextState.query = {
-                ...UnifySearchPageActions.toQuery(nextState.form),
-                recordTypes: UnifySearchPageActions.getRecordType(payload.domain),
-            };
-
-            return nextState;
-        })
-        .case(UnifySearchPageActions.setUnifyFormAC, (nextState, payload) => {
-            nextState.form = { ...payload.queryForm };
-            nextState.query = {
-                ...UnifySearchPageActions.toQuery(nextState.form),
-                recordTypes: UnifySearchPageActions.getRecordType(payload.domain),
+                ...payload,
             };
 
             return nextState;
         })
         .case(UnifySearchPageActions.getUnifySearchACs.started, (nextState, payload) => {
             nextState.results.status = LoadStatus.LOADING;
-            nextState.query = payload;
 
             return nextState;
         })

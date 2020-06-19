@@ -15,6 +15,7 @@ import { IApiError, PublishStatus } from "@vanilla/library/src/scripts/@types/ap
 import { IUnifySearchFormState, UnifySearchDomain } from "@knowledge/modules/search/unifySearchPageReducer";
 import _ from "lodash";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { notEmpty } from "@vanilla/utils";
 
 export interface IUnifySearchFormActionProps {
     searchActions: UnifySearchPageActions;
@@ -28,10 +29,11 @@ interface INotInForm {
     dateInserted?: string;
     insertUserIDs?: number[];
     locale?: string;
+    expand?: string[];
     // statuses?: PublishStatus[];
 }
 
-const createAction = actionCreatorFactory("@@searchPage");
+const createAction = actionCreatorFactory("@@unifySearchPage");
 
 export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppStoreState> {
     public static readonly LIMIT_DEFAULT = 10;
@@ -60,29 +62,29 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         "dateInserted",
         "locale",
         "insertUserIDs",
+        "expand",
         // "statuses",
     ];
 
     public static toQuery(form: IUnifySearchFormState, extraParams?: INotInForm): Partial<IUnifySearchRequestBody> {
         const paramsInForm = _.pick(form, UnifySearchPageActions.QUERY_KEYS_IN_FORM);
 
-        const paramsNotInForm = _.pickBy(
-            _.pick(extraParams, UnifySearchPageActions.QUERY_KEYS_NOT_IN_FORM),
-            UnifySearchPageActions.notIsNil,
-        );
+        const paramsNotInForm = _.pickBy(_.pick(extraParams, UnifySearchPageActions.QUERY_KEYS_NOT_IN_FORM), notEmpty);
 
         return { ...paramsInForm, ...paramsNotInForm };
     }
 
-    private static readonly ALL_FORM = ["query", "title", "authors", "startDate", "endDate"];
+    private static readonly ALL_FORM = ["query", "title", "authors", "startDate", "endDate", "page"];
 
     private static readonly DISCUSSIONS_FORM = [
         ...UnifySearchPageActions.ALL_FORM,
+        "domain",
         "categoryID",
         "tags",
         "followedCategories",
         "includeChildCategories",
         "includeArchivedCategories",
+        "insertUserIDs",
     ];
 
     private static readonly ARTICLES_FORM = [...UnifySearchPageActions.ALL_FORM, "knowledgeBaseID", "includeDeleted"];
@@ -96,8 +98,6 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         ...UnifySearchPageActions.ARTICLES_FORM,
         ...UnifySearchPageActions.CATEGORIES_AND_GROUPS_FORM,
     ];
-
-    public static notIsNil = (k: string) => !_.isNil(k);
 
     public static getRecordType(domain: UnifySearchDomain) {
         switch (domain) {
@@ -120,7 +120,7 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         domain: UnifySearchDomain,
         form: IUnifySearchFormState | IUnifySearchRequestBody,
     ): Partial<IUnifySearchFormState> {
-        const notIsNil = UnifySearchPageActions.notIsNil;
+        const notIsNil = notEmpty;
         switch (domain) {
             case UnifySearchDomain.DISCUSSIONS:
                 return _.pickBy(_.pick(form, UnifySearchPageActions.DISCUSSIONS_FORM), notIsNil);
@@ -157,33 +157,21 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         return this.dispatch(thunk);
     }
 
-    public static updateUnifyFormAC = createAction<{
-        entry: Partial<IUnifySearchFormState>;
-        domain: UnifySearchDomain;
-    }>("UPDATE_UNIFY_FORM");
-    public updateUnifyForm = this.bindDispatch(UnifySearchPageActions.updateUnifyFormAC);
-
-    public static setUnifyFormAC = createAction<{
-        queryForm: Partial<IUnifySearchFormState>;
-        domain: UnifySearchDomain;
-    }>("SET_UNIFY_FORM");
-    public setUnifyForm = this.bindDispatch(UnifySearchPageActions.setUnifyFormAC);
+    public static updateFormAC = createAction<Partial<IUnifySearchFormState>>("UPDATE_FORM");
+    public updateForm = this.bindDispatch(UnifySearchPageActions.updateFormAC);
 
     public static resetAC = createAction("RESET");
     public reset = this.bindDispatch(UnifySearchPageActions.resetAC);
 
-    public unifySearch = async (
-        domain = UnifySearchDomain.ALL_CONTENT,
-        page = 1,
-        limit = UnifySearchPageActions.LIMIT_DEFAULT,
-    ) => {
+    public unifySearch = async () => {
         const { form } = this.getState().knowledge.unifySearchPage;
+        const { domain } = form;
         const queryForm = this.getQueryForm(domain, form);
-        this.setUnifyForm({ queryForm, domain });
+        queryForm.domain = domain;
         const extraParams: INotInForm = {
             recordTypes: UnifySearchPageActions.getRecordType(domain),
-            page,
-            limit,
+            page: form.page,
+            limit: UnifySearchPageActions.LIMIT_DEFAULT,
             expandBody: true,
             locale:
                 domain === UnifySearchDomain.ARTICLES || domain === UnifySearchDomain.ALL_CONTENT
@@ -191,6 +179,7 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
                     : undefined,
             insertUserIDs:
                 form.authors && form.authors.length ? form.authors.map(author => author.value as number) : undefined,
+            expand: ["insertUser", "breadcrumbs"],
             // statuses: typeof form.includeDeleted === "boolean" ? this.getStatuses(form.includeDeleted) : undefined,
         };
         const requestOptions: IUnifySearchRequestBody = UnifySearchPageActions.toQuery(queryForm, extraParams);
