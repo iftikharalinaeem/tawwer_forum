@@ -54,7 +54,7 @@ export const INITIAL_SEARCH_FORM: IUnifySearchFormState = {
 
 const INITIAL_SEARCH_QUERY: IUnifySearchRequestBody = {
     query: "",
-    recordTypes: [UnifySearchDomain.ALL_CONTENT],
+    recordTypes: UnifySearchPageActions.getRecordType(UnifySearchDomain.ALL_CONTENT),
     page: 1,
 };
 
@@ -72,15 +72,21 @@ export const unifySearchPageReducer = produce(
         .case(UnifySearchPageActions.updateUnifyFormAC, (nextState, payload) => {
             nextState.form = {
                 ...nextState.form,
-                ...payload,
+                ...payload.entry,
             };
-            nextState.query = UnifySearchPageActions.toQuery(nextState.form);
+            nextState.query = {
+                ...UnifySearchPageActions.toQuery(nextState.form),
+                recordTypes: UnifySearchPageActions.getRecordType(payload.domain),
+            };
 
             return nextState;
         })
         .case(UnifySearchPageActions.setUnifyFormAC, (nextState, payload) => {
-            nextState.form = { ...payload };
-            nextState.query = UnifySearchPageActions.toQuery(nextState.form);
+            nextState.form = { ...payload.queryForm };
+            nextState.query = {
+                ...UnifySearchPageActions.toQuery(nextState.form),
+                recordTypes: UnifySearchPageActions.getRecordType(payload.domain),
+            };
 
             return nextState;
         })

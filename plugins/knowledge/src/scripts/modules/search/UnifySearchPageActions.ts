@@ -90,9 +90,16 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
     // Just a placeholder, to be expanded still
     private static readonly CATEGORIES_AND_GROUPS_FORM = [...UnifySearchPageActions.ALL_FORM];
 
-    private static notIsNil = (k: string) => !_.isNil(k);
+    public static readonly ALL_FORM_ENTRIES = [
+        ...UnifySearchPageActions.ALL_FORM,
+        ...UnifySearchPageActions.DISCUSSIONS_FORM,
+        ...UnifySearchPageActions.ARTICLES_FORM,
+        ...UnifySearchPageActions.CATEGORIES_AND_GROUPS_FORM,
+    ];
 
-    private getRecordType(domain: UnifySearchDomain) {
+    public static notIsNil = (k: string) => !_.isNil(k);
+
+    public static getRecordType(domain: UnifySearchDomain) {
         switch (domain) {
             case UnifySearchDomain.DISCUSSIONS:
                 return ["discussion"];
@@ -109,7 +116,10 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         return includeDeleted ? [PublishStatus.PUBLISHED, PublishStatus.DELETED] : [PublishStatus.PUBLISHED];
     }
 
-    public getQueryForm(domain: UnifySearchDomain, form: IUnifySearchFormState): Partial<IUnifySearchFormState> {
+    public getQueryForm(
+        domain: UnifySearchDomain,
+        form: IUnifySearchFormState | IUnifySearchRequestBody,
+    ): Partial<IUnifySearchFormState> {
         const notIsNil = UnifySearchPageActions.notIsNil;
         switch (domain) {
             case UnifySearchDomain.DISCUSSIONS:
@@ -147,10 +157,16 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         return this.dispatch(thunk);
     }
 
-    public static updateUnifyFormAC = createAction<Partial<IUnifySearchFormState>>("UPDATE_UNIFY_FORM");
+    public static updateUnifyFormAC = createAction<{
+        entry: Partial<IUnifySearchFormState>;
+        domain: UnifySearchDomain;
+    }>("UPDATE_UNIFY_FORM");
     public updateUnifyForm = this.bindDispatch(UnifySearchPageActions.updateUnifyFormAC);
 
-    public static setUnifyFormAC = createAction<Partial<IUnifySearchFormState>>("SET_UNIFY_FORM");
+    public static setUnifyFormAC = createAction<{
+        queryForm: Partial<IUnifySearchFormState>;
+        domain: UnifySearchDomain;
+    }>("SET_UNIFY_FORM");
     public setUnifyForm = this.bindDispatch(UnifySearchPageActions.setUnifyFormAC);
 
     public static resetAC = createAction("RESET");
@@ -163,9 +179,9 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
     ) => {
         const { form } = this.getState().knowledge.unifySearchPage;
         const queryForm = this.getQueryForm(domain, form);
-        this.setUnifyForm(queryForm);
+        this.setUnifyForm({ queryForm, domain });
         const extraParams: INotInForm = {
-            recordTypes: this.getRecordType(domain),
+            recordTypes: UnifySearchPageActions.getRecordType(domain),
             page,
             limit,
             expandBody: true,

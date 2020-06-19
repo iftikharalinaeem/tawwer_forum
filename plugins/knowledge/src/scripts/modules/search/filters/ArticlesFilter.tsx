@@ -4,12 +4,12 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 
 interface IProps {
-    fillLiveForm: (entry: Partial<IUnifySearchFormState>) => void;
+    fillQueryForm: (entry: Partial<IUnifySearchFormState>) => void;
     onSearch: () => void;
 }
 
 export default function ArticlesFilter(props: IProps) {
-    const { fillLiveForm, onSearch } = props;
+    const { fillQueryForm, onSearch } = props;
 
     return (
         <div>
@@ -19,7 +19,7 @@ export default function ArticlesFilter(props: IProps) {
                 <Button
                     baseClass={ButtonTypes.TEXT_PRIMARY}
                     onClick={() =>
-                        fillLiveForm({
+                        fillQueryForm({
                             query: "article",
                             includeDeleted: true,
                             authors: [{ value: "2", label: "tuanng" }],

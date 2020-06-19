@@ -4,19 +4,19 @@ import Button from "@vanilla/library/src/scripts/forms/Button";
 import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 
 interface IProps {
-    fillLiveForm: (entry: Partial<IUnifySearchFormState>) => void;
+    fillQueryForm: (entry: Partial<IUnifySearchFormState>) => void;
     onSearch: () => void;
 }
 
 export default function AllContentFilter(props: IProps) {
-    const { fillLiveForm, onSearch } = props;
+    const { fillQueryForm, onSearch } = props;
 
     return (
         <div>
             <h4> Search for all content</h4>
             <br /> <br />
             <div>
-                <Button baseClass={ButtonTypes.TEXT_PRIMARY} onClick={() => fillLiveForm({ query: "article" })}>
+                <Button baseClass={ButtonTypes.TEXT_PRIMARY} onClick={() => fillQueryForm({ query: "article" })}>
                     Fill All Content Form
                 </Button>
             </div>
