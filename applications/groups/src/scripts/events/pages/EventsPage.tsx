@@ -61,7 +61,11 @@ export default function EventsPage() {
 
     return (
         <>
-            <PageHeading title={<Translate source={"<0/> - Events"} c0={title}/>} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <PageHeading
+                title={<Translate source={"<0/> - Events"} c0={title} />}
+                includeBackLink={false}
+                headingClassName={classes.pageTitle}
+            />
             <EventFilter className={classes.filter} filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
             <SimplePager
