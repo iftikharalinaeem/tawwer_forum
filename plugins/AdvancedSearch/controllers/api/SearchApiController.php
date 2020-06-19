@@ -556,7 +556,6 @@ class SearchApiController extends AbstractApiController {
             if ($images && count($images) >= 1) {
                 $schemaRecord['imageUrl'] = $images[0];
             }
-
         }
 
         $result = $this->getEventManager()->fireFilter('searchApiController_normalizeOutput', $schemaRecord, $this, $searchRecord, []);
