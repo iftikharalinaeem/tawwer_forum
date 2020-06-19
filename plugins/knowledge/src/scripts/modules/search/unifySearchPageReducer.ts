@@ -47,7 +47,7 @@ export interface IUnifySearchFormState {
 
 export interface IUnifySearchPageState {
     form: IUnifySearchFormState;
-    results: ILoadable<IUnifySearchResponseBody>;
+    results: ILoadable<IUnifySearchResponseBody[]>;
     pages: ILinkPages;
 }
 
