@@ -21,13 +21,11 @@ import { IEditorPageState } from "@knowledge/modules/editor/EditorPageModel";
 import RevisionsPageActions from "@knowledge/modules/editor/RevisionsPageActions";
 import { IRevisionsPageState } from "@knowledge/modules/editor/RevisionsPageModel";
 import { ILocationPickerState } from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { ISearchPageState } from "@knowledge/modules/search/searchPageReducer";
 import { INavigationStoreState } from "@knowledge/navigation/state/NavigationModel";
 import { IRouteState } from "@knowledge/routes/RouteReducer";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { DeepPartial, Reducer } from "redux";
 import { IServerState } from "@knowledge/server/serverReducer";
-import { IUnifySearchPageState } from "@knowledge/modules/search/unifySearchPageReducer";
 
 export type KNOWLEDGE_ACTION =
     | typeof EditorPageActions.ACTION_TYPES
@@ -49,8 +47,6 @@ export interface IKbState {
     categories: IKbCategoriesState;
     categoriesPage: ICategoriesPageState;
     locationPicker: ILocationPickerState;
-    searchPage: ISearchPageState;
-    unifySearchPage: IUnifySearchPageState;
     navigation: INavigationStoreState;
     route: IRouteState;
     knowledgeBases: IKnowledgeBasesState;

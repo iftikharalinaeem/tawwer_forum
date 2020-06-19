@@ -74,7 +74,7 @@ function SearchForm(props: IProps) {
             <TitleBar title={t("Search")} />
             <Banner isContentBanner />
             <Container>
-                <QueryString value={form} defaults={getDefaultFormValues()} />
+                <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
                 <PanelLayout
                     className="hasLargePadding"
                     middleTop={

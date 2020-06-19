@@ -21,10 +21,13 @@ export function registerKbSearchDomain() {
                 return ["knowledgeBaseID", "includeDeleted"];
             },
             transformFormToQuery: (form: ISearchForm<IKnowledgeSearchTypes>) => {
-                if (form.knowledgeBaseOption) {
-                    form.knowledgeBaseID = form.knowledgeBaseOption.value as number;
+                const query = {
+                    ...form,
+                };
+                if (query.knowledgeBaseOption) {
+                    query.knowledgeBaseID = query.knowledgeBaseOption.value as number;
                 }
-                return form;
+                return query;
             },
             getRecordTypes: () => {
                 return ["article"];
