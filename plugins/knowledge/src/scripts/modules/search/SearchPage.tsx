@@ -9,7 +9,6 @@ import { LoadStatus } from "@library/@types/api/core";
 import PageLoader from "@library/routing/PageLoader";
 import SearchForm from "./SearchForm";
 import { IDeviceProps } from "@library/layout/DeviceContext";
-import UnifySearchForm from "@knowledge/modules/search/UnifySearchForm";
 
 interface IProps extends IDeviceProps {}
 

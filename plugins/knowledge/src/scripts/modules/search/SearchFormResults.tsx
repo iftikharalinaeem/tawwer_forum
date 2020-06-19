@@ -3,27 +3,23 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { ISearchResult } from "@knowledge/@types/api/search";
-import { LoadStatus } from "@library/@types/api/core";
-import { hashString } from "@vanilla/utils";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
-import ResultList from "@library/result/ResultList";
-import SearchPagination from "@knowledge/modules/search/components/SearchPagination";
-import { IResult } from "@library/result/Result";
-import { ResultMeta } from "@library/result/ResultMeta";
-import Loader from "@library/loaders/Loader";
-import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
-import KbErrorMessages from "@knowledge/modules/common/KbErrorMessages";
-import { useSearchPageData } from "@knowledge/modules/search/unifySearchPageReducer";
-import { useUnifySearchPageActions } from "@knowledge/modules/search/UnifySearchPageActions";
 import { IUnifySearchResponseBody } from "@knowledge/@types/api/unifySearch";
+import KbErrorMessages from "@knowledge/modules/common/KbErrorMessages";
+import SearchPagination from "@knowledge/modules/search/components/SearchPagination";
+import { LoadStatus } from "@library/@types/api/core";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
+import Loader from "@library/loaders/Loader";
+import { IResult } from "@library/result/Result";
+import ResultList from "@library/result/ResultList";
+import { ResultMeta } from "@library/result/ResultMeta";
+import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
+import { hashString } from "@vanilla/utils";
+import React from "react";
 
 interface IProps {}
 
 export function SearchFormResults(props: IProps) {
-    const { results, pages, form } = useSearchPageData();
-    const { unifySearch, updateForm } = useUnifySearchPageActions();
+    const { search, updateForm, results, form } = useSearchForm();
 
     switch (results.status) {
         case LoadStatus.PENDING:
@@ -32,26 +28,26 @@ export function SearchFormResults(props: IProps) {
         case LoadStatus.ERROR:
             return <KbErrorMessages apiError={results.error} />;
         case LoadStatus.SUCCESS:
-            const { next, prev } = pages;
+            const { next, prev } = results.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;
             let paginationPreviousClick: React.MouseEventHandler | undefined;
 
             if (next) {
                 paginationNextClick = e => {
                     updateForm({ page: next });
-                    void unifySearch();
+                    void search();
                 };
             }
             if (prev) {
                 paginationPreviousClick = e => {
                     updateForm({ page: prev });
-                    void unifySearch();
+                    void search();
                 };
             }
             return (
                 <>
-                    <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(pages))} />
-                    <ResultList results={results.data!.map(mapResult)} />
+                    <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
+                    <ResultList results={results.data!.results.map(mapResult)} />
                     <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                 </>
             );

@@ -15,7 +15,6 @@ import { useMemo, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import actionCreatorFactory from "typescript-fsa";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 export interface ISearchFormActionProps {
     searchActions: SearchPageActions;
