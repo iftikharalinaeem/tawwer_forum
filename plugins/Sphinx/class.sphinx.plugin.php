@@ -180,9 +180,7 @@ class SphinxPlugin extends Gdn_Plugin {
         if (array_key_exists('categoryID', $query)) {
             $params['cat'] = $query['categoryID'];
         } elseif ($this->session->isValid() && !empty($query['followed'])) {
-            $followed = $this->categoryModel->getFollowed($this->session->UserID);
-            $followedIDs = array_column($followed, 'CategoryID');
-            $params['cat'] = $followedIDs;
+            $params['followedcats'] = $query['followed'];
         }
 
         $result = $this->getSearchModel()->modelSearch(
