@@ -25,7 +25,7 @@ import { t, getSiteSection } from "@library/utility/appUtils";
 import debounce from "lodash/debounce";
 import qs from "qs";
 import * as React from "react";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useHistory } from "react-router";
 import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
@@ -36,16 +36,44 @@ import { typographyClasses } from "@library/styles/typographyStyles";
 import { iconClasses } from "@library/icons/iconStyles";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import { PageHeading } from "@library/layout/PageHeading";
+import { ISearchInButton, SearchInFilter } from "@library/search/SearchInFilter";
+import { SearchFilterAll, TypeArticles, TypeCategoriesAndGroups, TypeDiscussions } from "@library/icons/searchIcons";
 
 interface IProps extends IWithSearchProps {
     placeholder?: string;
 }
 
+// START - Placeholder data/functions for the search filters
+const dummmyFilters: ISearchInButton[] = [
+    {
+        label: t("All Content"),
+        icon: <SearchFilterAll />,
+        data: "all",
+    },
+    {
+        label: t("Discussions"),
+        icon: <TypeDiscussions />,
+        data: "discussions",
+    },
+    {
+        label: t("Articles"),
+        icon: <TypeArticles />,
+        data: "articles",
+    },
+    {
+        label: t("Categories & Groups"),
+        icon: <TypeCategoriesAndGroups />,
+        data: "categoriesAndGroups",
+    },
+];
+const [data, setData] = useState("all");
+
+// END - Placeholder data/functions for the search filters
+
 function SearchForm(props: IProps) {
     const { form, results } = useSearchPageData();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
     const classes = pageTitleClasses();
     useQueryParamSynchronization();
     useSearchContextValueSync();
@@ -111,6 +139,7 @@ function SearchForm(props: IProps) {
                                     needsPageTitle={false}
                                 />
                             </PanelWidget>
+                            <SearchInFilter setData={setData} activeItem={data} filters={dummmyFilters} />
                             {isMobile && (
                                 <PanelWidget>
                                     <Drawer title={t("Filter Results")}>
