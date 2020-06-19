@@ -19,7 +19,7 @@ import classNames from "classnames";
 import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
-import { radioInputAsButtonClasses } from "@vanilla/library/src/scripts/forms/radioAsButtons/radioInputAsTab.styles";
+import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -75,7 +75,7 @@ export function EventDetails(props: IProps) {
                     activeItem={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
                     accessibleTitle={t("Are you going?")}
                     setData={props.onChange}
-                    classes={radioInputAsButtonClasses()}
+                    classes={radioInputAsButtonsClasses()}
                 >
                     <>
                         <RadioInputAsButton
