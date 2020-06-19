@@ -112,7 +112,10 @@ class SearchApiController extends AbstractApiController {
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
-                'imageUrl:s?' => 'First image available in the record',
+                'image:o?' => [
+                    'url:s',
+                    'alt:s'
+                ],
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'SearchResult');
         }
@@ -341,7 +344,7 @@ class SearchApiController extends AbstractApiController {
             $expandParams = [
                 'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
                 'excerpt' => $this->isExpandField('excerpt', $query['expand']),
-                'extractImage' => $this->isExpandField('extractImage', $query['expand'])
+                'image' => $this->isExpandField('image', $query['expand'])
             ];
 
             return $this->normalizeOutput(
@@ -521,12 +524,12 @@ class SearchApiController extends AbstractApiController {
             $schemaRecord['excerpt'] = $searchRecord['excerpt'];
         }
 
-        $includeFirstImage = $expandParams['extractImage'] ?? false;
+        $includeFirstImage = $expandParams['image'] ?? false;
         if ($includeFirstImage && isset($searchRecord['Summary'])) {
-            $images = Gdn::formatService()->parseImageUrls($searchRecord['Summary'], $searchRecord['Format']);
+            $images = Gdn::formatService()->parseImages($searchRecord['Summary'], $searchRecord['Format']);
 
             if ($images && count($images) >= 1) {
-                $schemaRecord['imageUrl'] = $images[0];
+                $schemaRecord['image'] = $images[0];
             }
         }
 
