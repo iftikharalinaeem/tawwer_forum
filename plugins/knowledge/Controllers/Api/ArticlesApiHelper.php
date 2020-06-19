@@ -12,6 +12,7 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\RichFormat;
@@ -264,8 +265,12 @@ class ArticlesApiHelper {
         }
 
         if ($article['status'] !== ArticleModel::STATUS_PUBLISHED) {
-            // Deleted articles have a special permission check.
-            $this->knowledgeBaseModel->checkEditPermission($record['knowledgeBaseID']);
+            try {
+                // Deleted articles have a special permission check.
+                $this->knowledgeBaseModel->checkEditPermission($record['knowledgeBaseID']);
+            } catch (PermissionException $e) {
+                throw new ClientException('This article has been deleted.', 410);
+            }
         }
 
         return $record;
