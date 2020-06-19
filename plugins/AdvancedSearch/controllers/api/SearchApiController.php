@@ -14,15 +14,20 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchService;
 use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
  * Class SearchApiController
  */
 class SearchApiController extends AbstractApiController {
+
+    const FEATURE_USE_SEARCH_SERVICE = 'useSearchService';
 
     /** Default limit on the number of rows returned in a page. */
     const LIMIT_DEFAULT = 30;
@@ -51,21 +56,20 @@ class SearchApiController extends AbstractApiController {
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
+    /** @var SearchService */
+    private $searchService;
+
     /**
      * SearchApiController constructor.
      *
-     * @param CommentModel $commentModel
-     * @param DiscussionModel $discussionModel
-     * @param SearchModel $searchModel
-     * @param UserModel $userModel
-     * @param SearchRecordTypeProviderInterface $searchRecordTypeProvider
-     * @param BreadcrumbModel $breadcrumbModel
+     * @inheritdoc
      */
     public function __construct(
         CommentModel $commentModel,
         DiscussionModel $discussionModel,
         SearchModel $searchModel,
         UserModel $userModel,
+        SearchService $searchService,
         SearchRecordTypeProviderInterface $searchRecordTypeProvider,
         BreadcrumbModel $breadcrumbModel
     ) {
@@ -73,7 +77,8 @@ class SearchApiController extends AbstractApiController {
         $this->discussionModel = $discussionModel;
         $this->searchModel = $searchModel;
         $this->userModel = $userModel;
-        $this->searchRecordTypeProvider = $searchRecordTypeProvider;
+        $this->searchService = $searchService;
+        $this->searchRecordTypeProvider =$searchRecordTypeProvider;
         $this->breadcrumbModel = $breadcrumbModel;
     }
 
@@ -116,33 +121,66 @@ class SearchApiController extends AbstractApiController {
     }
 
     /**
-     * List search results.
+     * List search results. Currently has a feature flag check to go between new variations of the service and old variations.
      *
-     * @throws ServerException
      * @param array $query
+     *
      * @return Data
      */
     public function index(array $query): Data {
+        if (FeatureFlagHelper::featureEnabled(self::FEATURE_USE_SEARCH_SERVICE)) {
+            return $this->newIndex($query);
+        } else {
+            return $this->oldIndex($query);
+        }
+    }
+
+    /**
+     * New implementation of search index. Uses the search service.
+     *
+     * @param array $query
+     *
+     * @return Data
+     */
+    private function newIndex(array $query): Data {
+        $in = $this
+            ->searchService
+            ->buildQuerySchema()
+            ->merge($this->getCommonIndexSchema())
+            ->addValidator('', [$this, 'searchScopeValidator'])
+        ;
+
+        $query = $in->validate($query);
+        // Paging
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+
+        $searchResults = $this->searchService->search($query, new SearchOptions($offset, $limit));
+
+        // Expand associated rows.
+        $this->userModel->expandUsers(
+            $searchResults,
+            $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
+        );
+
+        $recordCount = $searchResults->getResultCount();
+
+        return new Data(
+            $searchResults,
+            [
+                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
+            ]
+        );
+    }
+
+    /**
+     * List search results.
+     *
+     * @param array $query
+     *
+     * @return Data
+     */
+    private function oldIndex(array $query): Data {
         $this->permission();
-
-        // Custom validator
-        $validator = function ($data, ValidationField $field) {
-            $schemaDefinition = $field->getField()['properties'];
-            foreach ($data as $name => $value) {
-                if (!empty($value) &&
-                    (isset($schemaDefinition[$name]['x-search-scope']) || isset($schemaDefinition[$name]['x-search-filter']))
-                ) {
-                    return true;
-                }
-            }
-
-            $field->addError('missingField', [
-                'messageCode' => 'You need to specify either a scope or a filter.',
-                'required' => true,
-            ]);
-
-            return false;
-        };
 
         $fullSchema = $this->fullSchema();
         $in = $this->schema(
@@ -257,25 +295,13 @@ class SearchApiController extends AbstractApiController {
                         "-dateInserted",
                         "dateFeatured",
                         "-dateFeatured",
-                    ]
+                    ],
                 ],
-                'page:i?' => [
-                    'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                    'default' => 1,
-                    'minimum' => 1,
-                ],
-                'limit:i?' => [
-                    'description' => 'Desired number of items per page.',
-                    'default' => self::LIMIT_DEFAULT,
-                    'minimum' => 1,
-                    'maximum' => self::LIMIT_MAXIMUM,
-                ],
-                'expandBody:b?' => [
-                    'default' => true,
-                ],
-                'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs', 'excerpt', 'extractImage']),
-            ], ['SearchIndex', 'in'])
-            ->addValidator('', $validator)
+            ],
+            ['SearchIndex', 'in']
+        )
+            ->merge($this->getCommonIndexSchema())
+            ->addValidator('', [$this, 'searchScopeValidator'])
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
 
@@ -287,7 +313,8 @@ class SearchApiController extends AbstractApiController {
         $search = $this->normalizeSearch($query);
 
         // Paging
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+
 
         $data = [];
         if ($this->searchModel instanceof SphinxSearchModel) {
@@ -328,7 +355,6 @@ class SearchApiController extends AbstractApiController {
 
 
         $result = $out->validate($searchResults);
-
         $recordCount = $data['RecordCount'] ?? 0;
 
         return new Data(
@@ -337,6 +363,57 @@ class SearchApiController extends AbstractApiController {
                 'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
             ]
         );
+    }
+
+    /**
+     * Get common schema for the search indexes.
+     *
+     * @return Schema
+     */
+    private function getCommonIndexSchema(): Schema {
+        return Schema::parse([
+            'page:i?' => [
+                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
+                'default' => 1,
+                'minimum' => 1,
+            ],
+            'limit:i?' => [
+                'description' => 'Desired number of items per page.',
+                'default' => self::LIMIT_DEFAULT,
+                'minimum' => 1,
+                'maximum' => self::LIMIT_MAXIMUM,
+            ],
+            'expandBody:b?' => [
+                'default' => true,
+            ],
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
+        ]);
+    }
+
+    /**
+     * Custom validator to ensure that a search has a scope or filter.
+     *
+     * @param mixed $data
+     * @param ValidationField $field
+     *
+     * @return bool
+     */
+    public function searchScopeValidator($data, ValidationField $field) {
+        $schemaDefinition = $field->getField()['properties'];
+        foreach ($data as $name => $value) {
+            if (!empty($value) &&
+                (isset($schemaDefinition[$name]['x-search-scope']) || isset($schemaDefinition[$name]['x-search-filter']))
+            ) {
+                return true;
+            }
+        }
+
+        $field->addError('missingField', [
+            'messageCode' => 'You need to specify either a scope or a filter.',
+            'required' => true,
+        ]);
+
+        return false;
     }
 
     /**

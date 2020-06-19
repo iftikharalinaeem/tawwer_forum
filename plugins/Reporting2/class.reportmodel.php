@@ -194,7 +194,7 @@ class ReportModel extends Gdn_Model {
             $this->EventArguments['Discussion'] = &$discussion;
             $this->fireEvent('BeforeDiscussion');
 
-            $discussionID = $discussionModel->save($discussion);
+            $discussionID = $discussionModel->save($discussion, ['ignoreMinLength' => true]);
             if (!$discussionID) {
                 trace('Discussion not saved.');
                 $this->Validation->addValidationResult($discussionModel->validationResults());
