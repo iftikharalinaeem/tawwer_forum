@@ -7,9 +7,11 @@
 
 use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\Models\ModelTestTrait;
 
 class SphinxSearchTest extends AbstractAPIv2Test {
     use \Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
+    use ModelTestTrait;
 
     /** @var array */
     protected static $category;
@@ -229,5 +231,115 @@ class SphinxSearchTest extends AbstractAPIv2Test {
         // Correct value is 2.
         // Partially fixed https://github.com/vanilla/internal/issues/1963
         $this->assertEquals(2, count($results));
+    }
+
+    /**
+     * Test searching in the title field.
+     */
+    public function testSearchTitle() {
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = self::container()->get(DiscussionModel::class);
+        $discussionTitle = $discussionModel->save([
+            'Name' => 'Title Query',
+            'Body' => 'Body',
+            'Format' => 'markdown',
+            'CategoryID' => self::$category['categoryID'],
+        ]);
+
+        $discussionWrongTitle = $discussionModel->save([
+            'Name' => 'Wrong',
+            'Body' => 'Title Query in body',
+            'Format' => 'markdown',
+            'CategoryID' => self::$category['categoryID'],
+        ]);
+
+        $this->sphinxReindex();
+
+        $this->assertSearchResultIDs(
+            [
+                'name' => 'title query',
+            ],
+            [$discussionTitle]
+        );
+    }
+
+    /**
+     * Test date ranges for the search query.
+     */
+    public function testDates() {
+        /** @var DiscussionModel $discussionModel */
+        $discussionModel = self::container()->get(DiscussionModel::class);
+        $discussion7_1 = $discussionModel->save([
+            'Name' => 'date test 7 1',
+            'Body' => '7 1',
+            'Format' => 'markdown',
+            'CategoryID' => self::$category['categoryID'],
+            'DateInserted' => "2019-07-01 12:00:00"
+        ]);
+
+        $discussion7_2 = $discussionModel->save([
+            'Name' => 'date test 7 2',
+            'Body' => '7 2',
+            'Format' => 'markdown',
+            'CategoryID' => self::$category['categoryID'],
+            'DateInserted' => "2019-07-02 12:00:00"
+        ]);
+
+        $discussion7_3 = $discussionModel->save([
+            'Name' => 'date test 7 3',
+            'Body' => '7 3',
+            'Format' => 'markdown',
+            'CategoryID' => self::$category['categoryID'],
+            'DateInserted' => "2019-07-03 12:00:00"
+        ]);
+
+        $this->sphinxReindex();
+
+        $this->assertSearchResultIDs(
+            [
+                'query' => 'date test',
+            ],
+            [$discussion7_1, $discussion7_2, $discussion7_3]
+        );
+
+        $this->assertSearchResultIDs(
+            [
+                'query' => 'date test',
+                'dateInserted' => '2019-07-03'
+            ],
+            [$discussion7_3]
+        );
+
+        $this->assertSearchResultIDs(
+            [
+                'query' => 'date test',
+                'dateInserted' => '[2019-07-01, 2019-07-02]'
+            ],
+            [$discussion7_1, $discussion7_2]
+        );
+
+        $this->assertSearchResultIDs(
+            [
+                'query' => 'date test',
+                'dateInserted' => '[2019-07-01, 2019-07-02)'
+            ],
+            [$discussion7_1]
+        );
+    }
+
+    /**
+     * Assert a search results in some particular result IDs.
+     *
+     * @param array $query
+     * @param array $expectedIDs
+     */
+    protected function assertSearchResultIDs(array $query, array $expectedIDs) {
+        $response = $this->api()->get('/search', $query);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $results = $response->getBody();
+
+        $actualIDs = array_column($results, 'recordID');
+        $this->assertIDsEqual($expectedIDs, $actualIDs);
     }
 }
