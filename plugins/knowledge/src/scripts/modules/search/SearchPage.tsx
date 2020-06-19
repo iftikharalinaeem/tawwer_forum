@@ -20,7 +20,6 @@ export class SearchPage extends React.Component<IProps> {
         return (
             <PageLoader status={LoadStatus.SUCCESS}>
                 <SearchForm />
-                {/* <UnifySearchForm /> */}
             </PageLoader>
         );
     }

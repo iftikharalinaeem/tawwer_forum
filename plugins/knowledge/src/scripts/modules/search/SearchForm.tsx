@@ -5,20 +5,12 @@
  */
 
 import { SearchFormResults } from "@knowledge/modules/search/SearchFormResults";
-import { useSearchPageActions } from "@knowledge/modules/search/SearchPageActions";
-import UnifySearchPageActions from "@knowledge/modules/search/UnifySearchPageActions";
-import {
-    INITIAL_SEARCH_FORM,
-    UnifySearchDomain,
-    useSearchPageData,
-} from "@knowledge/modules/search/unifySearchPageReducer";
 import { LoadStatus } from "@library/@types/api/core";
 import SearchBar from "@library/features/search/SearchBar";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
-import { SearchFilterAllIcon, TypeArticlesIcon, TypeDiscussionsIcon } from "@library/icons/searchIcons";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
@@ -31,21 +23,14 @@ import { SearchInFilter } from "@library/search/SearchInFilter";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { t } from "@library/utility/appUtils";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
-import { FilterPanelAll } from "@vanilla/library/src/scripts/search/panels/FilterPanelAll";
-import { SearchFilterPanelArticles } from "@vanilla/library/src/scripts/search/panels/FilterPanelArticles";
-import { SearchFilterPanelDiscussions } from "@vanilla/library/src/scripts/search/panels/FilterPanelDiscussions";
 import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
-import { notEmpty } from "@vanilla/utils";
+import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
 import debounce from "lodash/debounce";
-import pick from "lodash/pick";
-import pickBy from "lodash/pickBy";
 import qs from "qs";
 import * as React from "react";
 import { useCallback, useEffect } from "react";
-import { useHistory, useLocation } from "react-router";
-import { useLastValue } from "@vanilla/react-utils";
-import { ALL_CONTENT_DOMAIN_NAME } from "@vanilla/library/src/scripts/search/searchTypes";
+import { useLocation } from "react-router";
 
 interface IProps {
     placeholder?: string;
@@ -186,7 +171,6 @@ function useInitialQueryParamSync() {
     const lastinitialized = useLastValue(form.initialized);
     useEffect(() => {
         if (!lastinitialized && initialized) {
-            console.error("First init");
             search();
         }
     }, [search, lastinitialized, initialized]);
