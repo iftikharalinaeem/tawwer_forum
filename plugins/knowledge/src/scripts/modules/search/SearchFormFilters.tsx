@@ -60,15 +60,6 @@ export function SearchFormFilters(props: IProps) {
                     title={t("Filter Results")}
                 />
             )}
-            {/*<RadioTabs*/}
-            {/*    accessibleTitle={t("Search in:")}*/}
-            {/*    groupName="advancedSearchDomain"*/}
-            {/*    setData={(domain: SearchDomain) => updateForm({ domain })}*/}
-            {/*    activeItem={form.domain || SearchDomain.EVERYWHERE}*/}
-            {/*>*/}
-            {/*    <RadioTab label={t("Articles")} position="left" data={SearchDomain.ARTICLES} />*/}
-            {/*    <RadioTab label={t("Everywhere")} position="right" data={SearchDomain.EVERYWHERE} />*/}
-            {/*</RadioTabs>*/}
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
