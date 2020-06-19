@@ -59,10 +59,10 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         "page",
         "limit",
         "expandBody",
-        "dateInserted",
         "locale",
         "insertUserIDs",
         "expand",
+        "dateInserted",
         // "statuses",
     ];
 
@@ -74,7 +74,7 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         return { ...paramsInForm, ...paramsNotInForm };
     }
 
-    private static readonly ALL_FORM = ["query", "title", "authors", "startDate", "endDate", "page"];
+    private static readonly ALL_FORM = ["query", "name", "authors", "startDate", "endDate", "page"];
 
     private static readonly DISCUSSIONS_FORM = [
         ...UnifySearchPageActions.ALL_FORM,
@@ -87,7 +87,12 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         "insertUserIDs",
     ];
 
-    private static readonly ARTICLES_FORM = [...UnifySearchPageActions.ALL_FORM, "knowledgeBaseID", "includeDeleted"];
+    private static readonly ARTICLES_FORM = [
+        ...UnifySearchPageActions.ALL_FORM,
+        "knowledgeBaseID",
+        "includeDeleted",
+        "insertUserIDs",
+    ];
 
     // Just a placeholder, to be expanded still
     private static readonly CATEGORIES_AND_GROUPS_FORM = [...UnifySearchPageActions.ALL_FORM];
@@ -133,15 +138,9 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         }
     }
 
-    public static mapDispatchToProps(dispatch): IUnifySearchFormActionProps {
-        return {
-            searchActions: new UnifySearchPageActions(dispatch, apiv2),
-        };
-    }
-
     public static getUnifySearchACs = createAction.async<
         IUnifySearchRequestBody,
-        { body: IUnifySearchResponseBody; pagination: ILinkPages },
+        { body: IUnifySearchResponseBody[]; pagination: ILinkPages },
         IApiError
     >("GET_UNIFY_SEARCH");
 
@@ -168,6 +167,25 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
         const { domain } = form;
         const queryForm = this.getQueryForm(domain, form);
         queryForm.domain = domain;
+
+        // Convert start/endDate into format for our API.
+        let dateInserted: string | undefined;
+        if (form.startDate && form.endDate) {
+            if (form.startDate === form.endDate) {
+                // Simple equality.
+                dateInserted = form.startDate;
+            } else {
+                // Date range
+                dateInserted = `[${form.startDate},${form.endDate}]`;
+            }
+        } else if (form.startDate) {
+            // Only start date
+            dateInserted = `>=${form.startDate}`;
+        } else if (form.endDate) {
+            // Only end date.
+            dateInserted = `<=${form.endDate}`;
+        }
+
         const extraParams: INotInForm = {
             recordTypes: UnifySearchPageActions.getRecordType(domain),
             page: form.page,
@@ -179,8 +197,8 @@ export default class UnifySearchPageActions extends ReduxActions<IKnowledgeAppSt
                     : undefined,
             insertUserIDs:
                 form.authors && form.authors.length ? form.authors.map(author => author.value as number) : undefined,
+            dateInserted,
             expand: ["insertUser", "breadcrumbs"],
-            // statuses: typeof form.includeDeleted === "boolean" ? this.getStatuses(form.includeDeleted) : undefined,
         };
         const requestOptions: IUnifySearchRequestBody = UnifySearchPageActions.toQuery(queryForm, extraParams);
 

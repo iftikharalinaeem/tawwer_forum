@@ -24,7 +24,7 @@ export enum UnifySearchDomain {
 export interface IUnifySearchFormState {
     // These fields belong to all
     query?: string;
-    title?: string;
+    name?: string;
     authors?: IComboBoxOption[];
     startDate?: string;
     endDate?: string;
