@@ -54,17 +54,14 @@ trait SphinxQueryTrait {
      * Apply a sort mode the query.
      *
      * @param string|null $sort One of the SphinxQueryBuilder::SORT_* modes.
-     * @param array|null $forTerms Take search terms into account for a better sort. Will default to last extracted search terms.
+     * @param string|null $field
      *
      * @return $this
      */
-    public function setSort(?string $sort = null, ?array $forTerms = null) {
-        $hasMultipleTerms = count($forTerms ?? $this->terms) > 1;
-
-        if ($sort === null) {
-            $this->getSphinxClient()->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-            $this->getSphinxClient()->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
-        } elseif ($sort === SphinxQueryConstants::SORT_DATE || (!$hasMultipleTerms && $sort !== SphinxQueryConstants::SORT_RELEVANCE)) {
+    public function setSort(?string $sort = null, ?string $field = null) {
+        if ($field) {
+            $this->getSphinxClient()->setSortMode($sort ?? SphinxClient::SORT_ATTR_DESC, $field);
+        } elseif ($sort === SphinxQueryConstants::SORT_DATE) {
             // If there is just one search term then we really want to just sort by date.
             $this->getSphinxClient()->setSelect('*, (dateinserted + 1) as sort');
             $this->getSphinxClient()->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
@@ -215,11 +212,6 @@ trait SphinxQueryTrait {
         $terms = [];
         $query = ['', '', ''];
 
-        //
-        // TODO: This does not actually get used anywhere.
-        //
-        $hasops = false; // whether or not search has operators
-
         foreach ($tokens as $c) {
             // Figure out where to push the token.
             switch ($c) {
@@ -233,7 +225,6 @@ trait SphinxQueryTrait {
                     } else {
                         $query[1] .= $c;
                     }
-                    $hasops = true;
                     break;
                 case '"':
                     if ($inquote) {
@@ -244,7 +235,6 @@ trait SphinxQueryTrait {
                         $query[0] .= $c;
                         $inquote = true;
                     }
-                    $hasops = true;
                     break;
                 case ' ':
                     if ($inquote) {
