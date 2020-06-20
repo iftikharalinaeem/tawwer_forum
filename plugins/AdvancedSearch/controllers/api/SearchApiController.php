@@ -16,6 +16,7 @@ use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\SearchOptions;
@@ -387,7 +388,7 @@ class SearchApiController extends AbstractApiController {
             'expandBody:b?' => [
                 'default' => true,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs', 'image', 'excerpt']),
         ]);
     }
 
@@ -479,6 +480,7 @@ class SearchApiController extends AbstractApiController {
             'recordType' => null,
             'type' => null,
             'categoryID' => $searchRecord['CategoryID'],
+            'knowledgeCategoryID' => $searchRecord['knowledgeCategoryID'],
             'name' => $searchRecord['Title'],
             'score' => $searchRecord['Score'] ?? 0,
             'insertUserID' => $searchRecord['UserID'],
@@ -515,8 +517,12 @@ class SearchApiController extends AbstractApiController {
         }
 
         $includeBreadcrumbs = $expandParams['breadcrumbs'] ?? false;
-        if ($includeBreadcrumbs && isset($schemaRecord['categoryID'])) {
-            $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
+        if ($includeBreadcrumbs) {
+            if (isset($schemaRecord['categoryID']) && $schemaRecord['categoryID'] !== 0) {
+                $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
+            } elseif (isset($schemaRecord['knowledgeCategoryID'])) {
+                $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($schemaRecord['knowledgeCategoryID']));
+            }
         }
 
         $includeExcept = $expandParams['excerpt'] ?? false;
