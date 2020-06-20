@@ -15,6 +15,7 @@ import pDebounce from "p-debounce";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { PublishStatus } from "@library/@types/api/core";
 import { getCurrentLocale } from "@vanilla/i18n";
+import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
 
 export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     public constructor(private readonly knowledgeBaseID?: number | undefined) {}
@@ -23,6 +24,7 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
      * Simple data loading function for the search bar/react-select.
      */
     private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
+        SearchPageRoute.preload();
         const locale = getCurrentLocale();
         const siteSection = getSiteSection();
 
@@ -78,6 +80,6 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
 
     public makeSearchUrl(query: string): string {
         const queryString = qs.stringify({ knowledgeBaseID: this.knowledgeBaseID, query: query });
-        return `/kb/search?${queryString}`;
+        return SearchPageRoute.url(undefined) + `?${queryString}`;
     }
 }

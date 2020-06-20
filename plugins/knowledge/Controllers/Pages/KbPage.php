@@ -48,9 +48,6 @@ abstract class KbPage extends ThemedPage {
     /** @var AnalyticsClient */
     protected $analyticsClient;
 
-    /** @var \UsersApiController */
-    protected $usersApi;
-
     /** @var KnowledgeBasesApiController */
     protected $kbApi;
 
@@ -95,7 +92,6 @@ abstract class KbPage extends ThemedPage {
         MasterViewRenderer $masterViewRenderer,
         ThemePreloadProvider $themePreloadProvider = null, // Default needed for method extensions
         BreadcrumbModel $breadcrumbModel = null,
-        \UsersApiController $usersApi = null, // Default needed for method extensions
         KnowledgeApiController $rootApi = null, // Default needed for method extensions
         KnowledgeBasesApiController $kbApi = null, // Default needed for method extensions
         KnowledgeCategoriesApiController $categoriesApi = null, // Default needed for method extensions
@@ -113,7 +109,6 @@ abstract class KbPage extends ThemedPage {
             $themePreloadProvider
         );
         $this->breadcrumbModel = $breadcrumbModel;
-        $this->usersApi = $usersApi;
         $this->rootApi = $rootApi;
         $this->kbApi = $kbApi;
         $this->categoriesApi = $categoriesApi;
@@ -219,14 +214,6 @@ abstract class KbPage extends ThemedPage {
         }
 
         try {
-            $me = $this->usersApi->get_me([]);
-            $this->addReduxAction(new ReduxAction(\UsersApiController::ME_ACTION_CONSTANT, Data::box($me), []));
-
-            $permissions = $this->usersApi->get_permissions($this->session->UserID);
-            $this->addReduxAction(
-                new ReduxAction(\UsersApiController::PERMISSIONS_ACTION_CONSTANT, Data::box($permissions), [])
-            );
-
             $this->knowledgeBases = $this->kbApi->index($kbArgs);
             $this->addReduxAction(new ReduxAction(
                 ActionConstants::GET_ALL_KBS,

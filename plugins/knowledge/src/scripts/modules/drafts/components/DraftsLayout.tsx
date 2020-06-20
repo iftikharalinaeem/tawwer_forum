@@ -9,7 +9,6 @@ import Container from "@library/layout/components/Container";
 import { withDevice, Devices } from "@library/layout/DeviceContext";
 import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
-import PanelEmptyColumn from "@knowledge/modules/search/components/PanelEmptyColumn";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
 import DraftHeader from "@knowledge/modules/drafts/components/DraftHeader";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
@@ -35,10 +34,10 @@ class DraftsLayout extends React.Component<IProps> {
                 <Container>
                     <PanelLayout
                         className="hasLargePadding"
-                        leftTop={isFullWidth && <PanelEmptyColumn />}
+                        leftTop={isFullWidth && <React.Fragment />}
                         middleTop={!isMobile && <PageTitle includeBackLink={false} title={t("Drafts")} />}
                         middleBottom={<DraftList data={this.props.data} />}
-                        rightTop={isFullWidth && <PanelEmptyColumn />}
+                        rightTop={isFullWidth && <React.Fragment />}
                     />
                 </Container>
             </React.Fragment>
