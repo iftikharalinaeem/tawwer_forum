@@ -278,7 +278,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const meta = style("meta", {
         display: "inline",
         ...fonts({
-            size: globalVars.meta.text.fontSize,
+            size: globalVars.meta.text.size,
             color: globalVars.meta.colors.fg,
             lineHeight: globalVars.lineHeights.meta,
         }),
