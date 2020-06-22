@@ -8,6 +8,7 @@ use Garden\EventManager;
 use \Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Container\Container;
 use Vanilla\Adapters\SphinxClient;
+use Vanilla\DateFilterSphinxSchema;
 use Vanilla\Sphinx\Search\SearchModelSphinxQuery;
 use Vanilla\Sphinx\Search\SphinxQueryConstants;
 use Vanilla\Sphinx\Search\SphinxRanks;
@@ -261,23 +262,11 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['timestamp-from'])) {
             $queryBuilder->setFilterRange('DateInserted', $search['timestamp-from'], $search['timestamp-to']);
-        } elseif (isset($search['date-filters'])) {
-            $dtZone = new DateTimeZone('UTC');
-
-            $fromDate = array_shift($search['date-filters']);
-            $adjustedFrom = new DateTime('@'.$fromDate->getTimestamp());
-            $adjustedFrom->setTimezone($dtZone);
-
-            // We want an exact "date" but we still need to use setFilterRange().
-            if (count($search['date-filters']) === 0) {
-                $adjustedTo = $adjustedFrom;
-            } else {
-                $toDate = array_shift($search['date-filters']);
-                $adjustedTo = new DateTime('@'.$toDate->getTimestamp());
-                $adjustedTo->setTimezone($dtZone);
-            }
-
-            $queryBuilder->setFilterRange('DateInserted', $adjustedFrom->getTimestamp(), $adjustedTo->getTimestamp());
+        } elseif (isset($search['date-inserted'])) {
+            $range = DateFilterSphinxSchema::dateFilterRange($search['date-inserted']);
+            $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+            $queryBuilder->setFilterRange('DateInserted', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
         }
 
         if (isset($search['title'])) {
