@@ -34,7 +34,7 @@ export function SearchFilterPanelArticles() {
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
-        <FilterFrame handleSubmit={search}>
+        <FilterFrame title={t("Filter Results")} handleSubmit={search}>
             <InputTextBlock
                 label={t("Title")}
                 inputProps={{
