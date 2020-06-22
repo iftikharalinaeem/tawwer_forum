@@ -262,8 +262,8 @@ class SphinxSearchModel extends \SearchModel {
 
         if (isset($search['timestamp-from'])) {
             $queryBuilder->setFilterRange('DateInserted', $search['timestamp-from'], $search['timestamp-to']);
-        } elseif (isset($search['date-inserted'])) {
-            $range = DateFilterSphinxSchema::dateFilterRange($search['date-inserted']);
+        } elseif (isset($search['date-filters'])) {
+            $range = DateFilterSphinxSchema::dateFilterRange($search['date-filters']);
             $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
             $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
             $queryBuilder->setFilterRange('DateInserted', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());

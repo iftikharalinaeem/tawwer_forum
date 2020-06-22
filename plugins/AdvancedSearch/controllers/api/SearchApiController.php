@@ -255,9 +255,13 @@ class SearchApiController extends AbstractApiController {
                     'description' => 'Filter the records by inserted userIDs.',
                     'x-search-filter' => true,
                 ],
-                'dateInserted?' => new DateFilterSphinxSchema([
+                'dateInserted?' => new DateFilterSchema([
                     'description' => 'Filter by date when a record was inserted',
                     'x-search-filter' => true,
+                    'x-filter' => [
+                        'field' => 'DateInserted',
+                        'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                    ],
                 ]),
                 'statuses:a?' => [
                     'items' => ['type' => 'string'],
@@ -320,6 +324,9 @@ class SearchApiController extends AbstractApiController {
                 }
             }
         } else {
+            if ($query['dateInserted'] ?? false) {
+                $search['date-filters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
+            }
             $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
             $data['RecordCount'] = count($searchResults);
         }
@@ -424,7 +431,7 @@ class SearchApiController extends AbstractApiController {
             'includeArchivedCategories' => 'archived',
             'query' => 'search',
             'name' => 'title',
-            'dateInserted' => 'date-inserted',
+            'dateInserted' => 'date-filters',
             'insertUserNames' => 'author',
             'insertUserIDs' => 'users',
             'tags' => 'tags',
