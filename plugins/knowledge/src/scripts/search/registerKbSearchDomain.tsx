@@ -10,6 +10,10 @@ import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
 import React from "react";
 import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 import { SearchFilterPanelArticles } from "@knowledge/search/SearchFilterPanelArticles";
+import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
+import knowledgeReducer from "@knowledge/state/reducer";
+
+registerReducer("knowledge", knowledgeReducer);
 
 export function registerKbSearchDomain() {
     onReady(() => {
@@ -38,6 +42,13 @@ export function registerKbSearchDomain() {
                     includeDeleted: false,
                 };
             },
+        });
+
+        SearchFormContextProvider.addSubType({
+            label: t("Article"),
+            icon: <TypeArticlesIcon />,
+            recordType: "article",
+            type: "article",
         });
     });
 }
