@@ -55,7 +55,7 @@ export default function ThemeEditorPreviewPage() {
             <MemoryRouter>
                 <LinkContext.Provider
                     value={{
-                        linkContext: "",
+                        linkContexts: [""],
                         isDynamicNavigation: () => {
                             return true;
                         },
