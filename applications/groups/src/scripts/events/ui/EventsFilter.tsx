@@ -39,9 +39,15 @@ export function useEventQueryForFilter(filter: EventFilterTypes): Partial<IGetEv
                 dateEnds: `>${dateNow}`,
                 sort: "dateStarts",
             };
+        case EventFilterTypes.MINE:
+            return {
+                attendingStatus: [EventAttendance.GOING, EventAttendance.MAYBE],
+                dateEnds: `>${dateNow}`,
+                sort: "dateStarts",
+            };
         default:
             return {
-                attendingStatus: EventAttendance.GOING,
+                attendingStatus: [EventAttendance.GOING],
                 dateEnds: `>${dateNow}`,
                 sort: "dateStarts",
             };
