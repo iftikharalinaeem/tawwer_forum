@@ -6,19 +6,28 @@ namespace Vanilla\Knowledge\Models;
 
 use DiscussionModel;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\HttpException;
 use Gdn_Session;
 use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Vanilla\DateFilterSchema;
 use Vanilla\DateFilterSphinxSchema;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
+use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\AbstractSearchType;
+use Vanilla\Search\SearchResultItem;
+use Vanilla\Search\SearchResults;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Search\SearchQuery;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Search record type for a discussion.
  */
 class KnowledgeArticleSearchType extends AbstractSearchType {
+
+    const SPHINX_DTYPE = 5;
 
     /** @var Schema */
     private $searchResultSchema;
@@ -52,6 +61,9 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
 
     /** @var KnowledgeBaseModel $knowledgeBaseModel */
     private $knowledgeBaseModel;
+
+    /** @var KnowledgeApiController $knowledgeApiController */
+    private $knowledgeApiController;
 
     /** @var DiscussionModel */
     private $discussionModel;
@@ -91,6 +103,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
      * @param Gdn_Session $session
+     * @param KnowledgeApiController $knowledgeApiController
      */
     public function __construct(
         ArticleModel $articleModel,
@@ -103,7 +116,8 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         SiteSectionModel $siteSectionModel,
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        Gdn_Session $session
+        Gdn_Session $session,
+        KnowledgeApiController $knowledgeApiController
     ) {
         $this->articleModel = $articleModel;
         $this->userModel = $userModel;
@@ -116,6 +130,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
         $this->session = $session;
+        $this->knowledgeApiController = $knowledgeApiController;
     }
 
 
@@ -144,6 +159,26 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function getResultItems(array $recordIDs): array {
+        try {
+            $results  = $this->knowledgeApiController->getArticlesAsDiscussions(
+                $recordIDs, self::SPHINX_DTYPE
+            );
+            $resultItems = array_map(function ($result) {
+                $mapped = ArrayUtils::remapProperties($result, [
+                    'recordID' => 'articleID',
+                ]);
+                $mapped['recordType'] = $this->getSearchGroup();
+                $mapped['type'] = $this->getType();
+                $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($mapped['knowledgeCategoryID']));
+                return new SearchResultItem($mapped);
+            }, $results);
+
+            return $resultItems;
+
+        }  catch (HttpException $exception) {
+            trigger_error($exception->getMessage(), E_USER_WARNING);
+            return [];
+        }
 
     }
 
@@ -154,7 +189,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         $knowledgeBaseID  = $query->getQueryParameter('knowledgeBaseID');
 
         $knowledgeCategories = [];
-        if($knowledgeBaseID) {
+        if ($knowledgeBaseID) {
             $knowledgeCategories = $this->getKnowledgeCategories($knowledgeBaseID);
         }
 
@@ -173,16 +208,11 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         $statuses = $query->getQueryParameter('statuses');
         if ($statuses) {
             $query->setFilter('status', $statuses);
-        } else {
-            $query->setFilter('status', [ArticleModel::STATUS_PUBLISHED]);
         }
 
         $locale = $query->getQueryParameter('locale');
         if ($locale) {
             $query->setFilter('locale', $locale);
-        } else {
-            $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-            $query->setFilter('locale', [$siteSection->getContentLocale()]);
         }
 
         $siteSectionGroup = $query->getQueryParameter('siteSectionGroup');
@@ -192,16 +222,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         $featured = $query->getQueryParameter('featured');
         if ($featured) {
             $this->sphinx->setFilter('featured', [1]);
-            $this->sphinx->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
         }
-
-
-//        if ($query->getQueryParameter('dateUpdated')) {
-//            $range = DateFilterSphinxSchema::dateFilterRange($this->query['dateUpdated']);
-//            $range['startDate'] = $range['startDate'] ?? (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
-//            $range['endDate'] = $range['endDate'] ?? (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
-//            $query->setFilterRange('dateUpdated', $range['startDate']->getTimestamp(), $range['endDate']->getTimestamp());
-//        }
 
     }
 
