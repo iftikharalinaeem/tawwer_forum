@@ -14,8 +14,10 @@ import { getSiteSection } from "@library/utility/appUtils";
 import pDebounce from "p-debounce";
 import { ISearchRequestBody, ISearchResult } from "@knowledge/@types/api/search";
 import { PublishStatus } from "@library/@types/api/core";
-import { getCurrentLocale } from "@vanilla/i18n";
+import { getCurrentLocale, t } from "@vanilla/i18n";
 import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
+import getStore from "@vanilla/library/src/scripts/redux/getStore";
+import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 
 export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     public constructor(private readonly knowledgeBaseID?: number | undefined) {}
@@ -79,7 +81,23 @@ export default class KnowledgeSearchProvider implements ISearchOptionProvider {
     };
 
     public makeSearchUrl(query: string): string {
-        const queryString = qs.stringify({ knowledgeBaseID: this.knowledgeBaseID, query: query });
+        const params: Record<string, any> = {
+            domain: "knowledge",
+            knowledgeBaseID: this.knowledgeBaseID,
+            query: query,
+        };
+        if (this.knowledgeBaseID != null) {
+            const option: IComboBoxOption = {
+                value: this.knowledgeBaseID,
+                label:
+                    getStore<IKnowledgeAppStoreState>().getState().knowledge.knowledgeBases.knowledgeBasesByID.data?.[
+                        this.knowledgeBaseID
+                    ]?.name ?? t("Untitled"),
+            };
+            params.knowledgeBaseOption = option;
+        }
+
+        const queryString = qs.stringify(params);
         return SearchPageRoute.url(undefined) + `?${queryString}`;
     }
 }

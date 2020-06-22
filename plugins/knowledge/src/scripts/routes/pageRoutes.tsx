@@ -128,7 +128,7 @@ export function getPageRoutes() {
         ArticleRoute.route,
         CategoryRoute.route,
         CategoryPagedRoute.route,
-        NEW_SEARCH_PAGE_ENABLED ? null : SearchPageRoute.route,
+        SearchPageRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
         ArticleListPageRoute.route,
@@ -136,5 +136,5 @@ export function getPageRoutes() {
         HomeRoute.route,
         HomeAppRoute.route,
         <Route component={NotFound} key={"not found"} />,
-    ].filter(notEmpty);
+    ];
 }

@@ -37,7 +37,7 @@ function KnowledgeApp() {
         }
     });
 
-    let content = <Router sectionRoot="/kb" onRouteChange={clearError} />;
+    let content = <Router sectionRoots={["/kb", "/search"]} onRouteChange={clearError} />;
 
     if (routeState.error) {
         content = (

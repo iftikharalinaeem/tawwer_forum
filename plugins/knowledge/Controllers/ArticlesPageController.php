@@ -29,11 +29,10 @@ class ArticlesPageController extends PageDispatchController {
 
     /**
      * ArticlesPageController constructor.
-     * @param Container $container
+     * @param ArticlesApiController $articlesApi
      */
-    public function __construct(Container $container) {
-        parent::__construct($container);
-        $this->articlesApi = $container->get(ArticlesApiController::class);
+    public function __construct(ArticlesApiController $articlesApi) {
+        $this->articlesApi = $articlesApi;
     }
 
     /**
