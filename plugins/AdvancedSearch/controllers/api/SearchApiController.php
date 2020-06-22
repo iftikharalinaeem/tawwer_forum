@@ -14,6 +14,7 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\DateFilterSphinxSchema;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
@@ -255,7 +256,7 @@ class SearchApiController extends AbstractApiController {
                     'x-search-filter' => true,
                 ],
                 'dateInserted?' => new DateFilterSchema([
-                    'description' => 'Filter the record by when it was inserted.',
+                    'description' => 'Filter by date when a record was inserted',
                     'x-search-filter' => true,
                     'x-filter' => [
                         'field' => 'DateInserted',
@@ -306,10 +307,6 @@ class SearchApiController extends AbstractApiController {
         $out = $this->schema([':a' => $fullSchema], 'out');
 
         $query = $in->validate($query);
-
-        if (isset($query['dateInserted'])) {
-            $query['dateFilters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
-        }
         $search = $this->normalizeSearch($query);
 
         // Paging
@@ -327,6 +324,9 @@ class SearchApiController extends AbstractApiController {
                 }
             }
         } else {
+            if ($query['dateInserted'] ?? false) {
+                $search['date-filters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
+            }
             $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
             $data['RecordCount'] = count($searchResults);
         }
@@ -431,7 +431,7 @@ class SearchApiController extends AbstractApiController {
             'includeArchivedCategories' => 'archived',
             'query' => 'search',
             'name' => 'title',
-            'dateFilters' => 'date-filters',
+            'dateInserted' => 'date-filters',
             'insertUserNames' => 'author',
             'insertUserIDs' => 'users',
             'tags' => 'tags',
