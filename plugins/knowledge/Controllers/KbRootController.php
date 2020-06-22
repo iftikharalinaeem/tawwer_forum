@@ -69,8 +69,11 @@ class KbRootController extends PageDispatchController {
                 ]
             );
         } else {
-            $this->setAltExceptionHandler($this->searchRootController);
-            return $this->searchRootController->index();
+            return $this
+                ->useSimplePage(t('Search'))
+                ->blockRobots()
+                ->render()
+            ;
         }
     }
 
