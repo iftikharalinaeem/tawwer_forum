@@ -16,12 +16,10 @@ import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
-import NKnowledgeBaseInput from "@knowledge/knowledge-bases/NKnowledgeBaseInput";
-import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import knowledgeReducer from "@knowledge/state/reducer";
 import InputBlock from "@library/forms/InputBlock";
-
+import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 
 registerReducer("knowledge", knowledgeReducer);
 
@@ -63,8 +61,11 @@ export function SearchFilterPanelArticles() {
                 end={form.endDate}
                 className={classesDateRange.root}
             />
-            {/* {getFilterComponentsForDomain(form.domain)} */}
+
             <KnowledgeBaseInput
+                label={t("Knowledge Base")}
+                options={[]}
+                placeholder={""}
                 className={classesInputBlock.root}
                 onChange={(option: IComboBoxOption) => {
                     updateForm({ knowledgeBaseOption: option });
