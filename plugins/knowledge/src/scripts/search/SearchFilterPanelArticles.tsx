@@ -19,6 +19,7 @@ import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
 import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import knowledgeReducer from "@knowledge/state/reducer";
+import InputBlock from "@library/forms/InputBlock";
 
 registerReducer("knowledge", knowledgeReducer);
 
@@ -68,15 +69,18 @@ export function SearchFilterPanelArticles() {
                 }}
                 value={form.knowledgeBaseOption}
             />
+
             <Permission permission="articles.add">
-                <Checkbox
-                    label={t("Deleted Articles")}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        updateForm({ includeDeleted: event.target.checked || false });
-                    }}
-                    checked={form.includeDeleted}
-                    className={classesInputBlock.root}
-                />
+                <InputBlock>
+                    <Checkbox
+                        label={t("Deleted Articles")}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                            updateForm({ includeDeleted: event.target.checked || false });
+                        }}
+                        checked={form.includeDeleted}
+                        className={classesInputBlock.root}
+                    />
+                </InputBlock>
             </Permission>
         </FilterFrame>
     );
