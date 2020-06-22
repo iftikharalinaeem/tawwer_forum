@@ -16,10 +16,12 @@ import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
+import NKnowledgeBaseInput from "@knowledge/knowledge-bases/NKnowledgeBaseInput";
 import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import knowledgeReducer from "@knowledge/state/reducer";
 import InputBlock from "@library/forms/InputBlock";
+
 
 registerReducer("knowledge", knowledgeReducer);
 
@@ -77,7 +79,7 @@ export function SearchFilterPanelArticles() {
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             updateForm({ includeDeleted: event.target.checked || false });
                         }}
-                        checked={form.includeDeleted}
+                        checked={form.includeDeleted || false}
                         className={classesInputBlock.root}
                     />
                 </InputBlock>
