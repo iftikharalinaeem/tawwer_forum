@@ -3,15 +3,15 @@
  * @license Proprietary
  */
 
-import { SearchFilterContextProvider } from "@library/contexts/SearchFilterContext";
+// import { SearchFilterContextProvider } from "@library/search/SearchFilterContext";
 import { ProductSearchFormFilter } from "@subcommunities/forms/ProductSeachFormFilter";
 import React from "react";
 
-SearchFilterContextProvider.addSearchFilter(
-    "articles",
-    <ProductSearchFormFilter searchDomain="articles" default="current" />,
-);
-SearchFilterContextProvider.addSearchFilter(
-    "everywhere",
-    <ProductSearchFormFilter searchDomain="everywhere" default="all" />,
-);
+// SearchFilterContextProvider.addSearchFilter(
+//     UnifySearchDomain.ARTICLES,
+//     <ProductSearchFormFilter searchDomain={UnifySearchDomain.ARTICLES} default="current" />,
+// );
+// SearchFilterContextProvider.addSearchFilter(
+//     UnifySearchDomain.ALL_CONTENT,
+//     <ProductSearchFormFilter searchDomain={UnifySearchDomain.ALL_CONTENT} default="all" />,
+// );

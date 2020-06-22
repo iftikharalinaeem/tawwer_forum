@@ -9,7 +9,6 @@ import { t } from "@vanilla/i18n";
 import { useProducts } from "@subcommunities/products/productSelectors";
 import { getSiteSection } from "@library/utility/appUtils";
 import SelectOne from "@library/forms/select/SelectOne";
-import { useSearchFilters } from "@library/contexts/SearchFilterContext";
 
 interface IProps {
     default: "all" | "current";
