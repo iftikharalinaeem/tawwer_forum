@@ -114,6 +114,7 @@ class SearchApiController extends AbstractApiController {
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
+                'status:s?',
                 'image:o?' => [
                     'url:s',
                     'alt:s'
@@ -487,6 +488,7 @@ class SearchApiController extends AbstractApiController {
             'dateInserted' => $searchRecord['DateInserted'],
             'updateUserID' => $searchRecord['UpdateUserID'] ?? null,
             'dateUpdated' => $searchRecord['DateUpdated'] ?? null,
+            'status' => $searchRecord['status'] ?? null,
         ];
 
         if ($includeBody) {

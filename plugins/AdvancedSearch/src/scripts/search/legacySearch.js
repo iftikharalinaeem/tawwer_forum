@@ -72,7 +72,7 @@
                     },
                     select: function(event, ui) {
                         window.location = gdn.url(ui.item.Url);
-                    }
+                    },
                 },
                 options,
                 $this.data(),
@@ -105,7 +105,7 @@
                                 "</span>" +
                                 '<div class="Gloss">' +
                                 item.Summary +
-                                "</div>"
+                                "</div>",
                         )
                         .attr("href", item.Url)
                         .closest("li")
@@ -117,15 +117,14 @@
                     ul.outerWidth(
                         Math.max(
                             400, // min width
-                            this.element.outerWidth() // match input
-                        )
+                            this.element.outerWidth(), // match input
+                        ),
                     );
                 };
             }
         });
         return this;
     };
-
 
     $(document).ready(function($) {
         var translate = window.gdn.translate;
@@ -140,8 +139,8 @@
                     addForm: true,
                     position: {
                         collision: "flip",
-                        of: $this.closest("form")
-                    }
+                        of: $this.closest("form"),
+                    },
                 });
             });
 
@@ -153,8 +152,8 @@
                     addForm: true,
                     position: {
                         collision: "flip",
-                        of: $this.closest("form")
-                    }
+                        of: $this.closest("form"),
+                    },
                 });
             });
         }
@@ -185,7 +184,7 @@
             prePopulate: author,
             animateDropdown: false,
             allowTabOut: true,
-            ariaLabel: translate("Author")
+            ariaLabel: translate("Author"),
         });
 
         /// Tag token input.
@@ -221,8 +220,7 @@
             prePopulate: tags,
             animateDropdown: false,
             allowTabOut: true,
-            ariaLabel: translate("Tags")
+            ariaLabel: translate("Tags"),
         });
     });
-
 })(window, window.jQuery);

@@ -7,15 +7,15 @@ import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { percent, px } from "csx";
-import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { margins, paddings, unit } from "@library/styles/styleHelpers";
 import { modalVariables } from "@library/modal/modalStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { titleBarVariables } from "@vanilla/library/src/scripts/headers/titleBarStyles";
 
 export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
     const layoutVars = layoutVariables();
-    const titleBarVars = vanillaHeaderVariables();
+    const titleBarVars = titleBarVariables();
     const globalVars = globalVariables();
 
     const content = style("content", {
@@ -24,7 +24,7 @@ export const contentTranslatorClasses = useThemeCache(() => {
         maxWidth: unit(800),
         width: percent(100),
         ...margins({ horizontal: "auto" }),
-    } as NestedCSSProperties);
+    });
 
     const header = style("header", {
         display: "flex",
