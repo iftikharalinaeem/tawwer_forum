@@ -239,7 +239,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
         $types = $args['types'] ?? [];
         $hasKbType = false;
         foreach ($types as $type) {
-            if ($type instanceof SearchRecordTypeArticle) {
+            if ($type instanceof SearchRecordTypeArticle || $type instanceof SearchRecordTypeArticleDeleted) {
                 $hasKbType = true;
                 break;
             }
