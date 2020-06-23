@@ -1569,6 +1569,8 @@ class KeenIOTracker implements TrackerInterface {
      * @param array $eventData Data for the current event.
      */
     public function addDefinitions(Gdn_Controller $controller, $inDashboard = false, &$eventData = []) {
+        $hasReadPermission = Gdn::session()->checkPermission("Analytics.Data.View");
+
         $controller->addDefinition('keenio.projectID', $this->client->getProjectID());
         $controller->addDefinition('keenio.writeKey', $this->client->getWriteKey());
 
@@ -1588,7 +1590,7 @@ class KeenIOTracker implements TrackerInterface {
             'output' => 'referrerParsed'
         ];
 
-        if ($inDashboard) {
+        if ($inDashboard && $controller instanceof AnalyticsController && $hasReadPermission) {
             $controller->addDefinition('keenio.readKey', $this->client->getReadKey());
         }
     }
