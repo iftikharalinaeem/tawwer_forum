@@ -10,7 +10,7 @@ import { percent, px } from "csx";
 import { vanillaHeaderVariables } from "@library/headers/vanillaHeaderStyles";
 import { margins, paddings, unit } from "@library/styles/styleHelpers";
 import { modalVariables } from "@library/modal/modalStyles";
-import {NestedCSSProperties} from "typestyle/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 
 export const contentTranslatorClasses = useThemeCache(() => {
     const style = styleFactory("contentTranslator");
