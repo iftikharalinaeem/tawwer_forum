@@ -481,7 +481,7 @@ class SearchApiController extends AbstractApiController {
             'recordType' => null,
             'type' => null,
             'categoryID' => $searchRecord['CategoryID'],
-            'knowledgeCategoryID' => $searchRecord['knowledgeCategoryID'],
+            'knowledgeCategoryID' => $searchRecord['knowledgeCategoryID'] ?? null,
             'name' => $searchRecord['Title'],
             'score' => $searchRecord['Score'] ?? 0,
             'insertUserID' => $searchRecord['UserID'],
