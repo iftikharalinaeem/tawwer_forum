@@ -105,6 +105,18 @@ trait SphinxQueryTrait {
     }
 
     /**
+     * Set string attribute to filter
+     *
+     * @param string $attribute
+     * @param string $value
+     * @param bool $exclude
+     */
+    public function setFilterString(string $attribute, string $value, bool $exclude = false) {
+        $this->getSphinxClient()->setFilterString($attribute, $value);
+    }
+
+
+    /**
      * Set groupBy and groupFunc attributes
      *
      * @param string $attribute
