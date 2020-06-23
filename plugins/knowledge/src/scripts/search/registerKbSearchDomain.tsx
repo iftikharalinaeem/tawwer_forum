@@ -9,9 +9,10 @@ import { ISearchForm } from "@vanilla/library/src/scripts/search/searchTypes";
 import { onReady, t } from "@vanilla/library/src/scripts/utility/appUtils";
 import React from "react";
 import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
-import { SearchFilterPanelArticles } from "@knowledge/search/SearchFilterPanelArticles";
+import { KnowledgeSearchFilterPanel } from "@knowledge/search/KnowledgeSearchFilterPanel";
 import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegistry";
 import knowledgeReducer from "@knowledge/state/reducer";
+import { PublishStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 registerReducer("knowledge", knowledgeReducer);
 
@@ -22,7 +23,7 @@ export function registerKbSearchDomain() {
             name: t("Articles"),
             icon: <TypeArticlesIcon />,
             getAllowedFields: () => {
-                return ["knowledgeBaseID", "includeDeleted"];
+                return ["knowledgeBaseID", "siteSectionGroup", "statuses"];
             },
             transformFormToQuery: (form: ISearchForm<IKnowledgeSearchTypes>) => {
                 const query = {
@@ -31,12 +32,17 @@ export function registerKbSearchDomain() {
                 if (query.knowledgeBaseOption) {
                     query.knowledgeBaseID = query.knowledgeBaseOption.value as number;
                 }
+
+                query.statuses = form.includeDeleted
+                    ? [PublishStatus.PUBLISHED, PublishStatus.DELETED]
+                    : [PublishStatus.PUBLISHED];
+
                 return query;
             },
             getRecordTypes: () => {
                 return ["article"];
             },
-            PanelComponent: SearchFilterPanelArticles,
+            PanelComponent: KnowledgeSearchFilterPanel,
             getDefaultFormValues: () => {
                 return {
                     includeDeleted: false,

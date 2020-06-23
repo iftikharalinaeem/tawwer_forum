@@ -9,4 +9,6 @@ export interface IKnowledgeSearchTypes {
     knowledgeBaseID?: number;
     knowledgeBaseOption: IComboBoxOption;
     includeDeleted?: boolean;
+    statuses?: string[];
+    siteSectionGroup?: string;
 }

@@ -12,7 +12,7 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchFormContext";
+import { useSearchForm, SearchFormContextProvider } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
@@ -26,8 +26,10 @@ registerReducer("knowledge", knowledgeReducer);
 /**
  * Implement search filter panel for articles
  */
-export function SearchFilterPanelArticles() {
+export function KnowledgeSearchFilterPanel() {
     const { form, updateForm, search, getFilterComponentsForDomain } = useSearchForm<IKnowledgeSearchTypes>();
+
+    console.log(SearchFormContextProvider.extraFilters);
 
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
@@ -72,6 +74,7 @@ export function SearchFilterPanelArticles() {
                 }}
                 value={form.knowledgeBaseOption}
             />
+            {getFilterComponentsForDomain("knowledge")}
 
             <Permission permission="articles.add">
                 <InputBlock>
