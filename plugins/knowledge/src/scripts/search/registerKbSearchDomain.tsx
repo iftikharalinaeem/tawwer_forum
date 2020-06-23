@@ -31,6 +31,8 @@ export function registerKbSearchDomain() {
                 };
                 if (query.knowledgeBaseOption) {
                     query.knowledgeBaseID = query.knowledgeBaseOption.value as number;
+                } else if (query.knowledgeBaseID) {
+                    delete query.knowledgeBaseID;
                 }
 
                 query.statuses = form.includeDeleted ? [PublishStatus.DELETED] : [PublishStatus.PUBLISHED];

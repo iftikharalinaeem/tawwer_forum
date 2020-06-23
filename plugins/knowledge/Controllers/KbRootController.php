@@ -65,7 +65,7 @@ class KbRootController extends PageDispatchController {
                     'status' => 302,
                 ],
                 [
-                    'location' => $request->url('/search')
+                    'location' => $request->url('/search?domain=knowledge')
                 ]
             );
         } else {

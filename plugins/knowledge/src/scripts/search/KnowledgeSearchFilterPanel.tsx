@@ -29,8 +29,6 @@ registerReducer("knowledge", knowledgeReducer);
 export function KnowledgeSearchFilterPanel() {
     const { form, updateForm, search, getFilterComponentsForDomain } = useSearchForm<IKnowledgeSearchTypes>();
 
-    console.log(SearchFormContextProvider.extraFilters);
-
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
     return (
