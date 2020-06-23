@@ -9,20 +9,18 @@ import { t } from "@vanilla/i18n";
 import { useProducts } from "@subcommunities/products/productSelectors";
 import { getSiteSection } from "@library/utility/appUtils";
 import SelectOne from "@library/forms/select/SelectOne";
+import { useSearchForm } from "@vanilla/library/src/scripts/search/SearchFormContext";
 
 interface IProps {
     default: "all" | "current";
-    searchDomain: string;
 }
 
 /**
  * Search filter to add into the search form.
  */
 export function ProductSearchFormFilter(props: IProps) {
-    const { searchDomain } = props;
     const { productsById } = useProducts();
-    const { updateQueryValuesForDomain, getQueryValuesForDomain } = useSearchFilters();
-    const existingValues = getQueryValuesForDomain(props.searchDomain);
+    const { form, updateForm } = useSearchForm<{ siteSectionGroup?: string | null }>();
 
     const currentSiteSection = getSiteSection();
     const siteSectionGroupOptions: IComboBoxOption[] = [
@@ -41,21 +39,23 @@ export function ProductSearchFormFilter(props: IProps) {
 
     const defaultSectionGroup = props.default === "all" ? siteSectionGroupOptions[0] : siteSectionGroupOptions[1];
     const placeHolderText = defaultSectionGroup.label;
-    let value = siteSectionGroupOptions.find(option => option.value === existingValues.siteSectionGroup);
+    let value = siteSectionGroupOptions.find(option => option.value === form.siteSectionGroup);
 
-    const formSectionGroup = existingValues.siteSectionGroup;
+    const formSectionGroup = form.siteSectionGroup;
     const defaultValueToSet = defaultSectionGroup.value.toString();
 
     useEffect(() => {
         // On mount be sure to set our default value into the search form if it's not set.
         if (!formSectionGroup) {
-            updateQueryValuesForDomain(searchDomain, { siteSectionGroup: defaultValueToSet });
+            updateForm({ siteSectionGroup: defaultValueToSet });
         }
         // Always clear the form on unmount.
         return () => {
-            updateQueryValuesForDomain(searchDomain, { siteSectionGroup: null });
+            updateForm({ siteSectionGroup: null });
         };
     }, []);
+
+    console.log(productsById);
 
     if (Object.values(productsById).length <= 1) {
         // No need to offer the dropdown if don't have products.
@@ -79,7 +79,7 @@ export function ProductSearchFormFilter(props: IProps) {
                 if (!value) {
                     return;
                 }
-                updateQueryValuesForDomain(searchDomain, { siteSectionGroup: value.value.toString() });
+                updateForm({ siteSectionGroup: value.value.toString() });
             }}
         />
     );
