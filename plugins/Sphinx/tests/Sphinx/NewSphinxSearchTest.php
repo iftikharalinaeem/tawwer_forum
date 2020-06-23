@@ -23,6 +23,7 @@ class NewSphinxSearchTest extends \SphinxSearchTest {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
+        FeatureFlagHelper::clearCache();
         \Gdn::config()->saveToConfig('Feature.useSearchService.Enabled', true);
         self::container()->rule(SphinxSearchDriver::class)
             ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
