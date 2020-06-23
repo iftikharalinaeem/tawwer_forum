@@ -1,12 +1,14 @@
 <?php
-
+/**
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
 
 namespace Vanilla\Knowledge\Models;
 
-
 use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
-use Vanilla\DateFilterSchema;
+use Vanilla\Knowledge\Controllers\Api\CheckGlobalPermissionTrait;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\AbstractSearchType;
@@ -14,16 +16,21 @@ use Vanilla\Search\SearchResultItem;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Search\SearchQuery;
 
-
 /**
- * Search record type for a discussion.
+ * Search record type for a knowledge-article.
  */
 class KnowledgeArticleSearchType extends AbstractSearchType {
+    use CheckGlobalPermissionTrait;
 
     const SPHINX_DTYPE = 5;
+    const TYPE_ARTICLE = 5;
+    const TYPE_ARTICLE_DELETED = 6;
 
-    /** @var Schema */
-    private $searchResultSchema;
+    const ARTICLE_STATUSES = [
+        1 => ArticleModel::STATUS_PUBLISHED,
+        2 => ArticleModel::STATUS_DELETED,
+        3 => ArticleModel::STATUS_UNDELETED,
+    ];
 
     /** @var ArticleModel */
     private $articleModel;
@@ -102,21 +109,20 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      */
     public function getResultItems(array $recordIDs): array {
         try {
-            $results  = $this->knowledgeApiController->getArticles(
-                $recordIDs, self::SPHINX_DTYPE
+            $results  = $this->knowledgeApiController->getArticlesAsDiscussions(
+                $recordIDs,self::SPHINX_DTYPE
             );
             $resultItems = array_map(function ($result) {
                 $mapped['recordID'] = $result['articleID'];
                 $mapped['foreignID'] = $result['articleRevisionID'];
                 $mapped['name'] = $result['name'];
-                $mapped['url'] = $result['url'];
+                $mapped['url'] = $result['Url'];
                 $mapped['dateInserted'] = $result['dateInserted'];
                 $mapped['recordType'] = $this->getSearchGroup();
                 $mapped['type'] = $this->getType();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($result['knowledgeCategoryID']));
                 return new SearchResultItem($mapped);
             }, $results);
-
             return $resultItems;
         }  catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
@@ -129,7 +135,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function applyToQuery(SearchQuery $query) {
-        $knowledgeBaseID  = $query->getQueryParameter('knowledgeBaseID');
+        $knowledgeBaseID = $query->getQueryParameter('knowledgeBaseID');
 
         $knowledgeCategories = [];
         if ($knowledgeBaseID) {
@@ -137,7 +143,10 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         }
 
         if ($query->getQueryParameter('knowledgeCategoryIDs')) {
-            $knowledgeCategories = array_intersect($query->getQueryParameter('knowledgeCategoryIDs'), $knowledgeCategories);
+            $knowledgeCategories = array_intersect(
+                $query->getQueryParameter('knowledgeCategoryIDs'),
+                $knowledgeCategories
+            );
         };
 
         $filteredKnowledgeCategoryIDs = $this->filterKnowledgeBases($knowledgeCategories);
@@ -150,23 +159,24 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
 
         $statuses = $query->getQueryParameter('statuses');
         if ($statuses) {
-            $query->setFilter('status', $statuses);
+            $statusesToApply = $this->getStatusFilters($statuses, [self::TYPE_ARTICLE]);
+            $query->setFilter('status', $statusesToApply);
         }
 
         $locale = $query->getQueryParameter('locale');
         if ($locale) {
-            $query->setFilter('locale', $locale);
+            $query->setFilterString('locale', $locale);
         }
 
         $siteSectionGroup = $query->getQueryParameter('siteSectionGroup');
         if ($siteSectionGroup) {
-            $query->setFilter('siteSectionGroup', $siteSectionGroup);
+            $query->setFilterString('siteSectionGroup', $siteSectionGroup);
         }
+
         $featured = $query->getQueryParameter('featured');
         if ($featured) {
             $query->setFilter('featured', [1]);
         }
-
     }
 
     /**
@@ -181,13 +191,31 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      */
     public function getQuerySchema(): Schema {
         return $this->schemaWithTypes(Schema::parse([
-            "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
-            "knowledgeCategoryIDs:a?" => "Knowledge category ID to filter results.",
-            "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
-            "statuses:a?" => "Article statuses array to filter results.",
-            "locale:s?" => "The locale articles are published in",
-            "siteSectionGroup:s?" => "The site-section-group articles are associated to",
-            "featured:b?" => "Search for featured articles only. Default: false",
+            "knowledgeBaseID:i?" => [
+                'description' => 'Unique ID of a knowledge base. Results will be relative to this value.',
+                'x-search-scope' => true,
+            ],
+            'knowledgeCategoryIDs:a?' => [
+                'description' => 'Set the scope of the search to a specific category.',
+                'x-search-scope' => true,
+            ],
+            'statuses:a?' => [
+                'items' => ['type' => 'string'],
+                'description' => 'Article statuses array to filter results.',
+                'x-search-filter' => true,
+            ],
+            "locale:s?" => [
+                'description' => 'The locale articles are published in.',
+                'x-search-scope' => true
+            ],
+            'siteSectionGroup:s?' => [
+                'description' => 'The site-section-group articles are associated to',
+                'x-search-scope' => true
+            ],
+            "featured:b?" => [
+                'description' => "Search for featured articles only. Default: false",
+                'x-search-filter' => true,
+            ],
         ]));
 
     }
@@ -196,7 +224,6 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      * @inheritdoc
      */
     public function validateQuery(SearchQuery $query): void {
-
         return;
     }
 
@@ -233,9 +260,10 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      */
     private function filterKnowledgeBases(array $knowledgeCategories = []): array {
         $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
+        $kbIDs = $kbs['knowledgeBaseID'] ?? [];
         $allKnowledgeCategories = array_column(
             $this->knowledgeCategoryModel->get(
-                ['knowledgeBaseID' => $kbs['knowledgeBaseID']],
+                ['knowledgeBaseID' => $kbIDs],
                 ['select' => ['knowledgeCategoryID']]
             ),
             'knowledgeCategoryID'
@@ -245,8 +273,30 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         } else {
             $filterIDs = array_intersect($knowledgeCategories, $allKnowledgeCategories);
         }
-
         return $filterIDs;
+    }
+
+    /**
+     * Get the article status Filters.
+     *
+     * @param array $queryStatuses
+     * @param array $articleIndexes
+     * @return array
+     */
+    protected function getStatusFilters(array $queryStatuses, array $articleIndexes = [5]): array {
+        $searchDeleted = in_array(ArticleModel::STATUS_DELETED, $queryStatuses);
+        if ($searchDeleted) {
+            $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
+        };
+        $articleIndexes[] = self::TYPE_ARTICLE_DELETED;
+        $statuses = array_map(
+            function ($status) {
+                return array_search($status, self::ARTICLE_STATUSES);
+            },
+            $queryStatuses
+        );
+
+        return $statuses;
     }
 
 }
