@@ -4,23 +4,16 @@
 namespace Vanilla\Knowledge\Models;
 
 
-use DiscussionModel;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
-use Gdn_Session;
-use Vanilla\Adapters\SphinxClient as SphinxAdapter;
 use Vanilla\DateFilterSchema;
-use Vanilla\DateFilterSphinxSchema;
-use Vanilla\Forum\Navigation\ForumCategoryRecordType;
-use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
-use Vanilla\Search\SearchResults;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Search\SearchQuery;
-use Vanilla\Utility\ArrayUtils;
+
 
 /**
  * Search record type for a discussion.
@@ -32,29 +25,8 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
     /** @var Schema */
     private $searchResultSchema;
 
-    /** @var array */
-    private $results = [];
-
-    /** @var array */
-    private $query = [];
-
-    /** @var SphinxAdapter */
-    private $sphinx = null;
-
-    /** @var string */
-    private $sphinxQuery = '';
-
-    /** @var string */
-    private $sphinxIndexes = '';
-
-    /** @var array */
-    private $sphinxIndexWeights = [];
-
     /** @var ArticleModel */
     private $articleModel;
-
-    /** @var \UserModel */
-    private $userModel;
 
     /** @var KnowledgeCategoryModel */
     private $knowledgeCategoryModel;
@@ -65,15 +37,6 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
     /** @var KnowledgeApiController $knowledgeApiController */
     private $knowledgeApiController;
 
-    /** @var DiscussionModel */
-    private $discussionModel;
-
-    /** @var CommentModel */
-    private $commentModel;
-
-    /** @var \CategoryCollection */
-    private $categoryCollection;
-
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
@@ -83,53 +46,32 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
     /** @var KnowledgeUniversalSourceModel */
     private $knowledgeUniversalSourceModel;
 
-    /** @var Gdn_Session $session */
-    private $session;
-
-    /** @var array $knowledgeCategories */
-    private $knowledgeCategories = null;
-
     /**
      * DI.
      *
      * @param ArticleModel $articleModel
-     * @param \UserModel $userModel
      * @param KnowledgeCategoryModel $knowledgeCategoryModel
-     * @param DiscussionModel $discussionModel
-     * @param CommentModel $commentModel
-     * @param \CategoryCollection $categoryCollection
      * @param BreadcrumbModel $breadcrumbModel
      * @param SiteSectionModel $siteSectionModel
      * @param KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel
      * @param KnowledgeBaseModel $knowledgeBaseModel
-     * @param Gdn_Session $session
      * @param KnowledgeApiController $knowledgeApiController
      */
     public function __construct(
         ArticleModel $articleModel,
-        \UserModel $userModel,
         KnowledgeCategoryModel $knowledgeCategoryModel,
-        DiscussionModel $discussionModel,
-        \CommentModel $commentModel,
-        \CategoryCollection $categoryCollection,
         BreadcrumbModel $breadcrumbModel,
         SiteSectionModel $siteSectionModel,
         KnowledgeUniversalSourceModel $knowledgeUniversalSourceModel,
         KnowledgeBaseModel $knowledgeBaseModel,
-        Gdn_Session $session,
         KnowledgeApiController $knowledgeApiController
     ) {
         $this->articleModel = $articleModel;
-        $this->userModel = $userModel;
         $this->knowledgeCategoryModel = $knowledgeCategoryModel;
-        $this->discussionModel = $discussionModel;
-        $this->commentModel = $commentModel;
-        $this->categoryCollection = $categoryCollection;
         $this->breadcrumbModel = $breadcrumbModel;
         $this->siteSectionModel = $siteSectionModel;
         $this->knowledgeUniversalSourceModel = $knowledgeUniversalSourceModel;
         $this->knowledgeBaseModel = $knowledgeBaseModel;
-        $this->session = $session;
         $this->knowledgeApiController = $knowledgeApiController;
     }
 
@@ -160,21 +102,22 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      */
     public function getResultItems(array $recordIDs): array {
         try {
-            $results  = $this->knowledgeApiController->getArticlesAsDiscussions(
+            $results  = $this->knowledgeApiController->getArticles(
                 $recordIDs, self::SPHINX_DTYPE
             );
             $resultItems = array_map(function ($result) {
-                $mapped = ArrayUtils::remapProperties($result, [
-                    'recordID' => 'articleID',
-                ]);
+                $mapped['recordID'] = $result['articleID'];
+                $mapped['foreignID'] = $result['articleRevisionID'];
+                $mapped['name'] = $result['name'];
+                $mapped['url'] = $result['url'];
+                $mapped['dateInserted'] = $result['dateInserted'];
                 $mapped['recordType'] = $this->getSearchGroup();
                 $mapped['type'] = $this->getType();
-                $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($mapped['knowledgeCategoryID']));
+                $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($result['knowledgeCategoryID']));
                 return new SearchResultItem($mapped);
             }, $results);
 
             return $resultItems;
-
         }  catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];
@@ -221,7 +164,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         }
         $featured = $query->getQueryParameter('featured');
         if ($featured) {
-            $this->sphinx->setFilter('featured', [1]);
+            $query->setFilter('featured', [1]);
         }
 
     }
@@ -241,28 +184,10 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
             "knowledgeBaseID:i?" => "Unique ID of a knowledge base. Results will be relative to this value.",
             "knowledgeCategoryIDs:a?" => "Knowledge category ID to filter results.",
             "updateUserIDs:a?" => "Array of updateUserIDs (last editors of an article) to filter results.",
-            'dateUpdated?' =>new DateFilterSchema([
-                'description' => 'When the article was updated.',
-                'x-filter' => [
-                    'field' => 'dateUpdated',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
-                ],
-            ]),
             "statuses:a?" => "Article statuses array to filter results.",
             "locale:s?" => "The locale articles are published in",
             "siteSectionGroup:s?" => "The site-section-group articles are associated to",
             "featured:b?" => "Search for featured articles only. Default: false",
-            "sort:s?" => [
-                "description" => "Sort option to order search results.",
-                "enum" => [
-                    "name",
-                    "-name",
-                    "dateInserted",
-                    "-dateInserted",
-                    "dateFeatured",
-                    "-dateFeatured",
-                ]
-            ],
         ]));
 
     }
