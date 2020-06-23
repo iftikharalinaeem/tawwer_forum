@@ -301,4 +301,3 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
         return $statuses;
     }
 }
-
