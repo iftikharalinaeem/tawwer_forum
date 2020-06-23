@@ -194,7 +194,7 @@ paths:
             - insertUser
             - breadcrumbs
             - excerpt
-            - extractImage
+            - image
             type: string
           type: array
         style: form
@@ -283,7 +283,7 @@ components:
           description: The user that updated the record.
           nullable: true
           type: integer
-        imageUrl:
+        image:
           description: The url of the first image in the record.
           type: string
         breadcrumbs:

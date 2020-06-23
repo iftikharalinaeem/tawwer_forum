@@ -17,5 +17,5 @@ registerReducer("webhooks", WebhookReducer);
 registerReducer("deliveries", DeliveryReducer);
 
 addComponent("webhookApp", () => {
-    return <Router sectionRoot="/webhook-settings" />;
+    return <Router sectionRoots={["/webhook-settings"]} />;
 });
