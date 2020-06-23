@@ -546,6 +546,7 @@ class KnowledgeApiController extends AbstractApiController {
             $articleWithRevision["body"] = $articleWithRevision["excerpt"];
             $articleWithRevision["url"] = $this->articleModel->url($articleWithRevision);
             $articleWithRevision["status"] = self::ARTICLE_STATUSES[$sphinxItem['status']];
+            $articleWithRevision["Summary"] = $articleWithRevision["excerpt"];
 
             if ($this->isExpandField('category', $expand)) {
                 $articleWithRevision["category"] = $this->results['kbCategories'][$knowledgeCategoryID];
@@ -723,11 +724,16 @@ class KnowledgeApiController extends AbstractApiController {
             }
         }
 
+        if ($this->query['statuses'] ?? []) {
+            [$articleIndexes, $statuses] = $this->getStatusFilters();
+            $sphinxClient->setFilter('status', $statuses);
+        }
+        
         if ($this->query['locale'] ?? []) {
             $sphinxClient->setFilterString('locale', $this->query['locale']);
         }
 
-        if (isset($this->query['siteSectionGroup'])) {
+        if ($this->query['siteSectionGroup'] ?? []) {
             $sphinxClient->setFilterString('siteSectionGroup', $this->query['siteSectionGroup']);
         }
 
@@ -842,7 +848,7 @@ class KnowledgeApiController extends AbstractApiController {
      * @param array $articleIndexes
      * @return array
      */
-    protected function getStatusFilters(array $articleIndexes): array {
+    protected function getStatusFilters(array $articleIndexes = [5]): array {
         if (array_search(ArticleModel::STATUS_DELETED, $this->query['statuses'])) {
             $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         };
