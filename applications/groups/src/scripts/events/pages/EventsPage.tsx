@@ -21,6 +21,7 @@ import { useParams, useLocation } from "react-router";
 import { IGetEventsQuery, EventsActions } from "@groups/events/state/EventsActions";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import { CoreErrorMessages } from "@vanilla/library/src/scripts/errorPages/CoreErrorMessages";
+import Translate from "@library/content/Translate";
 
 export default function EventsPage() {
     const params = useParams<{ parentRecordType?: string; parentRecordID?: string }>();
@@ -56,10 +57,15 @@ export default function EventsPage() {
     }
 
     const parentRecordSlug = slugify(eventParent.data.name);
+    const title = eventParent.data.name ?? "Events";
 
     return (
         <>
-            <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
+            <PageHeading
+                title={<Translate source={"<0/> - Events"} c0={title} />}
+                includeBackLink={false}
+                headingClassName={classes.pageTitle}
+            />
             <EventFilter className={classes.filter} filter={filter} onFilterChange={changeFilter} />
             <EventsModule query={eventQuery} />
             <SimplePager

@@ -14,6 +14,7 @@ use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\DateFilterSphinxSchema;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
@@ -105,12 +106,14 @@ class SearchApiController extends AbstractApiController {
                 'name:s' => 'The title of the record. A comment would be "RE: {DiscussionTitle}".',
                 'url:s' => 'The url for the record',
                 'body:s?' => 'The content of the record.',
+                'excerpt:s?' => 'excerpt of record.',
                 'score:i' => 'Score of the record.',
                 'insertUserID:i' => 'The user that created the record.',
                 'insertUser?' => $this->getUserFragmentSchema(),
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
+                'imageUrl:s?' => 'First image available in the record',
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'SearchResult');
         }
@@ -252,7 +255,7 @@ class SearchApiController extends AbstractApiController {
                     'x-search-filter' => true,
                 ],
                 'dateInserted?' => new DateFilterSchema([
-                    'description' => 'Filter the record by when it was inserted.',
+                    'description' => 'Filter by date when a record was inserted',
                     'x-search-filter' => true,
                     'x-filter' => [
                         'field' => 'DateInserted',
@@ -302,10 +305,6 @@ class SearchApiController extends AbstractApiController {
         $out = $this->schema([':a' => $fullSchema], 'out');
 
         $query = $in->validate($query);
-
-        if (isset($query['dateInserted'])) {
-            $query['dateFilters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
-        }
         $search = $this->normalizeSearch($query);
 
         // Paging
@@ -323,6 +322,9 @@ class SearchApiController extends AbstractApiController {
                 }
             }
         } else {
+            if ($query['dateInserted'] ?? false) {
+                $search['date-filters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
+            }
             $searchResults = AdvancedSearchPlugin::devancedSearch($this->searchModel, $search, $offset, $limit, 'api');
             $data['RecordCount'] = count($searchResults);
         }
@@ -336,11 +338,16 @@ class SearchApiController extends AbstractApiController {
         );
 
         $searchResults = array_map(function ($record) use ($query) {
-            $expand = $query['expand'] ?? [];
+            $expandParams = [
+                'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
+                'excerpt' => $this->isExpandField('excerpt', $query['expand']),
+                'extractImage' => $this->isExpandField('extractImage', $query['expand'])
+            ];
+
             return $this->normalizeOutput(
                 $record,
                 $query['expandBody'],
-                $this->isExpandField('breadcrumbs', $expand)
+                $expandParams
             );
         }, $searchResults);
 
@@ -396,7 +403,7 @@ class SearchApiController extends AbstractApiController {
             'includeArchivedCategories' => 'archived',
             'query' => 'search',
             'name' => 'title',
-            'dateFilters' => 'date-filters',
+            'dateInserted' => 'date-filters',
             'insertUserNames' => 'author',
             'insertUserIDs' => 'users',
             'tags' => 'tags',
@@ -462,7 +469,7 @@ class SearchApiController extends AbstractApiController {
      * @param bool $includeBreadcrumbs Whether or not to include breadcrumbs in the result.
      * @return array
      */
-    public function normalizeOutput(array $searchRecord, bool $includeBody = true, bool $includeBreadcrumbs = false): array {
+    public function normalizeOutput(array $searchRecord, bool $includeBody = true, array $expandParams = []): array {
         $schemaRecord = [
             'recordID' => $searchRecord['PrimaryID'],
             'url' => $searchRecord['Url'],
@@ -504,8 +511,23 @@ class SearchApiController extends AbstractApiController {
             $schemaRecord['insertUser'] = $searchRecord['User'];
         }
 
+        $includeBreadcrumbs = $expandParams['breadcrumbs'] ?? false;
         if ($includeBreadcrumbs && isset($schemaRecord['categoryID'])) {
             $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
+        }
+
+        $includeExcept = $expandParams['excerpt'] ?? false;
+        if ($includeExcept && isset($searchRecord['excerpt'])) {
+            $schemaRecord['excerpt'] = $searchRecord['excerpt'];
+        }
+
+        $includeFirstImage = $expandParams['extractImage'] ?? false;
+        if ($includeFirstImage && isset($searchRecord['Summary'])) {
+            $images = Gdn::formatService()->parseImageUrls($searchRecord['Summary'], $searchRecord['Format']);
+
+            if ($images && count($images) >= 1) {
+                $schemaRecord['imageUrl'] = $images[0];
+            }
         }
 
         $result = $this->getEventManager()->fireFilter('searchApiController_normalizeOutput', $schemaRecord, $this, $searchRecord, []);
