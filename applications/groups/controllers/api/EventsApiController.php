@@ -422,13 +422,15 @@ class EventsApiController extends AbstractApiController {
                     // Add option for both
                 ],
             ],
-            'attendingStatus:s?' =>[
-                'enum' => [
-                    'yes',
-                    'no',
-                    'maybe'
-                ],
-                'description' => 'Filter events by users attending status',
+            'attendingStatus:a|n?' => [
+                [
+                    'items' => [
+                        'type' => [
+                            'enum' => ['yes', 'no', 'maybe']
+                        ],
+                    ],
+                    'description' => 'Is the participant attending the event.',
+                ]
             ],
             'dateStarts:dt?' => new DateFilterSchema([
                 'description' => 'Filter events by start dates',
