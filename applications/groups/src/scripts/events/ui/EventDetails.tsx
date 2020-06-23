@@ -9,8 +9,6 @@ import UserContent from "@library/content/UserContent";
 import { DataList } from "@library/dataLists/DataList";
 import { EventAttendees } from "@groups/events/ui/Attendees";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import ButtonTab from "@library/forms/buttonTabs/ButtonTab";
-import { ButtonTabs } from "@library/forms/buttonTabs/ButtonTabs";
 import { t } from "@vanilla/i18n/src";
 import React, { useReducer } from "react";
 import { IEvent, EventAttendance, EventPermissionName } from "@groups/events/state/eventsTypes";
@@ -19,6 +17,9 @@ import { makeProfileUrl } from "@vanilla/library/src/scripts/utility/appUtils";
 import { EventPermission } from "@groups/events/state/EventPermission";
 import classNames from "classnames";
 import { EventParticipantsTabModule } from "@groups/events/modules/EventParticipantsTabModule";
+import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
+import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
+import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -70,32 +71,34 @@ export function EventDetails(props: IProps) {
                 caption={t("Event Details")}
             />
             <EventPermission event={event} permission={EventPermissionName.ATTEND}>
-                <ButtonTabs
-                    activeTab={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
+                <RadioGroup
+                    activeItem={props.loadingAttendance ?? props.event.attending ?? EventAttendance.RSVP}
                     accessibleTitle={t("Are you going?")}
                     setData={props.onChange}
-                    className={classes.attendanceSelector}
+                    classes={radioInputAsButtonsClasses()}
                 >
-                    <ButtonTab
-                        disabled={!!props.loadingAttendance}
-                        label={t("Going")}
-                        isLoading={props.loadingAttendance === EventAttendance.GOING}
-                        data={EventAttendance.GOING}
-                    />
-                    <ButtonTab
-                        disabled={!!props.loadingAttendance}
-                        label={t("Maybe")}
-                        data={EventAttendance.MAYBE}
-                        isLoading={props.loadingAttendance === EventAttendance.MAYBE}
-                    />
-                    <ButtonTab
-                        disabled={!!props.loadingAttendance}
-                        label={t("Not going")}
-                        data={EventAttendance.NOT_GOING}
-                        isLoading={props.loadingAttendance === EventAttendance.NOT_GOING}
-                        className={"isLast"}
-                    />
-                </ButtonTabs>
+                    <>
+                        <RadioInputAsButton
+                            disabled={!!props.loadingAttendance}
+                            label={t("Going")}
+                            isLoading={props.loadingAttendance === EventAttendance.GOING}
+                            data={EventAttendance.GOING}
+                        />
+                        <RadioInputAsButton
+                            disabled={!!props.loadingAttendance}
+                            label={t("Maybe")}
+                            data={EventAttendance.MAYBE}
+                            isLoading={props.loadingAttendance === EventAttendance.MAYBE}
+                        />
+                        <RadioInputAsButton
+                            disabled={!!props.loadingAttendance}
+                            label={t("Not going")}
+                            data={EventAttendance.NOT_GOING}
+                            isLoading={props.loadingAttendance === EventAttendance.NOT_GOING}
+                            className={"isLast"}
+                        />
+                    </>
+                </RadioGroup>
             </EventPermission>
 
             <div className={classes.section}>

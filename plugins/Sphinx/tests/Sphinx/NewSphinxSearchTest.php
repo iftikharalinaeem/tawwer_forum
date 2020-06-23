@@ -11,6 +11,8 @@ use Garden\Container\Reference;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Search\CommentSearchType;
 use Vanilla\Forum\Search\DiscussionSearchType;
+use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Sphinx\Search\SphinxSearchDriver;
 
 /**
@@ -23,8 +25,13 @@ class NewSphinxSearchTest extends \SphinxSearchTest {
      */
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
+        FeatureFlagHelper::clearCache();
         \Gdn::config()->saveToConfig('Feature.useSearchService.Enabled', true);
-        self::container()->rule(SphinxSearchDriver::class)
+        self::container()
+            ->rule(SearchService::class)
+            ->addCall('registerActiveDriver', ['driver' => new Reference(SphinxSearchDriver::class)])
+            ->rule(SphinxSearchDriver::class)
+            ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
             ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
             ->addCall('registerSearchType', [new Reference(CommentSearchType::class)]);
     }

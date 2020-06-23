@@ -4,6 +4,10 @@
  */
 
 (function(window, $) {
+    if (!$) {
+        return;
+    }
+
     $(document)
         .on("click", ".AdvancedSearch .Handle", function(e) {
             e.preventDefault();
@@ -121,102 +125,102 @@
         });
         return this;
     };
-})(window, jQuery);
 
-jQuery(document).ready(function($) {
-    var translate = window.gdn.translate;
-    /// Search box autocomplete.
-    if ($.fn.searchAutocomplete && gdn.definition("searchAutocomplete", true) != "0") {
-        $(".AdvancedSearch #Form_search,.SiteSearch #Form_Search,.js-search").searchAutocomplete();
+    $(document).ready(function($) {
+        var translate = window.gdn.translate;
+        /// Search box autocomplete.
+        if ($.fn.searchAutocomplete && gdn.definition("searchAutocomplete", true) != "0") {
+            $(".AdvancedSearch #Form_search,.SiteSearch #Form_Search,.js-search").searchAutocomplete();
 
-        $(".QuickSearch #Form_search").each(function() {
-            var $this = $(this);
+            $(".QuickSearch #Form_search").each(function() {
+                var $this = $(this);
 
-            $this.searchAutocomplete({
-                addForm: true,
-                position: {
-                    collision: "flip",
-                    of: $this.closest("form"),
-                },
+                $this.searchAutocomplete({
+                    addForm: true,
+                    position: {
+                        collision: "flip",
+                        of: $this.closest("form"),
+                    },
+                });
             });
-        });
 
-        $(".js-search-groups").each(function() {
-            var $this = $(this);
+            $(".js-search-groups").each(function() {
+                var $this = $(this);
 
-            $this.searchAutocomplete({
-                source: "/search/groupautocomplete.json",
-                addForm: true,
-                position: {
-                    collision: "flip",
-                    of: $this.closest("form"),
-                },
+                $this.searchAutocomplete({
+                    source: "/search/groupautocomplete.json",
+                    addForm: true,
+                    position: {
+                        collision: "flip",
+                        of: $this.closest("form"),
+                    },
+                });
             });
-        });
-    }
-
-    if ($(".AdvancedSearch").length === 0) return;
-
-    /// Author tag token input.
-    var $author = $('.AdvancedSearch input[name="author"]');
-
-    var author = $author.val();
-    if (author && author.length) {
-        author = author.split(",");
-        for (i = 0; i < author.length; i++) {
-            author[i] = { id: i, name: author[i] };
         }
-    } else {
-        author = [];
-    }
 
-    $author.tokenInput(gdn.url("/user/tagsearch"), {
-        hintText: translate("TagHint", "Start to type..."),
-        noResultsText: translate("TagNoResults", "No results"),
-        tokenValue: "name",
-        searchingText: "", // search text gives flickery ux, don't like
-        searchDelay: 300,
-        minChars: 1,
-        maxLength: 25,
-        prePopulate: author,
-        animateDropdown: false,
-        allowTabOut: true,
-        ariaLabel: translate("Author"),
-    });
+        if ($(".AdvancedSearch").length === 0) return;
 
-    /// Tag token input.
-    var $tags = $('.AdvancedSearch input[name="tags"]');
+        /// Author tag token input.
+        var $author = $('.AdvancedSearch input[name="author"]');
 
-    var data_tags = $tags.data("tags");
-    var tags = $tags.val();
-
-    if (data_tags) {
-        tags = [];
-        if (jQuery.isPlainObject(data_tags)) {
-            for (id in data_tags) {
-                tags.push({ id: id, name: data_tags[id] });
+        var author = $author.val();
+        if (author && author.length) {
+            author = author.split(",");
+            for (i = 0; i < author.length; i++) {
+                author[i] = { id: i, name: author[i] };
             }
+        } else {
+            author = [];
         }
-    } else if (tags && tags.length) {
-        tags = tags.split(",");
-        for (i = 0; i < tags.length; i++) {
-            tags[i] = { id: i, name: tags[i] };
-        }
-    } else {
-        tags = [];
-    }
 
-    $tags.tokenInput(gdn.url("/tags/search?id=0&type=0"), {
-        hintText: translate("TagHint", "Start to type..."),
-        noResultsText: translate("TagNoResults", "No results"),
-        //      tokenValue: 'name',
-        searchingText: "",
-        searchDelay: 300,
-        minChars: 1,
-        maxLength: 25,
-        prePopulate: tags,
-        animateDropdown: false,
-        allowTabOut: true,
-        ariaLabel: translate("Tags"),
+        $author.tokenInput(gdn.url("/user/tagsearch"), {
+            hintText: translate("TagHint", "Start to type..."),
+            noResultsText: translate("TagNoResults", "No results"),
+            tokenValue: "name",
+            searchingText: "", // search text gives flickery ux, don't like
+            searchDelay: 300,
+            minChars: 1,
+            maxLength: 25,
+            prePopulate: author,
+            animateDropdown: false,
+            allowTabOut: true,
+            ariaLabel: translate("Author"),
+        });
+
+        /// Tag token input.
+        var $tags = $('.AdvancedSearch input[name="tags"]');
+
+        var data_tags = $tags.data("tags");
+        var tags = $tags.val();
+
+        if (data_tags) {
+            tags = [];
+            if (jQuery.isPlainObject(data_tags)) {
+                for (id in data_tags) {
+                    tags.push({ id: id, name: data_tags[id] });
+                }
+            }
+        } else if (tags && tags.length) {
+            tags = tags.split(",");
+            for (i = 0; i < tags.length; i++) {
+                tags[i] = { id: i, name: tags[i] };
+            }
+        } else {
+            tags = [];
+        }
+
+        $tags.tokenInput(gdn.url("/tags/search?id=0&type=0"), {
+            hintText: translate("TagHint", "Start to type..."),
+            noResultsText: translate("TagNoResults", "No results"),
+            //      tokenValue: 'name',
+            searchingText: "",
+            searchDelay: 300,
+            minChars: 1,
+            maxLength: 25,
+            prePopulate: tags,
+            animateDropdown: false,
+            allowTabOut: true,
+            ariaLabel: translate("Tags"),
+        });
     });
-});
+})(window, window.jQuery);
