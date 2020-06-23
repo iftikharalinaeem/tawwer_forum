@@ -109,7 +109,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('add', [new Reference(\Vanilla\Site\Application::class, ['knowledge-base', ['kb']])])
 
             ->rule(\Vanilla\Menu\CounterModel::class)
-                ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
+            ->addCall('addProvider', [new Reference(ArticleDraftCounterProvider::class)])
         ;
         $container->rule(TranslationProviderInterface::class)
             ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)])
@@ -119,8 +119,7 @@ class KnowledgePlugin extends \Gdn_Plugin {
             ->addCall('addSmartID', ['parentID', 'knowledge-categories', ['foreignID'], [$this, 'parentSmartIDResolver']])
             ->addCall('addSmartID', ['articleID', 'articles', ['foreignID'], 'article'])
         ;
-
-       $container->rule(AbstractSearchDriver::class)
+        $container->rule(AbstractSearchDriver::class)
             ->addCall('registerSearchType', [new Reference(KnowledgeArticleSearchType::class)]);
     }
 

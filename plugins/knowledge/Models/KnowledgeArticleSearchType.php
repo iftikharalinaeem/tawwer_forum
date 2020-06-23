@@ -110,7 +110,8 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
     public function getResultItems(array $recordIDs): array {
         try {
             $results  = $this->knowledgeApiController->getArticlesAsDiscussions(
-                $recordIDs,self::SPHINX_DTYPE
+                $recordIDs,
+                self::SPHINX_DTYPE
             );
             $resultItems = array_map(function ($result) {
                 $mapped['recordID'] = $result['articleID'];
@@ -124,11 +125,10 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
                 return new SearchResultItem($mapped);
             }, $results);
             return $resultItems;
-        }  catch (HttpException $exception) {
+        } catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];
         }
-
     }
 
     /**
@@ -217,7 +217,6 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
                 'x-search-filter' => true,
             ],
         ]));
-
     }
 
     /**
@@ -255,6 +254,8 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
     }
 
     /**
+     * Filter knowledge-base for query.
+     *
      * @param array $knowledgeCategories
      * @return array
      */
@@ -281,6 +282,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
      *
      * @param array $queryStatuses
      * @param array $articleIndexes
+     *
      * @return array
      */
     protected function getStatusFilters(array $queryStatuses, array $articleIndexes = [5]): array {
@@ -298,6 +300,5 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
 
         return $statuses;
     }
-
 }
 
