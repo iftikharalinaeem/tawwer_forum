@@ -39,3 +39,8 @@ TitleBar.registerBeforeMeBox(() => {
 });
 
 addHamburgerNavGroup(SubcommunityChooserHamburgerGroup);
+
+import { ProductSearchFormFilter } from "@subcommunities/forms/ProductSeachFormFilter";
+import { SearchFormContextProvider } from "@vanilla/library/src/scripts/search/SearchFormContext";
+
+SearchFormContextProvider.addSearchFilter("knowledge", <ProductSearchFormFilter default="current" />);
