@@ -53,9 +53,9 @@ export function ProductSearchFormFilter(props: IProps) {
         return () => {
             updateForm({ siteSectionGroup: null });
         };
+        // First load only.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    console.log(productsById);
 
     if (Object.values(productsById).length <= 1) {
         // No need to offer the dropdown if don't have products.
