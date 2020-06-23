@@ -10,7 +10,6 @@ import KnowledgeSearchProvider from "@knowledge/modules/search/KnowledgeSearchPr
 import { NavHistoryContextProvider } from "@knowledge/navigation/NavHistoryContext";
 import { KbRecordType } from "@knowledge/navigation/state/NavigationModel";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
-import { SearchRoute } from "@knowledge/routes/pageRoutes";
 import RouteActions from "@knowledge/routes/RouteActions";
 import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus } from "@library/@types/api/core";
@@ -18,12 +17,12 @@ import SearchContext from "@library/contexts/SearchContext";
 import Loader from "@library/loaders/Loader";
 import SiteNavProvider from "@library/navigation/SiteNavContext";
 import { Router } from "@library/Router";
-import PagesContext from "@library/routing/PagesContext";
 import React, { useCallback, useDebugValue, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import PageLoader from "@library/routing/PageLoader";
 import { Backgrounds } from "@vanilla/library/src/scripts/layout/Backgrounds";
+import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
 
 /*
  * Top level application component for knowledge.
@@ -38,7 +37,7 @@ function KnowledgeApp() {
         }
     });
 
-    let content = <Router sectionRoot="/kb" onRouteChange={clearError} />;
+    let content = <Router sectionRoots={["/kb", "/search"]} onRouteChange={clearError} />;
 
     if (routeState.error) {
         content = (
@@ -66,22 +65,14 @@ function KnowledgeApp() {
     }
 
     return (
-        <PagesContext.Provider
-            value={{
-                pages: {
-                    search: SearchRoute,
-                },
-            }}
-        >
-            <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
-                <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
-                    <NavHistoryContextProvider>
-                        <Backgrounds />
-                        <PageLoader status={LoadStatus.SUCCESS}>{content}</PageLoader>
-                    </NavHistoryContextProvider>
-                </SearchContext.Provider>
-            </SiteNavProvider>
-        </PagesContext.Provider>
+        <SiteNavProvider categoryRecordType={KbRecordType.CATEGORY}>
+            <SearchContext.Provider value={{ searchOptionProvider: new KnowledgeSearchProvider() }}>
+                <NavHistoryContextProvider>
+                    <Backgrounds />
+                    <PageLoader status={LoadStatus.SUCCESS}>{content}</PageLoader>
+                </NavHistoryContextProvider>
+            </SearchContext.Provider>
+        </SiteNavProvider>
     );
 }
 

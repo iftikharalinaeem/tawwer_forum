@@ -17,13 +17,6 @@
 
 }
 
-.meta,
-.meta-inline {
-    &.isDeleted {
-        color: $meta-deleted_color;
-    }
-}
-
 .metaBreadcrumb {
     display: inline;
 }

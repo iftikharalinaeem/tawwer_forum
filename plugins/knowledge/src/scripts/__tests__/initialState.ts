@@ -13,7 +13,6 @@ import EditorPageModel from "@knowledge/modules/editor/EditorPageModel";
 import CategoryModel from "@knowledge/modules/categories/CategoryModel";
 import { CATEGORY_PAGE_INITIAL_STATE } from "@knowledge/modules/categories/categoryPageReducer";
 import LocationPickerModel from "@knowledge/modules/locationPicker/LocationPickerModel";
-import { INITIAL_SEARCH_STATE } from "@knowledge/modules/search/searchPageReducer";
 import NavigationModel from "@knowledge/navigation/state/NavigationModel";
 import { ROUTE_INITIAL_STATE } from "@knowledge/routes/RouteReducer";
 import KnowledgeBaseModel from "@knowledge/knowledge-bases/KnowledgeBaseModel";
@@ -28,7 +27,6 @@ const KB_STATE: IKbState = {
     categories: CategoryModel.INITIAL_STATE,
     categoriesPage: CATEGORY_PAGE_INITIAL_STATE,
     locationPicker: LocationPickerModel.INITIAL_STATE,
-    searchPage: INITIAL_SEARCH_STATE,
     navigation: NavigationModel.DEFAULT_STATE,
     route: ROUTE_INITIAL_STATE,
     knowledgeBases: KnowledgeBaseModel.INITIAL_STATE,

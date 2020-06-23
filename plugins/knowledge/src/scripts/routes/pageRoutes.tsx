@@ -16,6 +16,9 @@ import { Route } from "react-router-dom";
 import { makeEditorUrl } from "@knowledge/routes/makeEditorUrl";
 import NavigationLoadingLayout from "@knowledge/navigation/NavigationLoadingLayout";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
+import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
+import { SearchPageRoute } from "@vanilla/library/src/scripts/search/SearchPageRoute";
+import { notEmpty } from "@vanilla/utils";
 
 const editorPaths = ["/kb/articles/add", "/kb/articles/:id(\\d+)/editor"];
 
@@ -73,12 +76,6 @@ export const ArticleListPageRoute = new RouteHandler(
     (data?: undefined) => "/kb/articles",
 );
 
-export const SearchRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/kb/search" */ "@knowledge/modules/search/SearchPage"),
-    "/kb/search",
-    (data?: undefined) => "/kb/search",
-);
-
 export const DraftsRoute = new RouteHandler(
     () => import(/* webpackChunkName: "pages/kb/drafts" */ "@knowledge/modules/drafts/DraftsPage"),
     "/kb/drafts",
@@ -131,7 +128,7 @@ export function getPageRoutes() {
         ArticleRoute.route,
         CategoryRoute.route,
         CategoryPagedRoute.route,
-        SearchRoute.route,
+        SearchPageRoute.route,
         DraftsRoute.route,
         OrganizeCategoriesRoute.route,
         ArticleListPageRoute.route,

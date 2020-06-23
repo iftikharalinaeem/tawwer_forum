@@ -34,6 +34,7 @@ import DropDownSection from "@library/flyouts/items/DropDownSection";
 import DropDownItemLinkWithCount from "@library/flyouts/items/DropDownItemLinkWithCount";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { registerDefaultNavItem } from "@library/headers/navigationVariables";
+import { registerKbSearchDomain } from "@knowledge/search/registerKbSearchDomain";
 
 debug(getMeta("context.debug"));
 
@@ -87,3 +88,5 @@ onReady(() => {
     initAllUserContent();
     render();
 });
+
+registerKbSearchDomain();
