@@ -110,6 +110,12 @@ Copyright © 2009-2019 Vanilla Forums Inc.
 > If not, see <http://www.gnu.org/licenses/>.
 > Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
+## Vanilla Cloud employee?
+
+Head over here instead.
+
+[vanilla/cloud](https://github.com/vanilla/vanilla-cloud)
+
 ## Bonk!
 
 Just kidding, everything's awesome. ![dance](http://images.v-cdn.net/dance.gif)
