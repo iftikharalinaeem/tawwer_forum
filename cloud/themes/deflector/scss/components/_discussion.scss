@@ -1,0 +1,98 @@
+//
+// # Discussion
+//
+// Styleguide Discussion
+
+.Item {
+  position: relative;
+  padding: $line-height-base;
+  border: 0;
+
+  .Meta {
+    color: #999;
+
+    a {
+      font-weight: 700;
+      color: #999;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .Message {
+    font-size: $font-size-base;
+  }
+
+  .Reactions {
+    &:empty {
+      display: none;
+    }
+  }
+
+  .Options {
+    margin-left: $font-size-base;
+  }
+}
+
+.Item-Header {
+  margin: 0;
+  @include clearfix;
+
+  .PhotoWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .Author a {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $text-color;
+  }
+
+  .Author,
+  .AuthorInfo {
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+  }
+
+  .AuthorInfo {
+    color: #999;
+  }
+
+  .AuthorWrap {
+    float: left;
+  }
+
+  .Meta {
+    float: right;
+    font-size: $font-size-base;
+    line-height: $line-height-base;
+
+    a {
+      font-weight: 700;
+      color: #999;
+
+      &:hover,
+      &:focus {
+        text-decoration: underline;
+      }
+    }
+
+    .MItem {
+      margin-right: 0;
+      margin-left: 8px;
+    }
+
+    .Category {
+      display: none;
+    }
+  }
+
+  + .Item-BodyWrap {
+    margin-top: $font-size-base;
+  }
+}

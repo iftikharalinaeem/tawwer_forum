@@ -1,0 +1,22 @@
+{
+    "description": "Adds social groups to your application.",
+    "version": "2.0.6",
+    "url": "https://vanillaforums.com",
+    "icon": "social-groups.png",
+    "key": "groups",
+    "type": "addon",
+    "priority": 10,
+    "name": "Groups",
+    "displayName": "Groups and Events",
+    "settingsUrl": "/settings/groups",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=3.2"
+    }
+}

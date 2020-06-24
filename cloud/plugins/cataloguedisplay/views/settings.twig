@@ -1,0 +1,33 @@
+<h1>{{ Title }}</h1>
+
+{{ form.open({'enctype': 'multipart/form-data'}) }}
+<div class="padded">
+    {{ form.errors() }}
+    {{ form.imageUploadReact('Photo',t('Default placeholder'), t('Upload a placeholder image for catalogue post.')) }}
+</div>
+<div class="padded image-link-choice">
+    {{ form.label(t('Catalogue image URL:')) }}
+    {{ form.radio('CatalogueDisplay.ImageLink', t('Discussion'), {'Value': 'Discussion', 'Default':  defaultImageLink, 'class':'choice'}) }}
+    {{ form.radio('CatalogueDisplay.ImageLink', t('Image'), {'Value': 'Image', 'Default': defaultImageLink, 'class':'choice'}) }}
+</div>
+<div class="padded">
+    {{ form.label(t('Additional classes'), 'CatalogueDisplay.AdditionalClasses') }}
+    {{ form.input('CatalogueDisplay.AdditionalClasses') }}
+    <div class="description info">
+        {{ t('Apply additional classes on catalogue image.') }}
+    </div>
+</div>
+<div class="padded">
+    {{ form.toggle('CatalogueDisplay.OnlyOnCategory', t('Category only')) }}
+    <div class="description info">
+        {{ t('Display on category page only.') }}
+    </div>
+</div>
+<div class="padded">
+    {{ form.toggle('CatalogueDisplay.Masonry.Enabled', t('Use Masonry display')) }}
+</div>
+<div class="buttons form-footer">
+    {{ form.button('Save', {'type' : 'submit', 'class': 'btn btn-primary'}) }}
+</div>
+
+{{ form.close() }}

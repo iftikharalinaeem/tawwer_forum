@@ -1,0 +1,18 @@
+{
+    "name": "Mod List",
+    "description": "Adds a list of moderators to categories.",
+    "version": "1.2.2",
+    "icon": "moderator-list.png",
+    "key": "modlist",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/tim"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

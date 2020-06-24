@@ -1,0 +1,59 @@
+//
+// # "Me" Module
+//
+// Styleguide #
+
+.MeBox {
+  float: right;
+
+  .WhoIs {
+    float: left;
+    min-height: 0;
+    line-height: @line-height-ratio;
+
+    .Username {
+      float: left;
+      line-height: @line-height-base;
+    }
+  }
+
+  .MeMenu {
+    float: left;
+    margin-left: 10px;
+    line-height: @line-height-base;
+  }
+
+  .MeButton {
+    padding: 0 4px;
+    border: 0;
+  }
+
+  > .PhotoWrap {
+    float: left;
+    margin-right: 10px;
+
+    img {
+      width: @line-height-base;
+      height: @line-height-base;
+    }
+  }
+
+  .Flyout {
+    right: -4px;
+    left: auto;
+
+    &:before,
+    &:after {
+      left: auto;
+      right: 6px;
+    }
+
+    a {
+      color: @link-color;
+    }
+  }
+}
+
+.MeBox-SignIn {
+  display: block;
+}

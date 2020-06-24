@@ -1,0 +1,14 @@
+{
+  "name": "vanilla-cornerstone",
+  "private": true,
+  "dependencies": {
+    "normalize-less": "*",
+    "preboot": "*",
+    "iCheck": "2.x"
+  },
+  "overrides": {
+    "preboot": {
+      "main": "less/preboot.less"
+    }
+  }
+}

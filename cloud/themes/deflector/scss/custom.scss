@@ -1,0 +1,57 @@
+/*!
+ * Prospect - A minimal Vanilla theme focused on customer support communities
+ *
+ * @author    Kasper Kronborg Isager <kasper@vanillaforums.com>
+ * @copyright 2009-2017 (c) Vanilla Forums Inc.
+ * @license   Proprietary
+ */
+
+
+// ## Globals
+@import "globals/variables";
+@import "globals/icons";
+
+// ## Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `gulp/grunt wiredep` command. Don't manually edit this section!
+//
+// bower:scss
+@import "../bower_components/bourbon/dist/_bourbon.scss";
+@import "../bower_components/neat/app/assets/stylesheets/_neat.scss";
+@import "../bower_components/normalize-scss/_normalize.scss";
+// endbower
+// bower:sass
+// endbower
+
+// ## Shared
+@import "shared/utilities";
+@import "shared/scaffolding";
+@import "shared/typography";
+@import "shared/forms";
+@import "shared/flyouts";
+@import "shared/buttons";
+@import "shared/grid";
+@import "shared/icons";
+
+// ## Components
+@import "components/navigation";
+@import "components/pagination";
+@import "components/masthead";
+@import "components/trail";
+@import "components/discussion";
+@import "components/listings";
+@import "components/avatars";
+@import "components/footer";
+@import "components/panel";
+@import "components/popups";
+
+// ## Sections
+@import "sections/profile";
+@import "sections/groups";
+
+// ## Plugins
+@import "plugins/online";
+
+// ## Compatibility
+@import "compat/compat";

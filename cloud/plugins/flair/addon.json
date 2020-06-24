@@ -1,0 +1,20 @@
+{
+    "name": "Flair",
+    "description": "Displays badges on user posts.",
+    "version": "1.1.2",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "flair.png",
+    "mobileFriendly": true,
+    "key": "flair",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "badges": ">=1.4"
+    }
+}

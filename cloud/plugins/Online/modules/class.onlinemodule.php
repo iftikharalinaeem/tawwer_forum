@@ -1,0 +1,308 @@
+<?php
+
+/**
+ * Online Plugin - OnlineModule
+ *
+ * This module displays a list of users who are currently online, either in
+ * user icon format, or as a simple user list.
+ *
+ * @author Tim Gunter <tim@vanillaforums.com>
+ * @copyright 2003 Vanilla Forums, Inc
+ * @license Proprietary
+ * @package Misc
+ */
+class OnlineModule extends Gdn_Module {
+
+    /**
+     * List of online users for this context
+     * @var array
+     */
+    protected $onlineUsers;
+
+    /**
+     * Whether to draw Invisible users (admin permission)
+     * @var boolean
+     */
+    protected $showInvisible;
+
+    /**
+     * Render style. 'pictures' or 'links'
+     * @var string
+     */
+    public $style;
+    protected $count;
+    protected $onlineCount;
+    protected $guestCount;
+    public $selector = null;
+    public $selectorID = null;
+    public $selectorField = null;
+    public $contextID = false;
+    public $contextField = false;
+    public $showGuests = true;
+
+    public function __construct($sender = null) {
+        parent::__construct($sender);
+        $this->onlineUsers = null;
+        $this->showInvisible = Gdn::session()->checkPermission('Plugins.Online.ViewHidden');
+        $this->style = c('Plugins.Online.Style', OnlinePlugin::DEFAULT_STYLE);
+        $this->selector = 'auto';
+    }
+
+    public function __set($name, $value) {
+        switch ($name) {
+            case 'CategoryID':
+                $this->selector = 'category';
+                $this->selectorID = $value;
+                $this->selectorField = 'CategoryID';
+                break;
+
+            case 'DiscussionID':
+                $this->selector = 'discussion';
+                $this->selectorID = $value;
+                $this->selectorField = 'DiscussionID';
+                break;
+        }
+    }
+
+    /**
+     * Get the list of currently online users for this context
+     *
+     * Also calculate counts.
+     */
+    public function getData() {
+        if (is_null($this->onlineUsers)) {
+
+            // Find out where we are
+            $this->lockOn();
+
+            $this->onlineUsers = OnlinePlugin::instance()->onlineUsers($this->selector, $this->selectorID, $this->selectorField);
+
+            if (Gdn::session()->isValid() && !array_key_exists(Gdn::session()->User->UserID, $this->onlineUsers)) {
+                $this->onlineUsers[Gdn::session()->UserID] = [
+                    'UserID' => Gdn::session()->UserID,
+                    'Timestamp' => date('Y-m-d H:i:s'),
+                    'Location' => $this->selector,
+                    "{$this->selectorField}" => $this->selectorID,
+                    'Visible' => !OnlinePlugin::instance()->privateMode(Gdn::session()->User)
+                ];
+            }
+            Gdn::userModel()->joinUsers($this->onlineUsers, ['UserID']);
+
+            // Strip invisibles, and index by username
+            $onlineUsers = [];
+            foreach ($this->onlineUsers as $user) {
+                if (!$user['Visible'] && !$this->showInvisible) {
+                    continue;
+                }
+                $onlineUsers[$user['Name']] = $user;
+            }
+
+            ksort($onlineUsers);
+            $this->onlineUsers = $onlineUsers;
+        }
+
+        $onlineCount = count($this->onlineUsers);
+        $guestCount = OnlinePlugin::guests();
+        $this->count = $onlineCount + $guestCount;
+        $this->onlineCount = $onlineCount;
+        $this->guestCount = $guestCount;
+    }
+
+    public function assetTarget() {
+        return 'Panel';
+    }
+
+    /**
+     * Determine current viewing location
+     *
+     * Fill in Selector and Context.
+     */
+    public function lockOn() {
+        if ($this->selector == 'auto') {
+
+            $location = OnlinePlugin::whereAmI(Gdn::controller()->ResolvedPath, Gdn::controller()->ReflectArgs);
+
+            switch ($location) {
+                case 'category':
+                case 'discussion':
+                case 'comment':
+                    $this->showGuests = false;
+                    $this->selector = 'category';
+                    $this->selectorField = 'CategoryID';
+
+                    if ($location == 'category') {
+                        $this->selectorID = Gdn::controller()->data('Category.CategoryID');
+                        $this->contextField = false;
+                        $this->contextID = false;
+                    } else {
+                        $this->selectorID = Gdn::controller()->data('Discussion.CategoryID');
+                        $this->contextField = 'DiscussionID';
+                        $this->contextID = Gdn::controller()->data('Discussion.DiscussionID');
+                    }
+
+                    break;
+
+                case 'limbo':
+                case 'all':
+                    $this->showGuests = true;
+                    $this->selector = 'all';
+                    $this->selectorID = null;
+                    $this->selectorField = null;
+                    break;
+            }
+        }
+    }
+
+    public function toString() {
+        $this->lockOn();
+
+        // Check cache
+        switch ($this->selector) {
+            case 'category':
+            case 'discussion':
+                $selectorID = is_null($this->selectorID) ? 'all' : $this->selectorID;
+                $selectorStub = "{$selectorID}-{$this->selectorField}";
+                break;
+
+            case 'limbo':
+                $selectorStub = 'all';
+                break;
+
+            case 'all':
+            default:
+                $selectorStub = 'all';
+                break;
+        }
+
+        $locale = Gdn::locale()->current();
+        if (!$locale) {
+            $locale = 'en';
+        }
+
+        // Check cache for matching pre-built data
+        $renderedCacheKey = sprintf(OnlinePlugin::CACHE_ONLINE_MODULE_KEY, $locale, $this->selector, $selectorStub);
+        $preRender = Gdn::cache()->get($renderedCacheKey);
+        if ($preRender !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $preRender;
+        }
+
+        $this->getData();
+
+        uksort($this->onlineUsers, 'strnatcasecmp');
+
+        $outputString = '';
+        ob_start();
+
+        $trackCount = ($this->showGuests) ? $this->count : $this->onlineCount;
+        switch ($this->selector) {
+            case 'category':
+                $title = t("Who's Online in this Category");
+                break;
+            case 'discussion':
+            case 'comment':
+                $title = t("Who's Online in this Discussion");
+            case 'limbo':
+            case 'all':
+            default:
+                $title = t("Who's Online");
+        }
+
+        if ($this->count > 0) {
+            ?>
+            <div id="WhosOnline" class="WhosOnline Box">
+            <?php echo panelHeading($title . '<span class="Count">' . Gdn_Format::bigNumber($trackCount, 'html') . '</span>'); ?>
+            <?php
+            if ($this->style == 'pictures') {
+                $listClass = 'PhotoGrid';
+                if (count($this->onlineUsers) > 10) {
+                    $listClass .= ' PhotoGridSmall';
+                }
+
+                echo '<div class="' . $listClass . '">' . "\n";
+                if ($this->onlineCount) {
+                    foreach ($this->onlineUsers as $user) {
+                        $wrapClass = ['OnlineUserWrap', 'UserPicture'];
+                        $wrapClass[] = ((!array_key_exists('Visible', $user) || !$user['Visible']) ? 'Invisible' : '');
+
+                        if (!$user['Photo'] && !function_exists('UserPhotoDefaultUrl')) {
+                            $user['Photo'] = asset('/applications/dashboard/design/images/usericon.gif', true);
+                        }
+
+                        if ($this->selector == 'category' && $this->contextField) {
+                            if (val($this->contextField, $user, null) == $this->contextID) {
+                                $wrapClass[] = 'InContext';
+                            }
+                        }
+
+                        $wrapClass = implode(' ', $wrapClass);
+                        echo "<div class=\"{$wrapClass}\">";
+                        echo userPhoto($user);
+
+                        $userName = val('Name', $user, false);
+                        if ($userName) {
+                            echo wrap(htmlspecialchars($userName), 'div', ['class' => 'OnlineUserName']);
+                        }
+                        echo '</div>';
+                    }
+                }
+
+                if ($this->guestCount && $this->showGuests) {
+                    $guestCount = Gdn_Format::bigNumber($this->guestCount, 'html');
+                    $guestsText = plural($this->guestCount, 'Guest', 'Guests');
+                    $plus = $this->count == $this->guestCount ? '' : '+';
+                    echo <<<EOT
+<span class="GuestCountBox"><span class="GuestCount">{$plus}$guestCount</span> <span class="GuestLabel">$guestsText</span></span>
+EOT;
+                }
+                echo '</div>' . "\n";
+            } else {
+
+                echo '<ul class="PanelInfo">' . "\n";
+                if ($this->onlineCount) {
+                    foreach ($this->onlineUsers as $user) {
+                        $wrapClass = ['OnlineUserWrap', 'UserLink'];
+                        $wrapClass[] = ((!array_key_exists('Visible', $user) || !$user['Visible']) ? 'Invisible' : '');
+                        if ($this->selector == 'category' && $this->contextField) {
+                            if (val($this->contextField, $user, null) == $this->contextID) {
+                                $wrapClass .= ' InContext';
+                            }
+                        }
+
+                        if (is_array($wrapClass)) {
+                            $wrapClass = implode(' ', $wrapClass);
+                        }
+                        echo "<li class=\"{$wrapClass}\">" . userAnchor($user) . "</li>\n";
+                    }
+                }
+
+                if ($this->guestCount && $this->showGuests) {
+                    $guestCount = Gdn_Format::bigNumber($this->guestCount, 'html');
+                    $guestsText = plural($this->guestCount, 'Guest', 'Guests');
+                    $plus = $this->count == $this->guestCount ? '' : '+';
+                    echo <<<EOT
+<li class="GuestCountText"><span class="GuestCount"><strong>{$plus}{$guestCount}</strong></span> <span class="GuestLabel"><strong>{$guestsText}</strong></span></li>\n
+EOT;
+                }
+                echo '</ul>' . "\n";
+            }
+            ?>
+            </div>
+                <?php
+            }
+
+            $outputString = ob_get_contents();
+            @ob_end_clean();
+
+            // Store rendered data
+            $cacheRenderDelay = OnlinePlugin::instance()->cacheRenderDelay;
+            if (!$this->count) {
+                $cacheRenderDelay = 5;
+            }
+            Gdn::cache()->store($renderedCacheKey, $outputString, [
+                Gdn_Cache::FEATURE_EXPIRY => OnlinePlugin::instance()->cacheRenderDelay
+            ]);
+
+            return $outputString;
+        }
+
+    }

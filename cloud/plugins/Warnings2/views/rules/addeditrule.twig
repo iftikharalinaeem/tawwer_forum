@@ -1,0 +1,23 @@
+{{ Form.open()|raw }}
+{{ Form.errors()|raw }}
+
+<ul>
+    {{ Form.hidden('RuleID')|raw }}
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ Form.label('Name', 'Name')|raw }}
+        </div>
+        <div class="input-wrap">
+            {{ Form.input('Name', 'text', { MaxLength: 255 })|raw }}
+        </div>
+    </li>
+    <li class="form-group">
+        <div class="label-wrap">
+            {{ Form.label('Description', 'Description')|raw }}
+        </div>
+        <div class="input-wrap">
+            {{ Form.textBox('Description', { MultiLine: true, MaxLength: 500 })|raw }}
+        </div>
+    </li>
+</ul>
+{{ Form.close('Save')|raw }}

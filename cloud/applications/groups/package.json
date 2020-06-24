@@ -1,0 +1,26 @@
+{
+    "name": "@vanilla/addon-groups",
+    "private": true,
+    "devDependencies": {
+        "bower": "*",
+        "grunt": "0.4.x",
+        "grunt-autoprefixer": "0.7.x",
+        "grunt-cli": "^1.2.0",
+        "grunt-contrib-concat": "0.4.x",
+        "grunt-contrib-imagemin": "1.0.x",
+        "grunt-contrib-watch": "0.6.x",
+        "grunt-sass": "1.1.x",
+        "grunt-wiredep": "2.0.x",
+        "load-grunt-tasks": "3.3.x",
+        "time-grunt": "1.2.x"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "scripts": {
+        "install": "bower install --allow-root",
+        "build": "grunt",
+        "styles": "grunt styles",
+        "watch": "grunt watch"
+    }
+}

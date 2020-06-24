@@ -1,0 +1,19 @@
+a.MyAccountLink,
+a.MyAccountLink:link,
+a.MyAccountLink:hover,
+a.MyAccountLink:active,
+a.MyAccountLink:visited {
+   margin: 0;
+   border: 1px solid #AEDEFC;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+   background: #C2E7FC;
+   display: inline;
+   font-weight: bold;
+   color: #1e79a7;
+   text-decoration: none;
+   padding: 5px 10px;
+}
+a.MyAccountLink:hover {
+   background: #f3fcff;
+}

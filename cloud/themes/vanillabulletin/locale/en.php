@@ -1,0 +1,68 @@
+<?php
+
+$Definition['Discussion'] = 'Topic';
+$Definition['Discussions'] = 'Topics';
+$Definition['Comment'] = 'Reply';
+$Definition['comment'] = 'reply';
+$Definition['Comments'] = 'Replies';
+$Definition['Category'] = 'Forum';
+$Definition['Categories'] = 'Forums';
+$Definition['Child Categories:'] = 'Sub-Forums:';
+$Definition['Announcement'] = 'Sticky';
+$Definition['Announce...'] = 'Sticky...';
+$Definition['In <b>%s</b> and recent discussions.'] = "In <b>%s</b> and what's new.";
+$Definition["Don't announce."] = "Don't sticky.";
+$Definition['Closed'] = 'Locked';
+$Definition['Recent Discussions'] = "What's New?";
+$Definition['%s discussion'] = '%s topic';
+$Definition['%s discussions'] = '%s topics';
+$Definition['%s comment'] = '%s reply';
+$Definition['%s comments'] = '%s replies';
+
+$Definition['Add a Comment'] = 'Reply';
+$Definition['Add Category'] = 'Add Forum';
+$Definition['Add Comment'] = 'Reply';
+$Definition['Delete Category'] = 'Delete Forum';
+$Definition['Deleting category...'] = 'Deleting forum...';
+$Definition['Edit Category'] = 'Edit Forum';
+$Definition['Invalid category for deletion.'] = 'Invalid forum for deletion.';
+$Definition['All discussions in this category will be permanently deleted.'] = 'All topics in this forum will be permanently deleted.';
+$Definition['Are you sure you want to delete this category?'] = 'Are you sure you want to delete this forum?';
+$Definition['Categories Layout'] = 'Forum Layout';
+$Definition['Category Page Layout'] = 'Forum Page Layout';
+$Definition['Category Url:'] = 'Forum Url:';
+$Definition['Default Category Permissions'] = 'Default Forum Permissions';
+$Definition['Permission.Category'] = 'Forum';
+$Definition['All Discussions'] = 'All Topics';
+$Definition['Back to Discussions'] = 'Back to Topcs';
+$Definition['Categories &amp; Discussions'] = 'Forums &amp; Topics';
+$Definition['Blank Discussion Topic'] = 'Blank Topic';
+$Definition['bookmarked discussion'] = 'bookmarked topic';
+$Definition['Bookmarked Discussions'] = 'Bookmarked Topics';
+$Definition['Click <a href="%s">here</a> to go back to the discussion.'] = 'Click <a href="%s">here</a> to go back to the topic.';
+$Definition['Delete Discussion'] = 'Delete Topic';
+$Definition['Discussion Title'] = 'Topic Title';
+$Definition['Edit Discussion'] = 'Edit Topic';
+$Definition['More Discussions'] = 'More Topics';
+$Definition['My Discussions'] = 'My Topics';
+$Definition['New Discussion'] = 'New Topic';
+$Definition['No discussions were found.'] = 'No topics were found.';
+$Definition['Notify me when people comment on my bookmarked discussions.'] = 'Notify me when people reply on my bookmarked topics.';
+$Definition['Notify me when people comment on my discussions.'] = 'Notify me when people reply on my topics.';
+$Definition['Post Discussion'] = 'Post';
+$Definition['Start a New Discussion'] = 'Post a New Thread';
+$Definition['Comment As ...'] = 'Reply As ...';
+$Definition['Comment by %s'] = 'Reply by %s';
+$Definition['Comment in'] = 'in';
+$Definition['Commenting not allowed.'] = 'Replies not allowed.';
+
+$Definition['HeadlineFormat.Comment'] = '{ActivityUserID,user} replied to <a href="{Url,html}">{Data.Name,text}</a>';
+$Definition['HeadlineFormat.Discussion'] = '{ActivityUserID,user} <a href="{Url,html}">{Data.Name,text}</a>';
+$Definition['HeadlineFormat.Mention'] = '{ActivityUserID,user} mentioned you in <a href="{Url,html}">{Data.Name,text}</a>';
+$Definition['Latest Comment'] = 'Latest Reply';
+$Definition['Leave a Comment'] = 'Reply';
+$Definition['Leave Comments'] = 'Reply';
+$Definition['More Comments'] = 'More Replies';
+
+$Definition['Unannounce'] = 'Un-Sticky';
+$Definition['Announce'] = 'Sticky';

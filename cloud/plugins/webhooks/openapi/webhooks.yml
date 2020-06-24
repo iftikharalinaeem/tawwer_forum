@@ -1,0 +1,416 @@
+openapi: 3.0.2
+info:
+paths:
+  /webhooks:
+    post:
+      summary: Create a webhook.
+      tags:
+        - Webhooks
+      callbacks:
+        ping:
+          $ref: '#/components/callbacks/WebhookPing'
+        userAdd:
+          $ref: '#/components/callbacks/WebhookUserAdd'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookPost'
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    get:
+      summary: List currently configured webhooks.
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: Success
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Webhook'
+  '/webhooks/{id}':
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      summary: Get information about a webhook.
+      tags:
+        - Webhooks
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    patch:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      summary: Update a webhook.
+      tags:
+        - Webhooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookPatch'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+    delete:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      summary: Delete a webhook.
+      tags:
+        - Webhooks
+      responses:
+        '204':
+          description: Success
+  '/webhooks/{id}/deliveries':
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/Page'
+        - name: limit
+          in: query
+          description: Desired number of items per page.          
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+            minimum: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookDelivery'
+      summary: List deliveries attempted for a specific webhook.
+      tags:
+        - Webhooks
+  '/webhooks/{id}/deliveries/{deliveryID}':
+    get:
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+        - name: deliveryID
+          in: path
+          description: Unique delivery ID.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookDeliveryWithRequest'
+      summary: Get a specific webhook delivery record.
+      tags:
+        - Webhooks
+  '/webhooks/{id}/pings':
+    post:
+      summary: Ping a webhook for testing.
+      tags:
+        - Webhooks
+      parameters:
+        - name: id
+          in: path
+          description: The webhook ID.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhookID:
+                    description: Unique ID of the webhook being pinged.
+                    type: string
+                  dateInserted:
+                    description: The date and time of the ping request.
+                    type: string
+                    format: date-time
+          description: Success
+components:
+  callbacks:
+    WebhookPing:
+      '{$request.body#/url}':
+        post:
+          parameters:
+            - in: header
+              name: X-Vanilla-Event
+              description: Type of the event.
+              schema:
+                type: string
+                example: ping
+            - in: header
+              name: X-Vanilla-ID
+              description: Unique identifier for this delivery.
+              schema:
+                type: string
+                example: aec96333-7dfd-4b7b-9fa9-26fe9963e725
+            - in: header
+              name: X-Vanilla-Signature
+              description: Signature for the delivery payload.
+              schema:
+                type: string
+                example: sha256=a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    action:
+                      type: string
+                      example: ping
+                    ping:
+                      example: 708eeb05-8427-4ce2-a7e8-d530b841557a
+                      format: uuid
+                      type: string
+                    sender:
+                      $ref: '#/components/schemas/UserFragment'
+                    site:
+                      $ref: '#/components/schemas/Site'
+          responses:
+            200:
+              description: Success
+    WebhookUserAdd:
+      '{$request.body#/url}':
+        post:
+          parameters:
+            - in: header
+              name: X-Vanilla-Event
+              description: Type of the event.
+              schema:
+                type: string
+                example: user
+            - in: header
+              name: X-Vanilla-ID
+              description: Unique identifier for this delivery.
+              schema:
+                type: string
+                example: aec96333-7dfd-4b7b-9fa9-26fe9963e725
+            - in: header
+              name: X-Vanilla-Signature
+              description: Signature for the delivery payload.
+              schema:
+                type: string
+                example: sha256=a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    action:
+                      type: string
+                      example: add
+                    sender:
+                      $ref: '#/components/schemas/UserFragment'
+                    site:
+                      $ref: '#/components/schemas/Site'
+                    user:
+                      $ref: '#/components/schemas/UserFragment'
+          responses:
+            200:
+              description: Success
+  schemas:
+    Site:
+      description: Details of the current site.
+      type: object
+      properties:
+        siteID:
+          type: integer
+    WebhookDelivery:
+      properties:
+        webhookDeliveryID:
+          description: Unique ID of the delivery.
+          type: string
+          format: uuid
+        webhookID:
+          description: Unique ID of the associated webhook.
+          type: integer
+        requestDuration:
+          description: Total duration of the request in miliseconds.
+          type: integer
+        responseCode:
+          description: HTTP response code received from the server upon delivery.
+          type: integer
+        dateInserted:
+          description: Date and time of the delivery attempt.
+          type: string
+          format: date-time
+      type: object
+    WebhookDeliveryWithRequest:
+      allOf:
+        - $ref: '#/components/schemas/WebhookDelivery'
+      properties:
+        requestBody:
+          description: Full string representation of request body.
+          type: string
+        requestHeaders:
+          description: Collection of headers sent in the request, grouped by type.
+          type: object
+        responseBody:
+          description: Full string representation of response body.
+          type: string
+        responseHeaders:
+          description: Collection of headers received in the response, grouped by type.
+          type: object
+      type: object
+    WebhookEvent:
+      type: string
+      enum:
+        - '*'
+        - comment
+        - discussion
+        - user
+    WebhookPost:
+      type: object
+      properties:
+        status:
+          type: string
+          default: active
+          description: The operational status of the webhook.
+          enum:
+            - active
+            - disabled
+        events:
+          type: array
+          description: Events to be forwarded to this webhook.
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
+        name:
+          type: string
+          description: User-friendly name.
+        url:
+          type: string
+          description: The target URL of the webhook.
+          format: uri
+        secret:
+          type: string
+          description: The secret used to sign events associated with this webhook.
+      required:
+        - events
+        - name
+        - secret
+        - url
+    Webhook:
+      type: object
+      properties:
+        webhookID:
+          type: integer
+          description: The webhook's identifier.
+          readOnly: true
+        status:
+          description: Operational status of this webhook.
+          type: string
+          default: active
+          enum:
+            - active
+            - disabled
+        name:
+          description: User-friendly name.
+          type: string
+        events:
+          type: array
+          description: Events to be forwarded to this webhook.
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
+        url:
+          type: string
+          description: The target URL of the webhook.
+          format: uri
+        secret:
+          type: string
+          description: The secret used to sign events associated with this webhook.
+        dateInserted:
+          type: string
+          description: The date/time that the webhook was created.
+          format: date-time
+          readOnly: true
+        insertUserID:
+          type: integer
+          description: The user that created the webhook.
+          readOnly: true
+        dateUpdated:
+          type: string
+          description: The date/time that the webhook was created.
+          format: date-time
+          nullable: true
+          readOnly: true
+        updateUserID:
+          type: integer
+          description: The user that created the webhook.
+          nullable: true
+          readOnly: true
+    WebhookPatch:
+      type: object
+      properties:
+        name:
+          type: string
+          description: User-friendly name.
+
+        events:
+          type: array
+          description: Events to be forwarded to this webhook.
+          items:
+            $ref: '#/components/schemas/WebhookEvent'
+        url:
+          type: string
+          description: The target URL of the webhook.
+          format: uri
+        secret:
+          type: string
+          description: The secret used to sign events associated with this webhook.
+        status:
+          type: string
+          description: The current operational status of the webhook.
+          enum:
+            - active
+            - disabled

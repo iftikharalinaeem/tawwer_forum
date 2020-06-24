@@ -1,0 +1,834 @@
+openapi: 3.0.2
+info:
+paths:
+  /groups:
+    get:
+      parameters:
+      - description: Filter by member userID.
+        in: query
+        name: memberID
+        schema:
+          type: integer
+      - description: |
+          Sort the results by the specified field. The default sort order is ascending.
+          Prefixing the field with "-" will sort using a descending order.
+        in: query
+        name: sort
+        schema:
+          enum:
+          - dateInserted
+          - '-dateInserted'
+          - dateLastComment
+          - '-dateLastComment'
+          - countMembers
+          - '-countMembers'
+          - countDiscussions
+          - '-countDiscussions'
+          type: string
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Group'
+                type: array
+          description: Success
+      tags:
+      - Groups
+      summary: List groups.
+    post:
+      summary: Create a group.
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupPost'
+        required: true
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: Success
+  /groups/search:
+    get:
+      parameters:
+      - description: >
+          The search query.
+        in: query
+        name: query
+        required: true
+        schema:
+          minLength: 1
+          type: string
+      - description: >
+          Sort the results by the specified field. The default sort order
+          is ascending.Prefixing the field with "-" will sort using a
+          descending order.
+        in: query
+        name: sort
+        schema:
+          enum:
+          - dateInserted
+          - '-dateInserted'
+          - dateLastComment
+          - '-dateLastComment'
+          - countMembers
+          - '-countMembers'
+          - countDiscussions
+          - '-countDiscussions'
+          type: string
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 24
+          maximum: 24
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/Group'
+                type: array
+          description: Success
+      tags:
+      - Groups
+      summary: Search for a group
+  '/groups/{id}':
+    delete:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Groups
+      summary: Delete a group.
+    get:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: Success
+      tags:
+      - Groups
+      summary: Get a group.
+    patch:
+      summary: Update a group.
+      tags:
+      - Groups
+      parameters:
+      - description: The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupPatch'
+        required: true
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: Success
+  '/groups/{id}/applicants':
+    get:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupApplicant'
+                type: array
+          description: Success
+      tags:
+      - Groups
+      summary: List applicants to a group.
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupApplicant'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                reason:
+                  description: The reason why the user wants to apply to this group.
+                  maxLength: 200
+                  minLength: 1
+                  type: string
+              required:
+              - reason
+              type: object
+        required: true
+      summary: Apply to a private group.
+  '/groups/{id}/applicants/{userID}':
+    patch:
+      parameters:
+      - description: The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: The group member user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupApplicant'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                status:
+                  description: The status of the applicant.
+                  enum:
+                  - approved
+                  - denied
+                  minLength: 1
+                  type: string
+              required:
+              - status
+              type: object
+        required: true
+      summary: Approve or deny a group applicant.
+  '/groups/{id}/apply':
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupApplicant'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                reason:
+                  description: The reason why the user wants to apply to this group.
+                  maxLength: 200
+                  minLength: 1
+                  type: string
+              required:
+              - reason
+              type: object
+        required: true
+      summary: Apply to a private group.
+  '/groups/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Group'
+          description: Success
+      tags:
+      - Groups
+      summary: Get a group for editing.
+  '/groups/{id}/invites':
+    get:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupInvite'
+                type: array
+          description: Success
+      tags:
+      - Groups
+      summary: List the invites for a group.
+    post:
+      parameters:
+      - description: The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupInvite'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                userID:
+                  type: integer
+              required:
+              - userID
+              type: object
+        required: true
+      summary: Invite a user to a group.
+  '/groups/{id}/invites/{userID}':
+    delete:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The group member user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Groups
+      summary: Delete an invite to a user from a group.
+  '/groups/{id}/join':
+    post:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupMember'
+          description: Success
+      tags:
+      - Groups
+      summary: Join a public group or a group that you have been invited to.
+  '/groups/{id}/leave':
+    post:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Groups
+      summary: Leave a group.
+  '/groups/{id}/members':
+    get:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records.
+        in: query
+        name: expand
+        schema:
+          type: boolean
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/GroupMember'
+                type: array
+          description: Success
+      tags:
+      - Groups
+      summary: List members of a group.
+    post:
+      parameters:
+      - description: The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupMember'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                role:
+                  type: string
+                  default: member
+                  description: The role of the user for that group.
+                  enum:
+                  - leader
+                  - member
+                userID:
+                  description: The ID of the user.
+                  type: integer
+              required:
+              - userID
+              type: object
+        required: true
+      summary: Add a user to a group.
+  '/groups/{id}/members/{userID}':
+    delete:
+      parameters:
+      - description: |
+          The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The group member user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Groups
+      summary: Remove a user from a group or leave a group.
+    patch:
+      parameters:
+      - description: The group ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: The group member user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/GroupMember'
+          description: Success
+      tags:
+      - Groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                role:
+                  description: The role of the user for that group.
+                  enum:
+                  - leader
+                  - member
+                  minLength: 1
+                  type: string
+              required:
+              - role
+              type: object
+        required: true
+      summary: Change a user's role within a group.
+components:
+  schemas:
+    Group:
+      properties:
+        bannerUrl:
+          description: The URL of the banner of the group.
+          nullable: true
+          type: string
+        description:
+          description: The description of the group.
+          minLength: 1
+          type: string
+        format:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
+        groupID:
+          description: The ID of the group.
+          type: integer
+        iconUrl:
+          description: The URL of the icon of the group.
+          nullable: true
+          type: string
+        name:
+          description: The name of the group.
+          minLength: 1
+          type: string
+        privacy:
+          description: The privacy level of the group's content.
+          enum:
+          - public
+          - private
+          - secret
+          minLength: 1
+          type: string
+      required:
+      - groupID
+      - name
+      - description
+      - format
+      - iconUrl
+      - bannerUrl
+      - privacy
+      type: object
+    GroupApplicant:
+      properties:
+        body:
+          description: Universal record field. Content of "reason".
+          minLength: 1
+          type: string
+        dateInserted:
+          description: When the applicant was created.
+          format: date-time
+          type: string
+        reason:
+          description: The reason why the applicant wants to join the group.
+          minLength: 1
+          type: string
+        status:
+          description: The status of the applicant.
+          enum:
+          - approved
+          - denied
+          - pending
+          minLength: 1
+          type: string
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The user ID of the applicant.
+          type: integer
+      required:
+      - userID
+      - status
+      - reason
+      - body
+      - dateInserted
+      type: object
+    GroupInvite:
+      properties:
+        dateInserted:
+          description: When the invite was issued.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the invite.
+          type: integer
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The ID of the user that has been invited.
+          type: integer
+      required:
+      - userID
+      - dateInserted
+      - insertUserID
+      type: object
+    GroupMember:
+      properties:
+        dateInserted:
+          description: When the user was added to the group.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that added this user to the group.
+          type: integer
+        role:
+          description: The role of the user for that group.
+          enum:
+          - leader
+          - member
+          minLength: 1
+          type: string
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The user ID of the member of the group.
+          type: integer
+      required:
+      - userID
+      - dateInserted
+      - insertUserID
+      - role
+      type: object
+    GroupPost:
+      type: object
+      properties:
+        bannerUrl:
+          description: The URL of the banner of the group.
+          nullable: true
+          type: string
+        description:
+          description: The description of the group.
+          minLength: 1
+          type: string
+        format:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
+        iconUrl:
+          description: The URL of the icon of the group.
+          nullable: true
+          type: string
+        name:
+          description: The name of the group.
+          minLength: 1
+          type: string
+        privacy:
+          description: The privacy level of the group's content.
+          enum:
+          - public
+          - private
+          - secret
+          minLength: 1
+          type: string
+      required:
+      - name
+      - description
+      - format
+      - privacy
+    GroupPatch:
+      type: object
+      properties:
+        bannerUrl:
+          description: The URL of the banner of the group.
+          nullable: true
+          type: string
+        description:
+          description: The description of the group.
+          minLength: 1
+          type: string
+        format:
+          $ref: '../../dashboard/openapi/schemas.yml#/components/schemas/Format'
+        iconUrl:
+          description: The URL of the icon of the group.
+          nullable: true
+          type: string
+        name:
+          description: The name of the group.
+          minLength: 1
+          type: string
+        privacy:
+          description: The privacy level of the group's content.
+          enum:
+          - public
+          - private
+          - secret
+          minLength: 1
+          type: string
+      required:
+      - name
+      - description
+      - format
+      - privacy

@@ -1,0 +1,51 @@
+@import "compass/css3";
+@import "compass/utilities/general/clearfix";
+
+.DataList-Replies {
+   .Item {
+      &:last-child {
+         border-bottom: 0;
+      }
+      
+      .OptionsTitle {
+         visibility: hidden;
+      }
+      
+      &.Open .OptionsTitle,
+      &:hover .OptionsTitle {
+         visibility: visible;
+      }
+   }
+   
+   .PhotoWrap {
+      float: left;
+      
+      img {
+         height: 30px;
+         width: 30px;
+      }
+   }
+   
+   .ItemContent {
+      margin-left: 40px;
+   }
+   
+   .FormPlaceholder {
+      display: block;
+      border: solid 1px #ddd;
+      padding: 0 3px;
+      background: #fff;
+      @include box-sizing(border-box);
+      height: 30px;
+      line-height: 30px;
+   }
+   
+   .Buttons {
+      text-align: right;
+   }
+   
+   textarea.TextBox {
+      height: 60px;
+      min-height: 60px;
+   }
+}

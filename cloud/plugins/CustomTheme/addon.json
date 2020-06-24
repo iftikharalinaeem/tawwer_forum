@@ -1,0 +1,19 @@
+{
+    "name": "Custom Theme",
+    "description": "Allows administrators to customize the CSS & master HTML template of the currently enabled theme.",
+    "version": "3.0.0",
+    "settingsUrl": "/settings/customtheme",
+    "icon": "custom_theme.png",
+    "usePopupSettings": false,
+    "mobileFriendly": true,
+    "key": "customtheme",
+    "type": "addon",
+    "DocumentationUrl": "http://docs.vanillaforums.com/help/appearance/custom-theme/",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

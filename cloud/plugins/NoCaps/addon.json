@@ -1,0 +1,19 @@
+{
+    "description": "Prevents ALL CAPS discussion titles",
+    "version": "1.0.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "mobileFriendly": true,
+    "key": "nocaps",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "James Ducker",
+            "email": "james.ducker@gmail.com",
+            "homepage": "http://www.ozvolvo.org"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

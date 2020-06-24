@@ -1,0 +1,24 @@
+.CategoryList a.Title {
+   display: inline;
+}
+
+.Collapsed .CategoryDescription,
+.Collapsed .Meta {
+   display: none;
+}
+
+.CollapseCategoryButton {
+   display: inline-block;
+   height: 16px;
+   width: 16px;
+   background: url(sprites.png) no-repeat 0 -13px;
+   color: transparent !Important;
+}
+
+.CollapseCategoryButton span {
+   visibility: hidden;
+}
+
+.Collapsed .CollapseCategoryButton {
+   background-position: 0 3px;
+}

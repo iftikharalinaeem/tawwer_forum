@@ -1,0 +1,19 @@
+{
+    "name": "Walk Through",
+    "description": "Allow other plugins to display custom tours to users.",
+    "version": "1.0",
+    "icon": "walk_through.png",
+    "mobileFriendly": false,
+    "key": "walkthrough",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Eric Vachaviolos",
+            "email": "eric.v@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/evach"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

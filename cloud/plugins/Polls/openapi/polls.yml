@@ -1,0 +1,770 @@
+openapi: 3.0.2
+info:
+paths:
+  /polls:
+    get:
+      parameters:
+      - description: |
+          Filter by discussion.
+        in: query
+        name: discussionID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+          minimum: 1
+      - description: |
+          Filter by author.
+        in: query
+        name: insertUserID
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - updateUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    countOptions:
+                      description: The number of options to choose from.
+                      type: integer
+                    countVotes:
+                      description: The number of votes.
+                      type: integer
+                    dateInserted:
+                      description: When the poll was created.
+                      format: date-time
+                      type: string
+                    dateUpdated:
+                      description: When the poll was updated.
+                      format: date-time
+                      nullable: true
+                      type: string
+                    discussionID:
+                      description: The discussion the poll is displayed in.
+                      type: integer
+                    insertUser:
+                      $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                    insertUserID:
+                      description: The unique ID of the user who created this poll.
+                      type: integer
+                    name:
+                      description: The name of the poll.
+                      minLength: 1
+                      type: string
+                    pollID:
+                      description: The unique ID of the poll.
+                      type: integer
+                    updateUser:
+                      $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                    updateUserID:
+                      description: The unique ID of the user who updated this poll.
+                      nullable: true
+                      type: integer
+                  required:
+                  - pollID
+                  - name
+                  - discussionID
+                  - countOptions
+                  - countVotes
+                  - insertUserID
+                  - dateInserted
+                  - updateUserID
+                  - dateUpdated
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Polls
+      summary: List polls.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                properties:
+                  countOptions:
+                    description: The number of options to choose from.
+                    type: integer
+                  countVotes:
+                    description: The number of votes.
+                    type: integer
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the poll was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  discussionID:
+                    description: The discussion the poll is displayed in.
+                    type: integer
+                  insertUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  insertUserID:
+                    description: The unique ID of the user who created this poll.
+                    type: integer
+                  name:
+                    description: The name of the poll.
+                    minLength: 1
+                    type: string
+                  pollID:
+                    description: The unique ID of the poll.
+                    type: integer
+                  updateUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  updateUserID:
+                    description: The unique ID of the user who updated this poll.
+                    nullable: true
+                    type: integer
+                required:
+                - pollID
+                - name
+                - discussionID
+                - countOptions
+                - countVotes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Polls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollPost'
+        required: true
+      summary: Create a poll.
+  '/polls/{id}':
+    delete:
+      parameters:
+      - description: |
+          The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Polls
+      summary: Delete a poll.
+    get:
+      parameters:
+      - description: |
+          The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  countOptions:
+                    description: The number of options to choose from.
+                    type: integer
+                  countVotes:
+                    description: The number of votes.
+                    type: integer
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the poll was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  discussionID:
+                    description: The discussion the poll is displayed in.
+                    type: integer
+                  insertUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  insertUserID:
+                    description: The unique ID of the user who created this poll.
+                    type: integer
+                  name:
+                    description: The name of the poll.
+                    minLength: 1
+                    type: string
+                  pollID:
+                    description: The unique ID of the poll.
+                    type: integer
+                  updateUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  updateUserID:
+                    description: The unique ID of the user who updated this poll.
+                    nullable: true
+                    type: integer
+                required:
+                - pollID
+                - name
+                - discussionID
+                - countOptions
+                - countVotes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Polls
+      summary: Get a poll.
+    patch:
+      parameters:
+      - description: The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  countOptions:
+                    description: The number of options to choose from.
+                    type: integer
+                  countVotes:
+                    description: The number of votes.
+                    type: integer
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the poll was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  discussionID:
+                    description: The discussion the poll is displayed in.
+                    type: integer
+                  insertUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  insertUserID:
+                    description: The unique ID of the user who created this poll.
+                    type: integer
+                  name:
+                    description: The name of the poll.
+                    minLength: 1
+                    type: string
+                  pollID:
+                    description: The unique ID of the poll.
+                    type: integer
+                  updateUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  updateUserID:
+                    description: The unique ID of the user who updated this poll.
+                    nullable: true
+                    type: integer
+                required:
+                - pollID
+                - name
+                - discussionID
+                - countOptions
+                - countVotes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Polls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollPost'
+        required: true
+      summary: Update a poll.
+  '/polls/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollGetEdit'
+          description: Success
+      tags:
+      - Polls
+      summary: Get a poll for editing.
+  '/polls/{id}/options':
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Filter by pollOptionID.
+        in: query
+        name: pollOptionID
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - updateUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    body:
+                      description: The name of the option.
+                      minLength: 1
+                      type: string
+                    countVotes:
+                      description: The number of votes.
+                      type: integer
+                    dateInserted:
+                      description: When the poll was created.
+                      format: date-time
+                      type: string
+                    dateUpdated:
+                      description: When the poll was updated.
+                      format: date-time
+                      nullable: true
+                      type: string
+                    insertUser:
+                      $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                    insertUserID:
+                      description: The unique ID of the user who created this poll.
+                      type: integer
+                    pollID:
+                      description: The unique ID of the poll.
+                      type: integer
+                    pollOptionID:
+                      description: The unique ID of the option.
+                      type: integer
+                    updateUser:
+                      $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                    updateUserID:
+                      description: The unique ID of the user who updated this poll.
+                      nullable: true
+                      type: integer
+                  required:
+                  - pollOptionID
+                  - pollID
+                  - body
+                  - countVotes
+                  - insertUserID
+                  - dateInserted
+                  - updateUserID
+                  - dateUpdated
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Polls
+      summary: List polls' options.
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    description: The name of the option.
+                    minLength: 1
+                    type: string
+                  countVotes:
+                    description: The number of votes.
+                    type: integer
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the poll was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  insertUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  insertUserID:
+                    description: The unique ID of the user who created this poll.
+                    type: integer
+                  pollID:
+                    description: The unique ID of the poll.
+                    type: integer
+                  pollOptionID:
+                    description: The unique ID of the option.
+                    type: integer
+                  updateUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  updateUserID:
+                    description: The unique ID of the user who updated this poll.
+                    nullable: true
+                    type: integer
+                required:
+                - pollOptionID
+                - pollID
+                - body
+                - countVotes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Polls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollOptionPost'
+        required: true
+      summary: Create a poll option.
+  '/polls/{id}/options/{pollOptionID}':
+    delete:
+      parameters:
+      - description: |
+          The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The poll option ID
+        in: path
+        name: pollOptionID
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Polls
+      summary: Delete a poll.
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: The poll option ID
+        in: path
+        name: pollOptionID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  body:
+                    description: The name of the option.
+                    minLength: 1
+                    type: string
+                  countVotes:
+                    description: The number of votes.
+                    type: integer
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the poll was updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                  insertUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  insertUserID:
+                    description: The unique ID of the user who created this poll.
+                    type: integer
+                  pollID:
+                    description: The unique ID of the poll.
+                    type: integer
+                  pollOptionID:
+                    description: The unique ID of the option.
+                    type: integer
+                  updateUser:
+                    $ref: '../dashboard/schemas.yml#/components/schemas/UserFragment'
+                  updateUserID:
+                    description: The unique ID of the user who updated this poll.
+                    nullable: true
+                    type: integer
+                required:
+                - pollOptionID
+                - pollID
+                - body
+                - countVotes
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                type: object
+          description: Success
+      tags:
+      - Polls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollOptionPost'
+        required: true
+      summary: Update a poll option.
+  '/polls/{id}/votes':
+    delete:
+      parameters:
+      - description: |
+          The poll ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The user that voted. Defaults to the current user.
+        in: query
+        name: userID
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Polls
+      summary: Delete a poll vote.
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 25
+          maximum: 100
+          minimum: 1
+      - description: |
+          Filter by pollOptionID.
+        in: query
+        name: pollOptionID
+        schema:
+          type: integer
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    dateInserted:
+                      description: When the poll was created.
+                      format: date-time
+                      type: string
+                    pollOptionID:
+                      description: The unique ID of the option.
+                      type: integer
+                    userID:
+                      description: The user that made the vote
+                  required:
+                  - userID
+                  - pollOptionID
+                  - dateInserted
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Polls
+      summary: List polls' votes.
+    post:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  dateInserted:
+                    description: When the poll was created.
+                    format: date-time
+                    type: string
+                  pollOptionID:
+                    description: The unique ID of the option.
+                    type: integer
+                  userID:
+                    description: The user that made the vote
+                required:
+                - userID
+                - pollOptionID
+                - dateInserted
+                type: object
+          description: Success
+      tags:
+      - Polls
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PollVotePost'
+        required: true
+      summary: Vote for a poll option.
+components:
+  schemas:
+    PollGetEdit:
+      properties:
+        discussionID:
+          description: The discussion the poll is displayed in.
+          type: integer
+        name:
+          description: The name of the poll.
+          minLength: 1
+          type: string
+        pollID:
+          description: The unique ID of the poll.
+          type: integer
+      required:
+      - pollID
+      - name
+      - discussionID
+      type: object
+    PollOptionPost:
+      properties:
+        body:
+          description: The name of the option.
+          minLength: 1
+          type: string
+      required:
+      - body
+      type: object
+    PollPost:
+      properties:
+        discussionID:
+          description: The discussion the poll is displayed in.
+          type: integer
+        name:
+          description: The name of the poll.
+          minLength: 1
+          type: string
+      required:
+      - name
+      - discussionID
+      type: object
+    PollVotePost:
+      properties:
+        pollOptionID:
+          description: The unique ID of the option.
+          type: integer
+        userID:
+          description: The user that made the vote
+      required:
+      - pollOptionID
+      type: object

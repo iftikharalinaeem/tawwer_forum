@@ -1,0 +1,16 @@
+{
+    "name": "Gigya Sign In",
+    "description": "Adds single sign-on (SSO) to Gigya connect platform.",
+    "version": "1.0",
+    "settingsUrl": "/settings/gigya",
+    "settingsPermission": "Garden.Settings.Manage",
+    "key": "gigya",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

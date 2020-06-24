@@ -1,0 +1,170 @@
+//
+// # Variables
+//
+// No styleguide reference.
+
+// -----------------------------------------------------------------------------
+
+// # Colours
+//
+// No styleguide reference.
+
+// Cool
+
+@aqua:  #7FDBFF;
+@blue:  #0074D9;
+@navy:  #001F3F;
+@teal:  #39CCCC;
+@green: #2ECC40;
+@olive: #3D9970;
+@lime:  #01FF70;
+
+// Warm
+
+@yellow:  #FFDC00;
+@orange:  #FF851B;
+@red:     #FF4136;
+@fuchsia: #F012BE;
+@purple:  #B10DC9;
+@maroon:  #85144B;
+
+// Gray Scale
+
+@white:  #fff;
+@silver: #ddd;
+@gray:   #aaa;
+@black:  #111;
+
+// -----------------------------------------------------------------------------
+
+// # Scaffolding
+//
+// No styleguide reference.
+
+// -----------------------------------------------------------------------------
+
+// # Typography
+//
+// No styleguide reference.
+
+@font-family-sans-serif                 : Helvetica, Arial, sans-serif;
+
+@line-height-base                       : 20px;
+@line-height-ratio                      : unit(@line-height-base / @font-size-base);
+
+// -----------------------------------------------------------------------------
+
+// ## Components
+//
+// No styleguide reference.
+
+@padding-base-vertical                  : 6px;
+@padding-base-horizontal                : 12px;
+
+@border-radius-base                     : 2px;
+
+// -----------------------------------------------------------------------------
+
+// ## Grid
+//
+// No styleguide reference.
+
+@container-min-width                    : 990px;
+@container-max-width                    : 1170px;
+
+// -----------------------------------------------------------------------------
+
+// ## Forms
+//
+// No styleguide reference.
+
+@input-background                       : #fff;
+@input-border                           : #eee;
+@input-border-active                    : @brand-primary;
+
+@input-height-base                      : (@line-height-base + (@padding-base-vertical * 2) + 2);
+
+// -----------------------------------------------------------------------------
+
+// ## Buttons
+//
+// No styleguide reference.
+
+@button-font-weight                     : 500;
+
+@button-default-color                   : @text-color;
+@button-default-background              : #fafafa;
+@button-default-border                  : darken(@button-default-background, 10%);
+
+@button-primary-color                   : #fff;
+@button-primary-background              : @brand-primary;
+@button-primary-border                  : darken(@button-primary-background, 10%);
+
+// -----------------------------------------------------------------------------
+
+// ## Navigation
+//
+// No styleguide reference.
+
+@nav-link-padding-vertical              : 10px;
+@nav-link-padding-horizontal            : 15px;
+
+@nav-link-background-hover              : #eee;
+
+@nav-link-color-active                  : #fff;
+@nav-link-background-active             : @brand-primary;
+
+@nav-stacked-link-border-radius         : @border-radius-base;
+
+@navbar-height                          : 64px;
+@navbar-background                      : @brand-primary;
+
+@navbar-link-color                      : #fff;
+@navbar-link-background-hover           : darken(@navbar-background, 10%);
+
+@navbar-brand-padding-vertical          : 10px;
+@navbar-brand-font-size                 : @font-size-large;
+@navbar-brand-font-weight               : 500;
+@navbar-brand-color                     : #fff;
+@navbar-brand-color-hover               : @navbar-brand-color;
+
+@topbar-color                           : #fff;
+@topbar-link-color                      : @navbar-link-color;
+@topbar-background                      : lighten(@navbar-background, 5%);
+@topbar-border                          : darken(@topbar-background, 10%);
+
+@trail-link-padding-vertical            : @padding-base-vertical;
+@trail-link-padding-horizontal          : @padding-base-horizontal;
+@trail-link-margin                      : 0 .75em;
+@trail-link-color                       : @text-color;
+@trail-link-background                  : mix(@body-background, @text-color, 85%);
+
+@trail-link-hover-color                 : #fff;
+@trail-link-hover-background            : @brand-primary;
+
+// -----------------------------------------------------------------------------
+
+// ## Discussion
+//
+// No styleguide reference.
+
+@item-padding-vertical                  : 10px;
+@item-padding-horizontal                : 15px;
+
+// -----------------------------------------------------------------------------
+
+// ## Listings
+//
+// No styleguide reference.
+
+@data-group-border                      : #d5d5d5;
+@data-group-border-radius               : 1px;
+@data-group-box-shadow                  : #eee;
+
+@data-group-header-padding-vertical     : @item-padding-vertical;
+@data-group-header-padding-horizontal   : @item-padding-horizontal;
+@data-group-header-font-family          : @font-family-base;
+@data-group-header-font-size            : @font-size-large;
+@data-group-header-font-weight          : 500;
+@data-group-header-color                : #fff;
+@data-group-header-background           : @brand-primary;

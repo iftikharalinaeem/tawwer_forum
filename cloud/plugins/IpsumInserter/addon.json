@@ -1,0 +1,19 @@
+{
+    "name": "IpsumInserter",
+    "description": "IpsumInserter",
+    "version": "0.0.1",
+    "settingsPermission": "Garden.Settings.Manage",
+    "settingsUrl": "/plugin/IpsumInserter",
+    "key": "ipsuminserter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "John Ashton",
+            "email": "john@vanillaforums.com",
+            "homepage": "http://www.github.com/John0x00"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1.18"
+    }
+}

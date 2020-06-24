@@ -1,0 +1,21 @@
+{
+  "name": "vanilla-prospect",
+  "private": true,
+  "dependencies": {
+    "bourbon": "~3.2.1",
+    "neat": "1.5.x",
+    "normalize-scss": "3.0.x",
+    "geopattern": "btmills/geopattern",
+    "noisy": "danielrapp/noisy",
+    "iCheck": "2.x",
+    "ScrollToFixed": "~1.0.6"
+  },
+  "overrides": {
+    "geopattern": {
+      "main": "js/geopattern.min.js"
+    },
+    "noisy": {
+      "main": "jquery/jquery.noisy.min.js"
+    }
+  }
+}

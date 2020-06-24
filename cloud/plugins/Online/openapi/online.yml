@@ -1,0 +1,62 @@
+openapi: 3.0.2
+info:
+paths:
+  /online:
+    get:
+      tags:
+      - Online
+      summary: List all online users.
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    name:
+                      description: Name of the user.
+                      minLength: 1
+                      type: string
+                    photoUrl:
+                      description: URL to the user photo.
+                      nullable: true
+                      type: string
+                    timestamp:
+                      format: date-time
+                      type: string
+                    userID:
+                      description: ID of the user.
+                      type: integer
+                  required:
+                  - userID
+                  - name
+                  - timestamp
+                  type: object
+                type: array
+          description: Success
+  /online/counts:
+    get:
+      summary: Get a count of users currently online.
+      tags:
+      - Online
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  guests:
+                    description: Number of guests on the site.
+                    type: integer
+                  total:
+                    description: Total number of all guests and signed-in users.
+                    type: integer
+                  users:
+                    description: Number of signed-in users on the site.
+                    type: integer
+                required:
+                - users
+                - guests
+                - total
+                type: object
+          description: Success

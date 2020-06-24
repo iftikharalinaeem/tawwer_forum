@@ -1,0 +1,46 @@
+//
+// # Avatars
+//
+// Styleguide Avatars
+
+.PhotoWrap {
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba($black,.15);
+
+  &:before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    display: block;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba($black,.25) inset;
+    content: " ";
+  }
+
+  img {
+    border-radius: 4px;
+  }
+}
+
+.Conversation-User .ProfilePhotoSmall {
+  vertical-align: middle;
+  margin-right: 5px;
+  border-radius: 4px;
+  border: solid 1px #333;
+  box-shadow: 0 1px 2px rgba($black,.15);
+}
+
+.ProfilePhotoMedium {
+  @include size(64px);
+}
+
+.ProfilePhotoLarge {
+  @include size(210px);
+}
+
+.PhotoWrapLarge {
+  width: 210px;
+}

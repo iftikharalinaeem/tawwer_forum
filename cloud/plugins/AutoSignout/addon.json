@@ -1,0 +1,21 @@
+{
+    "name": "Auto Signout Timer",
+    "description": "Automatically signs people out if they have not been active for a period of time",
+    "version": "1.1",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/autosignout",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "auto-signout-timer.png",
+    "key": "autosignout",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

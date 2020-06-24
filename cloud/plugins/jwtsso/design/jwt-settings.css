@@ -1,0 +1,13 @@
+.JWT-sample {
+    border:solid 1px #ccc;
+    background-color: #eee;
+    padding:10px;
+    margin: 10px;
+    border-radius: 3px;
+}
+
+.JWT-sample textarea {
+    width: 100%;
+    border: 0;
+    background: transparent;
+}

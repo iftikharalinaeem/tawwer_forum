@@ -1,0 +1,13 @@
+.readless {
+   height: 200px; // default, gets overwritten by inline value (user defined)
+   overflow: hidden;
+   box-shadow: inset 0 -8px 10px -10px rgba(0,0,0,0.5);
+   transition: all 0.5s ease;
+}
+
+.readmore {
+   display: block;
+   padding: 10px;
+   text-align: center;
+   cursor: pointer;
+}

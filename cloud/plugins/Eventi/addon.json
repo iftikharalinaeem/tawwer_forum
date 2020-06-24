@@ -1,0 +1,23 @@
+{
+    "name": "Eventi2",
+    "description": "This plugin hooks every possible event and outputs a little chunk of signed HTML in-line.",
+    "version": "2.0.0",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "icon": "internal-plugin.png",
+    "settingsUrl": false,
+    "settingsPermission": "Garden.AdminUser.Only",
+    "mobileFriendly": true,
+    "key": "eventi",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.10a"
+    }
+}

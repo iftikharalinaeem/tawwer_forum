@@ -1,0 +1,77 @@
+<h1><?php echo sprintf(t('%s Settings'), t('Cleanspeak')); ?></h1>
+
+<?php if (!$this->Data['IsConfigured']) { ?>
+
+    <div class="alert alert-danger padded"><?php echo t('Your Cleanspeak Integration is NOT complete.  Enabling the plugin before it has
+been configured will force all new content to go into the premoderation queue.'); ?>
+    </div>
+
+<?php } ?>
+
+<div class="padded list-un-reset">
+    <h3><?php echo t('Setup Instructions'); ?></h3>
+
+    <ol>
+        <li><?php echo t('Complete the form below.'); ?></li>
+        <li><?php echo t('Add a new notification server to Cleanspeak.'); ?>
+            <ul>
+                <li>URL: <?php echo $this->Data['PostBackURL']; ?></li>
+                <li><?php echo t('Select the application(s) you want notifications from.'); ?></li>
+            </ul>
+        </li>
+        <li><?php echo t('Enable the plugin.'); ?></li>
+    </ol>
+</div>
+
+
+<div class="form-group">
+    <div class="label-wrap-wide">
+        <div class="label"><?php echo t('Enable Cleanspeak'); ?></div>
+        <div class="info"><?php echo t('Send new discussions, comments, activity posts and comments to Cleanspeak for premoderation'); ?></div>
+    </div>
+    <div class="input-wrap-right">
+        <div id="cstoggle">
+            <?php
+            if($this->Data['Enabled']) {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+            } else {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/cleanspeaktoggle', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+            }
+            ?>
+        </div>
+    </div>
+</div>
+
+<?php
+// Settings
+echo $this->Form->open();
+echo $this->Form->errors();
+?>
+
+<ul>
+    <li class="form-group">
+        <?php
+        echo $this->Form->labelWrap('Cleanspeak API URL', 'ApiUrl');
+        echo $this->Form->textBoxWrap('ApiUrl');
+        ?>
+    </li>
+
+    <li class="form-group">
+        <?php
+        echo $this->Form->labelWrap('Application ID', 'ApplicationID');
+        echo $this->Form->textBoxWrap('ApplicationID');
+        ?>
+    </li>
+
+    <li class="form-group">
+        <div class="label-wrap">
+            <?php echo $this->Form->label('Authentication Key', 'AccessToken'); ?>
+            <div class="info">
+                <?php echo t('If the Cleanspeak API URL is publicly accessible, authentication key must be set.'); ?>
+            </div>
+        </div>
+        <?php echo $this->Form->textBoxWrap('AccessToken'); ?>
+    </li>
+
+</ul>
+<?php echo $this->Form->close('Save'); ?>

@@ -1,0 +1,22 @@
+{
+    "name": "Webhooks",
+    "description": "Adds support for webhooks.",
+    "version": "1.0",
+    "license": "Proprietary",
+    "settingsUrl": "/webhook-settings",
+    "settingsPermission": "Garden.Settings.Manage",
+    "usePopupSettings": false,
+    "key": "webhooks",
+    "type": "addon",
+    "icon": "webhooks.png",
+    "authors": [
+        {
+            "name": "Dani M",
+            "email": "dani.m@vanillaforums.com"
+        },
+        {
+            "name": "Isis (igraziatto) Graziatto",
+            "email": "isis.g@vanillaforums.com"
+        }
+    ]
+}

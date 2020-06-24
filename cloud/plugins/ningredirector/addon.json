@@ -1,0 +1,19 @@
+{
+    "name": "Ning Redirector",
+    "description": "Redirect Ning's URLs",
+    "version": "1.0.1",
+    "license": "GNU GPL2",
+    "key": "ningredirector",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    },
+    "icon": "ning_redirector.png"
+}

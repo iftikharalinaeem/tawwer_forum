@@ -1,0 +1,55 @@
+<?php
+/**
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+namespace Vanilla\Sphinx\Models;
+
+use Vanilla\Contracts\Search\SearchRecordTypeInterface;
+use Vanilla\Contracts\Search\SearchRecordTypeTrait;
+use SphinxSearchModel;
+
+/**
+ * Class SearchRecordTypeDiscussion
+ * WARNING: this is clone of Vanilla\AdvancedSearch\Models\SearchRecordTypeDiscussion
+ *          any changes should be synchronized with generic class
+ *
+ * @package Vanilla\Sphinx\Models
+ * @deprecated
+ */
+class SearchRecordTypeDiscussion implements SearchRecordTypeInterface {
+    use SearchRecordTypeTrait;
+
+    const PROVIDER_GROUP = 'advanced';
+
+    const INFRASTRUCTURE_TEMPLATE = 'standard';
+
+    const TYPE = 'discussion';
+
+    const API_TYPE_KEY = 'discussion';
+
+    const SUB_KEY = 'd';
+
+    const CHECKBOX_LABEL = 'discussions';
+
+    const SPHINX_DTYPE = 0;
+
+    const SPHINX_INDEX = 'Discussion';
+
+    const GUID_OFFSET = 1;
+
+    const GUID_MULTIPLIER = 10;
+
+    /**
+     * @inheritdoc
+     */
+    public function getDocuments(array $IDs, \SearchModel $searchModel): array {
+        $result = $searchModel->getDiscussions($IDs);
+        foreach ($result as &$record) {
+            $record['guid'] = $record['PrimaryID'] * self::GUID_MULTIPLIER + self::GUID_OFFSET;
+        }
+        return $result;
+    }
+}

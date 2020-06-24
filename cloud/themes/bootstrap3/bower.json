@@ -1,0 +1,28 @@
+{
+  "name": "bootstrap-3",
+  "private": true,
+  "dependencies": {
+    "vanilla-bootstrap": "vanilla/vanilla-bootstrap#~2.5.6",
+    "swiper": "~2.7.0"
+  },
+  "overrides": {
+    "bootstrap-social": {
+      "main": "bootstrap-social.less"
+    },
+    "font-awesome": {
+      "main": "less/font-awesome.less"
+    },
+    "jquery": {
+      "main": []
+    },
+    "jquery-icheck": {
+      "main": "icheck.js"
+    },
+    "spin.js": {
+      "main": [
+        "spin.js",
+        "jquery.spin.js"
+      ]
+    }
+  }
+}

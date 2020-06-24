@@ -1,0 +1,53 @@
+{% from "@dashboard/components/macros.twig" import dashboardHeading, dashboardSymbol %}
+
+{{
+dashboardHeading({
+    title: Title,
+    buttons: Form.linkButton(t('Add rule'), '/dashboard/settings/add-edit-rule', { class: 'js-modal button btn-primary'})
+})
+}}
+
+<div class="table-wrap">
+    <table id="Rules" class="table-data js-tj">
+        <thead>
+        <tr>
+            <th class="RuleName">Rule</th>
+            <th class="RuleDescription column-lg">Description</th>
+            <th class="options column-sm"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for Rule in Rules %}
+            <tr id="Rule_{{ Rule.RuleID }}">
+                <td class="NameColumn">
+                    <div class="strong">{{ Rule.Name }}</div>
+                </td>
+                <td class="DescriptionColumn">
+                    <div>{{ Rule.Description }}</div>
+                </td>
+                <td class="options">
+                    <div class="btn-group">
+                        <a
+                            href="{{ Rule.EditUrl }}"
+                            class="btn js-modal btn-icon"
+                            aria-label="{{ t('Edit') }}"
+                            title="{{ t('Edit') }}"
+                        >
+                            {{ dashboardSymbol({name: 'edit'}) }}
+                        </a>
+                        <a
+                            href="{{ Rule.DeleteUrl }}"
+                            class="btn js-modal-confirm btn-icon"
+                            aria-label="{{ t('Delete') }}"
+                            title="{{ t('Delete') }}"
+                            data-body="{{ sprintf(t('Are you sure you want to delete this %s?'), t('rule')) }}"
+                        >
+                            {{ dashboardSymbol({name: 'delete'}) }}
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

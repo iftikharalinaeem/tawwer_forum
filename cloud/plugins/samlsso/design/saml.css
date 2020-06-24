@@ -1,0 +1,21 @@
+.SocialIcon.SocialIcon-SAMLSSO {
+    background-color: #fff;
+}
+
+.SocialIcon.SocialIcon-SAMLSSO.HasText .Icon,
+.SocialIcon-SAMLSSO .Icon {
+    background-image: url("logo.png");
+}
+
+.SocialIcon.SocialIcon-SAMLSSO.HasText .Icon {
+    background-size: 32px 32px;
+}
+
+.SocialIcon-SAMLSSO .Icon {
+    background-size: 24px 24px;
+}
+
+
+.SocialIcon.SocialIcon-SAMLSSO.HasText .Text {
+    color: #000;
+}

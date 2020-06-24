@@ -1,0 +1,20 @@
+{
+    "name": "API v1",
+    "description": "Provides simple access_token API access to the forum. This addon was formally called \"Simple API\".",
+    "version": "1.4.0",
+    "settingsUrl": "/settings/api",
+    "icon": "simple-api.png",
+    "priority": 1000,
+    "key": "simpleapi",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://about.me/timgunter"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a"
+    }
+}

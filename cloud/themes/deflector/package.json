@@ -1,0 +1,30 @@
+{
+    "name": "deflector",
+    "private": true,
+    "devDependencies": {
+        "bower": "^1.8.2",
+        "gulp": "^3.6.2",
+        "gulp-autoprefixer": "^4.0.0",
+        "gulp-bower-files": "0.2.x",
+        "gulp-cache": "0.1.x",
+        "gulp-concat": "2.2.x",
+        "gulp-filter": "0.4.x",
+        "gulp-flatten": "0.0.x",
+        "gulp-imagemin": "^4.0.0",
+        "gulp-jshint": "1.5.x",
+        "gulp-livereload": "1.3.x",
+        "gulp-load-plugins": "0.5.x",
+        "gulp-plumber": "0.6.1",
+        "gulp-sass": "^3.1.0",
+        "gulp-size": "0.3.x",
+        "wiredep": "1.4.x"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "scripts": {
+        "install": "bower install --allow-root",
+        "build": "gulp",
+        "watch": "gulp watch"
+    }
+}

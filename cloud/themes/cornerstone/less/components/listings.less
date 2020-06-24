@@ -1,0 +1,204 @@
+//
+// # Listings
+//
+// Styleguide #
+
+// -----------------------------------------------------------------------------
+
+// ## Regular listings
+//
+// Styleguide #.1
+
+.data-list() {
+
+}
+
+.data-list-item() {
+  &:last-child {
+    border-bottom-width: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+.DataList {
+  .Item {
+    padding: @item-padding-vertical @item-padding-horizontal;
+    .data-list-item();
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+// ## Table-based listings
+//
+// Styleguide #.2
+
+.data-table() {
+
+}
+
+.data-table-item() {
+  td {
+    padding: @item-padding-vertical @item-padding-horizontal;
+  }
+
+  &:last-child td {
+    border-bottom-width: 0;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+.DataTable {
+  td {
+    padding: @item-padding-vertical @item-padding-horizontal;
+    vertical-align: middle;
+  }
+
+  .Item {
+    .data-table-item();
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+// ## List groups
+//
+// Styleguide #.3
+
+.data-group() {
+  margin: 3px;
+  margin-bottom: @line-height-base;
+  border: @data-group-border solid 1px;
+  border-radius: @data-group-border-radius;
+  box-shadow: 0 0 0 3px @data-group-box-shadow;
+}
+
+.data-group-header() {
+  padding: @data-group-header-padding-vertical @data-group-header-padding-horizontal;
+  margin: -1px -1px 0;
+  font-family: @data-group-header-font-family;
+  font-size: @data-group-header-font-size;
+  font-weight: @data-group-header-font-weight;
+  line-height: @line-height-base;
+  color: @data-group-header-color;
+  background-color: @data-group-header-background;
+  border: darken(@data-group-header-background, 7.5%) solid 1px;
+  .border-top-radius(@data-group-border-radius);
+}
+
+// -----------------------------------------------------------------------------
+
+.CommentsWrap {
+  .data-group();
+
+  .CommentHeading {
+    display: none;
+  }
+
+  .BeforeCommentHeading,
+  .PagerWrap {
+    float: none;
+    display: block;
+    margin: -1px;
+    .clearfix();
+    color: @data-group-header-color;
+    background-color: #fafafa;
+    border: @data-group-border solid 1px;
+  }
+
+  .BeforeCommentHeading {
+    .border-top-radius(@data-group-border-radius);
+  }
+
+  .PagerWrap {
+    .border-bottom-radius(@data-group-border-radius);
+  }
+}
+
+.DataList {
+  &.Discussions,
+  &.Activities,
+  &.Conversations,
+  &.Conversation {
+    .data-group();
+  }
+}
+
+.MessageList {
+  &.Discussion {
+    .data-group();
+
+    .Item {
+      margin: 0;
+    }
+
+    .PageTitle {
+      &,
+      a {
+	color: @data-group-header-color;
+      }
+
+      h1 {
+	.data-group-header();
+	margin-bottom: -1px;
+      }
+
+      .Bookmark:before {
+	color: @data-group-header-color;
+      }
+
+      .Options {
+	padding: @data-group-header-padding-vertical @data-group-header-padding-horizontal;
+      }
+
+      .AdminCheck {
+	margin-left: 5px;
+
+	.icheckbox:before,
+	.iradio:before {
+	  color: #fff;
+	}
+      }
+    }
+  }
+}
+
+.DataTableWrap {
+  .data-group();
+}
+
+.CategoryGroup {
+  .data-group();
+
+  .H {
+    .data-group-header();
+  }
+
+  // Reset nested groups
+  .DataTableWrap {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+.ChildCategoryList {
+  .data-group();
+
+  .Category {
+    padding: 0;
+  }
+
+  .Item {
+    float: none;
+    width: auto;
+    padding: @item-padding-vertical @item-padding-horizontal;
+  }
+}
+
+.CategoryList {
+  .data-group();
+}

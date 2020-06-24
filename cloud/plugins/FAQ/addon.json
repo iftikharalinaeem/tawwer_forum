@@ -1,0 +1,18 @@
+{
+    "name": "FAQ",
+    "description": "Take a category of discussions & it's subcategories, organizing & displaying them as FAQs",
+    "version": "1.0",
+    "key": "faq",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1a",
+        "vfcom": ">=1.0"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "name": "Auto-Role By Email",
+    "description": "Add users with a confirmed email address to roles, based on their email domain.",
+    "version": "2.0",
+    "icon": "auto_role_by_email.png",
+    "key": "autorolebyemail2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com"
+        }
+    ]
+}

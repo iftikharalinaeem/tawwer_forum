@@ -1,0 +1,70 @@
+#bulk-importer .valid-statuses {
+  font-style: italic;
+}
+#bulk-importer #bulk-importer-validation-feedback {
+  display: none;
+}
+#bulk-importer #bulk-importer-validation-feedback.import-errors {
+  display: block;
+  background-color: #d50a0a;
+  color: #fff;
+  padding: 10px 20px;
+}
+#bulk-importer .disable-option {
+  opacity: 0.50;
+  pointer-events: none;
+}
+#bulk-importer .removed {
+  display: none !important;
+}
+#bulk-importer #import-progress-container {
+  display: none;
+}
+#bulk-importer #import-progress-container.working {
+  display: inline;
+}
+#bulk-importer #bulk-error-header:empty {
+  display: none;
+}
+#bulk-importer #bulk-error-many-errors {
+  color: #AAA;
+}
+#bulk-importer #bulk-error-many-errors:empty {
+  display: none;
+}
+#bulk-importer #bulk-error-dump:empty {
+  display: none;
+}
+#bulk-importer #bulk-radio-options li {
+  list-style-type: none !important;
+  margin: 5px 0;
+}
+#bulk-importer .bulk-note {
+  color: #aaa;
+}
+#bulk-importer #bulk-expires {
+  padding: 0 30px;
+}
+#bulk-importer #bulk-expires.shlide {
+  height: 0;
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+#bulk-importer #bulk-expires.shlide.show {
+  padding: 10px 30px 20px 30px;
+  height: 20px;
+  opacity: 1;
+}
+#bulk-importer #bulk-expires input {
+  width: 300px;
+  padding: 5px;
+}
+#bulk-importer .userin-options-list li {
+  padding: 20px 200px 0 10px;
+}
+#bulk-importer .bulk-invite-notice {
+  background-color: #FEEFB3;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 10px;
+  margin: 0 20px;
+}

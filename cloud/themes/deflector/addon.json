@@ -1,0 +1,19 @@
+{
+    "name": "Deflector",
+    "description": "A clean Vanilla theme focused on customer support communities",
+    "version": "1.0.8",
+    "url": "http://vanillaforums.com",
+    "license": "Proprietary",
+    "hidden": true,
+    "archived": true,
+    "key": "deflector",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Kasper Kronborg Isager",
+            "email": "kasper@vanillaforums.com",
+            "homepage": "https://github.com/kasperisager"
+        }
+    ]
+}

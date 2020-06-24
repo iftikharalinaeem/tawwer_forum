@@ -1,0 +1,85 @@
+#avatarstock .label-selector-item {
+  flex: 0 0 8.33333333%;
+  padding: .5rem .5rem .25rem;
+}
+#avatarstock .label-selector-item img {
+  width: 90px;
+  height: 90px;
+}
+#avatarstock .label-selector-item .btn {
+  min-width: 60px;
+  color: #fff;
+}
+#avatarstock .label-selector {
+  margin-left: -.5rem;
+  margin-right: -.5rem;
+}
+
+.delete-selected-avatars {
+  display: none;
+}
+.delete-selected-avatars.show-delete-button {
+  display: block !important;
+}
+
+.stockavatar-wrap h1 {
+  display: block !important;
+  margin-left: 10px;
+}
+.stockavatar-wrap #custom-avatar-upload {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 10px 0 20px 0;
+  padding: 10px 0 20px 0;
+}
+.stockavatar-wrap .CurrentPicture {
+  margin: 20px 0 0 0;
+}
+.stockavatar-wrap .remove-picture {
+  margin: 20px 0;
+}
+
+#stockavatar-picker {
+  overflow: hidden;
+  padding: 3px;
+}
+#stockavatar-picker .avatar-option {
+  display: block;
+  float: left;
+  padding: 2px;
+}
+#stockavatar-picker .avatar-option label {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 2px;
+  cursor: pointer;
+  opacity: 0.40;
+  -webkit-transform: scale(0.9);
+  transform: scale(0.9);
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+#stockavatar-picker .avatar-option label:hover {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  box-shadow: 0 0 5px 0 #aaa;
+}
+#stockavatar-picker .avatar-option input[type=radio] {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+}
+#stockavatar-picker .avatar-option input[type=radio]:checked ~ label {
+  opacity: 1;
+  -webkit-transform: scale(1);
+  transform: scale(1);
+  box-shadow: 0 0 5px 0 #aaa;
+  pointer-events: none;
+}
+#stockavatar-picker .avatar-option img {
+  display: block;
+  position: relative;
+  pointer-events: none;
+}

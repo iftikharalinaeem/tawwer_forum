@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+x-aliases:
+  ThemeIDParam: &ThemeIDParam
+    description: Unique themeID.
+    in: path
+    name: themeID
+    required: true
+    schema:
+      type: integer
+  StringAssetIn: &StringAssetIn
+    description: An asset to be inserted.
+    type: object
+    properties: &StringAssetInProperties
+      type:
+        description: The type of the asset.
+        type: string
+        example: html
+        enum:
+          - html
+          - css
+          - js
+      data:
+        type: string
+        example: "<header>Hello Footer<footer />"
+        description: Contents of the asset. May require an expand parameter to retreive.
+  StringAssetOut: &StringAssetOut
+    200:
+      content:
+        application/json:
+          schema:
+            description: Contents of an asset.
+            type: object
+            properties:
+              <<: *StringAssetInProperties
+              content-type:
+                description: The content-type of the asset.
+                type: string
+                example: text/html
+              url:
+                type: string
+                description: Absolute URL of the resource.
+                example: "https://site.com/api/v2/themes/:themeID/assets/:assetName.ext?v=faasdf42d"
+      description: Success
+  JsonAssetIn: &JsonAssetIn
+    description: An asset to be inserted.
+    type: object
+    properties: &JsonAssetInProperties
+      <<: *StringAssetInProperties
+      type:
+        type: string
+        example: json
+      data:
+        type: object
+        description: JSON content of the asset.
+        example:
+          global:
+            mainColors:
+              primary: "#5cc530"
+  JsonAssetOut: &JsonAssetOut
+    200:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              <<: *JsonAssetInProperties
+              content-type:
+                description: The content-type of the asset.
+                type: string
+                example: application/json
+              url:
+                type: string
+                description: Absolute URL of the resource.
+                example: "https://site.com/api/v2/themes/:themeID/assets/:assetName.ext?v=faasdf42d"
+      description: Success
+  DeleteAsset: &DeleteAsset
+    parameters:
+      - *ThemeIDParam
+    responses:
+      204:
+        description: Success
+    tags:
+      - Theme Assets
+    summary: Delete theme asset.
+  StringPutAsset: &StringPutAsset
+    parameters:
+      - *ThemeIDParam
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: *StringAssetIn
+    responses:
+      <<: *StringAssetOut
+    tags:
+      - Theme Assets
+    summary: Set theme asset or replace if already exists.
+  HtmlPutAssetContentType: &HtmlPutAssetContentType
+    <<: *StringPutAsset
+    requestBody:
+      required: true
+      content:
+        text/html: &HtmlContentType
+          schema:
+            type: string
+            description: HTML contents.
+            example: "<div>Hello HTML Asset!</div>"
+    responses:
+      200:
+        content:
+          text/html: *HtmlContentType
+        description: Success
+  JsPutAssetContentType: &JsPutAssetContentType
+    <<: *StringPutAsset
+    requestBody:
+      required: true
+      content:
+        application/javascript: &JsContentType
+          schema:
+            type: string
+            description: HTML contents.
+            example: "console.log('Hello Javascript')"
+    responses:
+      200:
+        content:
+          application/javascript: *JsContentType
+        description: Success
+  CssPutAssetContentType: &CssPutAssetContentType
+    <<: *StringPutAsset
+    requestBody:
+      required: true
+      content:
+        text/css: &CssContentType
+          schema:
+            type: string
+            description: HTML contents.
+            example: >
+              .class {
+                 color: orange;
+              }
+    responses:
+      200:
+        content:
+          text/css: *CssContentType
+        description: Success
+  JsonPutAsset: &JsonPutAsset
+    parameters:
+      - *ThemeIDParam
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema: *JsonAssetIn
+    responses:
+      <<: *JsonAssetOut
+    tags:
+      - Theme Assets
+    summary: Set theme asset or replace if already exists.
+  JsonPutAssetContentType: &JsonPutAssetContentType
+    <<: *JsonPutAsset
+    requestBody:
+      required: true
+      content:
+        application/json: &JsonContentType
+          schema:
+            type: object
+            description: JSON contents of the asset.
+            example:
+              hello:
+                json:
+                  asset: true
+    responses:
+      200:
+        content:
+          application/json: *JsonContentType
+        description: Success
+paths:
+  /themes:
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/PostTheme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Create a new theme.
+  /themes/{themeID}:
+    patch:
+      parameters:
+        - *ThemeIDParam
+      requestBody:
+        $ref: "#/components/requestBodies/PatchTheme"
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: Update theme name.
+    delete:
+      parameters:
+        - *ThemeIDParam
+      responses:
+        204:
+          description: Success
+      tags:
+        - Themes
+      summary: Delete theme.
+  /themes/preview:
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                themeID:
+                  description: Theme ID.
+                  type: integer
+              example: {"themeID": 3}
+              required:
+                - themeID
+        required: true
+      responses:
+        200:
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Theme"
+          description: Success
+      tags:
+        - Themes
+      summary: "Set preview theme. Note: only applies to current user session"
+  /themes/current:
+      put:
+        requestBody:
+          content:
+            application/json:
+              schema:
+                  type: object
+                  properties:
+                    themeID:
+                      description: Theme ID.
+                      type: integer
+                  example: {"themeID": 3}
+                  required:
+                    - themeID
+          required: true
+        responses:
+          200:
+            content:
+              "application/json":
+                schema:
+                  $ref: "#/components/schemas/Theme"
+            description: Success
+        tags:
+          - Themes
+        summary: Set theme as "current".
+  /themes/{themeID}/assets/header:
+    put: *StringPutAsset
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/header.html:
+    put: *HtmlPutAssetContentType
+  /themes/{themeID}/assets/footer:
+    put: *StringPutAsset
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/footer.html:
+    put: *HtmlPutAssetContentType
+  /themes/{themeID}/assets/javascript:
+    put: *StringPutAsset
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/javascript.js:
+    put: *JsPutAssetContentType
+  /themes/{themeID}/assets/styles:
+    put: *StringPutAsset
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/styles.css:
+    put: *CssPutAssetContentType
+  /themes/{themeID}/assets/variables:
+    put: *JsonPutAsset
+    patch:
+      <<: *JsonPutAsset
+      summary: Merge some new variables into existing ones.
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/variables.json:
+    put: *JsonPutAssetContentType
+    patch:
+      <<: *JsonPutAssetContentType
+      summary: Merge some new variables into existing ones.
+  /themes/{themeID}/assets/scripts:
+    put: *JsonPutAsset
+    delete: *DeleteAsset
+  /themes/{themeID}/assets/scripts.json:
+    put: *JsonPutAssetContentType
+components:
+  x-component-aliases:
+    PostPatchFields: &PostPatchFields
+      name:
+        description: Theme name.
+        type: string
+      revisionName:
+        type: string
+        description: Theme revision name
+      assets:
+        type: object
+        properties:
+          header:
+            <<: *StringAssetIn
+            description: Header HTML Asset.
+          footer:
+            <<: *StringAssetIn
+            description: Footer HTML Asset.
+          variables:
+            <<: *JsonAssetIn
+            description: Variables JSON Asset.
+          scripts:
+            <<: *JsonAssetIn
+            description: Scripts JSON Asset.
+          styles:
+            <<: *StringAssetIn
+            description: Styles CSS Asset.
+          javascript:
+            <<: *StringAssetIn
+            description: Javascript JS Asset.
+  requestBodies:
+    PatchTheme:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              <<: *PostPatchFields
+            example: &PatchExample
+              name: My custom Theme
+              assets:
+                header:
+                  data: "<div><!-- HEADER --></div>"
+                  type: html
+                footer:
+                  data: "<div><!-- FOOTER --></div>"
+                  type: html
+      required: true
+    PostTheme:
+      content:
+          application/json:
+              schema:
+                  type: object
+                  properties:
+                    <<: *PostPatchFields
+                    parentTheme:
+                      type: string
+                      description: Parent theme template
+                    parentVersion:
+                      type: string
+                      description: Parent theme template version
+                    active:
+                      type: string
+                      description: Flag theme revision is active or not. Only for GET themes/{id}/revisions
+                  example:
+                    <<: *PatchExample
+                    parentTheme: theme-foundation
+                  required:
+                    - name
+      required: true

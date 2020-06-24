@@ -1,0 +1,18 @@
+{
+    "name": "Skimlinks",
+    "description": "Puts Skimlinks into vanilla pages.",
+    "version": "1.0",
+    "icon": "skimlinks.png",
+    "requiredTheme": false,
+    "hasLocale": true,
+    "registerPermissions": false,
+    "key": "googleadsense",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://toddburry.com"
+        }
+    ]
+}

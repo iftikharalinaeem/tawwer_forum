@@ -1,0 +1,709 @@
+body {
+   background: url('images/noise.png') top center repeat #333 !important;
+}
+.Head .Wrapper {
+   background: url('images/bg-glow.png') center -80px no-repeat transparent !important;
+}
+.Head .Center {
+	position: relative;
+	min-height: 80px;
+}
+.Wrapper {
+   text-align: center;
+}
+.Center {
+   text-align: left;
+   width: 960px;
+   margin: 0 auto;
+}
+.Head {
+   background: #014381;
+   background:-webkit-gradient(linear, center bottom, center top, from(#256098), to(#014381));
+	background:-moz-linear-gradient(top, #014381, #256098);
+	-pie-background:linear-gradient(top, #014381, #256098);
+	background:linear-gradient(top, #014381, #256098);
+   box-shadow: inset 0 -4px 12px #01284c;
+   -moz-box-shadow: inset 0 -4px 12px #01284c;
+   -webkit-box-shadow: inset 0 -4px 12px #01284c;   
+   background: url('images/noise-light.png') top center repeat #014381;
+}
+.Divider {
+    background: #66DEFF;
+    border-bottom: 1px solid #7B939A;
+    border-top: 2px solid #27B1D9;
+    height: 1px;
+}
+body > .Body {
+   background: #fff;
+   padding-top: 20px;
+   border-top: 1px solid #B9DDE8;
+   float: left;
+   width: 100%;
+}
+body > .Foot {
+   -moz-box-shadow: inset 0px 4px 2px #111;
+   -webkit-box-shadow: inset 0px 4px 2px #111;
+   -o-box-shadow: inset 0px 4px 2px #111;
+   box-shadow: inset 0px 4px 2px #111;
+   border-top: 1px solid #222;
+   position: relative;
+   float: left;
+   width: 100%;
+   padding: 0 0 40px;
+}
+.Foot .Wrapper {
+   background: url('images/bg-glow.png') center -80px no-repeat transparent;
+   padding: 40px 0 0;
+   min-height: 100px;
+}
+.Foot .Columns strong {
+   display: block;
+   font-weight: bold;
+   font-size: 13px;
+   color: #fff;
+}
+.Foot .Columns a {
+   color: #aaa;
+}
+.Foot .Columns a:hover {
+   color: #bbb;
+}
+.Column4 {
+   float: left;
+   width: 25%;
+   font-size: 13px;
+   line-height: 1.6;
+}
+h1.Logo {
+	top: 10px;
+	left: 0;
+	position: absolute !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+h1.Logo a {
+	color: transparent;
+	font-size: 1px;
+	display: block;
+	height: 65px;
+	width: 132px;
+	overflow: hidden;
+	text-align: left;
+	text-indent: -1000px;
+	background: url('images/vanilla-forums-logo-light-132px.png') 0 0 no-repeat;
+}
+/* Contact used on narrow master view */
+.Head .Contact {
+	position: absolute;
+	top: 26px;
+	right: 0;
+	font-size: 13px;
+	color: #ffda30;
+}
+.Head .Contact strong {
+	font-weight: normal;
+	color: #fff;
+	font-size: 20px;
+}
+
+
+/* MENU */
+.Menus {
+    position: relative;
+    top: 16px;
+    right: 0;
+}
+.AccountMenu {
+	position: absolute;
+	top: -10px;
+	right: 4px;
+}
+.AccountMenu a {
+	font-size: 12px;
+	text-shadow: 0 1px 1px #000;
+	color: #fff;
+	margin: 0 10px;
+}
+.AccountMenu a:hover {
+	text-shadow: none;
+	text-decoration: underline;
+}
+.AccountMenu a:last-child {
+	margin: 0 0 0 10px;
+}
+body.Search .AccountMenu a.Support,
+body.Vanilla .AccountMenu a.Support,
+body.Profile .AccountMenu a.Profile,
+body.Account .AccountMenu a.Account {
+   color: #ff0;
+   font-weight: bold;
+}
+.VFMenu {
+	position: absolute;
+	top: 16px;
+	right: 0;
+	height: 34px;
+	overflow: visible;
+	box-shadow: 0 0 4px #001329;
+	-moz-box-shadow: 0 0 4px #001329;
+	-webkit-box-shadow: 0 0 4px #001329;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+}
+.OrangeButton,
+.OrangeButton:hover,
+.BigButton,
+.BigButton:hover,
+.PurpleButton,
+.PurpleButton:hover,
+.GreenButton,
+.GreenButton:hover,
+.SmallBlueButton,
+.SmallBlueButton:hover,
+.BlueButton,
+.BlueButton:hover,
+.RedButton,
+.RedButton:hover,
+.VFMenu a {
+	background: #3bb6f3;
+	background:-webkit-gradient(linear, center bottom, center top, from(#3bb6f3), to(#b8e9fd));
+	background:-moz-linear-gradient(top, #b8e9fd, #3bb6f3);
+	-pie-background:linear-gradient(top, #b8e9fd, #3bb6f3);
+	background:linear-gradient(top, #b8e9fd, #3bb6f3);
+	border-color: #001329;
+   display: inline-block;
+	overflow: hidden;
+	font-weight: bold;
+	/* line-height: 34px;
+	padding: 0 14px;
+	height: 34px;
+ */
+   line-height: 27px;
+   padding: 4px 14px;
+	font-size: 12px;
+	text-shadow: 0 1px 1px #fff;
+	color: #003f87;
+	border-style: solid;
+   border-width: 1px;
+   border-radius: 3px;
+   -moz-border-radius: 3px;
+   -webkit-border-radius: 3px;
+}
+input.OrangeButton,
+input.OrangeButton:hover,
+input.BigButton,
+input.BigButton:hover,
+input.PurpleButton,
+input.PurpleButton:hover,
+input.GreenButton,
+input.GreenButton:hover,
+input.SmallBlueButton,
+input.SmallBlueButton:hover,
+input.BlueButton,
+input.BlueButton:hover,
+input.RedButton,
+input.RedButton:hover {
+   font-size: 14px;
+   padding: 10px 14px;
+}
+.VFMenu a {
+	border-color: #3bb6f3;
+   border-radius: 0;
+   -moz-border-radius: 0;
+   -webkit-border-radius: 0;
+	border-width: 0 1px 0 0;
+}
+.VFMenu a:first-child {
+	border-radius: 3px 0 0 3px;
+	-moz-border-radius: 3px 0 0 3px;
+	-webkit-border-radius: 3px 0 0 3px;
+}
+.VFMenu a:last-child {
+	border-radius: 0 3px 3px 0;
+	-moz-border-radius: 0 3px 3px 0;
+	-webkit-border-radius: 0 3px 3px 0;
+	border-width: 0;
+}
+.VFMenu a:hover {
+	box-shadow: inset 0 0 8px #003f87;
+	-moz-box-shadow: inset 0 0 8px #003f87;
+	-webkit-box-shadow: inset 0 0 8px #003f87;
+	color: #003f87;
+}
+.SmallBlueButton:focus,
+.BlueButton:focus,
+.VFMenu a:focus,
+body#vfcom_info_index .VFMenu a.Home,
+body.Resources .VFMenu a.Resources,
+body.plans .VFMenu a.Plans,
+body.Features .VFMenu a.Features{
+	background: #002a59;
+	background:-webkit-gradient(linear, center bottom, center top, from(#024d8f), to(#002a59));
+	background:-moz-linear-gradient(top, #002a59, #024d8f);
+	-pie-background:linear-gradient(top, #002a59, #024d8f);
+	background:linear-gradient(top, #002a59, #024d8f);
+	box-shadow: inset 0 -1px 0px #82a6c5,
+		inset 0 1px 1px #001b39;
+	-moz-box-shadow: inset 0 -1px 0px #82a6c5,
+		inset 0 1px 1px #001b39;
+	-webkit-box-shadow: inset 0 -1px 0px #82a6c5,
+		inset 0 1px 1px #001b39;
+	text-shadow: 0 -1px 1px #001b39;
+	color: #cef1fc;
+}
+body#vfcom_info_index .VFMenu a.Home,
+body.Resources .VFMenu a.Resources,
+body.plans .VFMenu a.Plans,
+body.Features .VFMenu a.Features{
+	border-width: 0;
+}
+.SmallBlueButton,
+.SmallBlueButton:hover,
+.SmallBlueButton:focus,
+.BlueButton,
+.BlueButton:hover,
+.BlueButton:focus {
+	background: #3bb6f3;
+	background:-webkit-gradient(linear, center bottom, center top, from(#3bb6f3), to(#b8e9fd));
+	background:-moz-linear-gradient(top, #b8e9fd, #3bb6f3);
+	-pie-background:linear-gradient(top, #b8e9fd, #3bb6f3);
+	background:linear-gradient(top, #b8e9fd, #3bb6f3);
+	border-color: #001329;
+	text-shadow: 0 1px 1px #fff;
+	color: #003f87;
+	box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f7fdff;
+	-moz-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f7fdff;
+	-webkit-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f7fdff;
+}
+.SmallBlueButton:hover,
+.BlueButton:hover {
+	background: #3bb6f3;
+}
+.SmallBlueButton:focus,
+.BlueButton:focus {
+	background: #0f94d6;
+}
+.OrangeButton,
+.OrangeButton:hover,
+.OrangeButton:focus {
+	background: #c64100;
+	background:-webkit-gradient(linear, center bottom, center top, from(#c64100), to(#ff9008));
+	background:-moz-linear-gradient(top, #ff9008, #c64100);
+	-pie-background:linear-gradient(top, #ff9008, #c64100);
+	background:linear-gradient(top, #ff9008, #c64100);
+	border-color: #4c1104;
+   color: #fff;
+   text-shadow: 0 -1px 1px #ac4f18;  
+	box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #913000;
+	-moz-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #913000;
+	-webkit-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #913000;
+}
+.OrangeButton:hover {
+	background: #c64100;
+}
+.OrangeButton:focus {
+	background: #a43600;
+}
+.GreenButton,
+.GreenButton:hover,
+.GreenButton:focus {
+	background: #2c9000;
+	background:-webkit-gradient(linear, center bottom, center top, from(#2c9000), to(#4cbc01));
+	background:-moz-linear-gradient(top, #4cbc01, #2c9000);
+	-pie-background:linear-gradient(top, #4cbc01, #2c9000);
+	background:linear-gradient(top, #4cbc01, #2c9000);
+	border-color: #133f00;
+   color: #fff;
+   text-shadow: 0 -1px 1px #1f6600; 
+	box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #c2ffbc;
+	-moz-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #c2ffbc;
+	-webkit-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #c2ffbc;
+}
+.GreenButton:hover {
+	background: #2c9000;
+}
+.GreenButton:focus {
+	background: #1f6600;
+	border-color: #0a2100;
+}
+.BigButton,
+.BigButton:hover,
+.BigButton:focus,
+.PurpleButton,
+.PurpleButton:hover,
+.PurpleButton:focus {
+	background: #981d5a;
+	background:-webkit-gradient(linear, center bottom, center top, from(#981d5a), to(#d43f8b));
+	background:-moz-linear-gradient(top, #d43f8b, #981d5a);
+	-pie-background:linear-gradient(top, #d43f8b, #981d5a);
+	background:linear-gradient(top, #d43f8b, #981d5a);
+	border-color: #5c0531;
+   color: #fff;
+   text-shadow: 0 -1px 1px #8b114f;   
+	box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #ff8af8;
+	-moz-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #ff8af8;
+	-webkit-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #ff8af8;
+}
+.BigButton:hover,
+.PurpleButton:hover {
+	background: #981d5a;
+}
+.BigButton:focus,
+.PurpleButton:focus {
+   background: #8b114f;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+.BigButton,
+.BigButton:hover,
+.BigButton:focus {
+   display: block;
+}
+.RedButton,
+.RedButton:hover,
+.RedButton:focus {
+	background: #b40613;
+	background:-webkit-gradient(linear, center bottom, center top, from(#b40613), to(#eb3543));
+	background:-moz-linear-gradient(top, #eb3543, #b40613);
+	-pie-background:linear-gradient(top, #eb3543, #b40613);
+	background:linear-gradient(top, #eb3543, #b40613);
+	border-color: #7c020b;
+   color: #fff;
+   text-shadow: 0 -1px 1px #7c020b;   
+	box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f8adad;
+	-moz-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f8adad;
+	-webkit-box-shadow: 0 0 4px #001329,
+        inset 0 0 1px #f8adad;
+}
+.RedButton:hover {
+	background: #b40613;
+}
+.RedButton:focus {
+	background: #7c020b;
+	border-color: #5d0007;
+}
+.SmallBlueButton,
+.SmallBlueButton:hover,
+.SmallBlueButton:focus {
+   padding: 4px 6px;
+   font-size: 12px;
+   height: auto;
+   line-height: 1;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+.Head .SignUpButton {
+   position: absolute;
+   top: 31px;
+   right: 422px;
+}
+body.Conversations.add .FormWrapper,
+body.Vanilla.Post .FormWrapper {
+   background: none;
+   margin: 0;
+   padding: 0;
+}
+a.ApplyButton {
+	display: none;
+}
+
+/* Login Page */
+body.Entry #Content h1 {
+	font-family: 'lucida grande','Lucida Sans Unicode', tahoma, sans-serif;
+	color: #000;
+	font-size: 18px;
+	font-weight: bold;
+	padding: 0 0 6px;
+}
+body.Entry #Content {
+	position: relative;
+}
+.LoginHelp {
+	font-size: 13px;
+	padding: 10px;
+	position: absolute;
+	right: 10px;
+	text-align: left;
+	width: 300px;
+	z-index: 2;
+	margin-top: -180px;
+}
+.LoginHelp p {
+	color: #777;
+	margin: 0;
+	padding: 0 0 10px;
+	font-size: 12px;
+}
+body#dashboard_entry_passwordrequest #Content,
+body#dashboard_entry_passwordreset #Content,
+body#dashboard_entry_password #Content,
+body#dashboard_entry_signin #Content,
+body#dashboard_entry_index #Content {
+    width: 640px;
+    margin-bottom: 40px;
+}
+body.Entry div.Box,
+body.Entry div.Entry {
+	position: relative;
+	z-index: 1;
+	width: auto;
+}
+body.Entry div.Box p {
+	text-align: left;
+}
+body.Entry div.Box,
+body.Entry div.Entry div.MainForm {
+	width: auto;
+	border: 10px solid #f5f5f5;
+	border-width: 10px 340px 10px 10px;
+	background: #fafafa;
+	padding: 10px;
+	-moz-border-radius: 4px;
+	box-shadow: 0 1px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0 1px 2px #999;
+}
+body.Entry.register div.Box {
+	border-width: 10px;
+}
+body.Entry.register #Content form {
+   padding: 0;
+}
+body.Entry div.Entry div.MainForm {
+	min-height: 150px;
+}
+body#dashboard_entry_passwordrequest #Content div.Box,
+body#dashboard_entry_passwordreset #Content div.Box {
+	padding: 10px;
+	border-width: 10px;
+}
+body.Entry#dashboard_entry_passwordrequest #Content form,
+body.Entry#dashboard_entry_passwordreset #Content form {
+   padding: 0;
+}
+
+/* Forms */
+#DiscussionForm form {
+	background: #fafafa;
+	border: 10px solid #f5f5f5;
+	padding: 10px;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	box-shadow: 0 0 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0 0 2px #999;
+}
+
+/* Popups */
+div.Border {
+   border: 1px solid #66deff;
+   background:  none;
+   padding: 0;
+}
+div.Popup div.Border {
+    max-width: 600px;
+}
+div.Popup div.Body {
+   border-radius: 7px;
+   -moz-border-radius: 7px;
+   -webkit-border-radius: 7px;
+}
+.Popup .Body {
+   border: 2px solid #27b1d9;
+   border-radius: 6px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+}
+.Popup .Body .Content {
+   border-radius: 5px;
+   -moz-border-radius: 5px;
+   -webkit-border-radius: 5px;
+}
+div.Popup h1, div.Popup h2, div.Connect h1, div.Connect h2 {
+   border: 1px solid #004487;
+   border-radius: 4px 4px 0 0;
+   -moz-border-radius: 4px 4px 0 0;
+   -webkit-border-radius: 4px 4px 0 0;
+   background: url('images/bg-heading-tile.png') 0 -1px repeat-x #004d99;
+   color: #FFFFFF;
+}
+div.Popup div.MultipleEntryMethods h1 {
+   padding: 5px 9px 4px;
+}
+div.Overlay {
+   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.7);   
+}
+a.Close, a.Close:hover {
+   right: 11px;
+   top: 9px;
+   text-decoration: none;
+}
+div.MultipleEntryMethods {
+   width: 494px;
+}
+.RoleTitle {
+   color: #000000;
+   font-weight: bold;
+}
+
+/* Search box on discussion list */
+#Content .SearchForm {
+	border: 1px solid #ddd;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	margin: 0 0 8px;
+	padding: 8px;
+	background: #F6F8FE;
+	-moz-box-shadow: inset 0 0 4px #fff;
+}
+#Content .SearchForm .InputBox {
+	font-size: 13px;
+	margin-right: 6px;
+	width: 582px;
+}
+.NumberPoint {
+   border-radius: 40px;
+   -moz-border-radius: 40px;
+   -webkit-border-radius: 40px;
+   box-shadow: inset 0 0 2px #000, 0 0 2px #256098;
+   -moz-box-shadow: inset 0 0 2px #000, 0 0 2px #256098;
+   -webkit-box-shadow: inset 0 0 2px #000, 0 0 2px #256098;
+   transform: rotate(-15deg);
+   -moz-transform: rotate(-15deg);
+   -webkit-transform: rotate(-15deg);
+   background: #014381;
+   background:-webkit-gradient(linear, center bottom, center top, from(#256098), to(#014381));
+	background:-moz-linear-gradient(top, #014381, #256098);
+	-pie-background:linear-gradient(top, #014381, #256098);
+	background:linear-gradient(top, #014381, #256098);
+   border: 4px solid #7ad5ff;
+   color: #aae4ff;
+   text-shadow: 0 1px 0 #001c65;
+   font-family: monospace,Arial,Sans-Serif;
+   font-size: 28px;
+   font-style: normal;
+   font-weight: bold;
+   height: 36px;
+   left: -40px;
+   line-height: 1.3;
+   position: absolute;
+   text-align: center;
+   top: -8px;
+   width: 36px;
+}
+/* Forum Fixes */
+.ClearFix { clear: none; display: none; }
+.Message { clear: none;}
+.UserSignature { overflow: auto; }
+body.filenotfound #Panel {
+   display: none;
+}
+body.filenotfound #Content {
+   float: none;
+   width: 500px;
+   margin: 0 auto 30px;
+	border: 10px solid #f5f5f5;
+	border-width: 10px;
+	background: #fafafa;
+	padding: 10px;
+	-moz-border-radius: 4px;
+	box-shadow: 0 1px 2px #999;
+	-moz-box-shadow: 0 0 2px #999;
+	-webkit-box-shadow: 0 1px 2px #999;
+   
+}
+
+.Tag {  
+   background: #96DAF9;
+   border: 1px solid #057EEE;
+   color: #195388;
+}
+
+/* vfcom mobile customizations begin here */
+body {
+   background: #fff !important;
+}
+.Menus,
+h1.Logo,
+.AccountMenu,
+.VFMenu {
+   position: inherit !important;
+   top: auto !important;
+   left: auto !important;
+   right: auto !important;
+   box-shadow: none;
+   -moz-box-shadow: none;
+   -webkit-box-shadow: none;
+}
+.VFMenu {
+   height: auto;
+}
+.VFMenu a {
+   border-radius: 3px !important;
+   -moz-border-radius: 3px !important;
+   -webkit-border-radius: 3px !important;
+   margin-right: 2px;
+   padding: 0 4px !important;
+   
+}
+.Cred,
+.Splash .Feature {
+   display: none;
+}
+h1.Logo,
+.Menus {
+   padding: 10px 0 !important;
+}
+.Center {
+   width: auto;
+   padding: 0 10px;
+}
+.Splash {
+   padding: 0;
+   position: inherit;
+   font-family: arial;
+}
+.Column3,
+.Column4 {
+   float: none;
+   margin: 0 !important;
+   width: auto;
+   padding: 10px 0 !important;
+}
+.SignUpCTA {
+   padding: 20px 0;
+   text-align: left;
+}
+.SignUpCTA label {
+   line-height: 1;
+   margin: 0;
+   padding: 0 0 10px;
+   display: block;
+   font-family: arial;
+}
+body > .Foot {
+   background: #333;
+}
+.FAQ {
+    padding: 10px 0 !important;
+    width: auto !important;
+}

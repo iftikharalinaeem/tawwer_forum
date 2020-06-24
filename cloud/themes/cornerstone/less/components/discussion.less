@@ -1,0 +1,63 @@
+//
+// # Discussion
+//
+// Styleguide #
+
+// -----------------------------------------------------------------------------
+
+// ## Base item
+//
+// Styleguide #.1
+
+.Item {
+  padding: @item-padding-vertical @item-padding-horizontal;
+
+  .Message {
+    margin: 0;
+    font-size: @font-size-base;
+    line-height: @line-height-base;
+  }
+
+  .Options {
+    .AdminCheck {
+      margin-left: 5px;
+    }
+  }
+
+  .Reactions {
+    &:empty {
+      display: none;
+    }
+  }
+}
+
+.Item-Header {
+  margin: 0;
+  .clearfix();
+
+  .PhotoWrap {
+    margin: 0;
+    margin-right: (@line-height-base / 2);
+  }
+
+  .Username,
+  .AuthorInfo {
+    font-size: @font-size-base;
+    line-height: @line-height-base;
+  }
+
+  .Meta {
+    font-size: @font-size-small;
+    line-height: @line-height-base;
+  }
+}
+
+.Item-BodyWrap {
+  .Item-Header + & {
+    padding-top: @item-padding-vertical;
+  }
+}
+
+.ProfilePhotoLarge {
+  width: 100%;
+}

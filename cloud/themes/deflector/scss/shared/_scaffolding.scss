@@ -1,0 +1,28 @@
+//
+// # Scaffolding
+//
+// No styleguide reference.
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-base;
+  line-height: $line-height-ratio;
+  color: $text-color;
+  background-color: $body-bg;
+}
+
+a {
+  color: $link-color;
+  text-decoration: none;
+  transition: color 150ms;
+
+  &:hover,
+  &:focus {
+    color: $link-hover-color;
+    text-decoration: none;
+  }
+}
+
+img {
+  vertical-align: middle;
+}

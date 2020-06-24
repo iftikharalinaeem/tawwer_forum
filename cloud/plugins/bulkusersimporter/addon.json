@@ -1,0 +1,23 @@
+{
+    "name": "Bulk User Import",
+    "description": "Bulk user import with standardized CSV files. Send invites or directly insert new members.",
+    "version": "1.2.3",
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "settingsUrl": "/settings/bulkusersimporter",
+    "settingsPermission": "Garden.Setttings.Manage",
+    "icon": "bulk-user-import.png",
+    "key": "bulkusersimporter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Dane MacMillan",
+            "email": "dane@vanillaforums.com",
+            "homepage": "http://vanillaforums.org/profile/dane"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

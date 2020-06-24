@@ -1,0 +1,75 @@
+//
+// # Masthead
+//
+// Styleguide Masthead
+
+.masthead {
+  padding: 40px;
+  margin-bottom: $line-height-base;
+  color: $masthead-color;
+  text-shadow: 0 1px 2px rgba($black,.25);
+  background-color: $masthead-bg;
+  box-shadow: 0  15px 15px -15px rgba($black,.25) inset,
+              0 -15px 15px -15px rgba($black,.25) inset;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: $masthead-color;
+  }
+
+  form {
+    position: relative;
+    width: 540px;
+    margin: $line-height-base auto 0;
+
+    input[type="text"] {
+      padding: 15px 20px;
+      padding-right: 100px;
+      border-color: transparent;
+      border-radius: 4px;
+    }
+
+    .AdvancedSearch input[type="text"] {
+      padding: 0 20px;
+    }
+
+    input[type="submit"] {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      float: right;
+      padding: 10px 25px;
+    }
+  }
+
+  .AdvancedSearch .AdvancedSearch-Category,
+  .AdvancedSearch .AdvancedSearch-Date {
+
+    select {
+      color: #333;
+    }
+
+  }
+
+  .AdvancedSearch input[type="text"] {
+    padding: 0 20px;
+  }
+
+  .container {
+    > *:first-child {
+      margin-top: 0;
+    }
+
+    > *:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .navbar + & {
+    margin-top: -$line-height-base;
+  }
+}

@@ -1,0 +1,549 @@
+openapi: 3.0.2
+info:
+paths:
+  /badges:
+    get:
+      parameters:
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: |
+          Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - insertUser
+            - updateUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Badge'
+                type: array
+          description: Success
+      tags:
+      - Badges
+      summary: List badges.
+    post:
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Badge'
+          description: Success
+      tags:
+      - Badges
+      requestBody:
+        $ref: '#/components/requestBodies/BadgePost'
+      summary: Create a custom badge.
+  /badges/requests:
+    get:
+      parameters:
+      - description: |
+          Filter by badge ID
+        in: query
+        name: badgeID
+        schema:
+          type: integer
+      - description: |
+          Filter by user ID
+        in: query
+        name: userID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - badge
+            - insertUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BadgeRequest'
+                type: array
+          description: Success
+      tags:
+      - Badges
+      summary: List badge requests.
+  /badges/users:
+    get:
+      parameters:
+      - description: |
+          Filter by badge ID
+        in: query
+        name: badgeID
+        schema:
+          type: integer
+      - description: |
+          Filter by user ID
+        in: query
+        name: userID
+        schema:
+          type: integer
+      - description: |
+          Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          maximum: 100
+          minimum: 1
+      - description: |
+          Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+          minimum: 1
+      - description: >
+          Expand associated records using one or more valid field names. A
+          value of "all" will expand all expandable fields.
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - badge
+            - insertUser
+            - all
+            type: string
+          type: array
+        style: form
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserBadge'
+                type: array
+          description: Success
+      tags:
+      - Badges
+      summary: List all the users that have the badge.
+  '/badges/{id}':
+    delete:
+      parameters:
+      - description: |
+          The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Badges
+      summary: Delete a custom badge.
+    get:
+      parameters:
+      - description: |
+          The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Badge'
+          description: Success
+      tags:
+      - Badges
+      summary: Get a badge.
+    patch:
+      parameters:
+      - description: The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Badge'
+          description: Success
+      tags:
+      - Badges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BadgePost'
+        required: true
+      summary: Update a badge.
+  '/badges/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Badge'
+          description: Success
+      tags:
+      - Badges
+      summary: Get a badge for editing.
+  '/badges/{id}/requests':
+    post:
+      parameters:
+      - description: The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgeRequest'
+          description: Success
+      tags:
+      - Badges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BadgeRequestPost'
+        required: true
+      summary: Request a badge.
+  '/badges/{id}/requests/{userID}':
+    delete:
+      parameters:
+      - description: |
+          The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Badges
+      summary: Delete the badge request of a user.
+  '/badges/{id}/users':
+    post:
+      parameters:
+      - description: The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserBadge'
+          description: Success
+      tags:
+      - Badges
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBadgePost'
+        required: true
+      summary: Give a badge to a user.
+  '/badges/{id}/users/{userID}':
+    delete:
+      parameters:
+      - description: |
+          The badge ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: |
+          The user ID.
+        in: path
+        name: userID
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Badges
+      summary: Remove a badge from a user.
+components:
+  requestBodies:
+    BadgePost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadgePost'
+      required: true
+  schemas:
+    Badge:
+      properties:
+        badgeID:
+          description: The ID of the badge.
+          type: integer
+        body:
+          description: The description of the badge.
+          minLength: 1
+          type: string
+        class:
+          description: The class of the badge.
+          minLength: 1
+          nullable: true
+          type: string
+        classLevel:
+          description: The class level.
+          nullable: true
+          type: integer
+        enabled:
+          description: Tells whether the badge is enabled or not.
+          type: boolean
+        key:
+          description: They key of the badge.
+          minLength: 1
+          type: string
+        name:
+          description: The name of the badge.
+          minLength: 1
+          type: string
+        photoUrl:
+          description: The photo of the badge.
+          minLength: 1
+          nullable: true
+          type: string
+        points:
+          description: The amount of point a badge is worth.
+          type: integer
+      required:
+      - badgeID
+      - name
+      - key
+      - body
+      - points
+      - class
+      - classLevel
+      - enabled
+      type: object
+    BadgePost:
+      properties:
+        body:
+          description: The description of the badge.
+          minLength: 1
+          type: string
+        class:
+          description: The class of the badge.
+          minLength: 1
+          nullable: true
+          type: string
+        classLevel:
+          description: The class level.
+          nullable: true
+          type: integer
+        enabled:
+          default: true
+          description: Tells whether the badge is enabled or not.
+          type: boolean
+        key:
+          description: They key of the badge.
+          minLength: 1
+          type: string
+        name:
+          description: The name of the badge.
+          minLength: 1
+          type: string
+        photoUrl:
+          description: The photo of the badge.
+          minLength: 1
+          nullable: true
+          type: string
+        points:
+          description: The amount of point a badge is worth.
+          type: integer
+      required:
+      - name
+      - key
+      - body
+      - points
+      - class
+      - classLevel
+      type: object
+    BadgeRequest:
+      properties:
+        badge:
+          $ref: '#/components/schemas/Badge'
+        badgeID:
+          description: The ID of the badge.
+          type: integer
+        dateInserted:
+          description: When the user requested the badge.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the user badge relation.
+          type: integer
+        reasonBody:
+          description: Reason why the user wants the badge.
+          minLength: 1
+          nullable: true
+          type: string
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The ID of the user.
+          type: integer
+      required:
+      - userID
+      - badgeID
+      - reasonBody
+      - insertUserID
+      - dateInserted
+      type: object
+    BadgeRequestPost:
+      properties:
+        reasonBody:
+          description: Reason why the user wants the badge.
+          minLength: 1
+          nullable: true
+          type: string
+      type: object
+    UserBadge:
+      properties:
+        badge:
+          $ref: '#/components/schemas/Badge'
+        badgeID:
+          description: The ID of the badge.
+          type: integer
+        dateEarned:
+          description: When the badge was earned.
+          format: date-time
+          nullable: true
+          type: string
+        dateInserted:
+          description: When the user badge relation was created.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: The user that created the user badge relation.
+          type: integer
+        reasonBody:
+          description: Reason why the badge was given to the user.
+          minLength: 1
+          nullable: true
+          type: string
+        user:
+          $ref: '#/components/schemas/UserFragment'
+        userID:
+          description: The ID of the user.
+          type: integer
+      required:
+      - userID
+      - badgeID
+      - reasonBody
+      - dateEarned
+      - insertUserID
+      - dateInserted
+      type: object
+    UserBadgePost:
+      properties:
+        reasonBody:
+          description: Reason why the badge was given to the user.
+          minLength: 1
+          nullable: true
+          type: string
+        userID:
+          description: The ID of the user.
+          type: integer
+      required:
+      - userID
+      type: object

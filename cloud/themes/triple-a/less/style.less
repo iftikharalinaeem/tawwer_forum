@@ -1,0 +1,282 @@
+/*!
+ * Triple-A - A gaming theme for Vanilla Forums. Build with Bootstrap.
+ *
+ * @author    Kasper Kronborg Isager <kasper@funktionel.co>
+ * @copyright 2014 (c) Funktionél and Vanilla Forums Inc.
+ * @license   GPLv2
+ */
+
+// Vendors
+//
+// Library dependencies installed using Bower are automagically wired up when
+// running the `npm run build` command. Don't manually edit this section!
+//
+// bower:less
+@import "../bower_components/bootstrap/less/bootstrap.less";
+@import "../bower_components/font-awesome/less/font-awesome.less";
+@import "../bower_components/bootstrap-social/bootstrap-social.less";
+@import "../bower_components/vanilla-bootstrap/less/vanilla-bootstrap.less";
+// endbower
+
+// Bootswatch
+@import "../bower_components/bootswatch/cyborg/variables";
+@import "../bower_components/bootswatch/cyborg/bootswatch";
+
+// Google Fonts
+@import url("//fonts.googleapis.com/css?family=Play:400,700");
+
+// Variables
+@headings-font-family: Play, sans-serif;
+
+@breadcrumb-bg: #000;
+
+@page-footer-bg: #000;
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: #151515;
+}
+
+// Navbar
+.navbar-brand {
+  font-family: @headings-font-family;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 rgba(255,255,255,.05);
+  transition: color 200ms;
+}
+
+.navbar-nav {
+  > li > a {
+    font-family: @headings-font-family;
+    text-transform: uppercase;
+  }
+}
+
+.navbar-default {
+  border: 0;
+
+  .ui-helper-hidden-accessible {
+    display: none;
+  }
+
+  .navbar-nav {
+    > li {
+      > a {
+        box-shadow: 0 0 fade(@brand-primary, 0%) inset;
+        transition: box-shadow 200ms;
+
+        &:hover {
+          box-shadow: 0 3px darken(@brand-primary, 25%) inset;
+        }
+      }
+    }
+    > .active > a {
+      box-shadow: 0 3px darken(@brand-primary, 15%) inset;
+    }
+  }
+}
+
+.navbar-form {
+  .Button {
+    display: none;
+  }
+}
+
+.navbar-static-top {
+  border-top: 3px solid @brand-primary;
+  border-bottom: 0;
+}
+
+// Breadcrumbs
+.breadcrumb {
+  margin-bottom: 0;
+  .border-bottom-radius(0);
+
+  > li {
+    font-family: @headings-font-family;
+  }
+}
+
+// Page header
+.page-header,
+.PageTitle h1 {
+  margin-top: 0;
+}
+
+// Page
+.page-wrap {
+  padding: @grid-gutter-width;
+  background-color: fade(@body-bg, 50%);
+  .border-bottom-radius(@border-radius-large);
+}
+
+// Slider
+.BoxPromoted {
+  width: 100%;
+  height: 233px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  backface-visibility: hidden;
+  z-index: 1;
+  margin-bottom: @line-height-computed;
+
+  h4 {
+    display: none;
+  }
+
+  .PromotedGroup {
+    float: left;
+    box-sizing: content-box;
+  }
+
+  .DataList {
+    position: relative;
+    width: 100%;
+    transition-property: transform, left, top;
+    transition-duration: 0s;
+    transform: translate3d(0px,0,0);
+    transition-timing-function: ease;
+    box-sizing: content-box;
+
+    .Item {
+      &:extend(.panel);
+      &:extend(.panel-primary);
+      float: left;
+      width: ((100% / 3) - (4% / 3));
+      padding: 0 0 40px;
+      margin-right: 2%;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+
+    .Title {
+      &:extend(.panel-heading);
+      &:extend(.panel-primary > .panel-heading);
+
+      a {
+        &:extend(.panel-title);
+        display: block;
+        color: @panel-primary-text;
+      .text-overflow();
+      }
+    }
+
+    .Body {
+      &:extend(.panel-body);
+    }
+
+    .BodyLink {
+      display: block;
+      height: (6 * @line-height-computed);
+      overflow: hidden;
+    }
+
+    .AuthorWrap {
+      &:extend(.panel-footer);
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      padding-right: 80px;
+
+      .ProfilePhoto {
+        width: @line-height-computed;
+        height: @line-height-computed;
+        vertical-align: bottom;
+      }
+
+      .Username {
+        display: block;
+        .text-overflow();
+      }
+    }
+
+    .Meta {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      padding: 10px 15px;
+      line-height: @line-height-computed;
+    }
+  }
+
+  .PanelInfo {
+    a {
+      display: inline;
+      padding: 0;
+      margin: 0;
+      background-color: transparent;
+      border: 0;
+    }
+  }
+}
+
+// Swiper
+.swiper-pagination {
+  &:extend(.carousel-indicators);
+  position: static;
+  float: right;
+  width: auto;
+  margin: 0 -3px;
+}
+
+.swiper-pagination-switch {
+  &:extend(.carousel-indicators li);
+  margin-right: 3px;
+  margin-left: 3px;
+}
+
+.swiper-active-switch {
+  &:extend(.carousel-indicators .active);
+  margin-right: 2px;
+  margin-left: 2px;
+}
+
+// Tokens
+.token-input-dropdown,
+.ac_results {
+  z-index: 1060 !important;
+}
+
+// Plugins
+@import "globals/icons";
+@import "plugins/reactions";
+@import "plugins/plugins";
+@import "plugins/groups";
+@import "components/attachments";
+
+// Compatibility
+
+.container {
+  .followButton {
+    font-size: 20px;
+  }
+
+  .followButton-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+  }
+
+  .discussion-sort-filter-module {
+    height: 38px;
+  }
+
+  .selectBox-toggle {
+    text-decoration: none !important;
+  }
+}
+
+.richEditor {
+  color: #252525;
+}
+
+.UserQuote.blockquote {
+  margin-bottom: 1em !important;
+}
+

@@ -1,0 +1,211 @@
+body, html {
+   width:100%;
+   height:100%;
+   padding:0;
+   margin:0;
+   font-family: 'Lucida Grande', Tahoma, Arial, sans-serif;
+   color: #333;
+}
+#framecover,
+#main{
+   float: left;
+   position: absolute;
+   top:0;
+   bottom: 0;
+   right: 0;
+   left:300px;
+}
+#main {
+   background: url('progress.gif') center center no-repeat #fff;
+}
+#framecover {
+   display: none;
+   z-index: 99;
+}
+#sidebar{
+   background-color: #efefef;
+   width: 300px;
+   float: right;
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   overflow-y: hidden;
+}
+#dragbar{
+   background: url('divider.png') center center no-repeat #eaeaea;
+   height:100%;
+   float: right;
+   width: 6px;
+   border-right: 1px solid #ccc;
+   cursor: col-resize;
+}
+.TextBox {
+   position: absolute;
+   top: 24px;
+   right: 6px;
+   bottom: 60px;
+   left: 6px;
+   background:#fff;
+   box-shadow: inset 0 0 2px #aaa;
+   font-family: Menlo, Monaco, 'Courier New', monospace;
+   font-size: 12px;
+   border: 1px solid #888;
+}
+.TextBox:focus {
+   background: #ffd;
+}
+#sidebar label {
+   left: 0;
+   right: 0;
+   white-space: nowrap;
+   font-size: 11px;
+   overflow: hidden;
+}
+#sidebar label.heading {
+   padding: 6px;
+   position: absolute;
+   top: 0;
+}
+#controls {
+   position: absolute;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   height: 60px;
+   padding: 6px 6px 0;
+}
+#buttons {
+   padding-top: 6px;
+}
+input.Button {
+   margin: 0;
+   border-radius: 2px;
+   background: #3fbcf3;
+   background: -webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
+   background: -moz-linear-gradient(top, #aee7fe, #3fbcf3);
+   -pie-background: linear-gradient(top, #aee7fe, #3fbcf3);
+   background: linear-gradient(top, #aee7fe, #3fbcf3);
+   border: 1px solid #0F7FE6;
+   color: #003673;
+   cursor: pointer;
+   font-size: 12px;
+   padding: 4px 8px;
+   text-shadow: 0 1px 0 #B7F5FD;
+   font-weight: normal;
+   display: inline-block;
+   box-shadow: 0px 0px 2px #999;
+}
+input.Button:hover {
+   box-shadow: none;
+}
+#Form_Apply {
+   position: absolute;
+   right: 9px;
+}
+#vframe {
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   right: 0;
+   left: 0;
+   border: none;
+   display: block;
+   height: 100%;
+   width: 100%;
+}
+
+
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+.InformMessages {
+   text-align: left;
+   position: fixed;
+   top: auto;
+   bottom: 0;
+   left: 0;
+   z-index: 200;
+   margin: 0;
+   padding: 0;
+   list-style: none;
+   font-size: 12px;
+   display: block;
+   width: auto;
+}
+* html .InformMessages {
+  position: absolute;
+  top: auto;
+  margin-left: 10px;
+  overflow: visible; 
+  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
+}
+.InformWrapper {
+	display: block;
+   margin: 10px;
+}
+.InformMessages .InformMessage {
+   color: #fff !important;
+	text-shadow: 0 1px 1px #000;
+   text-align: left !important;
+   border-radius: 2px;
+   -moz-border-radius: 2px;
+   -webkit-border-radius: 2px;
+	background: rgb(0, 0, 0) !important;
+	background: rgba(0, 0, 0, 0.7) !important;
+   border: none !important;
+   width: auto;
+	max-width: 400px;
+   padding: 9px 14px 8px;
+   display:-moz-inline-stack;
+   display:inline-block;
+   zoom:1;
+   *display:inline;
+	position: relative;
+	line-height: 1.6;
+}
+.InformMessages .InformMessage:hover {
+	background: #333;
+	background: rgba(0, 0, 0, 0.8) !important;
+}
+.InformMessages .InformMessage a {
+	color: #aff;
+}
+.InformMessages .InformMessage a:hover {
+	color: #cff;
+	text-decoration: underline;
+}
+.InformMessages .InformMessage strong {
+	font-weight: bold;
+}
+.InformMessages .InformMessage a.Close {
+	border: none;
+	background: transparent;
+   border-top-right-radius: 2px;
+   -webkit-border-top-right-radius: 2px;
+   -moz-border-radius-topright: 2px;
+	color: #ddd;
+	font-size: 14px;
+	text-align: center;
+	display: none;
+	height: 12px;
+	width: 12px;
+	line-height: 1;
+	text-decoration: none;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+.InformMessages .InformMessage a.Close span {
+	display: inline;
+}
+.InformMessages .InformMessage a.Close:hover {
+	background: #000;
+	color: #fff;
+}
+.InformMessages .InformMessage:hover a.Close {
+	display: block;
+}
+/* Only display this message when in other pages */
+#InPreviewCustomTheme,
+#InLiveEditCssMode {
+   display: none;
+}

@@ -1,0 +1,26 @@
+{
+    "name": "Theme Editor",
+    "description": "Provides an API & UI to manage theme resources and create custom themes.",
+    "version": "1.0",
+    "key": "themingapi",
+    "type": "addon",
+    "hidden": true,
+    "authors": [
+        {
+            "name": "Adam Charron",
+            "email": "adam.c@vanillaforums.com"
+        },
+        {
+            "name": "Alexander Kim",
+            "email": "alexander.k@vanillaforums.com"
+        },
+        {
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=4.0.0"
+    },
+    "icon": "theming_ui.png"
+}

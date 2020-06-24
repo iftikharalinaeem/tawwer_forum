@@ -1,0 +1,80 @@
+.self-deploy {
+    width: 700px;
+}
+
+.self-deploy .info {
+    padding: 0px;
+    margin: 20px;
+}
+
+.self-deploy .deploy-info {
+    margin: 20px;
+}
+
+.self-deploy .repository {
+    padding: 15px;
+    margin: 20px 0px;
+    background: #F1F1F1;
+}
+
+.self-deploy .deploy {
+    margin: 20px;
+}
+
+.self-deploy .deploying {
+    padding: 15px;
+    margin: 20px 0px;
+    background: #ccffce;
+    color: #282828;
+    font-weight: normal;
+}
+
+.self-deploy .do-deploy {
+    margin: 20px 0px;
+}
+
+.self-deploy .deploying .progress-track {
+    height: 4px;
+    background-color: white;
+    width: 100%;
+}
+
+.self-deploy .deploying .progress-bar {
+    height: 4px;
+    width: 0px;
+}
+
+.self-deploy .cluster-deploying {
+    background-color: #FFE4E4;
+    color: #A00000;
+    font-weight: bold;
+}
+
+.self-deploy .cluster-deploying .progress-bar {
+    background-color: #A00000;
+}
+
+.self-deploy .self-deploying .progress-bar {
+    background-color: #0e9700;
+}
+
+.self-deploy .self-deploying .text-status {
+    color: #0e9700;
+    font-weight: bold;
+}
+
+.self-deploy .caution {
+    padding: 15px;
+    background-color: #ffff99;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.self-deploy .deploy-info h2,
+.self-deploy .deploy h2 {
+    margin: 0px;
+}
+
+#Content .self-deploy .deploy form .Button {
+    margin-left: 0px;
+}

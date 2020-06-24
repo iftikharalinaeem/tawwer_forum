@@ -1,0 +1,70 @@
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+.odd {background-color: #f4f4f4;}
+tr:hover {
+    background-color: lightyellow;
+}
+.float-left {
+    float: left;
+}
+.floatfix {
+    float: left;
+    width: 100%
+}
+.blockgrid {
+    margin-left: -20px;
+}
+.blockgrid li.float-left {
+    padding: 0 10px;
+}
+input.Short {
+    width: 165px;
+}
+input.Shorter {
+    width: 75px;
+}
+
+.buttons {
+    margin-top: 15px;
+}
+.table-el {
+    table-layout: fixed;
+}
+
+.table-el th,
+.table-el td {
+    padding: 5px 8px;
+    word-wrap: break-word;
+}
+
+.el-date {
+    width: 100px;
+}
+.el-user {
+    width: 100px;
+}
+.el-priority {
+    width: 75px;
+}
+.el-event {
+    width: 130px;
+}
+.el-ip {
+    width: 115px;
+}
+
+.el-date {
+    width: 145px;
+}
+
+.el-site {
+    width: 140px;
+}

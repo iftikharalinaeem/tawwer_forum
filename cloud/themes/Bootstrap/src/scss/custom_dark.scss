@@ -1,0 +1,54 @@
+@import "defaults";
+
+/// Scaffolding ///
+
+$bodyBackground: #2F2F2F;
+$textColor: #c6c6c6;
+$headingsColor: #ffffff;
+$linkColor: #84BCDE;
+$linkColorHover: #39E5FF;
+$reactColor: #999999;
+
+$borderColor: #242424;
+
+/// Forms ///
+
+$btnBackground: lighten(#2F2F2F, 10%);
+$btnColor: #ffffff;
+$btnPrimaryBackground: $red;
+$btnPrimaryColor: #ffffff;
+$formBackground: #2A2A2A;
+
+$readBackground: #383838;
+
+$navbarBackground: #000000;
+
+$boxBackground: darken($bodyBackground, 2%);
+$listBackground: darken($bodyBackground, 2%);
+$boxBorder: $borderColor;
+
+$uiColor: #f0f0f0;
+
+/// Messages ///
+
+$warningText: #ffffff;
+$warningBackground: $orange;
+
+$errorText: #ffffff;
+$errorBackground: $red;
+
+$successText: #ffffff;
+$successBackground: $green;
+
+$infoText: #ffffff;
+$infoBackground: $blue;
+
+.PasswordStrength .Background {
+   background-color: #333333;
+}
+.PasswordStrength .Separator {
+   background-color: black;
+}
+
+@import "colors";
+@import "compat";

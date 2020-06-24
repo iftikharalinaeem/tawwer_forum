@@ -1,0 +1,19 @@
+{
+    "name": "Sphinx Search",
+    "description": "Upgrades search to use the powerful Sphinx engine instead of the default search.",
+    "version": "2.0",
+    "icon": "sphinx.png",
+    "settingsUrl": "/settings/sphinx",
+    "key": "sphinx",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=3.2"
+    }
+}

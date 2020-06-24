@@ -1,0 +1,19 @@
+{
+    "name": "Disqus Importer",
+    "description": "Imports commments from Disqus into Vanilla.",
+    "version": "1.0.1a",
+    "mobileFriendly": false,
+    "icon": "disqus_importer.png",
+    "key": "disqusimporter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.org/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

@@ -1,0 +1,244 @@
+//
+// # Icons
+//
+// Styleguide Icons
+
+.Sprite,
+.Sprite16,
+.ReactSprite,
+.SpFlyoutHandle {
+  width: auto;
+  height: auto;
+  background-image: none !important;
+
+  &:before {
+    @include icon;
+    min-width: 1em;
+    text-align: center;
+  }
+}
+
+.ReactSprite {
+  &:before {
+    font-size: 14px;
+  }
+}
+
+.SpFlyoutHandle {
+  cursor: pointer;
+}
+
+.SpEditProfile:before {
+  content: $icon-user;
+}
+.SpDropdownHandle:before {
+  content: $icon-caret-down;
+}
+.SpDiscussions:before {
+  content: $icon-discussion;
+}
+.SpActivity:before {
+  content: $icon-time;
+}
+.SpNotifications:before {
+  content: $icon-globe;
+}
+.SpDelete:before {
+  content: $icon-remove;
+}
+.SpFlyoutHandle:before {
+  content: $icon-cog;
+}
+.SpOptions:before {
+  content: $icon-cog;
+}
+.SpPreferences:before {
+  content: $icon-cog;
+}
+.SpBookmarks:before {
+  content: $icon-star;
+}
+.SpPassword:before {
+  content: $icon-lock;
+}
+.SpSearch:before {
+  content: $icon-search;
+}
+.SpInbox:before {
+  content: $icon-inbox;
+}
+
+//Reactions
+.ReactPromote:before {
+  content: $icon-hand-up;
+}
+.ReactOffTopic:before {
+  content: $icon-meh;
+}
+.ReactInsightful:before {
+  content: $icon-lightbulb;
+}
+.ReactDisagree:before {
+  content: $icon-frown;
+}
+.ReactAgree:before {
+  content: $icon-smile;
+}
+.ReactDislike:before {
+  content: $icon-thumbs-down;
+}
+.ReactLike:before {
+  content: $icon-thumbs-up;
+}
+.ReactDown:before {
+  content: $icon-arrow-down;
+}
+.ReactUp:before {
+  content: $icon-arrow-up;
+}
+.ReactWTF:before {
+  content: $icon-wtf;
+}
+.ReactAwesome:before {
+  content: $icon-heart;
+}
+.ReactLOL:before {
+  content: $icon-lol;
+}
+.ReactFlag:before {
+  content: $icon-flag;
+}
+.ReactAbuse:before {
+  content: $icon-exclamation-sign;
+}
+.ReactSpam:before {
+  content: $icon-spam;
+}
+.ReactQuote:before {
+  content: $icon-quote;
+}
+.ReactWarn:before {
+  content: $icon-warn;
+}
+.ReactFacebook:before {
+  content: $icon-facebook-alt;
+}
+.ReactFacebook:hover {
+  &:before {
+    color: #3a5795;
+  }
+}
+.ReactTwitter:before {
+  content: $icon-twitter;
+}
+.ReactTwitter:hover {
+  &:before {
+    color: #55acee;
+  }
+}
+.ReactGooglePlus:before {
+  content: $icon-google-plus-alt;
+}
+.ReactGooglePlus:hover {
+  &:before {
+    color: #dd4b39;
+  }
+}
+
+// -----------------------------------------------------------------------------
+
+.ReactButton.PopupWindow {
+  &:hover {
+    .Sprite:before {
+      color: $text-color;
+    }
+  }
+}
+
+.Button.Handle .Sprite,
+.NavButton.Handle .Sprite {
+  position: static;
+  border: 0;
+  vertical-align: baseline;
+}
+
+.Handle > .SpEditProfile,
+.NavButton > .SpEditProfile {
+  width: auto;
+  height: auto;
+  vertical-align: baseline;
+  line-height: inherit;
+}
+
+.Options {
+  .Bookmark,
+  .SpFlyoutHandle {
+    display: inline-block;
+    padding: 2px;
+
+    &,
+    &:before {
+      vertical-align: top;
+      line-height: ($line-height-base - 4px);
+    }
+
+    &:before {
+      font-size: $line-height-base;
+    }
+  }
+
+  .AdminCheck .icheckbox:before {
+    vertical-align: top;
+  }
+}
+
+.OptionsMenu {
+  font-size: $font-size-base;
+
+  .Flyout {
+    top: 100%;
+    right: -9px;
+    margin-top: 10px;
+  }
+}
+
+.OptionsTitle {
+  display: none;
+}
+
+.MeBox {
+  .Arrow {
+    display: none;
+  }
+}
+
+a.Bookmark {
+  width: auto;
+  height: auto;
+  font: 0/0 a;
+  color: transparent;
+  text-indent: 0;
+  background-image: none !important;
+
+  &:before {
+    @include icon;
+    font-size: $line-height-base;
+    color: $text-color;
+  }
+
+  &:hover:before {
+    color: darken($text-color, 10%);
+  }
+}
+
+a.Bookmark:before {
+  content: $icon-star-empty;
+}
+
+a.Bookmarked {
+  &:before,
+  &:hover:before {
+    color: #e5b951 !important;
+    content: $icon-star;
+  }
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Db Logger",
+    "description": "Enable database logging.",
+    "version": "1.3.0",
+    "icon": "internal-plugin.png",
+    "hidden": false,
+    "key": "dblogger",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

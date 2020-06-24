@@ -1,0 +1,94 @@
+#bulk-importer {
+
+   .valid-statuses {
+      font-style: italic;
+   }
+
+   #bulk-importer-validation-feedback {
+      display: none;
+   }
+
+   #bulk-importer-validation-feedback.import-errors {
+      display: block;
+      background-color: #d50a0a;
+      color: #fff;
+      padding: 10px 20px;
+   }
+
+   .disable-option {
+      opacity: 0.50;
+      pointer-events: none;
+   }
+
+   .removed {
+      display: none !important;
+   }
+
+   #import-progress-container {
+      display: none;
+   }
+
+   #import-progress-container.working {
+      display: inline;
+   }
+
+   #bulk-error-header:empty {
+      display: none;
+   }
+
+   #bulk-error-many-errors {
+      color: #AAA;
+
+      &:empty {
+         display: none;
+      }
+   }
+
+   #bulk-error-dump:empty {
+      display: none;
+   }
+
+   #bulk-radio-options {
+      li {
+         list-style-type: none !important;
+         margin: 5px 0;
+      }
+   }
+
+   .bulk-note {
+      color: #aaa;
+   }
+
+   #bulk-expires {
+      padding: 0 30px;
+      &.shlide {
+         height: 0;
+         transition: all 0.2s ease;
+         opacity: 0;
+         &.show {
+            padding: 10px 30px 20px 30px;
+            height: 20px;
+            opacity: 1;
+         }
+      }
+
+      input {
+         width: 300px;
+         padding: 5px;
+      }
+   }
+
+   .userin-options-list {
+      li {
+         padding: 20px 200px 0 10px;
+      }
+   }
+
+   .bulk-invite-notice {
+      background-color: #FEEFB3;
+      border: 1px solid rgba(0,0,0,0.05);
+      padding: 10px;
+      margin: 0 20px;
+   }
+
+}

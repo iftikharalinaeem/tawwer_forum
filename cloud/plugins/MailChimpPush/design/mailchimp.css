@@ -1,0 +1,48 @@
+.MailChimpSync .SyncBar {
+    height: 15px;
+    background: #8BC8FF;
+    border-radius: 4px;
+    border: 1px solid #489CF7;
+    width: 100%;
+}
+.MailChimpSync .SyncBar .SyncProgress {
+    height: 15px;
+    background: #489CF7;
+    border-radius: 3px;
+    width: 0%;
+    font-size: 11px;
+    text-align: right;
+    line-height: 15px;
+}
+.MailChimpSync .SyncBar .SyncProgress span {
+    color: white;
+    margin-right: 5px;
+}
+
+/* Error */
+.MailChimpSync .Synchronization.alert-danger .SyncProgressTitle span {
+    display: none;
+}
+.MailChimpSync .Synchronization.alert-danger .SyncBar {
+    border-color: #FA5A5A;
+}
+.MailChimpSync .Synchronization.alert-danger .SyncBar .SyncProgress {
+    width: 100%;
+    text-align: center;
+    background: #FA5A5A;
+    color: white;
+}
+
+/* Finished */
+.MailChimpSync .Synchronization.Finished .SyncBar .SyncProgress {
+    width: 100%;
+    text-align: center;
+    color: white;
+}
+.MailChimpSync .Synchronization.Finished .SyncProgressTitle span {
+    display: none;
+}
+
+.MailChimpSync #MailChimp-Synchronize:disabled {
+    opacity: 0.5;
+}
