@@ -353,6 +353,7 @@ class Warnings2Plugin extends Gdn_Plugin {
                 $email = $args['Email'];
                 $emailTemplate = $email->getEmailTemplate();
                 $message = $emailTemplate->getMessage();
+                $emailTemplate->removeButton();
 
                 $quotedRecord = formatQuote($record, false);
                 // Transform the HTML to Markdown
