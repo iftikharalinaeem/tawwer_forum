@@ -1,0 +1,58 @@
+<div class="table-wrap">
+    <table id="SubcommunityTable" class="Sortable table-data js-tj">
+        <thead>
+            <tr>
+                <th class="column-md">{{ t('Name') }}</th>
+                <th>{{ t('Folder') }}</th>
+                <th class="column-sm">{{ t('Locale') }}</th>
+                {% if useProducts %}
+                    <th>{{ t('Product') }}</th>
+                    <th>{{ t('Homepage') }}</th>
+                {% endif %}
+                <th class="column-sm"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in Sites %}
+                <tr data-id="{{ row.SubcommunityID }}" id="Subcommunity_{{ row.SubcommunityID }}" >
+                    <td>{{ row.Name }}</td>
+                    <td><a href="{{ row.Url }}">/{{ row.Folder }}</a></td>
+                    <td>{{ row.Locale }}</td>
+                    {% if useProducts %}
+                        <td>
+                            {% if row.product is defined %}
+                                {{ row.product.name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.defaultController is defined %}
+                                {{ row.defaultController }}
+                            {% endif %}
+                        </td>
+                    {% endif %}
+                    <td class="options">
+                        <div class="btn-group">
+                            <a
+                                href="{{ row.EditUrl }}"
+                                class="js-modal js-full-height-modal btn btn-icon"
+                                aria-label="{{ t('Edit') }}"
+                                title="{{ t('Edit') }}"
+                            >
+                                {{ functionContainer.dashboardSymbol('edit') }}
+                            </a>
+                            <a
+                                href="{{ row.DeleteUrl }}"
+                                class="js-modal-confirm btn btn-icon"
+                                aria-label="{{ t('Delete') }}"
+                                title="{{ t('Delete') }}"
+                                data-body="{{ sprintf(t('Are you sure you want to delete this %s?'), t('site')) }}"
+                            >
+                                {{ functionContainer.dashboardSymbol('delete') }}
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

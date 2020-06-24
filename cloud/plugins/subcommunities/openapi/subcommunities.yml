@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+paths:
+    /subcommunities:
+        get:
+            parameters:
+                - description: >
+                    Expand associated records using one or more valid field names. A
+                    value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                    items:
+                      enum:
+                      - all
+                      - product
+                      type: string
+                    type: array
+                  style: form
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Subcommunities'
+                                type: array
+                    description: Success
+            tags:
+                - Subcommunities
+            summary: Get a list of subcommunities.
+    /subcommunities/{id}:
+        get:
+            parameters:
+                - description: The ID of the subcommunity.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: >
+                    Expand associated records using one or more valid field names. A
+                    value of "all" will expand all expandable fields.
+                  in: query
+                  name: expand
+                  schema:
+                    items:
+                      enum:
+                      - all
+                      - product
+                      type: string
+                    type: array
+                  style: form
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Subcommunities'
+                    description: Success
+            tags:
+                - Subcommunities
+            summary: Get a single Subcommunity.
+components:
+    schemas:
+        Subcommunities:
+            properties:
+                subcommunityID:
+                    description: Unique subcommunity ID.
+                    type: integer
+                name:
+                    description: Name of the subcommunity.
+                    type: string
+                folder:
+                    description: Root directory of the subcommunity.
+                    nullable: true
+                    type: string
+                locale:
+                    description: Language associated with the subcommunity.
+                    type: string
+                productID:
+                    description: The product ID associated with the subcommunity.
+                    type: string
+                product:
+                    $ref: '#/components/schemas/ProductFragment'
+                subcommunityUrl:
+                    description: The subcommunity url.
+                    type: string
+                siteSectionGroup:
+                    description: The site-section-group associated to the subcommunity.
+                    type: string
+                siteSectionID:
+                    description: The site-section-id of the subcommunity.
+                    type: string  
+            required:
+                - subcommunityID
+                - name
+                - folder
+                - locale
+                - subcommunityUrl
+            type: object
+        ProductFragment:
+            properties:
+                 productID:
+                    description: Unique product ID.
+                    type: integer
+                 name:
+                    description: Name of the product.
+                    type: string
+                 body:
+                    description: Description of the product.
+                    type: string
+            required:
+                - productID
+                - name
+            type: object

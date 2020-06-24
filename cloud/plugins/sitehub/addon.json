@@ -1,0 +1,19 @@
+{
+    "name": "Multisite Hub",
+    "description": "The Multi-site Hub plugin provides functionality to manage a multi-site cluster.",
+    "version": "1.2.0",
+    "license": "Proprietary",
+    "icon": "hub.png",
+    "key": "sitehub",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "simpleapi": ">=1.0"
+    }
+}

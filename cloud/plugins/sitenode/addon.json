@@ -1,0 +1,18 @@
+{
+    "name": "Multisite Node",
+    "version": "1.2.1",
+    "license": "Proprietary",
+    "icon": "node.png",
+    "key": "sitenode",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.4"
+    }
+}
