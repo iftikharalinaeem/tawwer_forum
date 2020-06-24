@@ -1,0 +1,19 @@
+<main>
+    <h1>Revisions</h1>
+    <div>
+        <h2>Revisions List</h2>
+        <ul>
+            {% for revision in revisions %}
+                <li>
+                    <a href="{{ revision.url }}">
+                        <h3>{{ revision.name }}</h3>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <article>
+        <h2>{{ page.name }}</h2>
+        {{ page.bodyRendered|raw }}
+    </article>
+</main>

@@ -1,0 +1,145 @@
+openapi: 3.0.0
+info:
+paths:
+  '/article-revisions/{id}':
+    get:
+      parameters:
+      - description: |
+          <p>The article revision ID.</p>
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ArticleRevision'
+          description: Success
+      tags:
+      - Article Revisions
+      summary: Get an article revision.
+  '/article-revisions/re-render':
+    patch:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                articleID:
+                 description: The article ID.
+                 type: integer
+                limit:
+                  description: The desired maximum number of revisions to process.
+                  type: integer
+                  default: 1000
+                  minimum: 1
+                  maximum: 1000
+                offset:
+                  description: The number revisions to exclude.
+                  type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ReRender'
+          description: Success
+      tags:
+      - Article Revisions
+      summary: Re-render content in the article revisions table.
+components:
+  schemas:
+    ArticleRevision:
+      properties:
+        articleID:
+          description: Associated article ID.
+          type: integer
+        articleRevisionID:
+          description: Unique article revision ID.
+          type: integer
+        body:
+          description: Body contents.
+          minLength: 1
+          nullable: true
+          type: string
+        bodyRendered:
+          description: Rendered body contents.
+          minLength: 1
+          nullable: true
+          type: string
+        dateInserted:
+          description: When the article was created.
+          format: date-time
+          type: string
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUserID:
+          description: Unique ID of the user who originally created the article.
+          type: integer
+        locale:
+          description: Locale the article was written in.
+          minLength: 1
+          nullable: true
+          type: string
+        name:
+          description: Title of the article.
+          minLength: 1
+          nullable: true
+          type: string
+        status:
+          description: ''
+          enum:
+          - published
+          minLength: 1
+          nullable: true
+          type: string
+        translationStatus:
+          description: The translation status of the article revision.
+          enum:
+          - up-to-date
+          - out-of-date
+          - not-translated
+          minLength: 1
+          nullable: false
+          type: string
+      required:
+      - articleRevisionID
+      - articleID
+      - status
+      - name
+      - body
+      - bodyRendered
+      - locale
+      - insertUserID
+      - dateInserted
+    ReRender:
+      properties:
+        processed:
+          description: The number of articles re-render.
+          type: integer
+        errorCount:
+          description: The number of articles not re-rendered due to some error.
+          type: integer
+        first article RevisionID:
+          description: The id of the first article revision re-render.
+          type: integer
+        last article RevisionID:
+          description: The id of the last article revision re-render.
+          type: integer
+        errors:
+          description: The article id that were not processed and along with the error thrown.
+          type: object
+          properties:
+              articleRevisionID:
+                type: integer
+              errorMessage:
+                type: string
+      required:
+      - processed
+      - errorCount
+      - firstArticleRevisionID
+      - lastArticleRevisionID
+      - errors

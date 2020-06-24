@@ -1,0 +1,75 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$navMenu-item_color              : $global-color_fg;
+$navMenu-item_indent             : 6px;
+$navMenu-item_lineHeight         : 2.2;
+
+$navMenu-link_paddingVertical    : 6px;
+$navMenu-link_paddingHorizontal  : 18px;
+$navMenu-link_fontSize           : $global-medium_fontSize;
+$navMenu-link_active_bg          : mix($global-color_bg, $global-color_fg, 90%);
+
+$navMenu-arrow_offset            : 25px;
+$navMenu-arrow_width             : 8px;
+$navMenu-arrow_height            : 5.813px;
+$navMenu-arrow_color             : mix($global-color_bg, $global-color_fg, 30%);
+
+$navMenu_leftPadding             : 6px;
+
+.navMenu {
+    font-size: $navMenu-link_fontSize;
+}
+
+.navMenu-items {
+    list-style: none;
+    display: block;
+    padding: 0;
+    margin: 0;
+}
+
+.navMenu-item {
+    position: relative;
+    display: block;
+    color: $navMenu-item_color;
+    line-height: $navMenu-item_lineHeight;
+}
+
+.navMenu-link {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    color: inherit;
+    font-size: $navMenu-link_fontSize;
+    padding-left: $navMenu-arrow_offset;
+
+    &.isActive {
+        background-color: $navMenu-link_active_bg;
+    }
+
+    &.hasChildren {
+        font-weight: $global-fontWeight_bold;
+    }
+}
+
+.navMenu-icon {
+    @include absolute-topLeft(50%, $navMenu_leftPadding);
+    width: $navMenu-arrow_width;
+    height: $navMenu-arrow_height;
+    user-select: none;
+    color: $navMenu-arrow_color;
+    transform-origin: 50% 50%;
+    transform: translateY(-50%) rotate(-90deg);
+
+    &.isOpen {
+        transform: translateY(-50%) rotate(0);
+    }
+}
+
+.navMenu-itemChildren {
+    padding-left: $navMenu_leftPadding;
+}
+

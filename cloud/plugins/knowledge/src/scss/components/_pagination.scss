@@ -1,0 +1,329 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$pagination-buttonWidth                                                : $formElement_height;
+$pagination_height                                                     : $formElement_heightWithBorder;
+$pagination-navPadding_outer                                           : 9px;
+$pagination-navPadding_inner                                           : 5px;
+$pagination-bg                                                         : $global-color_bg;
+$pagination-disabled_bg                                                : mix($global-color_fg, $global-color_bg, 10%) !default;
+$pagination-disabled_fg                                                : mix($global-color_fg, $global-color_bg, 50%) !default;
+$pagination-jumpTo_fg                                                  : $global-color_fg !default;
+$pagination-jumpTo_bg                                                  : $global-color_bg;
+$pagination-border_color                                               : $formElement_borderColor;
+$pagination-simple_paddingOffset                                       : $utility-baseUnit * 3;
+$pagination-simple-buttonWidth                                         : 107px;
+
+$pagination-item_borderRadius                                          : 0;
+
+$pagination-navItem_borderOutsideRadius                                : $pagination_height;
+$pagination-navItem_borderInsideRadius                                 : 0;
+
+$pagerWithCount-margin                                                 : $utility-baseUnit * 7;
+
+$panelAndNav-smallScreen_breakpoint                                    : 700px;
+
+@mixin mediaQuery-pagination_smallScreen {
+    @media (max-width: #{$panelAndNav-smallScreen_breakpoint}) {
+        @content;
+    }
+}
+
+
+.pagination {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: $formElement_height;
+    margin: {
+        top: 0;
+        left: auto;
+        right: auto;
+    }
+}
+
+.stickyPager-detachable {
+    position: relative;
+}
+
+.stickyPager-detachable,
+.stickyPager-placeholder {
+    min-height: $pagination_height;
+}
+
+.vanillaPager {
+    &.isSticky {
+        .stickyPager-detachable {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+        }
+    }
+}
+
+
+.pagination-list {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    //margin: $pagination-padding 0;
+    height: $formElement_height;
+}
+
+
+.pagination-prev,
+.pagination-next {
+    min-height: $pagination-buttonWidth - $formElement_borderWidth;
+    width: auto;
+
+    &.button {
+        min-width: #{$formElement_fullBorderWidth + $icon-default_size + $pagination-navPadding_inner + $pagination-navPadding_outer};
+        padding: {
+            top: #{$utility-baseUnit - $formElement_borderWidth * 2};
+            bottom: #{$utility-baseUnit - ($formElement_borderWidth)};
+            left: 0;
+            right: 0;
+        }
+    }
+
+    &:hover {
+        z-index: 1;
+    }
+}
+
+.pagination-prev {
+    &.button {
+        border-top-left-radius: $pagination-navItem_borderOutsideRadius;
+        border-top-right-radius: $pagination-navItem_borderInsideRadius;
+        border-bottom-right-radius: $pagination-navItem_borderInsideRadius;
+        border-bottom-left-radius: $pagination-navItem_borderOutsideRadius;
+
+        padding: {
+            left: $pagination-navPadding_outer;
+            right: $pagination-navPadding_inner;
+        }
+    }
+}
+
+.pagination-next {
+    &.button {
+        border-top-right-radius: $pagination-navItem_borderOutsideRadius;
+        border-top-left-radius: $pagination-navItem_borderInsideRadius;
+        border-bottom-right-radius: $pagination-navItem_borderOutsideRadius;
+        border-bottom-left-radius: $pagination-navItem_borderInsideRadius;
+
+        padding: {
+            left: $pagination-navPadding_inner;
+            right: $pagination-navPadding_outer;
+        }
+    }
+}
+
+.pagination-prevIcon,
+.pagination-nextIcon
+{
+    display: inline-block;
+    vertical-align: middle;
+    width: $icon-default_size;
+    height: $icon-default_size;
+
+    &.isDisabled {
+        background-color: $pagination-disabled_bg;
+        color: $pagination-disabled_fg;
+    }
+}
+
+.pagination-element {
+    height: $formElement_height;
+    margin: {
+        left: -$formElement_borderWidth;
+    }
+
+    @include mediaQuery-pagination_smallScreen {
+        display: none;
+
+        &.pagination-mobilePageSelector,
+        &.pagination-visibleOnMobile {
+            display: block;
+        }
+    }
+}
+
+.pagination-mobilePageSelector {
+    display: none;
+    flex-grow: 1;
+}
+
+.pagination-item,
+.pagination-prev,
+.pagination-ellipsis,
+.pagination-next
+{
+    background-color: $pagination-bg;
+}
+
+
+.pagination-label {
+    user-select: none;
+    font-weight: $global-fontWeight_bold;
+    &:focus {
+        outline: 0;
+    }
+}
+
+.pagination-ellipsis {
+    text-align: center;
+    border-left: solid $formElement_borderWidth $pagination-border_color;
+    border-right: solid $formElement_borderWidth $pagination-border_color;
+}
+
+.pagination-item {
+    position: relative;
+    display: block;
+    min-height: $pagination-buttonWidth;
+    line-height: $formElement_height - $formElement_fullBorderWidth;
+    height: $formElement_height;
+    padding: {
+        top: 0;
+        bottom: 0;
+        left: $utility-baseUnit;
+        right: $utility-baseUnit;
+    }
+
+    &.button {
+        border-radius: $pagination-item_borderRadius;
+        min-width: $pagination-buttonWidth;
+    }
+
+    &.button.isCurrent {
+        background-color: $pagination-disabled_bg;
+        color: $pagination-disabled_fg;
+    }
+
+    &:hover {
+        z-index: 1;
+    }
+
+}
+
+.pagination-jumpTo {
+    text-align: right;
+}
+
+.pagination-jumpToInput {
+    @include removeSpinner;
+    width: 100%;
+    line-height: #{$formElement_height - $formElement_borderWidth * 2 - $utility-baseUnit * 2};
+    text-align: right;
+    border: 0;
+    border-radius: 0;
+    color: $pagination-jumpTo_fg;
+    background-color: $pagination-jumpTo_bg;
+    min-width: 100%;
+    outline: 0;
+    border: solid $formElement_borderWidth $pagination-border_color;
+    font-size: $global-small_fontSize;
+}
+
+.pagination-mobileSeparator {
+    padding: 0 $utility-baseUnit;
+}
+
+.pagination-compactNav {
+    display: flex;
+    border: $global-border_color $formElement_borderWidth solid;
+}
+
+.pagination-number {
+    display: flex;
+    flex-grow: 2;
+    align-items: center;
+    justify-content: center;
+    height: #{$formElement_height - 2 * $formElement_borderWidth};
+    line-height: #{$formElement_height - 2 * $formElement_borderWidth};
+    max-width: 30vw;
+    min-width: 65px;
+}
+
+.pagination-mobileTotal {
+    justify-content: flex-start;
+}
+
+// Simple _pagination (next and previous only)
+.simple_pagination-prev {
+    padding-left: $pagination-simple_paddingOffset;
+    border: {
+        top: {
+            right-radius: 0;
+            left-radius: $formElement-halfHeight;
+        }
+        bottom: {
+            right-radius: 0;
+            left-radius: $formElement-halfHeight;
+        }
+    }
+}
+
+.simple_pagination-next {
+    padding-right: $pagination-simple_paddingOffset;
+    border: {
+        top: {
+            right-radius: $formElement-halfHeight;
+            left-radius: 0;
+        }
+        bottom: {
+            right-radius: $formElement-halfHeight;
+            left-radius: 0;
+        }
+    }
+}
+
+.simple_pagination-prev,
+.simple_pagination-next {
+    width: $pagination-simple_buttonWidth;
+
+    &.isFullWidth {
+        width: $pagination-simple_buttonWidth * 2;
+        border-radius: $formElement-halfHeight;
+    }
+}
+
+
+
+
+.pagerWithCount {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    margin-top: $pagerWithCount-margin;
+
+    @include mediaQuery-pagination_smallScreen {
+        flex-wrap: wrap;
+    }
+}
+
+.pagerWithCount-count {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+
+    @include mediaQuery-pagination_smallScreen {
+        display: none;
+        position: relative;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+.pagerWithCount-pager {
+    position: relative;
+    z-index: 1;
+}

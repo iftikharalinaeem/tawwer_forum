@@ -1,0 +1,46 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$helpful-button_minWidth: 96px !default;
+$helpful-button_margin: $utility-baseUnit !default;
+$helpful-title_fontSize: $global-medium_fontSize !default;
+$helpful-title_fontWeight: $global-fontWeight_bold !default;
+$helpful-results_fontSize: $global-small_fontSize !default;
+$helpful-results_color: mix($global-color_fg, $global-color_bg, 50%) !default;
+$helpful_spacing: $utility-baseUnit * 2;
+$helpful_topMargin: $utility-baseUnit * 12;
+
+.helpful {
+    text-align: center;
+    margin-top: $helpful_topMargin;
+}
+
+.helpful-title {
+    display: block;
+    font-size: $helpful-title_fontSize;
+    font-weight: $helpful-title_fontWeight;
+}
+
+.helpful-vote {
+    display: flex;
+    justify-content: center;
+    margin-top: $helpful_spacing;
+}
+
+.helpful-results {
+    color: $helpful-results_color;
+    font-size: $global-small_fontSize;
+    margin-top: $helpful_spacing;
+}
+
+.helpful-signIn {
+    margin-top: $helpful_spacing;
+}
+
+.helpful-button {
+    min-width: $helpful-button_minWidth;
+    margin: 0 $helpful-button_margin;
+}

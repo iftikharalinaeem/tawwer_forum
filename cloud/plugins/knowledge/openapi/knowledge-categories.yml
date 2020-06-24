@@ -1,0 +1,591 @@
+openapi: 3.0.0
+info:
+paths:
+  '/knowledge-categories':
+    get:
+      parameters:
+        - description: Locale that the knowledge category' names and urls should be represented in. If fields are not translated the non-translated versions will be returned.
+          in: query
+          name: locale
+          required: false
+          schema:
+            type: string
+          example: fr
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  properties:
+                    articleCount:
+                      description: Total articles in the category.
+                      type: integer
+                    articleCountRecursive:
+                      description: >-
+                        Aggregate total of all articles in the category and its
+                        children.
+                      type: integer
+                    childCategoryCount:
+                      description: Total child categories.
+                      type: integer
+                    dateInserted:
+                      description: When the knowledge category was created.
+                      format: date-time
+                      type: string
+                    dateUpdated:
+                      description: When the knowledge category was last updated.
+                      format: date-time
+                      type: string
+                    insertUserID:
+                      description: >-
+                        Unique ID of the user who originally created the
+                        knowledge category.
+                      type: integer
+                    knowledgeBaseID:
+                      description: Knowledge base ID for a category.
+                      nullable: true
+                      type: integer
+                    knowledgeCategoryID:
+                      description: Unique knowledge category ID.
+                      type: integer
+                    lastUpdatedArticleID:
+                      description: >-
+                        Unique ID of the last article to be updated in the
+                        category.
+                      nullable: true
+                      type: integer
+                    lastUpdatedUserID:
+                      description: >-
+                        Unique ID of the last user to update an article in the
+                        category.
+                      nullable: true
+                      type: integer
+                    name:
+                      description: Name for the category.
+                      maxLength: 255
+                      type: string
+                    parentID:
+                      description: Unique ID of the parent for a category.
+                      nullable: true
+                      type: integer
+                    sort:
+                      description: >-
+                        Sort weight of the category. Used when sorting the
+                        parent category's contents.
+                      nullable: true
+                      type: integer
+                    sortChildren:
+                      description: Sort order for contents of the category.
+                      enum:
+                      - name
+                      - dateInserted
+                      - dateInsertedDesc
+                      - manual
+                      nullable: true
+                      type: string
+                    updateUserID:
+                      description: >-
+                        Unique ID of the last user to update the knowledge
+                        category.
+                      type: integer
+                    url:
+                      description: Full URL to the knowledge category.
+                      type: string
+                    foreignID:
+                      description: Foriegn ID to link knowledge category to some external resource.
+                      type: string
+                      maxLength: 32
+                      nullable: true
+                  required:
+                  - knowledgeCategoryID
+                  - name
+                  - parentID
+                  - knowledgeBaseID
+                  - sortChildren
+                  - sort
+                  - insertUserID
+                  - dateInserted
+                  - updateUserID
+                  - dateUpdated
+                  - lastUpdatedArticleID
+                  - lastUpdatedUserID
+                  - articleCount
+                  - articleCountRecursive
+                  - childCategoryCount
+                  - url
+                  type: object
+                type: array
+          description: Success
+      tags:
+      - Knowledge Categories
+      summary: List knowledge categories.
+    post:
+      responses:
+        '201':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  articleCount:
+                    description: Total articles in the category.
+                    type: integer
+                  articleCountRecursive:
+                    description: >-
+                      Aggregate total of all articles in the category and its
+                      children.
+                    type: integer
+                  childCategoryCount:
+                    description: Total child categories.
+                    type: integer
+                  dateInserted:
+                    description: When the knowledge category was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the knowledge category was last updated.
+                    format: date-time
+                    type: string
+                  insertUserID:
+                    description: >-
+                      Unique ID of the user who originally created the knowledge
+                      category.
+                    type: integer
+                  knowledgeBaseID:
+                    description: Knowledge base ID for a category.
+                    nullable: true
+                    type: integer
+                  knowledgeCategoryID:
+                    description: Unique knowledge category ID.
+                    type: integer
+                  lastUpdatedArticleID:
+                    description: >-
+                      Unique ID of the last article to be updated in the
+                      category.
+                    nullable: true
+                    type: integer
+                  lastUpdatedUserID:
+                    description: >-
+                      Unique ID of the last user to update an article in the
+                      category.
+                    nullable: true
+                    type: integer
+                  name:
+                    description: Name for the category.
+                    maxLength: 255
+                    type: string
+                  parentID:
+                    description: Unique ID of the parent for a category.
+                    nullable: true
+                    type: integer
+                  sort:
+                    description: >-
+                      Sort weight of the category. Used when sorting the parent
+                      category's contents.
+                    nullable: true
+                    type: integer
+                  sortChildren:
+                    description: Sort order for contents of the category.
+                    enum:
+                    - name
+                    - dateInserted
+                    - dateInsertedDesc
+                    - manual
+                    nullable: true
+                    type: string
+                  updateUserID:
+                    description: >-
+                      Unique ID of the last user to update the knowledge
+                      category.
+                    type: integer
+                  url:
+                    description: Full URL to the knowledge category.
+                    type: string
+                  foreignID:
+                    description: Foriegn ID to link knowledge category to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+                required:
+                - knowledgeCategoryID
+                - name
+                - parentID
+                - knowledgeBaseID
+                - sortChildren
+                - sort
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - lastUpdatedArticleID
+                - lastUpdatedUserID
+                - articleCount
+                - articleCountRecursive
+                - childCategoryCount
+                - url
+                type: object
+          description: Success
+      tags:
+      - Knowledge Categories
+      requestBody:
+        $ref: '#/components/requestBodies/KnowledgeCategoryPost'
+      summary: Create a new knowledge category.
+  '/knowledge-categories/{id}':
+    delete:
+      parameters:
+      - description: |
+          <p>Knowledge category ID.</p>
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: Success
+      tags:
+      - Knowledge Categories
+      summary: Delete a knowledge category.
+    get:
+      parameters:
+      - description: Knowledge category ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      - description: Locale that the knowledge category name and url should be represented in. If fields are not translated the non-translated versions will be returned.
+        in: query
+        name: locale
+        required: false
+        schema:
+          type: string
+        example: fr
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  articleCount:
+                    description: Total articles in the category.
+                    type: integer
+                  articleCountRecursive:
+                    description: >-
+                      Aggregate total of all articles in the category and its
+                      children.
+                    type: integer
+                  childCategoryCount:
+                    description: Total child categories.
+                    type: integer
+                  dateInserted:
+                    description: When the knowledge category was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the knowledge category was last updated.
+                    format: date-time
+                    type: string
+                  insertUserID:
+                    description: >-
+                      Unique ID of the user who originally created the knowledge
+                      category.
+                    type: integer
+                  knowledgeBaseID:
+                    description: Knowledge base ID for a category.
+                    nullable: true
+                    type: integer
+                  knowledgeCategoryID:
+                    description: Unique knowledge category ID.
+                    type: integer
+                  lastUpdatedArticleID:
+                    description: >-
+                      Unique ID of the last article to be updated in the
+                      category.
+                    nullable: true
+                    type: integer
+                  lastUpdatedUserID:
+                    description: >-
+                      Unique ID of the last user to update an article in the
+                      category.
+                    nullable: true
+                    type: integer
+                  name:
+                    description: Name for the category.
+                    maxLength: 255
+                    type: string
+                  parentID:
+                    description: Unique ID of the parent for a category.
+                    nullable: true
+                    type: integer
+                  sort:
+                    description: >-
+                      Sort weight of the category. Used when sorting the parent
+                      category's contents.
+                    nullable: true
+                    type: integer
+                  sortChildren:
+                    description: Sort order for contents of the category.
+                    enum:
+                    - name
+                    - dateInserted
+                    - dateInsertedDesc
+                    - manual
+                    nullable: true
+                    type: string
+                  updateUserID:
+                    description: >-
+                      Unique ID of the last user to update the knowledge
+                      category.
+                    type: integer
+                  url:
+                    description: Full URL to the knowledge category.
+                    type: string
+                  foreignID:
+                    description: Foriegn ID to link knowledge category to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+                required:
+                - knowledgeCategoryID
+                - name
+                - parentID
+                - knowledgeBaseID
+                - sortChildren
+                - sort
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - lastUpdatedArticleID
+                - lastUpdatedUserID
+                - articleCount
+                - articleCountRecursive
+                - childCategoryCount
+                - url
+                type: object
+          description: Success
+      tags:
+      - Knowledge Categories
+      summary: Get a single knowledge category.
+    patch:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  articleCount:
+                    description: Total articles in the category.
+                    type: integer
+                  articleCountRecursive:
+                    description: >-
+                      Aggregate total of all articles in the category and its
+                      children.
+                    type: integer
+                  childCategoryCount:
+                    description: Total child categories.
+                    type: integer
+                  dateInserted:
+                    description: When the knowledge category was created.
+                    format: date-time
+                    type: string
+                  dateUpdated:
+                    description: When the knowledge category was last updated.
+                    format: date-time
+                    type: string
+                  insertUserID:
+                    description: >-
+                      Unique ID of the user who originally created the knowledge
+                      category.
+                    type: integer
+                  knowledgeBaseID:
+                    description: Knowledge base ID for a category.
+                    nullable: true
+                    type: integer
+                  knowledgeCategoryID:
+                    description: Unique knowledge category ID.
+                    type: integer
+                  lastUpdatedArticleID:
+                    description: >-
+                      Unique ID of the last article to be updated in the
+                      category.
+                    nullable: true
+                    type: integer
+                  lastUpdatedUserID:
+                    description: >-
+                      Unique ID of the last user to update an article in the
+                      category.
+                    nullable: true
+                    type: integer
+                  name:
+                    description: Name for the category.
+                    maxLength: 255
+                    type: string
+                  parentID:
+                    description: Unique ID of the parent for a category.
+                    nullable: true
+                    type: integer
+                  sort:
+                    description: >-
+                      Sort weight of the category. Used when sorting the parent
+                      category's contents.
+                    nullable: true
+                    type: integer
+                  sortChildren:
+                    description: Sort order for contents of the category.
+                    enum:
+                    - name
+                    - dateInserted
+                    - dateInsertedDesc
+                    - manual
+                    nullable: true
+                    type: string
+                  updateUserID:
+                    description: >-
+                      Unique ID of the last user to update the knowledge
+                      category.
+                    type: integer
+                  url:
+                    description: Full URL to the knowledge category.
+                    type: string
+                required:
+                - knowledgeCategoryID
+                - name
+                - parentID
+                - knowledgeBaseID
+                - sortChildren
+                - sort
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - lastUpdatedArticleID
+                - lastUpdatedUserID
+                - articleCount
+                - articleCountRecursive
+                - childCategoryCount
+                - url
+                type: object
+          description: Success
+      tags:
+      - Knowledge Categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeCategoryPost'
+        required: true
+      summary: Update an existing knowledge category.
+  '/knowledge-categories/{id}/edit':
+    get:
+      parameters:
+      - description: |
+          <p>Knowledge category ID.</p>
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                properties:
+                  knowledgeCategoryID:
+                    description: Unique knowledge category ID.
+                    type: integer
+                  name:
+                    description: Name for the category.
+                    maxLength: 255
+                    type: string
+                  parentID:
+                    description: Unique ID of the parent for a category.
+                    nullable: true
+                    type: integer
+                  sort:
+                    description: >-
+                      Sort weight of the category. Used when sorting the parent
+                      category's contents.
+                    nullable: true
+                    type: integer
+                  sortChildren:
+                    description: Sort order for contents of the category.
+                    enum:
+                    - name
+                    - dateInserted
+                    - dateInsertedDesc
+                    - manual
+                    nullable: true
+                    type: string
+                  foreignID:
+                    description: Foriegn ID to link knowledge category to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+                required:
+                - knowledgeCategoryID
+                - name
+                - parentID
+                - sort
+                - sortChildren
+                type: object
+          description: Success
+      tags:
+      - Knowledge Categories
+      summary: Get a knowledge category for editing.
+components:
+  requestBodies:
+    KnowledgeCategoryPost:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/KnowledgeCategoryPost'
+      required: true
+  schemas:
+    KnowledgeCategoryPost:
+      properties:
+        knowledgeBaseID:
+          description: Knowledge base ID for a category.
+          nullable: true
+          type: integer
+        name:
+          description: Name for the category.
+          maxLength: 255
+          type: string
+        parentID:
+          description: Unique ID of the parent for a category.
+          nullable: true
+          type: integer
+        sort:
+          description: >-
+            Sort weight of the category. Used when sorting the parent category's
+            contents.
+          nullable: true
+          type: integer
+        sortChildren:
+          description: Sort order for contents of the category.
+          enum:
+          - name
+          - dateInserted
+          - dateInsertedDesc
+          - manual
+          nullable: true
+          type: string
+        foreignID:
+          description: Foriegn ID to link knowledge category to some external resource.
+          type: string
+          maxLength: 32
+          nullable: true
+      required:
+      - name
+      - parentID
+      - knowledgeBaseID
+      type: object

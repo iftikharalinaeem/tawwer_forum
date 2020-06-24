@@ -1,0 +1,1583 @@
+openapi: 3.0.2
+info:
+paths:
+    /articles:
+        get:
+            parameters:
+                - description: >
+                      <p>Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.</p>
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - excerpt
+                              - all
+                          type: string
+                      type: array
+                  style: form
+                - in: query
+                  name: knowledgeCategoryID
+                  required: true
+                  schema:
+                      minimum: 1
+                      type: integer
+                -  description: Locale the articles are written in.
+                   in: query
+                   name: locale
+                   required: false
+                   schema:
+                       type: string
+                -  description: Provide only translated articles.
+                   in: query
+                   name: only-translated
+                   required: false
+                   schema:
+                       type: boolean
+                - in: query
+                  name: limit
+                  required: true
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - description: |
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ArticleSimple"
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+            summary: List published articles in a given knowledge category.
+        post:
+            responses:
+                "201":
+                    headers:
+                        x-file-rehosted-success-count:
+                            $ref: "#/components/headers/x-file-rehosted-success-count"
+                        x-file-rehosted-failed-count:
+                            $ref: "#/components/headers/x-file-rehosted-failed-count"
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                $ref: "#/components/requestBodies/ArticlePost"
+            summary: Create a new article.
+    /articles/drafts:
+        get:
+            parameters:
+                - description: |
+                      <p>Unique ID article associated with a draft.</p>
+                  in: query
+                  name: articleID
+                  schema:
+                      type: integer
+                  x-filter:
+                      field: recordID
+                - description: |
+                      <p>Unique ID of the user who created the article draft.</p>
+                  in: query
+                  name: insertUserID
+                  schema:
+                      type: integer
+                  x-filter:
+                      field: insertUserID
+                - description: >
+                      <p>Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.</p>
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - insertUser
+                              - updateUser
+                          type: string
+                      type: array
+                  style: form
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        attributes:
+                                            description: >-
+                                                A free-form object containing all custom data for this
+                                                draft.
+                                            type: object
+                                        body:
+                                            description: Content of article
+                                            type: string
+                                        dateInserted:
+                                            description: When the draft was created.
+                                            format: date-time
+                                            type: string
+                                        dateUpdated:
+                                            description: When the draft was last updated
+                                            format: date-time
+                                            type: string
+                                        draftID:
+                                            description: The unique ID of the draft.
+                                            type: integer
+                                        excerpt:
+                                            description: Excerpt of article
+                                            type: string
+                                        format:
+                                            type: string
+                                            default: rich
+                                            description: "Body content format: rich, text, html."
+                                            enum:
+                                                - rich
+                                                - html
+                                                - text
+                                                - markdown
+                                        insertUserID:
+                                            description: Unique ID of the user who originally created the draft.
+                                            type: integer
+                                        insertUser:
+                                            $ref: "#/components/schemas/UserFragment"
+                                        parentRecordID:
+                                            description: The unique ID of the intended parent to this record.
+                                            nullable: true
+                                            type: integer
+                                        recordID:
+                                            description: >-
+                                                Unique ID of an existing record to associate with this
+                                                draft.
+                                            nullable: true
+                                            type: integer
+                                        recordType:
+                                            description: The type of record associated with this draft.
+                                            type: string
+                                        updateUserID:
+                                            description: Unique ID of the last user to update the draft.
+                                            type: integer
+                                        updateUser:
+                                            $ref: "#/components/schemas/UserFragment"
+                                    required:
+                                        - draftID
+                                        - recordType
+                                        - recordID
+                                        - parentRecordID
+                                        - attributes
+                                        - insertUserID
+                                        - dateInserted
+                                        - updateUserID
+                                        - dateUpdated
+                                        - body
+                                        - format
+                                        - excerpt
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+            summary: List article drafts.
+        post:
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    attributes:
+                                        description: >-
+                                            A free-form object containing all custom data for this
+                                            draft.
+                                        type: object
+                                    body:
+                                        description: Content of article
+                                        type: string
+                                    dateInserted:
+                                        description: When the draft was created.
+                                        format: date-time
+                                        type: string
+                                    dateUpdated:
+                                        description: When the draft was last updated
+                                        format: date-time
+                                        type: string
+                                    draftID:
+                                        description: The unique ID of the draft.
+                                        type: integer
+                                    excerpt:
+                                        description: Excerpt of article
+                                        type: string
+                                    format:
+                                        type: string
+                                        default: rich
+                                        description: "Body content format: rich, text, html."
+                                        enum:
+                                            - rich
+                                            - html
+                                            - text
+                                            - markdown
+                                    insertUserID:
+                                        description: Unique ID of the user who originally created the draft.
+                                        type: integer
+                                    parentRecordID:
+                                        description: The unique ID of the intended parent to this record.
+                                        nullable: true
+                                        type: integer
+                                    recordID:
+                                        description: >-
+                                            Unique ID of an existing record to associate with this
+                                            draft.
+                                        nullable: true
+                                        type: integer
+                                    recordType:
+                                        description: The type of record associated with this draft.
+                                        type: string
+                                    updateUserID:
+                                        description: Unique ID of the last user to update the draft.
+                                        type: integer
+                                required:
+                                    - draftID
+                                    - recordType
+                                    - recordID
+                                    - parentRecordID
+                                    - attributes
+                                    - insertUserID
+                                    - dateInserted
+                                    - updateUserID
+                                    - dateUpdated
+                                    - body
+                                    - format
+                                    - excerpt
+                                type: object
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                $ref: "#/components/requestBodies/Body"
+            summary: Create a new article draft.
+    "/articles/drafts/{draftID}":
+        delete:
+            parameters:
+                - description: |
+                      <p>Target article draft ID.</p>
+                  in: path
+                  name: draftID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+            tags:
+                - Articles
+            summary: Delete an article draft.
+        get:
+            parameters:
+                - description: |
+                      <p>Target article draft ID.</p>
+                  in: path
+                  name: draftID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    attributes:
+                                        description: >-
+                                            A free-form object containing all custom data for this
+                                            draft.
+                                        type: object
+                                    body:
+                                        description: Content of article
+                                        type: string
+                                    dateInserted:
+                                        description: When the draft was created.
+                                        format: date-time
+                                        type: string
+                                    dateUpdated:
+                                        description: When the draft was last updated
+                                        format: date-time
+                                        type: string
+                                    draftID:
+                                        description: The unique ID of the draft.
+                                        type: integer
+                                    excerpt:
+                                        description: Excerpt of article
+                                        type: string
+                                    format:
+                                        type: string
+                                        default: rich
+                                        description: "Body content format: rich, text, html."
+                                        enum:
+                                            - rich
+                                            - html
+                                            - text
+                                            - markdown
+                                    insertUserID:
+                                        description: Unique ID of the user who originally created the draft.
+                                        type: integer
+                                    parentRecordID:
+                                        description: The unique ID of the intended parent to this record.
+                                        nullable: true
+                                        type: integer
+                                    recordID:
+                                        description: >-
+                                            Unique ID of an existing record to associate with this
+                                            draft.
+                                        nullable: true
+                                        type: integer
+                                    recordType:
+                                        description: The type of record associated with this draft.
+                                        type: string
+                                    updateUserID:
+                                        description: Unique ID of the last user to update the draft.
+                                        type: integer
+                                required:
+                                    - draftID
+                                    - recordType
+                                    - recordID
+                                    - parentRecordID
+                                    - attributes
+                                    - insertUserID
+                                    - dateInserted
+                                    - updateUserID
+                                    - dateUpdated
+                                    - body
+                                    - format
+                                    - excerpt
+                                type: object
+                    description: Success
+            tags:
+                - Articles
+            summary: Get a single article draft.
+        patch:
+            parameters:
+                - description: Target article draft ID.
+                  in: path
+                  name: draftID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    headers:
+                        x-file-rehosted-success-count:
+                            $ref: "#/components/headers/x-file-rehosted-success-count"
+                        x-file-rehosted-failed-count:
+                            $ref: "#/components/headers/x-file-rehosted-failed-count"
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    attributes:
+                                        description: >-
+                                            A free-form object containing all custom data for this
+                                            draft.
+                                        type: object
+                                    body:
+                                        description: Content of article
+                                        type: string
+                                    dateInserted:
+                                        description: When the draft was created.
+                                        format: date-time
+                                        type: string
+                                    dateUpdated:
+                                        description: When the draft was last updated
+                                        format: date-time
+                                        type: string
+                                    draftID:
+                                        description: The unique ID of the draft.
+                                        type: integer
+                                    excerpt:
+                                        description: Excerpt of article
+                                        type: string
+                                    format:
+                                        type: string
+                                        default: rich
+                                        description: "Body content format: rich, text, html."
+                                        enum:
+                                            - rich
+                                            - html
+                                            - text
+                                            - markdown
+                                    insertUserID:
+                                        description: Unique ID of the user who originally created the draft.
+                                        type: integer
+                                    parentRecordID:
+                                        description: The unique ID of the intended parent to this record.
+                                        nullable: true
+                                        type: integer
+                                    recordID:
+                                        description: >-
+                                            Unique ID of an existing record to associate with this
+                                            draft.
+                                        nullable: true
+                                        type: integer
+                                    recordType:
+                                        description: The type of record associated with this draft.
+                                        type: string
+                                    updateUserID:
+                                        description: Unique ID of the last user to update the draft.
+                                        type: integer
+                                    fileRehosting:
+                                        description: Apply par
+                                required:
+                                    - draftID
+                                    - recordType
+                                    - recordID
+                                    - parentRecordID
+                                    - attributes
+                                    - insertUserID
+                                    - dateInserted
+                                    - updateUserID
+                                    - dateUpdated
+                                    - body
+                                    - format
+                                    - excerpt
+                                type: object
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                attributes:
+                                    description: >-
+                                        A free-form object containing all custom data for this
+                                        draft.
+                                    type: object
+                                body:
+                                    description: Content of article
+                                    type: string
+                                format:
+                                    type: string
+                                    default: rich
+                                    description: "Body content format: rich, text, html."
+                                    enum:
+                                        - rich
+                                        - html
+                                        - text
+                                        - markdown
+                                parentRecordID:
+                                    description: The unique ID of the intended parent to this record.
+                                    nullable: true
+                                    type: integer
+                                recordID:
+                                    description: >-
+                                        Unique ID of an existing record to associate with this
+                                        draft.
+                                    nullable: true
+                                    type: integer
+                            required:
+                                - attributes
+                                - body
+                                - format
+                            type: object
+                required: true
+            summary: Update an article draft.
+    "/articles/{id}":
+        get:
+            parameters:
+                - description: |
+                      <p>The article ID.</p>
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Locale the article is written in.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
+                - description: Provide only translated articles.
+                  in: query
+                  name: only-translated
+                  required: false
+                  schema:
+                      type: boolean
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get an article.
+        patch:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ArticlePatch"
+                required: true
+            summary: Update an existing article.
+    "/articles/{id}/edit":
+        get:
+            parameters:
+                - description: |
+                      <p>The article ID.</p>
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Locale the article is written in.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
+                - description: Provide only translated articles.
+                  in: query
+                  name: only-translated
+                  required: false
+                  schema:
+                      type: boolean
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    articleID:
+                                        description: Unique article ID.
+                                        type: integer
+                                    body:
+                                        description: Body contents.
+                                        minLength: 0
+                                        nullable: true
+                                        type: string
+                                    format:
+                                        description: Format of the raw body content.
+                                        enum:
+                                            - text
+                                            - textex
+                                            - markdown
+                                            - wysiwyg
+                                            - html
+                                            - bbcode
+                                            - rich
+                                        minLength: 1
+                                        nullable: true
+                                        type: string
+                                    knowledgeCategoryID:
+                                        description: Category the article belongs in.
+                                        nullable: true
+                                        type: integer
+                                    locale:
+                                        description: Locale the article was written in.
+                                        minLength: 2
+                                        type: string
+                                    name:
+                                        description: Title of the article.
+                                        minLength: 0
+                                        nullable: true
+                                        type: string
+                                    sort:
+                                        description: Manual sort order of the article.
+                                        nullable: true
+                                        type: integer
+                                required:
+                                    - articleID
+                                    - knowledgeCategoryID
+                                    - sort
+                                    - name
+                                    - body
+                                    - format
+                                    - locale
+                                type: object
+                    description: Success
+            tags:
+                - Articles
+            summary: Get an article for editing.
+    "/articles/{id}/revisions":
+        get:
+            parameters:
+                - description: The article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Locale to filter revisions by.
+                  in: query
+                  name: locale
+                  required: false
+                  schema:
+                      type: string
+                - description: >
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+                - description: >
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 10
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        articleID:
+                                            description: Associated article ID.
+                                            type: integer
+                                        articleRevisionID:
+                                            description: Unique article revision ID.
+                                            type: integer
+                                        dateInserted:
+                                            description: When the article was created.
+                                            format: date-time
+                                            type: string
+                                        featured:
+                                            description: Article featured flag.
+                                            type: boolean
+                                        insertUser:
+                                            $ref: "#/components/schemas/UserFragment"
+                                        locale:
+                                            description: Locale the article was written in.
+                                            minLength: 1
+                                            nullable: true
+                                            type: string
+                                        name:
+                                            description: Title of the article.
+                                            minLength: 0
+                                            nullable: true
+                                            type: string
+                                        status:
+                                            description: ""
+                                            enum:
+                                                - published
+                                            minLength: 1
+                                            nullable: true
+                                            type: string
+                                        translationStatus:
+                                            description: The translation status of the article revision.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            minLength: 1
+                                            nullable: false
+                                            type: string
+                                    required:
+                                        - articleRevisionID
+                                        - articleID
+                                        - status
+                                        - name
+                                        - locale
+                                        - insertUser
+                                        - dateInserted
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+            summary: Get revisions from a specific article.
+    "/articles/{id}/status":
+        patch:
+            parameters:
+                - description: The article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                status:
+                                    description: Article status.
+                                    enum:
+                                        - undeleted
+                                        - deleted
+                                        - published
+                                    minLength: 1
+                                    type: string
+                            required:
+                                - status
+                            type: object
+                required: true
+            summary: Set the status of an article.
+    "/articles/{id}/featured":
+        put:
+            parameters:
+                - description: The article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                featured:
+                                    description: Article featured flag.
+                                    type: boolean
+                            required:
+                                - featured
+                            type: object
+                required: true
+            summary: Set / unset article as featured.
+    "/articles/from-discussion":
+        get:
+            parameters:
+                - description: Unique identifier for the community discussion.
+                  in: query
+                  name: discussionID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/DiscussionArticle"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get a community discussion in a format that is easy to consume when creating a new article.
+    "/articles/{id}/react":
+        put:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/React"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleSimple"
+                    description: Success
+            tags:
+                - Articles
+            summary: Put reaction on article.
+    "/articles/{id}/aliases":
+        put:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            requestBody:
+                $ref: "#/components/requestBodies/Aliases"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleSimple"
+                    description: Success
+            tags:
+                - Articles
+            summary: Put aliases for article.
+        get:
+            parameters:
+              - description: The article ID.
+                in: path
+                name: id
+                required: true
+                schema:
+                  type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ArticleAliases"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get aliases for article.
+    "/articles/by-alias":
+        get:
+            parameters:
+              - description: Article alias.
+                in: query
+                name: alias
+                required: true
+                schema:
+                  type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Article"
+                    description: Success
+            tags:
+                - Articles
+            summary: Get an article by its alias.
+    "/articles/{id}/translations":
+        get:
+            parameters:
+                - description: Article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: The status of an article
+                  in: query
+                  name: status
+                  schema:
+                      items:
+                        enum:
+                            - published
+                            - deleted
+                            - undeleted
+                        type: string
+                      type: array
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        articleRevisionID:
+                                            description: Unique article revision ID.
+                                            type: integer
+                                        name:
+                                            description: The name of the article.
+                                            type: string
+                                        url:
+                                            description: The url of the article.
+                                            type: string
+                                        locale:
+                                            description: Locale the article was written in..
+                                            type: string
+                                        translationStatus:
+                                            description: The translation status of the article.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            type: string
+                                    required:
+                                        - articleRevisionID
+                                        - name
+                                        - url
+                                        - locale
+                                        - translationStatus
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+    "/articles/{id}/invalidate-translations":
+        put:
+            parameters:
+                - description: Article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        articleID:
+                                            description: article ID.
+                                            type: integer
+                                        articleRevisionID:
+                                            description: Unique article revision ID.
+                                            type: integer
+                                        locale:
+                                            description: Locale the article was written in..
+                                            type: string
+                                        translationStatus:
+                                            description: The translation status of the article.
+                                            enum:
+                                                - up-to-date
+                                                - out-of-date
+                                                - not-translated
+                                            type: string
+                                    required:
+                                        - articleID
+                                        - articleRevisionID
+                                        - locale
+                                        - translationStatus
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - Articles
+    "/articles/{id}/articles-related":
+        get:
+            parameters:
+                - description: article ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                    type: integer
+                - description: name of the article
+                  in: query
+                  name: name
+                  schema:
+                    type: string
+                - description: minimum number of articles to return.
+                  in: query
+                  name: minimumArticles
+                  schema:
+                      type: integer
+                - description: limit of articles to return
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                - description: locale associated to article
+                  in: query
+                  name: locale
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/searchResultSchema"
+                    description: Success
+            tags:
+                - Articles
+components:
+    requestBodies:
+        ArticlePost:
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/ArticlePost"
+            required: true
+        Body:
+            content:
+                application/json:
+                    schema:
+                        properties:
+                            attributes:
+                                description: A free-form object containing all custom data for this draft.
+                                type: object
+                            body:
+                                description: Content of article
+                                type: string
+                            format:
+                                type: string
+                                default: rich
+                                description: "Body content format: rich, text, html."
+                                enum:
+                                    - rich
+                                    - html
+                                    - text
+                                    - markdown
+                            parentRecordID:
+                                description: The unique ID of the intended parent to this record.
+                                nullable: true
+                                type: integer
+                            recordID:
+                                description: Unique ID of an existing record to associate with this draft.
+                                nullable: true
+                                type: integer
+                        required:
+                            - attributes
+                            - body
+                            - format
+                        type: object
+            required: true
+        React:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          helpful:
+                            description: User reaction on 'Was it helpful?'.
+                            type: string
+                            enum:
+                              - yes
+                              - no
+            required: true
+        Aliases:
+            content:
+                application/json:
+                    schema:
+                        type: object
+                        properties:
+                          aliases:
+                            description: Array of url aliases for article.
+                            type: array
+                            items:
+                                type: string
+                        example: { 'aliases': [ 'category/discussion-migrated-from/forum/', 'another-url/for-the-same/article' ]}
+            required: true
+    headers:
+        x-file-rehosted-success-count:
+            description: Number of images and attachments that were successfully rehosted.
+            schema:
+                type: integer
+        x-file-rehosted-failed-count:
+            description: Number of images and attachments that were unable to be rehosted.
+            schema:
+                type: integer
+    schemas:
+        ArticleRehostFiles:
+            description: >
+                Control rehosting of files within an article body. When configured correctly images and attachments in
+                the article body will be rehosted within Vanilla (or it's CDN).
+            type: object
+            properties:
+                enabled:
+                    type: boolean
+                    description: Enable file rehosting.
+                    example: true
+                requestHeaders:
+                    description: Headers to pass when fetching the remote resources. Primary use case is authentication.
+                    type: array
+                    items:
+                        type: string
+                    example: ["Authorization: Basic cHc0czFaZ05tRkQyUjZSTA="]
+        Article:
+            properties:
+                articleID:
+                    description: Unique article ID.
+                    type: integer
+                body:
+                    description: Body contents.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                dateInserted:
+                    description: When the article was created.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: When the article was last updated.
+                    format: date-time
+                    type: string
+                excerpt:
+                    description: Plain-text excerpt of the current article body.
+                    nullable: true
+                    type: string
+                insertUser:
+                    $ref: "#/components/schemas/UserFragment"
+                insertUserID:
+                    description: Unique ID of the user who originally created the article.
+                    type: integer
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    nullable: true
+                    type: integer
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 2
+                    type: string
+                name:
+                    description: Title of the article.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                outline:
+                    items:
+                        properties:
+                            level:
+                                description: Heading level
+                                type: integer
+                            ref:
+                                description: "Heading blot reference id. Ex: #title"
+                                minLength: 1
+                                type: string
+                            text:
+                                description: Heading text line
+                                minLength: 1
+                                type: string
+                        required:
+                            - ref
+                            - level
+                            - text
+                        type: object
+                    type: array
+                score:
+                    description: Score of the article.
+                    type: integer
+                seoDescription:
+                    description: SEO-optimized description of the article content.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                seoName:
+                    description: SEO-optimized name for the article.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                slug:
+                    description: URL slug
+                    minLength: 1
+                    nullable: true
+                    type: string
+                sort:
+                    description: Manual sort order of the article.
+                    nullable: true
+                    type: integer
+                status:
+                    description: ""
+                    enum:
+                        - undeleted
+                        - deleted
+                        - published
+                    minLength: 1
+                    nullable: true
+                    type: string
+                translationStatus:
+                    description: The translation status of the article revision.
+                    enum:
+                        - up-to-date
+                        - out-of-date
+                        - not-translated
+                    minLength: 1
+                    nullable: false
+                    type: string
+                updateUser:
+                    $ref: "#/components/schemas/UserFragment"
+                updateUserID:
+                    description: Unique ID of the last user to update the article.
+                    type: integer
+                featured:
+                    description: "Article is featured"
+                    type: boolean
+                dateFeatured:
+                    description: "When the article was last set or unset as featured"
+                    format: date-time
+                    type: string
+                url:
+                    description: Full URL to the article.
+                    minLength: 1
+                    type: string
+                views:
+                    description: How many times the article has been viewed.
+                    type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+            required:
+                - articleID
+                - knowledgeCategoryID
+                - name
+                - body
+                - outline
+                - excerpt
+                - seoName
+                - seoDescription
+                - slug
+                - sort
+                - score
+                - views
+                - url
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - status
+                - locale
+            type: object
+        ArticlePost:
+            properties:
+                body:
+                    description: Body contents.
+                    minLength: 1
+                    type: string
+                draftID:
+                    description: Unique ID of a draft to remove upon updating an article.
+                    type: integer
+                format:
+                    description: Format of the raw body content.
+                    enum:
+                        - text
+                        - textex
+                        - markdown
+                        - wysiwyg
+                        - html
+                        - bbcode
+                        - rich
+                    minLength: 1
+                    type: string
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    type: integer
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 1
+                    type: string
+                name:
+                    description: Title of the article.
+                    minLength: 1
+                    type: string
+                sort:
+                    description: Manual sort order of the article.
+                    nullable: true
+                    type: integer
+                discussionID:
+                    description: Discussion ID to link article url as discussion canonical url.
+                    type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+                fileRehosting:
+                    $ref: "#/components/schemas/ArticleRehostFiles"
+            required:
+                - knowledgeCategoryID
+                - name
+                - body
+                - locale
+                - format
+            type: object
+        ArticlePatch:
+            properties:
+                body:
+                    description: Body contents.
+                    minLength: 1
+                    type: string
+                draftID:
+                    description: Unique ID of a draft to remove upon updating an article.
+                    type: integer
+                format:
+                    description: Format of the raw body content.
+                    enum:
+                        - text
+                        - textex
+                        - markdown
+                        - wysiwyg
+                        - html
+                        - bbcode
+                        - rich
+                    minLength: 1
+                    type: string
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    type: integer
+                previousRevisionID:
+                    description: Article's last known revision ID. Needs to be passed when patching an existing article.
+                    type: integer
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 1
+                    type: string
+                name:
+                    description: Title of the article.
+                    minLength: 1
+                    type: string
+                sort:
+                    description: Manual sort order of the article.
+                    nullable: true
+                    type: integer
+                discussionID:
+                    description: Discussion ID to link article url as discussion canonical url.
+                    type: integer
+                foreignID:
+                    description: Foriegn ID to link article to some external resource.
+                    type: string
+                    maxLength: 32
+                    nullable: true
+                fileRehosting:
+                    $ref: "#/components/schemas/ArticleRehostFiles"
+            type: object
+        ArticleSimple:
+            type: object
+            properties:
+                articleID:
+                    description: Unique article ID.
+                    type: integer
+                dateInserted:
+                    description: When the article was created.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: When the article was last updated.
+                    format: date-time
+                    type: string
+                excerpt:
+                    description: Plain-text excerpt of the current article body.
+                    nullable: true
+                    type: string
+                insertUser:
+                    $ref: "#/components/schemas/UserFragment"
+                insertUserID:
+                    description: Unique ID of the user who originally created the article.
+                    type: integer
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    nullable: true
+                    type: integer
+                name:
+                    description: Title of the article.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                score:
+                    description: Score of the article.
+                    type: integer
+                seoDescription:
+                    description: SEO-optimized description of the article content.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                seoName:
+                    description: SEO-optimized name for the article.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                slug:
+                    description: URL slug
+                    minLength: 1
+                    nullable: true
+                    type: string
+                sort:
+                    description: Manual sort order of the article.
+                    nullable: true
+                    type: integer
+                status:
+                    description: ""
+                    enum:
+                        - undeleted
+                        - deleted
+                        - published
+                    minLength: 1
+                    nullable: true
+                    type: string
+                locale:
+                    description: Locale the article was written in.
+                    minLength: 2
+                    type: string
+                translationStatus:
+                    description: The translation status of the article revision.
+                    enum:
+                        - up-to-date
+                        - out-of-date
+                        - not-translated
+                    minLength: 1
+                    nullable: false
+                    type: string
+                updateUser:
+                    $ref: "#/components/schemas/UserFragment"
+                updateUserID:
+                    description: Unique ID of the last user to update the article.
+                    type: integer
+                url:
+                    description: Full URL to the article.
+                    minLength: 1
+                    type: string
+                views:
+                    description: How many times the article has been viewed.
+                    type: integer
+                reactions:
+                    description: List of user reactions on article.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Reaction"
+                aliases:
+                    description: List of url aliases for article.
+                    type: array
+                    items:
+                      type: string
+                    example: ['category/discussion-migrated-from/forum/', 'another-url/for-the-same/article']
+            required:
+                - articleID
+                - knowledgeCategoryID
+                - name
+                - seoName
+                - seoDescription
+                - slug
+                - sort
+                - score
+                - views
+                - url
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - status
+        ArticleAliases:
+            type: object
+            properties:
+                articleID:
+                    description: Unique article ID.
+                    type: integer
+                knowledgeCategoryID:
+                    description: Category the article belongs in.
+                    nullable: true
+                    type: integer
+                knowledgeBaseID:
+                    description: Knowledge base ID article belongs to.
+                    nullable: false
+                    type: integer
+                status:
+                    description: ""
+                    enum:
+                        - deleted
+                        - published
+                    minLength: 1
+                    nullable: true
+                    type: string
+                aliases:
+                    description: List of url aliases for article.
+                    type: array
+                    items:
+                      type: string
+                    example: ['category/discussion-migrated-from/forum/', 'another-url/for-the-same/article']
+            required:
+                - articleID
+                - knowledgeCategoryID
+                - knowledgeBaseID
+                - status
+                - aliases
+        DiscussionArticle:
+            type: object
+            properties:
+                acceptedAnswers:
+                    items:
+                        $ref: "#/components/schemas/DiscussionArticleAnswer"
+                    type: array
+                body:
+                    oneOf:
+                        - description: Rendered discussion body contents.
+                          type: string
+                        - description: Rich format operations for the discussion body contents.
+                          type: array
+                          items:
+                              type: object
+                format:
+                    description: Post format.
+                    type: string
+                name:
+                    description: Discussion name.
+                    type: string
+                url:
+                    description: Full URL to the discussion.
+                    type: string
+        DiscussionArticleAnswer:
+            type: object
+            properties:
+                body:
+                    oneOf:
+                        - description: Rendered answer body contents.
+                          type: string
+                        - description: Rich format operations for the answer body contents.
+                          type: array
+                          items:
+                              type: object
+                format:
+                    description: Post format.
+                    type: string
+                url:
+                    description: Full URL to the answer.
+                    type: string
+        Reaction:
+          type: object
+          properties:
+            reactionType:
+              type: string
+              example: helpful
+            yes:
+              type: integer
+              example: 1
+            no:
+              type: integer
+              example: 0
+            total:
+              type: integer
+              example: 1
+            userReaction:
+              type: string
+              enum:
+                - yes
+                - no
+                - null
+              example: yes

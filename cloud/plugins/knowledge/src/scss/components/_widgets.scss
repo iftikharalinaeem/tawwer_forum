@@ -1,0 +1,134 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$widget-titleBar_viewMoreColor        : mix($global-color_fg, $global-color_fg, 60%) !default;
+
+.widget {
+    width: 100%;
+    background-color: $global-widget_bg;
+    color: $global-widget_fg;
+    font-size: $global-widgetText_size;
+
+    border: {
+        color: $widget_borderColor;
+        width: $widget_borderWidth;
+        radius: $widget_borderRadius;
+    }
+
+    padding: {
+        top: $global-gutter_quarterSize;
+        right: $global-gutter_quarterSize;
+        bottom: $global-gutter_quarterSize;
+        left: $global-gutter_quarterSize;
+    }
+
+    + .widget {
+        margin-top: $global-widget_gap;
+    }
+}
+
+.widget-header {
+    background-color: $widget-head_bg;
+    color: $widget-head_fg;
+    margin-bottom: $widget-head_gap;
+    width: 100%;
+    padding: {
+        top: $widget-head_topPadding;
+        right: $widget-head_topPadding;
+        bottom: $widget-head_bottomPadding;
+        left: $widget-head_leftPadding;
+    }
+    border: {
+        color: $widget-head_borderColor;
+        width: $widget-head_borderWidth;
+        radius: $widget-head_borderRadius;
+    }
+    &:empty {
+        display: none;
+    }
+}
+
+.widgetTitle {
+    margin: 0;
+}
+
+.widget-body {
+    width: 100%;
+    color: $widget-body_fg;
+    padding: {
+        top: $widget-body_topPadding;
+        right: $widget-body_topPadding;
+        bottom: $widget-body_bottomPadding;
+        left: $widget-body_leftPadding;
+    }
+    border: {
+        color: $widget-body_borderColor;
+        width: $widget-body_borderWidth;
+        radius: $widget-body_borderRadius;
+    }
+}
+
+.widget-footer {
+    width: 100%;
+    background-color: $widget-footer_bg;
+    color: $widget-footer_fg;
+    margin-bottom: $widget-footer_gap;
+    padding: {
+        top: $widget-footer_topPadding;
+        right: $widget-footer_topPadding;
+        bottom: $widget-footer_bottomPadding;
+        left: $widget-footer_leftPadding;
+    }
+    border: {
+        color: $widget-footer_borderColor;
+        width: $widget-footer_borderWidth;
+        radius: $widget-footer_borderRadius;
+    }
+    &:empty {
+        display: none;
+    }
+}
+
+.widget-title {
+    display: block;
+    font-size: $global-widgetTitle_size;
+    margin-bottom: 0;
+}
+
+.widget-titleBar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    .widget-title {
+        margin-right: auto;
+    }
+}
+
+.widget-viewAll {
+    display: flex;
+    align-items: center;
+    border: 0;
+    margin-left: auto;
+}
+
+
+.widget-viewAllLabel {
+    vertical-align: middle;
+    font-size: $global-small_fontSize;
+    color: $widget-titleBar_viewMoreColor;
+    line-height: $formElement-height;
+
+    &:hover,
+    &:focus {
+        color: $global-color_primary;
+    }
+}
+
+.widget-viewAllIcon {
+    display: inline-block;
+    color: $widget-titleBar_viewMoreColor;
+}

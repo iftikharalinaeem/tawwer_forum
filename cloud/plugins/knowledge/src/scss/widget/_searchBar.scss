@@ -1,0 +1,199 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$searchBar-drawer_bg                              : $global-color_bg !default;
+$searchBar_height                                 : $formElement_giantInput_height !default;
+$searchBar_fontSize                               : $formElement_giantInput_fontSize !default;
+$searchBar_width                                  : 705px !default;
+$searchBar-button_minWidth                        : 130px !default;
+$searchBar-button_borderWidth                     : $formElement_borderWidth !default;
+$searchBar-button_borderRadius                    : $formElement_borderWidth !default;
+$searchBar-button_borderColor                     : $formElement_borderColor !default;
+
+$searchBar-icon_color                             : mix($global-color_bg, $global-color_fg, 40%) !default;
+$searchBar-input_fontSize                         : $global-subTitle_fontSize !default;
+$searchBar-button_fontSize                        : $global-medium_fontSize !default;
+
+$searchBarAdvanced_topPadding                     : $utility-baseUnit * 4 !default;
+$searchBarAdvanced_horizontalPadding              : $utility-baseUnit * 5 !default;
+$searchBarAdvanced_bottomPadding                  : $utility-baseUnit * 5 !default;
+
+$searchBarAdvanced_smallScreen_topPadding         : $utility-baseUnit * 2 !default;
+$searchBarAdvanced_smallScreen_horizontalPadding  : $utility-baseUnit * 3 !default;
+$searchBarAdvanced_smallScreen_bottomPadding      : $utility-baseUnit * 3 !default;
+
+$searchBarAdvanced-panel_shadowColor              : $autoComplete-panel_shadowColor !default;
+$searchBarAdvanced-panel_boxShadow                : $autoComplete-panel_boxShadow !default;
+
+$searchBar-searchIn_margin                        : $formElement_margin - $utility-baseUnit !default;
+
+$searchBarAdvanced-smallScreen_breakpoint         : 500px;
+
+
+@mixin mediaQuery-searchBarAdvanced_smallScreen {
+    @media (max-width: #{$searchBarAdvanced-smallScreen_breakpoint}) {
+        @content;
+    }
+}
+
+.searchBar {
+    max-width: #{$searchBar_width};
+    margin : auto;
+
+    &.showAdvancedSearch {
+        .searchBarAdvanced {
+            display: block;
+        }
+
+        .searchBar-button,
+        .searchBarAdvanced_footer {
+            display: none;
+        }
+
+        .inputText.searchBar-input {
+            border: {
+                right-width: $formElement_borderWidth;
+                right-color: $formElement_borderColor;
+                right-style: $formElement_borderStyle;
+                top-left-radius: $searchBar-button_borderRadius;
+                bottom-left-radius: $searchBar-button_borderRadius;
+            }
+            padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+        }
+    }
+
+    &.showAutoComplete {
+        .autoComplete {
+            display: block;
+        }
+    }
+}
+
+.searchBar-bar {
+    display: flex;
+    position: relative;
+    flex-wrap: nowrap;
+}
+
+.searchBar-inputAndIcon {
+    position: relative;
+    flex-grow: 1;
+}
+
+.searchBar-searchIcon {
+    @include absolute-middleLeft($formElement_horizontalPadding);
+    color: $searchBar-icon_color;
+}
+
+.inputText.searchBar-input {
+    height: $searchBar_height;
+    font-size: $searchBar-input_fontSize;
+    margin: 0;
+    padding-left: #{$formElement_horizontalPadding * 2 + $icon-default_size};
+    width: 100%;
+    border: {
+        right: 0;
+        top-right-radius: 0;
+        bottom-right-radius: 0;
+    }
+}
+
+.button {
+    &.searchBar-button {
+        height: $searchBar_height;
+        font-size: $searchBar-button_fontSize;
+        min-width: $searchBar-button_minWidth;
+
+        border: {
+            width: $searchBar-button_borderWidth;
+            color: $searchBar-button_borderColor;
+            top-left-radius: 0;
+            bottom-left-radius: 0;
+            top-right-radius: $searchBar-button_borderRadius;
+            bottom-right-radius: $searchBar-button_borderRadius;
+        }
+    }
+}
+
+
+.searchBar_footer {
+    display: flex;
+}
+
+.searchBar-toggleAdvanced {
+    min-width: $searchBar-button_minWidth;
+    padding: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+    }
+    border: {
+        width: $searchBar-button_borderWidth;
+        color: transparent;
+    }
+    margin-right: $buttonGroup-margin;
+}
+
+
+.splash-advancedSearchWrap {
+    @include defaultTransition(max-height);
+    overflow: hidden;
+    max-height: 0;
+}
+
+
+.searchBarAdvanced {
+    display: none;
+    box-shadow: $searchBarAdvanced-panel_boxShadow;
+    margin-top: -$formElement-borderWidth;
+    border: {
+        width: $formElement-borderWidth;
+        style: solid;
+        color: $searchBarAdvanced-panel_shadowColor;
+    }
+    padding: {
+        top: $searchBarAdvanced_topPadding;
+        right: $searchBarAdvanced_horizontalPadding;
+        left: $searchBarAdvanced_horizontalPadding;
+        bottom: $searchBarAdvanced_bottomPadding;
+    }
+
+    @include mediaQuery-searchBarAdvanced_smallScreen {
+        padding: {
+            top: $searchBarAdvanced_smallScreen_horizontalPadding;
+            right: $searchBarAdvanced_smallScreen_horizontalPadding;
+            left: $searchBarAdvanced_smallScreen_horizontalPadding;
+            bottom: $searchBarAdvanced_smallScreen_bottomPadding;
+        }
+    }
+}
+
+.searchBarAdvanced-query {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding: {
+        top: $utility-baseUnit;
+        bottom: $utility-baseUnit;
+    }
+}
+
+.searchBarAdvanced-searchIn {
+    margin-bottom: $searchBar-searchIn_margin;
+}
+
+.searchBarAdvanced_footer {
+    display: flex;
+    flex-wrap: nowrap;
+    width: calc(100% + #{$buttonGroup-margin * 2});
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin: {
+        left: -$buttonGroup-margin;
+    }
+}
+

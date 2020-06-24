@@ -1,0 +1,25 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$buttonGroup-margin: $utility-baseUnit;
+
+.buttonGroup {
+    display: flex;
+    flex-wrap: wrap;
+    width: calc(100% + #{$buttonGroup-margin * 2});
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin: {
+        top: -$buttonGroup-margin;
+        bottom: -$buttonGroup-margin;
+        left: -$buttonGroup-margin;
+    }
+
+    .button-fakeLink,
+    .button {
+        margin: $buttonGroup-margin;
+    }
+}
