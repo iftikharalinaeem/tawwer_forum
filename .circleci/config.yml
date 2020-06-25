@@ -3,6 +3,12 @@ orbs:
     core: vanilla/core@2
     codecov: codecov/codecov@1.0.5
 aliases:
+    - &symlink_addons
+      run:
+        - name: Symlink addons
+        - command: |
+            cd ~/workspace/repo
+            ./cloud/scripts/symlink-addons
     - &run_yarn
         run:
             name: Install Yarn Packages
@@ -59,6 +65,7 @@ jobs:
                     node --version
                     yarn --version
             - core/checkout
+            - *symlink_addons
             - run:
                 # Makes workspace persisting much faster if not needed.
                 name: Cleaning up git directory
@@ -117,6 +124,7 @@ jobs:
                     php --version
                     composer --version
             - core/checkout
+            - *symlink_addons
             # We explcitly don't cache dependencies.
             # The cache validation & fetching seems to take longer than fetching from source.
             - *run_composer
