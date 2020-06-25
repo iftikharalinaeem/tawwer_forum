@@ -11,6 +11,7 @@ import { AxiosResponse } from "axios";
 import apiv2 from "@library/apiv2";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import pDebounce from "p-debounce";
+import { NEW_SEARCH_PAGE_ENABLED } from "@vanilla/library/src/scripts/search/searchConstants";
 
 interface IAdvancedSearchQuery {
     query: string;
@@ -92,6 +93,7 @@ export class AdvancedSearchOptionProvider implements ISearchOptionProvider {
     };
 
     public makeSearchUrl = (query: string) => {
-        return formatUrl(`/search?search=${query}`, true);
+        const queryParamName = NEW_SEARCH_PAGE_ENABLED ? "query" : "search";
+        return formatUrl(`/search?${queryParamName}=${query}`, true);
     };
 }

@@ -85,9 +85,6 @@ class SphinxSearchTest extends AbstractAPIv2Test {
 
         self::SphinxReindex();
 
-        /** @var SearchApiController $searchAPIController */
-        $searchAPIController = static::container()->get('SearchApiController');
-
         $session->end();
     }
 
