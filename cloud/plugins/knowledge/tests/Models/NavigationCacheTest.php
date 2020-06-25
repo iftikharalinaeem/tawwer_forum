@@ -7,8 +7,16 @@
 
 namespace VanillaTests\Knowledge\Models;
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
 use Vanilla\Knowledge\KnowledgeStructure;
+use Vanilla\Knowledge\Models\ArticleModel;
+use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Knowledge\Models\NavigationCacheProcessor;
 use Vanilla\Site\TranslationModel;
+use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
@@ -18,6 +26,22 @@ class NavigationCacheTest extends KbApiTestCase {
 
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
     protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
+
+    public static function configureContainer(Container $container) {
+        $container
+            ->rule(ArticleModel::class)
+            ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
+            ->rule(ArticleRevisionModel::class)
+            ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
+            ->rule(KnowledgeCategoryModel::class)
+            ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
+            ->rule(KnowledgeBaseModel::class)
+            ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
+            ->rule(TranslationPropertyModel::class) // If the plugins not enabled it doesn't matter, since just a rule.
+            ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
+        ;
+    }
+
 
     /**
      * Setup the cache.
