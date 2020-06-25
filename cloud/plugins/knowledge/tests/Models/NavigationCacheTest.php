@@ -27,6 +27,9 @@ class NavigationCacheTest extends KbApiTestCase {
     protected static $enabledLocales = ['vf_fr' => 'fr', 'vf_es' => 'es', 'vf_ru' => 'ru'];
     protected static $addons = ['vanilla', 'translationsapi', 'knowledge'];
 
+    /**
+     * @param Container $container
+     */
     public static function configureContainer(Container $container) {
         $container
             ->rule(ArticleModel::class)
@@ -41,7 +44,6 @@ class NavigationCacheTest extends KbApiTestCase {
             ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])
         ;
     }
-
 
     /**
      * Setup the cache.

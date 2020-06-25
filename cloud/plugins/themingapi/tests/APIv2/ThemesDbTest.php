@@ -23,6 +23,16 @@ class ThemesDbTest extends AbstractAPIv2Test {
     private static $data = [];
 
     /**
+     * Ensure we have clean theme revision table.
+     */
+    public static function setupBeforeClass(): void {
+        parent::setupBeforeClass();
+        \Gdn::sql()->truncate('themeRevision');
+        \Gdn::sql()->truncate('theme');
+        \Gdn::sql()->truncate('themeAsset');
+    }
+
+    /**
      * Test POSTing a theme new name. Should fail since there is no dynamic theme provider.
      */
     public function testPostTheme() {
