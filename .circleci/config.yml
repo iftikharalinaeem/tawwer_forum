@@ -4,11 +4,11 @@ orbs:
     codecov: codecov/codecov@1.0.5
 aliases:
     - &symlink_addons
-      run:
-        - name: Symlink addons
-        - command: |
-            cd ~/workspace/repo
-            ./cloud/scripts/symlink-addons
+        run:
+            name: Symlink addons
+            command: |
+                cd ~/workspace/repo
+                ./cloud/scripts/symlink-addons
     - &run_yarn
         run:
             name: Install Yarn Packages
