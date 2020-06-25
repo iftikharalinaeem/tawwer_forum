@@ -1,6 +1,6 @@
 <?php
 /**
- * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
+ * @author Alexander Kim <alexander.k@vanillaforums.com>
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
@@ -312,5 +312,12 @@ class SearchServiceMysqlTest extends AbstractAPIv2Test {
         $results = $response->getBody();
 
         $this->assertTrue(count($results) >= 1);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function teardownAfterClass(): void {
+        FeatureFlagHelper::clearCache();
     }
 }
