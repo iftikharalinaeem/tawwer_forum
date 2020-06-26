@@ -8,6 +8,7 @@ namespace Vanilla\Knowledge\Models;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
+use Vanilla\ApiUtils;
 use Vanilla\Knowledge\Controllers\Api\CheckGlobalPermissionTrait;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -114,6 +115,7 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
                 self::SPHINX_DTYPE
             );
             $resultItems = array_map(function ($result) {
+                $mapped = ApiUtils::convertOutputKeys($result);
                 $mapped['recordID'] = $result['articleID'];
                 $mapped['foreignID'] = $result['articleRevisionID'];
                 $mapped['name'] = $result['name'];

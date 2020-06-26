@@ -4,17 +4,32 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Search\CommentSearchType;
-use Vanilla\Forum\Search\DiscussionSearchType;
+use Vanilla\Knowledge\Models\KnowledgeArticleSearchType;
 use Vanilla\Search\SearchService;
 use Vanilla\Sphinx\Search\SphinxSearchDriver;
 
 /**
- * Class unified search test
+ * Class unified search test.
  */
 class KnowledgeArticleSearchTypeTest extends SphinxUnifiedSearchKBTest {
+
+
+    /**
+     * Apply some container configuration.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        $container
+           ->rule(SearchService::class)
+           ->addCall('registerActiveDriver', [new Reference(SphinxSearchDriver::class)])
+            ->rule(SphinxSearchDriver::class)
+            ->addCall('registerSearchType', [new Reference(KnowledgeArticleSearchType::class)])
+        ;
+    }
 
     /**
      * @inheritdoc
@@ -22,11 +37,6 @@ class KnowledgeArticleSearchTypeTest extends SphinxUnifiedSearchKBTest {
     public static function setupBeforeClass(): void {
         parent::setupBeforeClass();
         \Gdn::config()->saveToConfig('Feature.useSearchService.Enabled', true);
-        self::container()->rule(SearchService::class)
-            ->addCall('registerActiveDriver', [new Reference(SphinxSearchDriver::class)]);
-        self::container()->rule(SphinxSearchDriver::class)
-            ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
-            ->addCall('registerSearchType', [new Reference(CommentSearchType::class)]);
     }
 
     /**
