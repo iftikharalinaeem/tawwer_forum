@@ -16,7 +16,6 @@ use Vanilla\Sphinx\Search\SphinxSearchDriver;
  */
 class KnowledgeArticleSearchTypeTest extends SphinxUnifiedSearchKBTest {
 
-
     /**
      * Apply some container configuration.
      *

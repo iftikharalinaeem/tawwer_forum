@@ -117,14 +117,18 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
             $resultItems = array_map(function ($result) {
                 $mapped = ApiUtils::convertOutputKeys($result);
                 $mapped['recordID'] = $result['articleID'];
-                $mapped['foreignID'] = $result['articleRevisionID'];
                 $mapped['name'] = $result['name'];
                 $mapped['url'] = $result['Url'];
                 $mapped['dateInserted'] = $result['dateInserted'];
                 $mapped['recordType'] = $this->getSearchGroup();
                 $mapped['type'] = $this->getType();
                 $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($result['knowledgeCategoryID']));
-                return new SearchResultItem($mapped);
+                $resultItem = new SearchResultItem($mapped);
+
+                // Sometimes a
+                $resultItem->setAltRecordID($result['articleRevisionID']);
+
+                return $resultItem;
             }, $results);
             return $resultItems;
         } catch (HttpException $exception) {
