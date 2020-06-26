@@ -164,6 +164,25 @@ trait SphinxQueryTrait {
     }
 
     /**
+     * Apply a date range over a query.
+     *
+     * @param string $attribute The field to apply the filter over.
+     * @param \DateTimeInterface|null $startDate The start date or null.
+     * @param \DateTimeInterface|null $endDate The end date or null.
+     */
+    public function applyDateRange(string $attribute, ?\DateTimeInterface $startDate, ?\DateTimeInterface $endDate) {
+        if (!$startDate) {
+            $startDate = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        }
+
+        if (!$endDate) {
+            $endDate = (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+        }
+
+        $this->setFilterRange($attribute, $startDate->getTimestamp(), $endDate->getTimestamp());
+    }
+
+    /**
      * Set index weights.
      *
      * @param array $weights Associative array of key value pairs: (string)indexName => (int)weight
