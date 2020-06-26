@@ -291,6 +291,18 @@ class SearchApiController extends AbstractApiController {
                     'description' => 'Tags search condition.',
                     'enum' => ['and', 'or'],
                 ],
+                "sort:s?" => [
+                    "description" => "Sort option to order search results.",
+                    "enum" => [
+                        "relevance",
+                        "name",
+                        "-name",
+                        "dateInserted",
+                        "-dateInserted",
+                        "dateFeatured",
+                        "-dateFeatured",
+                    ],
+                ],
             ],
             ['SearchIndex', 'in']
         )
