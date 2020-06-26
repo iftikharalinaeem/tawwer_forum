@@ -22,7 +22,7 @@ trait SphinxTestTrait {
      */
     public static function sphinxReindex() {
         $sphinxHost = c('Plugins.Sphinx.Server');
-        exec('curl -s ' . $sphinxHost . ':9399', $dockerResponse);
+        exec('curl ' . $sphinxHost . ':9399', $dockerResponse);
         self::$dockerResponse = $dockerResponse;
         self::$sphinxReindexed = ('Sphinx reindexed.' === end(self::$dockerResponse));
         sleep(1);

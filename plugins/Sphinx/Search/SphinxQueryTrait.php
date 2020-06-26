@@ -101,7 +101,17 @@ trait SphinxQueryTrait {
             }
         }
 
-        $sphinxMethod = $allNumbers ? 'setFilter' : 'setFilterString';
+        $sphinxMethod = 'setFilter';
+
+        if (!$allNumbers) {
+            if (count($values) === 1) {
+                $values = $values[0];
+                $sphinxMethod = 'setFilterString';
+            } else {
+                $countString = count($values) === 0 ? 'none' : 'multiple';
+                throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
+            }
+        }
 
         if ($filterOp === SphinxSearchQuery::FILTER_OP_AND) {
             foreach ($values as $value) {
@@ -110,9 +120,7 @@ trait SphinxQueryTrait {
         } else {
             $this->getSphinxClient()->{$sphinxMethod}($attribute, $values, $exclude);
         }
-        if (count($values) > 0) {
-            $this->isFiltered = true;
-        }
+        $this->isFiltered = true;
         return $this;
     }
 
