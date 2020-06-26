@@ -91,12 +91,24 @@ trait SphinxQueryTrait {
         bool $exclude = false,
         string $filterOp = SphinxSearchQuery::FILTER_OP_OR
     ) {
+        $allNumbers = true;
+        foreach ($values as $value) {
+            if (is_numeric($value)) {
+                continue;
+            } else {
+                $allNumbers = false;
+                break;
+            }
+        }
+
+        $sphinxMethod = $allNumbers ? 'setFilter' : 'setFilterString';
+
         if ($filterOp === SphinxSearchQuery::FILTER_OP_AND) {
             foreach ($values as $value) {
-                $this->getSphinxClient()->setFilter($attribute, $value);
+                $this->getSphinxClient()->{$sphinxMethod}($attribute, $value);
             }
         } else {
-            $this->getSphinxClient()->setFilter($attribute, $values, $exclude);
+            $this->getSphinxClient()->{$sphinxMethod}($attribute, $values, $exclude);
         }
         if (count($values) > 0) {
             $this->isFiltered = true;
