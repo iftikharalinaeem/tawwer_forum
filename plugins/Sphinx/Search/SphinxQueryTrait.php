@@ -54,17 +54,14 @@ trait SphinxQueryTrait {
      * Apply a sort mode the query.
      *
      * @param string|null $sort One of the SphinxQueryBuilder::SORT_* modes.
-     * @param array|null $forTerms Take search terms into account for a better sort. Will default to last extracted search terms.
+     * @param string|null $field
      *
      * @return $this
      */
-    public function setSort(?string $sort = null, ?array $forTerms = null) {
-        $hasMultipleTerms = count($forTerms ?? $this->terms) > 1;
-
-        if ($sort === null) {
-            $this->getSphinxClient()->setSelect("*, WEIGHT() + IF(dtype=5,2,1)*dateinserted/1000 AS sorter");
-            $this->getSphinxClient()->setSortMode(SphinxClient::SORT_EXTENDED, "sorter DESC");
-        } elseif ($sort === SphinxQueryConstants::SORT_DATE || (!$hasMultipleTerms && $sort !== SphinxQueryConstants::SORT_RELEVANCE)) {
+    public function setSort(?string $sort = null, ?string $field = null) {
+        if ($field) {
+            $this->getSphinxClient()->setSortMode($sort ?? SphinxClient::SORT_ATTR_DESC, $field);
+        } elseif ($sort === SphinxQueryConstants::SORT_DATE) {
             // If there is just one search term then we really want to just sort by date.
             $this->getSphinxClient()->setSelect('*, (dateinserted + 1) as sort');
             $this->getSphinxClient()->setSortMode(SphinxClient::SORT_ATTR_DESC, 'sort');
@@ -91,18 +88,50 @@ trait SphinxQueryTrait {
         bool $exclude = false,
         string $filterOp = SphinxSearchQuery::FILTER_OP_OR
     ) {
+        $allNumbers = true;
+        foreach ($values as $value) {
+            if (is_numeric($value)) {
+                continue;
+            } else {
+                $allNumbers = false;
+                break;
+            }
+        }
+
+        $sphinxMethod = 'setFilter';
+
+        if (!$allNumbers) {
+            if (count($values) === 1) {
+                $values = $values[0];
+                $sphinxMethod = 'setFilterString';
+            } else {
+                $countString = count($values) === 0 ? 'none' : 'multiple';
+                throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
+            }
+        }
+
         if ($filterOp === SphinxSearchQuery::FILTER_OP_AND) {
             foreach ($values as $value) {
-                $this->getSphinxClient()->setFilter($attribute, $value);
+                $this->getSphinxClient()->{$sphinxMethod}($attribute, $value);
             }
         } else {
-            $this->getSphinxClient()->setFilter($attribute, $values, $exclude);
+            $this->getSphinxClient()->{$sphinxMethod}($attribute, $values, $exclude);
         }
-        if (count($values) > 0) {
-            $this->isFiltered = true;
-        }
+        $this->isFiltered = true;
         return $this;
     }
+
+    /**
+     * Set string attribute to filter
+     *
+     * @param string $attribute
+     * @param string $value
+     * @param bool $exclude
+     */
+    public function setFilterString(string $attribute, string $value, bool $exclude = false) {
+        $this->getSphinxClient()->setFilterString($attribute, $value);
+    }
+
 
     /**
      * Set groupBy and groupFunc attributes
@@ -132,6 +161,25 @@ trait SphinxQueryTrait {
         $this->getSphinxClient()->setFilterRange($attribute, $min, $max, $exclude);
         $this->isFiltered = true;
         return $this;
+    }
+
+    /**
+     * Apply a date range over a query.
+     *
+     * @param string $attribute The field to apply the filter over.
+     * @param \DateTimeInterface|null $startDate The start date or null.
+     * @param \DateTimeInterface|null $endDate The end date or null.
+     */
+    public function applyDateRange(string $attribute, ?\DateTimeInterface $startDate, ?\DateTimeInterface $endDate) {
+        if (!$startDate) {
+            $startDate = (new \DateTime())->setDate(1970, 1, 1)->setTime(0, 0, 0);
+        }
+
+        if (!$endDate) {
+            $endDate = (new \DateTime())->setDate(2100, 12, 31)->setTime(0, 0, 0);
+        }
+
+        $this->setFilterRange($attribute, $startDate->getTimestamp(), $endDate->getTimestamp());
     }
 
     /**
@@ -215,11 +263,6 @@ trait SphinxQueryTrait {
         $terms = [];
         $query = ['', '', ''];
 
-        //
-        // TODO: This does not actually get used anywhere.
-        //
-        $hasops = false; // whether or not search has operators
-
         foreach ($tokens as $c) {
             // Figure out where to push the token.
             switch ($c) {
@@ -233,7 +276,6 @@ trait SphinxQueryTrait {
                     } else {
                         $query[1] .= $c;
                     }
-                    $hasops = true;
                     break;
                 case '"':
                     if ($inquote) {
@@ -244,7 +286,6 @@ trait SphinxQueryTrait {
                         $query[0] .= $c;
                         $inquote = true;
                     }
-                    $hasops = true;
                     break;
                 case ' ':
                     if ($inquote) {
