@@ -19,6 +19,7 @@ use SearchApiController;
 use Garden\Container\Reference;
 use Vanilla\Forum\Search\DiscussionSearchType;
 use Vanilla\Forum\Search\CommentSearchType;
+use Vanilla\FeatureFlagHelper;
 
 /**
  * Class SearchServiceMysqlTest
@@ -45,6 +46,7 @@ class SearchServiceMysqlTest extends AbstractAPIv2Test {
     public static function setupBeforeClass(): void {
 
         parent::setupBeforeClass();
+        FeatureFlagHelper::clearCache();
         \Gdn::config()->saveToConfig('Feature.useSearchService.Enabled', true);
 
         self::container()->rule(SearchService::class)
