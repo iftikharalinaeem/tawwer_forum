@@ -1,0 +1,22 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$newArticle-button_height           : 24px !default;
+$newArticle-button_minWidth         : 75px !default;
+$newArticle-button_borderRadius     : $newArticle-button_height !default;
+$newArticle-button_fontSize         : $global-small_fontSize !default;
+$newArticle-button_minWidth         : $global-button_minWidth !default;
+
+.button.button-newArticle {
+    @include buttonSizing($newArticle-button_height, $newArticle-button_minWidth, $newArticle-button_fontSize, 2px);
+    border-radius: $newArticle-button_borderRadius;
+    line-height: $newArticle-button_height;
+    font-size: $newArticle-button_fontSize;
+    min-height: $newArticle-button_height;
+    min-width: $newArticle-button_minWidth;
+}
+
+

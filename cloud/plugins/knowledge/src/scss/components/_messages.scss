@@ -1,0 +1,63 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$message-block_gap                : $utility-baseUnit * 2 !default;
+$message-block_borderColor        : mix($global-color_fg, $global-color_bg, 20%) !default;
+$message-block_borderStyle        : solid !default;
+$message-block_borderWidth        : $formElement_borderWidth !default;
+$message-block_borderRadius       : $global-borderRadius !default;
+$message-block_padding            : $utility-baseUnit * 2 !default;
+$message-block_boxShadow          : 0 0 3px 0 rgba($global-color_fg, .2) $global-border-style;
+
+$message-text_fontSize            : $global-small_fontSize;
+$message-title_color              : mix($global-color_fg, $global-color_bg, 90%) !default;
+
+.messages {
+    display: block;
+    margin-top: $message-block_gap;
+}
+
+.message {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: inherit;
+    padding: $message-block_padding;
+    box-shadow: $message-block_boxShadow;
+
+    border: {
+        color: $message-block_borderColor;
+        width: $message-block_borderWidth;
+        style: $message-block_borderStyle;
+        radius: $message-block_borderRadius;
+    }
+
+    + .message {
+        margin-top: $message-block_gap;
+    }
+}
+
+.message-main {
+    flex-grow: 1;
+}
+
+.message-title {
+    font-size: $message-text_fontSize;
+    color: $message-title_color;
+    font-weight: $global-fontWeight_bold;
+}
+
+.message-text {
+    font-size: $message-text_fontSize;
+    margin-top: $utility-baseUnit;
+    margin-bottom: 0;
+}
+
+.message-metas {
+    margin-bottom: 0;
+}

@@ -1,0 +1,18 @@
+<main>
+    <ul class="userContent">
+        {%- for article in articles -%}
+            {%- if article.url %}
+                <li>
+                    <a href="{{ article.url }}">
+                        {{ article.name }}
+                    </a>
+                    {%- if article.excerpt %}
+                        <p>
+                            {{ article.excerpt }}
+                        </p>
+                    {%- endif %}
+                </li>
+            {%- endif %}
+        {%- endfor -%}
+    </ul>
+</main>

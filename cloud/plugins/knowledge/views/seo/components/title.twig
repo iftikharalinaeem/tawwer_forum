@@ -1,0 +1,14 @@
+<h1 class="heading heading-1 pageTitle">{{ title }}</h1>
+<aside>
+    {#<ul>#}
+        {#{% for meta in metas %}#}
+            {#<li>#}
+                {#{% if article.excerpt %}#}
+                    {#<a href="{{ meta.url }}">#}
+                        {#{{ meta.name }}#}
+                    {#</a>#}
+                {#{% endif %}#}
+            {#</li>#}
+        {#{% endfor %}#}
+    {#</ul>#}
+</aside>

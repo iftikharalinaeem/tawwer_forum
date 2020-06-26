@@ -1,0 +1,24 @@
+{
+    "name": "Vanilla Analytics",
+    "description": "Track important trends on your forum and chart them in a customizable dashboard.",
+    "key": "vanillaanalytics",
+    "type": "addon",
+    "version": "1.2",
+    "authors": [
+        {
+            "name": "Ryan Perry",
+            "email": "ryan.p@vanillaforums.com"
+        },
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alexandre.c@vanillaforums.com",
+            "homepage": "https://github.com/DaazKu"
+        }
+    ],
+    "registerPermissions": {
+        "Analytics.Data.View": "Garden.Settings.Manage"
+    },
+    "require": {
+        "vanilla": ">=2.6"
+    }
+}

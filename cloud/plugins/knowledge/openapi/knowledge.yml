@@ -1,0 +1,223 @@
+openapi: 3.0.0
+info:
+paths:
+  /knowledge/search:
+    get:
+      parameters:
+      - description: 'Global search flag. Default: false'
+        in: query
+        name: global
+        schema:
+          type: boolean
+          default: false
+      - description: Unique ID of a knowledge base. Results will be relative to this
+          value.
+        in: query
+        name: knowledgeBaseID
+        schema:
+          type: integer
+      - description: Knowledge category ID list to filter results.
+        in: query
+        name: knowledgeCategoryIDs
+        schema:
+          items:
+            type: integer
+          type: array
+      - description: 'Community forum category ID list to filter results. Can only be used when: global = true'
+        in: query
+        name: categoryIDs
+        schema:
+          items:
+            type: integer
+          type: array
+      - description: Array of insertUserIDs (authors of article) to filter
+          results.
+        in: query
+        name: insertUserIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - description: Array of updateUserIDs (last editors of an article) to filter
+          results.
+        in: query
+        name: updateUserIDs
+        schema:
+          items:
+            type: integer
+          type: array
+        style: form
+      - description: 'Expand data for: user, category.'
+        in: query
+        name: expand
+        schema:
+          items:
+            enum:
+            - user
+            - category
+            type: string
+          type: array
+      - description: >
+          <p>Filter by date when the article was updated.<br />
+
+          This filter receive a string that can take two forms.<br />
+
+          A single date that matches '{Operator}{DateTime}' where {Operator}
+          can be =, &lt;, &gt;, &lt;=, &gt;=  and, if omitted, defaults to
+          =.<br />
+
+          A date range that matches '{Opening}{DateTime},{DateTime}{Closing}'
+          where {Opening} can be '[' or '(' and {Closing} can be ']' or ')'.
+          '[]' are inclusive and '()' are exclusive.</p>
+        in: query
+        name: dateUpdated
+        schema:
+          format: date-filter
+          type: string
+      - description: Article statuses array to filter results.
+        in: query
+        name: statuses
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: Locale where the articles were published.
+        in: query
+        name: locale
+        schema:
+          type: string
+      - description: The site section group the article is associated to.
+        in: query
+        name: name
+        schema:
+          type: string
+      - description: Keywords to search against article body.
+        in: query
+        name: body
+        schema:
+          type: string
+      - description: Keywords to search against article name or body.
+        in: query
+        name: all
+        schema:
+          type: string
+      - description: Filter only featured articles.
+        in: query
+        name: featured
+        schema:
+          type: boolean
+          default: false
+      - description: Sort option to order search results.
+        in: query
+        name: sort
+        schema:
+          type: string
+          enum:
+          - dateInserted
+          - -dateInserted
+          - dateFeatured
+          - -dateFeatured
+          - name
+          - -name
+      - description: 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).'
+        in: query
+        name: page
+        schema:
+          type: integer
+          default: 1
+          minimum: 1
+          maximum: 100
+      - description: Desired number of items per page.
+        in: query
+        name: limit
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+          minimum: 1
+      responses:
+        '200':
+          content:
+            'application/json':
+              schema:
+                items:
+                  $ref: '#/components/schemas/searchResultSchema'
+                type: array
+          description: Success
+      tags:
+      - Knowledge
+      summary: Get a navigation-friendly category hierarchy flat mode.
+components:
+  schemas:
+    searchResultSchema:
+      properties:
+        body:
+          type: string
+        dateInserted:
+          format: date-time
+          type: string
+        dateUpdated:
+          format: date-time
+          type: string
+        insertUserID:
+          type: integer
+        breadcrumbs:
+          description: 'List of breadcrumbs objects. Only returned if: expand[] = breadcrumbs.'
+          items:
+            properties:
+              name:
+                description: Breadcrumb element name.
+                minLength: 1
+                type: string
+                example: User Guide
+              url:
+                description: Breadcrumb element url.
+                minLength: 1
+                type: string
+                example: 'https://knowledge.com/kb/user-guide/'
+            type: object
+          type: array
+        knowledgeCategoryID:
+          type: integer
+        name:
+          type: string
+          example: Some article title Lorem Ipsum...
+        recordID:
+          type: integer
+        locale:
+          type: string
+        recordType:
+          enum:
+          - article
+          - knowledgeCategory
+          - discussion
+          - comment
+          type: string
+          example: article
+        status:
+          type: string
+          enum:
+          - published
+          - deleted
+        updateUser:
+          $ref: '#/components/schemas/UserFragment'
+        insertUser:
+          $ref: '#/components/schemas/UserFragment'
+        updateUserID:
+          type: integer
+        url:
+          type: string
+      required:
+      - name
+      - url
+      - insertUserID
+      - updateUserID
+      - recordID
+      - dateInserted
+      - dateUpdated
+      - status
+      - recordType
+      type: object
+

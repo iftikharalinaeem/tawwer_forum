@@ -1,0 +1,194 @@
+openapi: 3.0.0
+info:
+paths:
+    /products:
+        get:
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                items:
+                                    $ref: '#/components/schemas/Product'
+                                type: array
+                    description: Success
+            tags:
+                - Products
+            summary: Get a list of products.
+        post:
+            responses:
+                '201':
+                      content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                      description: Success
+            tags:
+                - Products
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                name:
+                                    description: The name of the product.
+                                    type: string
+                                body:
+                                    description: The description of the product.
+                                    type: string
+                            required:
+                                - name
+                            type: object
+                required: true
+            summary: Add a new product.
+    /products/{id}:
+        get:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+                '404':
+                    description: Not Found
+            tags:
+                - Products
+            summary: Get a single product.
+        patch:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                     type: integer
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+            tags:
+                - Products
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                name:
+                                    description: The name of the product.
+                                    type: string
+                                body:
+                                    description: The description of the product.
+                                    type: string
+                            type: object
+                required: true
+            summary: Update a product.
+        delete:
+            parameters:
+                - description: The ID of the product.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                    description: Success
+                '409':
+                    description: Product is associated with a subcommunity.
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    message:
+                                        description: Verbose description of the error.
+                                        type: string
+                                    status:
+                                        description: Response status code.
+                                        type: integer
+                                    errorType:
+                                        description: Error type.
+                                        type: string
+                                    subcommunityCount:
+                                        description: Number of subcommunities the product is associtated to.
+                                        type: integer
+                                    subcommunityIDs:
+                                        description: Id's of the associated subcommunities.
+                                        type: object
+                                type: object
+            tags:
+                - Products
+            summary: Delete a product.
+    /products/product-feature-flag:
+        x-hidden: true
+        put:
+            responses:
+                '200':
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    description: Success
+            tags:
+                - Products
+            requestBody:
+                    content:
+                        'application/json':
+                            schema:
+                                properties:
+                                    enabled:
+                                        description: Enabled state of the product feature.
+                                        type: boolean
+                                type: object
+                    required: true
+            summary: Enable\Disable the product feature.
+components:
+    schemas:
+        Product:
+            properties:
+                productID:
+                    description: Unique product ID.
+                    type: integer
+                name:
+                    description: Name of the product.
+                    nullable: true
+                    type: string
+                body:
+                    description: Description of the product.
+                    nullable: true
+                    type: string
+                siteSectionGroup:
+                    description: The site-section-group the product is associated to.
+                    nullable: true
+                    type: string
+                dateInserted:
+                    description: When the product was created.
+                    format: date-time
+                    type: string
+                dateUpated:
+                    description: When the product was updated.
+                    format: date-time
+                    type: string
+            required:
+                - productID
+                - name
+                - dateInserted
+            type: object

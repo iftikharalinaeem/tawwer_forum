@@ -1,0 +1,32 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$formatIcon-size                        : 20px;
+$formatIcon-spacing                     : 3px;
+$formatIcon-border_color                : $thumbnail-border_color;
+
+.formatIcons {
+    svg:first-child {
+        margin-left: 0;
+    }
+
+    svg:last-child {
+        margin-right: 0;
+    }
+
+    .formatIcon {
+        margin: {
+            left: $formatIcon-spacing;
+            right: $formatIcon-spacing;
+        }
+    }
+}
+
+.formatIcon {
+    width: $formatIcon-size;
+    height: $formatIcon-size;
+    color: $formatIcon-border_color;
+}

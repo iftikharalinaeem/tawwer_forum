@@ -1,0 +1,16 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$featuredArticle_spacing: 1em !default;
+
+.featuredArticle {
+    display: block;
+    margin-bottom: $featuredArticle_spacing;
+}
+
+.featuredArticle-title {
+    margin-top: 0;
+}

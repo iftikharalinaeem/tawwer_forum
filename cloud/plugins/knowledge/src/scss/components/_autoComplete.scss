@@ -1,0 +1,77 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$autoComplete_bg                   : $global-color_bg;
+$autoComplete-panel_shadowColor    : $formElement-panel_shadowColor !default;
+$autoComplete-panel_boxShadow      : $formElement-panel_boxShadow !default;
+$autoComplete-panel_hover_bg       : $global-color_active_primaryBg;
+$autoComplete-title_color          : $global-color_fg;
+$autoComplete-title_fontSize       : $global-medium_fontSize;
+$autoComplete-verticalPadding      : $utility-baseUnit * 2;
+$autoComplete-horizontalPadding    : $utility-baseUnit * 2;
+$autoComplete-separator_color      : $global-separator_color;
+$autoComplete-separator_width      : $global-separator_width;
+
+.autoComplete {
+    @include absolute-topLeft(100%);
+    display: none;
+    background-color: $autoComplete_bg;
+    width: 100%;
+    z-index: 1;
+}
+
+.autoComplete-results {
+    box-shadow: $autoComplete-panel_boxShadow;
+    margin-top: -$formElement-borderWidth;
+    max-height: 80vh;
+    overflow: auto;
+    border: {
+        width: $formElement-borderWidth;
+        style: solid;
+        color: $autoComplete-panel_shadowColor;
+    }
+}
+
+.autoCompleteResult {
+    position: relative;
+    user-select: none;
+
+    + .autoCompleteResult {
+        border: {
+            top-color: $autoComplete-separator_color;
+            top-width: $autoComplete-separator_width;
+            style: solid;
+        }
+    }
+}
+
+.autoCompleteResult-contents {
+    display: block;
+    color: $autoComplete-title_color;
+    padding: $autoComplete-verticalPadding $autoComplete-horizontalPadding;
+
+    &:hover {
+        background-color: $autoComplete-panel_hover_bg;
+    }
+}
+
+.autoCompleteResult-head {
+    display: flex;
+}
+
+.autoCompleteResult-title {
+    color: $autoComplete-title_color;
+    font-size: $autoComplete-title_fontSize;
+    flex-grow: 1;
+}
+
+.autoCompleteResult-attachments {
+    display: flex;
+}
+
+.autoCompleteResult-main {
+    margin-top: $utility-baseUnit;
+}

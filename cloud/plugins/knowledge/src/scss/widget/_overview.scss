@@ -1,0 +1,13 @@
+/**
+ * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$overview-newArticle_marginTop: $utility-baseUnit * 2 !default;
+
+.overview {
+    .widget-footer {
+        margin-top: $overview-newArticle_marginTop;
+    }
+}

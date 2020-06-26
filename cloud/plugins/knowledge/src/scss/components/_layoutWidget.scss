@@ -1,0 +1,48 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+
+$layoutWidget_bg                      : transparent !default;
+$layoutWidget_borderRadius            : 0;
+$layoutWidget_borderColor             : transparent;
+$layoutWidget_borderWidth             : 0;
+$layoutWidget_borderStyle             : solid;
+$layoutWidget_gap                     : $global-widget_gap;
+
+$layoutWidget_topPadding              : $global-widgetInner_padding !default;
+$layoutWidget_rightPadding            : $global-widgetInner_padding !default;
+$layoutWidget_bottomPadding           : $global-widgetInner_padding !default;
+$layoutWidget_leftPadding             : $global-widgetInner_padding !default;
+
+.layoutWidget {
+    background-color: $layoutWidget_bg;
+    border: {
+        radius: $layoutWidget_borderRadius;
+        color: $layoutWidget_borderColor;
+        width: $layoutWidget_borderWidth;
+        style: $layoutWidget_borderStyle;
+    }
+    padding: {
+        top: $layoutWidget_topPadding;
+        right: $layoutWidget_rightPadding;
+        bottom: $layoutWidget_bottomPadding;
+        left: $layoutWidget_leftPadding;
+    }
+
+    + .layoutWidget {
+        margin-top: $layoutWidget_gap;
+    }
+}
+
+.layoutWidget-widget {
+    position: relative;
+    padding: {
+        top: $layoutWidget_topPadding;
+        right: $layoutWidget_rightPadding;
+        bottom: $layoutWidget_bottomPadding;
+        left: $layoutWidget_leftPadding;
+    }
+}

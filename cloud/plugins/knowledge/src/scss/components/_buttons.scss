@@ -1,0 +1,159 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$buttonLoader-size: 16px;
+$buttonLoader-thickness: 3px;
+
+button {
+    .icon {
+        display: block;
+    }
+}
+
+.button {
+    @include singleLineEllipsis;
+    @include generateButtonClass($button-basic);
+    @include buttonSizing($formElement_height, $global-button_minWidth, $global-medium_fontSize, $utility-baseUnit);
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    min-width: $global-button_minWidth;
+    user-select: none;
+    overflow: hidden;
+    cursor: pointer;
+    color: $icon_color;
+    border: {
+        width: $formElement_borderWidth;
+        radius: $global-button_radius;
+        style: solid;
+    }
+
+    &.button-fullWidth {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    &.buttonNoMinWidth {
+        min-width: 0;
+    }
+
+    &.buttonNoBorder {
+        border: 0;
+        height: $formElement-height;
+    }
+
+    &.buttonNoHorizontalPadding {
+        padding: {
+            left: 0;
+            right: 0;
+        }
+    }
+
+    &.isSquare {
+        min-width: $formElement-height;
+        padding: {
+            left: $utility-baseUnit;
+            right: $utility-baseUnit;
+        }
+    }
+
+    .icon {
+        display: block;
+    }
+
+    &.isLarge {
+        height: $formElement_largeInput_height;
+    }
+
+    &:not(.focus-visible) {
+        &:hover,
+        &:focus,
+        &:active {
+            outline: 0;
+        }
+    }
+}
+
+.buttonIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: $formElement-height;
+    width: $formElement-height;
+    min-width: $formElement-height;
+    padding: 0;
+    color: $icon_color;
+
+    &:visited {
+        color: $icon_color;
+    }
+
+    .icon {
+        display: block;
+    }
+
+    &.isOpen {
+        color: $global-color_primary;
+    }
+
+    &:focus,
+    &:hover {
+        color: $global-color_primary;
+    }
+}
+
+.buttonNoBorder,
+.buttonAsText {
+
+    line-height: $global-base_lineHeight;
+    padding: 0;
+    text-align: left;
+    overflow: hidden;
+    min-width: 0;
+
+    &:hover,
+    &:focus {
+        color: $state-active_color;
+    }
+}
+
+.buttonAsText {
+    color: inherit;
+}
+
+
+.button-callToAction {
+    @include generateButtonClass($buttonPrimary);
+}
+
+
+.button-fakeLink {
+    color: $link_default-color;
+
+    &:hover {
+        color: $link_default_hover-color
+    }
+
+    &:focus {
+        color: $link_default_focus-color;
+    }
+}
+
+
+.buttonPrimary {
+    @include generateButtonClass($buttonPrimary);
+
+    .buttonLoader::after {
+        @include spinnerLoader($buttonLoader-size, $buttonLoader-thickness, $button-primary_fg);
+    }
+}
+
+.button-pushLeft {
+    margin-right: auto;
+}

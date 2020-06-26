@@ -1,0 +1,31 @@
+/**
+ * @author Stéphane (slafleche) LaFlèche <stephane.l@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+$linkList_fontSize        : $global-small_fontSize;
+$linkList_offset          : 12px;
+
+.linkList {
+    position: relative;
+    display: block;
+}
+
+.linkList-title {
+    margin-bottom: $linkList_offset;
+}
+
+.linkList-item {
+
+    + .linkList-item {
+        margin-top: $linkList_offset;
+    }
+}
+
+.linkList-link {
+    display: block;
+    position: relative;
+    width: 100%;
+    font-size: $linkList_fontSize;
+}

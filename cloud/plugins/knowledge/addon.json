@@ -1,0 +1,33 @@
+{
+    "name": "Knowledge",
+    "description": "A community centered knowledge base that helps your customers with self-service and tribal knowledge.",
+    "version": "1.2",
+    "mobileFriendly": true,
+    "hasLocale": true,
+    "icon": "knowledge.svg",
+    "key": "knowledge",
+    "type": "addon",
+    "priority": 1001,
+    "authors": [
+        {
+            "name": "Stéphane LaFlèche",
+            "email": "stephane.l@vanillaforums.com",
+            "homepage": "https://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=3.2",
+        "dashboard": ">=2.8"
+    },
+    "build": {
+        "process": "core",
+        "entries": {
+            "app": "./src/scripts/knowledge"
+        }
+    },
+    "registerPermissions": {
+        "knowledge.kb.view": "Garden.Activity.View",
+        "knowledge.articles.add": "Garden.Community.Manage",
+        "knowledge.articles.manage": "Garden.Community.Manage"
+    }
+}

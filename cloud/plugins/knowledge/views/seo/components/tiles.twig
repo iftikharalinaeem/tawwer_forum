@@ -1,0 +1,13 @@
+<ul>
+    {% for tile in tiles %}
+        <li>
+            <h2>{{ tile.title }}</h2>
+            {% if tile.image %}
+                <img src="{{ tile.image.url }}" alt="{{ tile.image.alt }}" />
+            {% endif %}
+            {% if tile.description %}
+                {{ description }}
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
