@@ -28,7 +28,8 @@ import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/component
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 
 interface IProps {
-    activeRecord: IActiveRecord;
+    children?: React.ReactNode;
+    activeRecord?: IActiveRecord;
     forceLoading?: boolean;
 }
 

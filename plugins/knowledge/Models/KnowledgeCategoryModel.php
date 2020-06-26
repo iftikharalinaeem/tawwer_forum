@@ -490,7 +490,7 @@ class KnowledgeCategoryModel extends FullRecordCacheModel {
         } else {
             $maxArticlesSort['maxSort'] = -1;
         }
-        $sortInfo['maxSort'] = max(-1, $maxArticlesSort['maxSort'], $sortInfo['maxSort']);
+        $sortInfo['maxSort'] = max(-1, $maxArticlesSort ? $maxArticlesSort['maxSort'] : false, $sortInfo['maxSort']);
 
         return $sortInfo;
     }
