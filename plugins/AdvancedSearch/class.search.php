@@ -34,7 +34,7 @@ class Search {
         $search = array_filter($search, function ($v) {
             return $v !== '';
         });
-        $doSearch = false;
+        $doSearch = true;
 
         /// Author ///
         if (isset($search['author'])) {

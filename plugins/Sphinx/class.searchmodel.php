@@ -245,7 +245,7 @@ class SphinxSearchModel extends \SearchModel {
         $terms = [];
 
         $queryBuilder = new SearchModelSphinxQuery($sphinx);
-        if (isset($search['search'])) {
+        if ($search['search'] ?? null) {
             $queryBuilder->whereText($search['search']);
         }
         $queryBuilder->setSort($search['sort'] ?? null);

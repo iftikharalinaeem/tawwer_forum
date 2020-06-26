@@ -17,6 +17,7 @@ use Vanilla\Contracts\Search\SearchRecordTypeInterface;
 use Vanilla\DateFilterSphinxSchema;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\SearchOptions;
@@ -113,7 +114,11 @@ class SearchApiController extends AbstractApiController {
                 'dateInserted:dt' => 'When the record was created.',
                 'updateUserID:i|n' => 'The user that updated the record.',
                 'dateUpdated:dt|n' => 'When the user was updated.',
-                'imageUrl:s?' => 'First image available in the record',
+                'status:s?',
+                'image:o?' => [
+                    'url:s',
+                    'alt:s'
+                ],
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'SearchResult');
         }
@@ -148,7 +153,6 @@ class SearchApiController extends AbstractApiController {
             ->searchService
             ->buildQuerySchema()
             ->merge($this->getCommonIndexSchema())
-            ->addValidator('', [$this, 'searchScopeValidator'])
         ;
 
         $query = $in->validate($query);
@@ -160,7 +164,7 @@ class SearchApiController extends AbstractApiController {
         // Expand associated rows.
         $this->userModel->expandUsers(
             $searchResults,
-            $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
+            $this->resolveExpandFields($query, ['insertUser' => 'insertUserID'])
         );
 
         $recordCount = $searchResults->getResultCount();
@@ -291,7 +295,6 @@ class SearchApiController extends AbstractApiController {
             ['SearchIndex', 'in']
         )
             ->merge($this->getCommonIndexSchema())
-            ->addValidator('', [$this, 'searchScopeValidator'])
             ->setDescription('Search for records matching specific criteria.');
         $out = $this->schema([':a' => $fullSchema], 'out');
 
@@ -332,7 +335,7 @@ class SearchApiController extends AbstractApiController {
             $expandParams = [
                 'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
                 'excerpt' => $this->isExpandField('excerpt', $query['expand']),
-                'extractImage' => $this->isExpandField('extractImage', $query['expand'])
+                'image' => $this->isExpandField('image', $query['expand'])
             ];
 
             return $this->normalizeOutput(
@@ -376,34 +379,8 @@ class SearchApiController extends AbstractApiController {
             'expandBody:b?' => [
                 'default' => true,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs', 'image', 'excerpt']),
         ]);
-    }
-
-    /**
-     * Custom validator to ensure that a search has a scope or filter.
-     *
-     * @param mixed $data
-     * @param ValidationField $field
-     *
-     * @return bool
-     */
-    public function searchScopeValidator($data, ValidationField $field) {
-        $schemaDefinition = $field->getField()['properties'];
-        foreach ($data as $name => $value) {
-            if (!empty($value) &&
-                (isset($schemaDefinition[$name]['x-search-scope']) || isset($schemaDefinition[$name]['x-search-filter']))
-            ) {
-                return true;
-            }
-        }
-
-        $field->addError('missingField', [
-            'messageCode' => 'You need to specify either a scope or a filter.',
-            'required' => true,
-        ]);
-
-        return false;
     }
 
     /**
@@ -494,12 +471,14 @@ class SearchApiController extends AbstractApiController {
             'recordType' => null,
             'type' => null,
             'categoryID' => $searchRecord['CategoryID'],
+            'knowledgeCategoryID' => $searchRecord['knowledgeCategoryID'] ?? null,
             'name' => $searchRecord['Title'],
             'score' => $searchRecord['Score'] ?? 0,
             'insertUserID' => $searchRecord['UserID'],
             'dateInserted' => $searchRecord['DateInserted'],
             'updateUserID' => $searchRecord['UpdateUserID'] ?? null,
             'dateUpdated' => $searchRecord['DateUpdated'] ?? null,
+            'status' => $searchRecord['status'] ?? null,
         ];
 
         if ($includeBody) {
@@ -530,8 +509,12 @@ class SearchApiController extends AbstractApiController {
         }
 
         $includeBreadcrumbs = $expandParams['breadcrumbs'] ?? false;
-        if ($includeBreadcrumbs && isset($schemaRecord['categoryID'])) {
-            $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
+        if ($includeBreadcrumbs) {
+            if (isset($schemaRecord['categoryID']) && $schemaRecord['categoryID'] !== 0) {
+                $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($schemaRecord['categoryID']));
+            } elseif (isset($schemaRecord['knowledgeCategoryID'])) {
+                $schemaRecord['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($schemaRecord['knowledgeCategoryID']));
+            }
         }
 
         $includeExcept = $expandParams['excerpt'] ?? false;
@@ -539,12 +522,12 @@ class SearchApiController extends AbstractApiController {
             $schemaRecord['excerpt'] = $searchRecord['excerpt'];
         }
 
-        $includeFirstImage = $expandParams['extractImage'] ?? false;
+        $includeFirstImage = $expandParams['image'] ?? false;
         if ($includeFirstImage && isset($searchRecord['Summary'])) {
-            $images = Gdn::formatService()->parseImageUrls($searchRecord['Summary'], $searchRecord['Format']);
+            $images = Gdn::formatService()->parseImages($searchRecord['Summary'], $searchRecord['Format']);
 
             if ($images && count($images) >= 1) {
-                $schemaRecord['imageUrl'] = $images[0];
+                $schemaRecord['image'] = $images[0];
             }
         }
 
