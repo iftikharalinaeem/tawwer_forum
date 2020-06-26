@@ -240,6 +240,19 @@ class KnowledgePlugin extends \Gdn_Plugin {
             $args['siteSectionGroup'] = $args['sitesectiongroup'];
         }
 
+        $types = $args['types'] ?? [];
+        $hasKbType = false;
+        foreach ($types as $type) {
+            if ($type instanceof SearchRecordTypeArticle || $type instanceof SearchRecordTypeArticleDeleted) {
+                $hasKbType = true;
+                break;
+            }
+        }
+
+        if (!$hasKbType) {
+            return $sphinx;
+        }
+
         /** @var KnowledgeApiController $knowledgeApiController */
         $knowledgeApiController = \Gdn::getContainer()->get(KnowledgeApiController::class);
         $sphinx = $knowledgeApiController->applySearchFilters($sphinx, $args);

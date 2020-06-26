@@ -10,6 +10,7 @@ import { mountModal } from "@library/modal/Modal";
 import React from "react";
 import { registerDefaultNavItem } from "@library/headers/navigationVariables";
 import { getMeta, t } from "@library/utility/appUtils";
+import { registerKbSearchDomain } from "@knowledge/search/registerKbSearchDomain";
 
 delegateEvent("click", ".js-convertDiscussionToArticle", (event, triggeringElement) => {
     event.preventDefault();
@@ -45,3 +46,5 @@ if (kbEnabled && forumEnabled) {
         };
     });
 }
+
+registerKbSearchDomain();

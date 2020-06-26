@@ -48,13 +48,13 @@ export const reactionClasses = useThemeCache(() => {
     });
 
     const resultText = style("resultText", {
-        fontSize: unit(vars.meta.text.fontSize),
+        fontSize: unit(vars.meta.text.size),
         color: colorOut(vars.meta.text.color),
         marginBottom: unit(12),
     });
 
     const reCaptchaText = style("reCaptchaText", {
-        fontSize: unit(vars.meta.text.fontSize),
+        fontSize: unit(vars.meta.text.size),
         color: colorOut(vars.meta.text.color),
         maxWidth: percent(100),
         width: unit(300),

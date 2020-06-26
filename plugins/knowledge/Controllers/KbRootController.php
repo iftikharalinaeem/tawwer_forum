@@ -9,11 +9,14 @@ namespace Vanilla\Knowledge\Controllers;
 
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\RequestInterface;
+use Vanilla\Controllers\SearchRootController;
 use Vanilla\Knowledge\Controllers\Pages\CategoryPage;
 use Vanilla\Knowledge\Controllers\Pages\HomePage;
 use Vanilla\Knowledge\Controllers\Pages\SitemapPage;
 use Vanilla\Knowledge\Controllers\Pages\KnowledgeBasePage;
 use Vanilla\Knowledge\Controllers\Pages\SimpleKbPage;
+use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -22,6 +25,23 @@ use Vanilla\Web\PageDispatchController;
 class KbRootController extends PageDispatchController {
 
     protected $simplePageClass = SimpleKbPage::class;
+
+    /** @var SearchRootController */
+    private $searchRootController;
+
+    /** @var ThemeFeatures */
+    private $themeFeatures;
+
+    /**
+     * DI.
+     *
+     * @param SearchRootController $searchRootController
+     * @param ThemeFeatures $themeFeatures
+     */
+    public function __construct(SearchRootController $searchRootController, ThemeFeatures $themeFeatures) {
+        $this->searchRootController = $searchRootController;
+        $this->themeFeatures = $themeFeatures;
+    }
 
     /**
      * Render out the /kb page.
@@ -34,13 +54,27 @@ class KbRootController extends PageDispatchController {
 
     /**
      * Render out the /kb/search page.
+     *
+     * @param \Gdn_Request $request
      */
-    public function get_search(): Data {
-        return $this
-            ->useSimplePage('Search')
-            ->blockRobots()
-            ->render()
-        ;
+    public function get_search(\Gdn_Request $request): Data {
+        if ($this->themeFeatures->get(SearchRootController::ENABLE_FLAG)) {
+            return new Data(
+                [],
+                [
+                    'status' => 302,
+                ],
+                [
+                    'location' => $request->url('/search?domain=knowledge')
+                ]
+            );
+        } else {
+            return $this
+                ->useSimplePage(t('Search'))
+                ->blockRobots()
+                ->render()
+            ;
+        }
     }
 
     /**
