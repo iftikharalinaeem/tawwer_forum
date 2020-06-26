@@ -165,12 +165,12 @@ class KnowledgeArticleSearchType extends AbstractSearchType {
 
         $locale = $query->getQueryParameter('locale');
         if ($locale) {
-            $query->setFilterString('locale', $locale);
+            $query->setFilter('locale', [$locale]);
         }
 
         $siteSectionGroup = $query->getQueryParameter('siteSectionGroup');
         if ($siteSectionGroup) {
-            $query->setFilterString('siteSectionGroup', $siteSectionGroup);
+            $query->setFilter('siteSectionGroup', [$siteSectionGroup]);
         }
 
         $featured = $query->getQueryParameter('featured');
