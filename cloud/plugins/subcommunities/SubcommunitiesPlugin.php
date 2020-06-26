@@ -42,6 +42,9 @@ class SubcommunitiesPlugin extends Gdn_Plugin {
 
     /// Methods ///
 
+    /**
+     * When addon it enabled.
+     */
     public function setup() {
         $this->structure();
     }

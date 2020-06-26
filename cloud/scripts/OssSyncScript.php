@@ -43,6 +43,7 @@ class OssSyncScript {
 
         // Actually different and maintained separately.
         ".circleci",
+        "README.md",
     ];
 
     /**

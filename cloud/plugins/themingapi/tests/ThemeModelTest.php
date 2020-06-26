@@ -13,7 +13,7 @@ use VanillaTests\Fixtures\MockSiteSectionProvider;
 /**
  * Class ThemeModelTests
  */
-class ThemeModelTests extends AbstractAPIv2Test {
+class ThemeModelTest extends AbstractAPIv2Test {
 
     protected static $addons = ['vanilla', 'themingapi'];
 

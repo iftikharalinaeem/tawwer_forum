@@ -19,7 +19,11 @@ class TermsManagerPlugin extends Gdn_Plugin {
 
     private $formatService;
 
+    /**
+     * Constructor.
+     */
     public function __construct() {
+        parent::__construct();
         $this->formatService = Gdn::getContainer()->get(FormatService::class);
     }
 

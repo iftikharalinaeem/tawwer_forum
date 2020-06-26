@@ -30,7 +30,7 @@ class NavigationCacheTest extends KbApiTestCase {
     /**
      * @param Container $container
      */
-    public static function configureContainer(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container) {
         $container
             ->rule(ArticleModel::class)
             ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])

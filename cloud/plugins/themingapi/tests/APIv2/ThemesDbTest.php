@@ -64,6 +64,8 @@ class ThemesDbTest extends AbstractAPIv2Test {
      * @depends testPostTheme
      */
     public function testPatchTheme() {
+        // So that our sort dates get a consistent order.
+        sleep(1);
         $response = $this->api()->patch(
             "themes/" . self::$data['newTheme']['themeID'],
             [
@@ -98,11 +100,12 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
 
-        self::$data['revisions']['initial'] = $body[0];
-        self::$data['revisions']['patched'] = $body[1];
+        // Latest inserted revisions are first.
+        self::$data['revisions']['initial'] = $body[1];
+        self::$data['revisions']['patched'] = $body[0];
 
-        $this->assertTrue($body[1]['active']);
-        $this->assertFalse($body[0]['active']);
+        $this->assertTrue($body[0]['active']);
+        $this->assertFalse($body[1]['active']);
 
         $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'], ['expand' => true]);
         $this->assertEquals(200, $response->getStatusCode());
@@ -142,8 +145,8 @@ class ThemesDbTest extends AbstractAPIv2Test {
         $body = $response->getBody();
         $this->assertEquals(2, count($body));
 
-        $this->assertTrue($body[0]['active']);
-        $this->assertFalse($body[1]['active']);
+        $this->assertTrue($body[1]['active']);
+        $this->assertFalse($body[0]['active']);
 
         $response = $this->api()->get("themes/" . self::$data['newTheme']['themeID'], ['expand' => true]);
         $this->assertEquals(200, $response->getStatusCode());

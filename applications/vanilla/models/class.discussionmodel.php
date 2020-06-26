@@ -132,6 +132,15 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
     private $userModel;
 
     /**
+     * Clear out the staticly cached values for tests.
+     */
+    public static function cleanForTests() {
+        self::$instance = null;
+        self::$discussionTypes = null;
+        self::$categoryPermissions = null;
+    }
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @param Gdn_Validation $validation The validation dependency.
@@ -401,7 +410,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 if (!$max) {
                     // Get the range for this update.
                     $dBAModel = new DBAModel();
-                    list($min, $max) = $dBAModel->primaryKeyRange('Discussion');
+                    [$min, $max] = $dBAModel->primaryKeyRange('Discussion');
 
                     if (!$from) {
                         $from = $min;
@@ -1168,7 +1177,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
                 }
             }
 
-            list($read, $count) = $this->calculateCommentReadData(
+            [$read, $count] = $this->calculateCommentReadData(
                 $discussion->CountComments,
                 $discussion->DateLastComment,
                 $discussion->CountCommentWatch,
@@ -3831,7 +3840,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             return;
         }
 
-        list($countWatch, $dateLastViewed, $op) = $this->calculateWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
+        [$countWatch, $dateLastViewed, $op] = $this->calculateWatch($discussion, $limit, $offset, $totalComments, $maxDateInserted);
 
         switch ($op) {
             case 'update':
