@@ -54,8 +54,23 @@
 
     <filter>
         <whitelist>
-            <directory suffix=".php">applications</directory>
-            <directory suffix=".php">plugins</directory>
+            <directory suffix=".php">applications/dashboard</directory>
+            <directory suffix=".php">applications/vanilla</directory>
+            <directory suffix=".php">applications/conversations</directory>
+            <directory suffix=".php">applications/groups</directory>
+
+            <directory suffix=".php">plugins/AdvancedSearch</directory>
+            <directory suffix=".php">plugins/Online</directory>
+            <directory suffix=".php">plugins/Polls</directory>
+            <directory suffix=".php">plugins/Ranks</directory>
+            <directory suffix=".php">plugins/Reactions</directory>
+            <directory suffix=".php">plugins/Sphinx</directory>
+            <directory suffix=".php">plugins/TranslationsApi</directory>
+            <directory suffix=".php">plugins/badges</directory>
+            <directory suffix=".php">plugins/ideation</directory>
+            <directory suffix=".php">plugins/subcommunities</directory>
+            <directory suffix=".php">plugins/themingapi</directory>
+            <directory suffix=".php">plugins/webhooks</directory>
             <directory suffix=".php">library</directory>
         </whitelist>
     </filter>
