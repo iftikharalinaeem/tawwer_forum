@@ -26,6 +26,11 @@
     </php>
 
     <testsuites>
+        <testsuite name="All">
+            <directory suffix="Test.php">./tests/</directory>
+            <directory suffix="Test.php">./applications/*/tests</directory>
+            <directory suffix="Test.php">./plugins/*/tests</directory>
+        </testsuite>
         <testsuite name="Library">
             <directory suffix="Test.php">./tests/Library/</directory>
         </testsuite>
