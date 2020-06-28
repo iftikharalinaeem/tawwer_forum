@@ -91,14 +91,22 @@ class SearchApiController extends AbstractApiController {
      */
     public function fullSchema(): Schema {
         if (!$this->searchResultSchema) {
+            $typeProviders = $this->searchRecordTypeProvider->getAll();
+            $recordTypes = [];
+            $types = [];
+            /** @var SearchRecordTypeInterface $provider */
+            foreach ($typeProviders as $provider) {
+                $recordTypes[] = $provider::TYPE;
+                $types[] = $provider->getApiTypeKey();
+            }
             $this->searchResultSchema = $this->schema([
                 'recordID:i' => 'The identifier of the record.',
                 'recordType:s' => [
-                    'enum' => ['discussion', 'comment'],
+                    'enum' => $recordTypes,
                     'description' => 'The main type of record.',
                 ],
                 'type:s' => [
-                    'enum' => ['discussion', 'comment'],
+                    'enum' => $types,
                     'description' => 'Sub-type of the discussion.',
                 ],
                 'discussionID:i?' => 'The id of the discussion.',
@@ -117,7 +125,7 @@ class SearchApiController extends AbstractApiController {
                 'status:s?',
                 'image:o?' => [
                     'url:s',
-                    'alt:s'
+                    'alt:s',
                 ],
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
             ], 'SearchResult');
@@ -172,7 +180,7 @@ class SearchApiController extends AbstractApiController {
         return new Data(
             $searchResults,
             [
-                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
+                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in),
             ]
         );
     }
@@ -216,7 +224,7 @@ class SearchApiController extends AbstractApiController {
                 ],
                 "knowledgeBaseID:i?" => [
                     'description' => 'Unique ID of a knowledge base. Results will be relative to this value.',
-                     'x-search-scope' => true,
+                    'x-search-scope' => true,
                 ],
                 'knowledgeCategoryIDs:a?' => [
                     'description' => 'Set the scope of the search to a specific category.',
@@ -274,11 +282,11 @@ class SearchApiController extends AbstractApiController {
                 ],
                 "locale:s?" => [
                     'description' => 'The locale articles are published in.',
-                    'x-search-scope' => true
+                    'x-search-scope' => true,
                 ],
                 'siteSectionGroup:s?' => [
                     'description' => 'The site-section-group articles are associated to',
-                    'x-search-scope' => true
+                    'x-search-scope' => true,
                 ],
                 'tags:a?' => [
                     'items' => ['type' => 'string'],
@@ -347,7 +355,7 @@ class SearchApiController extends AbstractApiController {
             $expandParams = [
                 'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
                 'excerpt' => $this->isExpandField('excerpt', $query['expand']),
-                'image' => $this->isExpandField('image', $query['expand'])
+                'image' => $this->isExpandField('image', $query['expand']),
             ];
 
             return $this->normalizeOutput(
@@ -364,7 +372,7 @@ class SearchApiController extends AbstractApiController {
         return new Data(
             $result,
             [
-                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in)
+                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in),
             ]
         );
     }
@@ -419,7 +427,7 @@ class SearchApiController extends AbstractApiController {
             'locale' => 'locale',
             'statuses' => 'statuses',
             'featured' => 'featured',
-            'siteSectionGroup' => 'siteSectionGroup'
+            'siteSectionGroup' => 'siteSectionGroup',
         ];
         $recordTypes = $this->searchRecordTypeProvider->getAll();
 

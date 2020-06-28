@@ -4,9 +4,20 @@
  * @license Proprietary
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
 use Garden\Schema\Schema;
+use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Forum\Search\CommentSearchType;
+use Vanilla\Forum\Search\DiscussionSearchType;
+use Vanilla\Knowledge\Models\KnowledgeArticleSearchType;
+use Vanilla\Knowledge\Models\SearchRecordTypeArticle;
+use Vanilla\Knowledge\Models\SearchRecordTypeArticleDeleted;
+use Vanilla\Search\GlobalSearchType;
+use Vanilla\Search\SearchService;
 use Vanilla\Site\DefaultSiteSection;
+use Vanilla\Sphinx\Search\SphinxSearchDriver;
 use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\Fixtures\MockConfig;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
@@ -28,6 +39,20 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
 
     /** @var array addons */
     protected static $addons = ['vanilla', 'translationsapi', 'sphinx', 'knowledge', 'advancedsearch'];
+
+    /**
+     * Apply some container configuration.
+     *
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        parent::configureContainerBeforeStartup($container);
+        $container
+            ->rule(SearchRecordTypeProviderInterface::class)
+            ->addCall('setType', [new SearchRecordTypeArticle()])
+            ->addCall('setType', [new SearchRecordTypeArticleDeleted()])
+        ;
+    }
 
     /**
      * Prepare knowledge base data for tests and reindex Sphinx indexes.
