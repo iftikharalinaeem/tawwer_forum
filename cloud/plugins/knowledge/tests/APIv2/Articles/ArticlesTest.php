@@ -71,6 +71,7 @@ class ArticlesTest extends AbstractResourceTest {
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
             "sourceLocale" => "en",
+            "siteSectionGroup" => 'mockSiteSectionGroup-1',
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
