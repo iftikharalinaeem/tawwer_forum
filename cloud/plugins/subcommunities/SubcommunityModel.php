@@ -270,10 +270,20 @@ class SubcommunityModel extends Gdn_Model {
         return $str;
     }
 
+    /**
+     * Clear the subcommunity cache. Particularly useful for tests.
+     */
+    public static function clearStaticCache() {
+        self::$all = null;
+    }
+
+    /**
+     * Clear the subcommunity cache.
+     */
     protected static function clearCache() {
         Gdn::cache()->remove(self::CACHE_KEY);
         Gdn::cache()->remove(self::CACHE_KEY_DEFAULTSITE);
-        self::$all = null;
+        self::clearStaticCache();
     }
 
     /**

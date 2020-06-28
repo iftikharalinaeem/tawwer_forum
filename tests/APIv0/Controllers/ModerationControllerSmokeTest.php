@@ -12,7 +12,7 @@ use VanillaTests\APIv0\BaseTest;
 /**
  * Class ModerationControllerTest: tests confirmdiscussionmoves action
  */
-class ModerationControllerTest extends BaseTest {
+class ModerationControllerSmokeTest extends BaseTest {
     const FIELDS_CHECK_LIST = [
         'CountAllDiscussions',
         'CountAllComments',

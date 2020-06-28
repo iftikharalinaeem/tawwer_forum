@@ -533,7 +533,7 @@ class KnowledgeApiController extends AbstractApiController {
         $articles = $this->articleModel->getWithRevision([
             'ar.articleRevisionID' => $iDs,
         ]);
-        $expand = $this->query['expand'];
+        $expand = $this->query['expand'] ?? [];
         $typeData = self::RECORD_TYPES[$dtype];
 
         foreach ($articles as &$articleWithRevision) {
@@ -742,6 +742,7 @@ class KnowledgeApiController extends AbstractApiController {
             $sphinxClient->setSortMode(SphinxAdapter::SORT_ATTR_DESC, 'dateFeatured');
         }
 
+
         return $sphinxClient;
     }
 
@@ -826,9 +827,10 @@ class KnowledgeApiController extends AbstractApiController {
      */
     private function filterKnowledgeBases(): array {
         $kbs = $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission([]);
+        $kbIDs = $kbs['knowledgeBaseID'] ?? [];
         $knowledgeCategories = array_column(
             $this->knowledgeCategoryModel->get(
-                ['knowledgeBaseID' => $kbs['knowledgeBaseID']],
+                ['knowledgeBaseID' => $kbIDs],
                 ['select' => ['knowledgeCategoryID']]
             ),
             'knowledgeCategoryID'

@@ -52,7 +52,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      *
      * @depends testData
      */
-    public function testSearchByyKnowledgeBaseID() {
+    public function testSearchByKnowledgeBaseID() {
         $knowledgeBase = $this->createKnowledgeBase();
         Gdn::database()->sql()->truncate('article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'unique', 'unique article');
@@ -77,7 +77,7 @@ class SphinxUnifiedSearchKBTest extends KbApiTestCase {
      *
      * @depends testData
      */
-    public function testSearchByyKnowledgeBaseIDWithName() {
+    public function testSearchByKnowledgeBaseIDWithName() {
         $knowledgeBase = $this->createKnowledgeBase();
         Gdn::database()->sql()->truncate('article');
         $this->articleRecord($knowledgeBase['rootCategoryID'], 'not unique', 'unique article');

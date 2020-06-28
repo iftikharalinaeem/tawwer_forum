@@ -8,11 +8,24 @@
  * @package TermsManager
  */
 
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\FormatService;
+
 /**
  * This plugin allows Admins to create a Terms of Service (or Code of Conduct, or Privacy Policy) that
  * users are required to agree to before connecting over SSO or creating an account.
  */
 class TermsManagerPlugin extends Gdn_Plugin {
+
+    private $formatService;
+
+    /**
+     * Constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->formatService = Gdn::getContainer()->get(FormatService::class);
+    }
 
     /**
      * Execute the structure() whenever the plugin is turned on.
@@ -350,7 +363,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
             echo wrap('<div class="DismissMessage '.$messageClass.'">'.$validationMessage.$message.' '.$anchor.'</div>', $wrapTag, ['class' => 'managed-terms-message']);
         } else {
             $termsBody = t('Terms of service body text.', val('Body', $terms));
-            $body = Gdn_Format::text($termsBody);
+            $body = $this->formatService->renderHTML($termsBody, HtmlFormat::FORMAT_KEY);
             echo wrap('<label class="inline-terms-label">'.t('Terms of Service').'</label><div class="inline-terms-body">'.$body.'</div>', $wrapTag, ['class' => 'managed-terms-row']);
         }
         echo wrap($sender->Form->checkBox('Terms', t('TermsLabel', 'By checking this box, I acknowledge I have read and understand, and agree to the forums code of conduct.'), ['value' => val('TermsOfUseID', $terms)]), $wrapTag, ['class' => 'managed-terms-checkbox-row']);
@@ -370,7 +383,7 @@ class TermsManagerPlugin extends Gdn_Plugin {
         } else {
             $termsBody = t('Terms on disabled or not configured');
         }
-        $body = Gdn_Format::text($termsBody);
+        $body = $this->formatService->renderHTML($termsBody, HtmlFormat::FORMAT_KEY);
         $sender->setData('Body', $body);
         $sender->render('terms', '', 'plugins/termsmanager');
     }

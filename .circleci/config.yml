@@ -9,6 +9,13 @@ aliases:
             command: |
                 cd ~/workspace/repo
                 ./cloud/scripts/symlink-addons
+    - &restore_yarn_cache
+        restore_cache:
+            keys:
+                # when lock file changes, use increasingly general patterns to restore cache
+                - yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
+                - yarn-packages-v1-{{ .Branch }}-
+                - yarn-packages-v1-
     - &run_yarn
         run:
             name: Install Yarn Packages
@@ -17,7 +24,11 @@ aliases:
                     cd ~/workspace/repo
                 fi
                 yarn install --pure-lockfile
-                yarn install-all
+    - &save_yarn_cache
+        save_cache:
+            paths:
+                - ~/.cache/yarn
+            key: yarn-packages-v1-{{ .Branch }}-{{ checksum "~/workspace/repo/yarn.lock" }}
     - &attach_workspace
         attach_workspace:
             at: ~/workspace
@@ -54,6 +65,42 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+    - &db_sphinx_env
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_DATABASE: vanilla_test
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    - &prepare_mysql
+        run:
+            name: Prepare MySQL
+            command: |
+                # Wait for MySQL to be fully booted.
+                dockerize -wait tcp://localhost:3306 -timeout 15s
+
+                # Create the SQL "circleci" user. Once we remove travis this should no longer be necessary.
+                mysql -h 127.0.0.1 -u root -e \
+                    "CREATE USER 'circleci'@'127.0.0.1'; GRANT ALL PRIVILEGES ON vanilla_test.* TO 'circleci'@'127.0.0.1' IDENTIFIED BY '';"
+    - &prepare_hosts
+        run:
+            name: Prepare Hosts
+            command: |
+                # Localhost redirects
+                echo 127.0.0.1 vanilla.test | sudo tee -a /etc/hosts
+                cat /etc/hosts
+executors:
+    php72-sphinx:
+        docker:
+            - image: adamcharron/vanilla-php72-mysql
+            - image: vanillaryan/sphinxsearch-vanilla-ci
+              environment: *db_sphinx_env
+            - image: mysql:5.7
+              environment: *db_sphinx_env
+    php73-sphinx:
+        docker:
+            - image: circleci/php:7.3.6-fpm-node
+            - image: vanillaryan/sphinxsearch-vanilla-ci
+              environment: *db_sphinx_env
+            - image: mysql:5.7
+              environment: *db_sphinx_env
 
 jobs:
     frontend_setup:
@@ -72,9 +119,9 @@ jobs:
                 command: |
                     cd ~/workspace/repo
                     rm -rf .git
-            # We explcitly don't cache dependencies.
-            # The cache validation & fetching seems to take longer than fetching from source.
+            - *restore_yarn_cache
             - *run_yarn
+            - *save_yarn_cache
             - persist_to_workspace:
                 root: ~/workspace
                 paths:
@@ -82,14 +129,14 @@ jobs:
                     - ci-scripts
     frontend_build:
         executor: core/node
-        resource_class: large
+        resource_class: large # 4 cores
         steps:
             - *attach_workspace
             - run:
                 name: Build Frontend
                 command: |
                     cd ~/workspace/repo
-                    yarn build
+                    NODE_OPTIONS=--max_old_space_size=7000 PARALLEL_CORES=4 yarn build
     frontend_test:
         executor: core/node
         steps:
@@ -101,11 +148,13 @@ jobs:
                     yarn test
     frontend_lint:
         executor: core/node
+        resource_class: large
         steps:
             - *attach_workspace
             - run: |
                 cd ~/workspace/repo
-                yarn lint
+                # 4 cores
+                yarn lint -w 4
                 yarn prettier --check "**/src/scripts/**/*"
     frontend_typechecker:
         executor: core/node
@@ -116,7 +165,7 @@ jobs:
                 cd ~/workspace/repo
                 yarn check-types
     php_setup:
-        executor: core/php72
+        executor: php72-sphinx
         steps:
             - run:
                 name: Versions
@@ -134,52 +183,52 @@ jobs:
                     - repo
                     - ci-scripts
     php_72_lint:
-        executor: core/php72
+        executor: php72-sphinx
         steps: &php_lint_steps
             - core/checkout
+            - *symlink_addons
             - *run_composer
             - *run_php_lint
     php_72_tests:
-        executor: core/php72
-        resource_class: large
-        steps: &php_unit_test_steps
+        executor: php72-sphinx
+        resource_class: medium
+        parallelism: 20
+        steps: &php_unit_library_test_steps
             - *attach_workspace
             - run:
                 name: Test setup
                 command: |
                     cd ~/workspace/repo
                     cp ./.circleci/scripts/templates/vanilla/conf/bootstrap.before.php ./conf/bootstrap.before.php
-            - core/prepare_php_tests
+            - *prepare_mysql
+            - *prepare_hosts
             - *prepare_coverage
             - run:
-                name: Library Tests
+                name: PHP Tests
                 command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="Library" \
-                        --log-junit ~/phpunit/library-junit.xml \
-                        --coverage-clover=library-coverage.xml
+                  cd ~/workspace/repo
+                  filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
+                  echo $filter;
+
+                  ./vendor/bin/phpunit \
+                      -c phpunit.xml.dist \
+                      --exclude-group=ignore \
+                      --log-junit ~/phpunit/php-tests-junit.xml \
+                      --coverage-clover=php-tests-coverage.xml \
+                      --filter $filter
             - run:
-                name: APIv2 Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="APIv2" \
-                        --log-junit ~/phpunit/apiv2-junit.xml \
-                        --coverage-clover=apiv2-coverage.xml
+                name: Adjust JUnit Paths
+                command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
     php_72_integration:
-        executor: core/php72
-        resource_class: large
+        executor: php72-sphinx
+        resource_class: medium
         steps: &php_integration_test_steps
             - *attach_workspace
-            - core/prepare_php_tests
+            - *prepare_mysql
+            - *prepare_hosts
             - core/prepare_nginx
             - run:
                 name: APIv0 Tests
@@ -190,35 +239,26 @@ jobs:
                         --exclude-group=ignore \
                         --testsuite="APIv0" \
                         --coverage-clover=apiv0-coverage.xml
-            - run:
-                name: Models Tests
-                command: |
-                    cd ~/workspace/repo
-                    ./vendor/bin/phpunit \
-                        -c phpunit.xml.dist \
-                        --exclude-group=ignore \
-                        --testsuite="Models" \
-                        --log-junit ~/phpunit/models-junit.xml \
-                        --coverage-clover=models-coverage.xml
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
     php_73_lint:
-        executor: core/php73
+        executor: php73-sphinx
         steps: *php_lint_steps
-    php_73_tests:
-        executor: core/php73
-        steps: *php_unit_test_steps
+    php_73_library_tests:
+        executor: php73-sphinx
+        steps: *php_unit_library_test_steps
     php_73_integration:
-        executor: core/php73
+        executor: php73-sphinx
         steps: *php_integration_test_steps
     dependency_audit:
-        executor: core/php72
+        executor: php72-sphinx
         steps:
             - core/checkout
             - run: yarn audit
     chromatic_test:
         executor: core/node
+        working_directory: ~/workspace/repo
         steps:
             - run:
                 command: |
@@ -230,12 +270,16 @@ jobs:
                     fi
                 name: "Conditionally perform Chromatic test"
             - checkout
+            - *symlink_addons
+            - *restore_yarn_cache
             - *run_yarn
+            - *save_yarn_cache
             - run:
-                command: yarn chromatic test --exit-zero-on-changes
+                command: yarn chromatic test --exit-zero-on-changes --exit-once-uploaded
                 name: Chromatic - accept all changes
     chromatic_run_accept_all:
         executor: core/node
+        working_directory: ~/workspace/repo
         steps:
             - run:
                 command: |
@@ -247,7 +291,10 @@ jobs:
                     fi
                 name: "Conditionally perform Chromatic test"
             - checkout
+            - *symlink_addons
+            - *restore_yarn_cache
             - *run_yarn
+            - *save_yarn_cache
             - run:
                 command: yarn chromatic test --auto-accept-changes
                 name: Chromatic - accept all changes
@@ -309,9 +356,6 @@ workflows:
                 requires:
                     - php_setup
             - php_72_tests:
-                requires:
-                    - php_setup
-            - php_73_tests:
                 requires:
                     - php_setup
             ## JS & browsers

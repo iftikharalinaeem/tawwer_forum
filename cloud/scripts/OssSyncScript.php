@@ -7,8 +7,6 @@
 
 namespace Vanilla\Cloud\Scripts;
 
-use Vanilla\Scripts\PathsAndBranches;
-
 /**
  * Script for syncing vanilla/vanilla-cloud to vanilla/vanilla.
  */
@@ -45,6 +43,7 @@ class OssSyncScript {
 
         // Actually different and maintained separately.
         ".circleci",
+        "README.md",
     ];
 
     /**
@@ -102,7 +101,7 @@ class OssSyncScript {
      * Ensure that our remote origin for vanilla/vanilla is created.
      */
     private function ensureOriginCreated() {
-        $OSS_ORIGIN = PathsAndBranches::OSS_ORIGIN;
+        $OSS_ORIGIN = self::OSS_ORIGIN;
         $this->logger->title("Validating Git Origins");
 
         $existingOrigins = shell_exec("git remote -v");
@@ -153,11 +152,11 @@ class OssSyncScript {
         $this->shellOrFail("git pull");
         $this->gitIntegrityCheck();
 
-        $paths = scandir(PathsAndBranches::getRootDir());
+        $paths = scandir($this->getRootDir());
         $allowedPaths = [];
         $excludedPaths = [];
         foreach ($paths as $path) {
-            if (!in_array($path, PathsAndBranches::DISALLOWED_PATHS)) {
+            if (!in_array($path, self::SYNC_EXCLUDE_LIST)) {
                 $allowedPaths[] = $path;
             } elseif ($path !== "." && $path !== "..") {
                 $excludedPaths[] = $path;

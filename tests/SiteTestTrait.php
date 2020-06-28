@@ -87,12 +87,11 @@ trait SiteTestTrait {
     }
 
     /**
-     * Configure the container immediately after creation.
+     * Configure the container before addons are started.
      *
      * @param Container $container
      */
-    public static function configureContainer(Container $container) {
-        // Default trait has no extra configuration here.
+    public static function configureContainerBeforeStartup(Container $container) {
         return;
     }
 
@@ -104,7 +103,7 @@ trait SiteTestTrait {
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
-        static::configureContainer($dic);
+        static::configureContainerBeforeStartup($dic);
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);

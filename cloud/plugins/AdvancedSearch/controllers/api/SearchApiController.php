@@ -294,6 +294,7 @@ class SearchApiController extends AbstractApiController {
                 "sort:s?" => [
                     "description" => "Sort option to order search results.",
                     "enum" => [
+                        "relevance",
                         "name",
                         "-name",
                         "dateInserted",
@@ -375,6 +376,7 @@ class SearchApiController extends AbstractApiController {
      */
     private function getCommonIndexSchema(): Schema {
         return Schema::parse([
+
             'page:i?' => [
                 'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
                 'default' => 1,

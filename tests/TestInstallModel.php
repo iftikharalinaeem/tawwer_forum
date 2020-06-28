@@ -220,6 +220,13 @@ class TestInstallModel extends InstallModel {
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
 
+        if (class_exists(\DiscussionModel::class)) {
+            \DiscussionModel::cleanForTests();
+        }
+
+        if (class_exists(\SubcommunityModel::class)) {
+            \SubcommunityModel::clearStaticCache();
+        }
         // Clear all database related objects from the container.
 
     }
