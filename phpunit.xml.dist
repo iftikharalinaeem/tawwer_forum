@@ -53,7 +53,7 @@
     </testsuites>
 
     <filter>
-        <whitelist addUncoveredFilesFromWhitelist="false">
+        <whitelist>
             <directory suffix=".php">applications/conversations</directory>
             <directory suffix=".php">applications/dashboard</directory>
             <directory suffix=".php">applications/vanilla</directory>
