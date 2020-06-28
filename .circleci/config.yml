@@ -210,13 +210,13 @@ jobs:
                   filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
                   echo $filter;
 
-                  ./vendor/bin/phpunit \
-                      -qrr \
-                      -c phpunit.xml.dist \
-                      --exclude-group=ignore \
-                      --log-junit ~/phpunit/php-tests-junit.xml \
-                      --coverage-clover=php-tests-coverage.xml \
-                      --filter $filter
+                  phpdbg -qrr \
+                    ./vendor/bin/phpunit \
+                    -c phpunit.xml.dist \
+                    --exclude-group=ignore \
+                    --log-junit ~/phpunit/php-tests-junit.xml \
+                    --coverage-clover=php-tests-coverage.xml \
+                    --filter $filter
             - run:
                 name: Adjust JUnit Paths
                 command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
