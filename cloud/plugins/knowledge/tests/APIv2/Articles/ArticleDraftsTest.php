@@ -9,6 +9,7 @@ namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\NotFoundException;
+use VanillaTests\APIv2\AbstractResourceTest;
 
 /**
  * Test the /api/v2/articles/drafts endpoint.

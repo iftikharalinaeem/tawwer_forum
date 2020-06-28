@@ -12,6 +12,7 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**

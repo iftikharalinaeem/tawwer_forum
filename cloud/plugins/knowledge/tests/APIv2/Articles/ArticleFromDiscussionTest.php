@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Knowledge\APIv2\Articles;
 
+use VanillaTests\APIv2\AbstractAPIv2Test;
+
 /**
  * Test translating community data into a format that can easily be used to create knowledge base data.
  */
