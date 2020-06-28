@@ -211,6 +211,7 @@ jobs:
                   echo $filter;
 
                   ./vendor/bin/phpunit \
+                      -qrr \
                       -c phpunit.xml.dist \
                       --exclude-group=ignore \
                       --log-junit ~/phpunit/php-tests-junit.xml \
