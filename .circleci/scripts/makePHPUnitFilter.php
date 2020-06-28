@@ -27,7 +27,7 @@ foreach ($paths as $i => $path) {
     }
 }
 
-$regex = "/^(.*\\)?($regexContents)/";
+$regex = "/^(.*\\\)?($regexContents)/";
 
 // Output the regex.
 echo $regex;
