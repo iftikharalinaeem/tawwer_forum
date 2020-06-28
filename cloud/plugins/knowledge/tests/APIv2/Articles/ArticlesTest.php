@@ -145,7 +145,26 @@ class ArticlesTest extends AbstractResourceTest {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function testPatchFull() {
+        $row = $this->testGetEdit();
+        $newRow = $this->modifyRow($row);
 
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            $newRow
+        );
+        $this->assertEquals(200, $r->getStatusCode());
+        $expected = $newRow;
+        $actual = $record = $r->getBody();
+        unset($expected['dateUpdated']);
+        unset($actual['dateUpdated']);
+        $this->assertRowsEqual($expected, $actual);
+
+        return $record;
+    }
 
     /**
      * Test PATCH /resource/<id> with a a single field update.
@@ -516,28 +535,6 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row["articleID"]}",
             $record
         );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function testPatchFull() {
-        $row = $this->testGetEdit();
-        $newRow = $this->modifyRow($row);
-
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}",
-            $newRow
-        );
-
-        $this->assertEquals(200, $r->getStatusCode());
-        $expected = $newRow;
-        $actual = $record = $r->getBody();
-        unset($expected['dateUpdated']);
-        unset($actual['dateUpdated']);
-        $this->assertRowsEqual($expected, $actual);
-
-        return $record;
     }
 
     /**
