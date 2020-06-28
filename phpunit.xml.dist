@@ -54,12 +54,9 @@
 
     <filter>
         <whitelist>
-            <directory suffix=".php">applications/conversations</directory>
-            <directory suffix=".php">applications/dashboard</directory>
-            <directory suffix=".php">applications/vanilla</directory>
-
+            <directory suffix=".php">applications</directory>
+            <directory suffix=".php">plugins</directory>
             <directory suffix=".php">library</directory>
-
         </whitelist>
     </filter>
 </phpunit>
