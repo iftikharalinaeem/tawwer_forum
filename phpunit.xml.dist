@@ -68,6 +68,7 @@
             <directory suffix=".php">plugins/TranslationsApi</directory>
             <directory suffix=".php">plugins/badges</directory>
             <directory suffix=".php">plugins/ideation</directory>
+            <directory suffix=".php">plugins/knowledge</directory>
             <directory suffix=".php">plugins/subcommunities</directory>
             <directory suffix=".php">plugins/themingapi</directory>
             <directory suffix=".php">plugins/webhooks</directory>
