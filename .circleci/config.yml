@@ -8,7 +8,7 @@ aliases:
             name: Symlink addons
             command: |
                 cd ~/workspace/repo
-                ./cloud/scripts/symlink-addons
+                ./cloud/scripts/copy-addons-test
     - &restore_yarn_cache
         restore_cache:
             keys:
