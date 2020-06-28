@@ -224,7 +224,7 @@ jobs:
                 command: |
                   # CodeCov requires file paths be resolved.
                   cd ~/workspace/repo
-                  php ./circleci/scripts/resolveCloverPaths.php ./php-tests-coverage.xml
+                  php ./.circleci/scripts/resolveCloverPaths.php ./php-tests-coverage.xml
 
                   echo "====== Resolved files ====="
                   grep "<file" ./php-tests-coverage.xml
