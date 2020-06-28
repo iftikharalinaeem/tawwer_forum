@@ -1,10 +1,11 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\Formats\RichFormat;
@@ -74,7 +75,7 @@ class ArticleRevisionsTest extends KbApiTestCase {
 
         /** @var ArticleRevisionModel $articleRevisionModel */
         $articleRevisionModel = self::container()->get(ArticleRevisionModel::class);
-        
+
         // Change body text and set the rendered content to null, to see if the rerender works.
         $newBody = json_encode([["insert" => "Some brand new text"]]);
 

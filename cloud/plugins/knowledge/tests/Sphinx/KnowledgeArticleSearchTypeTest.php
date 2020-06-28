@@ -26,6 +26,7 @@ class KnowledgeArticleSearchTypeTest extends SphinxUnifiedSearchKBTest {
      * @param Container $container
      */
     public static function configureContainerBeforeStartup(Container $container) {
+        parent::configureContainerBeforeStartup($container);
         $container
             ->rule(SearchService::class)
             ->addCall('registerActiveDriver', [new Reference(SphinxSearchDriver::class)])
@@ -34,7 +35,6 @@ class KnowledgeArticleSearchTypeTest extends SphinxUnifiedSearchKBTest {
             ->addCall('registerSearchType', [new Reference(DiscussionSearchType::class)])
             ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
             ->addCall('registerSearchType', [new Reference(CommentSearchType::class)])
-
         ;
     }
 

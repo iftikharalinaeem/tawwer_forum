@@ -191,9 +191,9 @@ jobs:
             - *run_php_lint
     php_72_tests:
         executor: php72-sphinx
-        resource_class: medium
+        resource_class: small
         parallelism: 20
-        steps: &php_unit_library_test_steps
+        steps: &php_unit_test_steps
             - *attach_workspace
             - run:
                 name: Test setup
@@ -220,10 +220,14 @@ jobs:
                 name: Adjust JUnit Paths
                 command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
             - run:
-                name: Check clover paths
+                name: Fix Clover Paths
                 command: |
+                  # CodeCov requires file paths be resolved.
                   cd ~/workspace/repo
-                  cat ./php-tests-coverage.xml
+                  php ./.circleci/scripts/resolveCloverPaths.php ./php-tests-coverage.xml
+
+                  echo "====== Resolved files ====="
+                  grep "<file" ./php-tests-coverage.xml
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
@@ -250,9 +254,9 @@ jobs:
     php_73_lint:
         executor: php73-sphinx
         steps: *php_lint_steps
-    php_73_library_tests:
+    php_73_tests:
         executor: php73-sphinx
-        steps: *php_unit_library_test_steps
+        steps: *php_unit_test_steps
     php_73_integration:
         executor: php73-sphinx
         steps: *php_integration_test_steps
@@ -363,6 +367,9 @@ workflows:
             - php_72_tests:
                 requires:
                     - php_setup
+            - php_73_tests:
+                requires:
+                  - php_setup
             ## JS & browsers
             - frontend_setup
             - frontend_lint:

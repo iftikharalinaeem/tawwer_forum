@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 

@@ -1,28 +1,31 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use Vanilla\Database\Operation;
-use Vanilla\Formatting\FormatCompatibilityService;
 use Vanilla\Knowledge\Controllers\Api\ArticlesApiController;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Models\ReactionModel;
 use Vanilla\ReCaptchaVerification;
+use VanillaTests\APIv2\AbstractResourceTest;
+use VanillaTests\Knowledge\Utils\KbApiTestTrait;
 
 /**
  * Test the /api/v2/articles endpoint.
  */
 class ArticlesTest extends AbstractResourceTest {
+
+    use KbApiTestTrait;
 
     /** @var int */
     private static $knowledgeBaseID;
@@ -32,9 +35,6 @@ class ArticlesTest extends AbstractResourceTest {
 
     /** @var string The resource route. */
     protected $baseUrl = "/articles";
-
-    /** @var SiteSectionProviderInterface*/
-    private static $siteSectionProvider;
 
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
@@ -71,6 +71,7 @@ class ArticlesTest extends AbstractResourceTest {
             "description" => "Basic knowledge base for testing.",
             "urlCode" => strtolower(substr(strrchr(__CLASS__, "\\"), 1)),
             "sourceLocale" => "en",
+            "siteSectionGroup" => 'mockSiteSectionGroup-1',
         ]);
 
         /** @var KnowledgeCategoryModel $knowledgeCategoryModel */
@@ -106,11 +107,10 @@ class ArticlesTest extends AbstractResourceTest {
      * @return array
      */
     public function providePatchStatusData(): array {
-        // PHPUnit has issues with auto-loading the ArticleModel class for the status constants when data providers are invoked.
         return [
-            ["deleted"], // ArticleModel::STATUS_DELETED
-            ["published"], // ArticleModel::STATUS_PUBLISHED
-            ["undeleted"], // ArticleModel::STATUS_UNDELETED
+            [ArticleModel::STATUS_DELETED], // ArticleModel::STATUS_DELETED
+            [ArticleModel::STATUS_PUBLISHED], // ArticleModel::STATUS_PUBLISHED
+            [ArticleModel::STATUS_UNDELETED], // ArticleModel::STATUS_UNDELETED
         ];
     }
 
@@ -135,30 +135,6 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Create new knowledge base.
-     *
-     * @return array Knowledge base
-     */
-    public function newKnowledgeBase(): array {
-        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
-        $record = [
-            'name' => 'Test Knowledge Base',
-            'description' => 'Test Knowledge Base ' . $salt,
-            'viewType' => 'guide',
-            'icon' => '',
-            'bannerImage' => '',
-            'sortArticles' => 'manual',
-            'sourceLocale' => 'en',
-            'urlCode' => 'test-knowledge-base' . $salt,
-            "siteSectionGroup" => "mockSiteSectionGroup-1",
-        ];
-        $kb = $this->api()
-            ->post('/knowledge-bases', $record)
-            ->getBody();
-        return $kb;
-    }
-
-    /**
      * Test DELETE /articles/<id>.
      */
     public function testDelete() {
@@ -170,45 +146,25 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test GET /articles/<id> when knowledge base has status "deleted"
+     * @inheritdoc
      */
-    public function testGetDeleted() {
-        $article = $this->prepareDeletedKnowledgeBase();
+    public function testPatchFull() {
+        $row = $this->testGetEdit();
+        $newRow = $this->modifyRow($row);
 
-        $this->expectException(NotFoundException::class);
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$article[$this->pk]}"
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            $newRow
         );
-    }
 
-    /**
-     * Test POST /articles when knowledge base has status "deleted"
-     */
-    public function testPostDeleted() {
-        $kb = $this->newKnowledgeBase();
-        $record = $this->record();
-        $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
+        $this->assertEquals(200, $r->getStatusCode());
+        $expected = $newRow;
+        $actual = $record = $r->getBody();
+        unset($expected['dateUpdated']);
+        unset($actual['dateUpdated']);
+        $this->assertRowsEqual($expected, $actual);
 
-        $this->api()->patch(
-            "/knowledge-bases/{$kb['knowledgeBaseID']}",
-            ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
-        $this->expectException(NotFoundException::class);
-        $article = $this->testPost($record);
-    }
-
-    /**
-     * Test GET /articles/<id>/edit when knowledge base has status "deleted"
-     */
-    public function testGetEditDeleted() {
-        $article = $this->prepareDeletedKnowledgeBase();
-
-        $this->expectException(NotFoundException::class);
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$article[$this->pk]}/edit"
-        );
+        return $record;
     }
 
     /**
@@ -371,32 +327,6 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test PATCH /articles/<id> when knowledge base has status "deleted".
-     */
-    public function testPatchDeleted() {
-        $article = $this->prepareDeletedKnowledgeBase();
-
-        $this->expectException(NotFoundException::class);
-        $this->api()->patch(
-            "{$this->baseUrl}/{$article[$this->pk]}",
-            ['name' => 'Patched test article']
-        );
-    }
-
-    /**
-     * Test PUT /articles/<id>/react when knowledge base has status "deleted".
-     */
-    public function testPutReactHelpfulDeleted() {
-        $article = $this->prepareDeletedKnowledgeBase();
-
-        $this->expectException(NotFoundException::class);
-        $this->api()->put(
-            "{$this->baseUrl}/{$article[$this->pk]}/react",
-            ['helpful' => 'yes']
-        );
-    }
-
-    /**
      * Test PUT /articles/<id>/react.
      */
     public function testPutReactHelpful() {
@@ -465,38 +395,6 @@ class ArticlesTest extends AbstractResourceTest {
             '/discussions/' . $discussion['discussionID']
         )->getBody();
         $this->assertStringEndsWith($article['url'], $discussionUpdated['canonicalUrl']);
-    }
-
-    /**
-     * Test PATCH /articles/<id>/status when knowledge base has status "deleted".
-     */
-    public function testPatchStatusDeleted() {
-        $article = $this->prepareDeletedKnowledgeBase();
-
-        $this->expectException(NotFoundException::class);
-        $this->api()->patch(
-            "{$this->baseUrl}/{$article[$this->pk]}/status",
-            ['status' => 'deleted']
-        );
-    }
-
-    /**
-     * Prepare knowledge with status "deleted", root category and article
-     *
-     * @return array Record-array of "draft" or "article"
-     */
-    private function prepareDeletedKnowledgeBase() {
-        $kb = $this->newKnowledgeBase();
-        $record = $this->record();
-        $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
-        $article = $this->testPost($record);
-
-        $this->api()->patch(
-            "/knowledge-bases/{$kb['knowledgeBaseID']}",
-            ['status' => KnowledgeBaseModel::STATUS_DELETED]
-        );
-
-        return $article;
     }
 
     /**
@@ -573,7 +471,7 @@ class ArticlesTest extends AbstractResourceTest {
      * Test getting history of article revisions.
      */
     public function testGetRevisions() {
-        $kb = $this->newKnowledgeBase();
+        $kb = $this->createKnowledgeBase();
         $record = $this->record();
         $record['knowledgeCategoryID'] = $kb['rootCategoryID'];
         $article = $this->testPost($record);
@@ -588,8 +486,9 @@ class ArticlesTest extends AbstractResourceTest {
         $this->assertEquals(ArticleModel::STATUS_PUBLISHED, $originalResponseBody[0]["status"]);
         $this->assertEquals($article["name"], $originalResponseBody[0]["name"]);
 
+        $revisionChangeCount = 3;
         // Add five new revisions.
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= $revisionChangeCount; $i++) {
             $latest = ["name" => __FUNCTION__ . " {$i}"] + $article;
             $this->api()->patch("{$this->baseUrl}/{$articleID}", $latest);
         }
@@ -599,7 +498,7 @@ class ArticlesTest extends AbstractResourceTest {
         $responseBody = $response->getBody();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertIsArray($responseBody);
-        $this->assertCount(6, $responseBody);
+        $this->assertCount($revisionChangeCount + 1, $responseBody);
 
         // Verify there is one, and only one, published revision and that it is the latest revision.
         $published = null;
@@ -625,341 +524,6 @@ class ArticlesTest extends AbstractResourceTest {
     }
 
     /**
-     * Test GET /articles/{ID}/translations
-     */
-    public function testGetArticleTranslations() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $record = $this->record();
-        $article = $this->testPost($record);
-        $articleID = $article["articleID"];
-
-        $response = $this->api()->get("{$this->baseUrl}/{$articleID}/translations");
-        $articleTranslations = $response->getBody();
-
-        $this->assertCount(4, $articleTranslations);
-        $this->assertEquals("up-to-date", $articleTranslations[0]["translationStatus"]);
-        $this->assertEquals("en", $articleTranslations[0]["locale"]);
-    }
-
-    /**
-     * Test posting article in a locale that is supported.
-     *
-     */
-    public function testPostArticleInSupportedLocale() {
-        /** @var KnowledgeBaseModel $knowledgeBaseModel */
-        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
-        $kb = $knowledgeBaseModel->get(["knowledgeBaseID" => self::$knowledgeBaseID]);
-        $kb = reset($kb);
-
-        $record = $this->record();
-        $record["locale"] = "en";
-
-        $response = $this->api()->post($this->baseUrl, $record);
-        $article = $response->getBody();
-
-        $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals($kb["sourceLocale"], $article["locale"]);
-    }
-
-    /**
-     * Test posting article in a locale that isn't supported.
-     */
-    public function testPostArticleInNotSupportedLocale() {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage('Articles must be created in en locale.');
-
-        /** @var KnowledgeBaseModel $knowledgeBaseModel */
-        $knowledgeBaseModel = self::container()->get(KnowledgeBaseModel::class);
-        $kb = $knowledgeBaseModel->get(["knowledgeBaseID" => self::$knowledgeBaseID]);
-        $kb = reset($kb);
-        $this->assertEquals("en", $kb["sourceLocale"]);
-
-        $record = $this->record();
-        $record["locale"] = "ru";
-
-        $this->api()->post($this->baseUrl, $record);
-    }
-
-    /**
-     * Test posting article in a locale that is supported.
-     */
-    public function testPatchArticleInSupportedLocale() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $record = $this->record();
-        $record["locale"] = "en";
-
-        $response = $this->api()->post($this->baseUrl, $record);
-        $article = $response->getBody();
-
-        $record = [
-            "body" => "Translated article body",
-            "format" => "markdown",
-            "knowledgeCategoryID" => self::$knowledgeCategoryID,
-            "locale" => "ru",
-            "name" => "Translated Example Article",
-            "sort" => 1,
-        ];
-
-        $response = $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
-        $this->assertEquals(200, $response->getStatusCode());
-
-        $response = $this->api()->get($this->baseUrl."/".$article["articleID"]."/revisions");
-        $revisions =  $response->getBody();
-        $locales = array_column($revisions, "locale");
-        $status = array_column($revisions, "status");
-
-        $this->assertEquals(2, count($revisions));
-        $this->assertContains("en", $locales);
-        $this->assertContains("ru", $locales);
-        $this->assertEquals(["published","published"], $status);
-    }
-
-    /**
-     * Test posting article in a locale that is supported.
-     *
-     */
-    public function testPatchArticleInNotSupportedLocale() {
-        $this->expectException(ClientException::class);
-        $this->expectExceptionMessage("Locale xx not supported in this Knowledge-Base");
-
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $record = $this->record();
-        $record["locale"] = "en";
-
-        $response = $this->api()->post($this->baseUrl, $record);
-        $article = $response->getBody();
-
-        $record = [
-            "body" => "Translated article body",
-            "format" => "markdown",
-            "knowledgeCategoryID" => self::$knowledgeCategoryID,
-            "locale" => "xx",
-            "name" => "Translated Example Article",
-            "sort" => 1,
-        ];
-        $this->api()->patch($this->baseUrl."/".$article["articleID"], $record);
-    }
-
-    /**
-     * Test GET /articles when filtering with locale without fallback articles.
-     */
-    public function testGetArticlesFilterByLocaleOnlyTranslated() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $this->createMultipleArticles();
-        $response = $this->api()->get(
-            $this->baseUrl,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "fr",
-                "only-translated" => true,
-            ]
-        );
-        $articles = $response->getBody();
-        $this->assertEquals(6, count($articles));
-
-        $response = $this->api()->get($this->baseUrl, ["knowledgeCategoryID" => self::$knowledgeCategoryID, "locale" => "en"]);
-        $articles = $response->getBody();
-        $this->assertEquals(24, count($articles));
-    }
-
-    /**
-     * Test GET /articles when filtering locale with fallback articles.
-     */
-    public function testGetArticlesFilterByLocale() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $this->createArticleWithRevisions(["ru"]);
-
-        $response = $this->api()->get(
-            $this->baseUrl,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "ru"
-            ]
-        );
-        $article = $response->getBody();
-        $locales = array_count_values(array_column($article, "locale"));
-
-        $this->assertEquals(25, count($article));
-        $this->assertEquals(2, $locales["ru"]);
-        $this->assertEquals(23, $locales["en"]);
-    }
-
-    /**
-     * @depends testGetArticlesFilterByLocale
-     *
-     * Test GET /articles when filtering with locale providing only translated articles.
-     */
-    public function testGetArticleFilterByLocaleOnlyTranslated() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $response = $this->api()->get(
-            $this->baseUrl,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "ru",
-                "only-translated" => true,
-            ]
-        );
-
-        $article = $response->getBody();
-        $this->assertEquals(2, count($article));
-    }
-    /**
-     * Test Get /articles/{ID} filtered by locale providing fallback article.
-     */
-    public function testGetArticleFilterByIDAndLocaleFallback() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            [
-                'siteSectionGroup' => 'mockSiteSectionGroup-1'
-            ]
-        );
-
-        $articleID = $this->createArticleWithRevisions(["es"]);
-
-        $response = $this->api()->get(
-            $this->baseUrl.'/'.$articleID,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "fr",
-                "only-translated" => false,
-            ]
-        );
-
-        $article = $response->getBody();
-        $this->assertEquals("en", $article["locale"]);
-        $this->assertEquals($articleID, $article["articleID"]);
-    }
-
-    /**
-     * Test Get /articles/{ID} filtered by locale providing translated article.
-     */
-    public function testGetArticleFilterByIDAndLocaleTranslated() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            [
-                'siteSectionGroup' => 'mockSiteSectionGroup-1'
-            ]
-        );
-
-        $articleID = $this->createArticleWithRevisions(["es"]);
-
-        $response = $this->api()->get(
-            $this->baseUrl.'/'.$articleID,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "es",
-                "only-translated" => true,
-            ]
-        );
-
-        $article = $response->getBody();
-        $this->assertEquals("es", $article["locale"]);
-        $this->assertEquals($articleID, $article["articleID"]);
-    }
-
-    /**
-     * Test Get /articles/{ID} filtered by locale with no translated article found.
-     */
-    public function testGetArticleFilterByIDAndLocaleNoTranslation() {
-        $this->expectException(ClientException::class);
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            [
-                'siteSectionGroup' => 'mockSiteSectionGroup-1'
-            ]
-        );
-
-        $articleID = $this->createArticleWithRevisions(["es"]);
-
-        $response = $this->api()->get(
-            $this->baseUrl.'/'.$articleID,
-            [
-                "knowledgeCategoryID" => self::$knowledgeCategoryID,
-                "locale" => "fr",
-                "only-translated" => true,
-            ]
-        );
-    }
-
-    /**
-     * Test translations-statuses are set correctly from POST & PATCH /articles.
-     */
-    public function testTranslationsStatuses() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $articleID = $this->createArticleWithRevisions(["es","ru"]);
-        $response = $this->api()->get($this->baseUrl."/".$articleID."/revisions");
-        $revisions = $response->getBody();
-        $translationsStatuses = array_column($revisions, "translationStatus");
-        $translationsStatuses = array_unique($translationsStatuses);
-        
-        $this->assertEquals(3, count($revisions));
-        $this->assertEquals(1, count($translationsStatuses));
-        $this->assertEquals("up-to-date", $translationsStatuses[0]);
-    }
-
-    /**
-     * Test PUT /articles/{ID}/invalidate-translations.
-     */
-    public function testInvalidatingTranslations() {
-        $this->api()->patch(
-            '/knowledge-bases/' . self::$knowledgeCategoryID,
-            ['siteSectionGroup' => 'mockSiteSectionGroup-1']
-        );
-
-        $articleID = $this->createArticleWithRevisions(["es","ru"]);
-        $response = $this->api()->put($this->baseUrl."/".$articleID."/invalidate-translations");
-
-        $revisions = $response->getBody();
-        $translationStatuses = array_column($revisions, "translationStatus", "locale");
-        
-        $this->assertEquals("up-to-date", $translationStatuses["en"]);
-        $this->assertEquals("out-of-date", $translationStatuses["es"]);
-        $this->assertEquals("out-of-date", $translationStatuses["ru"]);
-    }
-
-    /**
-     * Create multiple articles with some a revision in a different locale.
-     */
-    private function createMultipleArticles() {
-        for ($i = 1; $i <= 5; $i++) {
-            $record = $this->record();
-            $record["locale"] = "en";
-            $response = $this->api()->post($this->baseUrl, $record);
-            $article = $response->getBody();
-            $record["locale"] = "fr";
-            $this->api()->patch($this->baseUrl . "/" . $article["articleID"], $record);
-        }
-    }
-
-    /**
      * Create a revision in a locale.
      *
      * @param array $row
@@ -972,48 +536,6 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row["articleID"]}",
             $record
         );
-    }
-
-    /**
-     * Create an article with a revision.
-     *
-     * @param array $locales
-     * @return int
-     */
-    private function createArticleWithRevisions(array $locales = ["fr"]): int {
-        $record = $this->record();
-        $record["locale"] = "en";
-        $response = $this->api()->post($this->baseUrl, $record);
-        $article = $response->getBody();
-
-        foreach ($locales as $locale) {
-            $record["locale"] = $locale;
-            $this->api()->patch($this->baseUrl . "/" . $article["articleID"], $record);
-        }
-
-        return  $article["articleID"];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function testPatchFull() {
-        $row = $this->testGetEdit();
-        $newRow = $this->modifyRow($row);
-
-        $r = $this->api()->patch(
-            "{$this->baseUrl}/{$row[$this->pk]}",
-            $newRow
-        );
-
-        $this->assertEquals(200, $r->getStatusCode());
-        $expected = $newRow;
-        $actual = $record = $r->getBody();
-        unset($expected['dateUpdated']);
-        unset($actual['dateUpdated']);
-        $this->assertRowsEqual($expected, $actual);
-
-        return $record;
     }
 
     /**

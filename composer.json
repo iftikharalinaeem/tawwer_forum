@@ -79,7 +79,8 @@
         "mikey179/vfsstream": "~1.6",
         "phing/phing": "2.*",
         "roave/security-advisories": "dev-master",
-        "nette/robot-loader": "^3.2"
+        "nette/robot-loader": "^3.2",
+        "johnkary/phpunit-speedtrap": "^3.2"
     },
     "provide": {
         "ext-gd": "*"
