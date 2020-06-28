@@ -219,6 +219,11 @@ jobs:
             - run:
                 name: Adjust JUnit Paths
                 command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
+            - run:
+                name: Check clover paths
+                command: |
+                  cd ~/workspace/repo
+                  cat ./php-tests-coverage.xml
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
