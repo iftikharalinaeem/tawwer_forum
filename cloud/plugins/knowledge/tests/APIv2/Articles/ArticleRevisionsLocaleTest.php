@@ -1,10 +1,11 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Knowledge\Models\ArticleModel;
