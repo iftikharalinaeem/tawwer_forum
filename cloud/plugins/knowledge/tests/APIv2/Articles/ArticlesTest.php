@@ -156,6 +156,7 @@ class ArticlesTest extends AbstractResourceTest {
             "{$this->baseUrl}/{$row[$this->pk]}",
             $newRow
         );
+
         $this->assertEquals(200, $r->getStatusCode());
         $expected = $newRow;
         $actual = $record = $r->getBody();
