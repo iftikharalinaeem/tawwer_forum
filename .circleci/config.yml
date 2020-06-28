@@ -220,10 +220,14 @@ jobs:
                 name: Adjust JUnit Paths
                 command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"
             - run:
-                name: Check clover paths
+                name: Fix Clover Paths
                 command: |
+                  # CodeCov requires file paths be resolved.
                   cd ~/workspace/repo
-                  cat ./php-tests-coverage.xml
+                  php ./circleci/scripts/resolveCloverPaths.php ./php-tests-coverage.xml
+
+                  echo "====== Resolved files ====="
+                  grep "<file" ./php-tests-coverage.xml
             - *upload_coverage
             - store_test_results:
                 path: ~/phpunit
