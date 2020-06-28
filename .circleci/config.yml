@@ -191,8 +191,8 @@ jobs:
             - *run_php_lint
     php_72_tests:
         executor: php72-sphinx
-        resource_class: small
-        parallelism: 20
+        resource_class: medium
+        parallelism: 12
         steps: &php_unit_test_steps
             - *attach_workspace
             - run:
