@@ -58,7 +58,10 @@
     </testsuites>
 
     <filter>
-        <whitelist>
+        <!-- Setting this to true would give us "truer" coverage, but it causes all kinds of issues with actual coverage reporting -->
+        <!-- This is because of how we parallelize and split out tests. -->
+        <!-- If you want to see real coverage locally, I recommend setting this to true. -->
+        <whitelist addUncoveredFilesFromWhitelist="false">
             <directory suffix=".php">applications/dashboard</directory>
             <directory suffix=".php">applications/vanilla</directory>
             <directory suffix=".php">applications/conversations</directory>
@@ -78,6 +81,27 @@
             <directory suffix=".php">plugins/themingapi</directory>
             <directory suffix=".php">plugins/webhooks</directory>
             <directory suffix=".php">library</directory>
+            <exclude>
+                <directory suffix=".php">applications/dashboard/views</directory>
+                <directory suffix=".php">applications/vanilla/views</directory>
+                <directory suffix=".php">applications/conversations/views</directory>
+                <directory suffix=".php">applications/groups/views</directory>
+
+                <directory suffix=".php">plugins/AdvancedSearch/views</directory>
+                <directory suffix=".php">plugins/Online/views</directory>
+                <directory suffix=".php">plugins/Polls/views</directory>
+                <directory suffix=".php">plugins/Ranks/views</directory>
+                <directory suffix=".php">plugins/Reactions/views</directory>
+                <directory suffix=".php">plugins/Sphinx/views</directory>
+                <directory suffix=".php">plugins/TranslationsApi/views</directory>
+                <directory suffix=".php">plugins/badges/views</directory>
+                <directory suffix=".php">plugins/ideation/views</directory>
+                <directory suffix=".php">plugins/knowledge/views</directory>
+                <directory suffix=".php">plugins/subcommunities/views</directory>
+                <directory suffix=".php">plugins/themingapi/views</directory>
+                <directory suffix=".php">plugins/webhooks/views</directory>
+                <directory suffix=".php">library/deprecated</directory>
+            </exclude>
         </whitelist>
     </filter>
     <listeners>
