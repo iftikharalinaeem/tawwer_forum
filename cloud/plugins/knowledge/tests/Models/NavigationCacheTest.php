@@ -9,11 +9,13 @@ namespace VanillaTests\Knowledge\Models;
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\KnowledgeStructure;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
 use Vanilla\Knowledge\Models\NavigationCacheProcessor;
 use Vanilla\Site\TranslationModel;
 use Vanilla\TranslationsApi\Models\TranslationPropertyModel;
@@ -31,6 +33,8 @@ class NavigationCacheTest extends KbApiTestCase {
      * @param Container $container
      */
     public static function configureContainerBeforeStartup(Container $container) {
+        $container->rule(TranslationProviderInterface::class)
+            ->addCall('initializeResource', [new Reference(KnowledgeTranslationResource::class)]);
         $container
             ->rule(ArticleModel::class)
             ->addCall('addPipelineProcessor', [new Reference(NavigationCacheProcessor::class)])

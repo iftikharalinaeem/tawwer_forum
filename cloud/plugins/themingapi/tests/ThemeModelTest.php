@@ -4,8 +4,11 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\ThemingApi\DbThemeProvider;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSiteSection;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
@@ -35,6 +38,13 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * @var ThemeService
      */
     protected static $themeService;
+
+    /**
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        $container->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)]);
+    }
 
     /**
      * Setup Function function
