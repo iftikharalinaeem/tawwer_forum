@@ -12,7 +12,7 @@
     "icon": "reactions.png",
     "key": "reactions",
     "type": "addon",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/reputation/reactions/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/reputation/reactions/",
     "authors": [
         {
             "name": "Todd Burry",

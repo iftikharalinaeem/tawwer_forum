@@ -1,6 +1,6 @@
 {
-  "generator-vanilla": {
-    "preprocessor": "SCSS",
-    "buildtool": "Grunt"
-  }
+    "generator-vanilla": {
+        "preprocessor": "SCSS",
+        "buildtool": "Grunt"
+    }
 }

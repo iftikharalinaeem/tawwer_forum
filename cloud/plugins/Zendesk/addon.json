@@ -1,7 +1,7 @@
 {
     "name": "Zendesk",
     "description": "Allow staff users to create tickets and cases from discussions and comments.",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/addons/zendesk/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/zendesk/",
     "version": "1.0.2",
     "settingsUrl": "/plugin/zendesk",
     "settingsPermission": "Garden.Settings.Manage",

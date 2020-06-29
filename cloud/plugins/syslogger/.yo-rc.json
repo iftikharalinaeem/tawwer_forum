@@ -1,5 +1,5 @@
 {
-  "generator-vanilla": {
-    "type": "Plugin"
-  }
+    "generator-vanilla": {
+        "type": "Plugin"
+    }
 }
