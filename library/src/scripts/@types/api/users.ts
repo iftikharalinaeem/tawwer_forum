@@ -8,6 +8,7 @@ export interface IUserFragment {
     name: string;
     photoUrl: string;
     dateLastActive: string | null;
+    dateJoined?: string | null;
     label?: string | null;
 }
 
