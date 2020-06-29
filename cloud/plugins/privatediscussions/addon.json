@@ -12,14 +12,14 @@
             "email": "isis.g@vanillaforums.com"
         },
         {
-          "name": "Dani M",
-          "email": "dani.m@vanillaforums.com"
+            "name": "Dani M",
+            "email": "dani.m@vanillaforums.com"
         }
     ],
     "settingsUrl": "/settings/privatediscussions",
     "settingsPermission": "Garden.Settings.Manage",
     "build": {
-      "process": "v1"
+        "process": "v1"
     },
     "require": {
         "vanilla": ">=4.0"

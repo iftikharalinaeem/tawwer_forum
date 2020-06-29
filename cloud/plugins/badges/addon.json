@@ -14,7 +14,7 @@
     "settingsPermission": "Garden.Settings.Manage",
     "key": "badges",
     "type": "addon",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/reputation/badges/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/reputation/badges/",
     "authors": [
         {
             "name": "Lincoln Russell",
