@@ -7,12 +7,11 @@
 import { colorOut, ColorValues } from "@library/styles/styleHelpersColors";
 import { BorderRadiusProperty, BorderStyleProperty, BorderWidthProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { unit } from "@library/styles/styleHelpers";
+import { unit, processValue } from "@library/styles/styleHelpers";
 import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyleVars";
 import merge from "lodash/merge";
 import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
-import isNumeric from "validator/lib/isNumeric";
 
 export enum BorderType {
     BORDER = "border",
@@ -69,23 +68,6 @@ export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
 }
 
 export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
-
-const processValue = variable => {
-    const importantString = " !important";
-    const isImportant: boolean = typeof variable === "string" && variable.endsWith(importantString);
-    let value = variable;
-
-    if (isImportant) {
-        if (isNumeric(value as string)) {
-            value = Number(value);
-        }
-    }
-
-    return {
-        value,
-        isImportant,
-    };
-};
 
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
     if (variable !== null) {
