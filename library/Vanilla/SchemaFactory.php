@@ -23,6 +23,14 @@ final class SchemaFactory {
     private static $eventManager;
 
     /**
+     * Reset the schema factories static cache.
+     */
+    public static function reset() {
+        self::$container = null;
+        self::$eventManager = null;
+    }
+
+    /**
      * Get an instance of a schema object by its class name.
      *
      * @param string $schema
