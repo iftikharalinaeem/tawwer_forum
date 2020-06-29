@@ -46,10 +46,30 @@ export const ifExistsWithFallback = checkProp => {
     }
 };
 
+export const processValue = variable => {
+    const importantString = " !important";
+    const isImportant: boolean = typeof variable === "string" && variable.endsWith(importantString);
+    let value = variable;
+
+    if (isImportant) {
+        if (isNumeric(value as string)) {
+            value = Number(value);
+        }
+    }
+
+    return {
+        value,
+        isImportant,
+    };
+};
+
 export const unit = (
     val: string | number | undefined,
     options: { unitFunction?: (value) => string; isImportant?: boolean } = {} as any,
 ) => {
+    if (val === undefined) {
+        return undefined;
+    }
     const { unitFunction = px, isImportant = false } = options;
     const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
 
