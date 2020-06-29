@@ -12,6 +12,7 @@ import { globalVariables, IGlobalBorderStyles } from "@library/styles/globalStyl
 import merge from "lodash/merge";
 import { ColorHelper } from "csx";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
+import isNumeric from "validator/lib/isNumeric";
 
 export enum BorderType {
     BORDER = "border",
@@ -69,8 +70,25 @@ export interface IBorderStyles extends ISimpleBorderStyle, IRadiusFlex {
 
 export interface IMixedBorderStyles extends IBorderStyles, ISimpleBorderStyle {}
 
+const processValue = variable => {
+    const importantString = " !important";
+    const isImportant: boolean = typeof variable === "string" && variable.endsWith(importantString);
+    let value = variable;
+
+    if (isImportant) {
+        if (isNumeric(value as string)) {
+            value = Number(value);
+        }
+    }
+
+    return {
+        value,
+        isImportant,
+    };
+};
+
 const typeIsStringOrNumber = (variable: unknown): variable is number | string => {
-    if (variable != null) {
+    if (variable !== null) {
         const type = typeof variable;
         return type === "string" || type === "number";
     } else {
@@ -100,36 +118,53 @@ export const EMPTY_BORDER = {
  * @param radii
  * @param debug
  */
-export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRadiusValue => {
-    if (radii == null) {
+export const standardizeBorderRadius = (input: IRadiusInput, debug = false): IRadiusValue => {
+    if (input == null) {
         return;
     }
 
     const output: IBorderRadiusOutput = {};
 
-    if (typeIsStringOrNumber(radii)) {
-        const value = unit(radii as number | string);
+    if (typeIsStringOrNumber(input)) {
+        const { isImportant = false, value } = processValue(input);
         return {
-            borderTopRightRadius: unit(value),
-            borderBottomRightRadius: unit(value),
-            borderBottomLeftRadius: unit(value),
-            borderTopLeftRadius: unit(value),
+            borderTopRightRadius: unit(value, {
+                isImportant,
+            }),
+            borderBottomRightRadius: unit(value, {
+                isImportant,
+            }),
+            borderBottomLeftRadius: unit(value, {
+                isImportant,
+            }),
+            borderTopLeftRadius: unit(value, {
+                isImportant,
+            }),
         };
     }
 
     // Otherwise we need to check all of the values.
-    const all = getValueIfItExists(radii, "all");
-    const top = getValueIfItExists(radii, "top");
-    const bottom = getValueIfItExists(radii, "bottom");
-    const left = getValueIfItExists(radii, "left");
-    const right = getValueIfItExists(radii, "right");
+    const all = getValueIfItExists(input, "all");
+    const top = getValueIfItExists(input, "top");
+    const bottom = getValueIfItExists(input, "bottom");
+    const left = getValueIfItExists(input, "left");
+    const right = getValueIfItExists(input, "right");
 
     if (typeIsStringOrNumber(all)) {
+        const { isImportant = false, value } = processValue(all);
         merge(output, {
-            borderTopRightRadius: unit(all),
-            borderBottomRightRadius: unit(all),
-            borderBottomLeftRadius: unit(all),
-            borderTopLeftRadius: unit(all),
+            borderTopRightRadius: unit(value, {
+                isImportant,
+            }),
+            borderBottomRightRadius: unit(value, {
+                isImportant,
+            }),
+            borderBottomLeftRadius: unit(value, {
+                isImportant,
+            }),
+            borderTopLeftRadius: unit(value, {
+                isImportant,
+            }),
         });
     }
 
@@ -152,6 +187,7 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
     }
 
     if (bottom !== undefined) {
+        const { isImportant = false, value } = processValue();
         const isShorthand = typeIsStringOrNumber(bottom);
 
         if (isShorthand) {
@@ -170,6 +206,7 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
     }
 
     if (left !== undefined) {
+        const { isImportant = false, value } = processValue();
         const isShorthand = typeIsStringOrNumber(left);
 
         if (isShorthand) {
@@ -189,6 +226,7 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         }
     }
     if (right !== undefined) {
+        const { isImportant = false, value } = processValue();
         const isShorthand = typeIsStringOrNumber(right);
 
         if (isShorthand) {
@@ -208,26 +246,30 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
         }
     }
 
-    const borderTopRightRadius = getValueIfItExists(radii, "borderTopRightRadius");
+    const borderTopRightRadius = getValueIfItExists(input, "borderTopRightRadius");
     if (borderTopRightRadius !== undefined) {
+        const { isImportant = false, value } = processValue();
         merge(output, {
             borderTopRightRadius: unit(borderTopRightRadius),
         });
     }
-    const borderTopLeftRadius = getValueIfItExists(radii, "borderTopLeftRadius");
+    const borderTopLeftRadius = getValueIfItExists(input, "borderTopLeftRadius");
     if (borderTopLeftRadius !== undefined) {
+        const { isImportant = false, value } = processValue();
         merge(output, {
             borderTopLeftRadius: unit(borderTopLeftRadius),
         });
     }
-    const borderBottomRightRadius = getValueIfItExists(radii, "borderBottomRightRadius");
+    const borderBottomRightRadius = getValueIfItExists(input, "borderBottomRightRadius");
     if (borderBottomRightRadius !== undefined) {
+        const { isImportant = false, value } = processValue();
         merge(output, {
             borderBottomRightRadius: unit(borderBottomRightRadius),
         });
     }
-    const borderBottomLeftRadius = getValueIfItExists(radii, "borderBottomLeftRadius");
+    const borderBottomLeftRadius = getValueIfItExists(input, "borderBottomLeftRadius");
     if (borderBottomLeftRadius !== undefined) {
+        const { isImportant = false, value } = processValue();
         merge(output, {
             borderBottomLeftRadius: unit(borderBottomLeftRadius),
         });
@@ -236,7 +278,15 @@ export const standardizeBorderRadius = (radii: IRadiusInput, debug = false): IRa
     return output;
 };
 
-export const borderRadii = (radii: IRadiusValue, fallbackRadii = globalVariables().border.radius) => {
+export const borderRadii = (
+    radii: IRadiusValue,
+    options?: {
+        fallbackRadii?: object;
+        debug?: boolean;
+    },
+) => {
+    const { fallbackRadii = globalVariables().border.radius, debug = false } = options || {};
+
     const output: IBorderRadiusOutput = {};
 
     if (typeIsStringOrNumber(fallbackRadii)) {
@@ -255,9 +305,9 @@ export const borderRadii = (radii: IRadiusValue, fallbackRadii = globalVariables
         merge(output, setAllRadii(unit(fallbackRadii as any) as any));
     } else {
         // our fallback must be an object.
-        merge(output, standardizeBorderRadius(fallbackRadii as any));
+        merge(output, standardizeBorderRadius(fallbackRadii as any, debug));
     }
-    merge(output, standardizeBorderRadius(radii as any));
+    merge(output, standardizeBorderRadius(radii as any, debug));
     return output as NestedCSSProperties;
 };
 
@@ -265,7 +315,7 @@ const setAllBorders = (
     color: ColorValues,
     width: BorderWidthProperty<TLength>,
     style: BorderStyleProperty,
-    radius?: IBorderRadiusOutput,
+    radius?: BorderRadiusProperty<TLength>,
     debug = false,
 ) => {
     const output = {};
@@ -285,6 +335,15 @@ const setAllBorders = (
             borderRightWidth: unit(width),
             borderBottomWidth: unit(width),
             borderLeftWidth: unit(width),
+        });
+    }
+
+    if (radius !== undefined) {
+        merge(output, {
+            borderTopRightRadius: unit(radius),
+            borderTopLeftRadius: unit(radius),
+            borderBottomRightRadius: unit(radius),
+            borderBottomLeftRadius: unit(radius),
         });
     }
 

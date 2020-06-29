@@ -46,15 +46,27 @@ export const ifExistsWithFallback = checkProp => {
     }
 };
 
-export const unit = (val: string | number | undefined, unitFunction = px) => {
+export const unit = (
+    val: string | number | undefined,
+    options: { unitFunction?: (value) => string; isImportant?: boolean } = {} as any,
+) => {
+    const { unitFunction = px, isImportant = false } = options;
     const valIsNumeric = val || val === 0 ? isNumeric(val.toString().trim()) : false;
 
+    let output;
+
     if (typeof val === "string" && !valIsNumeric) {
-        return val;
+        output = val;
     } else if (val !== undefined && val !== null && valIsNumeric) {
-        return unitFunction(val as number);
+        output = unitFunction(val as number);
     } else {
-        return val;
+        output = val;
+    }
+
+    if (isImportant) {
+        return important(output);
+    } else {
+        return output;
     }
 };
 
