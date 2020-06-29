@@ -211,6 +211,7 @@ jobs:
                   echo $filter;
 
                   phpdbg -qrr \
+                    -d memory_limit=3000M \
                     ./vendor/bin/phpunit \
                     -c phpunit.xml.dist \
                     --exclude-group=ignore \
