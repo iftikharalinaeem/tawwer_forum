@@ -7,6 +7,8 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
+use Gdn_Configuration;
+use Vanilla\Theme\ThemeService;
 
 /**
  * Test the /api/v2/themes endpoints.
@@ -421,6 +423,25 @@ class ThemesDbTest extends AbstractAPIv2Test {
 
         $this->expectException(ClientException::class);
         $this->api()->put("/api/v2/themes/$themeID/assets/$assetName", $asset);
+    }
+
+    /**
+     * Test PUT /current when DB
+     */
+    public function testPutCurrentConfigValues() {
+        /** @var Gdn_Configuration $config */
+        $config = static::container()->get(Gdn_Configuration::class);
+        $config->set('Garden.Theme', 'keystone');
+
+        $themeID = $this->createTheme([]);
+
+        $this->api()->put("/themes/current", ["themeID" => $themeID]);
+
+        $theme = $config->get('Garden.Theme');
+        $currentTheme = $config->get('Garden.CurrentTheme');
+
+        $this->assertEquals(ThemeService::FOUNDATION_THEME_KEY, $theme);
+        $this->assertEquals($themeID, $currentTheme);
     }
 
     /**

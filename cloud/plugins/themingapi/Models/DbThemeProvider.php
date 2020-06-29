@@ -185,13 +185,11 @@ class DbThemeProvider implements ThemeProviderInterface, ThemeProviderCleanupInt
         try {
             $theme = $this->getTheme($themeID);
             $this->themeModel->setCurrentTheme($themeID);
-
-            $parentID = $theme->getParentTheme();
-            if (!$parentID) {
-                $this->config->set('Garden.Theme', $parentID);
-                $this->config->set('Garden.MobileTheme', $parentID);
-            }
+            $parentID = $theme->getParentTheme() ?? ThemeService::FOUNDATION_THEME_KEY;
+            $this->config->set('Garden.Theme', $parentID);
+            $this->config->set('Garden.MobileTheme', $parentID);
             $this->config->set('Garden.CurrentTheme', $themeID);
+
             return $theme;
         } catch (NoResultsException $e) {
             throw new NotFoundException('Theme');
