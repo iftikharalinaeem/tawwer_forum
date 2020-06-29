@@ -1,7 +1,7 @@
 {
     "name": "Salesforce",
     "description": "Allow staff users to create leads and cases from discussions and comments.",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/addons/salesforce/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/salesforce/",
     "version": "1.2",
     "settingsUrl": "/plugin/Salesforce",
     "settingsPermission": "Garden.Settings.Manage",
