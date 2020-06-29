@@ -10,6 +10,7 @@ namespace VanillaTests;
 use Psr\Container\ContainerInterface;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
+use Vanilla\SchemaFactory;
 
 /**
  * A Vanilla installer that handles uninstalling.
@@ -220,6 +221,7 @@ class TestInstallModel extends InstallModel {
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
 
+        SchemaFactory::reset();
         if (class_exists(\DiscussionModel::class)) {
             \DiscussionModel::cleanForTests();
         }
