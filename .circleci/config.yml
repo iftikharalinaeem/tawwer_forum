@@ -191,8 +191,8 @@ jobs:
             - *run_php_lint
     php_72_tests:
         executor: php72-sphinx
-        resource_class: small
-        parallelism: 20
+        resource_class: medium
+        parallelism: 12
         steps: &php_unit_test_steps
             - *attach_workspace
             - run:
@@ -210,12 +210,13 @@ jobs:
                   filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
                   echo $filter;
 
-                  ./vendor/bin/phpunit \
-                      -c phpunit.xml.dist \
-                      --exclude-group=ignore \
-                      --log-junit ~/phpunit/php-tests-junit.xml \
-                      --coverage-clover=php-tests-coverage.xml \
-                      --filter $filter
+                  phpdbg -qrr \
+                    ./vendor/bin/phpunit \
+                    -c phpunit.xml.dist \
+                    --exclude-group=ignore \
+                    --log-junit ~/phpunit/php-tests-junit.xml \
+                    --coverage-clover=php-tests-coverage.xml \
+                    --filter $filter
             - run:
                 name: Adjust JUnit Paths
                 command: $HOME/workspace/repo/.circleci/scripts/fixJUnitPaths.sh "$HOME/phpunit/php-tests-junit.xml"

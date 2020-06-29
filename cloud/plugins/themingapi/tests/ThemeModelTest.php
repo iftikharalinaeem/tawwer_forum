@@ -4,8 +4,11 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
+use Vanilla\ThemingApi\DbThemeProvider;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Fixtures\MockSiteSection;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
@@ -32,9 +35,16 @@ class ThemeModelTest extends AbstractAPIv2Test {
      */
     protected static $siteSectionProvider;
     /**
-     * @var ThemeService;
+     * @var ThemeService
      */
-    protected static $themeModel;
+    protected static $themeService;
+
+    /**
+     * @param Container $container
+     */
+    public static function configureContainerBeforeStartup(Container $container) {
+        $container->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)]);
+    }
 
     /**
      * Setup Function function
@@ -47,7 +57,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
         /** @var MockSiteSectionProvider $siteSectionProvider */
         self::$siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
         /** @var ThemeService self::$themeModel */
-        self::$themeModel = self::container()->get(ThemeService::class);
+        self::$themeService = self::container()->get(ThemeService::class);
     }
 
     /**
@@ -55,8 +65,8 @@ class ThemeModelTest extends AbstractAPIv2Test {
      */
     public function testGetCurrentThemeBaseThemeKey() {
         self::$config->set('Garden.Theme', 'keystone');
-        $theme = self::$themeModel->getCurrentTheme();
-        $this->assertEquals('keystone', $theme['themeID']);
+        $theme = self::$themeService->getCurrentTheme();
+        $this->assertEquals('keystone', $theme->getThemeID());
     }
 
     /**
@@ -66,20 +76,20 @@ class ThemeModelTest extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'theme-foundation');
         self::$config->set('Garden.CurrentTheme', 'keystone');
 
-        $theme = self::$themeModel->getCurrentTheme();
-        $this->assertEquals('keystone', $theme['themeID']);
+        $theme = self::$themeService->getCurrentTheme();
+        $this->assertEquals('keystone', $theme->getThemeID());
     }
 
     /**
      * Test getCurrentTheme with a preview in the session
      */
     public function testGetCurrentThemePreview() {
-        self::$themeModel->setPreviewTheme('lavendermoon');
-        $theme = self::$themeModel->getCurrentTheme();
+        self::$themeService->setPreviewTheme('lavendermoon');
+        $theme = self::$themeService->getCurrentTheme();
         /** @var ThemeServiceHelper self::$themeModelHelper */
         $themeModelHelper = self::container()->get(ThemeServiceHelper::class);
         $themeModelHelper->cancelSessionPreviewTheme();
-        $this->assertEquals('lavendermoon', $theme['themeID']);
+        $this->assertEquals('lavendermoon', $theme->getThemeID());
     }
 
     /**
@@ -89,9 +99,9 @@ class ThemeModelTest extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'notheme');
         self::$config->set('Garden.CurrentTheme', 'z');
 
-        $theme = self::$themeModel->getCurrentTheme();
+        $theme = @self::$themeService->getCurrentTheme();
 
-        $this->assertEquals(ThemeService::FALLBACK_THEME_KEY, $theme['themeID']);
+        $this->assertEquals(ThemeService::FALLBACK_THEME_KEY, $theme->getThemeID());
     }
 
     /**
@@ -102,8 +112,8 @@ class ThemeModelTest extends AbstractAPIv2Test {
 
         self::$config->set('Garden.CurrentTheme', null);
         self::$config->set('Garden.Theme', $dbTheme['themeID']);
-        $theme = self::$themeModel->getCurrentTheme();
-        $this->assertEquals($dbTheme['themeID'], $theme['themeID']);
+        $theme = self::$themeService->getCurrentTheme();
+        $this->assertEquals($dbTheme['themeID'], $theme->getThemeID());
     }
 
     /**
@@ -113,8 +123,8 @@ class ThemeModelTest extends AbstractAPIv2Test {
         $dbTheme = $this->createDBTheme('Second DB Theme');
 
         self::$config->set('Garden.CurrentTheme', $dbTheme['themeID']);
-        $theme = self::$themeModel->getCurrentTheme();
-        $this->assertEquals($dbTheme['themeID'], $theme['themeID']);
+        $theme = self::$themeService->getCurrentTheme();
+        $this->assertEquals($dbTheme['themeID'], $theme->getThemeID());
     }
 
     /**
@@ -123,13 +133,13 @@ class ThemeModelTest extends AbstractAPIv2Test {
     public function testGetCurrentThemePreviewDBTheme() {
         $dbTheme = $this->createDBTheme('Third DB Theme');
 
-        $theme = self::$themeModel->setPreviewTheme($dbTheme["themeID"]);
+        $theme = self::$themeService->setPreviewTheme($dbTheme["themeID"]);
 
         /** @var ThemeServiceHelper self::$themeModelHelper */
         $themeModelHelper = self::container()->get(ThemeServiceHelper::class);
         $themeModelHelper->cancelSessionPreviewTheme();
 
-        $this->assertEquals($dbTheme["themeID"], $theme['themeID']);
+        $this->assertEquals($dbTheme["themeID"], $theme->getThemeID());
     }
 
     /**
@@ -139,7 +149,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'theme-foundation');
         self::$config->set('Garden.CurrentTheme', '1');
 
-        $themeAddon = self::$themeModel->getCurrentThemeAddon();
+        $themeAddon = self::$themeService->getCurrentThemeAddon();
 
         $this->assertEquals('theme-foundation', $themeAddon->getKey());
     }
@@ -151,7 +161,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'theme-foundation');
         self::$config->set('Garden.CurrentTheme', 'keystone');
 
-        $themeAddon = self::$themeModel->getCurrentThemeAddon();
+        $themeAddon = self::$themeService->getCurrentThemeAddon();
 
         $this->assertEquals('keystone', $themeAddon->getKey());
     }
@@ -163,7 +173,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
         self::$config->set('Garden.Theme', 'zzzzzzz');
         self::$config->set('Garden.CurrentTheme', 'zzz');
 
-        $themeAddon = self::$themeModel->getCurrentThemeAddon();
+        $themeAddon = @self::$themeService->getCurrentThemeAddon();
 
         $this->assertEquals(ThemeService::FALLBACK_THEME_KEY, $themeAddon->getKey());
     }
@@ -172,7 +182,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * Test Getting a theme's master key.
      */
     public function testGetMasterThemeKey() {
-        $masterKey = self::$themeModel->getMasterThemeKey(1);
+        $masterKey = self::$themeService->getMasterThemeKey(1);
         $this->assertEquals('theme-foundation', $masterKey);
     }
 
@@ -180,7 +190,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * Test Getting a theme's master key with invalid id.
      */
     public function testGetMasterThemeKeyNonExistentTheme() {
-        $masterKey = self::$themeModel->getMasterThemeKey(100000);
+        $masterKey = self::$themeService->getMasterThemeKey(100000);
         $this->assertEquals('theme-foundation', $masterKey);
     }
 
@@ -188,7 +198,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * Test Getting a theme's master key with invalid key.
      */
     public function testGetMasterThemeKeyNonExistentThemeFs() {
-        $masterKey = self::$themeModel->getMasterThemeKey('zz');
+        $masterKey = @self::$themeService->getMasterThemeKey('zz');
         $this->assertEquals('theme-foundation', $masterKey);
     }
 
@@ -197,7 +207,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
      */
     public function testProviderSwitch() {
         $newDBTheme = $this->createDBTheme('Swapping DB theme');
-        $this->api()->put('/themes/current', ['themeID' => $newDBTheme['themeID']]);
+        @$this->api()->put('/themes/current', ['themeID' => $newDBTheme['themeID']]);
         /** @var \Vanilla\ThemingApi\Models\ThemeModel $dbThemeModel */
         $dbThemeModel = self::container()->get(\Vanilla\ThemingApi\Models\ThemeModel::class);
 
@@ -205,7 +215,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
         $this->assertCount(1, $result);
 
         // Change theme theme.
-        self::$themeModel->setCurrentTheme('theme-foundation');
+        self::$themeService->setCurrentTheme('theme-foundation');
         // Provider switched. Our DB rows should be cleaned up.
 
         $result = $dbThemeModel->get(['current' => 1]);
@@ -216,38 +226,8 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * Test getting a theme's asset data.
      */
     public function testGetThemeAssetDataDB() {
-        $assetData = self::$themeModel->getAssetData(1, 'header');
+        $assetData = self::$themeService->getTheme(1)->getAsset('header')->getValue();
         $this->assertEquals('<header>First DB Theme</header>', $assetData);
-    }
-
-    /**
-     * Test getting a theme's asset data.
-     */
-    public function testGetThemeAssetDataDBfail() {
-        $assetData = self::$themeModel->getAssetData(1000, 'header');
-        $this->assertEquals('', $assetData);
-    }
-
-    /**
-     * Test getting a theme's asset data.
-     */
-    public function testGetThemeAssetDataFS() {
-        $assetData = self::$themeModel->getAssetData('keystone', 'variables_classic');
-        $variable = '{
-    "global": {
-        "mainColors": {
-            "primary": "#008cba"
-        }
-    },
-    "titleBar": {
-        "colors": {
-            "bg": "#333",
-            "fg": "#fff"
-        }
-    }
-}
-';
-        $this->assertEquals($variable, $assetData);
     }
 
     /**
@@ -259,9 +239,9 @@ class ThemeModelTest extends AbstractAPIv2Test {
 
         $this->setCurrentSiteSection('newSection', 'lavendermoon');
 
-        $theme = self::$themeModel->getCurrentTheme();
+        $theme = self::$themeService->getCurrentTheme();
 
-        $this->assertEquals('lavendermoon', $theme['themeID']);
+        $this->assertEquals('lavendermoon', $theme->getThemeID());
     }
 
     /**
