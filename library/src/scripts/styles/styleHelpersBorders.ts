@@ -248,11 +248,8 @@ export const borderRadii = (radii: IRadiusValue, options?: IBorderRadiusOptions)
     const output: IBorderRadiusOutput = {};
 
     if (typeIsStringOrNumber(fallbackRadii)) {
-        // here
-        isImportant && console.log("here 1");
         merge(output, setAllRadii(fallbackRadii, { isImportant }));
     } else {
-        isImportant && console.log("here 2");
         merge(output, typeIsStringOrNumber(fallbackRadii) ? fallbackRadii : fallbackRadii);
     }
 
@@ -261,14 +258,10 @@ export const borderRadii = (radii: IRadiusValue, options?: IBorderRadiusOptions)
 
     // Make sure we have a value before overwriting.
     if (hasRadiusShorthand) {
-        isImportant && console.log("here 3");
         merge(output, setAllRadii(radii as any, { isImportant }));
     } else if (hasRadiusShorthandFallback) {
-        // here
-        isImportant && console.log("here 4");
         merge(output, setAllRadii(fallbackRadii as any, { isImportant }));
     } else {
-        isImportant && console.log("here 5");
         // our fallback must be an object.
         merge(output, standardizeBorderRadius(fallbackRadii as any, { isImportant }));
     }
