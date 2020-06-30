@@ -37,22 +37,22 @@ class DevElasticHttpConfig extends AbstractElasticHttpConfig {
         $secret = $config->get(self::CONFIG_API_SECRET, null);
         if ($secret === null) {
             throw new ServerException(
-                'Unable to run the dev elastic instance without configuring `ElasticDev.Secret`. You can find this value in 1password.'
+                'Unable to run the dev elastic instance without configuring `'.self::CONFIG_API_SECRET.'`. You can find this value in 1password.'
             );
         }
 
         $accountID = $config->get(self::CONFIG_ACCOUNT_ID, null);
         if ($accountID === null) {
-            // Generate a new accountID.
-            $accountID = random_int(50000000, 59999999);
-            $config->saveToConfig(self::CONFIG_ACCOUNT_ID, $accountID);
+            throw new ServerException(
+                'Unable to run the dev elastic instance without configuring `'.self::CONFIG_ACCOUNT_ID.'`. This can be a random ID as long is it is unique to your localhost'.
+            );
         }
 
         $siteID = $config->get(self::CONFIG_SITE_ID, null);
         if ($siteID === null) {
-            // Generate a new accountID.
-            $siteID = random_int(50000000, 59999999);
-            $config->saveToConfig(self::CONFIG_SITE_ID, $siteID);
+            throw new ServerException(
+                'Unable to run the dev elastic instance without configuring `'.self::CONFIG_SITE_ID.'`. This can be a random ID as long is it is unique to your localhost'.
+            );
         }
 
         $this->accountID = $accountID;
