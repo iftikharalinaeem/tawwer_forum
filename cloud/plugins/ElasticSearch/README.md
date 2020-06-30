@@ -1,53 +1,56 @@
 # How to setup locally
 
-Add the following code to `conf/bootstrap.after.php` and replace the parts that begins with `{{` and end with  `}}`.
+-   Make sure you are running the local host queue. (See `queue-stack-dev` repo).
+-   Add the following to your config.
+
 ```php
-<?php
+$Configuration['ElasticDev.AccountID'] = 5000;
+$Configuration['ElasticDev.SiteID'] = 5000;
+$Configuration['ElasticDev.Secret'] = GET_THE_SECRET_FROM_1PASSWORD;
+```
 
-if (config('EnabledPlugins.searchapiwrapper')) {
-    class DevSearchApiInformationProvider extends Vanilla\Inf\Search\AbstractSearchApiInformationProvider
-    {
-        public function getBaseUrl(): string
-        {
-            return 'https://ms-vanilla-search-api-dev.v-fabric.net/api/v1.0/';
-        }
+This will automatically configure the `DevElasticHttpConfig`.
 
-        protected function getSecret(): string
-        {
-            // Replace this. Look for the secret in 1Password
-            return '{{DEV_SEARCH_API_SECRET}}';
-        }
+For more control over the implementation, implement the `AbstractElasticHttpConfig` class and add the following somewhere in the container initialization.
 
-        protected function getTokenPayload(): array
-        {
-            return [
-                // Set whatever int you want here. Check the cluster forehand to not use the same as another dev.
-                'accountId' => {{ACCOUNT_ID}},
-                'siteId' =>{{SITE_ID}},
-            ];
-        }
-    }
+```php
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpConfig;
 
-    $dic->rule(Vanilla\Inf\Search\AbstractSearchApiInformationProvider::class)
-        ->setClass(DevSearchApiInformationProvider::class)
-    ;
-}
+$container
+    ->rule(AbstractElasticHttpConfig::class)
+    ->setClass(CustomElasticHttpConfig::class);
 ```
 
 # How to use
 
+Make sure you have the client configured, and the host queue running.
+
+https://staff.vanillaforums.com/kb/articles/255-dev-setup-overview
+
+## Indexing Your Site
+
+https://staff.vanillaforums.com/kb/articles/253-index-your-local-site
+
+The following API endpoint will trigger a full content index.
+
+```
+POST /api/v2/resources/crawl-elastic
+```
+
+## Running queries
+
 ```php
 <?php
-use Vanilla\Inf\Search\SearchApi;
+use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
 
-/** @var SearchApi $searchApi */
-$searchApi = $dic->get(SearchApi::class);
+/** @var ElasticHttpClient $searchApi */
+$searchApi = $dic->get(ElasticHttpClient::class);
 
 // Search for stuff in discussion/comment index.
 $elasticsearchResult = $searchApi->search(
     [
-        SearchApi::INDEX_ALIAS_DISCUSSION,
-        SearchApi::INDEX_ALIAS_COMMENT,
+        'discussions',
+        'comements',
     ],
     // See https://www.elastic.co/guide/en/elasticsearch/reference/7.8/query-dsl-terms-query.html#query-dsl-terms-lookup-example
     [
@@ -58,8 +61,8 @@ $elasticsearchResult = $searchApi->search(
                     'id' => 1,
                     'path' => 'body.keyword',
                 ],
-            ],             
-        ],       
+            ],
+        ],
     ]
 );
 ```

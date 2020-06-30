@@ -54,7 +54,7 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
      *
      * @return Data
      */
-    public function resourcesApiController_post_crawl(
+    public function resourcesApiController_post_indexElastic(
         ResourcesApiController $resourcesApi,
         \Gdn_Request $request
     ): Data {
