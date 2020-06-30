@@ -84,7 +84,6 @@ composer-local.json
 .settings
 .buildpath
 .idea/*
-.vscode
 .awcache
 /nbproject/
 /vendor/
