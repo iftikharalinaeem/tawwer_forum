@@ -10,11 +10,12 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
+// @Deprecated - Use globalVariables().widget.padding directly
 export const panelWidgetVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelWidget");
 
     const spacing = makeThemeVars("spacing", {
-        padding: 8,
+        padding: globalVariables().widget.padding,
     });
 
     return { spacing };

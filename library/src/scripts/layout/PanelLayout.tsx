@@ -5,7 +5,7 @@
 
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { IPanelLayoutClasses, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
@@ -15,6 +15,7 @@ import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
+import {threeColumnLayout} from "@library/layout/types/threeColumns";
 
 export interface IPanelLayoutProps {
     className?: string;
@@ -92,7 +93,7 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
     const shouldRenderLeftPanel: boolean = !isMobile && (!!childComponents.leftTop || !!childComponents.leftBottom);
     const shouldRenderRightPanel: boolean = isFullWidth || (isTablet && !shouldRenderLeftPanel);
-    const classes = props.classes ?? panelLayoutClasses();
+    const classes = props.classes ?? threeColumnLayout.();
 
     // Determine the classes we want to display.
     const panelClasses = classNames(

@@ -11,8 +11,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { unit } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { IPanelLayoutClasses, layoutVariables, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
+import { ITwoColumnLayoutMediaQueries, TwoColumnLayoutDevices } from "@library/layout/types/interface.layoutTwoColumn";
+import { IPanelLayoutClasses, layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -20,7 +21,7 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
     const makeThemeVars = variableFactory("twoColumnLayout", forcedVars);
     const fullPadding = panelWidgetVariables().spacing.padding * 2;
 
-    const { gutter, globalContentWidth } = panelLayoutVars;
+    const { gutter, contentWidth } = panelLayoutVars;
     const { fullGutter } = panelLayoutVars.foundationalWidths;
 
     // Important variables that will be used to calculate other variables
@@ -41,20 +42,20 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
     const mainColumnPaddedWidth = globalContentWidth - gutter.size - panel.paddedWidth;
     const mainColumnWidth = mainColumnPaddedWidth - fullPadding * 2;
 
-    const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", panelLayoutVars.panelLayoutSpacing);
+    const spacing = makeThemeVars("spacing", panelLayoutVars.panelLayoutSpacing);
 
-    const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
+    const breakPoints = makeThemeVars("breakPoints", {
         noBleed: globalContentWidth,
         oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
         xs: foundationalWidths.breakPoints.xs,
     });
 
-    const mediaQueries = () => {
+    const mediaQueries = (): ITwoColumnLayoutMediaQueries => {
         const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.noBleed),
-                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.oneColumn + 1) : undefined,
+                    maxWidth: px(breakPoints.noBleed),
+                    minWidth: useMinWidth ? px(breakPoints.oneColumn + 1) : undefined,
                 },
                 styles,
             );
@@ -63,7 +64,7 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const noBleedDown = (styles: NestedCSSProperties) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.noBleed),
+                    maxWidth: px(breakPoints.noBleed),
                 },
                 styles,
             );
@@ -72,8 +73,8 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const oneColumn = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.oneColumn),
-                    minWidth: useMinWidth ? px(panelLayoutBreakPoints.xs + 1) : undefined,
+                    maxWidth: px(breakPoints.oneColumn),
+                    minWidth: useMinWidth ? px(breakPoints.xs + 1) : undefined,
                 },
                 styles,
             );
@@ -82,7 +83,7 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const oneColumnDown = (styles: NestedCSSProperties) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.oneColumn),
+                    maxWidth: px(breakPoints.oneColumn),
                 },
                 styles,
             );
@@ -91,7 +92,7 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const aboveOneColumn = (styles: NestedCSSProperties) => {
             return media(
                 {
-                    minWidth: px(panelLayoutBreakPoints.oneColumn + 1),
+                    minWidth: px(breakPoints.oneColumn + 1),
                 },
                 styles,
             );
@@ -100,7 +101,7 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         const xs = (styles: NestedCSSProperties) => {
             return media(
                 {
-                    maxWidth: px(panelLayoutBreakPoints.xs),
+                    maxWidth: px(breakPoints.xs),
                 },
                 styles,
             );
@@ -116,6 +117,29 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         };
     };
 
+    const Devices = TwoColumnLayoutDevices;
+
+    const calculateDevice = () => {
+        const width = document.body.clientWidth;
+        if (width <= breakPoints.xs) {
+            return Devices.XS;
+        } else if (width <= breakPoints.oneColumn) {
+            return Devices.MOBILE;
+        } else if (width <= breakPoints.noBleed) {
+            return Devices.NO_BLEED;
+        } else {
+            return Devices.DESKTOP;
+        }
+    };
+
+    const isFullWidth = currentDevice => {
+        return currentDevice === Devices.DESKTOP || currentDevice === Devices.NO_BLEED;
+    };
+
+    const isCompact = currentDevice => {
+        return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
+    };
+
     return {
         foundationalWidths,
         gutter,
@@ -123,8 +147,11 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         mainColumnPaddedWidth,
         mainColumnWidth,
         mediaQueries,
-        panelLayoutSpacing,
-        panelLayoutBreakPoints,
+        spacing,
+        breakPoints,
+        isFullWidth,
+        isCompact,
+        calculateDevice,
     };
 });
 
@@ -157,9 +184,11 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
     const leftColumn = style("leftColumn", {});
 
     return {
-        ...panelLayoutClasses(),
+        // ...panelLayoutClasses(),
         rightColumn,
         leftColumn,
         middleColumnMaxWidth,
     } as IPanelLayoutClasses;
 });
+
+// Add function to generate panel classes to utils... or panellayout? Make sure to fallback to that in panelLayoutClasses() for less refactoring

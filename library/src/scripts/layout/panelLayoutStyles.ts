@@ -20,7 +20,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
-    const makeThemeVars = variableFactory("globalVariables", forcedVars);
+    const makeThemeVars = variableFactory("layoutVariables", forcedVars);
 
     const colors = makeThemeVars("colors", {
         leftColumnBg: globalVars.mainColors.bg,
@@ -59,18 +59,19 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         paddedWidth: foundationalWidths.middleColumnWidth + fullPadding,
     });
 
-    const globalContentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + fullPadding;
+    // @Deprecated - Use LayoutContext to get variables
+    const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + fullPadding;
 
+    // @Deprecated - Needs to be split into 2 layouts
     const contentSizes = makeThemeVars("content", {
-        full: globalContentWidth,
+        full: contentWidth,
         narrow:
-            foundationalWidths.narrowContentWidth < globalContentWidth
-                ? foundationalWidths.narrowContentWidth
-                : globalContentWidth,
+            foundationalWidths.narrowContentWidth < contentWidth ? foundationalWidths.narrowContentWidth : contentWidth,
     });
 
+    // @Deprecated - Use LayoutContext to get variables
     const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
-        noBleed: globalContentWidth,
+        noBleed: contentWidth,
         twoColumn: foundationalWidths.breakPoints.twoColumns,
         oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
         xs: foundationalWidths.breakPoints.xs,
@@ -106,6 +107,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
+    // @Deprecated - Use LayoutContext to get media queries of current layout.
     const mediaQueries = () => {
         const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
             return media(
@@ -201,7 +203,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         panel,
         middleColumn,
         contentSizes,
-        globalContentWidth,
+        contentWidth,
         mediaQueries,
         panelLayoutSpacing,
         panelLayoutBreakPoints,
@@ -225,6 +227,7 @@ export interface IPanelLayoutClasses {
     breadcrumbsContainer: string;
 }
 
+/*
 export const panelLayoutClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = layoutVariables();
@@ -399,3 +402,4 @@ export const panelLayoutClasses = useThemeCache(() => {
         breadcrumbsContainer,
     } as IPanelLayoutClasses;
 });
+*/
