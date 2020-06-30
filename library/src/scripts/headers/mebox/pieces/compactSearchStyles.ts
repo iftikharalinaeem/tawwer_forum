@@ -12,6 +12,7 @@ import {
     borders,
     EMPTY_BORDER,
     borderRadii,
+    paddings,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
@@ -195,7 +196,6 @@ export const compactSearchClasses = useThemeCache(() => {
             },
             ".searchBar-valueContainer": {
                 height: unit(formElementsVars.sizing.height),
-                border: 0,
             },
             ".searchBar__placeholder": {
                 color: colorOut(vars.colors.placeholder),
@@ -216,32 +216,36 @@ export const compactSearchClasses = useThemeCache(() => {
         },
     });
 
-    const contents = style(
-        "contents",
-        {
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "nowrap",
-            minHeight: unit(formElementsVars.sizing.height),
-            justifyContent: "center",
-            width: percent(100),
-            position: "relative",
-            ...borders(vars.borders),
-        },
-        mediaQueries.oneColumnDown({
-            height: unit(titleBarVars.sizing.mobile.height),
-        }),
-    );
+    const contents = style("contents", {
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "nowrap",
+        minHeight: unit(formElementsVars.sizing.height),
+        justifyContent: "center",
+        width: percent(100),
+        position: "relative",
+        ...borders(vars.borders),
+    });
 
     const close = style("close", {
         color: "inherit",
         whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.semiBold,
+        margin: 0,
+        ...paddings({
+            horizontal: 10,
+        }),
+        ...borderRadii(
+            {
+                left: 0,
+            },
+            {
+                isImportant: true,
+            },
+        ),
     });
 
-    const cancelContents = style("cancelContents", {
-        padding: px(4),
-    });
+    const cancelContents = style("cancelContents", {});
 
     const searchAndResults = style("searchAndResults", {
         flex: 1,
@@ -258,10 +262,10 @@ export const compactSearchClasses = useThemeCache(() => {
                 ...borderRadii(
                     {
                         left: vars.borders.radius,
-                        right: important(0),
+                        right: 0,
                     },
                     {
-                        debug: true,
+                        isImportant: true,
                     },
                 ),
             },
