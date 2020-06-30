@@ -17,14 +17,6 @@ use Psr\Container\ContainerInterface;
 final class SchemaFactory {
 
     /**
-     * Reset the schema factories static cache.
-     */
-    public static function reset() {
-        self::$container = null;
-        self::$eventManager = null;
-    }
-
-    /**
      * Get an instance of a schema object by its class name.
      *
      * @param string $schema
