@@ -85,7 +85,7 @@ class PipelineModel extends Model implements InjectableInterface {
      */
     public function insert(array $set, $options = []) {
         if (is_string($options)) {
-            deprecated("String options are deprecated.");
+            trigger_error("String options are deprecated in PipelineModel::insert().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
         }
         $options += [
@@ -114,7 +114,7 @@ class PipelineModel extends Model implements InjectableInterface {
      */
     public function update(array $set, array $where, $options = []): bool {
         if (is_string($options)) {
-            deprecated("String options are deprecated.");
+            trigger_error("String options are deprecated in PipelineModel::update().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
         }
         $options += [
