@@ -307,10 +307,6 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
             color: colorOut(vars.input.fg),
             cursor: "text",
             transition: `border ${globalVars.animation.defaultTiming} ${globalVars.animation.defaultTiming}`,
-            ...borderRadii({
-                left: vars.border.radius,
-                right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
-            }),
             $nest: {
                 "&&&": {
                     display: "flex",
@@ -319,6 +315,10 @@ export const searchBarClasses = useThemeCache((overwrites = {}) => {
                     justifyContent: "flex-start",
                     paddingLeft: unit(vars.searchIcon.gap),
                     paddingRight: unit(vars.searchIcon.padding.right),
+                    ...borderRadii({
+                        left: vars.border.radius,
+                        right: mirrorLeftRadius ? important(vars.border.radius) : important(0),
+                    }),
                 },
             },
         });
