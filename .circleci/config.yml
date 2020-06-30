@@ -189,6 +189,12 @@ jobs:
             - *symlink_addons
             - *run_composer
             - *run_php_lint
+    php_72_static:
+      executor: core/php72
+      steps: &php_static_steps
+        - core/checkout
+        - *run_composer
+        - *run_php_static
     php_72_tests:
         executor: php72-sphinx
         resource_class: medium
@@ -262,6 +268,9 @@ jobs:
     php_73_lint:
         executor: php73-sphinx
         steps: *php_lint_steps
+    php_73_static:
+      executor: core/php73
+      steps: *php_static_steps
     php_73_tests:
         executor: php73-sphinx
         steps: *php_unit_test_steps
@@ -332,6 +341,7 @@ workflows:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
             - php_72_lint
+            - php_72_static
             - php_72_integration:
                 requires:
                     - php_setup
@@ -365,7 +375,9 @@ workflows:
             # PHP and serverside
             - php_setup
             - php_72_lint
+            - php_72_static
             - php_73_lint
+            - php_73_static
             - php_72_integration:
                 requires:
                     - php_setup

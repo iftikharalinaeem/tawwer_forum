@@ -16,12 +16,6 @@ use Psr\Container\ContainerInterface;
  */
 final class SchemaFactory {
 
-    /** @var ContainerInterface */
-    private static $container;
-
-    /** @var EventManager */
-    private static $eventManager;
-
     /**
      * Reset the schema factories static cache.
      */
@@ -39,7 +33,7 @@ final class SchemaFactory {
      */
     public static function get(string $schema, ?string $id = null): Schema {
         /** @var Schema */
-        $schema = self::getContainer()->get($schema);
+        $schema = Gdn::getContainer()->get($schema);
         if ($id) {
             $schema->setID($id);
         }
@@ -51,26 +45,20 @@ final class SchemaFactory {
      * Get the configured container.
      *
      * @return ContainerInterface
+     * @deprecated
      */
     public static function getContainer(): ContainerInterface {
-        if (!isset(self::$container)) {
-            self::$container = Gdn::getContainer();
-        }
-        return self::$container;
+        return Gdn::getContainer();
     }
 
     /**
      * Get the configured event manager instance.
      *
      * @return EventManager
+     * @deprecated
      */
     public static function getEventManager(): EventManager {
-        if (!isset(self::$eventManager)) {
-            /** @var EventManager */
-            $eventManager = self::getContainer()->get(EventManager::class);
-            self::setEventManager($eventManager);
-        }
-        return self::$eventManager;
+        return Gdn::getContainer()->get(EventManager::class);
     }
 
     /**
@@ -109,7 +97,7 @@ final class SchemaFactory {
 
         if ($id) {
             // Fire an event for schema modification.
-            self::getEventManager()->fire("{$id}Schema_init", $result);
+            Gdn::getContainer()->get(EventManager::class)->fire("{$id}Schema_init", $result);
         }
 
         return $result;
@@ -120,9 +108,10 @@ final class SchemaFactory {
      *
      * @param ContainerInterface $container
      * @return void
+     * @deprecated
      */
     public static function setContainer(?ContainerInterface $container): void {
-        self::$container = $container;
+        return;  // noop
     }
 
     /**
@@ -130,8 +119,9 @@ final class SchemaFactory {
      *
      * @param EventManager $eventManager
      * @return void
+     * @deprecated
      */
     public static function setEventManager(?EventManager $eventManager): void {
-        self::$eventManager = $eventManager;
+        return; // noop
     }
 }
