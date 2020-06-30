@@ -3,7 +3,7 @@
  * @author Alexandre (Daazku) Chouinard
  */
 
-namespace Vanilla\Inf\Search;
+namespace Vanilla\Cloud\ElasticSearch\Http;
 
 use Exception;
 use Firebase\JWT\JWT;
@@ -13,7 +13,7 @@ use Firebase\JWT\JWT;
  *
  * Class AbstractSearchApiInformationProvider
  */
-abstract class AbstractSearchApiInformationProvider {
+abstract class AbstractElasticHttpConfig {
     /**
      * The base URL to the API.
      *
@@ -33,9 +33,9 @@ abstract class AbstractSearchApiInformationProvider {
     final public function getAuthJWT() {
         $timestamp = time();
         $fullPayload = $this->getTokenPayload() + [
-                'iat' => $timestamp,
-                'exp' => $timestamp + 10,
-            ];
+            'iat' => $timestamp,
+            'exp' => $timestamp + 10,
+        ];
 
         return JWT::encode($fullPayload, $this->getSecret(), 'HS512');
     }
