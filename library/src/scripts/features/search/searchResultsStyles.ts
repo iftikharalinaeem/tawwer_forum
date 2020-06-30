@@ -24,19 +24,19 @@ import { media } from "typestyle";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { BorderBottomProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { buttonVariables } from "@library/forms/buttonStyles";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("searchResults");
 
     const colors = makeThemeVars("colors", {
-        fg: globalVars.mainColors.primary,
+        fg: globalVars.mainColors.fg,
     });
 
     const title = makeThemeVars("title", {
-        fonts: {
-            color: undefined,
+        font: {
+            ...EMPTY_FONTS,
+            color: colors.fg,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
             lineHeight: globalVars.lineHeights.condensed,
@@ -74,7 +74,7 @@ export const searchResultsVariables = useThemeCache(() => {
     });
 
     const mediaElement = makeThemeVars("mediaElement", {
-        width: 115,
+        width: 190,
     });
 
     const breakPoints = makeThemeVars("breakPoints", {
@@ -164,13 +164,16 @@ export const searchResultClasses = useThemeCache(() => {
     const mediaQueries = vars.mediaQueries();
     const metaVars = metasVariables();
 
+    const linkColors = clickableItemStates();
+
     const title = style("title", {
         display: "block",
-        ...fonts(vars.title.fonts),
+        ...fonts(vars.title.font),
         overflow: "hidden",
         flexGrow: 1,
         margin: 0,
         paddingRight: unit(24),
+        $nest: linkColors.$nest,
     });
 
     const root = style(
@@ -181,7 +184,7 @@ export const searchResultClasses = useThemeCache(() => {
             width: percent(100),
             ...paddings(vars.spacing.padding),
             cursor: "pointer",
-            color: colorOut(vars.title.fonts.color),
+            color: colorOut(vars.title.font.color),
         },
         mediaQueries.compact({
             flexWrap: "wrap",
@@ -265,7 +268,6 @@ export const searchResultClasses = useThemeCache(() => {
         lineHeight: globalVars.lineHeights.excerpt,
     });
 
-    const linkColors = clickableItemStates();
     const link = style("link", {
         color: colorOut(globalVars.mainColors.fg),
         $nest: linkColors.$nest,
@@ -285,6 +287,7 @@ export const searchResultClasses = useThemeCache(() => {
         width: unit(vars.icon.size),
         height: unit(vars.icon.size),
         marginRight: unit(vars.spacing.padding.left),
+        cursor: "pointer",
     });
 
     return {

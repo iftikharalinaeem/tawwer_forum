@@ -26,7 +26,7 @@ export const draftPreviewClasses = useThemeCache(() => {
     });
 
     const actions = style("actions", {
-        height: unit(searchResultVars.title.fonts.size * searchResultVars.title.fonts.lineHeight),
+        height: unit(searchResultVars.title.font.size * searchResultVars.title.font.lineHeight),
         position: "relative",
     });
 
