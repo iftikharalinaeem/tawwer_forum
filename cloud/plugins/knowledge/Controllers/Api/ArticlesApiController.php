@@ -31,6 +31,7 @@ use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
+use Vanilla\Models\Model;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Models\ReactionModel;
 use Vanilla\Models\ReactionOwnerModel;
@@ -726,7 +727,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $fields['reactionOwnerID'] = $this->reactionOwnerModel->getReactionOwnerID($fields);
 
-            $this->reactionModel->insert($fields, $mode);
+            $this->reactionModel->insert($fields, [Model::OPT_MODE => $mode]);
 
             $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
