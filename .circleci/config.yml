@@ -65,6 +65,12 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+    - &run_php_static
+      run:
+        name: PHP Static Analysis
+        command: |
+          cd ~/workspace/repo
+          ./vendor/bin/psalm
     - &db_sphinx_env
       MYSQL_HOST: 127.0.0.1
       MYSQL_DATABASE: vanilla_test
