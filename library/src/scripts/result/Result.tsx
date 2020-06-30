@@ -14,7 +14,7 @@ import { searchResultClasses, searchResultsClasses } from "@library/features/sea
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IResult {
     name: string;
@@ -63,26 +63,31 @@ export default function Result(props: IResult) {
         </div>
     ) : null;
 
+    const { isCompact } = useLayout();
+
     return (
         <li className={classNames(classesSearchResults.item, className)}>
-            <article className={classNames(classesSearchResults.result)}>
-                <div className={classNames(classes.root, { hasIcon: !!icon })}>
-                    {icon && <div className={classes.iconWrap}>{icon}</div>}
-                    <div className={classNames(classes.main, { hasMedia: !!media })}>
-                        <SmartLink to={url} tabIndex={0} className={classes.link}>
-                            <HeadingTag className={classes.title}>{name}</HeadingTag>
-                        </SmartLink>
-                        {meta && <div className={classes.metas}>{meta}</div>}
-                        {!!excerpt && (
-                            <Paragraph className={classes.excerpt}>
-                                <>
-                                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
-                                    {afterExcerpt}
-                                </>
-                            </Paragraph>
-                        )}
+            <article className={classesSearchResults.result}>
+                <div className={classNames(classes.root)}>
+                    <div className={classes.content}>
+                        {icon && <div className={classes.iconWrap}>{icon}</div>}
+                        <div className={classNames(classes.main, { hasMedia: !!media, hasIcon: !!icon })}>
+                            <SmartLink to={url} tabIndex={0} className={classes.link}>
+                                <HeadingTag className={classes.title}>{name}</HeadingTag>
+                            </SmartLink>
+                            {meta && <div className={classes.metas}>{meta}</div>}
+                            {isCompact && ""}
+                            {!!excerpt && (
+                                <Paragraph className={classes.excerpt}>
+                                    <>
+                                        <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
+                                        {afterExcerpt}
+                                    </>
+                                </Paragraph>
+                            )}
+                        </div>
+                        {!isCompact && media}
                     </div>
-                    {media}
                 </div>
             </article>
         </li>

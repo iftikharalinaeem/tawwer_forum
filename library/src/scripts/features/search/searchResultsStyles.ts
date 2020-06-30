@@ -75,6 +75,7 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const mediaElement = makeThemeVars("mediaElement", {
         width: 190,
+        margin: 12,
     });
 
     const breakPoints = makeThemeVars("breakPoints", {
@@ -176,14 +177,19 @@ export const searchResultClasses = useThemeCache(() => {
         $nest: linkColors.$nest,
     });
 
-    const root = style(
+    const root = style({
+        display: "block",
+        ...paddings(vars.spacing.padding),
+    });
+
+    // This is so 100% is the space within the padding of the root element
+    const content = style(
+        "contents",
         {
             display: "flex",
             alignItems: "stretch",
             justifyContent: "space-between",
             width: percent(100),
-            ...paddings(vars.spacing.padding),
-            cursor: "pointer",
             color: colorOut(vars.title.font.color),
         },
         mediaQueries.compact({
@@ -191,7 +197,7 @@ export const searchResultClasses = useThemeCache(() => {
         }),
     );
 
-    const mediaWidth = vars.mediaElement.width + vars.spacing.padding.left;
+    const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
     const iconWidth = vars.icon.size + vars.spacing.padding.left;
 
     const main = style(
@@ -216,6 +222,12 @@ export const searchResultClasses = useThemeCache(() => {
                 "&.hasMedia": {
                     width: percent(100),
                 },
+                "&.hasIcon": {
+                    width: calc(`100% - ${unit(iconWidth)}`),
+                },
+                "&.hasMedia.hasIcon": {
+                    width: calc(`100% - ${unit(iconWidth)}`),
+                },
             },
         }),
     );
@@ -229,6 +241,7 @@ export const searchResultClasses = useThemeCache(() => {
         },
         mediaQueries.compact({
             width: percent(100),
+            marginLeft: "auto",
             $nest: {
                 "&.hasImage": {
                     height: unit(vars.mediaElement.width),
@@ -286,7 +299,6 @@ export const searchResultClasses = useThemeCache(() => {
         borderRadius: "50%",
         width: unit(vars.icon.size),
         height: unit(vars.icon.size),
-        marginRight: unit(vars.spacing.padding.left),
         cursor: "pointer",
     });
 
@@ -302,5 +314,6 @@ export const searchResultClasses = useThemeCache(() => {
         afterExcerptLink,
         link,
         iconWrap,
+        content,
     };
 });
