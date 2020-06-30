@@ -208,10 +208,16 @@ jobs:
                 command: |
                   cd ~/workspace/repo
                   filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
-                  echo $filter;
 
+                  echo -e "\033[1;33m====== Running PHPUnit with extra filter ======\033[0m"
+                  echo "--filter $filter";
+                  echo ""
+
+                  # phpdbg to generate code coverage is about 5x faster than xdebug.
+                  # Containers have 4gb a memory. Try to avoid coming too close to the limit.
+                  # Remember that sphinx and mysql also take memory.
                   phpdbg -qrr \
-                    -d memory_limit=3000M \
+                    -d memory_limit=2048M \
                     ./vendor/bin/phpunit \
                     -c phpunit.xml.dist \
                     --exclude-group=ignore \

@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use Psr\Container\ContainerInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
 use Vanilla\Models\InstallModel;
 use Vanilla\SchemaFactory;
@@ -222,6 +223,7 @@ class TestInstallModel extends InstallModel {
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
 
         SchemaFactory::reset();
+        FeatureFlagHelper::clearCache();
         if (class_exists(\DiscussionModel::class)) {
             \DiscussionModel::cleanForTests();
         }
@@ -230,6 +232,5 @@ class TestInstallModel extends InstallModel {
             \SubcommunityModel::clearStaticCache();
         }
         // Clear all database related objects from the container.
-
     }
 }

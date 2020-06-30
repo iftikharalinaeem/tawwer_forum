@@ -32,4 +32,5 @@ ignore:
   - "**/conf/**/*.php"
   - "**/*.css"
   - "**/*.scss"
+  - "**/tests/**/*.php"
   - "library/deprecated"
