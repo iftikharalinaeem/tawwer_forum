@@ -44,14 +44,18 @@ class DevElasticHttpConfig extends AbstractElasticHttpConfig {
         $accountID = $config->get(self::CONFIG_ACCOUNT_ID, null);
         if ($accountID === null) {
             throw new ServerException(
-                'Unable to run the dev elastic instance without configuring `'.self::CONFIG_ACCOUNT_ID.'`. This can be a random ID as long is it is unique to your localhost'.
+                'Unable to run the dev elastic instance without configuring `'
+                    .self::CONFIG_ACCOUNT_ID
+                    .'`. This can be a random ID as long is it is unique to your localhost'
             );
         }
 
         $siteID = $config->get(self::CONFIG_SITE_ID, null);
         if ($siteID === null) {
             throw new ServerException(
-                'Unable to run the dev elastic instance without configuring `'.self::CONFIG_SITE_ID.'`. This can be a random ID as long is it is unique to your localhost'.
+                'Unable to run the dev elastic instance without configuring `'
+                .self::CONFIG_SITE_ID
+                .'`. This can be a random ID as long is it is unique to your localhost'
             );
         }
 
