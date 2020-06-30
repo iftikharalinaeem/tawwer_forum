@@ -128,9 +128,9 @@ class WebhookModel extends PipelineModel {
     /**
      * {@inheritDoc}
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
+    public function update(array $set, array $where, $options = []): bool {
         $set = $this->prepareWrite($set);
-        $result = parent::update($set, $where);
+        $result = parent::update($set, $where, $options);
         $this->cache->remove(self::ACTIVE_CACHE_KEY);
         return $result;
     }
