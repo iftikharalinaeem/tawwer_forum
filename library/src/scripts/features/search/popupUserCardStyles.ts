@@ -60,7 +60,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        marginTop: vars.container.margin,
         marginBottom: vars.container.margin,
     });
 
@@ -96,6 +95,16 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         fontSize: vars.count.size,
     });
 
+    const header = style("header", {
+        height: vars.container.margin * 2,
+        display: "flex",
+        flexDirection: "row-reverse",
+    });
+
+    const section = style("section", {
+        paddingTop: vars.container.margin * 0.5,
+    });
+
     return {
         container,
         button,
@@ -104,5 +113,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         stat,
         vertical,
         count,
+        header,
+        section,
     };
 });

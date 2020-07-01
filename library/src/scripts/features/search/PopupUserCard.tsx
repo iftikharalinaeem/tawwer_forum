@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { userCardClasses } from "@library/features/search/popupUserCardStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -12,6 +12,8 @@ import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import LinkAsButton from "@library/routing/LinkAsButton";
+import { CloseCompactIcon } from "@library/icons/common";
+import Permission, { PermissionMode } from "@library/features/users/Permission";
 
 interface IProps {
     userInfo: IUserFragment;
@@ -52,6 +54,10 @@ interface IDateProps {
     date?: string | null;
 }
 
+interface IHeaderProps {
+    onClick: () => void;
+}
+
 function Name(props: INameProps) {
     const classes = userCardClasses();
     const { name } = props;
@@ -71,7 +77,7 @@ function Container(props) {
 
 function Separator(props: ISeparatorProps) {
     const { width } = props;
-    return <div style={{ width: `${width}px` }}></div>;
+    return <div style={{ width: `${width}px` }}> </div>;
 }
 
 function Stat(props: IStatProps) {
@@ -97,11 +103,34 @@ function Date(props: IDateProps) {
     return <span>{`${text}: ${date}`}</span>;
 }
 
+function Header(props: IHeaderProps) {
+    const classes = userCardClasses();
+    const { onClick } = props;
+    return (
+        <div className={classes.header}>
+            <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
+                <CloseCompactIcon />
+            </Button>
+        </div>
+    );
+}
+
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
     const { userInfo, stats, links } = props;
+    const [open, toggleOpen] = useState(false);
+
     return (
-        <DropDown selfPadded={true} flyoutType={FlyoutType.FRAME}>
+        <DropDown
+            buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
+            buttonContents={"Val"}
+            selfPadded={true}
+            flyoutType={FlyoutType.FRAME}
+            isVisible={open}
+            onVisibilityChange={isVisibble => toggleOpen(isVisibble)}
+        >
+            <Header onClick={() => toggleOpen(!open)} />
+
             <Container>
                 <UserPhoto userInfo={userInfo} size={UserPhotoSize.LARGE} />
             </Container>
@@ -113,6 +142,10 @@ export default function PopupUserCard(props: IProps) {
             <Container>
                 <Label label={userInfo.label} />
             </Container>
+
+            <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
+                <Container> email </Container>
+            </Permission>
 
             <Container>
                 <LinkAsButton to={links.profileLink} baseClass={ButtonTypes.STANDARD} className={classes.button}>
@@ -136,7 +169,7 @@ export default function PopupUserCard(props: IProps) {
                 </Container>
             </DropDownSection>
 
-            <DropDownSection noSeparator={false} title={""}>
+            <DropDownSection className={classes.section} noSeparator={false} title={""}>
                 <Container>
                     <Date text={"Joined"} date={userInfo.dateJoined} />
                     <Separator width={40} />

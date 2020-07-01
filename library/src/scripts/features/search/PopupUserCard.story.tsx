@@ -6,6 +6,8 @@
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import PopupUserCard from "@library/features/search/PopupUserCard";
+import { storyWithConfig } from "@library/storybook/StoryContext";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 export default {
     component: PopupUserCard,
@@ -31,8 +33,54 @@ const m = {
     },
 };
 
-export const UserCard = () => (
-    <StoryContent>
-        <PopupUserCard {...m} />
-    </StoryContent>
+export const UserCardNoState = () => <PopupUserCard {...m} />;
+
+export const UserCardWithoutPermission = storyWithConfig(
+    {
+        storeState: {
+            users: {
+                permissions: {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        isAdmin: false,
+                        permissions: [
+                            {
+                                type: "global",
+                                id: 1,
+                                permissions: {
+                                    "email.view": false,
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+    },
+    () => <PopupUserCard {...m} />,
+);
+
+export const UserCardWithPermission = storyWithConfig(
+    {
+        storeState: {
+            users: {
+                permissions: {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        isAdmin: false,
+                        permissions: [
+                            {
+                                type: "global",
+                                id: 1,
+                                permissions: {
+                                    "email.view": true,
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+    },
+    () => <PopupUserCard {...m} />,
 );
