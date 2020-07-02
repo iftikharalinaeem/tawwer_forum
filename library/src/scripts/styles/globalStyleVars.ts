@@ -275,9 +275,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         paddedWidth: middleColumnInit.width + widget.paddingBothSides,
     });
 
-    const contentWidth = () => {
-        return middleColumn.paddedWidth + panel.paddedWidth * 2;
-    };
+    const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
     const fontsInit0 = makeThemeVars("fonts", {
         size: {

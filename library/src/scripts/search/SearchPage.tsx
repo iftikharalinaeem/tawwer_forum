@@ -15,7 +15,6 @@ import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
 import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
@@ -34,6 +33,7 @@ import qs from "qs";
 import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
+import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 
 interface IProps {
     placeholder?: string;

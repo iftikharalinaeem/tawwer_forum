@@ -6,15 +6,16 @@
 import React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { useStoryConfig, NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
-import { twoColumnLayoutVariables } from "@library/layout/twoColumnLayoutStyles";
+import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
+import twoColumnLayout from "@library/layout/TwoColumnLayout";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import { twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
 
 export default {
-    title: "TwoColumnLayout",
+    title: "twoColumnLayout",
     parameters: {
         chromatic: {
-            viewports: Object.values(twoColumnLayoutVariables().panelLayoutBreakPoints),
+            viewports: Object.values(twoColumnLayoutVariables().breakPoints),
         },
     },
 };

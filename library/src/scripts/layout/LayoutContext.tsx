@@ -8,56 +8,42 @@ import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
 import {
-    LayoutTypes,
-    ILayoutMediaQueryFunction,
     IAllLayoutDevices,
-    IAllLayoutMediaQueries,
-} from "@library/layout/types/interface.layout";
-import { ThreeColumnLayoutDevices } from "./types/interface.layoutThreeColumn";
+    LayoutTypes,
+    layoutData,
+    ILayoutMediaQueryFunction,
+    filterQueriesByType,
+} from "@library/layout/types/layouts";
+import {
+    threeColumnLayoutClasses,
+    threeColumnLayoutDevices,
+    threeColumnLayoutVariables,
+} from "@library/layout/types/layout.threeColumns";
 
 export interface ILayoutProps {
     type: LayoutTypes;
     currentDevice: string;
-    Devices: any;
+    Devices: IAllLayoutDevices;
     isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
     isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
     layoutClasses: any;
     currentLayoutVariables: any;
     mediaQueries: ILayoutMediaQueryFunction;
-    contentWidth: () => number;
+    contentWidth: number;
     calculateDevice: () => IAllLayoutDevices;
     layoutSpecificStyles: (style) => any | undefined;
+    rightPanelCondition: (currentDevice: string, shouldRenderLeftPanel: boolean) => boolean;
 }
 
-const filterQueriesByType = (mediaQueriesByType, type) => {
-    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
-        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
-            if (layoutName === type) {
-                // Check if we're in the correct layout before applying
-                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
-                const stylesForLayout = mediaQueriesByLayout[layoutName];
-                if (mediaQueriesForLayout) {
-                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
-                        mediaQueriesForLayout[queryName] = stylesForLayout;
-                        const result = mediaQueriesForLayout[queryName];
-                        return result;
-                    });
-                }
-            }
-        });
-        return {};
-    };
-};
-
-const defaultLayoutVars = getLayout;
+const defaultLayoutVars = threeColumnLayoutVariables();
 
 const LayoutContext = React.createContext<ILayoutProps>({
     type: LayoutTypes.THREE_COLUMNS,
-    currentDevice: ThreeColumnLayoutDevices.DESKTOP,
-    Devices: defaultLayoutVars.Devices,
-    isCompact: defaultLayoutVars.isCompact(ThreeColumnLayoutDevices.DESKTOP),
-    isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
-    layoutClasses: layoutClasses(),
+    currentDevice: threeColumnLayoutDevices.DESKTOP,
+    Devices: defaultLayoutVars.Devices as any,
+    isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
+    isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
+    layoutClasses: threeColumnLayoutClasses(),
     currentLayoutVariables: defaultLayoutVars,
     mediaQueries: filterQueriesByType(
         defaultLayoutVars.mediaQueries,
@@ -66,6 +52,7 @@ const LayoutContext = React.createContext<ILayoutProps>({
     contentWidth: defaultLayoutVars.contentWidth,
     calculateDevice: defaultLayoutVars.calculateDevice,
     layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+    rightPanelCondition: defaultLayoutVars.rightPanelCondition,
 });
 
 export default LayoutContext;
@@ -74,49 +61,56 @@ export function useLayout() {
     return useContext(LayoutContext);
 }
 
+const defaultRenderRightPanel = (currentDevice, shouldRenderLeftPanel) => {
+    return false;
+};
+
 export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
     const { type = LayoutTypes.THREE_COLUMNS, children } = props;
-    const layoutVars = layoutVariables();
-    const currentLayoutVars = layoutVarsByLayoutType({ type, layoutVariables: layoutVars });
-
-    const defaultLayoutVars = layoutVars.layouts.types[LayoutTypes.THREE_COLUMNS];
-
+    const defaultLayoutVars = threeColumnLayoutVariables();
     const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
         type: LayoutTypes.THREE_COLUMNS,
-        currentDevice: ThreeColumnLayoutDevices.DESKTOP,
-        Devices: defaultLayoutVars.Devices,
-        isCompact: defaultLayoutVars.isCompact(ThreeColumnLayoutDevices.DESKTOP),
-        isFullWidth: defaultLayoutVars.isFullWidth(ThreeColumnLayoutDevices.DESKTOP),
-        layoutClasses: layoutClasses({ type: LayoutTypes.THREE_COLUMNS }),
+        currentDevice: threeColumnLayoutDevices.DESKTOP,
+        Devices: defaultLayoutVars.Devices as any,
+        isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
+        isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
+        layoutClasses: threeColumnLayoutClasses(),
         currentLayoutVariables: defaultLayoutVars,
-        mediaQueries: filterQueriesByType(defaultLayoutVars.mediaQueries, LayoutTypes.THREE_COLUMNS),
+        mediaQueries: filterQueriesByType(
+            defaultLayoutVars.mediaQueries,
+            LayoutTypes.THREE_COLUMNS,
+        ) as ILayoutMediaQueryFunction,
         contentWidth: defaultLayoutVars.contentWidth,
         calculateDevice: defaultLayoutVars.calculateDevice,
         layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+        rightPanelCondition: defaultLayoutVars["rightPanelCondition"] ?? defaultRenderRightPanel,
     });
+
+    const layout = layoutData(type);
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
-            const currentDevice = currentLayoutVars.calculateDevice;
+            const currentDevice = layout.variables.calculateDevice();
             setDeviceInfo({
-                type: currentLayoutVars.type,
-                currentDevice: currentDevice,
-                Devices: currentLayoutVars.Devices,
-                isCompact: currentLayoutVars.isCompact(currentDevice),
-                isFullWidth: currentLayoutVars.isFullWidth(currentDevice),
-                layoutClasses: layoutClasses({ type }),
-                currentLayoutVariables: currentLayoutVars,
-                mediaQueries: filterQueriesByType(currentLayoutVars.mediaQueries, currentLayoutVars.type),
-                contentWidth: currentLayoutVars.contentWidth,
-                calculateDevice: currentLayoutVars.calculateDevice,
-                layoutSpecificStyles: currentLayoutVars["layoutSpecificStyles"] ?? undefined,
+                type,
+                currentDevice,
+                Devices: layout.variables.Devices as any,
+                isCompact: layout.variables.isCompact(currentDevice),
+                isFullWidth: layout.variables.isFullWidth(currentDevice),
+                layoutClasses: layout.classes,
+                currentLayoutVariables: layout.variables,
+                mediaQueries: filterQueriesByType(layout.variables.mediaQueries, type),
+                contentWidth: layout.variables.contentWidth,
+                calculateDevice: layout.variables.calculateDevice,
+                layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
+                rightPanelCondition: defaultLayoutVars["rightPanelCondition"] ?? defaultRenderRightPanel,
             });
         }, 100);
         window.addEventListener("resize", throttledUpdate);
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [currentLayoutVars, setDeviceInfo]);
+    }, [layout.variables, setDeviceInfo]);
 
     return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
 }

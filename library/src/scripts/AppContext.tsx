@@ -60,9 +60,7 @@ export function AppContext(props: IProps) {
                                         <SearchFormContextProvider>
                                             <TitleBarDeviceProvider>
                                                 <BannerContextProviderNoHistory>
-                                                    <LayoutProvider>
-                                                        <DeviceProvider>{props.children}</DeviceProvider>
-                                                    </LayoutProvider>
+                                                    <DeviceProvider>{props.children}</DeviceProvider>
                                                 </BannerContextProviderNoHistory>
                                             </TitleBarDeviceProvider>
                                         </SearchFormContextProvider>

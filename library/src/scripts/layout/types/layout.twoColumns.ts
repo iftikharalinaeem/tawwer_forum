@@ -1,28 +1,49 @@
-/*
- * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
+/**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { calc, percent, px, translateY, viewHeight } from "csx";
-import { media } from "typestyle";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { unit } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { IThemeVariables } from "@library/theming/themeReducer";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { ITwoColumnLayoutMediaQueries, TwoColumnLayoutDevices } from "@library/layout/types/interface.layoutTwoColumn";
-import { IPanelLayoutClasses, layoutVariables } from "@library/layout/panelLayoutStyles";
+import { media } from "typestyle";
+import { calc, percent, px } from "csx";
+import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { unit } from "@library/styles/styleHelpers";
+import { IPanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
+import { LayoutTypes } from "@library/layout/types/layouts";
 
-export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
-    const globalVars = globalVariables(forcedVars);
-    const panelLayoutVars = layoutVariables();
-    const makeThemeVars = variableFactory("twoColumnLayout", forcedVars);
-    const fullPadding = panelWidgetVariables().spacing.padding * 2;
+export enum twoColumnLayoutDevices {
+    XS = "xs",
+    MOBILE = "mobile",
+    DESKTOP = "desktop",
+    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
+}
 
-    const { gutter, contentWidth } = panelLayoutVars;
-    const { fullGutter } = panelLayoutVars.foundationalWidths;
+export interface ITwoColumnLayoutMediaQueryStyles {
+    noBleed?: NestedCSSProperties;
+    noBleedDown?: NestedCSSProperties;
+    oneColumn?: NestedCSSProperties;
+    oneColumnDown?: NestedCSSProperties;
+    aboveOneColumn?: NestedCSSProperties;
+    xs?: NestedCSSProperties;
+}
+
+export interface ITwoColumnLayoutMediaQueries {
+    noBleed: (styles: NestedCSSProperties) => NestedCSSProperties;
+    oneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
+    oneColumnDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    aboveOneColumn: (styles: NestedCSSProperties) => NestedCSSProperties;
+    noBleedDown: (styles: NestedCSSProperties) => NestedCSSProperties;
+    xs: (styles: NestedCSSProperties) => NestedCSSProperties;
+}
+
+export const twoColumnLayoutVariables = useThemeCache((props = {}) => {
+    const layoutVars = layoutVariables();
+    const Devices = twoColumnLayoutDevices;
+    const { gutter, contentWidth } = layoutVars;
+    const { fullGutter } = layoutVars.foundationalWidths;
+
+    const makeThemeVars = variableFactory("twoColumnLayout");
 
     // Important variables that will be used to calculate other variables
     const foundationalWidths = makeThemeVars("foundationalWidths", {
@@ -30,22 +51,30 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         minimalMiddleColumnWidth: 600,
         panelWidth: 343,
         breakPoints: {
-            xs: panelLayoutVars.foundationalWidths.breakPoints.xs,
+            xs: layoutVars.foundationalWidths.breakPoints.xs,
         }, // Other break point are calculated
     });
 
-    const panel = makeThemeVars("panel", {
+    const panelInit = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,
-        paddedWidth: foundationalWidths.panelWidth + fullPadding * 2,
     });
 
-    const mainColumnPaddedWidth = globalContentWidth - gutter.size - panel.paddedWidth;
-    const mainColumnWidth = mainColumnPaddedWidth - fullPadding * 2;
+    const panel = makeThemeVars("panel", {
+        ...panelInit,
+        paddedWidth: panelInit.width + layoutVars.gutter.full,
+    });
 
-    const spacing = makeThemeVars("spacing", panelLayoutVars.panelLayoutSpacing);
+    const middleColumnInit = makeThemeVars("middleColumn", {
+        width: contentWidth - panel.paddedWidth - layoutVars.gutter.full,
+    });
+
+    const middleColumn = makeThemeVars("middleColumn", {
+        ...middleColumnInit,
+        paddedWidth: middleColumnInit.width + layoutVars.gutter.full,
+    });
 
     const breakPoints = makeThemeVars("breakPoints", {
-        noBleed: globalContentWidth,
+        noBleed: contentWidth,
         oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
         xs: foundationalWidths.breakPoints.xs,
     });
@@ -117,8 +146,6 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
         };
     };
 
-    const Devices = TwoColumnLayoutDevices;
-
     const calculateDevice = () => {
         const width = document.body.clientWidth;
         if (width <= breakPoints.xs) {
@@ -141,17 +168,17 @@ export const twoColumnLayoutVariables = useThemeCache((forcedVars?: IThemeVariab
     };
 
     return {
+        type: LayoutTypes.TWO_COLUMNS,
+        Devices,
         foundationalWidths,
-        gutter,
         panel,
-        mainColumnPaddedWidth,
-        mainColumnWidth,
-        mediaQueries,
-        spacing,
+        middleColumn,
+        contentWidth,
         breakPoints,
+        mediaQueries,
+        calculateDevice,
         isFullWidth,
         isCompact,
-        calculateDevice,
     };
 });
 
@@ -183,12 +210,11 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
 
     const leftColumn = style("leftColumn", {});
 
-    return {
-        // ...panelLayoutClasses(),
+    const classes: IPanelLayoutClasses = {
+        ...threeColumnLayoutClasses(),
         rightColumn,
         leftColumn,
         middleColumnMaxWidth,
-    } as IPanelLayoutClasses;
+    };
+    return classes;
 });
-
-// Add function to generate panel classes to utils... or panellayout? Make sure to fallback to that in panelLayoutClasses() for less refactoring

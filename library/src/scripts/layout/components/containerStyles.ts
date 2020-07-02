@@ -65,7 +65,7 @@ export const containerMainStyles = (): NestedCSSProperties => {
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: globalVars.content.width,
+        maxWidth: layoutVariables().contentWidth,
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings(vars.spacing.padding),
