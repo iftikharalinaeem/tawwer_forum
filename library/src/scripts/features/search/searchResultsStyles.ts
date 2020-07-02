@@ -179,6 +179,7 @@ export const searchResultClasses = useThemeCache(() => {
 
     const root = style({
         display: "block",
+        width: percent(100),
         ...paddings(vars.spacing.padding),
     });
 

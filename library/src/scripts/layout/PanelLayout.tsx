@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
@@ -15,7 +14,6 @@ import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
-import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
 import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IPanelLayoutProps {
@@ -74,7 +72,8 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const { layoutClasses, currentDevice, isCompact, isFullWidth, rightPanelCondition } = useLayout();
+    const { classes, currentDevice, isCompact, isFullWidth, rightPanelCondition, type } = useLayout();
+
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
     const measuredPanelTop = sidePanelMeasure.top;
@@ -95,7 +94,7 @@ export default function PanelLayout(props: IPanelLayoutProps) {
 
     // Determine the classes we want to display.
     const panelClasses = classNames(
-        layoutClasses.root,
+        classes.root,
         { noLeftPanel: !shouldRenderLeftPanel },
         { noRightPanel: !shouldRenderRightPanel },
         { noBreadcrumbs: !childComponents.breadcrumbs },
@@ -110,12 +109,10 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     return (
         <div className={panelClasses}>
             {childComponents.breadcrumbs && (
-                <div className={classNames(layoutClasses.container, layoutClasses.breadcrumbsContainer)}>
-                    {shouldRenderLeftPanel && (
-                        <Panel className={classNames(layoutClasses.leftColumn)} ariaHidden={true} />
-                    )}
+                <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
+                    {shouldRenderLeftPanel && <Panel className={classNames(classes.leftColumn)} ariaHidden={true} />}
                     <PanelAreaHorizontalPadding
-                        className={classNames(layoutClasses.middleColumnMaxWidth, {
+                        className={classNames(classes.middleColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel,
                         })}
                     >
@@ -124,15 +121,15 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                 </div>
             )}
 
-            <main className={classNames(layoutClasses.main, props.growMiddleBottom ? inheritHeightClass() : "")}>
+            <main className={classNames(classes.main, props.growMiddleBottom ? inheritHeightClass() : "")}>
                 <div
                     ref={panelRef}
-                    className={classNames(layoutClasses.container, props.growMiddleBottom ? inheritHeightClass() : "")}
+                    className={classNames(classes.container, props.growMiddleBottom ? inheritHeightClass() : "")}
                 >
                     {!isCompact && shouldRenderLeftPanel && (
                         <Panel
-                            className={classNames(layoutClasses.leftColumn, offsetClass, panelOffsetClass, {
-                                [layoutClasses.isSticky]: isFixed,
+                            className={classNames(classes.leftColumn, offsetClass, panelOffsetClass, {
+                                [classes.isSticky]: isFixed,
                             })}
                         >
                             <PanelOverflow
@@ -147,14 +144,14 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                     )}
 
                     <ContentTag
-                        className={classNames(layoutClasses.content, layoutClasses.middleColumnMaxWidth, {
+                        className={classNames(classes.content, classes.middleColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
                             hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                         })}
                     >
                         <Panel
                             className={classNames(
-                                layoutClasses.middleColumn,
+                                classes.middleColumn,
                                 props.growMiddleBottom ? inheritHeightClass() : "",
                             )}
                         >
@@ -175,8 +172,8 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                     </ContentTag>
                     {shouldRenderRightPanel && (
                         <Panel
-                            className={classNames(layoutClasses.rightColumn, offsetClass, panelOffsetClass, {
-                                [layoutClasses.isSticky]: isFixed,
+                            className={classNames(classes.rightColumn, offsetClass, panelOffsetClass, {
+                                [classes.isSticky]: isFixed,
                             })}
                         >
                             <PanelOverflow offset={overflowOffset}>
@@ -210,7 +207,7 @@ interface IContainerProps {
 
 export function Panel(props: IContainerProps) {
     const Tag = (props.tag as "div") || "div";
-    const classes = props.panelClasses ?? threeColumnLayoutClasses();
+    const { classes } = useLayout();
     return (
         <Tag className={classNames(classes.panel, props.className)} aria-hidden={props.ariaHidden} ref={props.innerRef}>
             {props.children}

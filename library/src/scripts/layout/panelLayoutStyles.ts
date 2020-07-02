@@ -4,20 +4,15 @@
  * @license GPL-2.0-only
  */
 
-import { calc, color, percent, px, translateY, viewHeight } from "csx";
-import { cssRule, media } from "typestyle";
-import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
+import { px } from "csx";
+import { media } from "typestyle";
+import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { margins, paddings, sticky, unit } from "@library/styles/styleHelpers";
-import { important } from "csx/lib/strings";
-import { panelListClasses } from "@library/layout/panelListStyles";
-import { titleBarVariables } from "@library/headers/titleBarStyles";
-import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
 
+// Global defaults for layouts. These variables are not meant to be used extended through a layout type, like a three or two column layout
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const makeThemeVars = variableFactory("layoutVariables", forcedVars);

@@ -26,7 +26,7 @@ export interface ILayoutProps {
     Devices: IAllLayoutDevices;
     isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
     isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
-    layoutClasses: any;
+    classes: any;
     currentLayoutVariables: any;
     mediaQueries: ILayoutMediaQueryFunction;
     contentWidth: number;
@@ -43,7 +43,7 @@ const LayoutContext = React.createContext<ILayoutProps>({
     Devices: defaultLayoutVars.Devices as any,
     isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
     isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
-    layoutClasses: threeColumnLayoutClasses(),
+    classes: threeColumnLayoutClasses(),
     currentLayoutVariables: defaultLayoutVars,
     mediaQueries: filterQueriesByType(
         defaultLayoutVars.mediaQueries,
@@ -65,28 +65,25 @@ const defaultRenderRightPanel = (currentDevice, shouldRenderLeftPanel) => {
     return false;
 };
 
-export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
-    const { type = LayoutTypes.THREE_COLUMNS, children } = props;
-    const defaultLayoutVars = threeColumnLayoutVariables();
+export function LayoutProvider(props: { type: LayoutTypes; children: React.ReactNode }) {
+    const { type, children } = props;
+    const layout = layoutData(type);
+    const currentDevice = layout.variables.calculateDevice();
+
     const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
-        type: LayoutTypes.THREE_COLUMNS,
-        currentDevice: threeColumnLayoutDevices.DESKTOP,
-        Devices: defaultLayoutVars.Devices as any,
-        isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
-        isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
-        layoutClasses: threeColumnLayoutClasses(),
-        currentLayoutVariables: defaultLayoutVars,
-        mediaQueries: filterQueriesByType(
-            defaultLayoutVars.mediaQueries,
-            LayoutTypes.THREE_COLUMNS,
-        ) as ILayoutMediaQueryFunction,
-        contentWidth: defaultLayoutVars.contentWidth,
-        calculateDevice: defaultLayoutVars.calculateDevice,
-        layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+        type,
+        currentDevice,
+        Devices: layout.variables.Devices as any,
+        isCompact: layout.variables.isCompact(currentDevice),
+        isFullWidth: layout.variables.isFullWidth(currentDevice),
+        classes: layout.classes,
+        currentLayoutVariables: layout.variables,
+        mediaQueries: filterQueriesByType(layout.variables.mediaQueries, type),
+        contentWidth: layout.variables.contentWidth,
+        calculateDevice: layout.variables.calculateDevice,
+        layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
         rightPanelCondition: defaultLayoutVars["rightPanelCondition"] ?? defaultRenderRightPanel,
     });
-
-    const layout = layoutData(type);
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
@@ -97,7 +94,7 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
                 Devices: layout.variables.Devices as any,
                 isCompact: layout.variables.isCompact(currentDevice),
                 isFullWidth: layout.variables.isFullWidth(currentDevice),
-                layoutClasses: layout.classes,
+                classes: layout.classes,
                 currentLayoutVariables: layout.variables,
                 mediaQueries: filterQueriesByType(layout.variables.mediaQueries, type),
                 contentWidth: layout.variables.contentWidth,

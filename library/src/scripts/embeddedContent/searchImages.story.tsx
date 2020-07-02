@@ -5,10 +5,7 @@
 
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storyWithConfig } from "@library/storybook/StoryContext";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import { EventList as EventListComponent } from "@groups/events/ui/EventList";
-import { EventAttendance } from "@groups/events/state/eventsTypes";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
