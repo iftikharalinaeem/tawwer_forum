@@ -8,6 +8,7 @@
 namespace Vanilla\Cloud\ElasticSearch\Http;
 
 use Garden\Http\HttpClient;
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 
@@ -40,9 +41,14 @@ class ElasticHttpClient extends HttpClient {
 
         $this->throwExceptions = true;
         $this->setDefaultHeaders([
-            'Authorization' => 'Bearer '.$clientConfig->getAuthJWT(),
             'content-type' => 'application/json',
         ]);
+
+        // Add a middleware to JWT auths are created at the correct time.
+        $this->addMiddleware(function (HttpRequest $request, callable $next) use ($clientConfig) : HttpResponse {
+            $request->setHeader('Authorization', 'Bearer '.$clientConfig->getAuthJWT());
+            return $next($request);
+        });
     }
 
     /**

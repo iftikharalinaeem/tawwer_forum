@@ -41,6 +41,8 @@ class DevElasticHttpConfig extends AbstractElasticHttpConfig {
             );
         }
 
+        $this->secret = $secret;
+
         $accountID = $config->get(self::CONFIG_ACCOUNT_ID, null);
         if ($accountID === null) {
             throw new ServerException(
@@ -67,7 +69,7 @@ class DevElasticHttpConfig extends AbstractElasticHttpConfig {
      * @return string
      */
     public function getBaseUrl(): string {
-        return 'https://ms-vanilla-search-api-dev.v-fabric.net/api/v1.0/';
+        return 'https://ms-vanilla-search-api-dev.v-fabric.net/api/v1.0';
     }
 
     /**
@@ -85,6 +87,6 @@ class DevElasticHttpConfig extends AbstractElasticHttpConfig {
      * @return string
      */
     protected function getSecret(): string {
-        return '{{DEV_SEARCH_API_SECRET}}';
+        return $this->secret;
     }
 }

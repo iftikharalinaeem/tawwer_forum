@@ -106,4 +106,22 @@ abstract class ResourceEvent {
         $type = lcfirst(preg_replace('/Event$/', '', $baseName));
         return $type;
     }
+
+    /**
+     * Create a normalized variation of the record's payload.
+     *
+     * @return array
+     */
+    public function getNormalizedRecordPayload(): array {
+        $result = [
+            'recordType' => $this->getType(),
+        ];
+
+        $idKey = $this->type . 'ID';
+        $payloadRecord = $this->payload[$this->type] ?? $this->payload;
+        $recordID = $payloadRecord['recordID'] ?? $payloadRecord[$idKey] ?? null;
+        $result['recordID'] = $recordID;
+
+        return $result;
+    }
 }

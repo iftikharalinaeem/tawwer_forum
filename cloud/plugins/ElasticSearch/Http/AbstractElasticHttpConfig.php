@@ -37,7 +37,8 @@ abstract class AbstractElasticHttpConfig {
             'exp' => $timestamp + 10,
         ];
 
-        return JWT::encode($fullPayload, $this->getSecret(), 'HS512');
+        $var = JWT::encode($fullPayload, $this->getSecret(), 'HS512');
+        return $var;
     }
 
     /**
