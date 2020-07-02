@@ -169,11 +169,16 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @param array $query The request query.
-     * @throws NotFoundException if the user could not be found.
      * @return Data
+     * @throws ServerException
+     * @throws NotFoundException if the user could not be found.
      */
     public function get($id, array $query) {
         $session = $this->getSession();
+        if (!$session instanceof Gdn_Session) {
+            throw new ServerException("Session not available.", 500);
+        }
+        
         $showFullSchema = false;
         if ($session->checkPermission([
             'Garden.Users.Add',
@@ -974,11 +979,7 @@ class UsersApiController extends AbstractApiController {
                 'name:s?',
                 'email:s?',
                 'photoUrl:s?',
-                'roleID:a?' => [
-                    'type' => 'array',
-                    'items' => ['type' => 'integer'],
-                    'description' => 'Roles to set on the user.'
-                ],
+                'roles:a?',
                 'dateInserted',
                 'dateLastActive:dt',
                 'CountDiscussions?',
