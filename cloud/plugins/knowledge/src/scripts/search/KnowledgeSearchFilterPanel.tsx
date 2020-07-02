@@ -12,7 +12,7 @@ import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm, SearchFormContextProvider } from "@library/search/SearchFormContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import KnowledgeBaseInput from "@knowledge/knowledge-bases/KnowledgeBaseInput";
@@ -20,6 +20,8 @@ import { registerReducer } from "@vanilla/library/src/scripts/redux/reducerRegis
 import knowledgeReducer from "@knowledge/state/reducer";
 import InputBlock from "@library/forms/InputBlock";
 import { IKnowledgeSearchTypes } from "@knowledge/search/knowledgeSearchTypes";
+import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
+import { cssOut } from "@dashboard/compatibilityStyles";
 
 registerReducer("knowledge", knowledgeReducer);
 
@@ -31,6 +33,9 @@ export function KnowledgeSearchFilterPanel() {
 
     const classesInputBlock = inputBlockClasses();
     const classesDateRange = dateRangeClasses();
+
+    cssOut(".suggestedTextInput-option", suggestedTextStyleHelper().option);
+
     return (
         <FilterFrame title={t("Filter Results")} handleSubmit={search}>
             <InputTextBlock
