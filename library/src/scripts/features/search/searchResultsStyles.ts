@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {
@@ -19,11 +18,11 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent, px } from "csx";
-import { media } from "typestyle";
+import { calc, percent } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { BorderBottomProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
+import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -78,18 +77,6 @@ export const searchResultsVariables = useThemeCache(() => {
         margin: 12,
     });
 
-    const breakPoints = makeThemeVars("breakPoints", {
-        compact: 800,
-    });
-
-    const mediaQueries = () => {
-        const compact = styles => {
-            return media({ maxWidth: px(breakPoints.compact) }, styles);
-        };
-
-        return { compact };
-    };
-
     return {
         colors,
         title,
@@ -99,8 +86,6 @@ export const searchResultsVariables = useThemeCache(() => {
         spacing,
         icon,
         mediaElement,
-        breakPoints,
-        mediaQueries,
     };
 });
 
@@ -108,7 +93,7 @@ export const searchResultsClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
-    const mediaQueries = layoutVariables().mediaQueries();
+    const { mediaQueries } = useLayout();
 
     const root = style(
         {
@@ -120,8 +105,17 @@ export const searchResultsClasses = useThemeCache(() => {
             }),
             marginTop: negativeUnit(globalVars.gutter.half),
         } as NestedCSSProperties,
-        mediaQueries.oneColumnDown({
-            borderTop: 0,
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    borderTop: 0,
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    borderTop: 0,
+                },
+            },
         }),
     );
     const noResults = style("noResults", {
@@ -162,8 +156,10 @@ export const searchResultClasses = useThemeCache(() => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResult");
-    const mediaQueries = vars.mediaQueries();
+    const { mediaQueries } = useLayout();
     const metaVars = metasVariables();
+
+    console.log("layout data: ", useLayout());
 
     const linkColors = clickableItemStates();
 
@@ -193,13 +189,36 @@ export const searchResultClasses = useThemeCache(() => {
             width: percent(100),
             color: colorOut(vars.title.font.color),
         },
-        mediaQueries.compact({
-            flexWrap: "wrap",
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    flexWrap: "wrap",
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    flexWrap: "wrap",
+                },
+            },
         }),
     );
 
     const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
     const iconWidth = vars.icon.size + vars.spacing.padding.left;
+
+    const mainCompactStyles: NestedCSSProperties = {
+        $nest: {
+            "&.hasMedia": {
+                width: percent(100),
+            },
+            "&.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+            "&.hasMedia.hasIcon": {
+                width: calc(`100% - ${unit(iconWidth)}`),
+            },
+        },
+    };
 
     const main = style(
         "main",
@@ -218,20 +237,25 @@ export const searchResultClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.compact({
-            $nest: {
-                "&.hasMedia": {
-                    width: percent(100),
-                },
-                "&.hasIcon": {
-                    width: calc(`100% - ${unit(iconWidth)}`),
-                },
-                "&.hasMedia.hasIcon": {
-                    width: calc(`100% - ${unit(iconWidth)}`),
-                },
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: mainCompactStyles,
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: mainCompactStyles,
             },
         }),
     );
+
+    const mediaElementCompactStyles: NestedCSSProperties = {
+        width: percent(100),
+        marginLeft: "auto",
+        $nest: {
+            "&.hasImage": {
+                height: unit(vars.mediaElement.width),
+            },
+        },
+    };
 
     const mediaElement = style(
         "mediaElement",
@@ -240,13 +264,12 @@ export const searchResultClasses = useThemeCache(() => {
             width: unit(vars.mediaElement.width),
             overflow: "hidden",
         },
-        mediaQueries.compact({
-            width: percent(100),
-            marginLeft: "auto",
-            $nest: {
-                "&.hasImage": {
-                    height: unit(vars.mediaElement.width),
-                },
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: mediaElementCompactStyles,
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: mediaElementCompactStyles,
             },
         }),
     );
@@ -255,16 +278,25 @@ export const searchResultClasses = useThemeCache(() => {
         ...objectFitWithFallback(),
     });
 
+    const attachmentCompactStyles: NestedCSSProperties = {
+        flexWrap: "wrap",
+        width: percent(100),
+        marginTop: unit(12),
+    };
+
     const attachments = style(
         "attachments",
         {
             display: "flex",
             flexWrap: "nowrap",
         },
-        mediaQueries.compact({
-            flexWrap: "wrap",
-            width: percent(100),
-            marginTop: unit(12),
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: attachmentCompactStyles,
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: attachmentCompactStyles,
+            },
         }),
     );
 

@@ -8,20 +8,14 @@ import { cssRule, media } from "typestyle";
 import { calc, important, percent, px, viewHeight } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { margins, paddings, sticky, unit } from "@library/styles/styleHelpers";
-import { IPanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { fallbackLayoutVariables, IPanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import { LayoutTypes } from "@library/layout/types/layouts";
+import { LayoutTypes } from "@library/layout/LayoutContext";
 
-export enum threeColumnLayoutDevices {
-    XS = "xs",
-    MOBILE = "mobile",
-    TABLET = "tablet",
-    DESKTOP = "desktop",
-    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
-}
+const threeColumnLayoutDevices = fallbackLayoutVariables;
 
 export interface IThreeColumnLayoutMediaQueryStyles {
     noBleed?: NestedCSSProperties;

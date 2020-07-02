@@ -9,8 +9,15 @@ import { media } from "typestyle";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 import { IThemeVariables } from "@library/theming/themeReducer";
+
+export enum fallbackLayoutVariables {
+    XS = "xs",
+    MOBILE = "mobile",
+    TABLET = "tablet",
+    DESKTOP = "desktop",
+    NO_BLEED = "no_bleed", // Not enough space for back link which goes outside the margin.
+}
 
 // Global defaults for layouts. These variables are not meant to be used extended through a layout type, like a three or two column layout
 export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -42,7 +49,7 @@ export const layoutVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         quarterSize: foundationalWidths.fullGutter / 8, // 6
     });
 
-    const fullPadding = panelWidgetVariables().spacing.padding * 2;
+    const fullPadding = globalVars.widget.padding * 2;
 
     const panel = makeThemeVars("panel", {
         width: foundationalWidths.panelWidth,

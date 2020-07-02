@@ -4,8 +4,7 @@
  */
 import React from "react";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { LayoutProvider } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/types/layouts";
+import { LayoutProvider, LayoutTypes } from "@library/layout/LayoutContext";
 
 interface IProps extends Omit<IPanelLayoutProps, "leftTop" | "leftBottom" | "renderLeftPanelBackground"> {}
 

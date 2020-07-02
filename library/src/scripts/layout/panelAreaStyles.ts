@@ -4,22 +4,21 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent, calc, linearGradient, ColorHelper, translateY } from "csx";
+import { percent, calc, linearGradient, ColorHelper } from "csx";
 import { styleFactory, useThemeCache } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
-import { panelWidgetClasses, panelWidgetVariables } from "@library/layout/panelWidgetStyles";
-import { paddings, unit, colorOut, ColorValues } from "@library/styles/styleHelpers";
-import { NestedCSSSelectors } from "typestyle/lib/types";
+import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
+import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
+import { NestedCSSProperties } from "typestyle/lib/types";
+
+import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
 
 export const panelAreaClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const layoutVars = layoutVariables();
-    const vars = layoutVariables();
-    const mediaQueries = vars.mediaQueries();
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses();
+    const { mediaQueries } = useLayout();
 
     const root = style(
         {
@@ -44,11 +43,22 @@ export const panelAreaClasses = useThemeCache(() => {
                     ...paddings({ all: 0 }),
                 },
             },
-        },
-        mediaQueries.oneColumnDown({
-            ...paddings({
-                horizontal: 0,
-            }),
+        } as NestedCSSProperties,
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        horizontal: 0,
+                    }),
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        horizontal: 0,
+                    }),
+                },
+            },
         }),
     );
 

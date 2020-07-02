@@ -7,19 +7,115 @@
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
+import { fallbackLayoutVariables, IPanelLayoutClasses, layoutVariables } from "@library/layout/panelLayoutStyles";
 import {
-    IAllLayoutDevices,
-    LayoutTypes,
-    layoutData,
-    ILayoutMediaQueryFunction,
-    filterQueriesByType,
-} from "@library/layout/types/layouts";
+    ITwoColumnLayoutMediaQueries,
+    ITwoColumnLayoutMediaQueryStyles,
+    twoColumnLayoutClasses,
+    twoColumnLayoutDevices,
+    twoColumnLayoutVariables,
+} from "@library/layout/types/layout.twoColumns";
 import {
-    threeColumnLayoutClasses,
-    threeColumnLayoutDevices,
+    IThreeColumnLayoutMediaQueries,
+    IThreeColumnLayoutMediaQueryStyles,
     threeColumnLayoutVariables,
 } from "@library/layout/types/layout.threeColumns";
-import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { NestedCSSProperties } from "typestyle/lib/types";
+import { panelListClasses } from "@library/layout/panelListStyles";
+
+export enum LayoutTypes {
+    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
+    TWO_COLUMNS = "two column", // Single column, but full width of page
+    // ONE_COLUMN = "one column", // Single column, but full width of page
+    // NARROW = "one column narrow", // Single column, but narrower than default
+    // LEGACY = "legacy", // Legacy layout used on the Forum pages. The media queries are also used for older components. Newer ones should use the context
+}
+
+export interface IAllLayoutMediaQueries {
+    [LayoutTypes.TWO_COLUMNS]?: ITwoColumnLayoutMediaQueryStyles;
+    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
+}
+
+export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
+
+export type IAllLayoutDevices = twoColumnLayoutDevices | fallbackLayoutVariables;
+
+export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries;
+
+/* Allows to declare styles for any layout without causing errors
+Declare media query styles like this:
+
+    mediaQueries({
+        [LayoutTypes.TWO_COLUMNS]: {
+            oneColumnDown: {
+                ...srOnly(),
+            },
+        },
+        [LayoutTypes.THREE_COLUMNS]: {
+            twoColumns: {
+                // Styles go here
+            }
+        }
+    }),
+
+
+Note that "twoColumns" does not exist in the two column layout media queries, but it does not crash!
+*/
+
+export const filterQueriesByType = (mediaQueriesByType, type) => {
+    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
+        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
+            if (layoutName === type) {
+                // Check if we're in the correct layout before applying
+                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
+                const stylesForLayout = mediaQueriesByLayout[layoutName];
+                if (mediaQueriesForLayout) {
+                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
+                        mediaQueriesForLayout[queryName] = stylesForLayout;
+                        const result = mediaQueriesForLayout[queryName];
+                        return result;
+                    });
+                }
+            }
+        });
+        return {};
+    };
+};
+
+export const allLayouts = (props: { offset?: number } = {}) => {
+    const mediaQueriesByType = {};
+
+    const variablesByType = {
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutVariables(),
+        [LayoutTypes.TWO_COLUMNS]: twoColumnLayoutVariables(),
+    };
+
+    const classesByType = {
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutVariables(),
+        [LayoutTypes.TWO_COLUMNS]: twoColumnLayoutClasses(),
+    };
+
+    Object.keys(LayoutTypes).forEach(layoutName => {
+        const enumKey = LayoutTypes[layoutName];
+        const layoutData = variablesByType[enumKey];
+        mediaQueriesByType[enumKey] = layoutData.mediaQueries();
+    });
+
+    return {
+        mediaQueriesByType,
+        classesByType,
+        variablesByType,
+    };
+};
+
+export const layoutData = (type: LayoutTypes = LayoutTypes.THREE_COLUMNS) => {
+    const layouts = allLayouts();
+    return {
+        mediaQueries: layouts.mediaQueriesByType[type] as IAllMediaQueriesForLayouts,
+        classes: layouts.classesByType[type] as IPanelLayoutClasses,
+        variables: layouts.variablesByType[type],
+    };
+};
 
 export interface ILayoutProps {
     type: LayoutTypes;
@@ -36,25 +132,20 @@ export interface ILayoutProps {
     rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
-const defaultLayoutVars = threeColumnLayoutVariables();
-
 const LayoutContext = React.createContext<ILayoutProps>({
     type: LayoutTypes.THREE_COLUMNS,
-    currentDevice: threeColumnLayoutDevices.DESKTOP,
-    Devices: defaultLayoutVars.Devices as any,
-    isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
-    isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
-    classes: threeColumnLayoutClasses(),
-    currentLayoutVariables: defaultLayoutVars,
-    mediaQueries: filterQueriesByType(
-        defaultLayoutVars.mediaQueries,
-        LayoutTypes.THREE_COLUMNS,
-    ) as ILayoutMediaQueryFunction,
-    contentWidth: defaultLayoutVars.contentWidth,
-    calculateDevice: defaultLayoutVars.calculateDevice,
-    layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
-    rightPanelCondition: defaultLayoutVars.rightPanelCondition,
-});
+    currentDevice: fallbackLayoutVariables.DESKTOP,
+    Devices: fallbackLayoutVariables as any,
+    // isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
+    // isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
+    // classes: threeColumnLayoutClasses(),
+    // currentLayoutVariables: defaultLayoutVars,
+    mediaQueries: layoutVariables().mediaQueries,
+    // contentWidth: defaultLayoutVars.contentWidth,
+    // calculateDevice: defaultLayoutVars.calculateDevice,
+    // layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
+    // rightPanelCondition: defaultLayoutVars.rightPanelCondition,
+} as any);
 
 export default LayoutContext;
 
@@ -66,10 +157,12 @@ const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
     return false;
 };
 
-export function LayoutProvider(props: { type: LayoutTypes; children: React.ReactNode }) {
-    const { type, children } = props;
+export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
+    const { type = LayoutTypes.THREE_COLUMNS, children } = props;
     const layout = layoutData(type);
     const currentDevice = layout.variables.calculateDevice();
+
+    console.log("trigger: ", type);
 
     const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
         type,

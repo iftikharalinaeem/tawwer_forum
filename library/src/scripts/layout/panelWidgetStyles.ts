@@ -4,11 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { color, percent } from "csx";
+import { percent } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
-import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
 
 // @Deprecated - Use globalVariables().widget.padding directly
 export const panelWidgetVariables = useThemeCache(() => {
@@ -23,9 +23,9 @@ export const panelWidgetVariables = useThemeCache(() => {
 
 export const panelWidgetClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const mediaQueries = layoutVariables().mediaQueries();
     const style = styleFactory("panelWidget");
     const vars = panelWidgetVariables();
+    const { mediaQueries } = useLayout();
 
     const root = style(
         {
@@ -48,10 +48,21 @@ export const panelWidgetClasses = useThemeCache(() => {
                 },
             },
         },
-        mediaQueries.oneColumnDown({
-            ...paddings({
-                all: vars.spacing.padding,
-            }),
+        mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        all: vars.spacing.padding,
+                    }),
+                },
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                oneColumnDown: {
+                    ...paddings({
+                        all: vars.spacing.padding,
+                    }),
+                },
+            },
         }),
     );
 

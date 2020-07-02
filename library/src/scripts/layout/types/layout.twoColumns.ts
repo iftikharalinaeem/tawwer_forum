@@ -10,7 +10,7 @@ import { styleFactory, useThemeCache, variableFactory } from "@library/styles/st
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { IPanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
-import { LayoutTypes } from "@library/layout/types/layouts";
+import { LayoutTypes } from "@library/layout/LayoutContext";
 
 export enum twoColumnLayoutDevices {
     XS = "xs",

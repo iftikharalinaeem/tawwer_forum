@@ -65,6 +65,16 @@ export default function Result(props: IResult) {
 
     const { isCompact } = useLayout();
 
+    const excerptElement =
+        excerpt && excerpt.length > 0 ? (
+            <Paragraph className={classes.excerpt}>
+                <>
+                    <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
+                    {afterExcerpt}
+                </>
+            </Paragraph>
+        ) : null;
+
     return (
         <li className={classNames(classesSearchResults.item, className)}>
             <article className={classesSearchResults.result}>
@@ -76,17 +86,11 @@ export default function Result(props: IResult) {
                                 <HeadingTag className={classes.title}>{name}</HeadingTag>
                             </SmartLink>
                             {meta && <div className={classes.metas}>{meta}</div>}
-                            {isCompact && ""}
-                            {!!excerpt && (
-                                <Paragraph className={classes.excerpt}>
-                                    <>
-                                        <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
-                                        {afterExcerpt}
-                                    </>
-                                </Paragraph>
-                            )}
+                            {isCompact && media}
+                            {!isCompact && excerptElement}
                         </div>
                         {!isCompact && media}
+                        {isCompact && excerptElement}
                     </div>
                 </div>
             </article>
