@@ -18,6 +18,11 @@ import { t } from "@vanilla/i18n";
 import { EventsHomePagePlaceholder } from "@groups/events/pages/EventsHomePagePlaceholder";
 import { PageHeading } from "@vanilla/library/src/scripts/layout/PageHeading";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
+import { useUser } from "@vanilla/library/src/scripts/features/users/userHooks";
+import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
+import { notEmpty } from "@vanilla/utils";
+import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
+import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 
 export default function EventsHomePage({ loading }: any) {
     const params = useParams<{ parentRecordType: string }>();
@@ -29,6 +34,15 @@ export default function EventsHomePage({ loading }: any) {
 
     const { filter, changeFilter } = useEventsListFilterQuery(page);
     const { parentRecordType } = params;
+
+    const user = useUser({ userID: 1 });
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data) {
+        return <Loader />;
+    }
+
+    if (!user.data || user.error) {
+        return <ErrorMessages errors={[user.error].filter(notEmpty)} />;
+    }
 
     if (loading) {
         return <EventsHomePagePlaceholder />;

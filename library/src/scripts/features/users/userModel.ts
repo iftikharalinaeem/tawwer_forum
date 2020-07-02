@@ -39,6 +39,7 @@ interface IUsersState {
         lastRequested: number | null; // A timestamp of the last time we received this count data.
     };
     suggestions: IUserSuggestionState;
+    user: ILoadable<IUser>;
 }
 
 export interface IUsersStoreState {
@@ -59,6 +60,9 @@ export const INITIAL_USERS_STATE: IUsersState = {
         lastRequested: null,
     },
     suggestions: suggestionReducer(undefined, "" as any),
+    user: {
+        status: LoadStatus.PENDING,
+    },
 };
 
 export const GUEST_USER_ID = 0;
@@ -108,6 +112,20 @@ export const usersReducer = produce(
         })
         .case(UserActions.getCountsACs.done, (state, payload) => {
             state.countInformation.counts = payload.result.counts;
+            return state;
+        })
+        .case(UserActions.getUserACs.started, state => {
+            state.user.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(UserActions.getUserACs.done, (state, payload) => {
+            state.user.data = payload.result;
+            state.user.status = LoadStatus.SUCCESS;
+            return state;
+        })
+        .case(UserActions.getUserACs.failed, (state, payload) => {
+            state.user.status = LoadStatus.ERROR;
+            state.user.error = payload.error;
             return state;
         })
         .default((state, action) => {
