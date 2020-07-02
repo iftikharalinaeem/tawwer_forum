@@ -2667,8 +2667,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         }
 
         $showEmail = $row['ShowEmail'] ?? 0;
-        if (
-            $showEmail === 0 &&
+        if ($showEmail === 0 &&
             !$this->session->checkPermission('Garden.Moderation.Manage')
         ) {
             unset($row['Email']);
