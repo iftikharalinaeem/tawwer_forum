@@ -10,7 +10,6 @@ import SearchOption from "@library/features/search/SearchOption";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
@@ -34,6 +33,7 @@ import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     placeholder?: string;
@@ -49,8 +49,7 @@ function SearchPage(props: IProps) {
         getCurrentDomain,
         getDefaultFormValues,
     } = useSearchForm<{}>();
-    const device = useDevice();
-    const isMobile = device === Devices.MOBILE || device === Devices.XS;
+    const { isCompact } = useLayout();
     const classes = pageTitleClasses();
     useInitialQueryParamSync();
 
@@ -134,7 +133,7 @@ function SearchPage(props: IProps) {
                                     sortOptions={[]}
                                 />
                             </PanelWidgetHorizontalPadding>
-                            {isMobile && (
+                            {isCompact && (
                                 <PanelWidgetHorizontalPadding>
                                     <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
                                 </PanelWidgetHorizontalPadding>
@@ -142,7 +141,7 @@ function SearchPage(props: IProps) {
                         </>
                     }
                     middleBottom={<SearchPageResults />}
-                    rightTop={!isMobile && <PanelWidget>{currentFilter}</PanelWidget>}
+                    rightTop={!isCompact && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>
         </DocumentTitle>

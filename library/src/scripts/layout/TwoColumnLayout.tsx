@@ -12,7 +12,7 @@ interface IProps extends Omit<IPanelLayoutProps, "leftTop" | "leftBottom" | "ren
 export default function TwoColumnLayout(props: IProps) {
     return (
         <LayoutProvider type={LayoutTypes.TWO_COLUMNS}>
-            <PanelLayout {...props} />;
+            <PanelLayout {...props} isFixed={props.isFixed !== undefined ? props.isFixed : true} />;
         </LayoutProvider>
     );
 }

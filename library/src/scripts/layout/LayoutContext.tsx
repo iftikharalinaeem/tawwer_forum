@@ -19,6 +19,7 @@ import {
     threeColumnLayoutDevices,
     threeColumnLayoutVariables,
 } from "@library/layout/types/layout.threeColumns";
+import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 export interface ILayoutProps {
     type: LayoutTypes;
@@ -26,13 +27,13 @@ export interface ILayoutProps {
     Devices: IAllLayoutDevices;
     isCompact: boolean; // Usually mobile and/or xs, but named this way to be more generic and not be confused with the actual mobile media query
     isFullWidth: boolean; // Usually desktop and no bleed, but named this way to be more generic and just to mean it's the full size
-    classes: any;
+    classes: IPanelLayoutClasses;
     currentLayoutVariables: any;
     mediaQueries: ILayoutMediaQueryFunction;
     contentWidth: number;
     calculateDevice: () => IAllLayoutDevices;
     layoutSpecificStyles: (style) => any | undefined;
-    rightPanelCondition: (currentDevice: string, shouldRenderLeftPanel: boolean) => boolean;
+    rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
 const defaultLayoutVars = threeColumnLayoutVariables();
@@ -61,7 +62,7 @@ export function useLayout() {
     return useContext(LayoutContext);
 }
 
-const defaultRenderRightPanel = (currentDevice, shouldRenderLeftPanel) => {
+const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
     return false;
 };
 
@@ -82,7 +83,7 @@ export function LayoutProvider(props: { type: LayoutTypes; children: React.React
         contentWidth: layout.variables.contentWidth,
         calculateDevice: layout.variables.calculateDevice,
         layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
-        rightPanelCondition: defaultLayoutVars["rightPanelCondition"] ?? defaultRenderRightPanel,
+        rightPanelCondition: layout.variables["rightPanelCondition"] ?? defaultRenderRightPanel,
     });
 
     useEffect(() => {
@@ -100,7 +101,7 @@ export function LayoutProvider(props: { type: LayoutTypes; children: React.React
                 contentWidth: layout.variables.contentWidth,
                 calculateDevice: layout.variables.calculateDevice,
                 layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
-                rightPanelCondition: defaultLayoutVars["rightPanelCondition"] ?? defaultRenderRightPanel,
+                rightPanelCondition: layout.variables["rightPanelCondition"] ?? defaultRenderRightPanel,
             });
         }, 100);
         window.addEventListener("resize", throttledUpdate);

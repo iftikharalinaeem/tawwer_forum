@@ -72,7 +72,7 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const { classes, currentDevice, isCompact, isFullWidth, rightPanelCondition, type } = useLayout();
+    const { classes, currentDevice, isCompact, isFullWidth, rightPanelCondition } = useLayout();
 
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
@@ -112,7 +112,7 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                 <div className={classNames(classes.container, classes.breadcrumbsContainer)}>
                     {shouldRenderLeftPanel && <Panel className={classNames(classes.leftColumn)} ariaHidden={true} />}
                     <PanelAreaHorizontalPadding
-                        className={classNames(classes.middleColumnMaxWidth, {
+                        className={classNames(classes.mainColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel,
                         })}
                     >
@@ -144,14 +144,14 @@ export default function PanelLayout(props: IPanelLayoutProps) {
                     )}
 
                     <ContentTag
-                        className={classNames(classes.content, classes.middleColumnMaxWidth, {
+                        className={classNames(classes.content, classes.mainColumnMaxWidth, {
                             hasAdjacentPanel: shouldRenderLeftPanel || shouldRenderRightPanel,
                             hasTwoAdjacentPanels: shouldRenderLeftPanel && shouldRenderRightPanel,
                         })}
                     >
                         <Panel
                             className={classNames(
-                                classes.middleColumn,
+                                classes.mainColumn,
                                 props.growMiddleBottom ? inheritHeightClass() : "",
                             )}
                         >

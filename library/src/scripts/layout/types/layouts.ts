@@ -6,15 +6,19 @@
 
 import { NestedCSSProperties } from "typestyle/lib/types";
 import {
+    ITwoColumnLayoutMediaQueries,
     ITwoColumnLayoutMediaQueryStyles,
+    twoColumnLayoutClasses,
     twoColumnLayoutDevices,
     twoColumnLayoutVariables,
 } from "./layout.twoColumns";
 import {
+    IThreeColumnLayoutMediaQueries,
     IThreeColumnLayoutMediaQueryStyles,
     threeColumnLayoutDevices,
     threeColumnLayoutVariables,
 } from "./layout.threeColumns";
+import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
@@ -32,6 +36,8 @@ export interface IAllLayoutMediaQueries {
 export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
 
 export type IAllLayoutDevices = twoColumnLayoutDevices | threeColumnLayoutDevices;
+
+export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries;
 
 /* Allows to declare styles for any layout without causing errors
 Declare media query styles like this:
@@ -83,7 +89,7 @@ export const allLayouts = (props: { offset?: number } = {}) => {
 
     const classesByType = {
         [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutVariables(),
-        [LayoutTypes.TWO_COLUMNS]: twoColumnLayoutVariables(),
+        [LayoutTypes.TWO_COLUMNS]: twoColumnLayoutClasses(),
     };
 
     Object.keys(LayoutTypes).forEach(layoutName => {
@@ -102,8 +108,8 @@ export const allLayouts = (props: { offset?: number } = {}) => {
 export const layoutData = (type: LayoutTypes = LayoutTypes.THREE_COLUMNS) => {
     const layouts = allLayouts();
     return {
-        mediaQueries: layouts.mediaQueriesByType[type],
-        classes: layouts.classesByType[type],
+        mediaQueries: layouts.mediaQueriesByType[type] as IAllMediaQueriesForLayouts,
+        classes: layouts.classesByType[type] as IPanelLayoutClasses,
         variables: layouts.variablesByType[type],
     };
 };

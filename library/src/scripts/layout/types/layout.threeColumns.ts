@@ -376,7 +376,7 @@ export const threeColumnLayoutClasses = useThemeCache(() => {
         paddingLeft: unit(offset),
     });
 
-    const middleColumn = style("middleColumn", {
+    const mainColumn = style("mainColumn", {
         justifyContent: "space-between",
         flexGrow: 1,
         width: percent(100),
@@ -385,7 +385,7 @@ export const threeColumnLayoutClasses = useThemeCache(() => {
         ...mediaQueries.oneColumnDown(paddings({ left: important(0), right: important(0) })),
     });
 
-    const middleColumnMaxWidth = style("middleColumnMaxWidth", {
+    const mainColumnMaxWidth = style("mainColumnMaxWidth", {
         $nest: {
             "&.hasAdjacentPanel": {
                 flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
@@ -441,8 +441,8 @@ export const threeColumnLayoutClasses = useThemeCache(() => {
         fullWidth,
         leftColumn,
         rightColumn,
-        middleColumn,
-        middleColumnMaxWidth,
+        mainColumn,
+        mainColumnMaxWidth,
         panel,
         isSticky,
         breadcrumbs,

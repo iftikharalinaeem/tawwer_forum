@@ -212,10 +212,10 @@ export interface IPanelLayoutClasses {
     main: string;
     container: string;
     fullWidth: string;
-    leftColumn: string;
+    leftColumn?: string;
     rightColumn: string;
-    middleColumn: string;
-    middleColumnMaxWidth: string;
+    mainColumn: string;
+    mainColumnMaxWidth: string;
     panel: string;
     isSticky: string;
     breadcrumbs: string;

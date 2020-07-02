@@ -7,7 +7,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { calc, percent, px } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { unit } from "@library/styles/styleHelpers";
+import { sticky, unit } from "@library/styles/styleHelpers";
 import { IPanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
 import { LayoutTypes } from "@library/layout/types/layouts";
@@ -195,7 +195,7 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
         overflow: "initial",
     });
 
-    const middleColumnMaxWidth = style("middleColumnMaxWidth", {
+    const mainColumnMaxWidth = style("middleColumnMaxWidth", {
         $nest: {
             "&.hasAdjacentPanel": {
                 flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth)}`),
@@ -208,13 +208,34 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
         },
     });
 
-    const leftColumn = style("leftColumn", {});
+    const isSticky = style("isSticky", {
+        ...sticky(),
+        height: percent(100),
+        $unique: true,
+        ...mediaQueries.oneColumnDown({
+            position: "relative",
+            top: "auto",
+            left: "auto",
+            bottom: "auto",
+        }),
+    });
 
+    const inheritedClasses = threeColumnLayoutClasses();
     const classes: IPanelLayoutClasses = {
-        ...threeColumnLayoutClasses(),
+        root: inheritedClasses.root,
+        content: inheritedClasses.content,
+        top: inheritedClasses.top,
+        main: inheritedClasses.main,
+        container: inheritedClasses.container,
+        fullWidth: inheritedClasses.fullWidth,
         rightColumn,
-        leftColumn,
-        middleColumnMaxWidth,
+        mainColumn: inheritedClasses.mainColumn,
+        isSticky,
+        mainColumnMaxWidth,
+        panel: inheritedClasses.panel,
+        breadcrumbs: inheritedClasses.breadcrumbs,
+        breadcrumbsContainer: inheritedClasses.breadcrumbsContainer,
     };
+
     return classes;
 });
