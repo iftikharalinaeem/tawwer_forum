@@ -173,15 +173,24 @@ class UsersApiController extends AbstractApiController {
      * @return Data
      */
     public function get($id, array $query) {
-        $this->permission([
+        $session = $this->getSession();
+        $showFullSchema = false;
+        if ($session->checkPermission([
             'Garden.Users.Add',
             'Garden.Users.Edit',
             'Garden.Users.Delete'
-        ]);
+        ])) {
+            $showFullSchema = true;
+        } elseif (!$session->checkPermission([
+            'Garden.Profiles.View',
+        ])) {
+            $this->permission('Garden.Profile.View');
+        }
+
 
         $this->idParamSchema();
         $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
-        $out = $this->schema($this->userSchema(), 'out');
+        $out = $showFullSchema ? $this->schema($this->userSchema(), 'out') : $this->viewProfileSchema();
 
         $query = $in->validate($query);
         $row = $this->userByID($id);
@@ -950,5 +959,33 @@ class UsersApiController extends AbstractApiController {
             $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
+    }
+
+    /**
+     * Get a user schema with minimal profile fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function viewProfileSchema() {
+        static $schema;
+
+        if ($schema === null) {
+            $schema = $this->schema(Schema::parse([
+                'name:s?',
+                'email:s?',
+                'photoUrl:s?',
+                'roleID:a?' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'integer'],
+                    'description' => 'Roles to set on the user.'
+                ],
+                'dateInserted',
+                'dateLastActive:dt',
+                'CountDiscussions?',
+                'CountComments?',
+            ])->add($this->fullSchema()), 'ViewProfile');
+        }
+
+        return $schema;
     }
 }
