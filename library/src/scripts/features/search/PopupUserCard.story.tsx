@@ -33,7 +33,11 @@ const m = {
     },
 };
 
-export const UserCardNoState = () => <PopupUserCard {...m} />;
+export const UserCardWithoutState = () => (
+    <StoryContent>
+        <PopupUserCard {...m} />
+    </StoryContent>
+);
 
 export const UserCardWithoutPermission = storyWithConfig(
     {
@@ -57,7 +61,11 @@ export const UserCardWithoutPermission = storyWithConfig(
             },
         },
     },
-    () => <PopupUserCard {...m} />,
+    () => (
+        <StoryContent>
+            <PopupUserCard {...m} />
+        </StoryContent>
+    ),
 );
 
 export const UserCardWithPermission = storyWithConfig(
@@ -82,5 +90,9 @@ export const UserCardWithPermission = storyWithConfig(
             },
         },
     },
-    () => <PopupUserCard {...m} />,
+    () => (
+        <StoryContent>
+            <PopupUserCard {...m} />
+        </StoryContent>
+    ),
 );
