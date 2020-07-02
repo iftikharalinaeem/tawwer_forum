@@ -526,12 +526,12 @@ MESSAGE
      *
      * @inheritdoc
      */
-    public function insert(array $set, string $mode = Operation::MODE_DEFAULT) {
+    public function insert(array $set, $options = []) {
 
         // Enforce restrictions on KB article sorting.
         $this->validateSortArticlesInternal($set);
 
-        return parent::insert($set, $mode);
+        return parent::insert($set, $options);
     }
 
     /**
@@ -539,7 +539,7 @@ MESSAGE
      *
      * @inheritdoc
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
+    public function update(array $set, array $where, $options = []): bool {
         $isSingle = array_key_exists("knowledgeBaseID", $where) && !is_array($where["knowledgeBaseID"]);
 
         // Enforce restrictions on sorting.
@@ -547,7 +547,7 @@ MESSAGE
             $this->validateSortArticlesInternal($set, $where["knowledgeBaseID"]);
         }
 
-        return parent::update($set, $where, $mode);
+        return parent::update($set, $where, $options);
     }
 
     /**
