@@ -9,14 +9,20 @@ import { storyWithConfig } from "@library/storybook/StoryContext";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import PopupUserCard from "@library/features/users/ui/PopupUserCard";
 import { IUserFragment, IUser } from "@vanilla/library/src/scripts/@types/api/users";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export default {
     component: PopupUserCard,
     title: "PopupUserCard",
+    parameters: {
+        chromatic: {
+            viewports: [1450, 700, layoutVariables().panelLayoutBreakPoints.xs],
+        },
+    },
 };
 
 const m = {
-    userInfo: {
+    user: {
         email: "val@vanillaforums.com",
         userID: 1,
         name: "Valérie Robitaille",
@@ -25,10 +31,6 @@ const m = {
         dateJoined: "May 2017",
         label: "Product Manager",
     } as IUser,
-    links: {
-        profileLink: "www.google.com",
-        messageLink: "www.google.com",
-    },
     stats: {
         discussions: 207,
         comments: 1375,

@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { IUserFragment, IUser } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -16,13 +16,11 @@ import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
+import { makeProfileUrl } from "@library/utility/appUtils";
 
 interface IProps {
-    userInfo: IUser;
-    links: {
-        profileLink: string;
-        messageLink: string;
-    };
+    user: IUser;
+
     stats: {
         discussions: number;
         comments: number;
@@ -37,10 +35,6 @@ interface ILabelProps {
     label?: string | null;
 }
 
-interface ISeparatorProps {
-    width: number;
-}
-
 interface IStatProps {
     count: number;
     text: string;
@@ -48,7 +42,6 @@ interface IStatProps {
 
 interface IVerticalLineProps {
     width: number;
-    height: number;
 }
 
 interface IDateProps {
@@ -77,9 +70,10 @@ function Container(props) {
     return <div className={classes.container}>{props.children}</div>;
 }
 
-function Separator(props: ISeparatorProps) {
-    const { width } = props;
-    return <div style={{ width: `${width}px` }}> </div>;
+function ButtonContainer(props) {
+    const classes = userCardClasses();
+
+    return <div className={classes.buttonContainer}>{props.children}</div>;
 }
 
 function Stat(props: IStatProps) {
@@ -98,13 +92,18 @@ function Stat(props: IStatProps) {
 
 function VerticalLine(props: IVerticalLineProps) {
     const classes = userCardClasses();
-    const { width, height } = props;
-    return <hr className={classes.vertical} style={{ width: `${width}px`, height: `${height}px` }} />;
+    const { width } = props;
+    return (
+        <div>
+            <hr className={classes.vertical} style={{ width: `${width}px`, height: "100%" }} />{" "}
+        </div>
+    );
 }
 
 function Date(props: IDateProps) {
+    const classes = userCardClasses();
     const { text, date } = props;
-    return <span>{`${text}: ${date}`}</span>;
+    return <div className={classes.date}>{`${text}: ${date}`} </div>;
 }
 
 function Header(props: IHeaderProps) {
@@ -121,7 +120,7 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { userInfo, stats, links } = props;
+    const { user, stats } = props;
     const [open, toggleOpen] = useState(false);
 
     return (
@@ -136,56 +135,59 @@ export default function PopupUserCard(props: IProps) {
             <Header onClick={() => toggleOpen(!open)} />
 
             <Container>
-                <UserPhoto userInfo={userInfo} size={UserPhotoSize.LARGE} />
+                <UserPhoto userInfo={user} size={UserPhotoSize.LARGE} />
             </Container>
 
             <Container>
-                <Name name={userInfo.name} />
+                <Name name={user.name} />
             </Container>
 
             <Container>
-                <Label label={userInfo.label} />
+                <Label label={user.label} />
             </Container>
 
             <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
                 <Container>
-                    <a className={classes.email} href={`mailto:${userInfo.email}`}>
-                        {userInfo.email}
+                    <a className={classes.email} href={`mailto:${user.email}`}>
+                        {user.email}
                     </a>
                 </Container>
             </Permission>
 
             <Container>
-                <LinkAsButton to={links.profileLink} baseClass={ButtonTypes.STANDARD} className={classes.button}>
-                    {t("View Profile")}
-                </LinkAsButton>
+                <ButtonContainer>
+                    <LinkAsButton
+                        to={makeProfileUrl(user.name)}
+                        baseClass={ButtonTypes.STANDARD}
+                        className={classes.button}
+                    >
+                        {t("View Profile")}
+                    </LinkAsButton>
+                </ButtonContainer>
 
-                <Separator width={16} />
-
-                <LinkAsButton
-                    to={`/messages/add/${userInfo.name}`}
-                    baseClass={ButtonTypes.STANDARD}
-                    className={classes.button}
-                >
-                    {t("Message")}
-                </LinkAsButton>
+                <ButtonContainer>
+                    <LinkAsButton
+                        to={`/messages/add/${user.name}`}
+                        baseClass={ButtonTypes.STANDARD}
+                        className={classes.button}
+                    >
+                        {t("Message")}
+                    </LinkAsButton>
+                </ButtonContainer>
             </Container>
 
-            <DropDownSection noSeparator={false} title={""}>
+            <DropDownSection className={classes.section} noSeparator={false} title={""}>
                 <Container>
-                    <Stat count={stats.discussions} text={"Discussions"} />
-                    <Separator width={29} />
-                    <VerticalLine width={1} height={58} />
-                    <Separator width={29} />
-                    <Stat count={stats.comments} text={"Comments"} />
+                    <Stat count={stats.discussions} text={t("Discussions")} />
+                    <VerticalLine width={1} />
+                    <Stat count={stats.comments} text={t("Comments")} />
                 </Container>
             </DropDownSection>
 
             <DropDownSection className={classes.section} noSeparator={false} title={""}>
                 <Container>
-                    <Date text={"Joined"} date={userInfo.dateJoined} />
-                    <Separator width={40} />
-                    <Date text={"Last Active"} date={userInfo.dateLastActive} />
+                    <Date text={t("Joined")} date={user.dateJoined} />
+                    <Date text={t("Last Active")} date={user.dateLastActive} />
                 </Container>
             </DropDownSection>
         </DropDown>

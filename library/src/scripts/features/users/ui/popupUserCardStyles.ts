@@ -22,6 +22,10 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         radius: formElementsVars.sizing.height / 2,
     });
 
+    const buttonContainer = makeVars("buttonContainer", {
+        padding: globalVars.gutter.half,
+    });
+
     const name = makeVars("name", {
         size: globalVars.fonts.size.large,
         weight: globalVars.fonts.weights.bold,
@@ -41,13 +45,24 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         size: globalVars.fonts.size.largeTitle,
     });
 
+    const stat = makeVars("stat", {
+        padding: 29,
+    });
+
+    const date = makeVars("date", {
+        padding: globalVars.gutter.size,
+    });
+
     return {
         container,
         button,
+        buttonContainer,
         name,
         label,
         vertical,
         count,
+        stat,
+        date,
     };
 });
 
@@ -58,13 +73,18 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const container = style("container", {
         display: "flex",
         flexDirection: "row",
-        alignItems: "center",
+        alignItems: "stretch",
         justifyContent: "center",
         marginBottom: vars.container.margin,
     });
 
     const button = style("button", {
         borderRadius: vars.button.radius,
+    });
+
+    const buttonContainer = style("buttonContainer", {
+        paddingLeft: vars.buttonContainer.padding,
+        paddingRight: vars.buttonContainer.padding,
     });
 
     const name = style("name", {
@@ -84,6 +104,8 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        paddingLeft: vars.stat.padding,
+        paddingRight: vars.stat.padding,
     });
 
     const vertical = style("vertical", {
@@ -110,9 +132,15 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         textDecoration: "inherit",
     });
 
+    const date = style("date", {
+        paddingLeft: vars.date.padding,
+        paddingRight: vars.date.padding,
+    });
+
     return {
         container,
         button,
+        buttonContainer,
         name,
         label,
         stat,
@@ -121,5 +149,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         header,
         section,
         email,
+        date,
     };
 });
