@@ -18,11 +18,6 @@ import { t } from "@vanilla/i18n";
 import { EventsHomePagePlaceholder } from "@groups/events/pages/EventsHomePagePlaceholder";
 import { PageHeading } from "@vanilla/library/src/scripts/layout/PageHeading";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import { useUser } from "@vanilla/library/src/scripts/features/users/userHooks";
-import ErrorMessages from "@vanilla/library/src/scripts/forms/ErrorMessages";
-import { notEmpty } from "@vanilla/utils";
-import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Loader from "@vanilla/library/src/scripts/loaders/Loader";
 import { UserCardModule } from "@vanilla/library/src/scripts/features/users/modules/UserCardModule";
 
 export default function EventsHomePage({ loading }: any) {
