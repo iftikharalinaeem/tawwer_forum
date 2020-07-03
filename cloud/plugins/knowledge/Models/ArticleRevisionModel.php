@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 use Exception;
 use Gdn_Session;
 use Vanilla\Database\Operation;
+use Vanilla\Models\Model;
 
 /**
  * A model for managing article revisions.
@@ -63,14 +64,14 @@ class ArticleRevisionModel extends \Vanilla\Models\PipelineModel {
         $this->update(
             $status,
             ["articleID" => $articleID, "status" => "published", "locale" => $locale],
-            $mode
+            [Model::OPT_MODE => $mode]
         );
         // Publish this revision.
         $status["status"] = "published";
         $this->update(
             $status,
             ["articleRevisionID" => $articleRevisionID],
-            $mode
+            [Model::OPT_MODE => $mode]
         );
     }
 
