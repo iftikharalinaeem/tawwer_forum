@@ -2666,13 +2666,6 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             unset($row['Admin']);
         }
 
-        $showEmail = $row['ShowEmail'] ?? false;
-        if (!$showEmail &&
-            !$this->session->checkPermission('Garden.Moderation.Manage')
-        ) {
-            unset($row['Email']);
-        }
-
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;

@@ -198,7 +198,15 @@ class UsersApiController extends AbstractApiController {
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
+        $showEmail = $row['showEmail'] ?? false;
+        if (!$showEmail &&
+            !$session->checkPermission('Garden.Moderation.Manage')
+        ) {
+            unset($row['email']);
+        }
+
         $result = $out->validate($row);
+
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
