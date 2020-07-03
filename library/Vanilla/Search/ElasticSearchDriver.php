@@ -9,7 +9,7 @@ namespace Vanilla\Search;
 use Garden\Http\HttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-use Vanilla\Contracts\Search\ElasticServiceClient;
+use Vanilla\Search\ElasticServiceClient;
 
 /**
  * Elasticsearch search driver.

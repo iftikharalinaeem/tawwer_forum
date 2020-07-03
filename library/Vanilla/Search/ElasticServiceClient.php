@@ -16,6 +16,7 @@ use Garden\Http\HttpResponseException;
  * Elasticsearch microservice API.
  */
 class ElasticServiceClient extends HttpClient {
+    const ELASTIC_HOST = 'https://ms-vanilla-search-api-dev.v-fabric.net';
     /**
      * @var string
      */
@@ -51,8 +52,8 @@ class ElasticServiceClient extends HttpClient {
      * @param array $query
      * @return array
      */
-    public function getKnowledgeCategoryBySmartID(string $paramSmartID, array $query = []): array {
-        $result = $this->get("/api/v2/knowledge-categories/".rawurlencode('$foreignID:'.$paramSmartID));
+    public function search(array $query = []): array {
+        $result = $this->post(self::ELASTIC_HOST."/api/v1.0/search", $query);
         $body = $result->getBody();
         return $body;
     }
