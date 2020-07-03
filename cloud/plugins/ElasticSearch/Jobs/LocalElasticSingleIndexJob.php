@@ -33,11 +33,8 @@ class LocalElasticSingleIndexJob extends AbstractLocalElasticJob {
             $recordResponse = $this->vanillaClient->get($this->apiUrl, $this->apiParams);
             $recordBody = $recordResponse->getBody();
 
-            throw new \Exception('Exception');
             // Insert the record body into elasticsearch.
             $response = $this->elasticClient->indexDocuments($this->indexName, "{$this->indexName}ID", [$recordBody]);
-
-            $debug = true;
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage(), ['trace' => $e->getTrace()]);
             return JobExecutionStatus::error();
