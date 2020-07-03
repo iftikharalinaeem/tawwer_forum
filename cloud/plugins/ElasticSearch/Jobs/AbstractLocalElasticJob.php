@@ -10,7 +10,7 @@ namespace Vanilla\Cloud\ElasticSearch;
 use Garden\Http\HttpClient;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\LocalJobInterface;
@@ -21,7 +21,7 @@ use VanillaTests\InternalClient;
  */
 abstract class AbstractLocalElasticJob implements LocalJobInterface {
 
-    /** @var ElasticHttpClient */
+    /** @var AbstractElasticHttpClient */
     protected $elasticClient;
 
     /** @var HttpClient */
@@ -30,11 +30,11 @@ abstract class AbstractLocalElasticJob implements LocalJobInterface {
     /**
      * Local job for updating individual requests in elasticsearch.
      *
-     * @param ElasticHttpClient $elasticClient
+     * @param AbstractElasticHttpClient $elasticClient
      * @param InternalClient $internalClient
      * @param ConfigurationInterface $config
      */
-    public function __construct(ElasticHttpClient $elasticClient, InternalClient $internalClient, ConfigurationInterface $config) {
+    public function __construct(AbstractElasticHttpClient $elasticClient, InternalClient $internalClient, ConfigurationInterface $config) {
         $this->elasticClient = $elasticClient;
 
         // Make an internal http client.

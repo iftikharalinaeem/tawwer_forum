@@ -8,7 +8,7 @@
 namespace Vanilla\Cloud\ElasticSearch;
 
 use Garden\Events\ResourceEvent;
-use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Utility\ModelUtils;
 
