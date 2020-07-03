@@ -6,7 +6,7 @@
     "icon": "ranks.png",
     "key": "ranks",
     "type": "addon",
-    "documentationUrl" : "http://docs.vanillaforums.com/help/reputation/ranks/",
+    "documentationUrl": "http://docs.vanillaforums.com/help/reputation/ranks/",
     "authors": [
         {
             "name": "Todd Burry",

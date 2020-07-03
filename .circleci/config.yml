@@ -65,6 +65,12 @@ aliases:
 
                 # Run code sniffer on the diffed files.
                 ./.circleci/scripts/diff-standards.sh $CUSTOM_TARGET_BRANCH
+    - &run_php_static
+      run:
+        name: PHP Static Analysis
+        command: |
+          cd ~/workspace/repo
+          ./vendor/bin/psalm
     - &db_sphinx_env
       MYSQL_HOST: 127.0.0.1
       MYSQL_DATABASE: vanilla_test
@@ -189,6 +195,12 @@ jobs:
             - *symlink_addons
             - *run_composer
             - *run_php_lint
+    php_72_static:
+      executor: core/php72
+      steps: &php_static_steps
+        - core/checkout
+        - *run_composer
+        - *run_php_static
     php_72_tests:
         executor: php72-sphinx
         resource_class: medium
@@ -208,10 +220,16 @@ jobs:
                 command: |
                   cd ~/workspace/repo
                   filter=$(./.circleci/scripts/parallelPHPUnitFilter.sh ./**/tests/**/*Test.php)
-                  echo $filter;
 
+                  echo -e "\033[1;33m====== Running PHPUnit with extra filter ======\033[0m"
+                  echo "--filter $filter";
+                  echo ""
+
+                  # phpdbg to generate code coverage is about 5x faster than xdebug.
+                  # Containers have 4gb a memory. Try to avoid coming too close to the limit.
+                  # Remember that sphinx and mysql also take memory.
                   phpdbg -qrr \
-                    -d memory_limit=3000M \
+                    -d memory_limit=2048M \
                     ./vendor/bin/phpunit \
                     -c phpunit.xml.dist \
                     --exclude-group=ignore \
@@ -256,6 +274,9 @@ jobs:
     php_73_lint:
         executor: php73-sphinx
         steps: *php_lint_steps
+    php_73_static:
+      executor: core/php73
+      steps: *php_static_steps
     php_73_tests:
         executor: php73-sphinx
         steps: *php_unit_test_steps
@@ -326,6 +347,7 @@ workflows:
             # PHP 7.2 jobs are only nightly until we move upwards on infra.
             - php_setup
             - php_72_lint
+            - php_72_static
             - php_72_integration:
                 requires:
                     - php_setup
@@ -359,7 +381,9 @@ workflows:
             # PHP and serverside
             - php_setup
             - php_72_lint
+            - php_72_static
             - php_73_lint
+            - php_73_static
             - php_72_integration:
                 requires:
                     - php_setup

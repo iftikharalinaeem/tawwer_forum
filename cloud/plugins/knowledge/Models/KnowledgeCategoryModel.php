@@ -223,14 +223,14 @@ class KnowledgeCategoryModel extends FullRecordCacheModel {
      *
      * @inheritdoc
      */
-    public function update(array $set, array $where, string $mode = Operation::MODE_DEFAULT): bool {
+    public function update(array $set, array $where, $options = []): bool {
         if (array_key_exists("parentID", $set) && array_key_exists("knowledgeCategoryID", $where)) {
             if ($set["parentID"] === $where["knowledgeCategoryID"]) {
                 throw new \Garden\Web\Exception\ClientException("Cannot set the parent of a knowledge category to itself.");
             }
         }
 
-        return parent::update($set, $where, $mode);
+        return parent::update($set, $where, $options);
     }
 
     /**
