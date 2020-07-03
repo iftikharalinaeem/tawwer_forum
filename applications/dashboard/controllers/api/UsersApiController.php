@@ -175,9 +175,6 @@ class UsersApiController extends AbstractApiController {
      */
     public function get($id, array $query) {
         $session = $this->getSession();
-        if (!$session instanceof Gdn_Session) {
-            throw new ServerException("Session not available.", 500);
-        }
 
         $showFullSchema = false;
         if ($session->checkPermission([
@@ -972,21 +969,15 @@ class UsersApiController extends AbstractApiController {
      * @return Schema Returns a schema object.
      */
     public function viewProfileSchema() {
-        static $schema;
-
-        if ($schema === null) {
-            $schema = $this->schema(Schema::parse([
+        return $this->schema(Schema::parse([
                 'name:s?',
                 'email:s?',
                 'photoUrl:s?',
                 'roles:a?',
                 'dateInserted',
                 'dateLastActive:dt',
-                'CountDiscussions?',
-                'CountComments?',
+                'countDiscussions?',
+                'countComments?',
             ])->add($this->fullSchema()), 'ViewProfile');
-        }
-
-        return $schema;
     }
 }

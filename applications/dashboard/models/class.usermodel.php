@@ -2666,8 +2666,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             unset($row['Admin']);
         }
 
-        $showEmail = $row['ShowEmail'] ?? 0;
-        if ($showEmail === 0 &&
+        $showEmail = $row['ShowEmail'] ?? false;
+        if (!$showEmail &&
             !$this->session->checkPermission('Garden.Moderation.Manage')
         ) {
             unset($row['Email']);
@@ -2738,8 +2738,8 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "showEmail",
                 "userID",
                 "title?",
-                "CountDiscussions?",
-                "CountComments?",
+                "countDiscussions?",
+                "countComments?",
             ]);
             $result->add($this->schema());
 
