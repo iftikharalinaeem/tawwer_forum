@@ -21,14 +21,10 @@ import {
     threeColumnLayoutVariables,
 } from "@library/layout/types/layout.threeColumns";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { panelListClasses } from "@library/layout/panelListStyles";
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
     TWO_COLUMNS = "two column", // Single column, but full width of page
-    // ONE_COLUMN = "one column", // Single column, but full width of page
-    // NARROW = "one column narrow", // Single column, but narrower than default
-    // LEGACY = "legacy", // Legacy layout used on the Forum pages. The media queries are also used for older components. Newer ones should use the context
 }
 
 export interface IAllLayoutMediaQueries {
@@ -57,23 +53,30 @@ Declare media query styles like this:
             }
         }
     }),
-
-
-Note that "twoColumns" does not exist in the two column layout media queries, but it does not crash!
+    Note that "twoColumns" does not exist in two column layout media queries, but it does not crash!
 */
 
 export const filterQueriesByType = (mediaQueriesByType, type) => {
-    return (mediaQueriesByLayout: IAllLayoutMediaQueries) => {
-        Object.keys(mediaQueriesByLayout).forEach(layoutName => {
+    return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => {
+        console.log("");
+        console.log("mediaQueriesForAllLayouts: ", mediaQueriesForAllLayouts);
+        Object.keys(mediaQueriesForAllLayouts).forEach(layoutName => {
+            // Check if we're in the correct layout before applying
             if (layoutName === type) {
-                // Check if we're in the correct layout before applying
-                const mediaQueriesForLayout = mediaQueriesByLayout[layoutName];
-                const stylesForLayout = mediaQueriesByLayout[layoutName];
-                if (mediaQueriesForLayout) {
-                    Object.keys(mediaQueriesForLayout).forEach(queryName => {
-                        mediaQueriesForLayout[queryName] = stylesForLayout;
-                        const result = mediaQueriesForLayout[queryName];
-                        return result;
+                // Fetch the available styles and the media queries for the current layout
+                const stylesByMediaQuery = mediaQueriesForAllLayouts[layoutName];
+                const mediaQueries = allLayouts().mediaQueriesByType[type];
+                console.log("stylesByMediaQuery: ", stylesByMediaQuery);
+                console.log("mediaQueries: ", mediaQueries);
+
+                // Match the two together
+                if (stylesByMediaQuery) {
+                    Object.keys(stylesByMediaQuery).forEach(queryName => {
+                        const query: ILayoutMediaQueryFunction = mediaQueries[queryName];
+                        const styles: NestedCSSProperties = stylesByMediaQuery[queryName];
+                        console.log("query: ", query);
+                        console.log("styles: ", styles);
+                        return query(styles as any);
                     });
                 }
             }
@@ -82,7 +85,7 @@ export const filterQueriesByType = (mediaQueriesByType, type) => {
     };
 };
 
-export const allLayouts = (props: { offset?: number } = {}) => {
+export const allLayouts = () => {
     const mediaQueriesByType = {};
 
     const variablesByType = {
@@ -139,6 +142,7 @@ const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
 const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
     const currentDevice = layout.variables.calculateDevice();
+
     return {
         type,
         currentDevice,
