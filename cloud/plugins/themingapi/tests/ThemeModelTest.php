@@ -6,6 +6,7 @@
 
 use Garden\Container\Container;
 use Garden\Container\Reference;
+use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\ThemingApi\DbThemeProvider;
@@ -43,6 +44,7 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * @param Container $container
      */
     public static function configureContainerBeforeStartup(Container $container) {
+        $container->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)]);
         $container->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)]);
     }
 
