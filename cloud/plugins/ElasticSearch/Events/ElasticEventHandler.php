@@ -17,23 +17,17 @@ use Vanilla\Utility\ModelUtils;
  */
 class ElasticEventHandler {
 
-    /** @var ElasticHttpClient */
-    private $elasticClient;
-
     /** @var SchedulerInterface */
     private $scheduler;
 
     /**
      * DI.
      *
-     * @param ElasticHttpClient $elasticClient
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(ElasticHttpClient $elasticClient, SchedulerInterface $scheduler) {
-        $this->elasticClient = $elasticClient;
+    public function __construct(SchedulerInterface $scheduler) {
         $this->scheduler = $scheduler;
     }
-
 
     /**
      * Dispatch resource events to the relevant webhooks.
@@ -42,7 +36,6 @@ class ElasticEventHandler {
      * @return ResourceEvent
      */
     public function handleResourceEvent(ResourceEvent $event): ResourceEvent {
-        $type = $event->getType();
         [$recordType, $recordID] = $event->getRecordTypeAndID();
 
         if ($recordType === null || $recordID === null) {

@@ -19,9 +19,7 @@ use VanillaTests\InternalClient;
 /**
  * Local job for with access to elasticsearch and an internal API client.
  */
-abstract class AbstractLocalElasticJob implements LocalJobInterface, LoggerAwareInterface {
-
-    use LoggerAwareTrait;
+abstract class AbstractLocalElasticJob implements LocalJobInterface {
 
     /** @var ElasticHttpClient */
     protected $elasticClient;
