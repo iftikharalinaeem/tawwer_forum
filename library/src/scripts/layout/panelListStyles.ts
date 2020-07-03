@@ -80,7 +80,7 @@ export const panelListClasses = useThemeCache(mediaQueries => {
     const items = style("items", {});
 
     return {
-        root,
+        root: root + " panelList", // This needs to be referenced in another file and was causing a circular import, so the static class is targetted instead
         title,
         item,
         link,

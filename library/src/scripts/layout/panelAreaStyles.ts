@@ -106,5 +106,11 @@ export const panelAreaClasses = useThemeCache(mediaQueries => {
         });
     });
 
-    return { root, overflowFull, areaOverlayBefore, areaOverlayAfter, areaOverlay };
+    return {
+        root: root + " panelArea",
+        overflowFull,
+        areaOverlayBefore,
+        areaOverlayAfter,
+        areaOverlay,
+    };
 });

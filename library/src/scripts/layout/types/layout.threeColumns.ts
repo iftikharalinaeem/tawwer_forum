@@ -4,13 +4,9 @@
  */
 
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import {
-    fallbackLayoutVariables,
-    generatePanelLayoutClasses,
-    IPanelLayoutVariables,
-    layoutVariables,
-} from "../panelLayoutStyles";
+import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: object;

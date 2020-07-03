@@ -15,6 +15,7 @@ import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { filterQueriesByType } from "@library/layout/mediaQueriesForAllLayouts";
+import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 
 interface IProps extends IPanelLayoutVariables {
@@ -23,7 +24,7 @@ interface IProps extends IPanelLayoutVariables {
     calculateDeviceFunction: (breakPoints, Devices) => () => string;
     panelLayoutBreakPoints: any;
 }
-
+``;
 // Global defaults for layouts. These variables are not meant to be used extended through a layout type, like a three or two column layout
 export const layoutVariables = useThemeCache(
     (forcedVars?: IThemeVariables): IProps => {
@@ -290,6 +291,10 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
     const style = styleFactory(name);
 
     const mediaQueries = filterQueriesByType(vars.mediaQueries(), type);
+    const classesPanelArea = panelAreaClasses(mediaQueries);
+    // const classesPanelArea = "";
+    // const classesPanelList = panelListClasses(mediaQueries);
+    const classesPanelList = "";
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -539,7 +544,7 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
     };
 };
 
-//@Deprecated use specific layout instead (i.e. three or two column layouts)
+//@Deprecated use specific layout intead (i.e. three or two column layouts)
 export const panelLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: layoutVariables(),

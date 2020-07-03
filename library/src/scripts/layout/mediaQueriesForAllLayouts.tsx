@@ -10,7 +10,7 @@ import {
     IThreeColumnLayoutMediaQueries,
     IThreeColumnLayoutMediaQueryStyles,
 } from "@library/layout/types/interface.threeColumns";
-import { fallbackLayoutVariables } from "@library/layout/panelLayoutStyles";
+import { fallbackLayoutVariables } from "@library/layout/types/interface.panelLayout";
 
 export interface IAllLayoutMediaQueries {
     [LayoutTypes.TWO_COLUMNS]?: ITwoColumnLayoutMediaQueryStyles;

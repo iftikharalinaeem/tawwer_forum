@@ -10,10 +10,10 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
-// @Deprecated - Use globalVariables().widget.padding directly
 export const panelWidgetVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("panelWidget");
 
+    // @Deprecated - Use globalVariables().widget.padding directly
     const spacing = makeThemeVars("spacing", {
         padding: globalVariables().widget.padding,
     });
@@ -63,5 +63,5 @@ export const panelWidgetClasses = useThemeCache(mediaQueries => {
         }),
     });
 
-    return { root };
+    return { root: root + " panelWidget" };
 });
