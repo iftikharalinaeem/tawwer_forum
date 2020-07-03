@@ -40,7 +40,7 @@ export interface ITwoColumnLayoutMediaQueries {
 export const twoColumnLayoutVariables = useThemeCache((props = {}) => {
     const layoutVars = layoutVariables();
     const Devices = twoColumnLayoutDevices;
-    const { gutter, contentWidth } = layoutVars;
+    const { contentWidth } = layoutVars;
     const { fullGutter } = layoutVars.foundationalWidths;
 
     const makeThemeVars = variableFactory("twoColumnLayout");
@@ -220,7 +220,19 @@ export const twoColumnLayoutClasses = useThemeCache(() => {
         }),
     });
 
-    const inheritedClasses = threeColumnLayoutClasses();
+    // const inheritedClasses = threeColumnLayoutClasses();
+    const inheritedClasses = {
+        root: "",
+        content: "",
+        top: "",
+        main: "",
+        container: "",
+        fullWidth: "",
+        mainColumn: "",
+        panel: "",
+        breadcrumbs: "",
+        breadcrumbsContainer: "",
+    };
     const classes: IPanelLayoutClasses = {
         root: inheritedClasses.root,
         content: inheritedClasses.content,

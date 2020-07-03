@@ -4,14 +4,17 @@
  */
 import React from "react";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { LayoutProvider, LayoutTypes } from "@library/layout/LayoutContext";
+import { LayoutProvider, LayoutTypes, withLayout } from "@library/layout/LayoutContext";
+import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
 
-interface IProps extends IPanelLayoutProps {}
+interface IProps extends Omit<IPanelLayoutProps, "classes"> {}
 
-export default function ThreeColumnLayout(props: IProps) {
+export function ThreeColumnLayout(props: IProps) {
     return (
         <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>
-            <PanelLayout {...props} />;
+            <PanelLayout {...props} classes={threeColumnLayoutClasses()} />;
         </LayoutProvider>
     );
 }
+
+export default withLayout(ThreeColumnLayout);

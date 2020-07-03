@@ -4,7 +4,7 @@
  */
 
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
-import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
+import { IPanelLayoutClasses, panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
@@ -14,9 +14,10 @@ import React, { useMemo, useRef } from "react";
 import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
-import { useLayout } from "@library/layout/LayoutContext";
+import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
+import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
 
-export interface IPanelLayoutProps {
+export interface IPanelLayoutProps extends ILayoutProps {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: keyof JSX.IntrinsicElements;
@@ -31,7 +32,6 @@ export interface IPanelLayoutProps {
     rightBottom?: React.ReactNode;
     breadcrumbs?: React.ReactNode;
     renderLeftPanelBackground?: boolean;
-    classes?: IPanelLayoutClasses;
 }
 
 /**
@@ -64,15 +64,30 @@ export interface IPanelLayoutProps {
  * | MiddleBottom |
  * | RightBottom  |
  */
-export default function PanelLayout(props: IPanelLayoutProps) {
-    const { topPadding, className, growMiddleBottom, isFixed, ...childComponents } = props;
+export function PanelLayout(props: IPanelLayoutProps) {
+    const {
+        className,
+        contentTag = "div",
+        growMiddleBottom = false,
+        topPadding = true,
+        isFixed = true,
+        ...childComponents
+    } = props;
 
     // Handle window resizes
 
     // Measure the panel itself.
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
-    const { classes, currentDevice, isCompact, isFullWidth, rightPanelCondition } = useLayout();
+    const {
+        classes = props.classes ?? panelLayoutClasses(),
+        currentDevice,
+        isCompact,
+        isFullWidth,
+        rightPanelCondition = () => {
+            return false;
+        },
+    } = useLayout();
 
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
@@ -188,13 +203,6 @@ export default function PanelLayout(props: IPanelLayoutProps) {
     );
 }
 
-PanelLayout.defaultProps = {
-    contentTag: "div",
-    growMiddleBottom: false,
-    topPadding: true,
-    isFixed: true,
-};
-
 // Simple container components.
 interface IContainerProps {
     className?: string;
@@ -265,3 +273,5 @@ export function PanelWidgetHorizontalPadding(props: IContainerProps) {
     const classes = panelWidgetClasses();
     return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
+
+export default withLayout(PanelLayout);

@@ -132,39 +132,14 @@ export interface ILayoutProps {
     rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
-const LayoutContext = React.createContext<ILayoutProps>({
-    type: LayoutTypes.THREE_COLUMNS,
-    currentDevice: fallbackLayoutVariables.DESKTOP,
-    Devices: fallbackLayoutVariables as any,
-    // isCompact: defaultLayoutVars.isCompact(threeColumnLayoutDevices.DESKTOP),
-    // isFullWidth: defaultLayoutVars.isFullWidth(threeColumnLayoutDevices.DESKTOP),
-    // classes: threeColumnLayoutClasses(),
-    // currentLayoutVariables: defaultLayoutVars,
-    mediaQueries: layoutVariables().mediaQueries,
-    // contentWidth: defaultLayoutVars.contentWidth,
-    // calculateDevice: defaultLayoutVars.calculateDevice,
-    // layoutSpecificStyles: defaultLayoutVars["layoutSpecificStyles"] ?? undefined,
-    // rightPanelCondition: defaultLayoutVars.rightPanelCondition,
-} as any);
-
-export default LayoutContext;
-
-export function useLayout() {
-    return useContext(LayoutContext);
-}
-
 const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
     return false;
 };
 
-export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
-    const { type = LayoutTypes.THREE_COLUMNS, children } = props;
+const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
     const currentDevice = layout.variables.calculateDevice();
-
-    console.log("trigger: ", type);
-
-    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>({
+    return {
         type,
         currentDevice,
         Devices: layout.variables.Devices as any,
@@ -176,32 +151,37 @@ export function LayoutProvider(props: { type?: LayoutTypes; children: React.Reac
         contentWidth: layout.variables.contentWidth,
         calculateDevice: layout.variables.calculateDevice,
         layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
-        rightPanelCondition: layout.variables["rightPanelCondition"] ?? defaultRenderRightPanel,
-    });
+        rightPanelCondition:
+            layout.variables["rightPanelCondition"] !== undefined
+                ? layout.variables["rightPanelCondition"]
+                : defaultRenderRightPanel,
+    };
+};
+
+const LayoutContext = React.createContext<ILayoutProps>({
+    mediaQueries: fallbackMediaQueries,
+} as any);
+
+export default LayoutContext;
+
+export function useLayout() {
+    return useContext(LayoutContext);
+}
+
+export function LayoutProvider(props: { type?: LayoutTypes; children: React.ReactNode }) {
+    const { type = LayoutTypes.THREE_COLUMNS, children } = props;
+
+    const [deviceInfo, setDeviceInfo] = useState<ILayoutProps>(layoutDataByType(type));
 
     useEffect(() => {
         const throttledUpdate = throttle(() => {
-            const currentDevice = layout.variables.calculateDevice();
-            setDeviceInfo({
-                type,
-                currentDevice,
-                Devices: layout.variables.Devices as any,
-                isCompact: layout.variables.isCompact(currentDevice),
-                isFullWidth: layout.variables.isFullWidth(currentDevice),
-                classes: layout.classes,
-                currentLayoutVariables: layout.variables,
-                mediaQueries: filterQueriesByType(layout.variables.mediaQueries, type),
-                contentWidth: layout.variables.contentWidth,
-                calculateDevice: layout.variables.calculateDevice,
-                layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
-                rightPanelCondition: layout.variables["rightPanelCondition"] ?? defaultRenderRightPanel,
-            });
+            setDeviceInfo(layoutDataByType(type));
         }, 100);
         window.addEventListener("resize", throttledUpdate);
         return () => {
             window.removeEventListener("resize", throttledUpdate);
         };
-    }, [layout.variables, setDeviceInfo]);
+    }, [type, setDeviceInfo]);
 
     return <LayoutContext.Provider value={deviceInfo}>{children}</LayoutContext.Provider>;
 }
@@ -225,4 +205,11 @@ export function withLayout<T extends ILayoutProps = ILayoutProps>(WrappedCompone
     };
     ComponentWithDevice.displayName = `withLayout(${displayName})`;
     return ComponentWithDevice;
+}
+
+/**
+ * Allows newer media query declaration while falling back to default (no context)
+ */
+export function fallbackMediaQueries() {
+    return filterQueriesByType(threeColumnLayoutVariables().mediaQueries, LayoutTypes.THREE_COLUMNS);
 }

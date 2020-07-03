@@ -6,7 +6,7 @@
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { fonts, paddings, srOnly, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutTypes, useLayout, fallbackMediaQueries } from "@library/layout/LayoutContext";
 
 export const filterPanelClasses = useThemeCache(() => {
     const globalVars = globalVariables();

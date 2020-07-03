@@ -5,11 +5,9 @@
 
 import React from "react";
 import { PanelWidget } from "@library/layout/PanelLayout";
-import { DeviceProvider } from "@library/layout/DeviceContext";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
-import twoColumnLayout from "@library/layout/TwoColumnLayout";
-import TwoColumnLayout from "@library/layout/TwoColumnLayout";
 import { twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
+import TwoColumnLayout from "./TwoColumnLayout";
 
 export default {
     title: "twoColumnLayout",
@@ -33,57 +31,49 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 
 export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
-            <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-            />
-        </DeviceProvider>
+        <TwoColumnLayout
+            middleTop={<DummyPanel>Middle Top</DummyPanel>}
+            middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+            rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+        />
     );
 });
 
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
-            <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
-                rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
-                rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-            />
-        </DeviceProvider>
+        <TwoColumnLayout
+            middleTop={<DummyPanel>Middle Top</DummyPanel>}
+            middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
+            rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
+            rightBottom={<DummyPanel>Right bottom</DummyPanel>}
+        />
     );
 });
 
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
-            <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top</DummyPanel>}
-                middleBottom={
-                    <DummyPanel>
-                        Middle Bottom{smallIpsum}
-                        {smallIpsum}
-                    </DummyPanel>
-                }
-                rightTop={<DummyPanel>Right Top</DummyPanel>}
-                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-            />
-        </DeviceProvider>
+        <TwoColumnLayout
+            middleTop={<DummyPanel>Middle Top</DummyPanel>}
+            middleBottom={
+                <DummyPanel>
+                    Middle Bottom{smallIpsum}
+                    {smallIpsum}
+                </DummyPanel>
+            }
+            rightTop={<DummyPanel>Right Top</DummyPanel>}
+            rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+        />
     );
 });
 
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
-        <DeviceProvider>
-            <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-            />
-        </DeviceProvider>
+        <TwoColumnLayout
+            middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+            middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+            rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+            rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+        />
     );
 });
 
@@ -101,14 +91,12 @@ export const DarkMode = storyWithConfig(
     },
     () => {
         return (
-            <DeviceProvider>
-                <TwoColumnLayout
-                    middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                    middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
-                    rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-                    rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-                />
-            </DeviceProvider>
+            <TwoColumnLayout
+                middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
+                rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
+            />
         );
     },
 );

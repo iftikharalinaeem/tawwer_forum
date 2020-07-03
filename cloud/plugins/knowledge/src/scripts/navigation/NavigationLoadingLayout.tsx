@@ -4,14 +4,11 @@
  */
 
 import Navigation from "@knowledge/navigation/Navigation";
-import { t } from "@library/utility/appUtils";
-import Loader from "@library/loaders/Loader";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
 import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";

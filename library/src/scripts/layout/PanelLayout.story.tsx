@@ -37,7 +37,7 @@ export const SimplePanels = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 middleTop={<DummyPanel>Middle Top</DummyPanel>}
                 middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -52,7 +52,7 @@ export const LargeContent = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -67,7 +67,7 @@ export const LargeLeftPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
                 rightTop={<DummyPanel>Right Top</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -82,7 +82,7 @@ export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
                 rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -102,7 +102,7 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 }
                 rightTop={<DummyPanel>Right Top</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -117,7 +117,7 @@ export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
                 middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-            ></PanelLayout>
+            />
         </DeviceProvider>
     );
 });
@@ -144,7 +144,7 @@ export const DarkMode = storyWithConfig(
                     middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                     rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
                     rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
-                ></PanelLayout>
+                />
             </DeviceProvider>
         );
     },
