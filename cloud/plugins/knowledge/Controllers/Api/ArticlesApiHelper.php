@@ -25,6 +25,7 @@ use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Knowledge\Models\KnowledgeCategoryModel;
 use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Models\DraftModel;
+use Vanilla\Models\Model;
 use Vanilla\UploadedFile;
 
 /**
@@ -419,7 +420,7 @@ class ArticlesApiHelper {
                 );
             }
 
-            $this->articleModel->update($article, ["articleID" => $articleID], $this->getOperationMode());
+            $this->articleModel->update($article, ["articleID" => $articleID], [Model::OPT_MODE => $this->getOperationMode()]);
 
             if ($moveToAnotherCategory) {
                 if (!empty($prevState['knowledgeCategoryID'])) {
@@ -462,7 +463,7 @@ class ArticlesApiHelper {
             if (!empty($fields["insertUserID"] ?? null)) {
                 $fields["updateUserID"] = $fields["insertUserID"];
             }
-            $articleID = $this->articleModel->insert($fields, $this->getOperationMode());
+            $articleID = $this->articleModel->insert($fields, [Model::OPT_MODE => $this->getOperationMode()]);
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
                     $fields['knowledgeCategoryID'],
@@ -516,9 +517,9 @@ class ArticlesApiHelper {
 
             if (!$currentRevision) {
                 $revision["status"] = "published";
-                $this->articleRevisionModel->insert($revision, $this->getOperationMode());
+                $this->articleRevisionModel->insert($revision, [Model::OPT_MODE => $this->getOperationMode()]);
             } else {
-                $articleRevisionID = $this->articleRevisionModel->insert($revision, $this->getOperationMode());
+                $articleRevisionID = $this->articleRevisionModel->insert($revision, [Model::OPT_MODE => $this->getOperationMode()]);
                 $this->articleRevisionModel->publish($articleRevisionID, $revision["insertUserID"] ?? null, $this->getOperationMode());
             }
 
