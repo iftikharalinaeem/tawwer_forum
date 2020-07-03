@@ -10,6 +10,7 @@ namespace VanillaTests\Library\Vanilla\Database;
 use Garden\EventManager;
 use Garden\Events\GenericResourceEvent;
 use Garden\Events\ResourceEvent;
+use Garden\Events\ResourceEventLimitException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Database\Operation;
@@ -154,6 +155,22 @@ class ResourceEventProcessorTest extends TestCase {
         $this->assertInstanceOf(\Exception::class, $exception);
 
         // An exception was thrown after the delete events were processed, but the events were not dispatched.
+    }
+
+    /**
+     * Test the limit of resources that can be processed.
+     */
+    public function testLimit() {
+        $this->eventProcessor->setUpdateLimit(2);
+        $this->model->insert(['name' => 'item1']);
+        $this->model->insert(['name' => 'item2']);
+        $this->model->insert(['name' => 'item2']);
+
+        // Only affects 2 rows. No limit needed.
+        $this->model->update(['name' => 'name reset'], ['modelID <' => 3]);
+
+        $this->expectException(ResourceEventLimitException::class);
+        $this->model->update(['name' => 'name reset'], ['modelID <' => 4]);
     }
 
     /**
