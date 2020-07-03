@@ -11,8 +11,8 @@ import { percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
 import { TileAlignment } from "@library/features/tiles/Tiles";
-import { IMediaQueryFunction } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { IMediaQueryFunction } from "@library/layout/mediaQueriesForAllLayouts";
 
 export interface ITilesOptions {
     columns?: number;

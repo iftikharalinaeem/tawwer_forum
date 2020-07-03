@@ -22,7 +22,6 @@ import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProviderNoHistory } from "@library/banner/BannerContext";
 import { SearchFormContextProvider } from "@library/search/SearchFormContext";
-import { LayoutProvider } from "./layout/LayoutContext";
 
 interface IProps {
     children: React.ReactNode;
