@@ -351,7 +351,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\Search\ElasticSearchDriver::class)
-    ->setConstructorArgs(["elastic" => new Reference(\Vanilla\Search\ElasticServiceClient::class)])
+    ->setConstructorArgs(["elastic" => new Reference(\Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient::class)])
 
     ->rule(SearchService::class)
     ->setShared(true)

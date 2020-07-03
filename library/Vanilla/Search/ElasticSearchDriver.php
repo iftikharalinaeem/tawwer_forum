@@ -6,10 +6,9 @@
 
 namespace Vanilla\Search;
 
-use Garden\Http\HttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
-use Vanilla\Search\ElasticServiceClient;
+use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
 
 /**
  * Elasticsearch search driver.
@@ -25,7 +24,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     /** @var ConfigurationInterface $config */
     private $config;
 
-    /** @var ElasticServiceClient $elastic */
+    /** @var ElasticHttpClient $elastic */
     private $elastic;
 
     /**
@@ -36,7 +35,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     public function __construct(
         SearchRecordTypeProviderInterface $searchRecordProvider,
         ConfigurationInterface $config,
-        ElasticServiceClient $elastic
+        ElasticHttpClient $elastic
     ) {
         $this->searchTypeRecordProvider = $searchRecordProvider;
         $this->config = $config;
@@ -54,9 +53,11 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     public function search(array $queryData, SearchOptions $options): SearchResults {
         $query = new ElasticSearchQuery($this->getSearchTypes(), $queryData);
 
-        $searchPayload = $query->getPayload();
-
-        $search = $this->query($searchPayload);
+        $searchPayload = ;
+        $search = $this->elastic->searchDocuments(
+            $query->getIndexes(),
+            $query->getPayload()
+        );
 
         $search = $this->convertRecordsToResultItems($search);
         return new SearchResults(
@@ -67,8 +68,4 @@ class ElasticSearchDriver extends AbstractSearchDriver {
         );
     }
 
-    public function query(array $payload): array {
-        $response = $this->elastic->search($payload);
-        return $response;
-    }
 }

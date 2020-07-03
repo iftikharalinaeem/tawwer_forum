@@ -64,10 +64,15 @@ class ElasticSearchQuery extends SearchQuery {
         return $this->getQueryParameter($param, $default);
     }
 
+    public function getIndexes(): array {
+        return [
+            "comment",
+            "discussion"
+        ];
+    }
+
     public function getPayload(): array {
-        $payload = [
-            "indexesAlias" => ["{{idx:comment}}", "{{idx:discussion}}"],
-            "searchPayload" => [
+        return [
                 "query"=> [
                     "query_string" => [
                         "query" => "discussion"
@@ -75,9 +80,6 @@ class ElasticSearchQuery extends SearchQuery {
                 ],
                 "from" => 2,
                 "size" => 2
-            ]
         ];
-
-        return $payload;
     }
 }
