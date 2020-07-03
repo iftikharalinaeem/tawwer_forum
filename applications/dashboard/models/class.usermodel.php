@@ -2665,6 +2665,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $row['isAdmin'] = in_array($row['Admin'], [1, 2]);
             unset($row['Admin']);
         }
+
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;
@@ -2681,7 +2682,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             'name:s' => 'Name of the user.',
             'password:s' => 'Password of the user.',
             'hashMethod:s' => 'Hash method for the password.',
-            'email:s' => [
+            'email:s?' => [
                 'description' => 'Email address of the user.',
                 'minLength' => 0,
             ],
@@ -2718,7 +2719,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             $result = Schema::parse([
                 "banned",
                 "bypassSpam",
-                "email",
+                "email?",
                 "emailConfirmed",
                 "dateInserted",
                 "dateLastActive",
@@ -2729,6 +2730,9 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "roles?",
                 "showEmail",
                 "userID",
+                "title?",
+                "countDiscussions?",
+                "countComments?",
             ]);
             $result->add($this->schema());
 
