@@ -16,6 +16,10 @@ use Garden\Http\HttpResponse;
  * Class AbstractSearchApiInformationProvider
  */
 abstract class AbstractElasticHttpConfig {
+
+    /** @var int */
+    private $time;
+
     /**
      * The base URL to the API.
      *
@@ -33,7 +37,7 @@ abstract class AbstractElasticHttpConfig {
      * @throws Exception When something goes wrong.
      */
     final public function getAuthJWT() {
-        $timestamp = time();
+        $timestamp = $this->getTime();
         $fullPayload = $this->getTokenPayload() + [
             'iat' => $timestamp,
             'exp' => $timestamp + 10,
@@ -41,6 +45,20 @@ abstract class AbstractElasticHttpConfig {
 
         $var = JWT::encode($fullPayload, $this->getSecret(), 'HS512');
         return $var;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTime(): int {
+        return $this->time ?? time();
+    }
+
+    /**
+     * @param int $time
+     */
+    public function setTime(int $time): void {
+        $this->time = $time;
     }
 
     /**
