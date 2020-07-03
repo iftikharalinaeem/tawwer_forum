@@ -602,6 +602,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *  - Gdn_PluginManager::ACCESS_CLASSNAME
      * @param mixed $sender An object to pass to a new plugin instantiation.
      * @return Gdn_IPlugin The plugin instance.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      */
     public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null) {
         $className = null;
@@ -870,8 +872,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $className The name of the class throwing the event.
      * @param string $methodName The name of the event.
-     * @return callback|null
-     * @since 2.1
+     * @return callable|null
      */
     public function getCallback($className, $methodName) {
         $eventKey = "{$className}_{$methodName}_method";
@@ -1196,12 +1197,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         foreach ($authors as $authorString) {
             $parts = explode(',', $authorString, 3);
             $author = [];
-            $author['Name'] = trim($author[0]);
+            $author['Name'] = trim($parts[0]);
             for ($i = 1; $i < count($parts); $i++) {
                 if (strpos($parts[$i], '@') !== false) {
                     $author['Email'] = $parts[$i];
-                } elseif (preg_match('`^https?://`', $parts[$i]))
+                } elseif (preg_match('`^https?://`', $parts[$i])) {
                     $author['Url'] = $parts[$i];
+                }
             }
             $result[] = $author;
         }
@@ -1213,8 +1215,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $name = $author['Name'];
                 if (isset($author['Url'])) {
                     $url = $author['Url'];
-                } elseif (isset($author['Email']))
+                } elseif (isset($author['Email'])) {
                     $url = "mailto:{$author['Email']}";
+                }
 
                 if (isset($url)) {
                     $htmls[] = '<a href="'.htmlspecialchars($url).'">'.htmlspecialchars($name).'</a>';
@@ -1223,7 +1226,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             $result = implode(', ', $htmls);
         }
         return $result;
-
     }
 
     /**
@@ -1302,8 +1304,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @param string $id Identifier of the entry to look for.
      *
-     * @throws \Interop\Container\Exception\NotFoundException  No entry was found for this identifier.
-     * @throws \Interop\Container\Exception\ContainerException Error while retrieving the entry.
+     * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
+     * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      *
      * @return mixed Entry.
      */

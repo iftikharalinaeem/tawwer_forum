@@ -169,25 +169,44 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @param array $query The request query.
-     * @throws NotFoundException if the user could not be found.
      * @return Data
+     * @throws ServerException If session isn't found.
+     * @throws NotFoundException If the user could not be found.
      */
     public function get($id, array $query) {
-        $this->permission([
+        $session = $this->getSession();
+
+        $showFullSchema = false;
+        if ($session->checkPermission([
             'Garden.Users.Add',
             'Garden.Users.Edit',
             'Garden.Users.Delete'
-        ]);
+        ])) {
+            $showFullSchema = true;
+        } elseif (!$session->checkPermission([
+            'Garden.Profiles.View',
+        ])) {
+            $this->permission('Garden.Profile.View');
+        }
+
 
         $this->idParamSchema();
         $in = $this->schema([], ['UserGet', 'in'])->setDescription('Get a user.');
-        $out = $this->schema($this->userSchema(), 'out');
+        $out = $showFullSchema ? $this->schema($this->userSchema(), 'out') : $this->viewProfileSchema();
 
         $query = $in->validate($query);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
+        $showEmail = $row['showEmail'] ?? false;
+        if (!$showEmail &&
+            !$session->checkPermission('Garden.Moderation.Manage')
+        ) {
+            unset($row['email']);
+        }
+
         $result = $out->validate($row);
+
 
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_getOutput', $result, $this, $in, $query, $row);
@@ -388,6 +407,10 @@ class UsersApiController extends AbstractApiController {
                 "description" => "Total number of unread notifications for the current user.",
                 "type" => "integer",
             ],
+            "countUnreadConversations" => [
+                "description" => "Total number of unread conversations for the current user.",
+                "type" => "integer",
+            ],
             "permissions" => [
                 "description" => "Global permissions available to the current user.",
                 "items" => [
@@ -409,6 +432,7 @@ class UsersApiController extends AbstractApiController {
         // Expand permissions for the current user.
         $user["permissions"] = $this->globalPermissions();
         $user["countUnreadNotifications"] = $this->activityModel->getUserTotalUnread($this->getSession()->UserID);
+        $user["countUnreadConversations"] = $user['countUnreadConversations'] ?? 0;
 
         $result = $out->validate($user);
         return $result;
@@ -950,5 +974,23 @@ class UsersApiController extends AbstractApiController {
             $this->userSchema = $this->schema($this->userModel->readSchema(), 'User');
         }
         return $this->schema($this->userSchema, $type);
+    }
+
+    /**
+     * Get a user schema with minimal profile fields.
+     *
+     * @return Schema Returns a schema object.
+     */
+    public function viewProfileSchema() {
+        return $this->schema(Schema::parse([
+                'name:s?',
+                'email:s?',
+                'photoUrl:s?',
+                'roles:a?',
+                'dateInserted',
+                'dateLastActive:dt',
+                'countDiscussions?',
+                'countComments?',
+            ])->add($this->fullSchema()), 'ViewProfile');
     }
 }

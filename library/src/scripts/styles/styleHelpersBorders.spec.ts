@@ -28,7 +28,22 @@ describe("styleHelperBorders", () => {
                     borderTopRightRadius: "24px",
                 };
 
-                expect(standardizeBorderRadius(input, true)).deep.eq(expected);
+                expect(standardizeBorderRadius(input)).deep.eq(expected);
+            });
+
+            it("short hand declaration - important", () => {
+                const input: IBorderRadiusValue = 24;
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "24px !important",
+                    borderBottomRightRadius: "24px !important",
+                    borderTopLeftRadius: "24px !important",
+                    borderTopRightRadius: "24px !important",
+                };
+                expect(
+                    standardizeBorderRadius(input, {
+                        isImportant: true,
+                    }),
+                ).deep.eq(expected);
             });
 
             it("Data already correct, just display:", () => {
@@ -49,6 +64,24 @@ describe("styleHelperBorders", () => {
                 expect(standardizeBorderRadius(input)).deep.eq(expected);
             });
 
+            it("Data already correct, just display - important:", () => {
+                const input: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "24px !important",
+                    borderBottomRightRadius: "24px !important",
+                    borderTopLeftRadius: "24px !important",
+                    borderTopRightRadius: "24px !important",
+                };
+
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "24px !important",
+                    borderBottomRightRadius: "24px !important",
+                    borderTopLeftRadius: "24px !important",
+                    borderTopRightRadius: "24px !important",
+                };
+
+                expect(standardizeBorderRadius(input)).deep.eq(expected);
+            });
+
             it("spreads the 'all' property over all of the radii", () => {
                 const input: IRadiusShorthand = { all: 24 };
                 const expected: IBorderRadiusOutput = {
@@ -59,6 +92,22 @@ describe("styleHelperBorders", () => {
                 };
 
                 expect(standardizeBorderRadius(input)).deep.eq(expected);
+            });
+
+            it("spreads the 'all' property over all of the radii - important", () => {
+                const input: IRadiusShorthand = { all: 24 };
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "24px !important",
+                    borderBottomRightRadius: "24px !important",
+                    borderTopLeftRadius: "24px !important",
+                    borderTopRightRadius: "24px !important",
+                };
+
+                expect(
+                    standardizeBorderRadius(input, {
+                        isImportant: true,
+                    }),
+                ).deep.eq(expected);
             });
 
             it("takes more specific properties along with the all", () => {
@@ -76,6 +125,25 @@ describe("styleHelperBorders", () => {
                 expect(standardizeBorderRadius(input)).deep.eq(expected);
             });
 
+            it("takes more specific properties along with the all - important", () => {
+                const input: IRadiusShorthand = {
+                    all: 24,
+                    left: 50,
+                };
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "50px !important",
+                    borderBottomRightRadius: "24px !important",
+                    borderTopLeftRadius: "50px !important",
+                    borderTopRightRadius: "24px !important",
+                };
+
+                expect(
+                    standardizeBorderRadius(input, {
+                        isImportant: true,
+                    }),
+                ).deep.eq(expected);
+            });
+
             it("real example", () => {
                 const input: IRadiusShorthand = {
                     left: 0,
@@ -91,6 +159,25 @@ describe("styleHelperBorders", () => {
                 expect(standardizeBorderRadius(input)).deep.eq(expected);
             });
 
+            it("real example - important", () => {
+                const input: IRadiusShorthand = {
+                    left: 0,
+                    right: 29,
+                };
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "0px !important",
+                    borderBottomRightRadius: "29px !important",
+                    borderTopLeftRadius: "0px !important",
+                    borderTopRightRadius: "29px !important",
+                };
+
+                expect(
+                    standardizeBorderRadius(input, {
+                        isImportant: true,
+                    }),
+                ).deep.eq(expected);
+            });
+
             it("Test top bottom", () => {
                 const input: IRadiusShorthand = {
                     top: 0,
@@ -104,6 +191,25 @@ describe("styleHelperBorders", () => {
                 };
 
                 expect(standardizeBorderRadius(input)).deep.eq(expected);
+            });
+
+            it("Test top bottom - important", () => {
+                const input: IRadiusShorthand = {
+                    top: 0,
+                    bottom: 12,
+                };
+                const expected: IBorderRadiusOutput = {
+                    borderBottomLeftRadius: "12px !important",
+                    borderBottomRightRadius: "12px !important",
+                    borderTopLeftRadius: "0px !important",
+                    borderTopRightRadius: "0px !important",
+                };
+
+                expect(
+                    standardizeBorderRadius(input, {
+                        isImportant: true,
+                    }),
+                ).deep.eq(expected);
             });
         });
     });
