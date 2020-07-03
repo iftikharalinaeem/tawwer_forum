@@ -9,6 +9,7 @@ namespace Vanilla\Search;
 use Garden\Http\HttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
+use Vanilla\Contracts\Search\ElasticServiceClient;
 
 /**
  * Elasticsearch search driver.
@@ -24,15 +25,22 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     /** @var ConfigurationInterface $config */
     private $config;
 
+    /** @var ElasticServiceClient $elastic */
+    private $elastic;
+
     /**
      * DI.
      *
      * @param SearchRecordTypeProviderInterface $searchRecordProvider
      */
-    public function __construct(SearchRecordTypeProviderInterface $searchRecordProvider, ConfigurationInterface $config) {
+    public function __construct(
+        SearchRecordTypeProviderInterface $searchRecordProvider,
+        ConfigurationInterface $config,
+        ElasticServiceClient $elastic
+    ) {
         $this->searchTypeRecordProvider = $searchRecordProvider;
         $this->config = $config;
-//        $this->db  = $db;
+        $this->elastic  = $elastic;
     }
 
     /**
@@ -48,7 +56,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
 
         $searchPayload = $query->getPayload();
 
-        $search = $this->elastic->query($searchPayload)->resultArray();
+        $search = $this->query($searchPayload);
 
         $search = $this->convertRecordsToResultItems($search);
         return new SearchResults(
@@ -60,6 +68,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     }
 
     public function query(array $payload): array {
-
+        $response = $this->elastic->search($payload);
+        return $response;
     }
 }
