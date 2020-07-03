@@ -225,7 +225,7 @@ export function Panel(props: IContainerProps) {
 export function PanelOverflow(
     props: IContainerProps & { offset: number; isLeft?: boolean; renderLeftPanelBackground?: boolean },
 ) {
-    const classes = panelAreaClasses();
+    const classes = panelAreaClasses(useLayout().mediaQueries);
     const panelVars = panelBackgroundVariables();
     const color =
         panelVars.config.render && !!props.isLeft && props.renderLeftPanelBackground
@@ -244,7 +244,7 @@ export function PanelOverflow(
 
 export function PanelArea(props: IContainerProps) {
     const Tag = (props.tag as "div") || "div";
-    const classes = panelAreaClasses();
+    const classes = panelAreaClasses(useLayout().mediaQueries);
     return (
         <Tag ref={props.innerRef} className={classNames(classes.root, props.className)}>
             {props.children}
@@ -254,22 +254,22 @@ export function PanelArea(props: IContainerProps) {
 
 export function PanelAreaHorizontalPadding(props: IContainerProps) {
     const Tag = props.tag || "div";
-    const classes = panelAreaClasses();
+    const classes = panelAreaClasses(useLayout().mediaQueries);
     return <Tag className={classNames(classes.root, props.className, "hasNoVerticalPadding")}>{props.children}</Tag>;
 }
 
 export function PanelWidget(props: IContainerProps) {
-    const classes = panelWidgetClasses();
+    const classes = panelWidgetClasses(useLayout().mediaQueries);
     return <div className={classNames(classes.root, props.className)}>{props.children}</div>;
 }
 
 export function PanelWidgetVerticalPadding(props: IContainerProps) {
-    const classes = panelWidgetClasses();
+    const classes = panelWidgetClasses(useLayout().mediaQueries);
     return <div className={classNames(classes.root, "hasNoHorizontalPadding", props.className)}>{props.children}</div>;
 }
 
 export function PanelWidgetHorizontalPadding(props: IContainerProps) {
-    const classes = panelWidgetClasses();
+    const classes = panelWidgetClasses(useLayout().mediaQueries);
     return <div className={classNames(classes.root, "hasNoVerticalPadding", props.className)}>{props.children}</div>;
 }
 

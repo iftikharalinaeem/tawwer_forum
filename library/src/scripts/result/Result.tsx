@@ -39,8 +39,9 @@ export default function Result(props: IResult) {
     const hasAttachments = attachments && attachments.length > 0;
     const showImage = image && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
-    const classesSearchResults = searchResultsClasses();
-    const classes = searchResultClasses();
+    const layoutContext = useLayout();
+    const classesSearchResults = searchResultsClasses(layoutContext.mediaQueries);
+    const classes = searchResultClasses(layoutContext.mediaQueries);
     const imageComponent = showImage ? (
         <img
             src={image}

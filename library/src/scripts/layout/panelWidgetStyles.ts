@@ -21,34 +21,31 @@ export const panelWidgetVariables = useThemeCache(() => {
     return { spacing };
 });
 
-export const panelWidgetClasses = useThemeCache(() => {
+export const panelWidgetClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
     const style = styleFactory("panelWidget");
     const vars = panelWidgetVariables();
-    const { mediaQueries } = useLayout();
 
-    const root = style(
-        {
-            display: "flex",
-            flexDirection: "column",
-            position: "relative",
-            width: percent(100),
-            ...paddings({
-                all: globalVars.gutter.half,
-            }),
-            $nest: {
-                "&.hasNoVerticalPadding": {
-                    ...paddings({ vertical: 0 }),
-                },
-                "&.hasNoHorizontalPadding": {
-                    ...paddings({ horizontal: 0 }),
-                },
-                "&.isSelfPadded": {
-                    ...paddings({ all: 0 }),
-                },
+    const root = style({
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        width: percent(100),
+        ...paddings({
+            all: globalVars.gutter.half,
+        }),
+        $nest: {
+            "&.hasNoVerticalPadding": {
+                ...paddings({ vertical: 0 }),
+            },
+            "&.hasNoHorizontalPadding": {
+                ...paddings({ horizontal: 0 }),
+            },
+            "&.isSelfPadded": {
+                ...paddings({ all: 0 }),
             },
         },
-        mediaQueries({
+        ...mediaQueries({
             [LayoutTypes.TWO_COLUMNS]: {
                 oneColumnDown: {
                     ...paddings({
@@ -64,7 +61,7 @@ export const panelWidgetClasses = useThemeCache(() => {
                 },
             },
         }),
-    );
+    });
 
     return { root };
 });

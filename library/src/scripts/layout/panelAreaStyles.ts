@@ -13,11 +13,10 @@ import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
 
-export const panelAreaClasses = useThemeCache(() => {
+export const panelAreaClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
     const style = styleFactory("panelArea");
-    const classesPanelWidget = panelWidgetClasses();
-    const { mediaQueries } = useLayout();
+    const classesPanelWidget = panelWidgetClasses(mediaQueries);
 
     const root = style(
         {

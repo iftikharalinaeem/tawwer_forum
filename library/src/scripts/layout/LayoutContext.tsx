@@ -136,10 +136,6 @@ export interface ILayoutProps {
     rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
 
-const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
-    return false;
-};
-
 const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
     const currentDevice = layout.variables.calculateDevice().toString();
@@ -161,7 +157,9 @@ const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
         rightPanelCondition:
             layout.variables["rightPanelCondition"] !== undefined
                 ? layout.variables["rightPanelCondition"]
-                : defaultRenderRightPanel,
+                : (currentDevice, shouldRenderRightPanel) => {
+                      return false;
+                  },
     };
 };
 

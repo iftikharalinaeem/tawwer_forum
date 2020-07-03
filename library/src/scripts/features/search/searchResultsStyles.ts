@@ -89,11 +89,10 @@ export const searchResultsVariables = useThemeCache(() => {
     };
 });
 
-export const searchResultsClasses = useThemeCache(() => {
+export const searchResultsClasses = useThemeCache(mediaQueries => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResults");
-    const { mediaQueries } = useLayout();
 
     const root = style({
         display: "block",
@@ -150,11 +149,10 @@ export const searchResultsClasses = useThemeCache(() => {
     };
 });
 
-export const searchResultClasses = useThemeCache(() => {
+export const searchResultClasses = useThemeCache(mediaQueries => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResult");
-    const { mediaQueries } = useLayout();
     const metaVars = metasVariables();
 
     const linkColors = clickableItemStates();

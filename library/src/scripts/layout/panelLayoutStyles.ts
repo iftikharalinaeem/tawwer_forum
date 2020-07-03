@@ -55,11 +55,6 @@ export interface IPanelLayoutMediaQueries {
     xs: (styles: NestedCSSProperties) => NestedCSSProperties;
 }
 
-export type IAllMediaQueryStyles =
-    | IThreeColumnLayoutMediaQueryStyles
-    | ITwoColumnLayoutMediaQueryStyles
-    | IPanelLayoutMediaQueryStyles;
-
 export type IAllMediaQueries = IThreeColumnLayoutMediaQueries | ITwoColumnLayoutMediaQueries | IPanelLayoutMediaQueries;
 
 export interface IPanelLayoutVariables {

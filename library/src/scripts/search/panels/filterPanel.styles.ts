@@ -6,13 +6,11 @@
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { fonts, paddings, srOnly, unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { LayoutTypes, useLayout, fallbackMediaQueries } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/LayoutContext";
 
-export const filterPanelClasses = useThemeCache(() => {
+export const filterPanelClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
     const style = styleFactory("filterPanel");
-
-    const { mediaQueries } = useLayout();
 
     const header = style(
         "header",
