@@ -275,6 +275,11 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
 
+    ->rule("@baseUrl")
+    ->setFactory(function (Gdn_Request $request) {
+        return $request->getSimpleUrl('');
+    })
+
     ->rule('@smart-id-middleware')
     ->setClass(\Vanilla\Web\SmartIDMiddleware::class)
     ->setConstructorArgs(['/api/v2/'])

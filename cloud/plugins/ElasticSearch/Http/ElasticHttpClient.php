@@ -8,6 +8,7 @@
 namespace Vanilla\Cloud\ElasticSearch\Http;
 
 use Garden\Http\HttpClient;
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 
@@ -40,9 +41,11 @@ class ElasticHttpClient extends HttpClient {
 
         $this->throwExceptions = true;
         $this->setDefaultHeaders([
-            'Authorization' => 'Bearer '.$clientConfig->getAuthJWT(),
             'content-type' => 'application/json',
         ]);
+
+        // Add a middleware to JWT auths are created at the correct time.
+        $this->addMiddleware([$clientConfig, 'requestAuthMiddleware']);
     }
 
     /**
@@ -104,7 +107,20 @@ class ElasticHttpClient extends HttpClient {
             'indexAlias' => $this->convertIndexNameToAlias($indexName),
             'documentsId' => $documentIDs, // This name is what is used in the API. Typo?
         ];
-        return $this->post('/documents', $body);
+        return $this->deleteWithBody('/documents', $body);
+    }
+
+    /**
+     * Send a DELETE request to the API with a body instead of params.
+     *
+     * @param string $uri The URL or path of the request.
+     * @param array $body The querystring to add to the URL.
+     * @param array $headers The HTTP headers to add to the request.
+     * @param array $options An array of additional options for the request.
+     * @return HttpResponse Returns the {@link HttpResponse} object from the call.
+     */
+    private function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []) {
+        return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
     }
 
     /**

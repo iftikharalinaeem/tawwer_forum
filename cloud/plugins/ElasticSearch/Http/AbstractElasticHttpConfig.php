@@ -7,6 +7,8 @@ namespace Vanilla\Cloud\ElasticSearch\Http;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Garden\Http\HttpRequest;
+use Garden\Http\HttpResponse;
 
 /**
  * Provide necessary information
@@ -14,6 +16,10 @@ use Firebase\JWT\JWT;
  * Class AbstractSearchApiInformationProvider
  */
 abstract class AbstractElasticHttpConfig {
+
+    /** @var int */
+    private $time;
+
     /**
      * The base URL to the API.
      *
@@ -31,13 +37,40 @@ abstract class AbstractElasticHttpConfig {
      * @throws Exception When something goes wrong.
      */
     final public function getAuthJWT() {
-        $timestamp = time();
+        $timestamp = $this->getTime();
         $fullPayload = $this->getTokenPayload() + [
             'iat' => $timestamp,
             'exp' => $timestamp + 10,
         ];
 
-        return JWT::encode($fullPayload, $this->getSecret(), 'HS512');
+        $var = JWT::encode($fullPayload, $this->getSecret(), 'HS512');
+        return $var;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTime(): int {
+        return $this->time ?? time();
+    }
+
+    /**
+     * @param int $time
+     */
+    public function setTime(int $time): void {
+        $this->time = $time;
+    }
+
+    /**
+     * An HTTP middleware function for applying authentication to elasticsearch requests.
+     *
+     * @param HttpRequest $request
+     * @param callable $next
+     * @return HttpResponse
+     */
+    final public function requestAuthMiddleware(HttpRequest $request, callable $next): HttpResponse {
+        $request->setHeader('Authorization', 'Bearer '.$this->getAuthJWT());
+        return $next($request);
     }
 
     /**
