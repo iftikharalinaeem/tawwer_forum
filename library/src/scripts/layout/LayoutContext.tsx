@@ -8,19 +8,15 @@ import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
 import { fallbackLayoutVariables, IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
-import {
-    ITwoColumnLayoutMediaQueries,
-    ITwoColumnLayoutMediaQueryStyles,
-    twoColumnLayoutClasses,
-    twoColumnLayoutDevices,
-    twoColumnLayoutVariables,
-} from "@library/layout/types/layout.twoColumns";
-import {
-    IThreeColumnLayoutMediaQueries,
-    IThreeColumnLayoutMediaQueryStyles,
-    threeColumnLayoutVariables,
-} from "@library/layout/types/layout.threeColumns";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import {
+    ITwoColumnLayoutMediaQueryStyles,
+    twoColumnLayoutDevices,
+    ITwoColumnLayoutMediaQueries,
+} from "./types/interface.twoColumns";
+import { IThreeColumnLayoutMediaQueryStyles, IThreeColumnLayoutMediaQueries } from "./types/interface.threeColumns";
+import { threeColumnLayoutVariables } from "./types/layout.threeColumns";
+import { twoColumnLayoutVariables, twoColumnLayoutClasses } from "./types/layout.twoColumns";
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
@@ -57,6 +53,7 @@ Declare media query styles like this:
 */
 
 export const filterQueriesByType = (mediaQueriesByType, type) => {
+    // The following function is the one called in component styles.
     return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => {
         // console.log("");
         // console.log("mediaQueriesForAllLayouts: ", mediaQueriesForAllLayouts);
@@ -134,7 +131,7 @@ export interface ILayoutProps {
     currentLayoutVariables: any;
     mediaQueries: ILayoutMediaQueryFunction;
     contentWidth: number;
-    calculateDevice: () => IAllLayoutDevices;
+    calculateDevice: () => any;
     layoutSpecificStyles: (style) => any | undefined;
     rightPanelCondition: (currentDevice: string, shouldRenderRightPanel: boolean) => boolean;
 }
@@ -143,9 +140,9 @@ const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
     return false;
 };
 
-const layoutDataByType = (type: LayoutTypes) => {
+const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
-    const currentDevice = layout.variables.calculateDevice();
+    const currentDevice = layout.variables.calculateDevice().toString();
 
     const mediaQueries = filterQueriesByType(layout.variables.mediaQueries, type);
 

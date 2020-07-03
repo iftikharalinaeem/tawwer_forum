@@ -199,7 +199,7 @@ export const searchResultClasses = useThemeCache(() => {
     const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
     const iconWidth = vars.icon.size + vars.spacing.padding.left;
 
-    const mainCompactStyles: NestedCSSProperties = {
+    const mainCompactStyles = {
         $nest: {
             "&.hasMedia": {
                 width: percent(100),
@@ -226,15 +226,15 @@ export const searchResultClasses = useThemeCache(() => {
             "&.hasMedia.hasIcon": {
                 width: calc(`100% - ${unit(mediaWidth + iconWidth)}`),
             },
+            ...mediaQueries({
+                [LayoutTypes.TWO_COLUMNS]: {
+                    oneColumnDown: mainCompactStyles,
+                },
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: mainCompactStyles,
+                },
+            }).$nest,
         },
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: mainCompactStyles,
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: mainCompactStyles,
-            },
-        }),
     });
 
     const mediaElementCompactStyles: NestedCSSProperties = {

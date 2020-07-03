@@ -15,7 +15,6 @@ import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
 import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
-import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
 
 export interface IPanelLayoutProps extends ILayoutProps {
     className?: string;

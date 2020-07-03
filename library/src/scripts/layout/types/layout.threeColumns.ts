@@ -7,86 +7,109 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import {
     fallbackLayoutVariables,
     generatePanelLayoutClasses,
-    IPanelLayoutMediaQueries,
-    IPanelLayoutMediaQueryStyles,
+    IPanelLayoutVariables,
     layoutVariables,
 } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/LayoutContext";
 
-export interface IThreeColumnLayoutMediaQueryStyles extends IPanelLayoutMediaQueryStyles {}
+export const threeColumnLayoutVariables = useThemeCache(
+    (): IPanelLayoutVariables => {
+        const layoutVars = layoutVariables();
+        const Devices = fallbackLayoutVariables;
 
-export interface IThreeColumnLayoutMediaQueries extends IPanelLayoutMediaQueries {}
+        const makeThemeVars = variableFactory("threeColumnLayout");
 
-export const threeColumnLayoutVariables = useThemeCache(() => {
-    const layoutVars = layoutVariables();
-    const Devices = fallbackLayoutVariables;
+        const colors = makeThemeVars("colors", {
+            ...layoutVars.colors,
+        });
+        const contentSizes = makeThemeVars("contentSizes", {
+            ...layoutVars.contentSizes,
+        });
+        const gutter = makeThemeVars("gutter", {
+            ...layoutVars.gutter,
+        });
+        const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
+            ...layoutVars.panelLayoutBreakPoints,
+        });
+        const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", {
+            ...layoutVars.panelLayoutBreakPoints,
+        });
 
-    // Important variables that will be used to calculate other variables
-    const makeThemeVars = variableFactory("threeColumnLayout");
+        const rightPanelCondition = (currentDevice, shouldRenderLeftPanel: boolean) => {
+            return currentDevice === Devices.TABLET && !shouldRenderLeftPanel;
+        };
 
-    const rightPanelCondition = (currentDevice, shouldRenderLeftPanel: boolean) => {
-        return currentDevice === Devices.TABLET && !shouldRenderLeftPanel;
-    };
+        const foundationalWidths = makeThemeVars("foundationalWidths", {
+            ...layoutVars.foundationalWidths,
+        });
 
-    const foundationalWidths = makeThemeVars("foundationalWidths", {
-        ...layoutVars.foundationalWidths,
-    });
+        const panelInit = makeThemeVars("panel", {
+            width: foundationalWidths.panelWidth,
+        });
 
-    const panelInit = makeThemeVars("panel", {
-        width: foundationalWidths.panelWidth,
-    });
+        const panel = makeThemeVars("panel", {
+            ...panelInit,
+            paddedWidth: panelInit.width + layoutVars.gutter.full,
+        });
 
-    const panel = makeThemeVars("panel", {
-        ...panelInit,
-        paddedWidth: panelInit.width + layoutVars.gutter.full,
-    });
+        const middleColumnInit = makeThemeVars("middleColumn", {
+            width: layoutVars.middleColumn.width,
+        });
 
-    const middleColumnInit = makeThemeVars("middleColumn", {
-        width: layoutVars.middleColumn.width,
-    });
+        const middleColumn = makeThemeVars("middleColumn", {
+            ...middleColumnInit,
+            paddedWidth: middleColumnInit.width + layoutVars.gutter.full,
+        });
 
-    const middleColumn = makeThemeVars("middleColumn", {
-        ...middleColumnInit,
-        paddedWidth: middleColumnInit.width + layoutVars.gutter.full,
-    });
+        const contentWidth = layoutVars.contentWidth;
 
-    const contentWidth = layoutVars.contentWidth;
+        const breakPoints = makeThemeVars("breakPoints", {
+            noBleed: contentWidth,
+            twoColumns: foundationalWidths.breakPoints.twoColumns,
+            oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
+            xs: foundationalWidths.breakPoints.xs,
+        });
 
-    const breakPoints = makeThemeVars("breakPoints", {
-        noBleed: contentWidth,
-        twoColumns: foundationalWidths.breakPoints.twoColumns,
-        oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
-        xs: foundationalWidths.breakPoints.xs,
-    });
+        const mediaQueries = layoutVars.mediaQueries;
 
-    const mediaQueries = layoutVars.mediaQueries;
+        const calculateDevice = () => {
+            return layoutVars.calculateDeviceFunction(breakPoints, Devices)();
+        };
 
-    const calculateDevice = layoutVars.setCalculateDevice(breakPoints, Devices);
+        const isFullWidth = currentDevice => {
+            return currentDevice === Devices.DESKTOP || currentDevice === Devices.NO_BLEED;
+        };
 
-    const isFullWidth = currentDevice => {
-        return currentDevice === Devices.DESKTOP || currentDevice === Devices.NO_BLEED;
-    };
+        const isCompact = currentDevice => {
+            return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
+        };
 
-    const isCompact = currentDevice => {
-        return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
-    };
-
-    return {
-        type: LayoutTypes.THREE_COLUMNS,
-        Devices,
-        foundationalWidths,
-        panel,
-        middleColumn,
-        contentWidth,
-        breakPoints,
-        mediaQueries,
-        calculateDevice,
-        isFullWidth,
-        isCompact,
-        rightPanelCondition,
-    };
-});
+        return {
+            colors,
+            contentSizes,
+            gutter,
+            panelLayoutBreakPoints,
+            panelLayoutSpacing,
+            type: LayoutTypes.THREE_COLUMNS,
+            Devices,
+            foundationalWidths,
+            panel,
+            middleColumn,
+            contentWidth,
+            breakPoints,
+            mediaQueries,
+            calculateDevice,
+            isFullWidth,
+            isCompact,
+            rightPanelCondition,
+        };
+    },
+);
 
 export const threeColumnLayoutClasses = () => {
-    return generatePanelLayoutClasses(threeColumnLayoutVariables(), "threeColumnLayout");
+    return generatePanelLayoutClasses({
+        vars: threeColumnLayoutVariables(),
+        name: "threeColumnLayout",
+        type: LayoutTypes.THREE_COLUMNS,
+    });
 };
