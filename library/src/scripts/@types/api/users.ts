@@ -52,4 +52,6 @@ export interface IUser extends IUserFragment, IUserRoles {
         name: string;
         userTitle: string;
     };
+    countDiscussions?: number;
+    countComments?: number;
 }

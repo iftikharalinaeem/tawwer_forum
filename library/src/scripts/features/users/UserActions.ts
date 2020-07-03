@@ -87,7 +87,7 @@ export default class UserActions extends ReduxActions {
     public getUserByID = (query: IGetUserByIDQuery) => {
         const { userID } = query;
         const thunk = bindThunkAction(UserActions.getUserACs, async () => {
-            const reponse = await this.api.get(`/users/${userID}?/expand[]=all`);
+            const reponse = await this.api.get(`/users/${userID}/?expand[]=all`);
             return reponse.data;
         })(userID);
         return this.dispatch(thunk);

@@ -20,11 +20,6 @@ import { makeProfileUrl } from "@library/utility/appUtils";
 
 interface IProps {
     user: IUser;
-
-    stats: {
-        discussions: number;
-        comments: number;
-    };
 }
 
 interface INameProps {
@@ -36,7 +31,7 @@ interface ILabelProps {
 }
 
 interface IStatProps {
-    count: number;
+    count?: number;
     text: string;
 }
 
@@ -62,7 +57,7 @@ function Name(props: INameProps) {
 function Label(props: ILabelProps) {
     const classes = userCardClasses();
     const { label } = props;
-    return <div className={classes.label}>{label}</div>;
+    return <div> {label && <div className={classes.label}>{label}</div>} </div>;
 }
 
 function Container(props) {
@@ -83,7 +78,7 @@ function Stat(props: IStatProps) {
     return (
         <div className={classes.stat}>
             <div className={classes.count}>
-                <NumberFormatted value={count} />
+                <NumberFormatted value={count || 0} />
             </div>
             <div> {text} </div>
         </div>
@@ -120,7 +115,7 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, stats } = props;
+    const { user } = props;
     const [open, toggleOpen] = useState(false);
 
     return (
@@ -178,9 +173,9 @@ export default function PopupUserCard(props: IProps) {
 
             <DropDownSection className={classes.section} noSeparator={false} title={""}>
                 <Container>
-                    <Stat count={stats.discussions} text={t("Discussions")} />
+                    <Stat count={user.countDiscussions} text={t("Discussions")} />
                     <VerticalLine width={1} />
-                    <Stat count={stats.comments} text={t("Comments")} />
+                    <Stat count={user.countComments} text={t("Comments")} />
                 </Container>
             </DropDownSection>
 

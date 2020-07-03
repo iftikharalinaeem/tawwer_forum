@@ -27,11 +27,5 @@ export function UserCardModule(props: IProps) {
         return <ErrorMessages errors={[user.error].filter(notEmpty)} />;
     }
 
-    console.log(user.data);
-
-    return (
-        <div>
-            <h1> Basic User Card </h1>
-        </div>
-    );
+    return <PopupUserCard user={user.data} />;
 }
