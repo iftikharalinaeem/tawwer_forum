@@ -53,11 +53,11 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     public function search(array $queryData, SearchOptions $options): SearchResults {
         $query = new ElasticSearchQuery($this->getSearchTypes(), $queryData);
 
-        $searchPayload = ;
         $search = $this->elastic->searchDocuments(
             $query->getIndexes(),
             $query->getPayload()
         );
+        die(var_dump($search));
 
         $search = $this->convertRecordsToResultItems($search);
         return new SearchResults(

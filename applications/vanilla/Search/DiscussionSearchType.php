@@ -14,6 +14,7 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\MysqlSearchQuery;
+use Vanilla\Search\ElasticSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
@@ -157,7 +158,10 @@ class DiscussionSearchType extends AbstractSearchType {
             }
         } elseif ($query instanceof MysqlSearchQuery) {
              $query->addSql($this->generateSql($query));
+        } elseif ($query instanceof ElasticSearchQuery) {
+            $this->prepareElasticQuery($query);
         }
+
     }
 
     /**
@@ -296,6 +300,87 @@ class DiscussionSearchType extends AbstractSearchType {
         $db->reset();
 
         return $sql;
+    }
+
+    /**
+     * Prepares Elasticsearch query payload
+     *
+     * @param ElasticSearchQuery $query
+     * @return string
+     */
+    public function prepareElasticQuery(ElasticSearchQuery $query) {
+        $categoryIDs = $this->getCategoryIDs($query);
+
+        if ($categoryIDs === []) {
+            return '';
+        }
+
+        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+
+        if ($userIDs === []) {
+            return '';
+        }
+
+        $query->addIndex('discussion');
+
+        $query->addFields([
+            "discussionID",
+            "name",
+            "format",
+            "categoryID",
+            "score",
+            "url",
+            "dateInserted",
+            "type",
+            "insertUserID"
+        ]);
+        if (false !== $query->get('expandBody', null)) {
+            $query->addFields(["body"]);
+        }
+
+        //    ->orderBy('d.DateInserted', 'desc')
+        ;
+
+
+        $terms = $query->get('query', false);
+        if ($terms) {
+            $query->setQueryString($terms);
+        }
+
+//        if ($title = $query->get('title', false)) {
+//            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $title).'%'));
+//        }
+
+//        if ($users = $query->get('users', false)) {
+//            $author = array_column($users, 'UserID');
+//            $db->where('d.InsertUserID', $author);
+//        }
+//
+//        if ($users = $query->get('insertUserIds', false)) {
+//            $author = array_column($users, 'UserID');
+//            $db->where('d.InsertUserID', $author);
+//        }
+//
+//        if (is_array($userIDs)) {
+//            $db->where('d.InsertUserID', $userIDs);
+//        }
+//
+//        if ($discussionID = $query->get('discussionID', false)) {
+//            $db->where('d.DiscussionID', $discussionID);
+//        }
+//
+//        if (!empty($categoryIDs)) {
+//            $db->whereIn('d.CategoryID', $categoryIDs);
+//        }
+//
+//        $limit = $query->get('limit', 100);
+//        $offset = $query->get('offset', 0);
+//        $db->limit($limit + $offset);
+//
+//        $sql = $db->getSelect(true);
+//        $db->reset();
+//
+//        return $sql;
     }
 
     /**

@@ -12,6 +12,14 @@ use Garden\Schema\Schema;
  * Elasticsearch version of a search query.
  */
 class ElasticSearchQuery extends SearchQuery {
+    /** @var array $indexes List of elasticsearch indexes */
+    private $indexes;
+
+    /** @var array $fields List of document fields to return */
+    private $fields;
+
+    /** @var string $queryString Query string to search */
+    private $queryString;
 
     /**
      * ElasticSearchQuery constructor.
@@ -64,22 +72,43 @@ class ElasticSearchQuery extends SearchQuery {
         return $this->getQueryParameter($param, $default);
     }
 
+    public function addIndex(string $index) {
+        $this->indexes[$index] = true;
+    }
+
     public function getIndexes(): array {
-        return [
-            "comment",
-            "discussion"
-        ];
+        return array_keys($this->indexes);
+    }
+
+    public function addFields(array $fields) {
+        foreach ($fields as $field) {
+            $this->fields[$field] = true;
+        }
+    }
+
+    public function getFields(): array {
+        return array_keys($this->fields);
+    }
+
+    public function setQueryString(string $keywords) {
+        $this->queryString = $keywords;
     }
 
     public function getPayload(): array {
-        return [
-                "query"=> [
-                    "query_string" => [
-                        "query" => "discussion"
-                    ]
-                ],
-                "from" => 2,
-                "size" => 2
-        ];
+        $payload = [];
+        if (!empty($this->fields)) {
+            $payload['_source'] = $this->getFields();
+        }
+
+        if ($this->queryString !== null) {
+            $payload["query_string"] = [
+                "query" => $this->queryString
+            ];
+        }
+
+        $payload["from"] = 2;
+        $payload["size"] = 2;
+
+        return $payload;
     }
 }
