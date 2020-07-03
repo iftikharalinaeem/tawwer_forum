@@ -7,7 +7,7 @@
 import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
-import { fallbackLayoutVariables, IPanelLayoutClasses, layoutVariables } from "@library/layout/panelLayoutStyles";
+import { fallbackLayoutVariables, IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import {
     ITwoColumnLayoutMediaQueries,
     ITwoColumnLayoutMediaQueryStyles,
@@ -58,30 +58,34 @@ Declare media query styles like this:
 
 export const filterQueriesByType = (mediaQueriesByType, type) => {
     return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => {
-        console.log("");
-        console.log("mediaQueriesForAllLayouts: ", mediaQueriesForAllLayouts);
+        // console.log("");
+        // console.log("mediaQueriesForAllLayouts: ", mediaQueriesForAllLayouts);
+        let output = {};
         Object.keys(mediaQueriesForAllLayouts).forEach(layoutName => {
             // Check if we're in the correct layout before applying
             if (layoutName === type) {
                 // Fetch the available styles and the media queries for the current layout
                 const stylesByMediaQuery = mediaQueriesForAllLayouts[layoutName];
                 const mediaQueries = allLayouts().mediaQueriesByType[type];
-                console.log("stylesByMediaQuery: ", stylesByMediaQuery);
-                console.log("mediaQueries: ", mediaQueries);
+                // console.log("stylesByMediaQuery: ", stylesByMediaQuery);
+                // console.log("mediaQueries: ", mediaQueries);
 
                 // Match the two together
                 if (stylesByMediaQuery) {
                     Object.keys(stylesByMediaQuery).forEach(queryName => {
                         const query: ILayoutMediaQueryFunction = mediaQueries[queryName];
                         const styles: NestedCSSProperties = stylesByMediaQuery[queryName];
-                        console.log("query: ", query);
-                        console.log("styles: ", styles);
-                        return query(styles as any);
+                        // console.log("query(styles as any): ", query(styles as any));
+                        output = {
+                            $nest: {
+                                ...query(styles as any).$nest,
+                            },
+                        };
                     });
                 }
             }
         });
-        return {};
+        return output;
     };
 };
 
@@ -139,9 +143,11 @@ const defaultRenderRightPanel = (currentDevice, shouldRenderRightPanel) => {
     return false;
 };
 
-const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
+const layoutDataByType = (type: LayoutTypes) => {
     const layout = layoutData(type);
     const currentDevice = layout.variables.calculateDevice();
+
+    const mediaQueries = filterQueriesByType(layout.variables.mediaQueries, type);
 
     return {
         type,
@@ -151,7 +157,7 @@ const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
         isFullWidth: layout.variables.isFullWidth(currentDevice),
         classes: layout.classes,
         currentLayoutVariables: layout.variables,
-        mediaQueries: filterQueriesByType(layout.variables.mediaQueries, type),
+        mediaQueries,
         contentWidth: layout.variables.contentWidth,
         calculateDevice: layout.variables.calculateDevice,
         layoutSpecificStyles: layout.variables["layoutSpecificStyles"] ?? undefined,
