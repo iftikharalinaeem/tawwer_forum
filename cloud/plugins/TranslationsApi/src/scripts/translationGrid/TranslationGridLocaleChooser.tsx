@@ -9,6 +9,7 @@ import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useLocaleInfo, LocaleDisplayer, t } from "@vanilla/i18n";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     /** Handler for when the locale changes. */
@@ -26,7 +27,7 @@ interface IProps {
  */
 export function TranslationGridLocaleChooser(props: IProps) {
     const classes = translationGridClasses();
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
     const { locales } = useLocaleInfo();
 
     const { selectedLocale, onChange } = props;

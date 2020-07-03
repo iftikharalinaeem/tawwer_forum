@@ -15,15 +15,10 @@ import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import { filterQueriesByType, LayoutTypes } from "@library/layout/LayoutContext";
-import {
-    ITwoColumnLayoutMediaQueries,
-    ITwoColumnLayoutMediaQueryStyles,
-} from "@library/layout/types/interface.twoColumns";
-import {
-    IThreeColumnLayoutMediaQueries,
-    IThreeColumnLayoutMediaQueryStyles,
-} from "@library/layout/types/interface.threeColumns";
+import { filterQueriesByType } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { ITwoColumnLayoutMediaQueries } from "@library/layout/types/interface.twoColumns";
+import { IThreeColumnLayoutMediaQueries } from "@library/layout/types/interface.threeColumns";
 
 export enum fallbackLayoutVariables {
     XS = "xs",
@@ -346,9 +341,10 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
     const { vars, name, type } = props;
     const globalVars = globalVariables();
     const style = styleFactory(name);
-    const classesPanelArea = panelAreaClasses();
-    const classesPanelList = panelListClasses();
+
     const mediaQueries = filterQueriesByType(vars.mediaQueries(), type);
+    const classesPanelArea = panelAreaClasses(mediaQueries);
+    const classesPanelList = panelListClasses(mediaQueries);
 
     const main = style("main", {
         minHeight: viewHeight(20),

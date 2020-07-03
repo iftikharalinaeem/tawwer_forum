@@ -17,11 +17,7 @@ import {
 import { IThreeColumnLayoutMediaQueryStyles, IThreeColumnLayoutMediaQueries } from "./types/interface.threeColumns";
 import { threeColumnLayoutVariables } from "./types/layout.threeColumns";
 import { twoColumnLayoutVariables, twoColumnLayoutClasses } from "./types/layout.twoColumns";
-
-export enum LayoutTypes {
-    THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
-    TWO_COLUMNS = "two column", // Single column, but full width of page
-}
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export interface IAllLayoutMediaQueries {
     [LayoutTypes.TWO_COLUMNS]?: ITwoColumnLayoutMediaQueryStyles;
@@ -33,6 +29,8 @@ export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => Nest
 export type IAllLayoutDevices = twoColumnLayoutDevices | fallbackLayoutVariables;
 
 export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries;
+
+export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => NestedCSSProperties;
 
 /* Allows to declare styles for any layout without causing errors
 Declare media query styles like this:
@@ -52,29 +50,25 @@ Declare media query styles like this:
     Note that "twoColumns" does not exist in two column layout media queries, but it does not crash!
 */
 
-export const filterQueriesByType = (mediaQueriesByType, type) => {
+export const filterQueriesByType = (mediaQueriesByType, type): IMediaQueryFunction => {
     // The following function is the one called in component styles.
-    return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => {
-        // console.log("");
-        // console.log("mediaQueriesForAllLayouts: ", mediaQueriesForAllLayouts);
-        let output = {};
+    return (mediaQueriesForAllLayouts: IAllLayoutMediaQueries): NestedCSSProperties => {
+        let output = { $nest: {} };
         Object.keys(mediaQueriesForAllLayouts).forEach(layoutName => {
             // Check if we're in the correct layout before applying
             if (layoutName === type) {
                 // Fetch the available styles and the media queries for the current layout
                 const stylesByMediaQuery = mediaQueriesForAllLayouts[layoutName];
                 const mediaQueries = allLayouts().mediaQueriesByType[type];
-                // console.log("stylesByMediaQuery: ", stylesByMediaQuery);
-                // console.log("mediaQueries: ", mediaQueries);
 
                 // Match the two together
                 if (stylesByMediaQuery) {
                     Object.keys(stylesByMediaQuery).forEach(queryName => {
                         const query: ILayoutMediaQueryFunction = mediaQueries[queryName];
                         const styles: NestedCSSProperties = stylesByMediaQuery[queryName];
-                        // console.log("query(styles as any): ", query(styles as any));
                         output = {
                             $nest: {
+                                ...output.$nest,
                                 ...query(styles as any).$nest,
                             },
                         };

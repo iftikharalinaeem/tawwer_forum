@@ -16,6 +16,7 @@ import { INavigationTreeItem } from "@library/@types/api/core";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { TabHandler } from "@vanilla/dom-utils";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     activeRecord: IActiveRecord;
@@ -42,7 +43,7 @@ export function SiteNav(props: IProps) {
     const { activeRecord, collapsible, onItemHover, children } = props;
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
     const handleKeyDown = useKeyboardHandler();
     const content = hasChildren

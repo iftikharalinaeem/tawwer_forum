@@ -214,14 +214,11 @@ export const storyBookClasses = useThemeCache(() => {
         transform: translateX(`-${unit(vars.gaps.tile * 3.5)}`),
         ...layoutVariables()
             .mediaQueries()
-            .oneColumn(
-                {
-                    display: "block",
-                    width: percent(100),
-                    transform: "none",
-                },
-                false,
-            ),
+            .oneColumnDown({
+                display: "block",
+                width: percent(100),
+                transform: "none",
+            }),
     });
 
     const tile = style("tile", {

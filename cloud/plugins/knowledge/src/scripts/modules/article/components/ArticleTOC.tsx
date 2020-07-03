@@ -12,6 +12,7 @@ import { IOutlineItem } from "@knowledge/@types/api/article";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import { articleTOCClasses } from "@knowledge/modules/article/components/articleTOCStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     items: IOutlineItem[];
@@ -28,7 +29,7 @@ export default class ArticleTOC extends React.Component<IProps> {
             return null;
         }
         const classes = articleTOCClasses();
-        const classesPanelList = panelListClasses();
+        const classesPanelList = panelListClasses(useLayout().mediaQueries);
         const contents = this.props.items
             .filter(item => item.level === 2)
             .map(item => {

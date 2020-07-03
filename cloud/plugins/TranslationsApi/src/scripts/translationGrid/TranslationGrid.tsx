@@ -12,6 +12,7 @@ import { TranslationProperty } from "./TranslationProperty";
 import { TranslationGridLocaleChooser } from "./TranslationGridLocaleChooser";
 import Translate from "@library/content/Translate";
 import { makeTranslationKey } from "../translator/TranslationActions";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ITranslations {
     [propertyKey: string]: string;
@@ -35,7 +36,7 @@ export function TranslationGrid(props: ITranslationGrid) {
         existingTranslations,
         onTranslationUpdate,
     );
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
     const { properties, inScrollingContainer = false } = props;
 
     const classes = translationGridClasses();

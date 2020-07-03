@@ -8,7 +8,7 @@ import { percent } from "csx";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
-import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 // @Deprecated - Use globalVariables().widget.padding directly
 export const panelWidgetVariables = useThemeCache(() => {

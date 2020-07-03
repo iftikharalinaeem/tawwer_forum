@@ -22,7 +22,7 @@ import { calc, percent } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { BorderBottomProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
-import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export const searchResultsVariables = useThemeCache(() => {
     const globalVars = globalVariables();

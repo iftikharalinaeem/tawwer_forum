@@ -4,8 +4,9 @@
  */
 import React from "react";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { LayoutProvider, LayoutTypes, withLayout } from "@library/layout/LayoutContext";
+import { LayoutProvider, withLayout } from "@library/layout/LayoutContext";
 import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 interface IProps extends Omit<IPanelLayoutProps, "classes"> {}
 

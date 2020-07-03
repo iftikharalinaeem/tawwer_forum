@@ -10,6 +10,7 @@ import Heading from "@library/layout/Heading";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
 import classNames from "classnames";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -22,7 +23,7 @@ interface IProps {
 export default class RevisionsList extends React.Component<IProps> {
     public render() {
         const classes = mobileDropDownClasses();
-        const classesPanelList = panelListClasses();
+        const classesPanelList = panelListClasses(useLayout().mediaQueries);
         return (
             <div className="revisionsList related">
                 {!this.props.hideTitle && (

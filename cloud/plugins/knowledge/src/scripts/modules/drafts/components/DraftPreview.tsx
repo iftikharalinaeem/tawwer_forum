@@ -17,6 +17,7 @@ import { searchResultClasses, searchResultsClasses } from "@library/features/sea
 import TruncatedText from "@library/content/TruncatedText";
 import { draftPreviewClasses } from "@knowledge/modules/drafts/components/DraftPreviewStyles";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IResponseArticleDraft {
     className?: string;
@@ -31,8 +32,9 @@ export function DraftPreview(props: IProps) {
     const { dateUpdated, draftID, headingLevel, className, excerpt, menuOverwrite } = props;
     const { name } = props.attributes;
     const HeadingTag = `h${headingLevel ?? 2}` as "h1" | "h3" | "h4" | "h5" | "h6";
-    const classesSearchResults = searchResultsClasses();
-    const classesResult = searchResultClasses();
+    const { mediaQueries } = useLayout();
+    const classesSearchResults = searchResultsClasses(mediaQueries);
+    const classesResult = searchResultClasses(mediaQueries);
     const classes = draftPreviewClasses();
     const { pushSmartLocation } = useLinkContext();
 

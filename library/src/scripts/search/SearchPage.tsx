@@ -33,7 +33,8 @@ import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
-import { LayoutProvider, LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutProvider, useLayout } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 interface IProps {
     placeholder?: string;

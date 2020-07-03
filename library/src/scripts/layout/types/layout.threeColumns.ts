@@ -10,10 +10,14 @@ import {
     IPanelLayoutVariables,
     layoutVariables,
 } from "../panelLayoutStyles";
-import { LayoutTypes } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+
+interface IProps extends IPanelLayoutVariables {
+    contentSizes: object;
+}
 
 export const threeColumnLayoutVariables = useThemeCache(
-    (): IPanelLayoutVariables => {
+    (): IProps => {
         const layoutVars = layoutVariables();
         const Devices = fallbackLayoutVariables;
 
@@ -28,11 +32,9 @@ export const threeColumnLayoutVariables = useThemeCache(
         const gutter = makeThemeVars("gutter", {
             ...layoutVars.gutter,
         });
-        const panelLayoutBreakPoints = makeThemeVars("panelLayoutBreakPoints", {
-            ...layoutVars.panelLayoutBreakPoints,
-        });
+
         const panelLayoutSpacing = makeThemeVars("panelLayoutSpacing", {
-            ...layoutVars.panelLayoutBreakPoints,
+            ...layoutVars.panelLayoutSpacing,
         });
 
         const rightPanelCondition = (currentDevice, shouldRenderLeftPanel: boolean) => {
@@ -88,7 +90,6 @@ export const threeColumnLayoutVariables = useThemeCache(
             colors,
             contentSizes,
             gutter,
-            panelLayoutBreakPoints,
             panelLayoutSpacing,
             type: LayoutTypes.THREE_COLUMNS,
             Devices,

@@ -13,6 +13,7 @@ import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/styles/metasStyles";
 import { itemListClasses } from "@knowledge/modules/editor/components/itemListStyles";
 import { panelListClasses } from "@library/layout/panelListStyles";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps extends IResponseArticleDraft {
     url: string;
@@ -26,7 +27,7 @@ export default class DraftsListItem extends React.Component<IProps> {
         const { dateInserted, insertUser, url } = this.props;
         const classesMetas = metasClasses();
         const classes = itemListClasses();
-        const classesPanelList = panelListClasses();
+        const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
         let name = "(" + t("Unknown User") + ")";
         let photoUrl: string | undefined;

@@ -11,7 +11,7 @@ import FrameHeader from "@library/layout/frame/FrameHeader";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import React from "react";
-import { filterPanelClasses } from "@library/search/panels/FilterPanel.styles";
+import { filterPanelClasses } from "@library/search/panels/filterPanel.styles";
 import { useLayout } from "@library/layout/LayoutContext";
 
 export interface ISearchFilterPanel {

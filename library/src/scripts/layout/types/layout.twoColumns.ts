@@ -8,7 +8,7 @@ import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { generatePanelLayoutClasses, IPanelLayoutVariables, layoutVariables } from "../panelLayoutStyles";
-import { LayoutTypes } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
 
 export const twoColumnLayoutVariables = useThemeCache(

@@ -30,6 +30,7 @@ import {
 } from "@library/icons/searchIcons";
 import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
+import { useLayout } from "@library/layout/LayoutContext";
 
 const story = storiesOf("Search", module);
 
@@ -41,7 +42,7 @@ const dummyUserFragment = {
 };
 
 story.add("Search Box", () => {
-    const classesSearch = bannerClasses();
+    const classesSearch = bannerClasses(useLayout().mediaQueries);
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Box</StoryHeading>

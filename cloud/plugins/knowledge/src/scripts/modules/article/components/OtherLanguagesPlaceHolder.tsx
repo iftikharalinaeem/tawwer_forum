@@ -11,13 +11,14 @@ import classNames from "classnames";
 import * as React from "react";
 import { LoadingRectange, LoadingSpacer } from "@library/loaders/LoadingRectangle";
 import { PanelWidget } from "@library/layout/PanelLayout";
+import { useLayout } from "@library/layout/LayoutContext";
 /**
  * Implements "other languages" DropDown for articles.
  */
 export default function OtherLanguagesPlaceHolder() {
     const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
     return (
         <div className={classNames("otherLanguages", "panelList", classesPanelList.root)}>

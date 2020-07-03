@@ -11,7 +11,7 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { LayoutTypes, useLayout } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export const panelAreaClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
