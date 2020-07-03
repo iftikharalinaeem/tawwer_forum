@@ -110,18 +110,15 @@ abstract class ResourceEvent {
     /**
      * Create a normalized variation of the record's payload.
      *
-     * @return array
+     * @return array A tuple of [string, int]
      */
-    public function getNormalizedRecordPayload(): array {
-        $result = [
-            'recordType' => $this->getType(),
-        ];
+    public function getRecordTypeAndID(): array {
+        $recordType = $this->getType();
 
         $idKey = $this->type . 'ID';
         $payloadRecord = $this->payload[$this->type] ?? $this->payload;
         $recordID = $payloadRecord['recordID'] ?? $payloadRecord[$idKey] ?? null;
-        $result['recordID'] = $recordID;
 
-        return $result;
+        return [$recordType, $recordID];
     }
 }

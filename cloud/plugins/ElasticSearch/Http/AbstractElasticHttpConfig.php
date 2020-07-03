@@ -7,6 +7,8 @@ namespace Vanilla\Cloud\ElasticSearch\Http;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Garden\Http\HttpRequest;
+use Garden\Http\HttpResponse;
 
 /**
  * Provide necessary information
@@ -39,6 +41,18 @@ abstract class AbstractElasticHttpConfig {
 
         $var = JWT::encode($fullPayload, $this->getSecret(), 'HS512');
         return $var;
+    }
+
+    /**
+     * An HTTP middleware function for applying authentication to elasticsearch requests.
+     *
+     * @param HttpRequest $request
+     * @param callable $next
+     * @return HttpResponse
+     */
+    final public function requestAuthMiddleware(HttpRequest $request, callable $next): HttpResponse {
+        $request->setHeader('Authorization', 'Bearer '.$this->getAuthJWT());
+        return $next($request);
     }
 
     /**
