@@ -96,13 +96,18 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const header = style("header", {
-        height: vars.container.margin * 2,
         display: "flex",
         flexDirection: "row-reverse",
+        alignItems: "center",
     });
 
     const section = style("section", {
         paddingTop: vars.container.margin * 0.5,
+    });
+
+    const email = style("email", {
+        color: "inherit",
+        textDecoration: "inherit",
     });
 
     return {
@@ -115,5 +120,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         count,
         header,
         section,
+        email,
     };
 });

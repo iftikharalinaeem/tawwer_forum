@@ -4,19 +4,21 @@
  */
 
 import React, { useState } from "react";
-import { userCardClasses } from "@library/features/search/popupUserCardStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUserFragment, IUser } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { CloseCompactIcon } from "@library/icons/common";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
+import NumberFormatted from "@library/content/NumberFormatted";
+import { t } from "@vanilla/i18n";
 
 interface IProps {
-    userInfo: IUserFragment;
+    userInfo: IUser;
     links: {
         profileLink: string;
         messageLink: string;
@@ -86,7 +88,9 @@ function Stat(props: IStatProps) {
     const { count, text } = props;
     return (
         <div className={classes.stat}>
-            <div className={classes.count}> {count} </div>
+            <div className={classes.count}>
+                <NumberFormatted value={count} />
+            </div>
             <div> {text} </div>
         </div>
     );
@@ -144,18 +148,26 @@ export default function PopupUserCard(props: IProps) {
             </Container>
 
             <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
-                <Container> email </Container>
+                <Container>
+                    <a className={classes.email} href={`mailto:${userInfo.email}`}>
+                        {userInfo.email}
+                    </a>
+                </Container>
             </Permission>
 
             <Container>
                 <LinkAsButton to={links.profileLink} baseClass={ButtonTypes.STANDARD} className={classes.button}>
-                    View Profile
+                    {t("View Profile")}
                 </LinkAsButton>
 
                 <Separator width={16} />
 
-                <LinkAsButton to={links.messageLink} baseClass={ButtonTypes.STANDARD} className={classes.button}>
-                    Message
+                <LinkAsButton
+                    to={`/messages/add/${userInfo.name}`}
+                    baseClass={ButtonTypes.STANDARD}
+                    className={classes.button}
+                >
+                    {t("Message")}
                 </LinkAsButton>
             </Container>
 
