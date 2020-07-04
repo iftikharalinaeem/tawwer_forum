@@ -10,14 +10,13 @@ import OtherLanguages from "@knowledge/modules/article/components/OtherLanguages
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
-import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import Container from "@library/layout/components/Container";
 import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/navigation/NextPrevious";
 import { t } from "@library/utility/appUtils";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ArticleReactions from "@knowledge/modules/article/components/ArticleReactions";
 import { IArticle, IArticleLocale, IRelatedArticle } from "@knowledge/@types/api/article";
 import classNames from "classnames";
@@ -32,6 +31,7 @@ import OtherLanguagesPlaceHolder from "@knowledge/modules/article/components/Oth
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     useBackButton?: boolean;
@@ -49,7 +49,8 @@ interface IProps {
  * Implements the article's layout
  */
 export default function ArticleLayout(props: IProps) {
-    const device = useDevice();
+    const { isCompact, isFullWidth } = useLayout();
+
     const {
         article,
         currentNavCategory,
@@ -77,8 +78,7 @@ export default function ArticleLayout(props: IProps) {
     const crumbs = article.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
 
-    const renderPanelBackground =
-        device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
+    const renderPanelBackground = !isCompact && panelBackgroundVariables().config.render;
 
     const relatedArticlesComponent = relatedArticles ? (
         <RelatedArticles articles={relatedArticles} />
@@ -118,7 +118,7 @@ export default function ArticleLayout(props: IProps) {
                 <PanelLayout
                     renderLeftPanelBackground={renderPanelBackground}
                     breadcrumbs={
-                        (device === Devices.XS || device === Devices.MOBILE) && article.breadcrumbs
+                        isCompact && article.breadcrumbs
                             ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
                             : article.breadcrumbs && (
                                   <Breadcrumbs forceDisplay={false}>{article.breadcrumbs}</Breadcrumbs>
@@ -146,7 +146,6 @@ export default function ArticleLayout(props: IProps) {
                                             knowledgeBase={knowledgeBase.data}
                                             article={article}
                                             buttonClassName={classNames("pageTitle-menu", classesButtons.icon)}
-                                            device={device}
                                         />
                                     </KbPermission>
                                 }
@@ -158,9 +157,7 @@ export default function ArticleLayout(props: IProps) {
                                         featured={featured}
                                     />
                                 }
-                                includeBackLink={
-                                    device !== Devices.MOBILE && device !== Devices.XS && props.useBackButton
-                                }
+                                includeBackLink={!isCompact && props.useBackButton}
                             />
                             {messages && <div className="messages">{messages}</div>}
                         </PanelWidget>
@@ -187,14 +184,11 @@ export default function ArticleLayout(props: IProps) {
                     }
                     rightTop={
                         <>
-                            {device !== Devices.MOBILE &&
-                                device !== Devices.TABLET &&
-                                article.outline &&
-                                article.outline.length > 0 && (
-                                    <PanelWidget>
-                                        <ArticleTOC items={article.outline} />
-                                    </PanelWidget>
-                                )}
+                            {!isCompact && !isFullWidth && article.outline && article.outline.length > 0 && (
+                                <PanelWidget>
+                                    <ArticleTOC items={article.outline} />
+                                </PanelWidget>
+                            )}
                             <PanelWidget>{otherLanguagesComponent}</PanelWidget>
                         </>
                     }

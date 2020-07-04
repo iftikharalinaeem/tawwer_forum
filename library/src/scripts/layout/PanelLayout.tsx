@@ -15,6 +15,7 @@ import { style } from "typestyle";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { useBannerContext } from "@library/banner/BannerContext";
 import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
+import { logError } from "@vanilla/utils";
 
 export interface IPanelLayoutProps extends ILayoutProps {
     className?: string;
@@ -88,6 +89,9 @@ export function PanelLayout(props: IPanelLayoutProps) {
         },
     } = useLayout();
 
+    if (!classes) {
+        logError(`Classes not loaded for panel layout of type: ${props.type}, classes given: `, classes);
+    }
     const panelRef = useRef<HTMLDivElement | null>(null);
     const sidePanelMeasure = useMeasure(panelRef);
     const measuredPanelTop = sidePanelMeasure.top;
