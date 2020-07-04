@@ -13,7 +13,6 @@ import Container from "@library/layout/components/Container";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import { pageTitleClasses } from "@library/layout/pageTitleStyles";
-import { PanelWidget, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
@@ -33,8 +32,9 @@ import React from "react";
 import { useCallback, useEffect } from "react";
 import { useLocation } from "react-router";
 import TwoColumnLayout from "@library/layout/TwoColumnLayout";
-import { LayoutProvider, useLayout } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@library/layout/components/PanelWidget";
+import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
 
 interface IProps {
     placeholder?: string;
@@ -78,74 +78,72 @@ function SearchPage(props: IProps) {
             <Banner isContentBanner />
             <Container>
                 <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
-                <LayoutProvider type={LayoutTypes.TWO_COLUMNS}>
-                    <TwoColumnLayout
-                        className="hasLargePadding"
-                        middleTop={
-                            <>
-                                <PanelWidget>
-                                    <PageHeading
-                                        className={classNames(
-                                            "searchBar-heading",
-                                            searchBarClasses().heading,
-                                            classes.smallBackLink,
-                                        )}
-                                        headingClassName={classNames(typographyClasses().pageTitle)}
-                                        title={"Search"}
-                                        includeBackLink={true}
-                                        isCompactHeading={true}
-                                    />
-                                    <SearchBar
-                                        placeholder={props.placeholder}
-                                        onChange={newQuery => updateForm({ query: newQuery })}
-                                        value={form.query}
-                                        onSearch={debouncedSearch}
-                                        isLoading={results.status === LoadStatus.LOADING}
-                                        optionComponent={SearchOption}
-                                        triggerSearchOnClear={true}
-                                        titleAsComponent={t("Search")}
-                                        handleOnKeyDown={event => {
-                                            if (event.key === "Enter") {
-                                                debouncedSearch();
-                                            }
-                                        }}
-                                        disableAutocomplete={true}
-                                        buttonBaseClass={ButtonTypes.PRIMARY}
-                                        needsPageTitle={false}
-                                    />
-                                    <SearchInFilter
-                                        setData={newDomain => {
-                                            updateForm({ domain: newDomain });
-                                        }}
-                                        activeItem={form.domain}
-                                        filters={getDomains().map(domain => {
-                                            return {
-                                                label: domain.name,
-                                                icon: domain.icon,
-                                                data: domain.key,
-                                            };
-                                        })}
-                                    />
-                                </PanelWidget>
+                <TwoColumnLayout
+                    className="hasLargePadding"
+                    middleTop={
+                        <>
+                            <PanelWidget>
+                                <PageHeading
+                                    className={classNames(
+                                        "searchBar-heading",
+                                        searchBarClasses().heading,
+                                        classes.smallBackLink,
+                                    )}
+                                    headingClassName={classNames(typographyClasses().pageTitle)}
+                                    title={"Search"}
+                                    includeBackLink={true}
+                                    isCompactHeading={true}
+                                />
+                                <SearchBar
+                                    placeholder={props.placeholder}
+                                    onChange={newQuery => updateForm({ query: newQuery })}
+                                    value={form.query}
+                                    onSearch={debouncedSearch}
+                                    isLoading={results.status === LoadStatus.LOADING}
+                                    optionComponent={SearchOption}
+                                    triggerSearchOnClear={true}
+                                    titleAsComponent={t("Search")}
+                                    handleOnKeyDown={event => {
+                                        if (event.key === "Enter") {
+                                            debouncedSearch();
+                                        }
+                                    }}
+                                    disableAutocomplete={true}
+                                    buttonBaseClass={ButtonTypes.PRIMARY}
+                                    needsPageTitle={false}
+                                />
+                                <SearchInFilter
+                                    setData={newDomain => {
+                                        updateForm({ domain: newDomain });
+                                    }}
+                                    activeItem={form.domain}
+                                    filters={getDomains().map(domain => {
+                                        return {
+                                            label: domain.name,
+                                            icon: domain.icon,
+                                            data: domain.key,
+                                        };
+                                    })}
+                                />
+                            </PanelWidget>
+                            <PanelWidgetHorizontalPadding>
+                                <SortAndPaginationInfo
+                                    pages={results.data?.pagination}
+                                    sortValue={form.sort}
+                                    onSortChange={newSort => updateForm({ sort: newSort })}
+                                    sortOptions={[]}
+                                />
+                            </PanelWidgetHorizontalPadding>
+                            {isCompact && (
                                 <PanelWidgetHorizontalPadding>
-                                    <SortAndPaginationInfo
-                                        pages={results.data?.pagination}
-                                        sortValue={form.sort}
-                                        onSortChange={newSort => updateForm({ sort: newSort })}
-                                        sortOptions={[]}
-                                    />
+                                    <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
                                 </PanelWidgetHorizontalPadding>
-                                {isCompact && (
-                                    <PanelWidgetHorizontalPadding>
-                                        <Drawer title={t("Filter Results")}>{currentFilter}</Drawer>
-                                    </PanelWidgetHorizontalPadding>
-                                )}
-                            </>
-                        }
-                        middleBottom={<SearchPageResults />}
-                        rightTop={!isCompact && <PanelWidget>{currentFilter}</PanelWidget>}
-                    />
-                </LayoutProvider>
+                            )}
+                        </>
+                    }
+                    middleBottom={<SearchPageResults />}
+                    rightTop={!isCompact && <PanelWidget>{currentFilter}</PanelWidget>}
+                />
             </Container>
         </DocumentTitle>
     );

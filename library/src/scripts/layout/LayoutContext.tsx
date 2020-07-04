@@ -9,7 +9,7 @@ import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
 import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { threeColumnLayoutClasses, threeColumnLayoutVariables } from "./types/layout.threeColumns";
-import { twoColumnLayoutVariables, twoColumnLayoutClasses } from "./types/layout.twoColumns";
+import { twoColumnLayoutClasses, twoColumnLayoutVariables } from "./types/layout.twoColumns";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import {
     ITwoColumnLayoutMediaQueries,
@@ -148,6 +148,9 @@ export interface ILayoutProps {
 
 const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
+
+    console.log("layout: ", layout);
+
     const currentDevice = layout.variables.calculateDevice().toString();
 
     const mediaQueries = filterQueriesByType(layout.variables.mediaQueries, type);
@@ -167,15 +170,13 @@ const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
         rightPanelCondition:
             layout.variables["rightPanelCondition"] !== undefined
                 ? layout.variables["rightPanelCondition"]
-                : (currentDevice, shouldRenderRightPanel) => {
+                : () => {
                       return false;
                   },
     };
 };
 
-const LayoutContext = React.createContext<ILayoutProps>({
-    mediaQueries: fallbackMediaQueries,
-} as any);
+const LayoutContext = React.createContext<ILayoutProps>(layoutDataByType(LayoutTypes.THREE_COLUMNS));
 
 export default LayoutContext;
 

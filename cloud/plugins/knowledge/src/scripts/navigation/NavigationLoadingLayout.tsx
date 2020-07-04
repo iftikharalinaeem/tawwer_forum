@@ -6,7 +6,6 @@
 import Navigation from "@knowledge/navigation/Navigation";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
 import React from "react";
 import { useNavHistory } from "@knowledge/navigation/NavHistoryContext";
@@ -14,7 +13,6 @@ import { KbViewType } from "@knowledge/knowledge-bases/KnowledgeBaseModel";
 import { LoadingRectange, LoadingSpacer } from "@vanilla/library/src/scripts/loaders/LoadingRectangle";
 import PageTitle from "@knowledge/modules/common/PageTitle";
 import BreadcrumbsLoader from "@vanilla/library/src/scripts/navigation/BreadcrumbsLoader";
-import { Devices, useDevice } from "@vanilla/library/src/scripts/layout/DeviceContext";
 import { metasClasses } from "@vanilla/library/src/scripts/styles/metasStyles";
 import { panelBackgroundVariables } from "@vanilla/library/src/scripts/layout/panelBackgroundStyles";
 import { typographyClasses } from "@vanilla/library/src/scripts/styles/typographyStyles";
@@ -23,6 +21,9 @@ import { NavigationPlaceholder } from "@knowledge/navigation/NavigationPlacehold
 import OtherLanguagesPlaceHolder from "@knowledge/modules/article/components/OtherLanguagesPlaceHolder";
 import { RelatedArticlesPlaceHolder } from "@knowledge/modules/article/components/RelatedArticlesPlaceholder";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
+import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@library/layout/ThreeColumnLayout";
 
 interface IProps {
     children?: React.ReactNode;
@@ -39,12 +40,11 @@ interface IProps {
  */
 export default function NavigationLoadingLayout(props: IProps) {
     const { lastKB } = useNavHistory();
-    const device = useDevice();
+    const { isCompact, isFullWidth } = useLayout();
 
     const classesMetas = metasClasses();
 
-    const renderPanelBackground =
-        device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
+    const renderPanelBackground = !isCompact && panelBackgroundVariables().config.render;
 
     const navigation =
         !lastKB || !props.activeRecord || props.forceLoading ? (
@@ -71,9 +71,9 @@ export default function NavigationLoadingLayout(props: IProps) {
                     contentImage={lastKB?.bannerContentImage}
                 />
                 <Container>
-                    <PanelLayout
+                    <ThreeColumnLayout
                         renderLeftPanelBackground={renderPanelBackground}
-                        breadcrumbs={device !== Devices.MOBILE && device !== Devices.XS && <BreadcrumbsLoader />}
+                        breadcrumbs={!isCompact && <BreadcrumbsLoader />}
                         leftBottom={<PanelWidget>{navigation}</PanelWidget>}
                         middleTop={
                             <PanelWidget>
@@ -113,7 +113,7 @@ export default function NavigationLoadingLayout(props: IProps) {
                         }
                         rightTop={
                             <>
-                                {device !== Devices.MOBILE && device !== Devices.TABLET && (
+                                {isFullWidth && (
                                     <PanelWidget>
                                         <OtherLanguagesPlaceHolder />
                                     </PanelWidget>

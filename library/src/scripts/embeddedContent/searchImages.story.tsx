@@ -7,11 +7,11 @@ import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { StoryContent } from "@library/storybook/StoryContent";
-import { LayoutProvider } from "@library/layout/LayoutContext";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { StoryListItem } from "@library/storybook/StoryListItem";
 import { StoryBookImageTypeSearchResult } from "@library/embeddedContent/storybook/attachments/StorybookImageTypeSearchResult";
 import { sampleImages } from "./storybook/attachments/sampleAttachmentImages";
+import { LayoutProvider } from "@library/layout/LayoutContext";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export default {
     title: "Search",

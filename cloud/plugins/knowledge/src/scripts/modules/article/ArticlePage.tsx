@@ -18,7 +18,6 @@ import { IKnowledgeAppStoreState } from "@knowledge/state/model";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import { withDevice, IDeviceProps } from "@library/layout/DeviceContext";
 import React from "react";
 import { connect } from "react-redux";
 import { match } from "react-router";
@@ -30,6 +29,7 @@ import ArticleModel from "@knowledge/modules/article/ArticleModel";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { hasPermission } from "@library/features/users/Permission";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import { ILayoutProps, withLayout } from "@vanilla/library/src/scripts/layout/LayoutContext";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -182,7 +182,7 @@ export class ArticlePage extends React.Component<IProps, IState> {
     }
 }
 
-interface IOwnProps extends IDeviceProps {
+interface IOwnProps extends ILayoutProps {
     match: match<{
         id: string;
     }>;
@@ -229,4 +229,4 @@ function mapDispatchToProps(dispatch, ownProps: IOwnProps) {
 
 const withRedux = connect(mapStateToProps, mapDispatchToProps);
 
-export default withDevice(withRedux(ArticlePage));
+export default withLayout(withRedux(ArticlePage));

@@ -10,7 +10,7 @@ import { useLocaleInfo } from "@vanilla/i18n";
 import classNames from "classnames";
 import * as React from "react";
 import { LoadingRectange, LoadingSpacer } from "@library/loaders/LoadingRectangle";
-import { PanelWidget } from "@library/layout/PanelLayout";
+
 import { useLayout } from "@library/layout/LayoutContext";
 /**
  * Implements "other languages" DropDown for articles.

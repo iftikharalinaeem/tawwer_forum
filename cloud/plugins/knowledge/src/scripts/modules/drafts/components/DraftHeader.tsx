@@ -8,11 +8,11 @@ import { t } from "@library/utility/appUtils";
 import BackLink from "@library/routing/links/BackLink";
 import classNames from "classnames";
 import Container from "@library/layout/components/Container";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
 import { modalClasses } from "@library/modal/modalStyles";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import { editorHeaderClasses } from "@knowledge/modules/editor/components/editorHeaderStyles";
-import FlexSpacer from "@library/layout/FlexSpacer";
+import PanelArea from "@vanilla/library/src/scripts/layout/components/PanelArea";
+import PanelWidgetHorizontalPadding from "@vanilla/library/src/scripts/layout/components/PanelWidgetHorizontalPadding";
 
 interface IProps {
     className?: string;

@@ -71,7 +71,18 @@ export const threeColumnLayoutVariables = useThemeCache(
         const mediaQueries = layoutVars.mediaQueries;
 
         const calculateDevice = () => {
-            return layoutVars.calculateDeviceFunction(breakPoints, Devices)();
+            const width = document.body.clientWidth;
+            if (width <= breakPoints.xs) {
+                return Devices.XS.toString();
+            } else if (width <= breakPoints.oneColumn) {
+                return Devices.MOBILE.toString();
+            } else if (width <= breakPoints.twoColumns) {
+                return Devices.TABLET.toString();
+            } else if (width <= breakPoints.noBleed) {
+                return Devices.NO_BLEED.toString();
+            } else {
+                return Devices.DESKTOP.toString();
+            }
         };
 
         const isFullWidth = currentDevice => {

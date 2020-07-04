@@ -6,8 +6,6 @@
 
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
-import { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import React from "react";
@@ -16,6 +14,8 @@ import KbErrorMessages, {
     messageFromKbErrorCode,
 } from "@knowledge/modules/common/KbErrorMessages";
 import { getErrorCode } from "@library/errorPages/CoreErrorMessages";
+import PanelWidgetVerticalPadding from "@vanilla/library/src/scripts/layout/components/PanelWidgetVerticalPadding";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
 
 export class KbErrorPage extends React.Component<IProps> {
     public render() {

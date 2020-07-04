@@ -19,7 +19,6 @@ import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;
     setMediaQueries: (breakPoints, Devices) => any;
-    calculateDeviceFunction: (breakPoints, Devices) => () => string;
     panelLayoutBreakPoints: any;
 }
 
@@ -82,7 +81,7 @@ export const layoutVariables = useThemeCache(
         // @Deprecated - Use LayoutContext to get variables
         const breakPoints = makeThemeVars("breakPoints", {
             noBleed: contentWidth,
-            twoColumn: foundationalWidths.breakPoints.twoColumns,
+            twoColumns: foundationalWidths.breakPoints.twoColumns,
             oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
             xs: foundationalWidths.breakPoints.xs,
         });
@@ -126,7 +125,7 @@ export const layoutVariables = useThemeCache(
                 return media(
                     {
                         maxWidth: px(breakPoints.noBleed),
-                        minWidth: useMinWidth ? px(breakPoints.twoColumn + 1) : undefined,
+                        minWidth: useMinWidth ? px(breakPoints.twoColumns + 1) : undefined,
                     },
                     styles,
                 );
@@ -141,19 +140,19 @@ export const layoutVariables = useThemeCache(
                 );
             };
 
-            const twoColumnsDown = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const twoColumnssDown = (styles: NestedCSSProperties): NestedCSSProperties => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.twoColumn),
+                        maxWidth: px(breakPoints.twoColumns),
                     },
                     styles,
                 );
             };
 
-            const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const twoColumnss = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
                 return media(
                     {
-                        maxWidth: px(breakPoints.twoColumn),
+                        maxWidth: px(breakPoints.twoColumns),
                         minWidth: useMinWidth ? px(breakPoints.oneColumn + 1) : undefined,
                     },
                     styles,
@@ -200,8 +199,8 @@ export const layoutVariables = useThemeCache(
             return {
                 noBleed,
                 noBleedDown,
-                twoColumns,
-                twoColumnsDown,
+                twoColumnss,
+                twoColumnssDown,
                 oneColumn,
                 oneColumnDown,
                 aboveOneColumn,
@@ -214,25 +213,20 @@ export const layoutVariables = useThemeCache(
             return setMediaQueries(breakPoints);
         };
 
-        // Allows to be recalculated in another layout (i.e. the three column layout)
-        const calculateDeviceFunction = (breakPoints, Devices) => {
+        // @Deprecated - Use a specific layout, like the three or two column layout and use the context
+        const calculateDevice = () => {
             const width = document.body.clientWidth;
             if (width <= breakPoints.xs) {
                 return Devices.XS.toString();
             } else if (width <= breakPoints.oneColumn) {
                 return Devices.MOBILE.toString();
-            } else if (width <= breakPoints.twoColumn) {
+            } else if (width <= breakPoints.twoColumns) {
                 return Devices.TABLET.toString();
             } else if (width <= breakPoints.noBleed) {
                 return Devices.NO_BLEED.toString();
             } else {
                 return Devices.DESKTOP.toString();
             }
-        };
-
-        // @Deprecated - Use a specific layout, like the three or two column layout and use the context
-        const calculateDevice = () => {
-            return calculateDeviceFunction(breakPoints, Devices)();
         };
 
         const isFullWidth = currentDevice => {
@@ -261,7 +255,6 @@ export const layoutVariables = useThemeCache(
             panelLayoutSpacing,
             breakPoints,
             panelLayoutBreakPoints,
-            calculateDeviceFunction,
         };
 
         return vars;

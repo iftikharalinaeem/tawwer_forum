@@ -23,7 +23,6 @@ import apiv2 from "@library/apiv2";
 import UserContent from "@library/content/UserContent";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -35,6 +34,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
+import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
+import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 
 interface IState {
     showRestoreDialogue: boolean;
@@ -98,7 +99,7 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      * Render the active revisions title and metadata.
      */
     private renderTitle(): React.ReactNode {
-        const { selectedRevision, device } = this.props;
+        const { selectedRevision } = this.props;
         return selectedRevision.status === LoadStatus.SUCCESS && selectedRevision.data ? (
             <PageTitle
                 title={selectedRevision.data.name}
@@ -120,13 +121,15 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     private renderDrafts(): React.ReactNode {
         const { drafts } = this.props;
 
+        const { isCompact } = useLayout();
+
         if (drafts.status !== LoadStatus.SUCCESS || (Array.isArray(drafts.data) && drafts.data.length === 0)) {
             return null;
         }
 
         return (
             drafts.data && (
-                <DraftsList hideTitle={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}>
+                <DraftsList hideTitle={isCompact}>
                     {drafts.data.slice().map(item => {
                         return (
                             <DraftsListItem
@@ -146,10 +149,11 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     private renderRevisions(): React.ReactNode {
         const { revisions, selectedRevisionID, pagination } = this.props;
+        const { isCompact } = useLayout();
         return (
             revisions.data && (
                 <>
-                    <RevisionsList hideTitle={this.props.device === Devices.MOBILE || this.props.device === Devices.XS}>
+                    <RevisionsList hideTitle={isCompact}>
                         {revisions.data.slice().map(item => {
                             const preload = () => this.props.preloadRevision(item.articleRevisionID);
                             return (
@@ -255,7 +259,8 @@ export class RevisionsPage extends React.Component<IProps, IState> {
 }
 
 interface IOwnProps
-    extends IDeviceProps,
+    extends ILayoutProps,
+        IDeviceProps,
         RouteComponentProps<{
             id: string;
             revisionID?: string;

@@ -12,7 +12,7 @@ import Navigation from "@knowledge/navigation/Navigation";
 import { KbRecordType, IKbNavigationItem } from "@knowledge/navigation/state/NavigationModel";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import Container from "@library/layout/components/Container";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import PanelLayout from "@library/layout/PanelLayout";
 import UserContent from "@library/content/UserContent";
 import * as React from "react";
 import NextPrevious from "@library/navigation/NextPrevious";
@@ -32,6 +32,8 @@ import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks"
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
 import Banner from "@vanilla/library/src/scripts/banner/Banner";
 import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@vanilla/library/src/scripts/layout/ThreeColumnLayout";
 
 interface IProps {
     useBackButton?: boolean;
@@ -49,7 +51,9 @@ interface IProps {
  * Implements the article's layout
  */
 export default function ArticleLayout(props: IProps) {
+    console.log("props: ", props);
     const { isCompact, isFullWidth } = useLayout();
+    console.log("useLayout(): ", useLayout());
 
     const {
         article,
@@ -115,7 +119,7 @@ export default function ArticleLayout(props: IProps) {
                 contentImage={knowledgeBase.data?.bannerContentImage}
             />
             <Container>
-                <PanelLayout
+                <ThreeColumnLayout
                     renderLeftPanelBackground={renderPanelBackground}
                     breadcrumbs={
                         isCompact && article.breadcrumbs

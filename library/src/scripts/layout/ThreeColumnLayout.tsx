@@ -3,17 +3,14 @@
  * @license GPL-2.0-only
  */
 import React from "react";
-import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
-import { LayoutProvider, useLayout, withLayout } from "@library/layout/LayoutContext";
-import { threeColumnLayoutClasses } from "@library/layout/types/layout.threeColumns";
+import { LayoutProvider, withLayout } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
+import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
 
-interface IProps extends Omit<IPanelLayoutProps, "classes"> {}
-
-export function ThreeColumnLayout(props: IProps) {
+function ThreeColumnLayout(props: IPanelLayoutProps) {
     return (
         <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>
-            <PanelLayout {...props} classes={threeColumnLayoutClasses()} />;
+            <PanelLayout {...props} />
         </LayoutProvider>
     );
 }

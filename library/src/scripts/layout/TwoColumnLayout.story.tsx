@@ -4,10 +4,10 @@
  */
 
 import React from "react";
-import { PanelWidget } from "@library/layout/PanelLayout";
 import { NO_WRAPPER_CONFIG, storyWithConfig } from "@library/storybook/StoryContext";
 import { twoColumnLayoutVariables } from "@library/layout/types/layout.twoColumns";
 import TwoColumnLayout from "./TwoColumnLayout";
+import PanelWidget from "./components/PanelWidget";
 
 export default {
     title: "twoColumnLayout",
