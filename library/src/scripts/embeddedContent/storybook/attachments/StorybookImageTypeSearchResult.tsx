@@ -88,6 +88,53 @@ export function StoryBookImageTypeSearchResult(props: {
                         ),
                         icon: <TypeDiscussionsIcon />,
                     },
+                    {
+                        name: `Example search result - icon, no image`,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                        icon: <TypeDiscussionsIcon />,
+                    },
+                    {
+                        name: `Example search result - Image, no icon`,
+                        url: "#",
+                        image: props.imageSet.small,
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                    },
+                    {
+                        name: `Example search result - no Icon, no image`,
+                        url: "#",
+                        excerpt:
+                            "Donut danish halvah macaroon chocolate topping. Sugar plum cookie chupa chups tootsie roll tiramisu cupcake carrot cake. Ice cream biscuit sesame snaps fruitcake.",
+                        meta: (
+                            <ResultMeta
+                                dateUpdated={"2016-07-25 17:51:15"}
+                                updateUser={dummyUserFragment}
+                                crumbs={[{ name: "This" }, { name: "is" }, { name: "the" }, { name: "breadcrumb" }]}
+                                status={PublishStatus.PUBLISHED}
+                                type={"Article"}
+                            />
+                        ),
+                    },
                 ]}
             />
         </>

@@ -7,6 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { metasVariables } from "@library/styles/metasStyles";
 import {
+    absolutePosition,
     colorOut,
     EMPTY_FONTS,
     fonts,
@@ -18,7 +19,7 @@ import {
     unit,
 } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { calc, percent } from "csx";
+import { calc, important, percent, viewHeight } from "csx";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { BorderBottomProperty } from "csstype";
 import { NestedCSSProperties, TLength } from "typestyle/lib/types";
@@ -75,6 +76,9 @@ export const searchResultsVariables = useThemeCache(() => {
     const mediaElement = makeThemeVars("mediaElement", {
         width: 190,
         margin: 12,
+        compact: {
+            ratio: (9 / 16) * 100,
+        },
     });
 
     return {
@@ -149,7 +153,7 @@ export const searchResultsClasses = useThemeCache(mediaQueries => {
     };
 });
 
-export const searchResultClasses = useThemeCache(mediaQueries => {
+export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false) => {
     const vars = searchResultsVariables();
     const globalVars = globalVariables();
     const style = styleFactory("searchResult");
@@ -195,7 +199,7 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
     });
 
     const mediaWidth = vars.mediaElement.width + vars.mediaElement.margin;
-    const iconWidth = vars.icon.size + vars.spacing.padding.left;
+    const iconWidth = hasIcon ? vars.icon.size + vars.spacing.padding.left : 0;
 
     const mainCompactStyles = {
         $nest: {
@@ -235,32 +239,31 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
         },
     });
 
-    const mediaElementCompactStyles: NestedCSSProperties = {
-        width: percent(100),
-        marginLeft: "auto",
+    const image = style("image", {
+        ...objectFitWithFallback(),
+    });
+
+    const compactMediaElement = style("compactMediaElement", {
         $nest: {
-            "&.hasImage": {
-                height: unit(vars.mediaElement.width),
+            [`& .${image}`]: {
+                position: important("absolute"),
             },
         },
-    };
+    });
 
     const mediaElement = style("mediaElement", {
         position: "relative",
         width: unit(vars.mediaElement.width),
         overflow: "hidden",
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: mediaElementCompactStyles,
+        $nest: {
+            [`&.${compactMediaElement}`]: {
+                overflow: "hidden",
+                position: "relative",
+                marginTop: unit(10),
+                paddingTop: percent(vars.mediaElement.compact.ratio),
+                width: percent(100),
             },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: mediaElementCompactStyles,
-            },
-        }),
-    });
-
-    const image = style("image", {
-        ...objectFitWithFallback(),
+        },
     });
 
     const attachmentCompactStyles: NestedCSSProperties = {
@@ -290,22 +293,20 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
         width: calc(`100% + ${unit(metaVars.spacing.default * 2)}`),
     });
 
+    const compactExcerpt = style("compactExcerpt", {});
+
     const excerpt = style("excerpt", {
         marginTop: unit(vars.excerpt.margin),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: {
-                    marginTop: unit(globalVars.spacer.size),
-                },
+        $nest: {
+            [`&.${compactExcerpt}`]: {
+                ...margins({
+                    top: globalVars.spacer.size,
+                    left: iconWidth,
+                }),
             },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    marginTop: unit(globalVars.spacer.size),
-                },
-            },
-        }),
+        },
     });
 
     const link = style("link", {
@@ -333,12 +334,15 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
         root,
         main,
         mediaElement,
+        compactMediaElement,
         image,
         title,
         attachments,
         metas,
         excerpt,
+        compactExcerpt,
         afterExcerptLink,
+        attachmentCompactStyles,
         link,
         iconWrap,
         content,

@@ -40,12 +40,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     let colorPrimary = color("#037DBC");
     const makeThemeVars = variableFactory("global", forcedVars);
 
-    const utility = {
-        "percentage.third": percent(100 / 3),
-        "percentage.nineSixteenths": percent((9 / 16) * 100),
-        "svg.encoding": "data:image/svg+xml,",
-    };
-
     const constants = makeThemeVars("constants", {
         stateColorEmphasis: 0.15,
         fullGutter: FULL_GUTTER,
@@ -520,7 +514,6 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     return {
         options,
-        utility,
         elementaryColors,
         mainColors,
         messageColors,

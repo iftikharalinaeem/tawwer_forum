@@ -41,7 +41,7 @@ export default function Result(props: IResult) {
     const hasMedia = hasAttachments || showImage;
     const layoutContext = useLayout();
     const classesSearchResults = searchResultsClasses(layoutContext.mediaQueries);
-    const classes = searchResultClasses(layoutContext.mediaQueries);
+    const classes = searchResultClasses(layoutContext.mediaQueries, !!icon);
     const imageComponent = showImage ? (
         <img
             src={image}
@@ -57,18 +57,23 @@ export default function Result(props: IResult) {
     }
     const HeadingTag = `h${headingLevel}` as "h1";
 
+    const { isCompact } = useLayout();
+
     const media = hasMedia ? (
-        <div className={classNames("searchResult-media", classes.mediaElement, { hasImage: showImage })}>
+        <div
+            className={classNames(classes.mediaElement, {
+                hasImage: showImage,
+                [classes.compactMediaElement]: isCompact,
+            })}
+        >
             {showImage && imageComponent}
             {attachmentOutput}
         </div>
     ) : null;
 
-    const { isCompact } = useLayout();
-
     const excerptElement =
         excerpt && excerpt.length > 0 ? (
-            <Paragraph className={classes.excerpt}>
+            <Paragraph className={classNames(classes.excerpt, { [classes.compactExcerpt]: isCompact })}>
                 <>
                     <TruncatedText maxCharCount={160}>{excerpt}</TruncatedText>
                     {afterExcerpt}

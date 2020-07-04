@@ -101,7 +101,7 @@ export const tilesClasses = useThemeCache((optionOverrides: ITilesOptions) => {
     let itemPadding = vars.itemSpacing.paddingTwoColumns;
     switch (columnCount) {
         case 3:
-            width = globalVars.utility["percentage.third"];
+            width = percent((1 / 3) * 100);
             extraMediaQuery = mediaQueries({
                 [LayoutTypes.THREE_COLUMNS]: {
                     twoColumns: {
