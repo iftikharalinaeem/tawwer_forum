@@ -294,6 +294,14 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
         marginTop: unit(vars.excerpt.margin),
         color: colorOut(vars.excerpt.fg),
         lineHeight: globalVars.lineHeights.excerpt,
+        ...mediaQueries({
+            [LayoutTypes.TWO_COLUMNS]: {
+                marginTop: unit(globalVars.spacer.size),
+            },
+            [LayoutTypes.THREE_COLUMNS]: {
+                marginTop: unit(globalVars.spacer.size),
+            },
+        }),
     });
 
     const link = style("link", {

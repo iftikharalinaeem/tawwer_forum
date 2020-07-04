@@ -12,12 +12,12 @@ export enum fallbackLayoutVariables {
 
 export interface IPanelLayoutMediaQueryStyles {
     noBleed?: NestedCSSProperties;
+    noBleedDown?: NestedCSSProperties;
     oneColumn?: NestedCSSProperties;
     oneColumnDown?: NestedCSSProperties;
     aboveOneColumn?: NestedCSSProperties;
     twoColumns?: NestedCSSProperties;
     twoColumnsDown?: NestedCSSProperties;
-    noBleedDown?: NestedCSSProperties;
     xs?: NestedCSSProperties;
 }
 

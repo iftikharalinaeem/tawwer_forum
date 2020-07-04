@@ -5,5 +5,5 @@
 
 export enum LayoutTypes {
     THREE_COLUMNS = "three columns", // Dynamic layout with up to 3 columns that adjusts to its contents. This is the default for KB
-    TWO_COLUMNS = "two column", // Single column, but full width of page
+    TWO_COLUMNS = "two columns", // Single column, but full width of page
 }

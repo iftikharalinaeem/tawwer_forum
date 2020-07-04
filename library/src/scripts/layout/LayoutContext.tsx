@@ -8,7 +8,7 @@ import { Optionalize } from "@library/@types/utils";
 import throttle from "lodash/throttle";
 import React, { useContext, useEffect, useState } from "react";
 import { IPanelLayoutClasses } from "@library/layout/panelLayoutStyles";
-import { threeColumnLayoutVariables } from "./types/layout.threeColumns";
+import { threeColumnLayoutClasses, threeColumnLayoutVariables } from "./types/layout.threeColumns";
 import { twoColumnLayoutVariables, twoColumnLayoutClasses } from "./types/layout.twoColumns";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import {
@@ -19,7 +19,7 @@ import {
 } from "@library/layout/mediaQueriesForAllLayouts";
 
 export const allLayouts = () => {
-    const mediaQueriesByType = {};
+    const mediaQueriesByType: IAllMediaQueriesForLayouts = {};
 
     const variablesByType = {
         [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutVariables(),
@@ -27,7 +27,7 @@ export const allLayouts = () => {
     };
 
     const classesByType = {
-        [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutVariables(),
+        [LayoutTypes.THREE_COLUMNS]: threeColumnLayoutClasses(),
         [LayoutTypes.TWO_COLUMNS]: twoColumnLayoutClasses(),
     };
 
@@ -46,11 +46,13 @@ export const allLayouts = () => {
 
 export const layoutData = (type: LayoutTypes = LayoutTypes.THREE_COLUMNS) => {
     const layouts = allLayouts();
-    return {
-        mediaQueries: layouts.mediaQueriesByType[type] as IAllMediaQueriesForLayouts,
-        classes: layouts.classesByType[type] as IPanelLayoutClasses,
+    const result = {
+        mediaQueries: layouts.mediaQueriesByType[type],
+        classes: layouts.classesByType[type],
         variables: layouts.variablesByType[type],
     };
+
+    return result;
 };
 
 export interface ILayoutProps {
