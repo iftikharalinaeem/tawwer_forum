@@ -174,6 +174,6 @@ export const twoColumnLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: twoColumnLayoutVariables(),
         name: "twoColumnLayout",
-        type: LayoutTypes.TWO_COLUMNS,
+        mediaQueries: twoColumnLayoutVariables().mediaQueries,
     });
 };

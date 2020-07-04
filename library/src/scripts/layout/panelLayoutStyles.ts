@@ -14,8 +14,11 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { filterQueriesByType } from "@library/layout/mediaQueriesForAllLayouts";
-import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import {
+    fallbackLayoutVariables,
+    IAllMediaQueries,
+    IPanelLayoutVariables,
+} from "@library/layout/types/interface.panelLayout";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;
@@ -284,12 +287,10 @@ export interface IPanelLayoutClasses {
     breadcrumbsContainer: string;
 }
 
-export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables; name: string; type: LayoutTypes }) => {
-    const { vars, name, type } = props;
+export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables; name: string; mediaQueries }) => {
+    const { vars, name, mediaQueries } = props;
     const globalVars = globalVariables();
     const style = styleFactory(name);
-
-    const mediaQueries = filterQueriesByType(vars.mediaQueries(), type);
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -544,6 +545,6 @@ export const panelLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: layoutVariables(),
         name: "panelLayout",
-        type: LayoutTypes.THREE_COLUMNS,
+        mediaQueries: layoutVariables().mediaQueries,
     });
 };

@@ -107,6 +107,6 @@ export const threeColumnLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: threeColumnLayoutVariables(),
         name: "threeColumnLayout",
-        type: LayoutTypes.THREE_COLUMNS,
+        mediaQueries: threeColumnLayoutVariables().mediaQueries,
     });
 };

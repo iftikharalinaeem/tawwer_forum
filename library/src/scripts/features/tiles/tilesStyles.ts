@@ -12,7 +12,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
 import { TileAlignment } from "@library/features/tiles/Tiles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { IMediaQueryFunction } from "@library/layout/mediaQueriesForAllLayouts";
+import { IMediaQueryFunction } from "@library/layout/LayoutContext";
 
 export interface ITilesOptions {
     columns?: number;

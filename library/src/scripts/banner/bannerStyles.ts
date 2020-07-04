@@ -45,7 +45,7 @@ import { breakpointVariables } from "@library/styles/styleHelpersBreakpoints";
 import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { IMediaQueryFunction } from "@library/layout/mediaQueriesForAllLayouts";
+import { IMediaQueryFunction } from "@library/layout/LayoutContext";
 
 export enum BannerAlignment {
     LEFT = "left",

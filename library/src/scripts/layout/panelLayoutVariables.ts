@@ -14,9 +14,9 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { filterQueriesByType } from "@library/layout/mediaQueriesForAllLayouts";
 import { panelAreaClasses } from "@library/layout/panelAreaStyles";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import { filterQueriesByType } from "@library/layout/LayoutContext";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;

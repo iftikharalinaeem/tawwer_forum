@@ -296,10 +296,14 @@ export const searchResultClasses = useThemeCache(mediaQueries => {
         lineHeight: globalVars.lineHeights.excerpt,
         ...mediaQueries({
             [LayoutTypes.TWO_COLUMNS]: {
-                marginTop: unit(globalVars.spacer.size),
+                oneColumnDown: {
+                    marginTop: unit(globalVars.spacer.size),
+                },
             },
             [LayoutTypes.THREE_COLUMNS]: {
-                marginTop: unit(globalVars.spacer.size),
+                oneColumnDown: {
+                    marginTop: unit(globalVars.spacer.size),
+                },
             },
         }),
     });
