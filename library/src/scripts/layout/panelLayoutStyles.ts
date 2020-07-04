@@ -14,11 +14,7 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import {
-    fallbackLayoutVariables,
-    IAllMediaQueries,
-    IPanelLayoutVariables,
-} from "@library/layout/types/interface.panelLayout";
+import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;
@@ -247,7 +243,7 @@ export const layoutVariables = useThemeCache(
             return currentDevice === Devices.XS || currentDevice === Devices.MOBILE;
         };
 
-        return {
+        const vars: IProps = {
             type: LayoutTypes.THREE_COLUMNS.toString(),
             Devices,
             colors,
@@ -267,6 +263,8 @@ export const layoutVariables = useThemeCache(
             panelLayoutBreakPoints,
             calculateDeviceFunction,
         };
+
+        return vars;
     },
 );
 

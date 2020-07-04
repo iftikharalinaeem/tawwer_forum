@@ -11,7 +11,6 @@ import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 interface IProps extends Omit<IPanelLayoutProps, "classes"> {}
 
 export function ThreeColumnLayout(props: IProps) {
-    const { mediaQueries } = useLayout();
     return (
         <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>
             <PanelLayout {...props} classes={threeColumnLayoutClasses()} />;

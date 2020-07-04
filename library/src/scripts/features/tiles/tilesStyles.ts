@@ -7,17 +7,16 @@
 import { unit, EMPTY_SPACING, paddings, extendItemContainer } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { percent } from "csx";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSPercentage } from "csx/lib/types";
+import { NestedCSSProperties } from "typestyle/lib/types";
 import { TileAlignment } from "@library/features/tiles/Tiles";
-import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { IMediaQueryFunction } from "@library/layout/LayoutContext";
 
 export interface ITilesOptions {
     columns?: number;
     alignment?: TileAlignment;
-    mediaQueries: IMediaQueryFunction;
 }
 
 export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) => {
@@ -73,94 +72,88 @@ export const tilesVariables = useThemeCache((optionOverrides?: ITilesOptions) =>
     };
 });
 
-export const tilesClasses = useThemeCache((optionOverrides: ITilesOptions) => {
+export const tilesClasses = useThemeCache((optionOverrides?: ITilesOptions) => {
     const globalVars = globalVariables();
     const vars = tilesVariables(optionOverrides);
     const style = styleFactory("tiles");
-    const { mediaQueries } = optionOverrides;
+    const mediaQueries = layoutVariables().mediaQueries();
 
-    const root = style({
-        maxWidth: unit(vars.calculatedMaxWidth),
-        margin: "auto",
-        width: percent(100),
-        ...paddings(vars.containerSpacing.padding),
-        ...mediaQueries({
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    padding: 0,
-                },
-            },
+    const root = style(
+        {
+            maxWidth: unit(vars.calculatedMaxWidth),
+            margin: "auto",
+            width: percent(100),
+        },
+        paddings(vars.containerSpacing.padding),
+        mediaQueries.oneColumnDown({
+            padding: 0,
         }),
-    });
+    );
 
     const isCentered = vars.options.alignment === TileAlignment.CENTER;
 
     let columnCount = vars.options.columns;
     let width: CSSPercentage = "50%";
-    let extraMediaQuery;
+    let additionalMediaQueries = [] as NestedCSSProperties[];
     let itemPadding = vars.itemSpacing.paddingTwoColumns;
     switch (columnCount) {
         case 3:
             width = percent((1 / 3) * 100);
-            extraMediaQuery = mediaQueries({
-                [LayoutTypes.THREE_COLUMNS]: {
-                    twoColumns: {
+            if ("twoColumns" in mediaQueries) {
+                additionalMediaQueries.push(
+                    mediaQueries.twoColumns({
                         width: percent(50),
-                    },
-                },
-            }).$nest;
+                    }),
+                );
+            }
             itemPadding = vars.itemSpacing.paddingThreeColumns;
             break;
         case 4:
             width = "25%";
-            extraMediaQuery = mediaQueries({
-                [LayoutTypes.THREE_COLUMNS]: {
-                    twoColumns: {
+            if ("twoColumns" in mediaQueries) {
+                additionalMediaQueries.push(
+                    mediaQueries.twoColumns({
                         width: percent(50),
-                    },
-                },
-            }).$nest;
+                    }),
+                );
+            }
             itemPadding = vars.itemSpacing.paddingFourColumns;
             break;
     }
 
-    const items = style("items", {
-        position: "relative",
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "stretch",
-        justifyContent: isCentered ? "center" : "flex-start",
-        ...extendItemContainer(itemPadding),
-        ...mediaQueries({
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    display: "block",
-                    ...extendItemContainer(vars.itemSpacing.paddingOneColumn),
-                },
-            },
-        }),
-    });
-
-    const item = style("item", {
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "stretch",
-        width,
-        padding: unit(itemPadding),
-        $nest: {
-            ...mediaQueries({
-                [LayoutTypes.THREE_COLUMNS]: {
-                    oneColumnDown: {
-                        display: "block",
-                        width: percent(100),
-                        padding: unit(vars.itemSpacing.paddingOneColumn),
-                    },
-                },
-            }).$nest,
-            ...extraMediaQuery.$nest,
+    const items = style(
+        "items",
+        {
+            position: "relative",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "stretch",
+            justifyContent: isCentered ? "center" : "flex-start",
+            ...extendItemContainer(itemPadding),
         },
-    });
+        mediaQueries.oneColumnDown({
+            display: "block",
+            ...extendItemContainer(vars.itemSpacing.paddingOneColumn),
+        }),
+    );
+
+    const item = style(
+        "item",
+        {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "stretch",
+            width,
+            padding: unit(itemPadding),
+        },
+        ...additionalMediaQueries,
+        mediaQueries.oneColumnDown({
+            display: "block",
+            width: percent(100),
+            padding: unit(vars.itemSpacing.paddingOneColumn),
+        }),
+    );
 
     const title = style("title", {
         marginTop: globalVars.gutter.size,
