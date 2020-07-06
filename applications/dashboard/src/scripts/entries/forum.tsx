@@ -109,3 +109,7 @@ applyReactElementsInForum({
         );
     },
 });
+
+cssOut(".userCardHolder", {
+    fontSize: "inherit",
+});
