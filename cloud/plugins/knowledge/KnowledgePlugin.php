@@ -13,10 +13,12 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\TranslationProviderInterface;
 use Vanilla\Knowledge\Controllers\Api\KnowledgeApiController;
 use Vanilla\Knowledge\Controllers\KbPageRoutes;
+use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\KbBreadcrumbProvider;
 use Vanilla\Knowledge\Models\KnowledgeArticleSearchType;
 use Vanilla\Knowledge\Models\KnowledgeTranslationResource;
 use Vanilla\Knowledge\Models\SearchRecordTypeArticleDeleted;
+use Vanilla\Models\ModelFactory;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\THeme\ThemeSectionModel;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -121,6 +123,9 @@ class KnowledgePlugin extends \Gdn_Plugin {
         ;
         $container->rule(AbstractSearchDriver::class)
             ->addCall('registerSearchType', [new Reference(KnowledgeArticleSearchType::class)]);
+
+        $mf = ModelFactory::fromContainer($container);
+        $mf->addModel('article', ArticleModel::class, 'a');
     }
 
     /**
