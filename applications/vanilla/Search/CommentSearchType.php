@@ -20,8 +20,6 @@ use Vanilla\Utility\ArrayUtils;
  */
 class CommentSearchType extends DiscussionSearchType {
 
-    const TYPE_COMMENT = 100;
-
     /** @var \CommentsApiController */
     private $commentsApi;
 
@@ -93,16 +91,6 @@ class CommentSearchType extends DiscussionSearchType {
         } catch (HttpException $exception) {
             trigger_error($exception->getMessage(), E_USER_WARNING);
             return [];
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function applyToQuery(SearchQuery $query) {
-        $types = $query->getQueryParameter('types');
-        if ($types !== null && count($types) === 1 && in_array($this->getType(), $types)) {
-            $query->setFilter('dtype', [self::TYPE_COMMENT]);
         }
     }
 
