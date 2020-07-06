@@ -43,9 +43,7 @@ export default function Banner(props: IProps) {
     const { isCompact, mediaQueries } = useLayout();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar, setRenderedH1 } = useBannerContext();
-
     const { action, className, isContentBanner } = props;
-
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
     const classes = isContentBanner ? contentBannerClasses(mediaQueries) : bannerClasses(mediaQueries);
@@ -80,7 +78,7 @@ export default function Banner(props: IProps) {
     const searchAloneInContainer =
         showBottomSearch || (showMiddleSearch && options.hideDescription && options.hideTitle);
 
-    const hideButton = isCompact && bannerVariables().presets.button.preset === ButtonPreset.HIDE;
+    const hideButton = isCompact || bannerVariables().presets.button.preset === ButtonPreset.HIDE;
 
     const searchComponent = (
         <div className={classNames(classes.searchContainer, { [classes.noTopMargin]: searchAloneInContainer })}>
