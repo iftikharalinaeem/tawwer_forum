@@ -75,7 +75,8 @@ export const searchResultsVariables = useThemeCache(() => {
 
     const mediaElement = makeThemeVars("mediaElement", {
         width: 190,
-        margin: 12,
+        height: 106.875,
+        margin: 15,
         compact: {
             ratio: (9 / 16) * 100,
         },
@@ -254,12 +255,13 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
     const mediaElement = style("mediaElement", {
         position: "relative",
         width: unit(vars.mediaElement.width),
+        height: unit(vars.mediaElement.height),
         overflow: "hidden",
         $nest: {
             [`&.${compactMediaElement}`]: {
                 overflow: "hidden",
                 position: "relative",
-                marginTop: unit(10),
+                marginTop: unit(globalVars.gutter.size),
                 paddingTop: percent(vars.mediaElement.compact.ratio),
                 width: percent(100),
             },
@@ -302,7 +304,7 @@ export const searchResultClasses = useThemeCache((mediaQueries, hasIcon = false)
         $nest: {
             [`&.${compactExcerpt}`]: {
                 ...margins({
-                    top: globalVars.spacer.size,
+                    top: globalVars.gutter.size,
                     left: iconWidth,
                 }),
             },
