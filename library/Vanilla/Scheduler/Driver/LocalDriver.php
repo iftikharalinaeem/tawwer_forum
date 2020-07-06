@@ -72,6 +72,9 @@ class LocalDriver implements DriverInterface {
         try {
             return $driverSlip->execute();
         } catch (\Throwable $t) {
+            if ($t instanceof \Exception) {
+                logException($t);
+            }
             $msg = "Driver failed to execute Job";
             $msg .= ". Message: ".$t->getMessage();
             $msg .= ". File: ".$t->getFile();

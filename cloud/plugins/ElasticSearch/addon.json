@@ -1,0 +1,24 @@
+{
+    "name": "Elastic Search",
+    "description": "Provide needed framework to work the the search api microservice. Read the README.md to set it up properly!",
+    "version": "1.0",
+    "key": "ElasticSearch",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Adam (charrondev) Charron",
+            "email": "adam.c@vanillaforums.com"
+        },
+        {
+            "name": "Alexandre (DaazKu) Chouinard",
+            "email": "alex@vanillaforums.com"
+        },
+        {
+            "name": "Francis Caisse",
+            "email": "francis.c@vanillaforums.com"
+        }
+    ],
+    "require": {
+        "hosted-job": ">=1.0"
+    }
+}
