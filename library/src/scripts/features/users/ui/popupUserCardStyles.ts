@@ -54,7 +54,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const header = makeVars("header", {
-        height: globalVars.gutter.size * 2,
+        height: formElementsVars.sizing.height,
     });
 
     const stat = makeVars("stat", {
@@ -107,19 +107,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
                 backgroundColor: colorOut(globalVariables().mainColors.primary),
                 color: colorOut(globalVariables().mainColors.bg),
                 border: `1px solid ${colorOut(globalVariables().mainColors.bg)}`,
-                borderRadius: vars.button.radius,
-            },
-            "&:focus": {
-                borderRadius: vars.button.radius,
-            },
-            "&.focus-visible": {
-                borderRadius: vars.button.radius,
-            },
-            "&:visited": {
-                borderRadius: vars.button.radius,
-            },
-            "&:active": {
-                borderRadius: vars.button.radius,
             },
         },
         borderRadius: vars.button.radius,
