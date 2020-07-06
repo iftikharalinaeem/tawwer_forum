@@ -116,7 +116,6 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function applyToQuery(SearchQuery $query) {
         $types = $query->getQueryParameter('types');
-
         if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything

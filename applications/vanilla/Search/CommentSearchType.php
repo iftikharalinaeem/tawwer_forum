@@ -11,7 +11,6 @@ use Garden\Web\Exception\HttpException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\MysqlSearchQuery;
-use Vanilla\Search\SearchQuery;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 
