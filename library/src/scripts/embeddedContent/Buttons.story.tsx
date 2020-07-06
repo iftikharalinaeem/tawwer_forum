@@ -53,6 +53,10 @@ function StoryButton() {
                     <Button baseClass={ButtonTypes.PRIMARY}>Primary</Button>
                 </StoryTileAndTextCompact>
 
+                <StoryTileAndTextCompact text={"Standard - Round"}>
+                    <Button baseClass={ButtonTypes.STANDARD_ROUND}>Standard - Round</Button>
+                </StoryTileAndTextCompact>
+
                 <StoryTileAndTextCompact type="titleBar" text={"For Title Bar (Sign in Button)"}>
                     <Button baseClass={ButtonTypes.TRANSPARENT}>Transparent</Button>
                 </StoryTileAndTextCompact>
