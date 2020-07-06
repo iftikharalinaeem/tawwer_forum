@@ -1404,8 +1404,9 @@ if (!function_exists('userAnchor')) {
         $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
 
         $attributes = [
-            'class' => $cssClass,
-            'rel' => val('Rel', $options)
+            'class' => trim(($cssClass ?? "") . " js-userCard"),
+            'rel' => val('Rel', $options),
+            'data-userid' => $user->UserID ?? $user['UserID'],
         ];
         if (isset($options['title'])) {
             $attributes['title'] = $options['title'];
