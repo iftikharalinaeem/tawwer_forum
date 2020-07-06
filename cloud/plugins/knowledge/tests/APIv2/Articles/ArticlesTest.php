@@ -63,6 +63,9 @@ class ArticlesTest extends AbstractResourceTest {
 
     private $defaultKB = [];
 
+    /**
+     * {@inheritDoc}
+     */
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
         $this->sortFields = ['sort', 'dateInserted', 'dateUpdated', 'score', 'articleID'];

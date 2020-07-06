@@ -16,10 +16,14 @@ use Vanilla\ApiUtils;
  * Adds a basic test for crawling.
  */
 trait TestCrawlTrait {
+    /**
+     * Test a basic crawl.
+     */
     public function testResourceCrawl(): void {
         if (empty($this->resourceName)) {
             $this->markTestSkipped('No resource to crawl.');
         }
+        $rows = $this->generateIndexRows();
 
         $resources = $this->api()->get('/resources', ['crawlable' => true])->getBody();
         foreach ($resources as $row) {
@@ -40,8 +44,6 @@ trait TestCrawlTrait {
      * @param string $url
      */
     protected function assertResourceCrawl(string $url): void {
-        $rows = $this->generateIndexRows();
-
         $r = $this->api()->get($url, ['expand' => 'crawl'])->getBody();
         ['url' => $crawlUrl, 'parameter' => $param, 'min' => $min, 'max' => $max] = $r['crawl'];
 
