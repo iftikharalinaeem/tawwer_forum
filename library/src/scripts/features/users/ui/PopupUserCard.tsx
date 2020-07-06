@@ -17,6 +17,7 @@ import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles"
 import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
 import { makeProfileUrl } from "@library/utility/appUtils";
+import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 
 interface IProps {
     user: IUser;
@@ -108,7 +109,9 @@ function Header(props: IHeaderProps) {
     return (
         <div className={classes.header}>
             <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
-                <CloseCompactIcon />
+                <>
+                    <CloseCompactIcon /> <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                </>
             </Button>
         </div>
     );

@@ -8,6 +8,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpers";
+import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -33,6 +34,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 
     const label = makeVars("label", {
         color: colorOut(globalVars.mainColors.primary),
+        border: globalVars.border.radius,
         size: globalVars.fonts.size.small,
         padding: globalVars.gutter.quarter,
     });
@@ -53,6 +55,10 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         padding: globalVars.gutter.size,
     });
 
+    const email = makeVars("email", {
+        color: colorOut(globalVars.mainColors.fg),
+    });
+
     return {
         container,
         button,
@@ -63,12 +69,14 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         count,
         stat,
         date,
+        email,
     };
 });
 
 export const userCardClasses = useThemeCache((props: { compact?: boolean } = {}) => {
     const style = styleFactory("popupUserCard");
     const vars = userCardVariables();
+    const linkColors = clickableItemStates();
 
     const container = style("container", {
         display: "flex",
@@ -76,6 +84,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         alignItems: "stretch",
         justifyContent: "center",
         marginBottom: vars.container.margin,
+        flexWrap: "wrap",
     });
 
     const button = style("button", {
@@ -83,8 +92,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const buttonContainer = style("buttonContainer", {
-        paddingLeft: vars.buttonContainer.padding,
-        paddingRight: vars.buttonContainer.padding,
+        padding: vars.buttonContainer.padding,
     });
 
     const name = style("name", {
@@ -98,14 +106,14 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         fontSize: vars.label.size,
         border: `1px solid ${vars.label.color}`,
         padding: vars.label.padding,
+        borderRadius: vars.label.border,
     });
 
     const stat = style("stat", {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        paddingLeft: vars.stat.padding,
-        paddingRight: vars.stat.padding,
+        width: "49%",
     });
 
     const vertical = style("vertical", {
@@ -128,13 +136,12 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const email = style("email", {
-        color: "inherit",
-        textDecoration: "inherit",
+        color: vars.email.color,
+        $nest: linkColors.$nest,
     });
 
     const date = style("date", {
-        paddingLeft: vars.date.padding,
-        paddingRight: vars.date.padding,
+        padding: vars.buttonContainer.padding,
     });
 
     return {
