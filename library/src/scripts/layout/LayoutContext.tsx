@@ -149,8 +149,6 @@ export interface ILayoutProps {
 const layoutDataByType = (type: LayoutTypes): ILayoutProps => {
     const layout = layoutData(type);
 
-    console.log("layout: ", layout);
-
     const currentDevice = layout.variables.calculateDevice().toString();
 
     const mediaQueries = filterQueriesByType(layout.variables.mediaQueries, type);
