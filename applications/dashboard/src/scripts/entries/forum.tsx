@@ -109,11 +109,3 @@ applyReactElementsInForum({
         );
     },
 });
-
-cssOut(`.js-userCard`, {
-    outline: `outline solid orange 5px !important`,
-});
-
-cssOut(`.js-userCard.js-initialized`, {
-    outline: `outline solid blue 5px !important`,
-});
