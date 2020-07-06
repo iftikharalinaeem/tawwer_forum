@@ -51,9 +51,7 @@ interface IProps {
  * Implements the article's layout
  */
 export default function ArticleLayout(props: IProps) {
-    console.log("props: ", props);
     const { isCompact, isFullWidth } = useLayout();
-    console.log("useLayout(): ", useLayout());
 
     const {
         article,
