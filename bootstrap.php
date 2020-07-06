@@ -278,6 +278,10 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\DeploymentHeaderMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
     ->addCall('addMiddleware', [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
+    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)])
+
+    ->rule(\Vanilla\Web\Middleware\LogTransactionMiddleware::class)
+    ->setShared(true)
 
     ->rule("@baseUrl")
     ->setFactory(function (Gdn_Request $request) {

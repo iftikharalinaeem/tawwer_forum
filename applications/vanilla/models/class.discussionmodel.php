@@ -3049,11 +3049,7 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
         $comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
         $totalComments = count($comments);
 
-        if ($totalComments > 0 && $totalComments <= 25) {
-            // A smaller number of comments should just be stored with the record.
-            $data['_Data']['Comment'] = $comments;
-            LogModel::insert($log, 'Discussion', $data, $logOptions);
-        } else {
+        if ($totalComments > 0) {
             LogModel::insert($log, 'Discussion', $data, $logOptions);
             foreach ($comments as $comment) {
                 LogModel::insert($log, 'Comment', $comment, $logOptions);

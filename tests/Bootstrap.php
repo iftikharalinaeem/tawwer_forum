@@ -38,6 +38,7 @@ use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\FsThemeProvider;
+use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\UASniffer;
 use Vanilla\Theme\ThemeFeatures;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
@@ -306,6 +307,10 @@ class Bootstrap {
             ->setShared(true)
             ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
             ->addCall('addMiddleware', [new Reference(\Vanilla\Web\PrivateCommunityMiddleware::class)])
+            ->addCall('addMiddleware', [new Reference(LogTransactionMiddleware::class)])
+
+            ->rule(LogTransactionMiddleware::class)
+            ->setShared(true)
 
             ->rule(\Vanilla\Web\HttpStrictTransportSecurityModel::class)
             ->addAlias('HstsModel')
