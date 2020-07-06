@@ -15,6 +15,7 @@ export enum UserPhotoSize {
     SMALL = "small",
     MEDIUM = "medium",
     LARGE = "large",
+    XLARGE = "xlarge",
 }
 
 interface IProps {
@@ -36,6 +37,9 @@ export class UserPhoto extends React.Component<IProps> {
         const classes = userPhotoClasses();
         let sizeClass = classes.small;
         switch (this.props.size) {
+            case UserPhotoSize.XLARGE:
+                sizeClass = classes.xlarge;
+                break;
             case UserPhotoSize.LARGE:
                 sizeClass = classes.large;
                 break;

@@ -125,6 +125,7 @@ export default function PopupUserCard(props: IProps) {
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
+    const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
 
     return (
         <DropDown
@@ -138,7 +139,7 @@ export default function PopupUserCard(props: IProps) {
             {isCompact && <Header onClick={() => toggleOpen(!open)} />}
 
             <Container>
-                <UserPhoto userInfo={user} size={UserPhotoSize.LARGE} />
+                <UserPhoto userInfo={user} size={photoSize} />
             </Container>
 
             <Container>

@@ -25,6 +25,7 @@ export const userPhotoVariables = useThemeCache((forcedVars?: IThemeVariables) =
         small: 28,
         medium: 40,
         large: 100,
+        xlarge: 145,
     });
 
     return { border, sizing };
@@ -56,12 +57,18 @@ export const userPhotoMixins = vars => {
         height: unit(vars.sizing.large),
     } as NestedCSSProperties;
 
+    const xlarge = {
+        width: unit(vars.sizing.xlarge),
+        height: unit(vars.sizing.xlarge),
+    };
+
     return {
         root,
         photo,
         small,
         medium,
         large,
+        xlarge,
     };
 };
 
@@ -75,5 +82,6 @@ export const userPhotoClasses = useThemeCache(() => {
     const small = style("small", mixinStyles.small);
     const medium = style("medium", mixinStyles.medium);
     const large = style("large", mixinStyles.large);
-    return { root, small, medium, large, photo };
+    const xlarge = style("large", mixinStyles.xlarge);
+    return { root, small, medium, large, xlarge, photo };
 });
