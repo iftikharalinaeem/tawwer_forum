@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web\Middleware;
 
+use Garden\Http\HttpRequest;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 
@@ -23,22 +24,18 @@ class LogTransactionMiddleware {
     /**
      * Invoke the cache control middleware on a request.
      *
-     * @param RequestInterface $request The incoming request.
+     * @param RequestInterface|HttpRequest $request The incoming request.
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke($request, callable $next) {
         $transactionID = $request->getHeader(self::HEADER_NAME) ?: null;
 
-        if ($transactionID !== null) {
-            $intTransactionID = filter_var($transactionID, FILTER_VALIDATE_INT);
-            if ($intTransactionID !== false) {
-                $this->setTransactionID($intTransactionID);
-            }
+        if (is_numeric($transactionID)) {
+            $this->setTransactionID((int) $transactionID);
         }
 
-        $response = Data::box($next($request));
-        return $response;
+        return $next($request);
     }
 
     /**

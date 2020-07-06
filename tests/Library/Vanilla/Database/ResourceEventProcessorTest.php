@@ -7,15 +7,14 @@
 
 namespace VanillaTests\Library\Vanilla\Database;
 
-use Garden\EventManager;
-use Garden\Events\GenericResourceEvent;
 use Garden\Events\ResourceEvent;
 use Garden\Events\ResourceEventLimitException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Database\Operation;
 use Vanilla\Models\PipelineModel;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Database\ProcessorFixture;
+use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 
 /**
@@ -24,6 +23,8 @@ use VanillaTests\SiteTestTrait;
 class ResourceEventProcessorTest extends TestCase {
 
     use SiteTestTrait;
+    use SetupTraitsTrait;
+    use EventSpyTestTrait;
 
     /**
      * @var PipelineModel
@@ -34,9 +35,6 @@ class ResourceEventProcessorTest extends TestCase {
      * @var Operation\ResourceEventProcessor
      */
     private $eventProcessor;
-
-    /** @var MockObject */
-    private $mockEventManager;
 
     /**
      * Install the site and set up a test table.
@@ -59,6 +57,7 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function setUp(): void {
         parent::setUp();
+        $this->setupTestTraits();
 
         $this->container()->call(function (
             \Gdn_SQLDriver $sql
@@ -67,7 +66,6 @@ class ResourceEventProcessorTest extends TestCase {
         });
 
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $this->mockEventManager = $this->getMockBuilder(EventManager::class)->getMock();
         $this->eventProcessor = $this->container()->getArgs(Operation\ResourceEventProcessor::class, [
             'eventManager' => $this->mockEventManager,
         ]);
@@ -79,7 +77,7 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function testInsert() {
         $this->assertEventsWillBeDispatched([
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
         ]);
 
         $this->model->insert(['name' => 'item1']);
@@ -90,8 +88,8 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function testUpdateSingle() {
         $this->assertEventsWillBeDispatched([
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_UPDATE, ['name' => 'item2', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'item2', 'modelID' => 1]),
         ]);
         $this->model->insert(['name' => 'item1']);
         $this->model->update(['name' => 'item2'], ['modelID' => 1]);
@@ -102,10 +100,10 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function testUpdateMultiple() {
         $this->assertEventsWillBeDispatched([
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
-            $this->expectedEvent(ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 2]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 2]),
         ]);
         $this->model->insert(['name' => 'item1']);
         $this->model->insert(['name' => 'item2']);
@@ -117,10 +115,10 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function testDeleteMultiple() {
         $this->assertEventsWillBeDispatched([
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
-            $this->expectedEvent(ResourceEvent::ACTION_DELETE, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_DELETE, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item2', 'modelID' => 2]),
         ]);
         $this->model->insert(['name' => 'item1']);
         $this->model->insert(['name' => 'item2']);
@@ -132,8 +130,8 @@ class ResourceEventProcessorTest extends TestCase {
      */
     public function testFailureNoDispatch() {
         $this->assertEventsWillBeDispatched([
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedEvent(ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
         ]);
         $this->model->insert(['name' => 'item1']);
         $this->model->insert(['name' => 'item2']);
@@ -171,39 +169,5 @@ class ResourceEventProcessorTest extends TestCase {
 
         $this->expectException(ResourceEventLimitException::class);
         $this->model->update(['name' => 'name reset'], ['modelID <' => 4]);
-    }
-
-    /**
-     * @param ResourceEvent[] $events
-     */
-    private function assertEventsWillBeDispatched(array $events) {
-        $calls = [];
-        foreach ($events as $event) {
-            $calls[] = [$event];
-        }
-        $this->mockEventManager
-            ->expects($this->exactly(count($events)))
-            ->method("dispatch")
-            ->withConsecutive(...$calls);
-    }
-
-    /**
-     * Generate an excepected event.
-     *
-     * @param string $action
-     * @param array $payload
-     * @return ResourceEvent
-     */
-    private function expectedEvent(string $action, array $payload): ResourceEvent {
-        return new GenericResourceEvent('model', $action, [
-            'model' => $payload,
-        ], $this->getCurrentUser());
-    }
-
-    /**
-     * Get the current user.
-     */
-    private function getCurrentUser() {
-        return \Gdn::userModel()->currentFragment();
     }
 }

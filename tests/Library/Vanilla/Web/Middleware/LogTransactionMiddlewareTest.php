@@ -7,9 +7,10 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Middleware;
 
-use Vanilla\Formatting\Formats\MarkdownFormat;
+use Garden\Http\HttpResponse;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use VanillaTests\APIv2\AbstractAPIv2Test;
+use VanillaTests\Fixtures\MockHttpClient;
 
 /**
  * Tests for logging using the transaction middleware.
@@ -17,54 +18,41 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 class LogTransactionMiddlewareTest extends AbstractAPIv2Test {
 
     /**
-     * @inheritdoc
+     * Test the we can retreive a value from the middleware.
+     *
+     * @param array $headers
+     * @param int|null $expected
+     *
+     * @dataProvider provideHeadersAndValues
      */
-    public function setUp(): void {
-        parent::setUp();
-        \Gdn::sql()->truncate('Log');
+    public function testStoreGetTransactionID(array $headers, ?int $expected) {
+        $mockClient = new MockHttpClient();
+        $mockClient->addMockResponse('/test', new HttpResponse(200));
+
+        $middleware = new LogTransactionMiddleware();
+        $mockClient->addMiddleware($middleware);
+
+        $mockClient->get('/test', [], $headers);
+        $this->assertSame($expected, $middleware->getTransactionID());
     }
 
     /**
-     * Test that deleting a discussion deletes all comments and logs them with the correct transactionID.
+     * @return array
      */
-    public function testLogDeletedDiscussionCommentsTransaction() {
-        $this->api()->setDefaultHeader(LogTransactionMiddleware::HEADER_NAME, 1000);
-        $commonParams = [
-            'body' => 'hello',
-            'format' => MarkdownFormat::FORMAT_KEY,
+    public function provideHeadersAndValues(): array {
+        return [
+            'good value' => [
+                [LogTransactionMiddleware::HEADER_NAME => '41351'],
+                41351,
+            ],
+            'no value' => [
+                [],
+                null,
+            ],
+            'bad value' => [
+                [LogTransactionMiddleware::HEADER_NAME => 'asdfasdfasdf'],
+                null,
+            ],
         ];
-        $discussion = $this->api()->post('/discussions', $commonParams + [
-            'name' => 'hello',
-            'categoryID' => -1,
-        ]);
-        $discussionID = $discussion->getBody()['discussionID'];
-
-        $this->api()->post('/comments', $commonParams + [
-            'discussionID' => $discussionID,
-        ]);
-        $this->api()->post('/comments', $commonParams + [
-            'discussionID' => $discussionID,
-        ]);
-        $this->api()->post('/comments', $commonParams + [
-            'discussionID' => $discussionID,
-        ]);
-
-        $this->api()->delete("/discussions/$discussionID");
-
-        /** @var \LogModel $logModel */
-        $logModel = $this->container()->get(\LogModel::class);
-
-        $logs = $logModel->getWhere([
-            'TransactionLogID' => 1000,
-        ]);
-        $this->assertCount(4, $logs);
-
-        // Comment count
-        $this->assertCount(0, $this->api()->get('/comments', ['insertUserID' => $this->api()->getUserID()])->getBody());
-
-        // Restoration off of our transactionID.
-        $logModel->restore($logs[0]);
-        $this->assertCount(0, $logModel->getWhere([ 'TransactionLogID' => 1000 ]));
-        $this->assertCount(3, $this->api()->get('/comments', ['insertUserID' => $this->api()->getUserID()])->getBody());
     }
 }
