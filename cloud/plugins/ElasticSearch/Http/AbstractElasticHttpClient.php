@@ -27,6 +27,16 @@ use Garden\Web\Exception\HttpException;
  */
 abstract class AbstractElasticHttpClient extends HttpClient {
 
+    const SCOPE_ACCOUNT = 'account';
+    const SCOPE_HUB = 'hub';
+    const SCOPE_SITE = 'site';
+
+    const SCOPES = [
+        self::SCOPE_ACCOUNT,
+        self::SCOPE_HUB,
+        self::SCOPE_SITE,
+    ];
+
     /** @var AbstractElasticHttpConfig */
     private $clientConfig;
 
@@ -87,15 +97,18 @@ abstract class AbstractElasticHttpClient extends HttpClient {
      * {@link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#search-search-api-request-body}.
      * Query is in the `query` subfield.
      * {@link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html}
+     * @param string $scope The search scope.
+     * One of {@link AbstractElasticHttpClient::SCOPES}.
      *
      * @return HttpResponse
      *
      * @throws HttpException When something goes wrong.
      */
-    public function searchDocuments(array $indexNames, array $searchPayload): HttpResponse {
+    public function searchDocuments(array $indexNames, array $searchPayload, string $scope = self::SCOPE_SITE): HttpResponse {
         $indexAliases = array_map([$this, 'convertIndexNameToAlias'], $indexNames);
         $body = [
             'indexesAlias' => $indexAliases,
+            'scope' => $scope,
             'searchPayload' => $searchPayload,
         ];
         return $this->post('/search', $body);
