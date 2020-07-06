@@ -25,6 +25,8 @@ use Vanilla\Utility\ArrayUtils;
  */
 class DiscussionSearchType extends AbstractSearchType {
 
+    const TYPE_DISCUSSION = 0;
+
     /** @var \DiscussionsApiController */
     protected $discussionsApi;
 
@@ -116,6 +118,11 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     public function applyToQuery(SearchQuery $query) {
         $types = $query->getQueryParameter('types');
+
+        if ($types !== null && count($types) === 1 && in_array($this->getType(), $types)) {
+            $query->setFilter('dtype', [self::TYPE_DISCUSSION]);
+        }
+
         if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
