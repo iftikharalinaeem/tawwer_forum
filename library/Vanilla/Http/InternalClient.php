@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests;
+namespace Vanilla\Http;
 
 use Garden\Container\Container;
 use Garden\Http\HttpClient;
@@ -13,6 +13,9 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 
+/**
+ * Http client for making requests internally against the dispatcher.
+ */
 class InternalClient extends HttpClient {
 
     const DEFAULT_USER_ID = 2;
