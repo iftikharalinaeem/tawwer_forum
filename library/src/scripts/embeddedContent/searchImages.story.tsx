@@ -19,7 +19,7 @@ export default {
         chromatic: {
             viewports: [
                 1450,
-                layoutVariables().panelLayoutBreakPoints.twoColumn,
+                layoutVariables().panelLayoutBreakPoints.twoColumns,
                 layoutVariables().panelLayoutBreakPoints.oneColumn,
                 layoutVariables().panelLayoutBreakPoints.xs,
             ],
