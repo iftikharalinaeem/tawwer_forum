@@ -18,8 +18,9 @@ import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { Devices, IDeviceProps, useDevice } from "@library/layout/DeviceContext";
 
-interface IProps {
+interface IProps extends IDeviceProps {
     user: IUser;
     visible?: boolean;
 }
@@ -121,6 +122,9 @@ export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
     const { user, visible } = props;
     const [open, toggleOpen] = useState(visible || false);
+    const device = useDevice();
+
+    const isCompact = device === Devices.MOBILE || device === Devices.XS;
 
     return (
         <DropDown
@@ -129,9 +133,9 @@ export default function PopupUserCard(props: IProps) {
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
-            onVisibilityChange={isVisibble => toggleOpen(isVisibble)}
+            onVisibilityChange={isVisible => toggleOpen(isVisible)}
         >
-            <Header onClick={() => toggleOpen(!open)} />
+            {isCompact && <Header onClick={() => toggleOpen(!open)} />}
 
             <Container>
                 <UserPhoto userInfo={user} size={UserPhotoSize.LARGE} />
