@@ -7,7 +7,7 @@ import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import PopupUserCard from "@library/features/users/ui/PopupUserCard";
+import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
@@ -21,7 +21,7 @@ export default {
     },
 };
 
-const m: IUser = {
+const m: IUserCardInfo = {
     email: "val@vanillaforums.com",
     userID: 1,
     name: "Valérie Robitaille",
@@ -31,19 +31,6 @@ const m: IUser = {
     label: "Product Manager",
     countDiscussions: 207,
     countComments: 3456,
-    emailConfirmed: true,
-    showEmail: false,
-    bypassSpam: false,
-    banned: 0,
-    dateInserted: "2020-04-07T23:10:49+00:00",
-    dateUpdated: "2020-04-07T23:10:49+00:00",
-    hidden: false,
-    roles: [
-        {
-            roleID: 16,
-            name: "Administrator",
-        },
-    ],
 };
 
 export const UserCardWithoutState = () => (

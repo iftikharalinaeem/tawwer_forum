@@ -9,6 +9,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { colorOut } from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
+import { layoutVariables } from "@library/layout/panelLayoutStyles";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -43,8 +44,17 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         color: colorOut(globalVars.border.color),
     });
 
+    const divider = makeVars("divider", {
+        color: colorOut(globalVars.border.color),
+        margin: globalVars.gutter.size,
+    });
+
     const count = makeVars("count", {
         size: globalVars.fonts.size.largeTitle,
+    });
+
+    const header = makeVars("header", {
+        height: globalVars.gutter.size * 2,
     });
 
     const stat = makeVars("stat", {
@@ -66,7 +76,9 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         name,
         label,
         vertical,
+        divider,
         count,
+        header,
         stat,
         date,
         email,
@@ -77,6 +89,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const style = styleFactory("popupUserCard");
     const vars = userCardVariables();
     const linkColors = clickableItemStates();
+    const mediaQueries = layoutVariables().mediaQueries();
 
     const container = style("container", {
         display: "flex",
@@ -88,6 +101,27 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const button = style("button", {
+        display: "block",
+        $nest: {
+            "&:hover": {
+                backgroundColor: colorOut(globalVariables().mainColors.primary),
+                color: colorOut(globalVariables().mainColors.bg),
+                border: `1px solid ${colorOut(globalVariables().mainColors.bg)}`,
+                borderRadius: vars.button.radius,
+            },
+            "&:focus": {
+                borderRadius: vars.button.radius,
+            },
+            "&.focus-visible": {
+                borderRadius: vars.button.radius,
+            },
+            "&:visited": {
+                borderRadius: vars.button.radius,
+            },
+            "&:active": {
+                borderRadius: vars.button.radius,
+            },
+        },
         borderRadius: vars.button.radius,
     });
 
@@ -95,10 +129,17 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         padding: vars.buttonContainer.padding,
     });
 
-    const name = style("name", {
-        fontSize: vars.name.size,
-        fontWeight: vars.name.weight,
-    });
+    const name = style(
+        "name",
+        {
+            fontSize: vars.name.size,
+            fontWeight: vars.name.weight,
+        },
+
+        mediaQueries.oneColumnDown({
+            fontSize: vars.name.size * 1.25,
+        }),
+    );
 
     const label = style("label", {
         color: vars.label.color,
@@ -121,6 +162,11 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         background: vars.vertical.color,
     });
 
+    const divider = style("divider", {
+        borderTop: `1px solid ${vars.divider.color}`,
+        marginBottom: vars.divider.margin,
+    });
+
     const count = style("count", {
         fontSize: vars.count.size,
     });
@@ -129,6 +175,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         display: "flex",
         flexDirection: "row-reverse",
         alignItems: "center",
+        height: vars.header.height,
     });
 
     const section = style("section", {
@@ -152,6 +199,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         label,
         stat,
         vertical,
+        divider,
         count,
         header,
         section,

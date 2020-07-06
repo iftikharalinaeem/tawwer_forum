@@ -7,21 +7,34 @@ import React, { useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { IUser } from "@vanilla/library/src/scripts/@types/api/users";
+import { IUser, IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import DropDownSection from "@library/flyouts/items/DropDownSection";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { CloseCompactIcon } from "@library/icons/common";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
-import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
+import { userCardClasses, userCardVariables } from "@library/features/users/ui/popupUserCardStyles";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { Devices, IDeviceProps, useDevice } from "@library/layout/DeviceContext";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
+import DateTime from "@library/content/DateTime";
 
-interface IProps extends IDeviceProps {
-    user: IUser;
+export interface IUserCardInfo {
+    email: string;
+    userID: number;
+    name: string;
+    photoUrl: string;
+    dateLastActive?: string;
+    dateJoined?: string;
+    label: string;
+    countDiscussions: number;
+    countComments: number;
+}
+
+interface IProps {
+    user: IUserCardInfo;
     visible?: boolean;
 }
 
@@ -44,7 +57,7 @@ interface IVerticalLineProps {
 
 interface IDateProps {
     text: string;
-    date?: string | null;
+    date: string | undefined;
 }
 
 interface IHeaderProps {
@@ -93,27 +106,41 @@ function VerticalLine(props: IVerticalLineProps) {
     const { width } = props;
     return (
         <div>
-            <hr className={classes.vertical} style={{ width: `${width}px`, height: "100%" }} />{" "}
+            <hr className={classes.vertical} style={{ width: `${width}px`, height: "100%" }} />
         </div>
     );
+}
+
+function Divider() {
+    const classes = userCardClasses();
+    return <hr className={classes.divider} />;
 }
 
 function Date(props: IDateProps) {
     const classes = userCardClasses();
     const { text, date } = props;
-    return <div className={classes.date}>{`${text}: ${date}`} </div>;
+    return (
+        <div className={classes.date}>
+            {`${text}: `} <DateTime timestamp={date} />
+        </div>
+    );
 }
 
 function Header(props: IHeaderProps) {
     const classes = userCardClasses();
     const { onClick } = props;
+    const device = useDevice();
+    const isCompact = device === Devices.MOBILE || device === Devices.XS;
+
     return (
         <div className={classes.header}>
-            <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
-                <>
-                    <CloseCompactIcon /> <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
-                </>
-            </Button>
+            {isCompact && (
+                <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
+                    <>
+                        <CloseCompactIcon /> <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                    </>
+                </Button>
+            )}
         </div>
     );
 }
@@ -127,6 +154,14 @@ export default function PopupUserCard(props: IProps) {
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
 
+    const userInfo: IUserFragment = {
+        userID: user.userID,
+        name: user.name,
+        photoUrl: user.photoUrl,
+        dateLastActive: user.dateLastActive || null,
+        label: user.label || null,
+    };
+
     return (
         <DropDown
             buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
@@ -136,10 +171,10 @@ export default function PopupUserCard(props: IProps) {
             isVisible={open}
             onVisibilityChange={isVisible => toggleOpen(isVisible)}
         >
-            {isCompact && <Header onClick={() => toggleOpen(!open)} />}
+            <Header onClick={() => toggleOpen(!open)} />
 
             <Container>
-                <UserPhoto userInfo={user} size={photoSize} />
+                <UserPhoto userInfo={userInfo} size={photoSize} />
             </Container>
 
             <Container>
@@ -180,20 +215,20 @@ export default function PopupUserCard(props: IProps) {
                 </ButtonContainer>
             </Container>
 
-            <DropDownSection className={classes.section} noSeparator={false} title={""}>
-                <Container>
-                    <Stat count={user.countDiscussions} text={t("Discussions")} />
-                    <VerticalLine width={1} />
-                    <Stat count={user.countComments} text={t("Comments")} />
-                </Container>
-            </DropDownSection>
+            <Divider />
 
-            <DropDownSection className={classes.section} noSeparator={false} title={""}>
-                <Container>
-                    <Date text={t("Joined")} date={user.dateJoined} />
-                    <Date text={t("Last Active")} date={user.dateLastActive} />
-                </Container>
-            </DropDownSection>
+            <Container>
+                <Stat count={user.countDiscussions} text={t("Discussions")} />
+                <VerticalLine width={1} />
+                <Stat count={user.countComments} text={t("Comments")} />
+            </Container>
+
+            <Divider />
+
+            <Container>
+                <Date text={t("Joined")} date={user.dateJoined} />
+                <Date text={t("Last Active")} date={user.dateLastActive} />
+            </Container>
         </DropDown>
     );
 }

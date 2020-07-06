@@ -9,7 +9,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@library/loaders/Loader";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
-import PopupUserCard from "@library/features/users/ui/PopupUserCard";
+import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 
 interface IProps {
     userID: number;
@@ -27,5 +27,17 @@ export function UserCardModule(props: IProps) {
         return <ErrorMessages errors={[user.error].filter(notEmpty)} />;
     }
 
-    return <PopupUserCard user={user.data} />;
+    const userCardInfo: IUserCardInfo = {
+        email: user.data.email,
+        userID: user.data.userID,
+        name: user.data.name,
+        photoUrl: user.data.photoUrl,
+        dateLastActive: user.data.dateLastActive || undefined,
+        dateJoined: user.data.dateInserted,
+        label: user.data.label || "",
+        countDiscussions: user.data.countDiscussions || 0,
+        countComments: user.data.countComments || 0,
+    };
+
+    return <PopupUserCard user={userCardInfo} />;
 }
