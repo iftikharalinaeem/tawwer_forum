@@ -63,7 +63,7 @@ export default {
     title: "Search/Filters",
     parameters: {
         chromatic: {
-            viewports: [layoutVariables().panelLayoutBreakPoints.twoColumn],
+            viewports: [1400, 500],
         },
     },
 };
