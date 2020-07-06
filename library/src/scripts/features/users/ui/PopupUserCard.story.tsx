@@ -48,7 +48,7 @@ const m: IUser = {
 
 export const UserCardWithoutState = () => (
     <StoryContent>
-        <PopupUserCard user={m} />
+        <PopupUserCard user={m} visible={true} />
     </StoryContent>
 );
 
@@ -76,7 +76,7 @@ export const UserCardWithoutPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={m} />
+            <PopupUserCard user={m} visible={true} />
         </StoryContent>
     ),
 );
@@ -105,7 +105,7 @@ export const UserCardWithPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={m} />
+            <PopupUserCard user={m} visible={true} />
         </StoryContent>
     ),
 );

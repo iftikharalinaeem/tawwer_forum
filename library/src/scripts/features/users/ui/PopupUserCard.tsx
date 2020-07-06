@@ -20,6 +20,7 @@ import { makeProfileUrl } from "@library/utility/appUtils";
 
 interface IProps {
     user: IUser;
+    visible?: boolean;
 }
 
 interface INameProps {
@@ -115,8 +116,8 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user } = props;
-    const [open, toggleOpen] = useState(false);
+    const { user, visible } = props;
+    const [open, toggleOpen] = useState(visible || false);
 
     return (
         <DropDown
