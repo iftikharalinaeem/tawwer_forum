@@ -3,6 +3,8 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+
+use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -41,7 +43,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     /** @var string The format of the email. */
     protected $format;
 
-    /** @var string The supported email formats. */
+    /** @var string[] The supported email formats. */
     public static $supportedFormats = ['html', 'text'];
 
     /**
@@ -346,16 +348,19 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     }
 
     /**
+     * Send the email.
+     *
      * @param string $eventName
-     * @todo add port settings
      * @return boolean
+     * @throws \Vanilla\Exception\ConfigurationException Throws an exception if email is disabled.
+     * @throws \PHPMailer\PHPMailer\Exception Throws an exception if there was a problem sending the email.
      */
     public function send($eventName = '') {
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');
 
         if (c('Garden.Email.Disabled')) {
-            throw new Exception('Email disabled', self::ERR_SKIPPED);
+            throw new \Vanilla\Exception\ConfigurationException('Email disabled', self::ERR_SKIPPED);
         }
 
         if (c('Garden.Email.UseSmtp')) {
