@@ -337,7 +337,7 @@ class Bootstrap {
             ->addAlias('FileUtils')
 
             ->rule('WebLinking')
-            ->setClass(\Vanilla\Web\WebLinking::class)
+            ->setClass(\Vanilla\Web\Pagination\WebLinking::class)
             ->setShared(true)
 
             ->rule(\Vanilla\EmbeddedContent\EmbedService::class)

@@ -403,8 +403,7 @@ $dic->setInstance(Garden\Container\Container::class, $dic)
     ->rule('Smarty')
     ->setShared(true)
 
-    ->rule('WebLinking')
-    ->setClass(\Vanilla\Web\WebLinking::class)
+    ->rule(\Vanilla\Web\Pagination\WebLinking::class)
     ->setShared(true)
 
     ->rule('ViewHandler.tpl')
