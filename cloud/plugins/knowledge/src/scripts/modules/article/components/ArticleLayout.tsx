@@ -186,7 +186,7 @@ export default function ArticleLayout(props: IProps) {
                     }
                     rightTop={
                         <>
-                            {!isCompact && !isFullWidth && article.outline && article.outline.length > 0 && (
+                            {(!isCompact || isFullWidth) && article.outline && article.outline.length > 0 && (
                                 <PanelWidget>
                                     <ArticleTOC items={article.outline} />
                                 </PanelWidget>

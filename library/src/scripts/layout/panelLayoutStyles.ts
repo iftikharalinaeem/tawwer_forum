@@ -140,7 +140,7 @@ export const layoutVariables = useThemeCache(
                 );
             };
 
-            const twoColumnssDown = (styles: NestedCSSProperties): NestedCSSProperties => {
+            const twoColumnsDown = (styles: NestedCSSProperties): NestedCSSProperties => {
                 return media(
                     {
                         maxWidth: px(breakPoints.twoColumns),
@@ -149,7 +149,7 @@ export const layoutVariables = useThemeCache(
                 );
             };
 
-            const twoColumnss = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
+            const twoColumns = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {
                 return media(
                     {
                         maxWidth: px(breakPoints.twoColumns),
@@ -199,8 +199,8 @@ export const layoutVariables = useThemeCache(
             return {
                 noBleed,
                 noBleedDown,
-                twoColumnss,
-                twoColumnssDown,
+                twoColumns,
+                twoColumnsDown,
                 oneColumn,
                 oneColumnDown,
                 aboveOneColumn,

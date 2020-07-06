@@ -44,23 +44,23 @@ export const panelWidgetClasses = useThemeCache(mediaQueries => {
             "&.isSelfPadded": {
                 ...paddings({ all: 0 }),
             },
+            ...mediaQueries({
+                [LayoutTypes.TWO_COLUMNS]: {
+                    oneColumnDown: {
+                        ...paddings({
+                            all: vars.spacing.padding,
+                        }),
+                    },
+                },
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        ...paddings({
+                            all: vars.spacing.padding,
+                        }),
+                    },
+                },
+            }).$nest,
         },
-        ...mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: {
-                    ...paddings({
-                        all: vars.spacing.padding,
-                    }),
-                },
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    ...paddings({
-                        all: vars.spacing.padding,
-                    }),
-                },
-            },
-        }),
     });
 
     return { root: root + " panelWidget" };
