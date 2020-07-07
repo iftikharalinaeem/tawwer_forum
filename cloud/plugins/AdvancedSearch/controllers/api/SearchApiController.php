@@ -365,7 +365,7 @@ class SearchApiController extends AbstractApiController {
                 $record,
                 $expandBody,
                 $expandParams,
-                $searchTerm,
+                $searchTerm
             );
         }, $searchResults);
 
