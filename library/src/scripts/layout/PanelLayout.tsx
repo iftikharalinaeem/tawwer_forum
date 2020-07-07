@@ -73,6 +73,7 @@ function PanelLayout(props: IPanelLayoutProps) {
         growMiddleBottom = false,
         topPadding = true,
         isFixed = true,
+        mediaQueries,
         ...childComponents
     } = props;
 
@@ -82,7 +83,7 @@ function PanelLayout(props: IPanelLayoutProps) {
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
     const {
-        classes = props.classes ?? panelLayoutClasses(),
+        classes = props.classes ?? panelLayoutClasses(mediaQueries),
         currentDevice,
         isCompact,
         isFullWidth,

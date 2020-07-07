@@ -7,7 +7,7 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { doNothingWithMediaQueries, generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
 import { IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";

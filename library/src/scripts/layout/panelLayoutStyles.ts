@@ -15,6 +15,7 @@ import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import { logError } from "@vanilla/utils";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: any;
@@ -278,6 +279,11 @@ export interface IPanelLayoutClasses {
     breadcrumbsContainer: string;
 }
 
+export const doNothingWithMediaQueries = (styles: any) => {
+    logError("Media queries are undefined, unable to set the following styles: ", styles);
+    return {};
+};
+
 export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables; name: string; mediaQueries }) => {
     const { vars, name, mediaQueries } = props;
     const globalVars = globalVariables();
@@ -475,7 +481,6 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
                 "&.hasTwoAdjacentPanels": {
                     flexBasis: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
                     maxWidth: calc(`100% - ${unit(vars.panel.paddedWidth * 2)}`),
-
                     ...mediaQueries({
                         [LayoutTypes.THREE_COLUMNS]: {
                             oneColumnDown: {
@@ -532,10 +537,10 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
 };
 
 //@Deprecated use specific layout instead (i.e. three or two column layouts)
-export const panelLayoutClasses = () => {
+export const panelLayoutClasses = (mediaQueries = doNothingWithMediaQueries) => {
     return generatePanelLayoutClasses({
         vars: layoutVariables(),
         name: "panelLayout",
-        mediaQueries: layoutVariables().mediaQueries,
+        mediaQueries,
     });
 };

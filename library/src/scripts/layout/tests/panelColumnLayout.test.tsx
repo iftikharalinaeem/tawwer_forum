@@ -27,6 +27,24 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
     );
 };
 
+// For Three column layout:
+// left panel   : 216
+// gutter       : 40
+// middle column: 672
+// gutter       : 40
+// right panel  : 216
+// total        : 1184
+
+// For Two column layout:
+// right panel  : 343
+// gutter       : 40
+// main column  : 1184 - 343 - 40
+
+// For Legacy
+// right panel  : 244
+// gutter       : 52 (special)
+// main column  : 1184 - 244 - 52
+
 describe.only("TwoColumnLayout", () => {
     it("Check desktop widths", () => {
         const { container } = render(

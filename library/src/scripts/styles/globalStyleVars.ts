@@ -31,7 +31,8 @@ export enum GlobalPreset {
     LIGHT = "light",
 }
 
-export const FULL_GUTTER = 48;
+export const FULL_GUTTER = 40;
+
 
 export const defaultFontFamily = "Open Sans";
 
@@ -226,6 +227,12 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         excerpt: 1.4,
         meta: 1.5,
     });
+
+    // Three column
+    // 216 + 40 + 672 + 40 + 216 = 1184 (correct full width of three column layout)
+    // 1184
+    // (216 + 40 + 672  + 40 + 216) - 343px         + 40 + 343px (two column layout)
+    //                                           52 (Extra space) + 244px (Foundation)
 
     // These globals are here because the layout system was created based on a 3 column layout
     // These variables are used as a starting off point and as a base, but each layout can define
