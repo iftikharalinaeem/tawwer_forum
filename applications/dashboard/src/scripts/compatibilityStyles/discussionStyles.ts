@@ -165,8 +165,4 @@ export const discussionCSS = () => {
             marginTop: negativeUnit(2),
         },
     );
-
-    cssOut(`.Item.Read`, {
-        background: colorOut(vars.mixBgAndFg(0.05)),
-    });
 };

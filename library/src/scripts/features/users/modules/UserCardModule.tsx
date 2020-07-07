@@ -6,25 +6,32 @@
 import React from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Loader from "@library/loaders/Loader";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 
-interface IProps {
+export interface IUserCardModule {
     userID: number;
+    children?: React.ReactNode; // fallback to original HTML
 }
 
-export function UserCardModule(props: IProps) {
-    const { userID } = props;
+export function UserCardModule(props: IUserCardModule) {
+    const { userID, children } = props;
     const user = useUser({ userID });
 
+    // Fallback to the original link, unchanged
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data) {
-        return <Loader />;
+        return <>{children}</>;
     }
 
     if (!user.data || user.error) {
-        return <ErrorMessages errors={[user.error].filter(notEmpty)} />;
+        return (
+            <>
+                {/* Fallback to the original link, unchanged */}
+                {children}
+                <ErrorMessages errors={[user.error].filter(notEmpty)} />
+            </>
+        );
     }
 
     const userCardInfo: IUserCardInfo = {

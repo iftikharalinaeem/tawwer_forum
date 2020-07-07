@@ -90,6 +90,10 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
         }
 
+        if (FeatureFlagHelper::featureEnabled('UserCards')) {
+            $themeValues['UserCards'] = true;
+        }
+
         return array_merge(self::FEATURE_DEFAULTS, $configValues, $themeValues, $this->forcedFeatures);
     }
 

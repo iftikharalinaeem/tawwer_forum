@@ -72,10 +72,14 @@ addComponent("title-bar-hamburger", TitleBarHamburger);
 addComponent("community-banner", CommunityBanner);
 addComponent("community-content-banner", CommunityContentBanner);
 
-const applyReactElementsInForum = (props: { metaKey: string; onInitialLoad: () => void; onNewHTML: (e) => void }) => {
-    const { metaKey, onInitialLoad, onNewHTML } = props;
+const applyReactElementsInForum = (props: {
+    metaPermissionKey: string;
+    onInitialLoad: () => void;
+    onNewHTML: (e) => void;
+}) => {
+    const { metaPermissionKey, onInitialLoad, onNewHTML } = props;
 
-    if (getMeta(metaKey, false)) {
+    if (getMeta(metaPermissionKey, false)) {
         onReady(() => {
             onInitialLoad();
         });
@@ -86,7 +90,7 @@ const applyReactElementsInForum = (props: { metaKey: string; onInitialLoad: () =
 };
 
 applyReactElementsInForum({
-    metaKey: "themeFeatures.DataDrivenTheme",
+    metaPermissionKey: "themeFeatures.DataDrivenTheme",
     onInitialLoad: () => {
         compatibilityStyles();
         applyCompatibilityIcons();
@@ -99,7 +103,7 @@ applyReactElementsInForum({
 });
 
 applyReactElementsInForum({
-    metaKey: "themeFeatures.UserCards",
+    metaPermissionKey: "themeFeatures.UserCards",
     onInitialLoad: () => {
         applyCompatibilityUserCards();
     },
@@ -108,8 +112,4 @@ applyReactElementsInForum({
             e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
         );
     },
-});
-
-cssOut(".userCardHolder", {
-    fontSize: "inherit",
 });

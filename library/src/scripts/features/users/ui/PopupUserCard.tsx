@@ -146,7 +146,8 @@ function Header(props: IHeaderProps) {
             {isCompact && (
                 <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
                     <>
-                        <CloseCompactIcon /> <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                        <CloseCompactIcon />
+                        <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                     </>
                 </Button>
             )}
