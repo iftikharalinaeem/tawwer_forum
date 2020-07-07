@@ -5,14 +5,18 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Web;
+namespace Vanilla\Web\Pagination;
 
+use Garden\Http\HttpResponse;
 use Garden\Web\Data;
 
 /**
  * Class WebLinking
  */
 class WebLinking {
+
+    const WEB_LINK_REGEX = '/<(?<link>[0-9a-zA-Z$-_.+!*\'(),:?=&%#]+)>;\s+rel="(?<rel>next|prev)"/i';
+    const HEADER_NAME = 'Link';
 
     /** @var array */
     private $links = [];
@@ -23,9 +27,10 @@ class WebLinking {
      * @link http://tools.ietf.org/html/rfc5988
      * @link http://www.iana.org/assignments/link-relations/link-relations.xml
      *
-     * @param string $uri Target URI for the link.
      * @param string $rel Link relation. Either an IANA registered type, or an absolute URL.
+     * @param string $uri Target URI for the link.
      * @param array $attributes Link parameters.
+     *
      * @return WebLinking
      */
     public function addLink($rel, $uri, $attributes = []) {
@@ -53,7 +58,7 @@ class WebLinking {
         }
 
         if ($uri !== null) {
-            $this->links[$rel] = array_filter($this->links[$rel], function($element) use ($uri) {
+            $this->links[$rel] = array_filter($this->links[$rel], function ($element) use ($uri) {
                 return $element['uri'] !== $uri;
             });
         } else {
@@ -72,13 +77,13 @@ class WebLinking {
      */
     public function getLinkHeader() {
         $headerValue = $this->getLinkHeaderValue();
-        return $headerValue ? 'Link: '.$headerValue : null;
+        return $headerValue ? self::HEADER_NAME.': '.$headerValue : null;
     }
 
     /**
-     * return link header value.
+     * Get the link header value.
      */
-    public function getLinkHeaderValue() {
+    public function getLinkHeaderValue(): string {
         $results = [];
 
         foreach ($this->links as $rel => $links) {
@@ -109,12 +114,51 @@ class WebLinking {
      * @param Data $data
      */
     public function setHeader(Data $data) {
-        $link = $data->getHeader('Link');
+        $link = $data->getHeader(self::HEADER_NAME);
         if (empty($link)) {
             $link = $this->getLinkHeaderValue();
         } else {
             $link .= ', '.$this->getLinkHeaderValue();
         }
-        $data->setHeader('Link', $link);
+        $data->setHeader(self::HEADER_NAME, $link);
+    }
+
+    /**
+     * Parse a link
+     *
+     * @param string $header The link header value.
+     *
+     * @return array
+     * @example
+     * [
+     *     'previous' => 'https://something.com/page/1
+     *     'next' => 'https://something.com/page/3
+     * ]
+     */
+    public static function parseLinkHeaders(string $header): array {
+        $segments = explode(',', $header);
+        $result = [
+            'prev' => null,
+            'next' => null,
+        ];
+        foreach ($segments as $segment) {
+            $segment = trim($segment);
+            preg_match(self::WEB_LINK_REGEX, $segment, $matches);
+            $link = $matches['link'] ?? null;
+            $rel = $matches['rel'] ?? null;
+
+            if (!$link) {
+                // Badly formed.
+                continue;
+            }
+
+            if ($rel === 'next') {
+                $result['next'] = $link;
+            } elseif ($rel === 'prev') {
+                $result['prev'] = $link;
+            }
+        }
+
+        return $result;
     }
 }

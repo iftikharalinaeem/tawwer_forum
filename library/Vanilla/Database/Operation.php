@@ -6,6 +6,7 @@
 
 namespace Vanilla\Database;
 
+use Garden\MetaTrait;
 use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 
@@ -13,6 +14,8 @@ use Vanilla\Models\PipelineModel;
  * Simple class to represent a database operation.
  */
 class Operation {
+
+    use MetaTrait;
 
     /** Type identifier for delete operations. */
     const TYPE_DELETE = 'DELETE';

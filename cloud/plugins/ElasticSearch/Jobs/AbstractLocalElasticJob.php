@@ -13,48 +13,26 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Scheduler\Job\JobPriority;
+use Vanilla\Scheduler\Job\LocalApiJob;
 use Vanilla\Scheduler\Job\LocalJobInterface;
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 /**
  * Local job for with access to elasticsearch and an internal API client.
  */
-abstract class AbstractLocalElasticJob implements LocalJobInterface {
+abstract class AbstractLocalElasticJob extends LocalApiJob {
 
     /** @var AbstractElasticHttpClient */
     protected $elasticClient;
 
-    /** @var HttpClient */
-    protected $vanillaClient;
-
     /**
-     * Local job for updating individual requests in elasticsearch.
+     * DI.
      *
-     * @param AbstractElasticHttpClient $elasticClient
      * @param InternalClient $internalClient
-     * @param ConfigurationInterface $config
+     * @param AbstractElasticHttpClient $elasticClient
      */
-    public function __construct(AbstractElasticHttpClient $elasticClient, InternalClient $internalClient, ConfigurationInterface $config) {
+    public function setDependencies(InternalClient $internalClient, AbstractElasticHttpClient $elasticClient = null) {
+        parent::setDependencies($internalClient);
         $this->elasticClient = $elasticClient;
-
-        // Make an internal http client.
-        $internalClient->setBaseUrl('');
-        $internalClient->setUserID($config->get('Garden.SystemUserID'));
-        $internalClient->setThrowExceptions(true);
-        $this->vanillaClient = $internalClient;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPriority(JobPriority $priority) {
-        // Unused.
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDelay(int $seconds) {
-        // Unused.
     }
 }
