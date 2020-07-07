@@ -32,9 +32,11 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     private $elastic;
 
     /**
-     * DI.
+     * ElasticSearchDriver constructor.
      *
      * @param SearchRecordTypeProviderInterface $searchRecordProvider
+     * @param ConfigurationInterface $config
+     * @param AbstractElasticHttpClient $elastic
      */
     public function __construct(
         SearchRecordTypeProviderInterface $searchRecordProvider,
@@ -58,7 +60,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
         $query = new ElasticSearchQuery($this->getSearchTypes(), $queryData);
         $records = [];
         $indexes = $query->getIndexes();
-        if(!empty($indexes)) {
+        if (!empty($indexes)) {
             $search = $this->elastic->searchDocuments(
                 $indexes,
                 $query->getPayload()
@@ -79,5 +81,4 @@ class ElasticSearchDriver extends AbstractSearchDriver {
             $options->getLimit()
         );
     }
-
 }
