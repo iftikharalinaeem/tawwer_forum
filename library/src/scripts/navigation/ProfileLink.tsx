@@ -21,10 +21,6 @@ export default class ProfileLink extends React.Component<IProps> {
     public render() {
         const { username } = this.props;
         const children = this.props.children || username;
-        return (
-            // <a href={makeProfileUrl(username)} className={classNames(this.props.className)}>
-            <span className={classNames(this.props.className)}> {children} </span>
-            // </a>
-        );
+        return <span className={classNames(this.props.className)}> {children} </span>;
     }
 }
