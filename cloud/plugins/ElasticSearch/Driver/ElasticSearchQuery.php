@@ -86,7 +86,11 @@ class ElasticSearchQuery extends SearchQuery {
      * Note: this implementation only valid for date ranges!
      * $min and $max will be transformed into date time string formatted to pass to elasticserach query payload
      *
-     * @inheritDoc
+     * @param string $attribute
+     * @param int $min
+     * @param int $max
+     * @param bool $exclude
+     * @return $this|SearchQuery
      */
     public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
         $this->filterRange[$attribute] = [date(DATE_ATOM, $min), date(DATE_ATOM, $max)];
