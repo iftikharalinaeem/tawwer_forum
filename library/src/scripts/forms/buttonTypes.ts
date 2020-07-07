@@ -15,4 +15,5 @@ export enum ButtonTypes {
     DASHBOARD_PRIMARY = "dashboardPrimary",
     DASHBOARD_SECONDARY = "dashboardSecondary",
     DASHBOARD_LINK = "dashboardLink",
+    STANDARD_ROUND = "STANDARD_ROUND",
 }
