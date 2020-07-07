@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { IUserFragment } from "@library/@types/api/users";
 import { metasClasses } from "@library/styles/metasStyles";
 import SmartLink from "@library/routing/links/SmartLink";
+import { UserCardModule } from "@vanilla/library/src/scripts/features/users/modules/UserCardModule";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -30,7 +31,11 @@ export class ArticleMeta extends React.Component<IProps> {
                 <span className={classesMetas.meta}>
                     <Translate
                         source="By <0/>"
-                        c0={<ProfileLink className={classesMetas.meta} username={updateUser.name} />}
+                        c0={
+                            <ProfileLink className={classesMetas.meta} username={updateUser.name}>
+                                <UserCardModule userID={updateUser.userID} />
+                            </ProfileLink>
+                        }
                     />
                 </span>
                 <span className={classesMetas.meta}>

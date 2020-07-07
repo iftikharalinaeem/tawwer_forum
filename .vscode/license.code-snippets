@@ -1,0 +1,10 @@
+{
+    "GPL-2.0": {
+        "prefix": "gpl",
+        "body": ["/**", " * @copyright 2009-2020 Vanilla Forums Inc.", " * @license GPL-2.0-only", " */"]
+    },
+    "Proprietary": {
+        "prefix": "pro",
+        "body": ["/**", " * @copyright 2009-2020 Vanilla Forums Inc.", " * @license Proprietary", " */"]
+    }
+}
