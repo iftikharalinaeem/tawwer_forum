@@ -5,12 +5,15 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Library\Vanilla\Utility;
+namespace VanillaTests\Library\Vanilla\Web\Pagination;
 
-use VanillaTests\SharedBootstrapTestCase;
-use Vanilla\Web\WebLinking;
+use PHPUnit\Framework\TestCase;
+use Vanilla\Web\Pagination\WebLinking;
 
-class WebLinkingTest extends SharedBootstrapTestCase {
+/**
+ * Tests for the weblinking class.
+ */
+class WebLinkingTest extends TestCase {
 
     /** @var WebLinking */
     private $webLinking;
@@ -99,5 +102,56 @@ class WebLinkingTest extends SharedBootstrapTestCase {
         $this->webLinking->clear();
 
         $this->assertEmpty($this->webLinking->getLinkHeader());
+    }
+
+
+    /**
+     * Test parsing of the link headers.
+     *
+     * @param string $header
+     * @param array $expected
+     *
+     * @dataProvider provideParsing
+     */
+    public function testLinkParsing(string $header, array $expected) {
+        $result = WebLinking::parseLinkHeaders($header);
+        $this->assertSame($expected, $result);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function provideParsing(): array {
+        return [
+            'just next' => [
+                '<http://example.com/TheBook/pages?page=3>; rel="next"; title="next chapter"',
+                [
+                    'prev' => null,
+                    'next' => 'http://example.com/TheBook/pages?page=3',
+                ],
+            ],
+            'just prev' => [
+                '<http://example.com/TheBook/chapter2>; rel="prev"; title="previous chapter"',
+                [
+                    'prev' => 'http://example.com/TheBook/chapter2',
+                    'next' => null,
+                ],
+            ],
+            'both' => [
+                '<http://example.com/TheBook/pages?page=3>; rel="next"; title="next chapter",'.
+                ' <http://example.com/TheBook/chapter2>; rel="prev"; title="previous chapter"',
+                [
+                    'prev' => 'http://example.com/TheBook/chapter2',
+                    'next' => 'http://example.com/TheBook/pages?page=3',
+                ],
+            ],
+            'invalid' => [
+                'asdfasdf;kajsdfl;kjasdf',
+                [
+                    'prev' => null,
+                    'next' => null,
+                ]
+            ]
+        ];
     }
 }

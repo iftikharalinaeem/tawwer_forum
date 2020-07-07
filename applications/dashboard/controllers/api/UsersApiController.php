@@ -499,6 +499,12 @@ class UsersApiController extends AbstractApiController {
                     'processor' => [DateFilterSchema::class, 'dateFilterField'],
                 ],
             ]),
+            'dateLastActive?' => new DateFilterSchema([
+                'x-filter' => [
+                    'field' => 'u.DateLastActive',
+                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+                ],
+            ]),
             'roleID:i?' => [
                 'x-filter' => ['field' => 'roleID']
             ],
@@ -512,7 +518,7 @@ class UsersApiController extends AbstractApiController {
                 'description' => 'Desired number of items per page.',
                 'default' => 30,
                 'minimum' => 1,
-                'maximum' => 100,
+                'maximum' => 500,
             ],
             'sort:s?' => [
                 'enum' => ApiUtils::sortEnum('dateInserted', 'dateLastActive', 'name', 'userID')
@@ -552,7 +558,6 @@ class UsersApiController extends AbstractApiController {
         // Allow addons to modify the result.
         $result = $this->getEventManager()->fireFilter('usersApiController_indexOutput', $result, $this, $in, $query, $rows);
         return new Data($result, ['paging' => $paging, 'api-allow' => ['email']]);
-
     }
 
     /**
