@@ -88,10 +88,20 @@ class LogModel extends Gdn_Pluggable {
     }
 
     /**
-     * Begin a log transaction.
+     * @return int
      */
-    public static function beginTransaction() {
-        self::$transactionID = true;
+    public static function generateTransactionID(): int {
+        return  random_int(0, 1000000000);
+    }
+
+    /**
+     * Begin a log transaction.
+     *
+     * @return int The transactionID.
+     */
+    public static function beginTransaction(): int {
+        self::$transactionID = self::generateTransactionID();
+        return self::$transactionID;
     }
 
     /**
@@ -107,10 +117,6 @@ class LogModel extends Gdn_Pluggable {
         $middlewareID = $logTransactionMiddleware->getTransactionID();
         if ($middlewareID) {
             return $middlewareID;
-        }
-
-        if (self::$transactionID === true) {
-            self::$transactionID = random_int(0, 1000000000);
         }
 
         return self::$transactionID;
