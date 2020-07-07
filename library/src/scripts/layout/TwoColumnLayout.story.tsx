@@ -69,8 +69,8 @@ export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeEverything = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <TwoColumnLayout
-            middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-            middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+            mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+            mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
             rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
             rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
         />
