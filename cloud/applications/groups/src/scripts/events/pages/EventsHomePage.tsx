@@ -38,7 +38,6 @@ export default function EventsHomePage({ loading }: any) {
     return (
         <div>
             <PageHeading title={t("Events")} includeBackLink={false} headingClassName={classes.pageTitle} />
-            <UserCardModule userID={1} />
             <Tabs
                 defaultTabIndex={parentRecordType === "category" ? 0 : 1}
                 tabType={TabsTypes.BROWSE}
