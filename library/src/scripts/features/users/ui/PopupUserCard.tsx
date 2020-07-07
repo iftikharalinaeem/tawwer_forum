@@ -37,7 +37,6 @@ export interface IUserCardInfo {
 
 interface IProps {
     user: IUserCardInfo;
-    buttonContents: string;
     visible?: boolean;
 }
 
@@ -157,7 +156,7 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible, buttonContents } = props;
+    const { user, visible } = props;
     const [open, toggleOpen] = useState(visible || false);
     const device = useDevice();
 
@@ -175,7 +174,7 @@ export default function PopupUserCard(props: IProps) {
     return (
         <DropDown
             buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
-            buttonContents={buttonContents}
+            buttonContents={user.name}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}

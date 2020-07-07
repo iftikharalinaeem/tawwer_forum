@@ -34,8 +34,6 @@ export function UserPhoto(props: IProps) {
     const name = userInfo ? userInfo.name : "";
     const classes = userPhotoClasses();
 
-    const [validPhoto, setValidPhoto] = useState(!!photoUrl);
-
     let sizeClass = classes.small;
     switch (size) {
         case UserPhotoSize.XLARGE:
@@ -51,18 +49,15 @@ export function UserPhoto(props: IProps) {
 
     return (
         <div className={classNames(className, sizeClass, classes.root, { isOpen: open })}>
-            {validPhoto && (
+            {photoUrl && (
                 <img
-                    onError={() => {
-                        setValidPhoto(false);
-                    }}
                     src={photoUrl!}
                     title={name || ""}
                     alt={accessibleLabel(`User: "%s"`, [name])}
                     className={classNames(classes.photo)}
                 />
             )}
-            {!validPhoto && <UserIcon filled={open} className={classNames(classes.photo, classes.noPhoto)} />}
+            {!photoUrl && <UserIcon filled={open} className={classNames(classes.photo, classes.noPhoto)} />}
         </div>
     );
 }
