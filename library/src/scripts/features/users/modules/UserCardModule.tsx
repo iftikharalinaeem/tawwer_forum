@@ -13,6 +13,7 @@ import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUs
 
 interface IProps {
     userID: number;
+    buttonContents: string;
 }
 
 export function UserCardModule(props: IProps) {
@@ -34,10 +35,10 @@ export function UserCardModule(props: IProps) {
         photoUrl: user.data.photoUrl,
         dateLastActive: user.data.dateLastActive || undefined,
         dateJoined: user.data.dateInserted,
-        label: user.data.label || "",
+        label: user.data.label,
         countDiscussions: user.data.countDiscussions || 0,
         countComments: user.data.countComments || 0,
     };
 
-    return <PopupUserCard user={userCardInfo} />;
+    return <PopupUserCard user={userCardInfo} buttonContents={"Val"} />;
 }

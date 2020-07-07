@@ -20,6 +20,7 @@ import { makeProfileUrl } from "@library/utility/appUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
+import { NoUserPhotoIcon } from "@library/icons/titleBar";
 
 export interface IUserCardInfo {
     email: string;
@@ -28,13 +29,14 @@ export interface IUserCardInfo {
     photoUrl: string;
     dateLastActive?: string;
     dateJoined?: string;
-    label: string;
+    label?: string | null;
     countDiscussions: number;
     countComments: number;
 }
 
 interface IProps {
     user: IUserCardInfo;
+    buttonContents: string;
     visible?: boolean;
 }
 
@@ -147,7 +149,7 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible } = props;
+    const { user, visible, buttonContents } = props;
     const [open, toggleOpen] = useState(visible || false);
     const device = useDevice();
 
@@ -165,7 +167,7 @@ export default function PopupUserCard(props: IProps) {
     return (
         <DropDown
             buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
-            buttonContents={"Val"}
+            buttonContents={buttonContents}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
@@ -174,16 +176,19 @@ export default function PopupUserCard(props: IProps) {
             <Header onClick={() => toggleOpen(!open)} />
 
             <Container>
-                <UserPhoto userInfo={userInfo} size={photoSize} />
+                {user.photoUrl ? <UserPhoto userInfo={userInfo} size={photoSize} /> : <NoUserPhotoIcon />}
             </Container>
 
             <Container>
                 <Name name={user.name} />
             </Container>
 
-            <Container>
-                <Label label={user.label} />
-            </Container>
+            {/* We don't  want this section to show at all if there's no label */}
+            {user.label && (
+                <Container>
+                    <Label label={user.label} />
+                </Container>
+            )}
 
             <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
                 <Container>

@@ -21,21 +21,33 @@ export default {
     },
 };
 
-const m: IUserCardInfo = {
+const v: IUserCardInfo = {
     email: "val@vanillaforums.com",
     userID: 1,
     name: "Valérie Robitaille",
     photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
-    dateLastActive: "May 24th",
+    dateLastActive: "May 2014",
     dateJoined: "May 2017",
     label: "Product Manager",
     countDiscussions: 207,
     countComments: 3456,
 };
 
-export const UserCardWithoutState = () => (
+const m: IUserCardInfo = {
+    email: "anonymous@where.com",
+    userID: 0,
+    name: "Anonymous",
+    photoUrl: "",
+    dateLastActive: "May May 2014",
+    dateJoined: "May 2017",
+    label: null,
+    countDiscussions: 207,
+    countComments: 3456,
+};
+
+export const UserCardNoPhotoNoLabel = () => (
     <StoryContent>
-        <PopupUserCard user={m} visible={true} />
+        <PopupUserCard user={m} visible={true} buttonContents={"anonymous"} />
     </StoryContent>
 );
 
@@ -63,7 +75,7 @@ export const UserCardWithoutPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={m} visible={true} />
+            <PopupUserCard user={v} visible={true} buttonContents={"Val"} />
         </StoryContent>
     ),
 );
@@ -92,7 +104,7 @@ export const UserCardWithPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={m} visible={true} />
+            <PopupUserCard user={v} visible={true} buttonContents={"Val"} />
         </StoryContent>
     ),
 );
