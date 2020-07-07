@@ -116,7 +116,7 @@ final class DomUtils {
             foreach ($xpathQuery as $node) {
                 $replaced = preg_replace_callback($pattern, $callback, $node->nodeValue, $limit = -1, $count);
                 if ($count > 0 && $replaced !== $node->nodeValue) {
-                    $replacementCount++;
+                    $replacementCount += $count;
                     $node->nodeValue = $replaced;
                 }
             }

@@ -265,7 +265,7 @@ EOT;
                 'forbiddenword', '<p>test forbiddenword</p></p>','<p>test ***</p></p>'
             ],
             'Testtext2' => [
-                1,
+                2,
                 'forbiddenword','test forbiddenword test forbiddenword', 'test *** test ***'
             ],
             'PTag' => [1, 'forbiddenword', '<p>test forbiddenword</p>', '<p>test ***</p>'],
@@ -278,7 +278,7 @@ EOT;
                 '<img src="img_test.jpg" alt="forbiddenword image" width="100" height="100">',
                 '<img src="img_test.jpg" alt="*** image" width="100" height="100">'],
             'emoji' => [1, '🤓','test 🤓', 'test ***'],
-            'count' => [2, 'a+', '<p>a aaa is</p><p>aaa</p>', '<p>*** *** is</p><p>***</p>']
+            'count' => [3, 'a+', '<p>a aaa is</p><p>aaa</p>', '<p>*** *** is</p><p>***</p>']
         ];
         return $r;
     }
