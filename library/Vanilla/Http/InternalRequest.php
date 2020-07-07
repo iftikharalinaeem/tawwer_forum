@@ -13,6 +13,8 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Dispatcher;
 use Garden\Web\RequestInterface;
+use League\Uri\Http;
+use Vanilla\Utility\UrlUtils;
 
 /**
  * Request class for running requests directly against vanilla's dispatcher.
@@ -52,6 +54,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         array $options = []
     ) {
         parent::__construct($method, $url, $body, $headers, $options);
+
         $this->dispatcher = $dispatcher;
         $this->container = $container;
     }
@@ -82,7 +85,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      * {@inheritdoc}
      */
     public function setQuery(array $value) {
-        [$url, $query] = explode('?', $this->getUrl(), 1) + ['', ''];
+        [$url, $query] = explode('?', $this->getUrl(), 2) + ['', ''];
 
         if (empty($value)) {
             $this->setUrl($url);
