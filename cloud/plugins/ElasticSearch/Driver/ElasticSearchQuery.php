@@ -111,12 +111,11 @@ class ElasticSearchQuery extends SearchQuery {
         return array_keys($this->fields);
     }
 
-    public function addRecordKeyMap(array $types) {
-        foreach ($types as $type => $recordKey) {
-            $this->recordKeyMap[$type] = $recordKey;
-        }
-    }
-
+    /**
+     * Prepare payload for elastisearch microservice
+     *
+     * @return array
+     */
     public function getPayload(): array {
         $payload = [];
         if (!empty($this->fields)) {
@@ -168,6 +167,12 @@ class ElasticSearchQuery extends SearchQuery {
         return $record;
     }
 
+    /**
+     * Detect possible record type by elasticsearch index name
+     *
+     * @param string $indexName
+     * @return string
+     */
     private function getRecordType(string $indexName): string {
         preg_match('/{{idx\:(.*)}}/', $indexName, $match);
         return end($match);
