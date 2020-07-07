@@ -54,4 +54,3 @@ class ApiPaginationIteratorTest extends MinimalContainerTestCase {
         $this->assertEquals($expectedResponses, $actualResponses);
     }
 }
-
