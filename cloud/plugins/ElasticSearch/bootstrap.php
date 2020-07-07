@@ -9,6 +9,7 @@ use Garden\Container\Reference;
 use Garden\EventManager;
 use Vanilla\Cloud\ElasticSearch\Driver\ElasticSearchDriver;
 use Vanilla\Cloud\ElasticSearch\ElasticEventHandler;
+use Vanilla\Search\SearchService;
 
 $container = \Gdn::getContainer();
 /** @var EventManager */
@@ -16,6 +17,5 @@ $eventManager =$container->get(EventManager::class);
 $eventManager->addListenerMethod(ElasticEventHandler::class, 'handleResourceEvent');
 
 $container->rule(SearchService::class)
-    ->addCall('registerActiveDriver', [new Reference(ElasticSearchDriver::class), 3]);
-
+    ->addCall('registerActiveDriver', [new Reference(ElasticSearchDriver::class)]);
 

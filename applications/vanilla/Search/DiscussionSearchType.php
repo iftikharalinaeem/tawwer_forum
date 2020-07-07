@@ -356,6 +356,9 @@ class DiscussionSearchType extends AbstractSearchType {
             $query->getQueryParameter('includeChildCategories'),
             $query->getQueryParameter('includeArchivedCategories')
         );
+        if (empty($categoryIDs)) {
+            $categoryIDs[] = 0;
+        }
         return $categoryIDs;
     }
 

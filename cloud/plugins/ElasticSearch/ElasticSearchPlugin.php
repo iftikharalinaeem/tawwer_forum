@@ -10,15 +10,11 @@ namespace Vanilla\Cloud\ElasticSearch;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
-use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpConfig;
 use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpClient;
-use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpConfig;
 use Vanilla\Dashboard\Controllers\API\ResourcesApiController;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
-use Vanilla\Cloud\ElasticSearch\Driver\ElasticSearchDriver;
-use Garden\Container\Reference;
 
 /**
  * Plugin for elastic search.
@@ -49,9 +45,6 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
                 ->rule(AbstractElasticHttpClient::class)
                 ->setClass(DevElasticHttpClient::class);
         }
-        $dic->rule( ElasticSearchDriver::class)
-            ->setConstructorArgs(["elastic" => new Reference(ElasticHttpClient::class)]);
-
     }
 
     /**

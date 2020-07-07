@@ -46,7 +46,7 @@ class ElasticSearchQuery extends SearchQuery {
      * @param array $fieldNames
      * @return $this
      */
-    public function whereText(string $text, array $fieldNames = []): self {
+    public function whereText(string $text, array $fieldNames = ['name', 'body']): self {
         if (count($fieldNames) > 1) {
             foreach ($fieldNames as $field) {
                 $this->should[$field] = $text;

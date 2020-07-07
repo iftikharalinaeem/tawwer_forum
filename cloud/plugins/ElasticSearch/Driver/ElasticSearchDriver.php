@@ -6,6 +6,7 @@
 
 namespace Vanilla\Cloud\ElasticSearch\Driver;
 
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
@@ -38,7 +39,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     public function __construct(
         SearchRecordTypeProviderInterface $searchRecordProvider,
         ConfigurationInterface $config,
-        ElasticHttpClient $elastic
+        AbstractElasticHttpClient $elastic
     ) {
         $this->searchTypeRecordProvider = $searchRecordProvider;
         $this->config = $config;
