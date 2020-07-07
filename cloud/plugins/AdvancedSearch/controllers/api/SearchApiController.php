@@ -502,7 +502,7 @@ class SearchApiController extends AbstractApiController {
         ];
 
         if ($includeBody) {
-            $schemaRecord['body'] = Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']);
+            $schemaRecord['body'] = Gdn::formatService()->renderHTML($searchRecord['Summary'], $searchRecord['Format']);
         }
 
         $lcfRecordType = lcfirst($searchRecord['RecordType'] ?? '');
