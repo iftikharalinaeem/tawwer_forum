@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests;
+namespace Vanilla\Http;
 
 use Garden\Container\Container;
 use Garden\Http\HttpHandlerInterface;
@@ -13,7 +13,12 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Dispatcher;
 use Garden\Web\RequestInterface;
+use League\Uri\Http;
+use Vanilla\Utility\UrlUtils;
 
+/**
+ * Request class for running requests directly against vanilla's dispatcher.
+ */
 class InternalRequest extends HttpRequest implements RequestInterface {
     /**
      * @var Dispatcher
@@ -25,6 +30,20 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      */
     private $container;
 
+    /** @var string */
+    private $root;
+
+    /**
+     * Constructor.
+     *
+     * @param Dispatcher $dispatcher
+     * @param Container $container
+     * @param string $method
+     * @param string $url
+     * @param string $body
+     * @param array $headers
+     * @param array $options
+     */
     public function __construct(
         Dispatcher $dispatcher,
         Container $container,
@@ -35,6 +54,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         array $options = []
     ) {
         parent::__construct($method, $url, $body, $headers, $options);
+
         $this->dispatcher = $dispatcher;
         $this->container = $container;
     }
@@ -65,7 +85,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
      * {@inheritdoc}
      */
     public function setQuery(array $value) {
-        [$url, $query] = explode('?', $this->getUrl(), 1) + ['', ''];
+        [$url, $query] = explode('?', $this->getUrl(), 2) + ['', ''];
 
         if (empty($value)) {
             $this->setUrl($url);
@@ -179,18 +199,6 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         return $result;
     }
 
-//    public function handleErrorResponse(HttpResponse $response, $options = []) {
-//        if ($this->val('throw', $options, $this->throwExceptions)) {
-//            $body = $response->getBody();
-//            if (is_array($body)) {
-//                $message = $this->val('message', $body, $response->getReasonPhrase());
-//            } else {
-//                $message = $response->getReasonPhrase();
-//            }
-//            throw new \Exception($message, $response->getStatusCode());
-//        }
-//    }
-
     /**
      * Set the path of the request.
      *
@@ -267,7 +275,7 @@ class InternalRequest extends HttpRequest implements RequestInterface {
         $baseUrl = static::buildUrl(array_replace(parse_url($this->container->get('@baseUrl')), ['path' => $root]));
         $this->container->setInstance('@baseUrl', $baseUrl);
 
-        $this->root = $root;
+        return $this;
     }
 
     /**

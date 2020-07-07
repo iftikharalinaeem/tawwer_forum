@@ -18,6 +18,8 @@ use Vanilla\InjectableInterface;
  */
 class PipelineModel extends Model implements InjectableInterface {
 
+    const OPT_RUN_PIPELINE = 'runPipeline';
+
     /** @var Pipeline */
     protected $pipeline;
 
@@ -71,7 +73,7 @@ class PipelineModel extends Model implements InjectableInterface {
                 $databaseOperation->getWhere(),
                 $databaseOperation->getOptions()
             );
-        });
+        }, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -83,7 +85,7 @@ class PipelineModel extends Model implements InjectableInterface {
      * @return mixed ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, $options = []) {
+    public function insert(array $set, array $options = []) {
         if (is_string($options)) {
             trigger_error("String options are deprecated in PipelineModel::insert().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
@@ -99,7 +101,7 @@ class PipelineModel extends Model implements InjectableInterface {
         $databaseOperation->setOptions($options);
         $result = $this->pipeline->process($databaseOperation, function (Operation $databaseOperation) {
             return parent::insert($databaseOperation->getSet(), $databaseOperation->getOptions());
-        });
+        }, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -112,7 +114,7 @@ class PipelineModel extends Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, $options = []): bool {
+    public function update(array $set, array $where, array $options = []): bool {
         if (is_string($options)) {
             trigger_error("String options are deprecated in PipelineModel::update().", E_USER_DEPRECATED);
             $options = [self::OPT_MODE => $options];
@@ -132,7 +134,7 @@ class PipelineModel extends Model implements InjectableInterface {
                 $databaseOperation->getSet(),
                 $databaseOperation->getWhere()
             );
-        });
+        }, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 
@@ -156,7 +158,7 @@ class PipelineModel extends Model implements InjectableInterface {
                 $databaseOperation->getWhere(),
                 $databaseOperation->getOptions()
             );
-        });
+        }, $options[self::OPT_RUN_PIPELINE] ?? true);
         return $result;
     }
 }
