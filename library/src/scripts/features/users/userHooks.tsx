@@ -15,7 +15,7 @@ export function useUser(query: IGetUserByIDQuery) {
 
     const existingResult = useSelector((state: IUsersStoreState) => {
         return (
-            state.users.userList[userID] ?? {
+            state.users.usersByID[userID] ?? {
                 status: LoadStatus.PENDING,
             }
         );
