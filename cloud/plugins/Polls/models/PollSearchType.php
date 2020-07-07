@@ -14,13 +14,7 @@ use Vanilla\Forum\Search\DiscussionSearchType;
  * @package Vanilla\Polls\Models
  */
 class PollSearchType extends DiscussionSearchType {
-
-    /** @var \DiscussionsApiController */
-    protected $discussionsApi;
-
-    /** @var BreadcrumbModel */
-    protected $breadcrumbModel;
-
+    
     /**
      * @inheritdoc
      */
