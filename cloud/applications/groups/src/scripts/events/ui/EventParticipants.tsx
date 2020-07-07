@@ -15,6 +15,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/styles/metasStyles";
+import { UserCardModule } from "@vanilla/library/src/scripts/features/users/modules/UserCardModule";
 
 interface IProps {
     participants: IEventParticipant[];
@@ -27,8 +28,14 @@ function Participant({ user }) {
 
     const participantsClasses = eventParticipantsClasses();
     return (
-        <ProfileLink username={user.name} userID={user.userID} className={participantsClasses.item}>
-            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
+        <ProfileLink username={user.name} className={participantsClasses.item}>
+            <UserCardModule
+                userID={user.userID}
+                buttonContent={
+                    <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
+                }
+                openAsModal={true}
+            />
             <span className={participantsClasses.name}>{user.name}</span>
         </ProfileLink>
     );

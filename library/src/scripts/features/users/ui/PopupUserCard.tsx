@@ -22,6 +22,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
 import { NoUserPhotoIcon } from "@library/icons/titleBar";
 import classNames from "classnames";
+import { string } from "prop-types";
 
 export interface IUserCardInfo {
     email: string;
@@ -38,6 +39,8 @@ export interface IUserCardInfo {
 interface IProps {
     user: IUserCardInfo;
     visible?: boolean;
+    buttonContent?: ReactNode | string;
+    openAsModal?: boolean;
 }
 
 interface IContainerProps {
@@ -156,7 +159,7 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible } = props;
+    const { user, visible, buttonContent, openAsModal } = props;
     const [open, toggleOpen] = useState(visible || false);
     const device = useDevice();
 
@@ -174,11 +177,12 @@ export default function PopupUserCard(props: IProps) {
     return (
         <DropDown
             buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
-            buttonContents={user.name}
+            buttonContents={buttonContent || user.name}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
             onVisibilityChange={isVisible => toggleOpen(isVisible)}
+            openAsModal={openAsModal}
         >
             <Header onClick={() => toggleOpen(!open)} />
 

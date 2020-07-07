@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@library/loaders/Loader";
@@ -13,10 +13,12 @@ import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUs
 
 interface IProps {
     userID: number;
+    buttonContent?: ReactNode | string;
+    openAsModal?: boolean;
 }
 
 export function UserCardModule(props: IProps) {
-    const { userID } = props;
+    const { userID, buttonContent, openAsModal } = props;
     const user = useUser({ userID });
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data) {
@@ -39,5 +41,5 @@ export function UserCardModule(props: IProps) {
         countComments: user.data.countComments || 0,
     };
 
-    return <PopupUserCard user={userCardInfo} />;
+    return <PopupUserCard user={userCardInfo} buttonContent={buttonContent} openAsModal={openAsModal} />;
 }
