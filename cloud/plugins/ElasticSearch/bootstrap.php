@@ -18,4 +18,3 @@ $eventManager->addListenerMethod(ElasticEventHandler::class, 'handleResourceEven
 
 $container->rule(SearchService::class)
     ->addCall('registerActiveDriver', [new Reference(ElasticSearchDriver::class)]);
-
