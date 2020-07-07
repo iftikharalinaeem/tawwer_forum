@@ -137,7 +137,7 @@ class DiscussionSearchType extends AbstractSearchType {
             return null;
         }
 
-        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+        $userIDs = $this->getUserIDs($query->getQueryParameter('insertUserNames', []));
         if ($userIDs === []) {
             return null;
         }
