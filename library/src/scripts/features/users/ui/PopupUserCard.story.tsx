@@ -47,7 +47,7 @@ const m: IUserCardInfo = {
 
 export const UserCardNoPhotoNoLabel = () => (
     <StoryContent>
-        <PopupUserCard user={m} visible={true} buttonContents={"anonymous"} />
+        <PopupUserCard user={m} visible={true} />
     </StoryContent>
 );
 
@@ -75,7 +75,7 @@ export const UserCardWithoutPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={v} visible={true} buttonContents={"Val"} />
+            <PopupUserCard user={v} visible={true} />
         </StoryContent>
     ),
 );
@@ -104,7 +104,7 @@ export const UserCardWithPermission = storyWithConfig(
     },
     () => (
         <StoryContent>
-            <PopupUserCard user={v} visible={true} buttonContents={"Val"} />
+            <PopupUserCard user={v} visible={true} />
         </StoryContent>
     ),
 );

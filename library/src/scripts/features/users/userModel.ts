@@ -39,7 +39,7 @@ interface IUsersState {
         lastRequested: number | null; // A timestamp of the last time we received this count data.
     };
     suggestions: IUserSuggestionState;
-    user: ILoadable<IUser>;
+    userList: Record<number, ILoadable<IUser>>;
 }
 
 export interface IUsersStoreState {
@@ -60,9 +60,7 @@ export const INITIAL_USERS_STATE: IUsersState = {
         lastRequested: null,
     },
     suggestions: suggestionReducer(undefined, "" as any),
-    user: {
-        status: LoadStatus.PENDING,
-    },
+    userList: {},
 };
 
 export const GUEST_USER_ID = 0;
@@ -114,18 +112,25 @@ export const usersReducer = produce(
             state.countInformation.counts = payload.result.counts;
             return state;
         })
-        .case(UserActions.getUserACs.started, state => {
-            state.user.status = LoadStatus.LOADING;
+        .case(UserActions.getUserACs.started, (state, params) => {
+            const { userID } = params;
+            state.userList[userID] = { status: LoadStatus.LOADING };
             return state;
         })
         .case(UserActions.getUserACs.done, (state, payload) => {
-            state.user.data = payload.result;
-            state.user.status = LoadStatus.SUCCESS;
+            const { userID } = payload.params;
+            state.userList[userID] = {
+                data: payload.result,
+                status: LoadStatus.SUCCESS,
+            };
             return state;
         })
         .case(UserActions.getUserACs.failed, (state, payload) => {
-            state.user.status = LoadStatus.ERROR;
-            state.user.error = payload.error;
+            const { userID } = payload.params;
+            state.userList[userID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
             return state;
         })
         .default((state, action) => {

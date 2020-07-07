@@ -18,7 +18,6 @@ import { t } from "@vanilla/i18n";
 import { EventsHomePagePlaceholder } from "@groups/events/pages/EventsHomePagePlaceholder";
 import { PageHeading } from "@vanilla/library/src/scripts/layout/PageHeading";
 import { eventsClasses } from "@groups/events/ui/eventStyles";
-import { UserCardModule } from "@vanilla/library/src/scripts/features/users/modules/UserCardModule";
 
 export default function EventsHomePage({ loading }: any) {
     const params = useParams<{ parentRecordType: string }>();

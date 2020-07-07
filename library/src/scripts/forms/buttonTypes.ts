@@ -1,6 +1,5 @@
 export enum ButtonTypes {
     STANDARD = "standard",
-    STANDARD_ROUND = "standardRound",
     PRIMARY = "primary",
     TRANSPARENT = "transparent",
     TRANSLUCID = "translucid",
@@ -16,4 +15,5 @@ export enum ButtonTypes {
     DASHBOARD_PRIMARY = "dashboardPrimary",
     DASHBOARD_SECONDARY = "dashboardSecondary",
     DASHBOARD_LINK = "dashboardLink",
+    STANDARD_ROUND = "STANDARD_ROUND",
 }

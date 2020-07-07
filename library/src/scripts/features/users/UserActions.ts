@@ -82,14 +82,14 @@ export default class UserActions extends ReduxActions {
         return this.dispatch(apiThunk);
     };
 
-    public static getUserACs = createAction.async<{}, IUser, IApiError>("GET_USER");
+    public static getUserACs = createAction.async<{ userID: number }, IUser, IApiError>("GET_USER");
 
     public getUserByID = (query: IGetUserByIDQuery) => {
         const { userID } = query;
         const thunk = bindThunkAction(UserActions.getUserACs, async () => {
             const reponse = await this.api.get(`/users/${userID}/?expand[]=all`);
             return reponse.data;
-        })(userID);
+        })({ userID });
         return this.dispatch(thunk);
     };
 }

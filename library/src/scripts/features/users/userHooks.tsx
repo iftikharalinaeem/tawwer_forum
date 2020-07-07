@@ -11,9 +11,14 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 
 export function useUser(query: IGetUserByIDQuery) {
     const actions = useUserActions();
+    const { userID } = query;
 
     const existingResult = useSelector((state: IUsersStoreState) => {
-        return state.users.user;
+        return (
+            state.users.userList[userID] ?? {
+                status: LoadStatus.PENDING,
+            }
+        );
     });
 
     const { status } = existingResult;
