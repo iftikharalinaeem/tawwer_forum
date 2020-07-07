@@ -2666,6 +2666,16 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             unset($row['Admin']);
         }
 
+        $row['CountDiscussions'] = $row['CountDiscussions'] ?? false;
+        if (!$row['CountDiscussions']) {
+            $row['CountDiscussions'] = 0;
+        }
+
+        $row['CountComments'] = $row['CountComments'] ?? false;
+        if (!$row['CountComments']) {
+            $row['CountComments'] = 0;
+        }
+
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
         return $result;
