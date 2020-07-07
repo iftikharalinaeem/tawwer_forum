@@ -45,10 +45,8 @@ export function Event(props: IProps) {
     return (
         <li className={classNames(classes.item, props.className)}>
             <article className={classes.result}>
-                <SmartLink
-                    to={event.url}
-                    className={classes.link}
-                    tabIndex={0}
+                <div
+                    className={classes.wrapper}
                     style={
                         showAttendance
                             ? {
@@ -67,9 +65,11 @@ export function Event(props: IProps) {
                             timestamp={event.dateStarts}
                         />
                         <div className={classes.main()}>
-                            <HeadingTag title={event.name} className={classes.title}>
-                                {event.name}
-                            </HeadingTag>
+                            <SmartLink to={event.url} className={classes.link} tabIndex={0}>
+                                <HeadingTag title={event.name} className={classes.title}>
+                                    {event.name}
+                                </HeadingTag>
+                            </SmartLink>
                             {!props.compact && (
                                 <Paragraph className={classes.excerpt}>
                                     <TruncatedText maxCharCount={160}>{event.excerpt}</TruncatedText>
@@ -111,7 +111,8 @@ export function Event(props: IProps) {
                             )}
                         </div>
                     </div>
-                </SmartLink>
+                </div>
+
                 <EventPermission permission={EventPermissionName.ATTEND} event={props.event}>
                     {!props.compact && (
                         <div
