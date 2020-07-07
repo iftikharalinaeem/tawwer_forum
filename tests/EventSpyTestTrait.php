@@ -10,45 +10,83 @@ namespace VanillaTests;
 use Garden\EventManager;
 use Garden\Events\GenericResourceEvent;
 use Garden\Events\ResourceEvent;
+use OpenStack\Metric\v1\Gnocchi\Models\Resource;
 use PHPUnit\Framework\MockObject\MockObject;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * Trait for asserting that events are dispatched properly.
  *
- * @method getMockBuilder(string $className)
- * @method atLeast(int $count)
+ * @method fail(string $message)
+ * @method assertEquals(...$args)
  */
 trait EventSpyTestTrait {
-
-    /** @var MockObject */
-    private $mockEventManager;
-
-    /** @var bool */
-    private $shouldStubContainer = true;
 
     /**
      * Setup.
      */
     public function setUpEventSpyTestTrait() {
-        $this->mockEventManager = $this->getMockBuilder(EventManager::class)->getMock();
+        $this->getEventManager()->clearDispatchedEvents();
+    }
 
-        if ($this->shouldStubContainer) {
-            \Gdn::getContainer()->setInstance(EventManager::class, $this->mockEventManager);
+    /**
+     * @return SpyingEventManager
+     */
+    protected function getEventManager(): SpyingEventManager {
+        return \Gdn::getContainer()->get(EventManager::class);
+    }
+
+    /**
+     * Assert that events were dispatched.
+     *
+     * @param ResourceEvent[] $events
+     * @param array|string[] $matchPayloadFields
+     */
+    public function assertEventsDispatched(array $events, array $matchPayloadFields = ["*"]) {
+        foreach ($events as $event) {
+            $this->assertEventDispatched($event, $matchPayloadFields);
         }
     }
 
     /**
-     * @param ResourceEvent[] $events
+     * Assert that an event was dispatched.
+     *
+     * @param ResourceEvent $event
+     * @param array|string[] $matchPayloadFields
      */
-    private function assertEventsWillBeDispatched(array $events) {
-        $calls = [];
-        foreach ($events as $event) {
-            $calls[] = [$event];
+    public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]) {
+        $matchAll = in_array("*", $matchPayloadFields);
+        $hasEvent = false;
+        $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
+        /** @var ResourceEvent $dispatchedEvent */
+        foreach ($dispatchedEvents as $dispatchedEvent) {
+            if (!($event instanceof ResourceEvent)) {
+                continue;
+            }
+
+            if ($dispatchedEvent->getFullEventName() !== $event->getFullEventName()) {
+                continue;
+            }
+
+            if ($matchAll) {
+                $matchPayloadFields = array_keys($event->getPayload()[$event->getType()]);
+            }
+
+            foreach ($matchPayloadFields as $matchPayloadField) {
+                $dispatchedField = $dispatchedEvent->getPayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
+                $expectedField = $event->getPayload()[$event->getType()][$matchPayloadField] ?? null;
+                if ($dispatchedField !== $expectedField) {
+                    continue 2;
+                }
+            }
+
+            $hasEvent = true;
         }
-        $this->mockEventManager
-            ->expects($this->atLeast(count($events)))
-            ->method("dispatch")
-            ->withConsecutive(...$calls);
+
+        $this->assertTrue(
+            $hasEvent,
+            "Could not find a matching event for $event in dispatched events:\n" . json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+        );
     }
 
     /**

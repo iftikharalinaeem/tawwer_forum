@@ -7,7 +7,12 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Events\ResourceEvent;
+use Vanilla\Http\InternalClient;
+use Vanilla\Http\InternalRequest;
+use Vanilla\TranslationsApi\Models\ResourceModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
+use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -16,7 +21,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 class DiscussionsBulkDeleteTest extends AbstractAPIv2Test {
 
     use CommunityApiTestTrait;
-    use CommunityApiTestTrait;
+    use EventSpyTestTrait;
 
     /**
      * @inheritdoc
@@ -30,18 +35,19 @@ class DiscussionsBulkDeleteTest extends AbstractAPIv2Test {
      * Test that deleting a discussion deletes all comments and logs them with the correct transactionID.
      */
     public function testDeleteDiscussion() {
-        $this->api()->setDefaultHeader(LogTransactionMiddleware::HEADER_NAME, 1000);
+        $this->container()->rule(InternalRequest::class)
+            ->addCall('setHeader', [LogTransactionMiddleware::HEADER_NAME, 1000]);
+
         $category = $this->createCategory();
         $discussion = $this->createDiscussion();
-        $this->createComment();
-        $this->createComment();
-        $this->createComment();
+        $comment1 = $this->createComment();
+        $comment2 = $this->createComment();
+        $comment3 = $this->createComment();
 
         $this->api()->delete("/discussions/{$discussion['discussionID']}");
 
         /** @var \LogModel $logModel */
         $logModel = $this->container()->get(\LogModel::class);
-
         $logs = $logModel->getWhere([
             'TransactionLogID' => 1000,
         ]);
@@ -54,5 +60,14 @@ class DiscussionsBulkDeleteTest extends AbstractAPIv2Test {
         $logModel->restore($logs[0]);
         $this->assertCount(0, $logModel->getWhere([ 'TransactionLogID' => 1000 ]));
         $this->assertCount(3, $this->api()->get('/comments', ['insertUserID' => $this->api()->getUserID()])->getBody());
+
+
+        $this->assertEventsDispatched([
+            $this->expectedResourceEvent("comment", ResourceEvent::ACTION_DELETE, $comment1),
+            $this->expectedResourceEvent("comment", ResourceEvent::ACTION_DELETE, $comment2),
+            $this->expectedResourceEvent("comment", ResourceEvent::ACTION_DELETE, $comment3),
+            $this->expectedResourceEvent("discussion", ResourceEvent::ACTION_DELETE, $discussion),
+        ], ['commentID', 'discussionID', 'name']);
+
     }
 }

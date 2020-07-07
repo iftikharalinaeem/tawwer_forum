@@ -66,9 +66,7 @@ class ResourceEventProcessorTest extends TestCase {
         });
 
         $this->model = $this->container()->getArgs(PipelineModel::class, ['model']);
-        $this->eventProcessor = $this->container()->getArgs(Operation\ResourceEventProcessor::class, [
-            'eventManager' => $this->mockEventManager,
-        ]);
+        $this->eventProcessor = $this->container()->get(Operation\ResourceEventProcessor::class);
         $this->model->addPipelineProcessor($this->eventProcessor);
     }
 
@@ -76,63 +74,58 @@ class ResourceEventProcessorTest extends TestCase {
      * Test that delets events are gathered and fired.
      */
     public function testInsert() {
-        $this->assertEventsWillBeDispatched([
+        $this->model->insert(['name' => 'item1']);
+        $this->assertEventsDispatched([
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
         ]);
-
-        $this->model->insert(['name' => 'item1']);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
     public function testUpdateSingle() {
-        $this->assertEventsWillBeDispatched([
+        $this->model->insert(['name' => 'item1']);
+        $this->model->update(['name' => 'item2'], ['modelID' => 1]);
+        $this->assertEventsDispatched([
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'item2', 'modelID' => 1]),
         ]);
-        $this->model->insert(['name' => 'item1']);
-        $this->model->update(['name' => 'item2'], ['modelID' => 1]);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
     public function testUpdateMultiple() {
-        $this->assertEventsWillBeDispatched([
+        $this->model->insert(['name' => 'item1']);
+        $this->model->insert(['name' => 'item2']);
+        $this->model->update(['name' => 'name reset'], ['modelID <' => 3]);
+        $this->assertEventsDispatched([
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 1]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_UPDATE, ['name' => 'name reset', 'modelID' => 2]),
         ]);
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
-        $this->model->update(['name' => 'name reset'], ['modelID <' => 3]);
     }
 
     /**
      * Test that delets events are gathered and fired.
      */
     public function testDeleteMultiple() {
-        $this->assertEventsWillBeDispatched([
+        $this->model->insert(['name' => 'item1']);
+        $this->model->insert(['name' => 'item2']);
+        $this->model->delete(['modelID <' => 3]);
+        $this->assertEventsDispatched([
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item1', 'modelID' => 1]),
             $this->expectedResourceEvent('model', ResourceEvent::ACTION_DELETE, ['name' => 'item2', 'modelID' => 2]),
         ]);
-        $this->model->insert(['name' => 'item1']);
-        $this->model->insert(['name' => 'item2']);
-        $this->model->delete(['modelID <' => 3]);
     }
 
     /**
      * Test that if an operation fails, no events will be dispatched from it.
      */
     public function testFailureNoDispatch() {
-        $this->assertEventsWillBeDispatched([
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
-            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
-        ]);
         $this->model->insert(['name' => 'item1']);
         $this->model->insert(['name' => 'item2']);
 
@@ -153,6 +146,10 @@ class ResourceEventProcessorTest extends TestCase {
         $this->assertInstanceOf(\Exception::class, $exception);
 
         // An exception was thrown after the delete events were processed, but the events were not dispatched.
+        $this->assertEventsDispatched([
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item1', 'modelID' => 1]),
+            $this->expectedResourceEvent('model', ResourceEvent::ACTION_INSERT, ['name' => 'item2', 'modelID' => 2]),
+        ]);
     }
 
     /**

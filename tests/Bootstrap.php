@@ -46,6 +46,7 @@ use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\Fixtures\NullCache;
 use Vanilla\Utility\ContainerUtils;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
+use VanillaTests\Fixtures\SpyingEventManager;
 
 /**
  * Run bootstrap code for Vanilla tests.
@@ -208,6 +209,7 @@ class Bootstrap {
 
             // EventManager
             ->rule(\Garden\EventManager::class)
+            ->setClass(SpyingEventManager::class)
             ->addAlias(EventListenerConfigInterface::class)
             ->addAlias(EventDispatcherInterface::class)
             ->addAlias(ListenerProviderInterface::class)
