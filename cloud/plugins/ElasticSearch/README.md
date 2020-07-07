@@ -41,10 +41,10 @@ POST /api/v2/resources/crawl-elastic
 
 ```php
 <?php
-use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 
-/** @var ElasticHttpClient $searchApi */
-$searchApi = $dic->get(ElasticHttpClient::class);
+/** @var AbstractElasticHttpClient $searchApi */
+$searchApi = $dic->get(AbstractElasticHttpClient::class);
 
 // Search for stuff in discussion/comment index.
 $elasticsearchResult = $searchApi->search(

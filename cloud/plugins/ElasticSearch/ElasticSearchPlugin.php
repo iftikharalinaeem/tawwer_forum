@@ -9,7 +9,9 @@ namespace Vanilla\Cloud\ElasticSearch;
 
 use Garden\Container\Container;
 use Garden\Web\Data;
+use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpConfig;
+use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpClient;
 use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpConfig;
 use Vanilla\Dashboard\Controllers\API\ResourcesApiController;
 use Vanilla\Scheduler\Job\JobPriority;
@@ -40,12 +42,12 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
      * @param Container $dic
      */
     public function container_init(Container $dic) {
-        // No elasticsearch config has been added.
-        // Let's setup the development one.
-        if (!$dic->hasRule(AbstractElasticHttpConfig::class)) {
+        if (!$dic->hasRule(AbstractElasticHttpClient::class)) {
+            // No elasticsearch client has been added.
+            // Let's setup the development one.
             $dic
-                ->rule(AbstractElasticHttpConfig::class)
-                ->setClass(DevElasticHttpConfig::class);
+                ->rule(AbstractElasticHttpClient::class)
+                ->setClass(DevElasticHttpClient::class);
         }
         $dic->rule( ElasticSearchDriver::class)
             ->setConstructorArgs(["elastic" => new Reference(ElasticHttpClient::class)]);

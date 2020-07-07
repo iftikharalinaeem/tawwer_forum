@@ -25,7 +25,17 @@ use Garden\Web\Exception\HttpException;
  * Eg. `discussions` as an alias name will be passed to the service as `{{idx:discussions}}`.
  * This alias will be resolved to the service as something like: `vf_ACCOUNTID_SITEID_discussions`.
  */
-class ElasticHttpClient extends HttpClient {
+abstract class AbstractElasticHttpClient extends HttpClient {
+
+    const SCOPE_ACCOUNT = 'account';
+    const SCOPE_HUB = 'hub';
+    const SCOPE_SITE = 'site';
+
+    const SCOPES = [
+        self::SCOPE_ACCOUNT,
+        self::SCOPE_HUB,
+        self::SCOPE_SITE,
+    ];
 
     /** @var AbstractElasticHttpConfig */
     private $clientConfig;
@@ -49,6 +59,36 @@ class ElasticHttpClient extends HttpClient {
     }
 
     /**
+     * Send documents to be indexed by the microservice.
+     *
+     * @param string $indexName The index to index into.
+     * @param string $documentIdField The field in the document to use as elastics `_id`.
+     * @param array $apiPointer A pointer to an API endpoint to fetch the documents from.
+     * @example
+     * [
+     *      'apiUrl' => 'https://site.com/api/v2/discussions/5'
+     *      'apiParams' => [ 'expand' => ['crawl'] ] // The query parameters.
+     * ]
+     *
+     * @return HttpResponse Http response (contains ES result).
+     *
+     * @throws HttpException When something goes wrong.
+     */
+    abstract public function indexDocuments(string $indexName, string $documentIdField, array $apiPointer): HttpResponse;
+
+    /**
+     * Delete documents from elasticsearch.
+     *
+     * @param string $indexName The index to delete from.
+     * @param array $documentIDs The documents `_id`s to delete.
+     *
+     * @return HttpResponse Http response (contains ES response).
+     *
+     * @throws HttpException When something goes wrong.
+     */
+    abstract public function deleteDocuments(string $indexName, array $documentIDs): HttpResponse;
+
+    /**
      * Search some documents.
      *
      * @param array $indexNames The index names to search.
@@ -57,57 +97,21 @@ class ElasticHttpClient extends HttpClient {
      * {@link https://www.elastic.co/guide/en/elasticsearch/reference/current/search-search.html#search-search-api-request-body}.
      * Query is in the `query` subfield.
      * {@link https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html}
+     * @param string $scope The search scope.
+     * One of {@link AbstractElasticHttpClient::SCOPES}.
      *
      * @return HttpResponse
      *
      * @throws HttpException When something goes wrong.
      */
-    public function searchDocuments(array $indexNames, array $searchPayload): HttpResponse {
+    public function searchDocuments(array $indexNames, array $searchPayload, string $scope = self::SCOPE_SITE): HttpResponse {
         $indexAliases = array_map([$this, 'convertIndexNameToAlias'], $indexNames);
         $body = [
             'indexesAlias' => $indexAliases,
+            'scope' => $scope,
             'searchPayload' => $searchPayload,
         ];
         return $this->post('/search', $body);
-    }
-
-    /**
-     * Send documents to be indexed by the microservice.
-     *
-     * @param string $indexName
-     * @param string $documentIdField
-     * @param array $documents
-     *
-     * @return HttpResponse Http response (contains ES result).
-     *
-     * @throws HttpException When something goes wrong.
-     */
-    public function indexDocuments(string $indexName, string $documentIdField, array $documents): HttpResponse {
-        $body = [
-            'indexAlias' => $this->convertIndexNameToAlias($indexName),
-            'documentIdField' => $documentIdField,
-            'documents' => $documents,
-        ];
-
-        return $this->post('/documents', $body);
-    }
-
-    /**
-     * Delete documents.
-     *
-     * @param string $indexName
-     * @param array $documentIDs
-     *
-     * @return HttpResponse Http response (contains ES result).
-     *
-     * @throws HttpException When something goes wrong.
-     */
-    public function deleteDocuments(string $indexName, array $documentIDs): HttpResponse {
-        $body = [
-            'indexAlias' => $this->convertIndexNameToAlias($indexName),
-            'documentsId' => $documentIDs, // This name is what is used in the API. Typo?
-        ];
-        return $this->deleteWithBody('/documents', $body);
     }
 
     /**
@@ -119,7 +123,7 @@ class ElasticHttpClient extends HttpClient {
      * @param array $options An array of additional options for the request.
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
-    private function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []) {
+    protected function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []) {
         return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
     }
 
@@ -130,7 +134,7 @@ class ElasticHttpClient extends HttpClient {
      *
      * @return string
      */
-    private function convertIndexNameToAlias(string $indexName): string {
+    protected function convertIndexNameToAlias(string $indexName): string {
         return "{{idx:".trim($indexName)."}}";
     }
 }
