@@ -7,7 +7,6 @@
 namespace Vanilla\Polls\Models;
 
 use Vanilla\Forum\Search\DiscussionSearchType;
-use Vanilla\Navigation\BreadcrumbModel;
 
 /**
  * Class PollSearchType
@@ -21,31 +20,6 @@ class PollSearchType extends DiscussionSearchType {
 
     /** @var BreadcrumbModel */
     protected $breadcrumbModel;
-
-    /**
-     * DI.
-     *
-     * @param \DiscussionsApiController $discussionsApi
-     * @param \CategoryModel $categoryModel
-     * @param \UserModel $userModel
-     * @param \TagModel $tagModel
-     * @param BreadcrumbModel $breadcrumbModel
-     */
-    public function __construct(
-        \DiscussionsApiController $discussionsApi,
-        \CategoryModel $categoryModel,
-        \UserModel $userModel,
-        \TagModel $tagModel,
-        BreadcrumbModel $breadcrumbModel
-    ) {
-        parent::__construct(
-            $discussionsApi,
-            $categoryModel,
-            $userModel,
-            $tagModel,
-            $breadcrumbModel
-        );
-    }
 
     /**
      * @inheritdoc
