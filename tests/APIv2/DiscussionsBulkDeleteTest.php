@@ -68,6 +68,5 @@ class DiscussionsBulkDeleteTest extends AbstractAPIv2Test {
             $this->expectedResourceEvent("comment", ResourceEvent::ACTION_DELETE, $comment3),
             $this->expectedResourceEvent("discussion", ResourceEvent::ACTION_DELETE, $discussion),
         ], ['commentID', 'discussionID', 'name']);
-
     }
 }
