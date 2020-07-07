@@ -34,7 +34,7 @@ class InstantScheduler extends DummyScheduler {
     public function addJob(string $jobType, $message = [], JobPriority $jobPriority = null, int $delay = null): TrackingSlipInterface {
         $result = parent::addJob($jobType, $message, $jobPriority, $delay);
 
-        if ($this->isDispatching) {
+        if (!$this->isDispatching) {
             // We are already executing a job. The newly queued job is pushed onto the end of the driver slips.
             // This way the jobs fully execute in the order they are queued.
             $this->dispatchAll();
