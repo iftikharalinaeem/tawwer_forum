@@ -92,7 +92,7 @@ export default function Banner(props: IProps) {
                 buttonClass={classes.searchButton}
                 buttonBaseClass={ButtonTypes.CUSTOM}
                 isLarge={true}
-                placeholder={t("SearchBoxPlaceHolder")}
+                placeholder={t("SearchBoxPlaceHolder", "Search")}
                 inputClass={classes.input}
                 iconClass={classes.icon}
                 buttonLoaderClassName={classes.buttonLoader}
