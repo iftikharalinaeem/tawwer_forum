@@ -184,4 +184,11 @@ class CommentSearchType extends DiscussionSearchType {
 
         return $sql;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIndex(): string {
+        return 'comment';
+    }
 }

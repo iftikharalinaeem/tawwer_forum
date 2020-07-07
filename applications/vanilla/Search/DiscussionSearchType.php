@@ -9,16 +9,13 @@ namespace Vanilla\Forum\Search;
 
 use Garden\Schema\Schema;
 use Garden\Web\Exception\HttpException;
-use Vanilla\Adapters\SphinxClient;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\MysqlSearchQuery;
-use Vanilla\Search\ElasticSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
 use Vanilla\Search\SearchResultItem;
-use Vanilla\Sphinx\Search\SphinxSearchQuery;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -113,29 +110,69 @@ class DiscussionSearchType extends AbstractSearchType {
     }
 
     /**
-     * @inheritdoc
+     * Check empty results.
+     * This method checks some edge cases when we know that there is no any search results possible.
+     * Ex: when categoryID or userID filer does not exists or user has no permissions to view.
+     *
+     * @param SearchQuery $query
+     * @return array|null
      */
-    public function applyToQuery(SearchQuery $query) {
+    protected function skipType(SearchQuery $query): ?array {
         $types = $query->getQueryParameter('types');
         if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
-            return;
+            return null;
         }
 
         $types = $query->getQueryParameter('recordTypes');
         if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
-            return;
+            return null;
         }
-        // Notably includes 0 to still allow other normalized records if set.
-        $tagNames = $query->getQueryParameter('tags', []);
-        $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
-        $tagOp = $query->getQueryParameter('tagOperator', 'or');
-        ;
 
-        if ($query instanceof SphinxSearchQuery) {
+        $categoryIDs = $this->getCategoryIDs($query);
+        if ($categoryIDs === []) {
+            return null;
+        }
+
+        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
+        if ($userIDs === []) {
+            return null;
+        }
+        return [
+            'users' => $userIDs,
+            'categories' => $categoryIDs
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applyToQuery(SearchQuery $query) {
+        $preparedIDs = $this->skipType($query);
+        if (is_null($preparedIDs)) {
+            return ;
+        }
+
+        if ($query instanceof MysqlSearchQuery) {
+            $query->addSql($this->generateSql($query));
+        } else {
+            $query->addIndex($this->getIndex($query));
+
+            $terms = $query->get('query', false);
+            if ($terms) {
+                $query->whereText($terms, ['name', 'body']);
+            }
+
+            if ($title = $query->get('name', false)) {
+                $query->whereText($title, ['name']);
+            }
+
+            if ($body = $query->get('body', false)) {
+                $query->whereText($body, ['body']);
+            }
             // TODO: Figure out the ideal time to do this.
             // Make sure we don't get duplicate discussion results.
             // $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
@@ -144,24 +181,26 @@ class DiscussionSearchType extends AbstractSearchType {
             if ($discussionID = $query->getQueryParameter('discussionID', false)) {
                 $query->setFilter('DiscussionID', [$discussionID]);
             };
-            $categoryIDs = $this->getCategoryIDs($query);
+            $categoryIDs = $preparedIDs['categories'];
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
-            } else {
-                // Only include non-category content.
-                $query->setFilter('CategoryID', [0]);
+            }
+
+            $userIDs = $preparedIDs['users'];
+            if (!empty($userIDs)) {
+                $query->setFilter('insertUserID', $userIDs);
             }
 
             // tags
+            // Notably includes 0 to still allow other normalized records if set.
+            $tagNames = $query->getQueryParameter('tags', []);
+            $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
+            $tagOp = $query->getQueryParameter('tagOperator', 'or');
+            ;
             if (!empty($tagIDs)) {
                 $query->setFilter('Tags', $tagIDs, false, $tagOp);
             }
-        } elseif ($query instanceof MysqlSearchQuery) {
-             $query->addSql($this->generateSql($query));
-        } elseif ($query instanceof ElasticSearchQuery) {
-            $this->prepareElasticQuery($query);
         }
-
     }
 
     /**
@@ -191,6 +230,8 @@ class DiscussionSearchType extends AbstractSearchType {
             'includeArchivedCategories:b?' => [
                 'x-search-filter' => true,
             ],
+            'name:s?',
+            'body:s?',
             'tags:a?' => [
                 'items' => [
                     'type' => 'string',
@@ -300,87 +341,6 @@ class DiscussionSearchType extends AbstractSearchType {
         $db->reset();
 
         return $sql;
-    }
-
-    /**
-     * Prepares Elasticsearch query payload
-     *
-     * @param ElasticSearchQuery $query
-     * @return string
-     */
-    public function prepareElasticQuery(ElasticSearchQuery $query) {
-        $categoryIDs = $this->getCategoryIDs($query);
-
-        if ($categoryIDs === []) {
-            return '';
-        }
-
-        $userIDs = $this->getUserIDs($query->get('insertUserNames', []));
-
-        if ($userIDs === []) {
-            return '';
-        }
-
-        $query->addIndex('discussion');
-
-        $query->addFields([
-            "discussionID",
-            "name",
-            "format",
-            "categoryID",
-            "score",
-            "url",
-            "dateInserted",
-            "type",
-            "insertUserID"
-        ]);
-        if (false !== $query->get('expandBody', null)) {
-            $query->addFields(["body"]);
-        }
-
-        //    ->orderBy('d.DateInserted', 'desc')
-        ;
-
-
-        $terms = $query->get('query', false);
-        if ($terms) {
-            $query->setQueryString($terms);
-        }
-
-//        if ($title = $query->get('title', false)) {
-//            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $title).'%'));
-//        }
-
-//        if ($users = $query->get('users', false)) {
-//            $author = array_column($users, 'UserID');
-//            $db->where('d.InsertUserID', $author);
-//        }
-//
-//        if ($users = $query->get('insertUserIds', false)) {
-//            $author = array_column($users, 'UserID');
-//            $db->where('d.InsertUserID', $author);
-//        }
-//
-//        if (is_array($userIDs)) {
-//            $db->where('d.InsertUserID', $userIDs);
-//        }
-//
-//        if ($discussionID = $query->get('discussionID', false)) {
-//            $db->where('d.DiscussionID', $discussionID);
-//        }
-//
-//        if (!empty($categoryIDs)) {
-//            $db->whereIn('d.CategoryID', $categoryIDs);
-//        }
-//
-//        $limit = $query->get('limit', 100);
-//        $offset = $query->get('offset', 0);
-//        $db->limit($limit + $offset);
-//
-//        $sql = $db->getSelect(true);
-//        $db->reset();
-//
-//        return $sql;
     }
 
     /**

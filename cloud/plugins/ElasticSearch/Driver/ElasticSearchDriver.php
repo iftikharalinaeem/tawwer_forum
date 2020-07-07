@@ -4,11 +4,14 @@
  * @license GPL-2.0-only
  */
 
-namespace Vanilla\Search;
+namespace Vanilla\Cloud\ElasticSearch\Driver;
 
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
+use Vanilla\Search\AbstractSearchDriver;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchResults;
 
 /**
  * Elasticsearch search driver.
@@ -52,14 +55,22 @@ class ElasticSearchDriver extends AbstractSearchDriver {
      */
     public function search(array $queryData, SearchOptions $options): SearchResults {
         $query = new ElasticSearchQuery($this->getSearchTypes(), $queryData);
+        $records = [];
+        $indexes = $query->getIndexes();
+        if(!empty($indexes)) {
+            $search = $this->elastic->searchDocuments(
+                $indexes,
+                $query->getPayload()
+            )->getBody();
 
-        $search = $this->elastic->searchDocuments(
-            $query->getIndexes(),
-            $query->getPayload()
-        );
-        die(var_dump($search));
+            $results = $search['result']['hits']['hits'] ?? [];
 
-        $search = $this->convertRecordsToResultItems($search);
+            foreach ($results as $result) {
+                $records[] = $query->prepareResultItem($result);
+            }
+        }
+
+        $search = $this->convertRecordsToResultItems($records);
         return new SearchResults(
             $search,
             count($search),

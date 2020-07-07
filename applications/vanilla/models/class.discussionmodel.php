@@ -3682,7 +3682,8 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
 
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
-        $result['type'] = !empty($result['type']) ? lcfirst($result['type']) : null;
+        $result['type'] = !empty($result['type']) ? lcfirst($result['type']) : 'discussion';
+        $result['type'] = ($result['type'] === 'stub') ? 'discussion' : $result['type'];
 
         return $result;
     }

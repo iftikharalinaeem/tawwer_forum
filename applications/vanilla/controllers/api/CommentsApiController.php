@@ -387,6 +387,8 @@ class CommentsApiController extends AbstractApiController {
      */
     public function normalizeOutput(array $dbRecord) {
         $normalizedRow = $this->commentModel->normalizeRow($dbRecord);
+        $normalizedRow['type'] = 'comment';
+        $normalizedRow['recordID'] = 'commentID';
         // Allow addons to hook into the normalization process.
         $options = [];
         $result = $this->getEventManager()->fireFilter(

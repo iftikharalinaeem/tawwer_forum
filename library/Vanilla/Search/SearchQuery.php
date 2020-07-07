@@ -24,6 +24,9 @@ abstract class SearchQuery {
     /** @var array */
     private $queryData;
 
+    /** @var array $indexes */
+    protected $indexes;
+
     /**
      * Create a query.
      *
@@ -74,6 +77,26 @@ abstract class SearchQuery {
      * @return $this
      */
     abstract public function whereText(string $text, array $fieldNames = []);
+
+    /**
+     * Add index to scan to the search query
+     *
+     * @param string $index
+     * @return mixed
+     */
+    public function addIndex(string $index) {
+        $this->indexes[$index] = true;
+    }
+
+    /**
+     * Get all indexes to scan
+     *
+     * @return array|null
+     */
+    public function getIndexes(): ?array {
+        return array_keys($this->indexes);
+    }
+
 
     /**
      * Set filter values for some attribute.
