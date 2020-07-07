@@ -17,7 +17,7 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 /**
  * Tests for Question and Answer Search types.
  */
-class QnaSearchTest extends AbstractAPIv2Test {
+class QnASearchTest extends AbstractAPIv2Test {
 
     use SphinxTestTrait;
 
