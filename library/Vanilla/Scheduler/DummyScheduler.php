@@ -268,19 +268,24 @@ class DummyScheduler implements SchedulerInterface {
      * @return void
      */
     protected function dispatchAll() {
+        /** @var TrackingSlip $trackingSlip */
         foreach ($this->generateTrackingSlips() as $trackingSlip) {
             try {
                 $jobInterface = $trackingSlip->getJobInterface();
                 $driverSlip = $trackingSlip->getDriverSlip();
                 $this->drivers[$jobInterface]->execute($driverSlip);
             } catch (Throwable $t) {
-                $msg = "Scheduler failed to execute Job";
-                $msg .= ". Message: ".$t->getMessage();
-                $msg .= ". File: ".$t->getFile();
-                $msg .= ". Line: ".$t->getLine();
+                $msg = $t->getMessage();
+                if (strpos($msg, "File: ") !== false) {
+                    $msg = "Scheduler failed to execute Job";
+                    $msg .= ". Message: ".$t->getMessage();
+                    $msg .= ". File: ".$t->getFile();
+                    $msg .= ". Line: ".$t->getLine();
+                }
 
                 $driverSlip->setStackExecutionFailed($msg);
 
+                trigger_error($msg, E_USER_ERROR);
                 $this->logger->error($msg);
             }
         }
