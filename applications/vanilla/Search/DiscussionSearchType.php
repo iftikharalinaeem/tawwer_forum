@@ -161,23 +161,15 @@ class DiscussionSearchType extends AbstractSearchType {
         } else {
             $query->addIndex($this->getIndex($query));
 
-            $terms = $query->get('query', false);
+            $terms = $query->getQueryParameter('query', false);
             if ($terms) {
                 $query->whereText($terms, ['name', 'body']);
             }
 
-            if ($title = $query->get('name', false)) {
+            if ($title = $query->getQueryParameter('name', false)) {
                 $query->whereText($title, ['name']);
             }
 
-            if ($body = $query->get('body', false)) {
-                $query->whereText($body, ['body']);
-            }
-            // TODO: Figure out the ideal time to do this.
-            // Make sure we don't get duplicate discussion results.
-            // $query->setGroupBy('DiscussionID', SphinxClient::GROUPBY_ATTR, 'sort DESC');
-            // Always set.
-            // discussionID
             if ($discussionID = $query->getQueryParameter('discussionID', false)) {
                 $query->setFilter('DiscussionID', [$discussionID]);
             };
