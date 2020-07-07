@@ -20,6 +20,8 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Scheduler\Job\LocalApiBulkDeleteJob;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\SchemaFactory;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\ModelUtils;
@@ -3043,56 +3045,62 @@ class DiscussionModel extends Gdn_Model implements FormatFieldInterface, EventFr
             $log = 'Delete';
         }
 
-        LogModel::beginTransaction();
-
         // Log all of the comment deletes.
         $comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
         $totalComments = count($comments);
 
         if ($totalComments > 0) {
+            // Queue out a delete job. It will come back to here after the comments are cleared.
+            /** @var SchedulerInterface $scheduler */
+            $scheduler = \Gdn::getContainer()->get(SchedulerInterface::class);
+            $request = \Gdn::request();
+            $scheduler->addJob(LocalApiBulkDeleteJob::class, [
+                'iteratorUrl' => $request->getSimpleUrl("/api/v2/comments?discussionID=${discussionID}"),
+                'recordIDField' => 'commentID',
+                'deleteUrlPattern' => $request->getSimpleUrl("/api/v2/comments/:recordID"),
+                'finalDeleteUrl' => $request->getSimpleUrl("/api/v2/discussions/${discussionID}")
+            ]);
+        } else {
+            $transactionID = LogModel::beginTransaction();
             LogModel::insert($log, 'Discussion', $data, $logOptions);
-            foreach ($comments as $comment) {
-                LogModel::insert($log, 'Comment', $comment, $logOptions);
+            LogModel::endTransaction();
+
+            // Delete the discussion
+            $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
+
+            $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
+            $this->updateDiscussionCount($categoryID);
+
+            // Update the last post info for the category and its parents.
+            CategoryModel::instance()->refreshAggregateRecentPost($categoryID, true);
+
+            // Decrement CountAllDiscussions for category and its parents.
+            CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
+
+            // Decrement CountAllDiscussions for category and its parents.
+            if ($totalComments > 0) {
+                CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
             }
-        }
 
-        LogModel::endTransaction();
+            // Get the user's discussion count.
+            $this->updateUserDiscussionCount($userID);
 
-        $this->SQL->delete('Comment', ['DiscussionID' => $discussionID]);
-        $this->SQL->delete('Discussion', ['DiscussionID' => $discussionID]);
+            // Update bookmark counts for users who had bookmarked this discussion
+            foreach ($bookmarkData->result() as $user) {
+                $this->setUserBookmarkCount($user->UserID);
+            }
 
-        $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
-        $this->updateDiscussionCount($categoryID);
+            if ($data) {
+                $dataObject = (object)$data;
+                $this->calculate($dataObject);
 
-        // Update the last post info for the category and its parents.
-        CategoryModel::instance()->refreshAggregateRecentPost($categoryID, true);
-
-        // Decrement CountAllDiscussions for category and its parents.
-        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
-
-        // Decrement CountAllDiscussions for category and its parents.
-        if ($totalComments > 0) {
-            CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
-        }
-
-        // Get the user's discussion count.
-        $this->updateUserDiscussionCount($userID);
-
-        // Update bookmark counts for users who had bookmarked this discussion
-        foreach ($bookmarkData->result() as $user) {
-            $this->setUserBookmarkCount($user->UserID);
-        }
-
-        if ($data) {
-            $dataObject = (object)$data;
-            $this->calculate($dataObject);
-
-            $discussionEvent = $this->eventFromRow(
-                (array)$dataObject,
-                DiscussionEvent::ACTION_DELETE,
-                $this->userModel->currentFragment()
-            );
-            $this->getEventManager()->dispatch($discussionEvent);
+                $discussionEvent = $this->eventFromRow(
+                    (array)$dataObject,
+                    DiscussionEvent::ACTION_DELETE,
+                    $this->userModel->currentFragment()
+                );
+                $this->getEventManager()->dispatch($discussionEvent);
+            }
         }
         return true;
     }
