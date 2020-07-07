@@ -141,6 +141,7 @@ class DiscussionSearchType extends AbstractSearchType {
         if ($userIDs === []) {
             return null;
         }
+
         return [
             'users' => $userIDs,
             'categories' => $categoryIDs
@@ -161,26 +162,12 @@ class DiscussionSearchType extends AbstractSearchType {
         } else {
             $query->addIndex($this->getIndex($query));
 
-            $terms = $query->getQueryParameter('query', false);
-            if ($terms) {
-                $query->whereText($terms, ['name', 'body']);
-            }
-
-            if ($title = $query->getQueryParameter('name', false)) {
-                $query->whereText($title, ['name']);
-            }
-
             if ($discussionID = $query->getQueryParameter('discussionID', false)) {
                 $query->setFilter('DiscussionID', [$discussionID]);
             };
             $categoryIDs = $preparedIDs['categories'];
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
-            }
-
-            $userIDs = $preparedIDs['users'];
-            if (!empty($userIDs)) {
-                $query->setFilter('insertUserID', $userIDs);
             }
 
             // tags
@@ -222,8 +209,6 @@ class DiscussionSearchType extends AbstractSearchType {
             'includeArchivedCategories:b?' => [
                 'x-search-filter' => true,
             ],
-            'name:s?',
-            'body:s?',
             'tags:a?' => [
                 'items' => [
                     'type' => 'string',
