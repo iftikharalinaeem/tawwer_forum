@@ -7,9 +7,11 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
+import { UserCardModule } from "@library/features/users/modules/UserCardModule";
 
 interface IProps {
     username: string;
+    userID: number;
     className?: string;
     children?: React.ReactNode;
 }
@@ -19,8 +21,12 @@ interface IProps {
  */
 export default class ProfileLink extends React.Component<IProps> {
     public render() {
-        const { username } = this.props;
+        const { username, userID } = this.props;
         const children = this.props.children || username;
-        return <span className={classNames(this.props.className)}> {children} </span>;
+        return (
+            <span className={classNames(this.props.className)}>
+                <UserCardModule userID={userID} />
+            </span>
+        );
     }
 }
