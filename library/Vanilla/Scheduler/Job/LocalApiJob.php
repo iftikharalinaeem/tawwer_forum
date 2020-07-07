@@ -32,4 +32,18 @@ abstract class LocalApiJob implements LocalJobInterface, InjectableInterface {
         $internalClient->setThrowExceptions(true);
         $this->vanillaClient = $internalClient;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPriority(JobPriority $priority) {
+        // Unused.
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setDelay(int $seconds) {
+        // Unused.
+    }
 }

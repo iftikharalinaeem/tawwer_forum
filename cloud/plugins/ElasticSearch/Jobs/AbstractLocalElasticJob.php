@@ -35,18 +35,4 @@ abstract class AbstractLocalElasticJob extends LocalApiJob {
         parent::setDependencies($internalClient);
         $this->elasticClient = $elasticClient;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function setPriority(JobPriority $priority) {
-        // Unused.
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setDelay(int $seconds) {
-        // Unused.
-    }
 }
