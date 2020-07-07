@@ -57,10 +57,6 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         height: formElementsVars.sizing.height,
     });
 
-    const stat = makeVars("stat", {
-        padding: 29,
-    });
-
     const date = makeVars("date", {
         padding: globalVars.gutter.size,
     });
@@ -79,7 +75,6 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         containerWithBorder,
         count,
         header,
-        stat,
         date,
         email,
     };
@@ -150,6 +145,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const vertical = style("vertical", {
+        display: "block",
         border: "none",
         background: vars.vertical.color,
     });

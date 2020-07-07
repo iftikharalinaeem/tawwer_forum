@@ -117,11 +117,7 @@ function Stat(props: IStatProps) {
 function VerticalLine(props: IVerticalLineProps) {
     const classes = userCardClasses();
     const { width } = props;
-    return (
-        <div>
-            <hr className={classes.vertical} style={{ width: `${width}px`, height: "100%" }} />
-        </div>
-    );
+    return <hr className={classes.vertical} style={{ width: `${width}px` }} />;
 }
 
 function Date(props: IDateProps) {
