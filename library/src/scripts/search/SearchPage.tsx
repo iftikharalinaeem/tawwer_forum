@@ -80,7 +80,7 @@ function SearchPage(props: IProps) {
                 <QueryString value={{ ...form, initialized: undefined }} defaults={getDefaultFormValues()} />
                 <TwoColumnLayout
                     className="hasLargePadding"
-                    middleTop={
+                    mainTop={
                         <>
                             <PanelWidget>
                                 <PageHeading
@@ -141,7 +141,7 @@ function SearchPage(props: IProps) {
                             )}
                         </>
                     }
-                    middleBottom={<SearchPageResults />}
+                    mainBottom={<SearchPageResults />}
                     rightTop={!isCompact && <PanelWidget>{currentFilter}</PanelWidget>}
                 />
             </Container>

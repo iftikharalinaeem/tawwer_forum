@@ -32,8 +32,8 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <TwoColumnLayout
-            middleTop={<DummyPanel>Middle Top</DummyPanel>}
-            middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+            mainTop={<DummyPanel>Middle Top</DummyPanel>}
+            mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
             rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
         />
     );
@@ -42,8 +42,8 @@ export const SimplePanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <TwoColumnLayout
-            middleTop={<DummyPanel>Middle Top</DummyPanel>}
-            middleBottom={<DummyPanel>Middle Bottom</DummyPanel>}
+            mainTop={<DummyPanel>Middle Top</DummyPanel>}
+            mainBottom={<DummyPanel>Middle Bottom</DummyPanel>}
             rightTop={<DummyPanel>Right Top {largeIpsum}</DummyPanel>}
             rightBottom={<DummyPanel>Right bottom</DummyPanel>}
         />
@@ -53,8 +53,8 @@ export const LargeRightTopPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
 export const LargeRightBottomPanel = storyWithConfig(NO_WRAPPER_CONFIG, () => {
     return (
         <TwoColumnLayout
-            middleTop={<DummyPanel>Middle Top</DummyPanel>}
-            middleBottom={
+            mainTop={<DummyPanel>Middle Top</DummyPanel>}
+            mainBottom={
                 <DummyPanel>
                     Middle Bottom{smallIpsum}
                     {smallIpsum}
@@ -92,8 +92,8 @@ export const DarkMode = storyWithConfig(
     () => {
         return (
             <TwoColumnLayout
-                middleTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
-                middleBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
+                mainTop={<DummyPanel>Middle Top{largeIpsum}</DummyPanel>}
+                mainBottom={<DummyPanel>Middle Bottom{largeIpsum}</DummyPanel>}
                 rightTop={<DummyPanel>Right Top{largeIpsum}</DummyPanel>}
                 rightBottom={<DummyPanel>Right bottom {largeIpsum}</DummyPanel>}
             />

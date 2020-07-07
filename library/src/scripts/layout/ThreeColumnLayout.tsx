@@ -7,7 +7,9 @@ import { LayoutProvider, withLayout } from "@library/layout/LayoutContext";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import PanelLayout, { IPanelLayoutProps } from "@library/layout/PanelLayout";
 
-function ThreeColumnLayout(props: IPanelLayoutProps) {
+interface IProps extends Omit<IPanelLayoutProps, "ILayoutProps" | "leftTop" | "leftBottom"> {}
+
+function ThreeColumnLayout(props: IProps) {
     return (
         <LayoutProvider type={LayoutTypes.THREE_COLUMNS}>
             <PanelLayout {...props} />
