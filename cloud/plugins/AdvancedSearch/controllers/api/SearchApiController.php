@@ -351,8 +351,6 @@ class SearchApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
-
-
         $searchResults = array_map(function ($record) use ($query) {
             $expandParams = [
                 'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
@@ -514,7 +512,10 @@ class SearchApiController extends AbstractApiController {
         ];
 
         if ($includeBody) {
-            $schemaRecord['body'] = searchExcerpt(Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']), $searchTerm);
+            $schemaRecord['body'] = searchExcerpt(
+                Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']),
+                $searchTerm
+            );
         }
 
         $lcfRecordType = lcfirst($searchRecord['RecordType'] ?? '');
