@@ -5,9 +5,12 @@
  */
 
 use Garden\Container\Container;
+use Vanilla\Polls\Models\PollSearchType;
 use Vanilla\Polls\Models\SearchRecordTypePoll;
 use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
+use Vanilla\Search\AbstractSearchDriver;
+
 
 /**
  * Class PollsPlugin
@@ -39,6 +42,9 @@ class PollsPlugin extends Gdn_Plugin {
             ->rule(SearchRecordTypeProviderInterface::class)
             ->addCall('setType', [new SearchRecordTypePoll()])
         ;
+
+        $dic->rule(AbstractSearchDriver::class)
+            ->addCall('registerSearchType', [new \Garden\Container\Reference(PollSearchType::class)]);
     }
 
     /**
