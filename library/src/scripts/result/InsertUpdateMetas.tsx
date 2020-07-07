@@ -28,14 +28,26 @@ export default function InsertUpdateMetas(props: IProps) {
                 <Translate
                     source="Published <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateInserted} />}
-                    c1={<ProfileLink className={classesMetas.metaStyle} username={props.insertUser.name} />}
+                    c1={
+                        <ProfileLink
+                            userID={props.insertUser.userID}
+                            className={classesMetas.metaStyle}
+                            username={props.insertUser.name}
+                        />
+                    }
                 />
             </DropDownItemMeta>
             <DropDownItemMeta>
                 <Translate
                     source="Updated <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateUpdated} />}
-                    c1={<ProfileLink className={classesMetas.metaStyle} username={props.updateUser.name} />}
+                    c1={
+                        <ProfileLink
+                            userID={props.insertUser.userID}
+                            className={classesMetas.metaStyle}
+                            username={props.updateUser.name}
+                        />
+                    }
                 />
             </DropDownItemMeta>
         </DropDownItemMetas>
