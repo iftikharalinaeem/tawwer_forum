@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState } from "react";
+import React, { useState, ReactNode } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
@@ -21,6 +21,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
 import { NoUserPhotoIcon } from "@library/icons/titleBar";
+import classNames from "classnames";
 
 export interface IUserCardInfo {
     email: string;
@@ -38,6 +39,11 @@ interface IProps {
     user: IUserCardInfo;
     buttonContents: string;
     visible?: boolean;
+}
+
+interface IContainerProps {
+    children: ReactNode;
+    borderTop?: boolean;
 }
 
 interface INameProps {
@@ -78,9 +84,14 @@ function Label(props: ILabelProps) {
     return <div> {label && <div className={classes.label}>{label}</div>} </div>;
 }
 
-function Container(props) {
+function Container(props: IContainerProps) {
+    const { borderTop } = props;
     const classes = userCardClasses();
-    return <div className={classes.container}>{props.children}</div>;
+    return (
+        <div className={classNames(classes.container, { [classes.containerWithBorder]: borderTop })}>
+            {props.children}
+        </div>
+    );
 }
 
 function ButtonContainer(props) {
@@ -111,11 +122,6 @@ function VerticalLine(props: IVerticalLineProps) {
             <hr className={classes.vertical} style={{ width: `${width}px`, height: "100%" }} />
         </div>
     );
-}
-
-function Divider() {
-    const classes = userCardClasses();
-    return <hr className={classes.divider} />;
 }
 
 function Date(props: IDateProps) {
@@ -220,17 +226,13 @@ export default function PopupUserCard(props: IProps) {
                 </ButtonContainer>
             </Container>
 
-            <Divider />
-
-            <Container>
+            <Container borderTop={true}>
                 <Stat count={user.countDiscussions} text={t("Discussions")} />
                 <VerticalLine width={1} />
                 <Stat count={user.countComments} text={t("Comments")} />
             </Container>
 
-            <Divider />
-
-            <Container>
+            <Container borderTop={true}>
                 <Date text={t("Joined")} date={user.dateJoined} />
                 <Date text={t("Last Active")} date={user.dateLastActive} />
             </Container>

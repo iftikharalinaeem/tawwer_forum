@@ -44,9 +44,9 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         color: colorOut(globalVars.border.color),
     });
 
-    const divider = makeVars("divider", {
+    const containerWithBorder = makeVars("containerWithBorder", {
         color: colorOut(globalVars.border.color),
-        margin: globalVars.gutter.size,
+        padding: globalVars.gutter.size,
     });
 
     const count = makeVars("count", {
@@ -76,7 +76,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         name,
         label,
         vertical,
-        divider,
+        containerWithBorder,
         count,
         header,
         stat,
@@ -98,6 +98,11 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         justifyContent: "center",
         marginBottom: vars.container.margin,
         flexWrap: "wrap",
+    });
+
+    const containerWithBorder = style("containerWithBorder", {
+        borderTop: `1px solid ${vars.containerWithBorder.color}`,
+        paddingTop: vars.containerWithBorder.padding,
     });
 
     const button = style("button", {
@@ -149,11 +154,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         background: vars.vertical.color,
     });
 
-    const divider = style("divider", {
-        borderTop: `1px solid ${vars.divider.color}`,
-        marginBottom: vars.divider.margin,
-    });
-
     const count = style("count", {
         fontSize: vars.count.size,
     });
@@ -180,13 +180,13 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     return {
         container,
+        containerWithBorder,
         button,
         buttonContainer,
         name,
         label,
         stat,
         vertical,
-        divider,
         count,
         header,
         section,
