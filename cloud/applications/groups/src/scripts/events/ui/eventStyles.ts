@@ -40,6 +40,7 @@ export const eventsVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     const title = makeVars("title", {
         font: {
+            color: globalVars.mainColors.fg,
             lineHeight: globalVars.lineHeights.condensed,
             size: globalVars.fonts.size.large,
             weight: globalVars.fonts.weights.semiBold,
@@ -187,8 +188,8 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
     const linkColors = clickableItemStates();
     const toggleClass = selectBoxClasses().toggle;
 
-    const link = style(
-        "link",
+    const wrapper = style(
+        "wrapper",
         {
             color: colorOut(globalVars.mainColors.fg),
             display: "flex",
@@ -224,6 +225,10 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
             maxWidth: important("100%"),
         }),
     );
+
+    const link = style("titleLink", {
+        ...fonts(vars.title.font),
+    });
 
     const linkAlignment = style("linkAlignment", {
         display: "flex",
@@ -442,10 +447,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins(vars.section.spacing),
     });
 
-    const firstSection = style("firstSection", {
-        marginTop: -globalVars.spacer.size,
-    });
-
     const pageTitle = style("pageTitle", {
         $nest: {
             "&&": {
@@ -486,6 +487,7 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         body,
         result,
         link,
+        wrapper,
         linkAlignment,
         title,
         main,
@@ -513,7 +515,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         attendeePlus,
         noAttendees,
         section,
-        firstSection,
         pageTitle,
         sectionTitle,
         description,

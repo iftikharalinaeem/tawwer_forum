@@ -67,7 +67,7 @@ export function EventDetails(props: IProps) {
                         ),
                     },
                 ]}
-                className={classNames(classes.section, classes.firstSection)}
+                className={classNames(classes.section)}
                 caption={t("Event Details")}
             />
             <EventPermission event={event} permission={EventPermissionName.ATTEND}>
