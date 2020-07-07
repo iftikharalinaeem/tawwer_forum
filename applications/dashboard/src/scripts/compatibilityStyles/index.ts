@@ -175,6 +175,34 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(
         `
+            .MessageList .Item:not(.Read) .Title,
+            .DataList .Item:not(.Read) .Title,
+    `,
+        {
+            $nest: {
+                "&&": {
+                    fontWeight: vars.fonts.weights.bold,
+                },
+            },
+        },
+    );
+
+    cssOut(
+        `
+            .MessageList .Item.Read .Title,
+            .DataList .Item.Read .Title,
+    `,
+        {
+            $nest: {
+                "&&": {
+                    fontWeight: vars.fonts.weights.normal,
+                },
+            },
+        },
+    );
+
+    cssOut(
+        `
         .Herobanner .SearchBox .AdvancedSearch .BigInput,
         .Herobanner .SearchBox #Form_Search
     `,
@@ -355,6 +383,13 @@ compatibilityStyles = useThemeCache(() => {
 
     cssOut(`.Item.Read`, {
         backgroundColor: colorOut(formVars.lists.colors.read.bg),
+        opacity: 1,
+        $nest: {
+            "&:hover, &:focus, &:active, &.focus-visible": {
+                backgroundColor: colorOut(formVars.lists.colors.read.bg),
+                opacity: 1,
+            },
+        },
     });
 
     cssOut(".Bullet, .QuickSearch", {
