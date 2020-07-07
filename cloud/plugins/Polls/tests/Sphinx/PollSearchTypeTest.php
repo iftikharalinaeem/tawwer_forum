@@ -13,6 +13,9 @@ use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\CategoryAndDiscussionApiTestTrait;
 
+/**
+ * Class PollSearchTypeTest
+ */
 class PollSearchTypeTest extends AbstractAPIv2Test {
     use SphinxTestTrait, CategoryAndDiscussionApiTestTrait;
 
@@ -69,7 +72,7 @@ class PollSearchTypeTest extends AbstractAPIv2Test {
         $pollsApiController->post([
             'name' => 'Poll 1',
             'discussionID' => $discussion1['discussionID']
-       ]);
+        ]);
 
         $discussion2 = $this->createDiscussion([
             'name' => 'Polls test discussion2',

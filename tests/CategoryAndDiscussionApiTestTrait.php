@@ -31,7 +31,6 @@ trait CategoryAndDiscussionApiTestTrait {
     public function setUpCategoryAndDiscussionApiTestTrait(): void {
         $this->lastInsertedCategoryID = null;
         $this->lastInsertedDiscussionID = null;
-
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
-
-namespace Vanilla\Polls\Models;
 /**
  * @copyright Copyright 2008-2016 Vanilla Forums, Inc.
  * @license Proprietary
  */
+
+namespace Vanilla\Polls\Models;
 
 use Garden\Web\Exception\HttpException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
