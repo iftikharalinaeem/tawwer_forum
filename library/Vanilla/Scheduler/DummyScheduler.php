@@ -66,6 +66,9 @@ class DummyScheduler implements SchedulerInterface {
      */
     protected $finalizeRequest = true;
 
+    /** @var bool */
+    protected $logErrorsAsWarnings = false;
+
     /**
      * DummyScheduler constructor.
      *
@@ -285,7 +288,9 @@ class DummyScheduler implements SchedulerInterface {
 
                 $driverSlip->setStackExecutionFailed($msg);
 
-                trigger_error($msg, E_USER_ERROR);
+                if ($this->logErrorsAsWarnings) {
+                    trigger_error($msg, E_USER_ERROR);
+                }
                 $this->logger->error($msg);
             }
         }

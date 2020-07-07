@@ -224,8 +224,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
         });
 
-        // A warning will have been converted to an exception by PHPUnit. Supress it.
-        @$eventManager->fire(self::DISPATCH_EVENT);
+        $eventManager->fire(self::DISPATCH_EVENT);
     }
 
     /**
@@ -271,9 +270,6 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
         /** @var $eventManager \Garden\EventManager */
         $eventManager = $container->get(\Garden\EventManager::class);
 
-        /** @var $eventManager \Garden\EventManager */
-        $eventManager = $container->get(\Garden\EventManager::class);
-
         $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
             /** @var $trackingSlips \Vanilla\Scheduler\TrackingSlip[] */
             $this->assertTrue(count($trackingSlips) == 1);
@@ -284,8 +280,7 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
         });
 
-        // A warning will have been converted to an exception by PHPUnit. Supress it.
-        @$eventManager->fire(self::DISPATCH_EVENT);
+        $eventManager->fire(self::DISPATCH_EVENT);
     }
 
     /**

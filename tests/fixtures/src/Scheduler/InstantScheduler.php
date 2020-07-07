@@ -22,6 +22,8 @@ class InstantScheduler extends DummyScheduler {
      */
     private $isDispatching = false;
 
+    protected $logErrorsAsWarnings = true;
+
     /**
      * Add a new Job to the queue and immediately execute it.
      *
