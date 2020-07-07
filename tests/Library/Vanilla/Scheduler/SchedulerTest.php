@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Vanilla\Library\Scheduler;
 
+use PHPUnit\Framework\Error\Deprecated;
+
 /**
  * Class SchedulerTest
  */
@@ -222,7 +224,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
         });
 
-        $eventManager->fire(self::DISPATCH_EVENT);
+        // A warning will have been converted to an exception by PHPUnit. Supress it.
+        @$eventManager->fire(self::DISPATCH_EVENT);
     }
 
     /**
@@ -281,7 +284,8 @@ final class SchedulerTest extends \PHPUnit\Framework\TestCase {
             $this->assertNotNull($trackingSlips[0]->getExtendedStatus()['error']);
         });
 
-        $eventManager->fire(self::DISPATCH_EVENT);
+        // A warning will have been converted to an exception by PHPUnit. Supress it.
+        @$eventManager->fire(self::DISPATCH_EVENT);
     }
 
     /**

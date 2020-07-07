@@ -171,7 +171,7 @@ class Model implements InjectableInterface {
             $selectExpressions = $sqlDriver->parseSelectExpression($selects);
             $selectFinalFieldNames = [];
             foreach ($selectExpressions as $selectExpression) {
-                $selectFinalFieldNames[] = $selectExpression['Alias'] ?? $selectExpression['Field'];
+                $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
             }
 
             $schema = Schema::parse([":a" => Schema::parse($selectFinalFieldNames)->add($this->getReadSchema())]);
