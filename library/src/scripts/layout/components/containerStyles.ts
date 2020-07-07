@@ -57,7 +57,6 @@ export const containerVariables = useThemeCache(() => {
 });
 
 export const containerMainStyles = (): NestedCSSProperties => {
-    const globalVars = globalVariables();
     const vars = containerVariables();
     return {
         display: "flex",

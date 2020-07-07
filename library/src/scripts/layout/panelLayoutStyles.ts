@@ -311,18 +311,18 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
             "&.hasLargePadding": {
                 ...paddings(vars.panelLayoutSpacing.largePadding),
             },
-        },
-        ...mediaQueries({
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    $nest: {
-                        "&.hasTopPadding.noBreadcrumbs": {
-                            paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+            ...mediaQueries({
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        $nest: {
+                            "&.hasTopPadding.noBreadcrumbs": {
+                                paddingTop: unit(vars.panelLayoutSpacing.extraPadding.mobile.noBreadcrumbs.top),
+                            },
                         },
                     },
                 },
-            },
-        }),
+            }).$nest,
+        },
     });
 
     const content = style("content", {
