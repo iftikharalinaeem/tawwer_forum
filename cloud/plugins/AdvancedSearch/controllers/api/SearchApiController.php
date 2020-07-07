@@ -351,6 +351,8 @@ class SearchApiController extends AbstractApiController {
             $this->resolveExpandFields($query, ['insertUser' => 'UserID'])
         );
 
+
+
         $searchResults = array_map(function ($record) use ($query) {
             $expandParams = [
                 'breadcrumbs' => $this->isExpandField('breadcrumbs', $query['expand']),
@@ -358,10 +360,14 @@ class SearchApiController extends AbstractApiController {
                 'image' => $this->isExpandField('image', $query['expand']),
             ];
 
+            $expandBody = $query['expandBody'] ?? false;
+            $searchTerm = $query['query'] ?? '';
+
             return $this->normalizeOutput(
                 $record,
-                $query['expandBody'],
-                $expandParams
+                $expandBody,
+                $expandParams,
+                $searchTerm,
             );
         }, $searchResults);
 
@@ -481,10 +487,16 @@ class SearchApiController extends AbstractApiController {
      *
      * @param array $searchRecord
      * @param bool $includeBody Whether or not to include the body in the output.
-     * @param bool $includeBreadcrumbs Whether or not to include breadcrumbs in the result.
+     * @param array $expandParams
+     * @param string $searchTerm
      * @return array
      */
-    public function normalizeOutput(array $searchRecord, bool $includeBody = true, array $expandParams = []): array {
+    public function normalizeOutput(
+        array $searchRecord,
+        bool $includeBody = true,
+        array $expandParams = [],
+        string $searchTerm = ''
+    ): array {
         $schemaRecord = [
             'recordID' => $searchRecord['PrimaryID'],
             'url' => $searchRecord['Url'],
@@ -502,7 +514,7 @@ class SearchApiController extends AbstractApiController {
         ];
 
         if ($includeBody) {
-            $schemaRecord['body'] = Gdn::formatService()->renderHTML($searchRecord['Summary'], $searchRecord['Format']);
+            $schemaRecord['body'] = searchExcerpt(Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']), $searchTerm);
         }
 
         $lcfRecordType = lcfirst($searchRecord['RecordType'] ?? '');
