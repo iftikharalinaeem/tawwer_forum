@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -63,6 +63,9 @@ class VanillaMailer extends PHPMailer {
      * Check the PHP Mailer exception message and tell us if the exception should be treated as
      * a server error instead of a "critical" error.
      * Server error means that we can try to resend the email.
+     *
+     * @param \PHPMailer\PHPMailer\Exception $e
+     * @return bool
      */
     public function isServerError(\PHPMailer\PHPMailer\Exception $e) {
         $serverErrorMessages = [
@@ -72,7 +75,7 @@ class VanillaMailer extends PHPMailer {
             'execute',
         ];
 
-        foreach($serverErrorMessages as $errorMessage) {
+        foreach ($serverErrorMessages as $errorMessage) {
            if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
                return true;
            }

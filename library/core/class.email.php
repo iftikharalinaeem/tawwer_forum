@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2020 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -49,7 +49,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
     /**
      * Constructor.
      */
-    function __construct() {
+    public function __construct() {
         $this->PhpMailer = new \Vanilla\VanillaMailer();
         $this->PhpMailer->CharSet = 'utf-8';
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
@@ -352,15 +352,15 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface {
      *
      * @param string $eventName
      * @return boolean
-     * @throws \Vanilla\Exception\ConfigurationException Throws an exception if email is disabled.
-     * @throws \PHPMailer\PHPMailer\Exception Throws an exception if there was a problem sending the email.
+     * @throws \Exception Throws an exception if emailing is disabled.
+     * @throws \PHPMailer\PHPMailer\Exception Throws an exception if there is a problem sending the email.
      */
     public function send($eventName = '') {
         $this->formatMessage($this->emailTemplate->toString());
         $this->fireEvent('BeforeSendMail');
 
         if (c('Garden.Email.Disabled')) {
-            throw new \Vanilla\Exception\ConfigurationException('Email disabled', self::ERR_SKIPPED);
+            throw new Exception('Email disabled', self::ERR_SKIPPED);
         }
 
         if (c('Garden.Email.UseSmtp')) {
