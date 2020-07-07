@@ -713,7 +713,7 @@ class UsersTest extends AbstractResourceTest {
 
         /** @var UserModel $userModel */
         $userModel =  static::container()->get(UserModel::class);
-        $userModel->setField($user2['userID'],'ShowEmail', 1);
+        $userModel->setField($user2['userID'], 'ShowEmail', 1);
 
         $this->api()->setUserID($user['userID']);
 
