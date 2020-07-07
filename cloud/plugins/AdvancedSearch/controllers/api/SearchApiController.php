@@ -358,12 +358,10 @@ class SearchApiController extends AbstractApiController {
                 'image' => $this->isExpandField('image', $query['expand']),
             ];
 
-            $expandBody = $query['expandBody'] ?? false;
             $searchTerm = $query['query'] ?? '';
 
             return $this->normalizeOutput(
                 $record,
-                $expandBody,
                 $expandParams,
                 $searchTerm
             );
@@ -484,14 +482,12 @@ class SearchApiController extends AbstractApiController {
      * Normalize a group database record to match the schema definition.
      *
      * @param array $searchRecord
-     * @param bool $includeBody Whether or not to include the body in the output.
      * @param array $expandParams
      * @param string $searchTerm
      * @return array
      */
     public function normalizeOutput(
         array $searchRecord,
-        bool $includeBody = true,
         array $expandParams = [],
         string $searchTerm = ''
     ): array {
@@ -510,13 +506,6 @@ class SearchApiController extends AbstractApiController {
             'dateUpdated' => $searchRecord['DateUpdated'] ?? null,
             'status' => $searchRecord['status'] ?? null,
         ];
-
-        if ($includeBody) {
-            $schemaRecord['body'] = searchExcerpt(
-                Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']),
-                $searchTerm
-            );
-        }
 
         $lcfRecordType = lcfirst($searchRecord['RecordType'] ?? '');
         if (in_array($lcfRecordType, $this->fullSchema()->getField('properties.recordType.enum'))) {
@@ -551,8 +540,17 @@ class SearchApiController extends AbstractApiController {
         }
 
         $includeExcept = $expandParams['excerpt'] ?? false;
-        if ($includeExcept && isset($searchRecord['excerpt'])) {
+        $excerpt = $searchRecord['excerpt'] ?? false;
+
+        if ($includeExcept && $excerpt) {
             $schemaRecord['excerpt'] = $searchRecord['excerpt'];
+        }
+
+        if (!$excerpt) {
+            $schemaRecord['excerpt'] = searchExcerpt(
+                Gdn::formatService()->renderPlainText($searchRecord['Summary'], $searchRecord['Format']),
+                $searchTerm
+            );
         }
 
         $includeFirstImage = $expandParams['image'] ?? false;
