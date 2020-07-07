@@ -114,4 +114,18 @@ abstract class SearchQuery {
         bool $exclude = false,
         string $filterOp = SearchQuery::FILTER_OP_OR
     );
+
+    /**
+     * Set int range filter
+     *
+     * @param string $attribute
+     * @param int $min
+     * @param int $max
+     * @param bool $exclude
+     *
+     * @return $this
+     */
+    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
+        return $this;
+    }
 }

@@ -20,6 +20,9 @@ class ElasticSearchQuery extends SearchQuery {
     /** @var array $filters List of filters */
     private $filters;
 
+    /** @var array $filterRange List of filters with range value */
+    private $filterRange;
+
     /** @var array $must List of must match fields (AND)*/
     private $must;
 
@@ -79,6 +82,16 @@ class ElasticSearchQuery extends SearchQuery {
         return $this;
     }
 
+    /**
+     * Note: this implementation only valid for date ranges!
+     * $min and $max will be transformed into date time string formatted to pass to elasticserach query payload
+     *
+     * @inheritDoc
+     */
+    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false) {
+        $this->filterRange[$attribute] = [date(DATE_ATOM, $min), date(DATE_ATOM, $max)];
+        return $this;
+    }
 
     /**
      * Get query parameter
@@ -138,6 +151,19 @@ class ElasticSearchQuery extends SearchQuery {
         if (!empty($this->filters)) {
             foreach ($this->filters as $term => $values) {
                 $payload['query']['bool']['must'][] = ['terms' => [$term => $values]];
+            }
+        }
+
+        if (!empty($this->filterRange)) {
+            foreach ($this->filterRange as $term => $range) {
+                $payload['query']['bool']['must'][] = [
+                    'range' => [
+                        $term => [
+                            "gte" => $range[0],
+                            "lte" => $range[1]
+                        ]
+                    ]
+                ];
             }
         }
 
