@@ -11,14 +11,17 @@ import {
     borders,
     colorOut,
     EMPTY_BORDER,
-    EMPTY_FONTS, EMPTY_SPACING,
+    EMPTY_FONTS,
+    EMPTY_SPACING,
     fonts,
     paddings,
-    unit
+    singleBorder,
+    unit,
 } from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
-import {TextTransformProperty} from "csstype";
+import { TextTransformProperty } from "csstype";
+import { percent } from "csx";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -33,7 +36,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         minWidth: 120,
         mobile: {
             minWidth: 140,
-        }
+        },
     });
 
     const buttonContainer = makeVars("buttonContainer", {
@@ -61,7 +64,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
             color: globalVars.mainColors.primary,
             size: 10,
             transform: "uppercase" as TextTransformProperty,
-        }
+        },
     });
 
     const vertical = makeVars("vertical", {
@@ -125,19 +128,21 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         paddingTop: vars.containerWithBorder.padding,
     });
 
-    const button = style("button", {
-        $nest: {
-            "&&": {
-                minWidth: unit(vars.button.minWidth),
-            }
-        }
-    },
+    const button = style(
+        "button",
+        {
+            $nest: {
+                "&&": {
+                    minWidth: unit(vars.button.minWidth),
+                },
+            },
+        },
         mediaQueries.oneColumnDown({
             $nest: {
                 "&&": {
-                    minWidth: unit(vars.button.mobile.minWidth)
-                }
-            }
+                    minWidth: unit(vars.button.mobile.minWidth),
+                },
+            },
         }),
     );
 
@@ -167,7 +172,11 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        width: "49%",
+        flexGrow: 1,
+        maxWidth: percent(50),
+        ...paddings({
+            horizontal: globalVars.spacer.size,
+        }),
     });
 
     const vertical = style("vertical", {
@@ -192,7 +201,10 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const email = style("email", {
-        color: vars.email.color,
+        ...fonts({
+            color: globalVars.mainColors.fg,
+            size: globalVars.fonts.size.small,
+        }),
         $nest: linkColors.$nest,
     });
 
@@ -202,9 +214,14 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
 
     const statLabel = style("statLabel", {
         ...fonts({
-            size: globalVars.fonts.size.small
+            size: globalVars.fonts.size.small,
         }),
     });
+
+    const statLeft = style("statLeft", {
+        borderRight: singleBorder({}),
+    });
+    const statRight = style("statRight", {});
 
     return {
         container,
@@ -221,5 +238,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         email,
         date,
         statLabel,
+        statLeft,
+        statRight,
     };
 });

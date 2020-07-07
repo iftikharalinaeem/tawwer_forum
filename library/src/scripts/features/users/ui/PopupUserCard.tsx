@@ -57,6 +57,7 @@ interface ILabelProps {
 interface IStatProps {
     count?: number;
     text: string;
+    position: "left" | "right";
 }
 
 interface IVerticalLineProps {
@@ -103,9 +104,14 @@ function ButtonContainer(props) {
 function Stat(props: IStatProps) {
     const classes = userCardClasses();
 
-    const { count, text } = props;
+    const { count, text, position } = props;
     return (
-        <div className={classes.stat}>
+        <div
+            className={classNames(classes.stat, {
+                [classes.statLeft]: position === "left",
+                [classes.statRight]: position === "right",
+            })}
+        >
             <div className={classes.count}>
                 <NumberFormatted value={count || 0} />
             </div>
@@ -223,9 +229,8 @@ export default function PopupUserCard(props: IProps) {
             </Container>
 
             <Container borderTop={true}>
-                <Stat count={user.countDiscussions} text={t("Discussions")} />
-                <VerticalLine width={1} />
-                <Stat count={user.countComments} text={t("Comments")} />
+                <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />
+                <Stat count={user.countComments} text={t("Comments")} position={"right"} />
             </Container>
 
             <Container borderTop={true}>
