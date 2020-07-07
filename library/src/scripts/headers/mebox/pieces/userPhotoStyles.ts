@@ -8,6 +8,7 @@ import { objectFitWithFallback, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { NestedCSSProperties } from "typestyle/lib/types";
+import { percent } from "csx";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -77,11 +78,30 @@ export const userPhotoClasses = useThemeCache(() => {
     const style = styleFactory("userPhoto");
     // I'm doing this so we can import the styles in the compatibility styles.
     const mixinStyles = userPhotoMixins(vars);
+
     const root = style(mixinStyles.root);
     const photo = style("photo", mixinStyles.photo);
     const small = style("small", mixinStyles.small);
     const medium = style("medium", mixinStyles.medium);
     const large = style("large", mixinStyles.large);
     const xlarge = style("large", mixinStyles.xlarge);
-    return { root, small, medium, large, xlarge, photo };
+
+    const noPhoto = style("noPhoto", {
+        display: "block",
+        $nest: {
+            "&&": {
+                width: percent(100),
+            },
+        },
+    });
+
+    return {
+        root,
+        small,
+        medium,
+        large,
+        xlarge,
+        photo,
+        noPhoto,
+    };
 });

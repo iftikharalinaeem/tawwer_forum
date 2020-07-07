@@ -81,7 +81,7 @@ function Name(props: INameProps) {
 function Label(props: ILabelProps) {
     const classes = userCardClasses();
     const { label } = props;
-    return <div> {label && <div className={classes.label}>{label}</div>} </div>;
+    return label ? <div className={classes.label}>{label}</div> : null;
 }
 
 function Container(props: IContainerProps) {
@@ -109,7 +109,7 @@ function Stat(props: IStatProps) {
             <div className={classes.count}>
                 <NumberFormatted value={count || 0} />
             </div>
-            <div> {text} </div>
+            <div className={classes.statLabel}>{text}</div>
         </div>
     );
 }
@@ -178,7 +178,7 @@ export default function PopupUserCard(props: IProps) {
             <Header onClick={() => toggleOpen(!open)} />
 
             <Container>
-                {user.photoUrl ? <UserPhoto userInfo={userInfo} size={photoSize} /> : <NoUserPhotoIcon />}
+                <UserPhoto userInfo={userInfo} size={photoSize} />
             </Container>
 
             <Container>

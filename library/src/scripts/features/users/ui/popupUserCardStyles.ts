@@ -7,9 +7,18 @@ import { useThemeCache, variableFactory, styleFactory } from "@library/styles/st
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { colorOut } from "@library/styles/styleHelpers";
+import {
+    borders,
+    colorOut,
+    EMPTY_BORDER,
+    EMPTY_FONTS, EMPTY_SPACING,
+    fonts,
+    paddings,
+    unit
+} from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
+import {TextTransformProperty} from "csstype";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -21,7 +30,10 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const button = makeVars("button", {
-        radius: formElementsVars.sizing.height / 2,
+        minWidth: 120,
+        mobile: {
+            minWidth: 140,
+        }
     });
 
     const buttonContainer = makeVars("buttonContainer", {
@@ -34,10 +46,22 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const label = makeVars("label", {
-        color: colorOut(globalVars.mainColors.primary),
-        border: globalVars.border.radius,
-        size: globalVars.fonts.size.small,
-        padding: globalVars.gutter.quarter,
+        border: {
+            ...EMPTY_BORDER,
+            color: globalVars.mainColors.primary,
+            radius: 3,
+        },
+        padding: {
+            ...EMPTY_SPACING,
+            vertical: 2,
+            horizontal: 10,
+        },
+        font: {
+            ...EMPTY_FONTS,
+            color: globalVars.mainColors.primary,
+            size: 10,
+            transform: "uppercase" as TextTransformProperty,
+        }
     });
 
     const vertical = makeVars("vertical", {
@@ -50,7 +74,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const count = makeVars("count", {
-        size: globalVars.fonts.size.largeTitle,
+        size: 28,
     });
 
     const header = makeVars("header", {
@@ -85,6 +109,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const vars = userCardVariables();
     const linkColors = clickableItemStates();
     const mediaQueries = layoutVariables().mediaQueries();
+    const globalVars = globalVariables();
 
     const container = style("container", {
         display: "flex",
@@ -101,16 +126,20 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     });
 
     const button = style("button", {
-        display: "block",
         $nest: {
-            "&:hover": {
-                backgroundColor: colorOut(globalVariables().mainColors.primary),
-                color: colorOut(globalVariables().mainColors.bg),
-                border: `1px solid ${colorOut(globalVariables().mainColors.bg)}`,
-            },
-        },
-        borderRadius: vars.button.radius,
-    });
+            "&&": {
+                minWidth: unit(vars.button.minWidth),
+            }
+        }
+    },
+        mediaQueries.oneColumnDown({
+            $nest: {
+                "&&": {
+                    minWidth: unit(vars.button.mobile.minWidth)
+                }
+            }
+        }),
+    );
 
     const buttonContainer = style("buttonContainer", {
         padding: vars.buttonContainer.padding,
@@ -129,12 +158,9 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     );
 
     const label = style("label", {
-        color: vars.label.color,
-        textTransform: "uppercase",
-        fontSize: vars.label.size,
-        border: `1px solid ${vars.label.color}`,
-        padding: vars.label.padding,
-        borderRadius: vars.label.border,
+        ...fonts(vars.label.font),
+        ...paddings(vars.label.padding),
+        ...borders(vars.label.border),
     });
 
     const stat = style("stat", {
@@ -174,6 +200,12 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         padding: vars.buttonContainer.padding,
     });
 
+    const statLabel = style("statLabel", {
+        ...fonts({
+            size: globalVars.fonts.size.small
+        }),
+    });
+
     return {
         container,
         containerWithBorder,
@@ -188,5 +220,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         section,
         email,
         date,
+        statLabel,
     };
 });

@@ -49,16 +49,16 @@ export class UserPhoto extends React.Component<IProps> {
         }
 
         return (
-            <div className={classNames("userPhoto", className, sizeClass, classes.root, { isOpen: open })}>
+            <div className={classNames(className, sizeClass, classes.root, { isOpen: open })}>
                 {!!photoUrl && (
                     <img
                         src={photoUrl}
                         title={name || ""}
                         alt={accessibleLabel(`User: "%s"`, [name])}
-                        className={classNames("userPhoto-photo", classes.photo)}
+                        className={classNames(classes.photo)}
                     />
                 )}
-                {!photoUrl && <UserIcon filled={open} className={classNames("userPhoto-photo", classes.photo)} />}
+                {!photoUrl && <UserIcon filled={open} className={classNames(classes.photo, classes.noPhoto)} />}
             </div>
         );
     }
