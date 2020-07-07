@@ -11,7 +11,6 @@ use Vanilla\Contracts\Search\SearchRecordTypeProviderInterface;
 use Garden\Schema\Schema;
 use Vanilla\Search\AbstractSearchDriver;
 
-
 /**
  * Class PollsPlugin
  */

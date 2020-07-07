@@ -11,9 +11,7 @@ use Vanilla\Search\SearchService;
 use Vanilla\Sphinx\Search\SphinxSearchDriver;
 use Vanilla\Sphinx\Tests\Utils\SphinxTestTrait;
 use VanillaTests\APIv2\AbstractAPIv2Test;
-use VanillaTests\APIv2\PollsTest;
 use VanillaTests\CategoryAndDiscussionApiTestTrait;
-
 
 class PollSearchTypeTest extends AbstractAPIv2Test {
     use SphinxTestTrait, CategoryAndDiscussionApiTestTrait;
@@ -53,7 +51,7 @@ class PollSearchTypeTest extends AbstractAPIv2Test {
     /**
      * Test searching for Poll types
      */
-    public function testSearchPollType () {
+    public function testSearchPollType() {
         /** @var PollsApiController $pollsApiController */
         $pollsApiController = Gdn::getContainer()->get(PollsApiController::class);
         $category = $this->createCategory([
@@ -68,48 +66,45 @@ class PollSearchTypeTest extends AbstractAPIv2Test {
             'categoryID' => $category['categoryID'],
         ]);
 
-       $pollsApiController->post([
-           'name' => 'Poll 1',
-           'discussionID' => $discussion1['discussionID']
+        $pollsApiController->post([
+            'name' => 'Poll 1',
+            'discussionID' => $discussion1['discussionID']
        ]);
 
-       $discussion2 = $this->createDiscussion([
-           'name' => 'Polls test discussion2',
-           'body' => 'Polls Test',
-           'format' => 'markdown',
-           'categoryID' => $category['categoryID'],
-       ]);
+        $discussion2 = $this->createDiscussion([
+            'name' => 'Polls test discussion2',
+            'body' => 'Polls Test',
+            'format' => 'markdown',
+            'categoryID' => $category['categoryID'],
+        ]);
 
-       $pollsApiController->post([
-           'name' => 'Poll 2',
-           'discussionID' => $discussion2['discussionID']
-       ]);
+        $pollsApiController->post([
+            'name' => 'Poll 2',
+            'discussionID' => $discussion2['discussionID']
+        ]);
 
+        $discussion = $this->createDiscussion([
+            'categoryID' => $category['categoryID'],
+            'name' => 'Not A Poll',
+            'body' => 'Discussion'
+        ]);
+        self::SphinxReindex();
 
-       $discussion = $this->createDiscussion([
-           'categoryID' => $category['categoryID'],
-           'name' => 'Not A Poll',
-           'body' => 'Discussion'
-       ]);
-
-       self::SphinxReindex();
-
-       $params = [
-           'query' => 'Polls',
-           'recordTypes' => ['discussion'],
-           'types' => ['poll'],
-       ];
-       $response = $this->api()->get('/search?'.http_build_query($params));
-       $this->assertEquals(200, $response->getStatusCode());
-
-       $results = $response->getBody();
-       $this->assertEquals(2, count($results));
+        $params = [
+            'query' => 'Polls',
+            'recordTypes' => ['discussion'],
+            'types' => ['poll'],
+        ];
+        $response = $this->api()->get('/search?'.http_build_query($params));
+        $this->assertEquals(200, $response->getStatusCode());
+        $results = $response->getBody();
+        $this->assertEquals(2, count($results));
     }
 
     /**
      * Test searching for Poll and Discussions Types..
      */
-    public function testSearchPollTypeWithDiscussion () {
+    public function testSearchPollTypeWithDiscussion() {
         /** @var PollsApiController $pollsApiController */
         $pollsApiController = Gdn::getContainer()->get(PollsApiController::class);
         $this->resetTable('Category');
@@ -164,6 +159,5 @@ class PollSearchTypeTest extends AbstractAPIv2Test {
 
         $results = $response->getBody();
         $this->assertEquals(3, count($results));
-
     }
 }

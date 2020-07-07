@@ -1,6 +1,10 @@
 <?php
 
 namespace Vanilla\Polls\Models;
+/**
+ * @copyright Copyright 2008-2016 Vanilla Forums, Inc.
+ * @license Proprietary
+ */
 
 use Garden\Web\Exception\HttpException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
@@ -9,6 +13,11 @@ use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 
+/**
+ * Class PollSearchType
+ *
+ * @package Vanilla\Polls\Models
+ */
 class PollSearchType extends DiscussionSearchType {
 
     /** @var \DiscussionsApiController */
@@ -90,5 +99,3 @@ class PollSearchType extends DiscussionSearchType {
         }
     }
 }
-
-
