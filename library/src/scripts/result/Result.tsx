@@ -14,7 +14,6 @@ import { searchResultClasses, searchResultsClasses } from "@library/features/sea
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import Paragraph from "@library/layout/Paragraph";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { TypeQuestionIcon } from "@library/icons/searchIcons";
 
 export interface IResult {
     name: string;

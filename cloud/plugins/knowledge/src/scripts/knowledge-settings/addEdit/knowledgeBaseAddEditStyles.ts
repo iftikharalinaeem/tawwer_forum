@@ -5,9 +5,7 @@
 
 import { useThemeCache, styleFactory } from "@library/styles/styleUtils";
 import { globalVariables } from "@vanilla/library/src/scripts/styles/globalStyleVars";
-import { flexHelper, unit } from "@vanilla/library/src/scripts/styles/styleHelpers";
-import { formElementsVariables } from "@library/forms/formElementStyles";
-import { translateY } from "csx";
+import { flexHelper } from "@vanilla/library/src/scripts/styles/styleHelpers";
 
 export const knowledgeBaseAddEditClasses = useThemeCache(() => {
     const globalVars = globalVariables();

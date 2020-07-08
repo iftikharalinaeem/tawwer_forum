@@ -115,7 +115,7 @@ class CommentsApiController extends AbstractApiController {
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment['CommentID']);
+            $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
         }
         $this->commentModel->deleteID($id);

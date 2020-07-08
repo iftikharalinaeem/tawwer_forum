@@ -1943,9 +1943,9 @@ abstract class Gdn_SQLDriver {
         return $this;
     }
 
+
     /**
-     * Allows the specification of columns to be selected in a database query.
-     * Returns this object for chaining purposes. ie. $db->select()->from();
+     * Parse select information for SqlDriver::select().
      *
      * @param mixed $select NotRequired "*" The field(s) being selected. It
      * can be a comma delimited string, the name of a single field, or an array
@@ -1954,9 +1954,9 @@ abstract class Gdn_SQLDriver {
      * the select column. Only valid if a single column name is provided.
      * Accepted values are MAX, MIN, AVG, SUM.
      * @param string $alias NotRequired "" The alias to give a column name.
-     * @return $this
+     * @return array The select information. ['Field:s', 'Function:s', 'Alias:s'];
      */
-    public function select($select = '*', $function = '', $alias = '') {
+    public function parseSelectExpression($select = '*', $function = '', $alias = ''): array {
         if (is_string($select)) {
             if ($function == '') {
                 $select = explode(',', $select);
@@ -1966,6 +1966,7 @@ abstract class Gdn_SQLDriver {
         }
         $count = count($select);
 
+        $selects = [];
         for ($i = 0; $i < $count; $i++) {
             $field = trim($select[$i]);
 
@@ -1984,13 +1985,32 @@ abstract class Gdn_SQLDriver {
                     $alias = '';
                 }
             }
-
             $expr = ['Field' => $field, 'Function' => $function, 'Alias' => $alias];
+            $selects[] = $expr;
+        }
+        return $selects;
+    }
 
+    /**
+     * Allows the specification of columns to be selected in a database query.
+     * Returns this object for chaining purposes. ie. $db->select()->from();
+     *
+     * @param mixed $select NotRequired "*" The field(s) being selected. It
+     * can be a comma delimited string, the name of a single field, or an array
+     * of field names.
+     * @param string $function NotRequired "" The aggregate function to be used on
+     * the select column. Only valid if a single column name is provided.
+     * Accepted values are MAX, MIN, AVG, SUM.
+     * @param string $alias NotRequired "" The alias to give a column name.
+     * @return $this
+     */
+    public function select($select = '*', $function = '', $alias = '') {
+        $selectInfos = $this->parseSelectExpression($select, $function, $alias);
+        foreach ($selectInfos as $selectInfo) {
             if ($alias == '') {
-                $this->_Selects[] = $expr;
+                $this->_Selects[] = $selectInfo;
             } else {
-                $this->_Selects[$alias] = $expr;
+                $this->_Selects[$alias] = $selectInfo;
             }
         }
         return $this;

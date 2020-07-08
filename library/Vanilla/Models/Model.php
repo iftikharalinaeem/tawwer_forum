@@ -150,7 +150,7 @@ class Model implements InjectableInterface {
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
         $offset = $options[self::OPT_OFFSET] ?? 0;
-        $selects =  $options[self::OPT_SELECT] ?? [];
+        $selects = $options[self::OPT_SELECT] ?? [];
 
         $sqlDriver = $this->createSql();
 
@@ -168,7 +168,13 @@ class Model implements InjectableInterface {
         if (empty($selects)) {
             $schema = Schema::parse([":a" => $this->getReadSchema()]);
         } else {
-            $schema = Schema::parse([":a" =>  Schema::parse($selects)->add($this->getReadSchema())]);
+            $selectExpressions = $sqlDriver->parseSelectExpression($selects);
+            $selectFinalFieldNames = [];
+            foreach ($selectExpressions as $selectExpression) {
+                $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
+            }
+
+            $schema = Schema::parse([":a" => Schema::parse($selectFinalFieldNames)->add($this->getReadSchema())]);
         }
         // What if a processor goes here?
 
