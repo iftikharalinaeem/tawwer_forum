@@ -42,7 +42,7 @@ export const layoutVariables = useThemeCache(
         const foundationalWidths = makeThemeVars("foundationalWidths", {
             fullGutter: globalVars.constants.fullGutter,
             panelWidth: globalVars.panel.width,
-            middleColumnWidth: 672,
+            middleColumn: globalVars.middleColumn.width,
             minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
             narrowContentWidth: 900, // For home page widgets, narrower than full width
             breakPoints: {
@@ -69,7 +69,7 @@ export const layoutVariables = useThemeCache(
         });
 
         const middleColumnInit = makeThemeVars("middleColumn", {
-            width: foundationalWidths.middleColumnWidth,
+            width: foundationalWidths.middleColumn,
         });
 
         const middleColumn = makeThemeVars("middleColumn", {
@@ -479,7 +479,7 @@ export const generatePanelLayoutClasses = (props: {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        paddingBottom: unit(6),
+        paddingBottom: unit(14),
     });
 
     const layoutSpecificStyles = style => {

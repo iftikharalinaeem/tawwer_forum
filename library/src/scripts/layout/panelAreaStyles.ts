@@ -20,7 +20,8 @@ export const panelAreaClasses = useThemeCache(mediaQueries => {
     const root = style({
         width: percent(100),
         ...paddings({
-            all: globalVariables().widget.padding,
+            horizontal: globalVariables().widget.padding,
+            vertical: globalVariables().widget.padding / 5,
         }),
         $nest: {
             "& .heading": {

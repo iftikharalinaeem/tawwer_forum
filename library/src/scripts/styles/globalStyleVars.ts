@@ -238,7 +238,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     // its own variables. These are the globals from which the rest is calculated.
     const foundationalWidths = makeThemeVars("foundationalWidths", {
         panelWidth: 216,
-        middleColumnWidth: 672,
+        middleColumn: 672,
         minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
         narrowContentWidth: 900, // For home page widgets, narrower than full width
         breakPoints: {
@@ -267,7 +267,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const middleColumnInit = makeThemeVars("middleColumn", {
-        width: foundationalWidths.middleColumnWidth,
+        width: foundationalWidths.middleColumn,
     });
 
     const middleColumn = makeThemeVars("middleColumn", {

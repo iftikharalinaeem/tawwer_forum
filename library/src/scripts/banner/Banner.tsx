@@ -129,7 +129,7 @@ export default function Banner(props: IProps) {
                                 )}
                         </div>
                         {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
-                        <Container fullGutter className={classes.fullHeight}>
+                        <Container className={classes.fullHeight}>
                             <div className={classes.imagePositioner}>
                                 {/*For SEO & accessibility*/}
                                 {options.hideTitle && (
