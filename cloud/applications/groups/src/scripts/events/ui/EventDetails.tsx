@@ -20,6 +20,7 @@ import { EventParticipantsTabModule } from "@groups/events/modules/EventParticip
 import RadioInputAsButton from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { RadioGroup } from "@vanilla/library/src/scripts/forms/radioAsButtons/RadioGroup";
 import { radioInputAsButtonsClasses } from "@library/forms/radioAsButtons/radioInputAsButtons.styles";
+import { UserCardModuleLazyLoad } from "@vanilla/library/src/scripts/features/users/modules/UserCardModuleLazyLoad";
 
 interface IAttendees {
     users: IUserFragment[] | undefined;
@@ -61,9 +62,10 @@ export function EventDetails(props: IProps) {
                     {
                         key: t("Organizer"),
                         value: (
-                            <SmartLink className={classes.organizer} to={makeProfileUrl(event.insertUser.name)}>
-                                {event.insertUser.name}
-                            </SmartLink>
+                            <UserCardModuleLazyLoad
+                                userID={event.insertUser.userID}
+                                buttonContent={event.insertUser.name}
+                            />
                         ),
                     },
                 ]}

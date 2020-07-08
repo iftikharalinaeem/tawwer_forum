@@ -6,7 +6,7 @@
 import React, { ReactNode, useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -20,6 +20,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
 import classNames from "classnames";
+import { string } from "prop-types";
 
 export interface IUserCardInfo {
     email: string;
@@ -36,6 +37,10 @@ export interface IUserCardInfo {
 interface IProps {
     user: IUserCardInfo;
     visible?: boolean;
+    buttonContent?: ReactNode | string;
+    openAsModal?: boolean;
+    buttonType?: ButtonTypes;
+    buttonClass?: string;
 }
 
 interface IContainerProps {
@@ -75,7 +80,8 @@ function Name(props: INameProps) {
 function Label(props: ILabelProps) {
     const classes = userCardClasses();
     const { label } = props;
-    return label ? <div className={classes.label}>{label}</div> : null;
+    // HTML here is sanitized server side.
+    return label ? <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} /> : null;
 }
 
 function Container(props: IContainerProps) {
@@ -145,8 +151,8 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible } = props;
-    const [open, toggleOpen] = useState(visible || false);
+    const { user, visible, buttonContent, openAsModal } = props;
+    const [open, toggleOpen] = useState(!!visible);
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -162,13 +168,15 @@ export default function PopupUserCard(props: IProps) {
 
     return (
         <DropDown
-            buttonBaseClass={ButtonTypes.TEXT}
-            buttonContents={user.name}
-            buttonClassName={classes.link}
+            tag={"span"}
+            buttonContents={buttonContent || user.name}
+            buttonBaseClass={props.buttonType ?? ButtonTypes.TEXT}
+            buttonClassName={classNames(classes.link, props.buttonClass)}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
             onVisibilityChange={isVisible => toggleOpen(isVisible)}
+            openAsModal={openAsModal}
         >
             <Header onClick={() => toggleOpen(!open)} />
 

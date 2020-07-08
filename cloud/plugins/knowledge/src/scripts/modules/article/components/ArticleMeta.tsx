@@ -8,10 +8,10 @@ import React from "react";
 import Translate from "@library/content/Translate";
 import ProfileLink from "@library/navigation/ProfileLink";
 import DateTime from "@library/content/DateTime";
-import { Link } from "react-router-dom";
 import { IUserFragment } from "@library/@types/api/users";
 import { metasClasses } from "@library/styles/metasStyles";
 import SmartLink from "@library/routing/links/SmartLink";
+import { UserCardModuleLazyLoad } from "@vanilla/library/src/scripts/features/users/modules/UserCardModuleLazyLoad";
 
 interface IProps {
     updateUser: IUserFragment;
@@ -30,7 +30,13 @@ export class ArticleMeta extends React.Component<IProps> {
                 <span className={classesMetas.meta}>
                     <Translate
                         source="By <0/>"
-                        c0={<ProfileLink className={classesMetas.meta} username={updateUser.name} />}
+                        c0={
+                            <ProfileLink
+                                className={classesMetas.meta}
+                                username={updateUser.name}
+                                userID={updateUser.userID}
+                            />
+                        }
                     />
                 </span>
                 <span className={classesMetas.meta}>

@@ -2716,6 +2716,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 'roleID:i' => 'ID of the role.',
                 'name:s' => 'Name of the role.'
             ], 'RoleFragment'),
+            'label:s?',
         ]);
         return $result;
     }
@@ -2743,6 +2744,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
                 "title?",
                 "countDiscussions?",
                 "countComments?",
+                "label?",
             ]);
             $result->add($this->schema());
 

@@ -41,7 +41,13 @@ export class ResultMeta extends React.Component<IProps> {
                             <Translate
                                 source="<0/> by <1/>"
                                 c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                                c1={<ProfileLink className={classesMetas.meta} username={updateUser.name} />}
+                                c1={
+                                    <ProfileLink
+                                        className={classesMetas.meta}
+                                        username={updateUser.name}
+                                        userID={updateUser.userID}
+                                    />
+                                }
                             />
                         )}
                     </span>
