@@ -43,7 +43,7 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 // left panel    : 20 + 216 + 20 = 256
 // middle column : 20 + 672 + 20 = 712
 // right panel   : 20 + 216 + 20 = 256
-// total         : 1172
+// total         : 1224
 
 // == TWO COLUMN LAYOUT ==
 
@@ -51,14 +51,14 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 // gutter       : 20
 // right panel  : 343
 // gutter       : 40
-// main column  : 1172 - 20 - 343 - 40 - 20 = 749
+// main column  : 1224 - 20 - 343 - 40 - 20 = 801
 // gutter       : 20
-// total        : 1172
+// total        : 1224
 
 // -- Padded Widths --
 // right panel    : 20 + 343 + 20 = 383
 // middle column : 20 + 749 + 20 = 789
-// total         : 1172
+// total         : 1224
 
 // == LEGACY LAYOUT ==
 
@@ -66,9 +66,9 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 // gutter       : 20
 // right panel  : 244
 // gutter       : 52 (different than other layouts)
-// main column  : 1172 - 20 - 244 - 52 - 20 = 836
+// main column  : 1224 - 20 - 244 - 52 - 20 = 888
 // gutter       : 20
-// total        : 1172
+// total        : 1224
 
 // -- Padded Widths --
 // right panel    : 20 + 244 + (52/2) = 290

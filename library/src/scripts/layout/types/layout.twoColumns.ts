@@ -17,7 +17,6 @@ export const twoColumnLayoutVariables = useThemeCache(
     (): IPanelLayoutVariables => {
         const layoutVars = layoutVariables();
         const Devices = twoColumnLayoutDevices;
-        const { contentWidth } = layoutVars;
         const { fullGutter } = layoutVars.foundationalWidths;
 
         const makeThemeVars = variableFactory("twoColumnLayout");
@@ -33,10 +32,10 @@ export const twoColumnLayoutVariables = useThemeCache(
         });
 
         const gutter = makeThemeVars("gutter", {
-            full: foundationalWidths.fullGutter, // 48
-            size: foundationalWidths.fullGutter / 2, // 24
-            halfSize: foundationalWidths.fullGutter / 4, // 12
-            quarterSize: foundationalWidths.fullGutter / 8, // 6
+            full: foundationalWidths.fullGutter, // 40
+            size: foundationalWidths.fullGutter / 2, // 20
+            halfSize: foundationalWidths.fullGutter / 4, // 10
+            quarterSize: foundationalWidths.fullGutter / 8, // 5
         });
 
         const panelInit = makeThemeVars("panel", {
@@ -48,20 +47,22 @@ export const twoColumnLayoutVariables = useThemeCache(
             paddedWidth: panelInit.width + layoutVars.gutter.full,
         });
 
-        const middleColumnInit = makeThemeVars("middleColumn", {
-            width: contentWidth - panel.paddedWidth - layoutVars.gutter.full,
+        const middleColumnInit = makeThemeVars("mainColumn", {
+            width: layoutVars.contentWidth - panel.paddedWidth - layoutVars.gutter.full,
         });
 
-        const middleColumn = makeThemeVars("middleColumn", {
+        const middleColumn = makeThemeVars("mainColumn", {
             ...middleColumnInit,
             paddedWidth: middleColumnInit.width + layoutVars.gutter.full,
         });
 
         const breakPoints = makeThemeVars("breakPoints", {
-            noBleed: contentWidth,
+            noBleed: layoutVars.contentWidth,
             oneColumn: foundationalWidths.minimalMiddleColumnWidth + panel.paddedWidth,
             xs: foundationalWidths.breakPoints.xs,
         });
+
+        const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
         const mediaQueries = (): ITwoColumnLayoutMediaQueries => {
             const noBleed = (styles: NestedCSSProperties, useMinWidth: boolean = true) => {

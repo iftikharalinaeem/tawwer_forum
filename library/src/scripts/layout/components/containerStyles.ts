@@ -16,15 +16,17 @@ export const containerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
+    console.log("--- vars: ", vars);
+
     let spacing = makeThemeVars("spacing", {
-        padding: vars.gutter.size,
+        padding: globalVars.constants.fullGutter / 2,
         mobile: {
             padding: globalVars.widget.padding,
         },
     });
 
     const sizing = makeThemeVars("sizes", {
-        full: vars.contentSizes.full,
+        full: vars.contentWidth,
         narrowContentSize: vars.contentSizes.narrow,
     });
 
@@ -47,7 +49,7 @@ export const containerMainStyles = (): NestedCSSProperties => {
         position: "relative",
         boxSizing: "border-box",
         width: percent(100),
-        maxWidth: unit(layoutVariables().contentWidth + vars.spacing.padding * 2),
+        maxWidth: unit(vars.sizing.full + vars.spacing.padding * 2),
         marginLeft: "auto",
         marginRight: "auto",
         ...paddings({

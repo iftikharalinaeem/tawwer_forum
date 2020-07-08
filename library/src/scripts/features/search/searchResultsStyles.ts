@@ -67,9 +67,9 @@ export const searchResultsVariables = useThemeCache(() => {
     const spacing = makeThemeVars("spacing", {
         padding: {
             top: 15,
-            right: globalVars.gutter.half,
+            right: globalVars.widget.padding,
             bottom: 16,
-            left: globalVars.gutter.half,
+            left: globalVars.widget.padding,
         },
     });
 

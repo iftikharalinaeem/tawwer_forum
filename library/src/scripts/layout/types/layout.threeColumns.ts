@@ -60,7 +60,7 @@ export const threeColumnLayoutVariables = useThemeCache(
             paddedWidth: middleColumnInit.width + layoutVars.gutter.full,
         });
 
-        const contentWidth = layoutVars.contentWidth;
+        const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
         const breakPoints = makeThemeVars("breakPoints", {
             noBleed: contentWidth,

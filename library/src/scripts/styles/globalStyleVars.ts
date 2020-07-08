@@ -229,8 +229,8 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     // Three column
     // 216 + 40 + 672 + 40 + 216 = 1184 (correct full width of three column layout)
-    // 1184
-    // (216 + 40 + 672  + 40 + 216) - 343px         + 40 + 343px (two column layout)
+    // 1184 + 40 = 1224 - padded
+    // 1184 - 343px =  (two column layout)
     //                                           52 (Extra space) + 244px (Foundation)
 
     // These globals are here because the layout system was created based on a 3 column layout

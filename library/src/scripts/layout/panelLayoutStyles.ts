@@ -42,7 +42,7 @@ export const layoutVariables = useThemeCache(
         const foundationalWidths = makeThemeVars("foundationalWidths", {
             fullGutter: globalVars.constants.fullGutter,
             panelWidth: globalVars.panel.width,
-            middleColumnWidth: 700,
+            middleColumnWidth: 672,
             minimalMiddleColumnWidth: 550, // Will break if middle column width is smaller than this value.
             narrowContentWidth: 900, // For home page widgets, narrower than full width
             breakPoints: {
@@ -53,22 +53,28 @@ export const layoutVariables = useThemeCache(
         });
 
         const gutter = {
-            full: foundationalWidths.fullGutter, // 48
-            size: foundationalWidths.fullGutter / 2, // 24
-            halfSize: foundationalWidths.fullGutter / 4, // 12
-            quarterSize: foundationalWidths.fullGutter / 8, // 6
+            full: foundationalWidths.fullGutter, // 40
+            size: foundationalWidths.fullGutter / 2, // 20
+            halfSize: foundationalWidths.fullGutter / 4, // 10
+            quarterSize: foundationalWidths.fullGutter / 8, // 5
         };
 
-        const fullPadding = globalVars.widget.padding * 2;
+        const panelInit = makeThemeVars("panel", {
+            width: foundationalWidths.panelWidth,
+        });
 
         const panel = makeThemeVars("panel", {
-            width: foundationalWidths.panelWidth,
-            paddedWidth: foundationalWidths.panelWidth + fullPadding,
+            ...panelInit,
+            paddedWidth: panelInit.width + gutter.full,
+        });
+
+        const middleColumnInit = makeThemeVars("middleColumn", {
+            width: foundationalWidths.middleColumnWidth,
         });
 
         const middleColumn = makeThemeVars("middleColumn", {
-            width: foundationalWidths.middleColumnWidth,
-            paddedWidth: foundationalWidths.middleColumnWidth + fullPadding,
+            ...middleColumnInit,
+            paddedWidth: middleColumnInit.width + gutter.full,
         });
 
         const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
@@ -418,6 +424,9 @@ export const generatePanelLayoutClasses = (props: {
             },
         }),
     });
+
+    console.log("two vars.panel.paddedWidth: ", vars.panel.paddedWidth);
+    console.log("two vars: ", vars);
 
     const mainColumnMaxWidth = style("mainColumnMaxWidth", {
         $nest: {
