@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests;
+namespace Vanilla\Http;
 
 use Garden\Container\Container;
 use Garden\Http\HttpClient;
@@ -13,6 +13,9 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 
+/**
+ * Http client for making requests internally against the dispatcher.
+ */
 class InternalClient extends HttpClient {
 
     const DEFAULT_USER_ID = 2;
@@ -37,6 +40,9 @@ class InternalClient extends HttpClient {
      */
     private $transientKeySigned;
 
+    /** @var string */
+    private $siteBaseUrl;
+
     /**
      * InternalClient constructor.
      *
@@ -47,6 +53,7 @@ class InternalClient extends HttpClient {
         parent::__construct($baseUrl);
         $this->throwExceptions = true;
         $this->container = $container;
+        $this->siteBaseUrl = $container->get("@baseUrl");
 
         // Add a middleware to ensure objects are properly serialized.
         $this->addMiddleware(function (HttpRequest $request, callable $next): HttpResponse {
@@ -80,6 +87,9 @@ class InternalClient extends HttpClient {
      * {@inheritdoc}
      */
     public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = []) {
+        // If we already have our own domain, strip it off.
+        $uri = str_replace($this->baseUrl, "", $uri);
+
         if (strpos($uri, '//') === false) {
             $uri = $this->baseUrl.'/'.ltrim($uri, '/');
         }

@@ -3,24 +3,22 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import { IUser, IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
+import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import DropDownSection from "@library/flyouts/items/DropDownSection";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { CloseCompactIcon } from "@library/icons/common";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
-import { userCardClasses, userCardVariables } from "@library/features/users/ui/popupUserCardStyles";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { t } from "@vanilla/i18n";
 import { makeProfileUrl } from "@library/utility/appUtils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import DateTime from "@library/content/DateTime";
-import { NoUserPhotoIcon } from "@library/icons/titleBar";
 import classNames from "classnames";
 import { string } from "prop-types";
 
@@ -60,10 +58,6 @@ interface IStatProps {
     count?: number;
     text: string;
     position: "left" | "right";
-}
-
-interface IVerticalLineProps {
-    width: number;
 }
 
 interface IDateProps {
@@ -122,12 +116,6 @@ function Stat(props: IStatProps) {
     );
 }
 
-function VerticalLine(props: IVerticalLineProps) {
-    const classes = userCardClasses();
-    const { width } = props;
-    return <hr className={classes.vertical} style={{ width: `${width}px` }} />;
-}
-
 function Date(props: IDateProps) {
     const classes = userCardClasses();
     const { text, date } = props;
@@ -147,9 +135,10 @@ function Header(props: IHeaderProps) {
     return (
         <div className={classes.header}>
             {isCompact && (
-                <Button onClick={onClick} baseClass={ButtonTypes.ICON}>
+                <Button className={classes.close} onClick={onClick} baseClass={ButtonTypes.ICON}>
                     <>
-                        <CloseCompactIcon /> <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
+                        <CloseCompactIcon />
+                        <ScreenReaderContent>{t("Close")}</ScreenReaderContent>
                     </>
                 </Button>
             )}
@@ -176,8 +165,9 @@ export default function PopupUserCard(props: IProps) {
 
     return (
         <DropDown
-            buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
             buttonContents={buttonContent || user.name}
+            buttonBaseClass={ButtonTypes.TEXT}
+            buttonClassName={classes.link}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
@@ -186,30 +176,21 @@ export default function PopupUserCard(props: IProps) {
         >
             <Header onClick={() => toggleOpen(!open)} />
 
-            <Container>
-                <UserPhoto userInfo={userInfo} size={photoSize} />
-            </Container>
+            <UserPhoto userInfo={userInfo} size={photoSize} className={classes.userPhoto} />
 
             <Container>
                 <Name name={user.name} />
-            </Container>
+                {/* We don't  want this section to show at all if there's no label */}
+                {user.label && <Label label={user.label} />}
 
-            {/* We don't  want this section to show at all if there's no label */}
-            {user.label && (
-                <Container>
-                    <Label label={user.label} />
-                </Container>
-            )}
-
-            <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
-                <Container>
+                <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
                     <a className={classes.email} href={`mailto:${user.email}`}>
                         {user.email}
                     </a>
-                </Container>
-            </Permission>
+                </Permission>
+            </Container>
 
-            <Container>
+            <div className={classNames(classes.container, classes.actionContainer)}>
                 <ButtonContainer>
                     <LinkAsButton
                         to={makeProfileUrl(user.name)}
@@ -229,7 +210,7 @@ export default function PopupUserCard(props: IProps) {
                         {t("Message")}
                     </LinkAsButton>
                 </ButtonContainer>
-            </Container>
+            </div>
 
             <Container borderTop={true}>
                 <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />

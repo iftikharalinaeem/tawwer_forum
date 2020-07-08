@@ -14,6 +14,7 @@ import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -41,7 +42,7 @@ export const modalVariables = useThemeCache(() => {
     });
 
     const spacing = makeThemeVars("spacing", {
-        horizontalMargin: 16,
+        horizontalMargin: 40,
     });
 
     const border = makeThemeVars("border", {
@@ -172,19 +173,19 @@ export const modalClasses = useThemeCache(() => {
             "&.isXL": {
                 width: unit(vars.sizing.xl),
                 height: percent(100),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isLarge": {
                 width: unit(vars.sizing.large),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isMedium": {
                 width: unit(vars.sizing.medium),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&.isSmall": {
                 width: unit(vars.sizing.small),
-                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin * 2)}`),
+                maxWidth: calc(`100% - ${unit(vars.spacing.horizontalMargin)}`),
             },
             "&&&.isSidePanelRight": {
                 ...sidePanelMixin,

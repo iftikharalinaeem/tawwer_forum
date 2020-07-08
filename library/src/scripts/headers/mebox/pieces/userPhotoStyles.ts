@@ -8,7 +8,7 @@ import { objectFitWithFallback, unit } from "@library/styles/styleHelpers";
 import { styleFactory, useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { percent } from "csx";
+import { important, percent } from "csx";
 
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
@@ -41,6 +41,7 @@ export const userPhotoMixins = vars => {
 
     const photo = {
         ...objectFitWithFallback(),
+        padding: important(0),
     } as NestedCSSProperties;
 
     const small = {

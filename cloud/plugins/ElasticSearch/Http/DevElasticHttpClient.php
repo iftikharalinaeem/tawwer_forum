@@ -10,7 +10,7 @@ namespace Vanilla\Cloud\ElasticSearch\Http;
 use Garden\Http\HttpResponse;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Utility\ArrayUtils;
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 /**
  * Dev implementation of the elastic http client.
