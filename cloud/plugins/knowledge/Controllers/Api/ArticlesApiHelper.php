@@ -6,6 +6,9 @@
 
 namespace Vanilla\Knowledge\Controllers\Api;
 
+use Garden\EventManager;
+use Garden\Events\ResourceEvent;
+use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
@@ -18,6 +21,7 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Knowledge\Events\ArticleEvent;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\ArticleModel;
@@ -34,6 +38,7 @@ use Vanilla\UploadedFile;
 class ArticlesApiHelper {
 
     use UpdateMediaTrait;
+    use ArticlesApiSchemes;
 
     const REHOST_SUCCESS_HEADER = 'x-file-rehosted-success-count';
     const REHOST_FAILED_HEADER = 'x-file-rehosted-failed-count';
@@ -71,6 +76,9 @@ class ArticlesApiHelper {
     /** @var \Gdn_Upload */
     private $upload;
 
+    /** @var EventManager */
+    private $eventManager;
+
     /**
      * DI.
      *
@@ -88,7 +96,8 @@ class ArticlesApiHelper {
         \Gdn_Session $session,
         \MediaModel $mediaModel,
         ExtendedContentFormatService $formatService,
-        \Gdn_Upload $upload
+        \Gdn_Upload $upload,
+        EventManager $eventManager
     ) {
         $this->articleModel = $articleModel;
         $this->articleRevisionModel = $articleRevisionModel;
@@ -101,6 +110,7 @@ class ArticlesApiHelper {
         $this->session = $session;
         $this->formatService = $formatService;
         $this->upload = $upload;
+        $this->eventManager = $eventManager;
 
         $this->setMediaForeignTable("article");
         $this->setMediaModel($mediaModel);
@@ -121,7 +131,9 @@ class ArticlesApiHelper {
         if (!$articleID) {
             throw new ServerException("No ID in article row.");
         }
-        $row["url"] = $this->articleModel->url($row);
+        if (!isset($row['url'])) {
+            $row["url"] = $this->articleModel->url($row);
+        }
 
         if (isset($row["queryLocale"])) {
             $row["translationStatus"] = ($row["locale"] === $row["queryLocale"]) ?
@@ -129,9 +141,11 @@ class ArticlesApiHelper {
                 ArticleRevisionModel::STATUS_TRANSLATION_NOT_TRANSLATED;
         }
 
-        $bodyRendered = $row["bodyRendered"] ?? null;
-        $row["body"] = $bodyRendered;
-        $row["outline"] = isset($row["outline"]) ? json_decode($row["outline"], true) : [];
+        if (isset($row['bodyRendered']) ?? !isset($row['body'])) {
+            $bodyRendered = $row["bodyRendered"] ?? null;
+            $row["body"] = $bodyRendered;
+        }
+        $row["outline"] = isset($row["outline"]) && is_string($row['outline']) ? json_decode($row["outline"], true) : [];
         // Placeholder data.
         $row["seoName"] = null;
         $row["seoDescription"] = null;
@@ -274,6 +288,8 @@ class ArticlesApiHelper {
             }
         }
 
+        $record = $this->normalizeOutput($record);
+        $record = $this->articleSchema()->validate($record);
         return $record;
     }
 
@@ -342,6 +358,24 @@ class ArticlesApiHelper {
         }
         return $fields;
     }
+
+    /**
+     * Fire an update resource event for all locale variants.
+     *
+     * @param int $articleID
+     */
+    public function fireUpdateEventForAllLocales(int $articleID) {
+        // Fire resource events for every updated record.
+        $allLocaleVariants = $this->articleModel->getIDWithRevision($articleID, true);
+        $articleSchema = $this->articleSchema();
+        foreach ($allLocaleVariants as $localeVariant) {
+            $localeVariant = $this->normalizeOutput($localeVariant);
+            $localeVariant = $articleSchema->validate($localeVariant);
+            $event = new ArticleEvent(ResourceEvent::ACTION_UPDATE, ['article' => $localeVariant]);
+            $this->eventManager->dispatch($event);
+        }
+    }
+
     /**
      * Separate article and revision fields from request input and save to the proper resources.
      *
@@ -478,6 +512,7 @@ class ArticlesApiHelper {
             $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
         }
 
+        $isUpdate = false;
         if (!empty($revision)) {
             // Grab the current published revisions from each locale, if available, to load as initial defaults.
             $articles = $this->articleModel->getIDWithRevision($articleID, true);
@@ -489,6 +524,12 @@ class ArticlesApiHelper {
                     $currentRevision = array_intersect_key($article, $revisionFields);
                     break;
                 }
+            }
+
+            if (!empty($currentRevision)) {
+                // We have an existing revision for this locale. This means it's an update.
+                // This means it's an update.
+                $isUpdate = true;
             }
 
             $revision = array_merge($currentRevision, $revision);
@@ -529,6 +570,11 @@ class ArticlesApiHelper {
             $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
             $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);
         }
+
+        // The article has been updated or saved. Make sure we dispatch a resource event.
+        $article = $this->retrieveRow($articleID, ['locale' => $locale]);
+        $event = new ArticleEvent($isUpdate ? ResourceEvent::ACTION_UPDATE : ResourceEvent::ACTION_INSERT, ['article' => $article]);
+        $this->eventManager->dispatch($event);
 
         if ($fields['discussionID'] ?? false) {
             // canonicalize discussion

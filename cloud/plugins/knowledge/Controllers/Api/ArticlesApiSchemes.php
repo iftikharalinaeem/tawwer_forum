@@ -18,7 +18,9 @@ use Vanilla\Knowledge\Models\ArticleDraft;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
+use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Navigation\Breadcrumb;
+use Vanilla\SchemaFactory;
 use Vanilla\Utility\InstanceValidatorSchema;
 
 /**
@@ -261,10 +263,10 @@ trait ArticlesApiSchemes {
      */
     public function articleSchema(string $type = ""): Schema {
         if ($this->articleSchema === null) {
-            $this->articleSchema = $this->schema(Schema::parse([
+            $this->articleSchema = Schema::parse([
                 "articleID",
                 "knowledgeCategoryID",
-                "breadcrumbs",
+                "breadcrumbs?",
                 "knowledgeBaseID",
                 "name",
                 "body",
@@ -292,9 +294,9 @@ trait ArticlesApiSchemes {
                 "locale",
                 "translationStatus",
                 "foreignID"
-            ])->add($this->fullSchema()), "Article");
+            ])->add($this->fullSchema());
         }
-        return $this->schema($this->articleSchema, $type);
+        return $this->articleSchema;
     }
 
     /**
@@ -398,7 +400,7 @@ trait ArticlesApiSchemes {
                 "description" => "Unique ID of the user who originally created the draft.",
                 "type" => "integer",
             ],
-            "insertUser?" => $this->getUserFragmentSchema(),
+            "insertUser?" => SchemaFactory::get(UserFragmentSchema::class),
             "dateInserted" => [
                 "description" => "When the draft was created.",
                 "type" => "datetime",
@@ -407,7 +409,7 @@ trait ArticlesApiSchemes {
                 "description" => "Unique ID of the last user to update the draft.",
                 "type" => "integer",
             ],
-            "updateUser?" => $this->getUserFragmentSchema(),
+            "updateUser?" => SchemaFactory::get(UserFragmentSchema::class),
             "dateUpdated" => [
                 "description" => "When the draft was last updated",
                 "type" => "datetime",
@@ -489,6 +491,7 @@ trait ArticlesApiSchemes {
                 "allowNull" => true,
                 "description" => "Manual sort order of the article.",
             ],
+            "featured:b",
             "score:i" => "Score of the article.",
             "views:i" => "How many times the article has been viewed.",
             "url:s" => "Full URL to the article.",
@@ -496,8 +499,8 @@ trait ArticlesApiSchemes {
             "dateInserted:dt" => "When the article was created.",
             "updateUserID:i" => "Unique ID of the last user to update the article.",
             "dateUpdated:dt" => "When the article was last updated.",
-            "insertUser?" => $this->getUserFragmentSchema(),
-            "updateUser?" => $this->getUserFragmentSchema(),
+            "insertUser?" => SchemaFactory::get(UserFragmentSchema::class),
+            "updateUser?" => SchemaFactory::get(UserFragmentSchema::class),
             "status:s" => [
                 'description' => "Article status.",
                 'enum' => ArticleModel::getAllStatuses(),
@@ -590,8 +593,8 @@ trait ArticlesApiSchemes {
             "insertUserID:i" => "Unique ID of the user who originally created the article.",
             "dateInserted:dt" => "When the article was created.",
             "dateUpdated:dt" => "When the article was updated.",
-            "insertUser?" => $this->getUserFragmentSchema(),
-            "updateUser?" => $this->getUserFragmentSchema(),
+            "insertUser?" => SchemaFactory::get(UserFragmentSchema::class),
+            "updateUser?" => SchemaFactory::get(UserFragmentSchema::class),
             "featured:b",
             "dateFeatured?:dt",
             "validateLocale:b?" => [

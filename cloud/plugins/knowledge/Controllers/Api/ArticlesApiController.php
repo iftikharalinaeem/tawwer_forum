@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\EventManager;
+use Garden\Events\ResourceEvent;
 use Garden\Http\HttpClient;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
@@ -20,6 +21,7 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Knowledge\Events\ArticleEvent;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -639,6 +641,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
                 ['status' => $body['status']],
                 ["articleID" => $id]
             );
+
+            $this->articleHelper->fireUpdateEventForAllLocales($id);
             $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
             $this->articleHelper->updateDefaultArticleID($article["knowledgeCategoryID"]);
         }
@@ -874,6 +878,8 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
 
         $this->articleFeaturedModel->update(['featured' => ($body['featured'] ? 1 : 0)], ['articleID' => $id]);
+        $this->articleHelper->fireUpdateEventForAllLocales($id);
+
         $this->knowledgeBaseModel->resetSphinxCounters();
         return $this->get($id);
     }
