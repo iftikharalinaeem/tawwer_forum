@@ -7,12 +7,11 @@ import React, { useRef } from "react";
 import isNumeric from "validator/lib/isNumeric";
 import { logError } from "@vanilla/utils";
 import { mountReact } from "@vanilla/react-utils/src";
-import { UserCardModule } from "@library/features/users/modules/UserCardModule";
-import InputTextBlock from "@library/forms/InputTextBlock";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
+import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 
 export function applyCompatibilityUserCards(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
@@ -31,7 +30,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
                 placeholderElement.classList.add("userCardWrapper");
                 userLink.parentElement.replaceChild(placeholderElement, userLink); // I couldn't get mountReact to replace the link directly
                 mountReact(
-                    <UserCardModule userID={parseInt(userid)}>
+                    <UserCardModuleLazyLoad userID={parseInt(userid)} buttonContent={<>{userLink.innerText}</>}>
                         <SmartLink
                             to={userLink.href}
                             title={userLink.title}
@@ -41,7 +40,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
                         >
                             {userLink.innerText}
                         </SmartLink>
-                    </UserCardModule>,
+                    </UserCardModuleLazyLoad>,
                     placeholderElement,
                     undefined,
                 );

@@ -6,7 +6,7 @@
 import React, { ReactNode, useState } from "react";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { IUserFragment } from "@vanilla/library/src/scripts/@types/api/users";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import LinkAsButton from "@library/routing/LinkAsButton";
@@ -149,7 +149,7 @@ function Header(props: IHeaderProps) {
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
     const { user, visible, buttonContent, openAsModal } = props;
-    const [open, toggleOpen] = useState(visible || false);
+    const [open, toggleOpen] = useState(!!visible);
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
@@ -165,6 +165,7 @@ export default function PopupUserCard(props: IProps) {
 
     return (
         <DropDown
+            tag={"span"}
             buttonContents={buttonContent || user.name}
             buttonBaseClass={ButtonTypes.TEXT}
             buttonClassName={classes.link}

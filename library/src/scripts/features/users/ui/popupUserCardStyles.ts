@@ -16,13 +16,14 @@ import {
     EMPTY_SPACING,
     fonts,
     paddings,
+    pointerEvents,
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { TextTransformProperty } from "csstype";
-import { percent } from "csx";
+import { important, percent } from "csx";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
@@ -291,6 +292,12 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     const link = style("link", {
         color: "inherit",
         fontSize: "inherit",
+        $nest: {
+            "&.isLoading": {
+                cursor: important("wait"),
+                ...pointerEvents("auto"),
+            },
+        },
     });
 
     return {
