@@ -386,7 +386,7 @@ class PagerModule extends Gdn_Module {
             return sprintf(
                 $this->Wrapper,
                 attribute(['class' => concatSep(' ', $this->CssClass, static::PREV_NEXT_CLASS)]),
-                $this->previousLink($pageCount + 1)
+                $this->previousLink(($pageCount + 1), t('Previous'))
             );
         }
 
@@ -407,14 +407,15 @@ class PagerModule extends Gdn_Module {
         $previousText = t($this->LessCode);
         $nextText = t($this->MoreCode);
         $linkCount = $pagesToDisplay + 2;
-
         $pager = "";
 
         // Previous
         if ($currentPage == 1) {
             $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
-            $pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev', 'tabindex' => "0"]);
+            //$pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev', 'tabindex' => "0"]);
+            $attr = ['title' => t('Previous'), 'aria-label' => t('Previous')];
+            $pager .= $this->previousLink($currentPage, $previousText, $attr);
         }
 
         // Build Pager based on number of pages (Examples assume $Range = 3)
@@ -489,7 +490,12 @@ class PagerModule extends Gdn_Module {
                 $nextText,
                 $this->pageUrl($currentPage + 1),
                 'Next Pager-nav',
-                ['rel' => 'next', 'tabindex' => "0"]
+                [
+                    'rel' => 'next',
+                    'tabindex' => "0",
+                    'title' => t('Next'),
+                    'aria-label' => t('Next')
+                ]
             ); // extra sprintf parameter in case old url style is set
         }
         if ($pageCount <= 1) {
@@ -544,7 +550,7 @@ class PagerModule extends Gdn_Module {
 
         if ($currentPage > 1) {
             $pageParam = 'p'.($currentPage - 1);
-            $pager .= $this->previousLink($currentPage);
+            $pager .= $this->previousLink($currentPage, t('Previous'));
         }
 
         $hasNext = true;
@@ -675,9 +681,21 @@ class PagerModule extends Gdn_Module {
      * Generate the previous page link.
      *
      * @param int $currentPage
+     * @param string $linkLabel
      * @return string
      */
-    private function previousLink($currentPage): string {
-        return anchor(t('Previous'), $this->pageUrl($currentPage - 1), 'Previous', ['rel' => 'prev', 'tabindex' => '0']);
+    private function previousLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'prev',
+            'tabindex' => '0'
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage - 1),
+            'Previous',
+            $attr
+        );
     }
 }
