@@ -20,7 +20,7 @@ $container->rule(EventScheduler::class)
     ->addCall("useHostedQueue", [$hostedQueueAvailable]);
 
 $container->rule(EventDispatcher::class)->setShared(true);
-    
+
 /** @var EventManager */
 $eventManager = Gdn::getContainer()->get(EventManager::class);
 $eventManager->addListenerMethod(EventDispatcher::class, "dispatch");
