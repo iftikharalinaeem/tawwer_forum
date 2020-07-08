@@ -8,7 +8,7 @@
  * @since 2.0
  */
 
-use Vanilla\Web\WebLinking;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Builds a pager control related to a dataset.

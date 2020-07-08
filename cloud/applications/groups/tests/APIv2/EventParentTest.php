@@ -12,7 +12,7 @@ use EventModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use VanillaTests\Groups\Utils\GroupsAndEventsApiTestTrait;
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**

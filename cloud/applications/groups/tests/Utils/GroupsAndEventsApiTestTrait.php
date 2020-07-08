@@ -8,7 +8,7 @@
 namespace VanillaTests\Groups\Utils;
 
 use Vanilla\Formatting\Formats\TextFormat;
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 /**
  * @method InternalClient api()

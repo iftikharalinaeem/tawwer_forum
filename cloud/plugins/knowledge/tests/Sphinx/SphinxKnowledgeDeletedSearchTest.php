@@ -9,7 +9,7 @@ use Garden\Schema\Schema;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Garden\Web\Exception\ServerException;
-use VanillaTests\InternalClient;
+use Vanilla\Http\InternalClient;
 
 /**
  * Class SphinxKnowledgeSearchTest
