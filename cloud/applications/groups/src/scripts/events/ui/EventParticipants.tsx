@@ -25,7 +25,7 @@ function Participant({ user }) {
 
     const participantsClasses = eventParticipantsClasses();
     return (
-        <li className={classes.itemWrapper}>
+        <li>
             <ProfileLink
                 username={user.name}
                 userID={user.userID}
