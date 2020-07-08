@@ -88,6 +88,10 @@ trait SphinxQueryTrait {
         bool $exclude = false,
         string $filterOp = SphinxSearchQuery::FILTER_OP_OR
     ) {
+        if ($attribute === 'type') {
+            // this case handled by SphinxSearchDriver itself with method applyDtypes()
+            return $this;
+        }
         $allNumbers = true;
         foreach ($values as $value) {
             if (is_numeric($value)) {
@@ -106,12 +110,7 @@ trait SphinxQueryTrait {
                 $sphinxMethod = 'setFilterString';
             } else {
                 $countString = count($values) === 0 ? 'none' : 'multiple';
-                if ($attribute === 'type') {
-                    // this case handled by SphinxSearchDriver itself with method applyDtypes()
-                    return $this;
-                } else {
-                    throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
-                }
+                throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
             }
         }
 
