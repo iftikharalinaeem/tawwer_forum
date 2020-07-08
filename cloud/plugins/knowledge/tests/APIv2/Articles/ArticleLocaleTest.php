@@ -320,4 +320,17 @@ class ArticleLocaleTest extends KbApiTestCase {
             return $row['locale'] === 'es';
         }));
     }
+
+    /**
+     * If I specify a knowledge category and no locale then only articles of the default locale should be returned.
+     *
+     * This is the default behavior.
+     */
+    public function testIndexDefaultLocale(): void {
+        $articles = $this->generateTestArticles();
+        $actual = $this->api()->get('/articles', ['knowledgeCategoryID' => $articles[0]['knowledgeCategoryID']])->getBody();
+        $this->assertSame(count($actual), count(array_filter($actual, function ($row) {
+            return $row['locale'] === 'en';
+        })));
+    }
 }
