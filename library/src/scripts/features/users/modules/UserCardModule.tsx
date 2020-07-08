@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
-import { notEmpty } from "@vanilla/utils";
+import { notEmpty, logError } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 
 export interface IUserCardModule {
@@ -31,11 +31,11 @@ export function UserCardModule(props: IUserCardModule) {
     }
 
     if (!user.data || user.error) {
+        logError("failed to fetch data for UserCardModule", user);
         return (
             <>
                 {/* Fallback to the original link, unchanged */}
                 {children || buttonContent}
-                <ErrorMessages errors={[user.error].filter(notEmpty)} />
             </>
         );
     }
