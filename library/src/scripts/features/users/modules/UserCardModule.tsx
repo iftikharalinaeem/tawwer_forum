@@ -9,6 +9,7 @@ import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty, logError } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export interface IUserCardModule {
     userID: number;
@@ -17,6 +18,8 @@ export interface IUserCardModule {
     children?: React.ReactNode; // First fallback
     fallbackButton: React.ReactNode;
     visible?: boolean;
+    buttonType?: ButtonTypes;
+    buttonClass?: string;
 }
 
 // Does not lazy load, will load user data right away
@@ -54,6 +57,13 @@ export function UserCardModule(props: IUserCardModule) {
     };
 
     return (
-        <PopupUserCard user={userCardInfo} buttonContent={buttonContent} openAsModal={openAsModal} visible={visible} />
+        <PopupUserCard
+            buttonClass={props.buttonClass}
+            buttonType={props.buttonType}
+            user={userCardInfo}
+            buttonContent={buttonContent}
+            openAsModal={openAsModal}
+            visible={visible}
+        />
     );
 }

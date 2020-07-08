@@ -418,6 +418,7 @@ export const buttonResetMixin = (): NestedCSSProperties => ({
     cursor: "pointer",
     color: "inherit",
     textDecoration: important("none"),
+    textAlign: "inherit",
 });
 
 export const overwriteButtonClass = (
