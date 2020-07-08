@@ -70,11 +70,6 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 // gutter       : 20
 // total        : 1224
 
-// -- Padded Widths --
-// right panel    : 20 + 244 + (52/2) = 290
-// middle column : 20 + 836 + (52/2) = 882
-// total         : 1172
-
 describe.only("TwoColumnLayout", () => {
     it("Check desktop widths", () => {
         const { container } = render(
