@@ -534,6 +534,26 @@ class JsConnectPlugin extends SSOAddon {
     }
 
     /**
+     * Generate a test embedd SSO token.
+     *
+     * @param string $client_id
+     * @param array $user
+     * @return string
+     */
+    public function generateTestEmbed(string $client_id = '', array $user = []) : string {
+        $provider = self::getProvider($client_id);
+        $secret = $provider['AssociationSecret'] ?? '';
+        if (!isset($user['client_id'])) {
+            $user['client_id'] = $client_id;
+        }
+        $string = base64_encode(json_encode($user));
+        $timestamp = time();
+        $hash = hash_hmac('sha1', "{$string} {$timestamp}", $secret);
+        $result = "{$string} {$hash} {$timestamp} hmacsha1";
+        return $result;
+    }
+
+    /**
      * An intermediate page for jsConnect that checks SSO against and then posts the information to /entry/connect.
      *
      * @param EntryController $sender
@@ -1026,6 +1046,8 @@ class JsConnectPlugin extends SSOAddon {
                         }
                         $sender->setData('known', $known);
                         $sender->setData('unknown', $unknown);
+                        $embedToken = $this->generateTestEmbed($jsc->getSigningClientID(), $known);
+                        $sender->setData('embedToken', $embedToken);
                     }
                 } catch (\Exception $ex) {
                     $sender->Form->addError($ex);

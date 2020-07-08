@@ -786,7 +786,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
             return false;
         }
 
-        $uniqueID = $data['uniqueid'];
+        $uniqueID = $data['id'] ?? $data['uniqueid'];
         $user = arrayTranslate($data, [
             'name' => 'Name',
             'email' => 'Email',
