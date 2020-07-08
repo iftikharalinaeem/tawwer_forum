@@ -57,7 +57,7 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
 
 // -- Padded Widths --
 // right panel    : 20 + 343 + 20 = 383
-// middle column : 20 + 749 + 20 = 789
+// middle column : 20 + 801 + 20 = 841
 // total         : 1224
 
 // == LEGACY LAYOUT ==
