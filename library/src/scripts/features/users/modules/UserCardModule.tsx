@@ -3,37 +3,41 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode, useState } from "react";
+import React, { useState } from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
-import Loader from "@library/loaders/Loader";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import PopupUserCard, { IUserCardInfo } from "@library/features/users/ui/PopupUserCard";
 
-interface IProps {
+export interface IUserCardModule {
     userID: number;
-    buttonContent?: ReactNode | string;
+    buttonContent?: React.ReactNode; // Second fallback AND button content
     openAsModal?: boolean;
-}
-
-interface IUserCardProps {
-    userID: number;
-    buttonContent?: ReactNode | string;
-    openAsModal?: boolean;
+    children?: React.ReactNode; // First fallback
+    fallbackButton: React.ReactNode;
     visible?: boolean;
 }
 
-function UserCard(props: IUserCardProps) {
-    const { userID, buttonContent, openAsModal, visible } = props;
+// Does not lazy load, will load user data right away
+export function UserCardModule(props: IUserCardModule) {
+    const { userID, buttonContent, openAsModal, children, fallbackButton, visible } = props;
     const user = useUser({ userID });
+    const [ready, setReady] = useState(false);
 
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data) {
-        return <Loader />;
+    // Fallback to the original link, unchanged
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data && !ready) {
+        return <>{fallbackButton}</>;
     }
 
     if (!user.data || user.error) {
-        return <ErrorMessages errors={[user.error].filter(notEmpty)} />;
+        return (
+            <>
+                {/* Fallback to the original link, unchanged */}
+                {children || buttonContent}
+                <ErrorMessages errors={[user.error].filter(notEmpty)} />
+            </>
+        );
     }
 
     const userCardInfo: IUserCardInfo = {
@@ -49,22 +53,6 @@ function UserCard(props: IUserCardProps) {
     };
 
     return (
-        <PopupUserCard
-            visible={visible || false}
-            user={userCardInfo}
-            buttonContent={buttonContent}
-            openAsModal={openAsModal}
-        />
-    );
-}
-
-export function UserCardModule(props: IProps) {
-    const { userID, buttonContent, openAsModal } = props;
-    const [ready, setReady] = useState(false);
-
-    return ready ? (
-        <UserCard visible={ready} userID={userID} buttonContent={buttonContent} openAsModal={openAsModal} />
-    ) : (
-        <PopupUserCard onClick={() => setReady(true)} buttonContent={buttonContent} openAsModal={openAsModal} />
+        <PopupUserCard user={userCardInfo} buttonContent={buttonContent} openAsModal={openAsModal} visible={visible} />
     );
 }

@@ -44,8 +44,10 @@ class ThemeModelTest extends AbstractAPIv2Test {
      * @param Container $container
      */
     public static function configureContainerBeforeStartup(Container $container) {
-        $container->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)]);
-        $container->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)]);
+        $container->rule(ThemeService::class)
+            ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
+            ->addCall("addThemeProvider", [new Reference(DbThemeProvider::class)])
+        ;
     }
 
     /**

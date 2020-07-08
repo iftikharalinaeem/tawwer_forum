@@ -8,6 +8,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import {
+    absolutePosition,
     borders,
     colorOut,
     EMPTY_BORDER,
@@ -15,21 +16,25 @@ import {
     EMPTY_SPACING,
     fonts,
     paddings,
+    pointerEvents,
     singleBorder,
     unit,
 } from "@library/styles/styleHelpers";
 import { clickableItemStates } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { layoutVariables } from "@library/layout/panelLayoutStyles";
 import { TextTransformProperty } from "csstype";
-import { percent } from "csx";
+import { important, percent } from "csx";
 
 export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeVars = variableFactory("popupUserCard", forcedVars);
     const globalVars = globalVariables();
-    const formElementsVars = formElementsVariables();
 
-    const container = makeVars("card", {
-        margin: globalVars.gutter.size,
+    const container = makeVars("container", {
+        spacing: globalVars.gutter.size / 2,
+    });
+
+    const actionContainer = makeVars("actionContainer", {
+        spacing: 12,
     });
 
     const button = makeVars("button", {
@@ -67,13 +72,12 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         },
     });
 
-    const vertical = makeVars("vertical", {
-        color: colorOut(globalVars.border.color),
-    });
-
     const containerWithBorder = makeVars("containerWithBorder", {
         color: colorOut(globalVars.border.color),
-        padding: globalVars.gutter.size,
+        ...paddings({
+            horizontal: container.spacing * 2,
+            vertical: container.spacing * 4,
+        }),
     });
 
     const count = makeVars("count", {
@@ -81,7 +85,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     const header = makeVars("header", {
-        height: formElementsVars.sizing.height,
+        height: 32,
     });
 
     const date = makeVars("date", {
@@ -96,9 +100,9 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         container,
         button,
         buttonContainer,
+        actionContainer,
         name,
         label,
-        vertical,
         containerWithBorder,
         count,
         header,
@@ -119,13 +123,32 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         flexDirection: "row",
         alignItems: "stretch",
         justifyContent: "center",
-        marginBottom: vars.container.margin,
+        ...paddings({
+            all: vars.container.spacing,
+        }),
         flexWrap: "wrap",
+    });
+
+    const actionContainer = style("actionContainer", {
+        $nest: {
+            "&&": {
+                ...paddings({
+                    horizontal: vars.actionContainer.spacing,
+                    top: vars.container.spacing,
+                    bottom: vars.actionContainer.spacing * 2 - vars.container.spacing,
+                }),
+                ...mediaQueries.oneColumnDown({
+                    ...paddings({
+                        vertical: vars.actionContainer.spacing * 2 - vars.container.spacing,
+                        horizontal: vars.actionContainer.spacing,
+                    }),
+                }).$nest,
+            },
+        },
     });
 
     const containerWithBorder = style("containerWithBorder", {
         borderTop: `1px solid ${vars.containerWithBorder.color}`,
-        paddingTop: vars.containerWithBorder.padding,
     });
 
     const button = style(
@@ -147,7 +170,9 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
     );
 
     const buttonContainer = style("buttonContainer", {
-        padding: vars.buttonContainer.padding,
+        ...paddings({
+            all: vars.container.spacing,
+        }),
     });
 
     const name = style(
@@ -155,8 +180,9 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         {
             fontSize: vars.name.size,
             fontWeight: vars.name.weight,
+            width: percent(100),
+            textAlign: "center",
         },
-
         mediaQueries.oneColumnDown({
             fontSize: vars.name.size * 1.25,
         }),
@@ -166,6 +192,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         ...fonts(vars.label.font),
         ...paddings(vars.label.padding),
         ...borders(vars.label.border),
+        marginTop: unit(vars.container.spacing),
     });
 
     const stat = style("stat", {
@@ -174,54 +201,104 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         alignItems: "center",
         flexGrow: 1,
         maxWidth: percent(50),
-        ...paddings({
-            horizontal: globalVars.spacer.size,
+    });
+
+    const statLabel = style("statLabel", {
+        marginTop: unit(2),
+        marginBottom: unit(3),
+        ...fonts({
+            size: globalVars.fonts.size.small,
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
+        ...mediaQueries.oneColumnDown({
+            ...fonts({
+                size: globalVars.fonts.size.medium,
+                lineHeight: globalVars.lineHeights.condensed,
+            }),
         }),
     });
 
-    const vertical = style("vertical", {
-        display: "block",
-        border: "none",
-        background: vars.vertical.color,
+    const statLeft = style("statLeft", {
+        borderRight: singleBorder({}),
+        ...paddings({
+            vertical: vars.container.spacing,
+            right: globalVars.spacer.size / 2,
+            left: globalVars.spacer.size,
+        }),
+    });
+
+    const statRight = style("statRight", {
+        ...paddings({
+            vertical: vars.container.spacing,
+            right: globalVars.spacer.size,
+            left: globalVars.spacer.size / 2,
+        }),
     });
 
     const count = style("count", {
-        fontSize: vars.count.size,
+        marginTop: unit(3),
+        ...fonts({
+            size: vars.count.size,
+            lineHeight: globalVars.lineHeights.condensed,
+        }),
     });
 
     const header = style("header", {
-        display: "flex",
-        flexDirection: "row-reverse",
-        alignItems: "center",
-        height: vars.header.height,
+        position: "relative",
+        height: unit(vars.header.height),
     });
 
-    const section = style("section", {
-        paddingTop: vars.container.margin * 0.5,
-    });
+    const section = style("section", {});
 
     const email = style("email", {
-        ...fonts({
-            color: globalVars.mainColors.fg,
-            size: globalVars.fonts.size.small,
-        }),
-        $nest: linkColors.$nest,
+        $nest: {
+            "&&&": {
+                ...fonts({
+                    color: globalVars.mainColors.fg,
+                    size: globalVars.fonts.size.small,
+                    align: "center",
+                }),
+                marginTop: unit(vars.container.spacing * 1.8),
+                width: percent(100),
+            },
+            ...linkColors.$nest,
+        },
     });
 
     const date = style("date", {
         padding: vars.buttonContainer.padding,
     });
 
-    const statLabel = style("statLabel", {
-        ...fonts({
-            size: globalVars.fonts.size.small,
-        }),
+    const formElementsVars = formElementsVariables();
+
+    const close = style("close", {
+        $nest: {
+            "&&&": {
+                ...absolutePosition.topRight(),
+                width: unit(formElementsVars.sizing.height),
+                height: unit(formElementsVars.sizing.height),
+                ...mediaQueries.oneColumnDown({
+                    height: unit(formElementsVars.sizing.height),
+                }),
+            },
+        },
     });
 
-    const statLeft = style("statLeft", {
-        borderRight: singleBorder({}),
+    const userPhoto = style("userPhoto", {
+        margin: "auto",
+        display: "block",
     });
-    const statRight = style("statRight", {});
+
+    const link = style("link", {
+        color: "inherit",
+        fontSize: "inherit",
+        $nest: {
+            "&.isLoading": {
+                cursor: important("wait"),
+                ...pointerEvents("auto"),
+            },
+        },
+    });
 
     return {
         container,
@@ -231,7 +308,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         name,
         label,
         stat,
-        vertical,
         count,
         header,
         section,
@@ -240,5 +316,9 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         statLabel,
         statLeft,
         statRight,
+        close,
+        userPhoto,
+        actionContainer,
+        link,
     };
 });
