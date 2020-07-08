@@ -35,7 +35,7 @@ class ArticleEventFiringTest extends KbApiTestCase {
                 'articleID' => 1,
                 'locale' => 'en',
             ]),
-        ], ['name', 'articleID', 'locale']);
+        ], ['name', 'articleID', 'locale'], true);
     }
 
     /**
@@ -47,6 +47,7 @@ class ArticleEventFiringTest extends KbApiTestCase {
             'name' => 'New Article',
         ]);
 
+        $this->clearDispatchedEvents();
         $this->api()->patch("/articles/{$article['articleID']}", [
             'name' => 'Updated Name',
         ]);
@@ -54,10 +55,51 @@ class ArticleEventFiringTest extends KbApiTestCase {
         $this->assertEventsDispatched([
             $this->expectedResourceEvent('article', ResourceEvent::ACTION_UPDATE, [
                 'name' => 'Updated Name',
-                'articleID' => 1,
+                'articleID' => $article['articleID'],
                 'locale' => 'en',
             ]),
-        ], ['name', 'articleID', 'locale']);
+        ], ['name', 'articleID', 'locale'], true);
+    }
+
+    /**
+     * Test that moving a category updates all article revisions.
+     */
+    public function testMoveCategoryUpdatesAllRevisions() {
+        // Setup
+        $this->createKnowledgeBase([
+            'siteSectionGroup' => 'mockSiteSectionGroup-1',
+        ]);
+        $cat1 = $this->createCategory();
+        $cat2 = $this->createCategory();
+        $article = $this->createArticle([
+            'name' => 'Name in En',
+            'knowledgeCategoryID' => $cat1['knowledgeCategoryID'],
+        ]);
+        $this->api()->patch("/articles/{$article['articleID']}", [
+            'name' => 'Name in Fr',
+            'body' => 'Hello world',
+            'format' => TextFormat::FORMAT_KEY,
+            'locale' => 'fr'
+        ]);
+        $this->clearDispatchedEvents();
+
+        // Actual tests.
+        $this->api()->patch("/articles/{$article['articleID']}", [
+            'knowledgeCategoryID' => $cat2['knowledgeCategoryID'],
+        ]);
+
+        $this->assertEventsDispatched([
+            $this->expectedResourceEvent('article', ResourceEvent::ACTION_UPDATE, [
+                'name' => 'Name in En',
+                'knowledgeCategoryID' => $cat2['knowledgeCategoryID'],
+                'locale' => 'en',
+            ]),
+            $this->expectedResourceEvent('article', ResourceEvent::ACTION_UPDATE, [
+                'name' => 'Name in Fr',
+                'knowledgeCategoryID' => $cat2['knowledgeCategoryID'],
+                'locale' => 'fr',
+            ]),
+        ], ["*"], true);
     }
 
     /**
@@ -71,6 +113,7 @@ class ArticleEventFiringTest extends KbApiTestCase {
             'name' => 'New Article',
         ]);
 
+        $this->clearDispatchedEvents();
         $this->api()->patch("/articles/{$article['articleID']}", [
             'name' => 'Name in Fr',
             'body' => 'Hello world',
@@ -81,10 +124,10 @@ class ArticleEventFiringTest extends KbApiTestCase {
         $this->assertEventsDispatched([
             $this->expectedResourceEvent('article', ResourceEvent::ACTION_INSERT, [
                 'name' => 'Name in Fr',
-                'articleID' => 1,
+                'articleID' => $article['articleID'],
                 'locale' => 'fr',
             ]),
-        ], ['name', 'articleID', 'locale']);
+        ], ['name', 'articleID', 'locale'], true);
     }
 
     /**
@@ -120,7 +163,7 @@ class ArticleEventFiringTest extends KbApiTestCase {
                 'locale' => 'fr',
                 'status' => ArticleModel::STATUS_DELETED,
             ]),
-        ], ['articleID', 'locale', 'status'], true);
+        ], ['name', 'locale', 'status'], true);
 
         $this->clearDispatchedEvents();
         $this->api()->patch("/articles/{$article['articleID']}/status", ['status' => ArticleModel::STATUS_PUBLISHED]);
@@ -136,7 +179,7 @@ class ArticleEventFiringTest extends KbApiTestCase {
                 'locale' => 'fr',
                 'status' => ArticleModel::STATUS_PUBLISHED,
             ]),
-        ], ['articleID', 'locale', 'status'], true);
+        ], ['name', 'locale', 'status'], true);
     }
 
     /**

@@ -31,6 +31,7 @@ use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Models\DraftModel;
 use Vanilla\Models\Model;
 use Vanilla\UploadedFile;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * API controller helper functions.
@@ -242,6 +243,60 @@ class ArticlesApiHelper {
     }
 
     /**
+     * Get an article by its numeric ID.
+     *
+     * @param int $id Article ID.
+     * @param bool $includeRevision
+     * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
+     * @param bool $includeTranslations Whether to include translated article revisions.
+     *
+     * @return array
+     * @throws NotFoundException If the article could not be found.
+     * @throws ValidationException If the result fails schema validation.
+     */
+    public function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false, bool $includeTranslations = false): array {
+        try {
+            if ($includeRevision) {
+                $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
+                if ($includeTranslations) {
+                    $knowledgeCategoryID = array_unique(array_column($article, "knowledgeCategoryID"));
+                } else {
+                    $knowledgeCategoryID = $article["knowledgeCategoryID"];
+                }
+                if (empty($article)) {
+                    throw new NoResultsException("No rows matched the provided criteria.");
+                }
+            } else {
+                $article = $this->articleModel->selectSingle(["articleID" => $id]);
+                $knowledgeCategoryID = $article['knowledgeCategoryID'];
+            }
+            if (!$includeDeleted) {
+                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
+                $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
+            }
+
+            if ($includeRevision) {
+                $normalizeAndValidate = function ($article) {
+                    $article = $this->normalizeOutput($article);
+                    $article = $this->articleSchema()->validate($article);
+                    return $article;
+                };
+
+                if (ArrayUtils::isAssociative($article)) {
+                    // We're dealing with 1 language revision.
+                    $article = $normalizeAndValidate($article);
+                } else {
+                    // We're dealing with multiple language revisions.
+                    $article = array_map($normalizeAndValidate, $article);
+                }
+            }
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Article");
+        }
+        return $article;
+    }
+
+    /**
      * Get an article row by it's id and locale.
      *
      * @param int $id
@@ -288,8 +343,6 @@ class ArticlesApiHelper {
             }
         }
 
-        $record = $this->normalizeOutput($record);
-        $record = $this->articleSchema()->validate($record);
         return $record;
     }
 
@@ -364,9 +417,9 @@ class ArticlesApiHelper {
      *
      * @param int $articleID
      */
-    public function fireUpdateEventForAllLocales(int $articleID) {
+    public function dispatchUpdateForAllLocales(int $articleID) {
         // Fire resource events for every updated record.
-        $allLocaleVariants = $this->articleModel->getIDWithRevision($articleID, true);
+        $allLocaleVariants = $this->articleByID($articleID, true, true, true);
         $articleSchema = $this->articleSchema();
         foreach ($allLocaleVariants as $localeVariant) {
             $localeVariant = $this->normalizeOutput($localeVariant);
@@ -388,15 +441,21 @@ class ArticlesApiHelper {
     public function save(array $fields, int $articleID = null): int {
         $revisionFields = $this->getRevisionFields();
 
-        $article = array_diff_key($fields, $revisionFields);
-        $revision = array_intersect_key($fields, $revisionFields);
-        if (isset($article['dateUpdated'])) {
+        $articleUpdate = array_diff_key($fields, $revisionFields);
+        // Strip off some extra fields.
+        if (isset($articleUpdate['validateLocale'])) {
+            unset($articleUpdate['validateLocale']);
+        }
+
+        $revisionUpdate = array_intersect_key($fields, $revisionFields);
+        if (isset($articleUpdate['dateUpdated'])) {
             // The dateUpdated should be used for the revision.
-            $revision['dateInserted'] = $article['dateUpdated'];
+            $revisionUpdate['dateInserted'] = $articleUpdate['dateUpdated'];
         }
 
         $locale = $fields["locale"] ?? null;
 
+        $updateAllRevisions = false;
         if ($articleID !== null) {
             // this means we patch existing Article
             if ($previousRevisionID = $fields['previousRevisionID'] ?? false) {
@@ -408,7 +467,7 @@ class ArticlesApiHelper {
                 $prevState = $this->articleModel->getID($articleID);
             }
 
-            $knowledgeCategory = $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
+            $knowledgeCategory = $this->knowledgeCategoryByID($articleUpdate['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
             $knowledgeBase = $this->getKnowledgeBaseFromCategoryID($knowledgeCategory["knowledgeCategoryID"]);
 
             // If the locale is passed check if it is supported.
@@ -418,16 +477,16 @@ class ArticlesApiHelper {
             }
 
             //check if knowledge category exists and knowledge base is "published"
-            $this->knowledgeCategoryByID($article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
+            $this->knowledgeCategoryByID($articleUpdate['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID']);
 
-            $moveToAnotherCategory = (isset($article['knowledgeCategoryID'])
-                && $prevState['knowledgeCategoryID'] !== $article['knowledgeCategoryID']);
+            $moveToAnotherCategory = (isset($articleUpdate['knowledgeCategoryID'])
+                && $prevState['knowledgeCategoryID'] !== $articleUpdate['knowledgeCategoryID']);
 
             if (!is_int($fields['sort'] ?? false)) {
                 if ($moveToAnotherCategory) {
-                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($article['knowledgeCategoryID']);
+                    $sortInfo = $this->knowledgeCategoryModel->getMaxSortIdx($articleUpdate['knowledgeCategoryID']);
                     $maxSortIndex = $sortInfo['maxSort'];
-                    $article['sort'] = $maxSortIndex + 1;
+                    $articleUpdate['sort'] = $maxSortIndex + 1;
                     $updateSorts = false;
                 } else {
                     // if we don't change the categoryID and there is no $fields['sort']
@@ -436,13 +495,13 @@ class ArticlesApiHelper {
                 }
             } else {
                 //update sorts for other records only if 'sort' changed
-                $updateSorts = ($article['sort'] != $prevState['sort']);
+                $updateSorts = ($articleUpdate['sort'] != $prevState['sort']);
             }
 
-            if (isset($article['sort'])
+            if (isset($articleUpdate['sort'])
                 && isset($prevState['knowledgeCategoryID'])
                 && isset($prevState['sort'])
-                && $article['sort'] != $prevState['sort']) {
+                && $articleUpdate['sort'] != $prevState['sort']) {
                 $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
                 //shift sorts down for source category when move one article to another category
                 $this->knowledgeCategoryModel->shiftSorts(
@@ -454,8 +513,10 @@ class ArticlesApiHelper {
                 );
             }
 
-            $this->articleModel->update($article, ["articleID" => $articleID], [Model::OPT_MODE => $this->getOperationMode()]);
-
+            if (!empty($articleUpdate)) {
+                $this->articleModel->update($articleUpdate, ["articleID" => $articleID], [Model::OPT_MODE => $this->getOperationMode()]);
+                $updateAllRevisions = true;
+            }
             if ($moveToAnotherCategory) {
                 if (!empty($prevState['knowledgeCategoryID'])) {
                     $this->knowledgeCategoryModel->updateCounts($prevState['knowledgeCategoryID']);
@@ -464,8 +525,8 @@ class ArticlesApiHelper {
 
             if ($updateSorts) {
                 $this->knowledgeCategoryModel->shiftSorts(
-                    $article['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
-                    $article['sort'],
+                    $articleUpdate['knowledgeCategoryID'] ?? $prevState['knowledgeCategoryID'],
+                    $articleUpdate['sort'],
                     $articleID,
                     KnowledgeCategoryModel::SORT_TYPE_ARTICLE
                 );
@@ -508,20 +569,20 @@ class ArticlesApiHelper {
             }
             $this->updateDefaultArticleID($fields['knowledgeCategoryID']);
         }
-        if (!empty($article['knowledgeCategoryID'])) {
-            $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
+        if (!empty($articleUpdate['knowledgeCategoryID'])) {
+            $this->knowledgeCategoryModel->updateCounts($articleUpdate['knowledgeCategoryID']);
         }
 
         $isUpdate = false;
-        if (!empty($revision)) {
+        if (!empty($revisionUpdate)) {
             // Grab the current published revisions from each locale, if available, to load as initial defaults.
             $articles = $this->articleModel->getIDWithRevision($articleID, true);
 
             $currentRevision =[];
-            foreach ($articles as $article) {
+            foreach ($articles as $articleUpdate) {
                 // find the unique published revision in the give locale.
-                if ($article["locale"] === $locale) {
-                    $currentRevision = array_intersect_key($article, $revisionFields);
+                if ($articleUpdate["locale"] === $locale) {
+                    $currentRevision = array_intersect_key($articleUpdate, $revisionFields);
                     break;
                 }
             }
@@ -532,54 +593,59 @@ class ArticlesApiHelper {
                 $isUpdate = true;
             }
 
-            $revision = array_merge($currentRevision, $revision);
-            $revision["articleID"] = $articleID;
-            $revision["locale"] = $locale;
+            $revisionUpdate = array_merge($currentRevision, $revisionUpdate);
+            $revisionUpdate["articleID"] = $articleID;
+            $revisionUpdate["locale"] = $locale;
 
             // Temporary defaults until drafts are implemented, at which point these fields will be required.
-            $revision["name"] = $revision["name"] ?? "";
-            $revision["body"] = $revision["body"] ?? "";
-            $revision["format"] = $revision["format"] ?? HtmlFormat::FORMAT_KEY;
+            $revisionUpdate["name"] = $revisionUpdate["name"] ?? "";
+            $revisionUpdate["body"] = $revisionUpdate["body"] ?? "";
+            $revisionUpdate["format"] = $revisionUpdate["format"] ?? HtmlFormat::FORMAT_KEY;
 
             // Temporary hack to avoid a Rich format error if we have no body.
-            if ($revision["body"] === "" && $revision["format"] === RichFormat::FORMAT_KEY) {
-                $revision["body"] = "[]";
+            if ($revisionUpdate["body"] === "" && $revisionUpdate["format"] === RichFormat::FORMAT_KEY) {
+                $revisionUpdate["body"] = "[]";
             }
 
-            $images = $this->formatterService->parseImageUrls($revision['body'], $revision['format']);
-            $revision['seoImage'] = count($images) > 0 ? $images[0] : null;
-            $revision["bodyRendered"] = $this->formatterService->renderHTML($revision['body'], $revision['format']);
-            $revision["plainText"] = $this->formatterService->renderPlainText($revision['body'], $revision['format']);
-            $revision["excerpt"] =  $this->formatterService->renderExcerpt($revision['body'], $revision['format']);
-            $revision["outline"] =  json_encode($this->formatterService->parseHeadings($revision['body'], $revision['format']));
-            $revision["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
-            $revision["insertUserID"] = $fields["insertUserID"] ?? null;
-            $revision["updateUserID"] =  $fields["updateUserID"] ?? $revision["insertUserID"] ?? null;
+            $images = $this->formatterService->parseImageUrls($revisionUpdate['body'], $revisionUpdate['format']);
+            $revisionUpdate['seoImage'] = count($images) > 0 ? $images[0] : null;
+            $revisionUpdate["bodyRendered"] = $this->formatterService->renderHTML($revisionUpdate['body'], $revisionUpdate['format']);
+            $revisionUpdate["plainText"] = $this->formatterService->renderPlainText($revisionUpdate['body'], $revisionUpdate['format']);
+            $revisionUpdate["excerpt"] =  $this->formatterService->renderExcerpt($revisionUpdate['body'], $revisionUpdate['format']);
+            $revisionUpdate["outline"] =  json_encode($this->formatterService->parseHeadings($revisionUpdate['body'], $revisionUpdate['format']));
+            $revisionUpdate["translationStatus"] = ArticleRevisionModel::STATUS_TRANSLATION_UP_TO_DATE;
+            $revisionUpdate["insertUserID"] = $fields["insertUserID"] ?? null;
+            $revisionUpdate["updateUserID"] =  $fields["updateUserID"] ?? $revisionUpdate["insertUserID"] ?? null;
 
             if (!$currentRevision) {
-                $revision["status"] = "published";
-                $this->articleRevisionModel->insert($revision, [Model::OPT_MODE => $this->getOperationMode()]);
+                $revisionUpdate["status"] = "published";
+                $this->articleRevisionModel->insert($revisionUpdate, [Model::OPT_MODE => $this->getOperationMode()]);
             } else {
-                $articleRevisionID = $this->articleRevisionModel->insert($revision, [Model::OPT_MODE => $this->getOperationMode()]);
-                $this->articleRevisionModel->publish($articleRevisionID, $revision["insertUserID"] ?? null, $this->getOperationMode());
+                $articleRevisionID = $this->articleRevisionModel->insert($revisionUpdate, [Model::OPT_MODE => $this->getOperationMode()]);
+                $this->articleRevisionModel->publish($articleRevisionID, $revisionUpdate["insertUserID"] ?? null, $this->getOperationMode());
             }
 
             if (isset($fields['knowledgeCategoryID'])) {
                 $this->updateDefaultArticleID($fields['knowledgeCategoryID']);
             }
-            $this->flagInactiveMedia($articleID, $revision["body"], $revision["format"]);
-            $this->refreshMediaAttachments($articleID, $revision["body"], $revision["format"]);
+            $this->flagInactiveMedia($articleID, $revisionUpdate["body"], $revisionUpdate["format"]);
+            $this->refreshMediaAttachments($articleID, $revisionUpdate["body"], $revisionUpdate["format"]);
         }
 
         // The article has been updated or saved. Make sure we dispatch a resource event.
-        $article = $this->retrieveRow($articleID, ['locale' => $locale]);
-        $event = new ArticleEvent($isUpdate ? ResourceEvent::ACTION_UPDATE : ResourceEvent::ACTION_INSERT, ['article' => $article]);
-        $this->eventManager->dispatch($event);
-
+        if ($updateAllRevisions) {
+            $this->dispatchUpdateForAllLocales($articleID);
+        } else {
+            $articleUpdate = $this->retrieveRow($articleID, ['locale' => $locale]);
+            $articleUpdate = $this->normalizeOutput($articleUpdate);
+            $articleUpdate = $this->articleSchema()->validate($articleUpdate);
+            $event = new ArticleEvent($isUpdate ? ResourceEvent::ACTION_UPDATE : ResourceEvent::ACTION_INSERT, ['article' => $articleUpdate]);
+            $this->eventManager->dispatch($event);
+        }
         if ($fields['discussionID'] ?? false) {
             // canonicalize discussion
-            $article = $this->articleModel->getIDWithRevision($articleID);
-            $articleUrl = $this->articleModel->url($article);
+            $articleUpdate = $this->articleModel->getIDWithRevision($articleID);
+            $articleUrl = $this->articleModel->url($articleUpdate);
             $this->discussionApi->put_canonicalUrl($fields['discussionID'], ['canonicalUrl' => $articleUrl]);
         }
 
