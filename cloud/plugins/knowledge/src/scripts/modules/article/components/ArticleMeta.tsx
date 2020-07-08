@@ -33,7 +33,7 @@ export class ArticleMeta extends React.Component<IProps> {
                         source="By <0/>"
                         c0={
                             <ProfileLink className={classesMetas.meta} username={updateUser.name}>
-                                <UserCardModule userID={updateUser.userID} />
+                                <UserCardModule userID={updateUser.userID} buttonContent={updateUser.name} />
                             </ProfileLink>
                         }
                     />

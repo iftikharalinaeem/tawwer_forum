@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { useUser } from "@library/features/users/userHooks";
 import { LoadStatus } from "@vanilla/library/src/scripts/@types/api/core";
 import Loader from "@library/loaders/Loader";
@@ -17,8 +17,15 @@ interface IProps {
     openAsModal?: boolean;
 }
 
-export function UserCardModule(props: IProps) {
-    const { userID, buttonContent, openAsModal } = props;
+interface IUserCardProps {
+    userID: number;
+    buttonContent?: ReactNode | string;
+    openAsModal?: boolean;
+    visible?: boolean;
+}
+
+function UserCard(props: IUserCardProps) {
+    const { userID, buttonContent, openAsModal, visible } = props;
     const user = useUser({ userID });
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data) {
@@ -41,5 +48,23 @@ export function UserCardModule(props: IProps) {
         countComments: user.data.countComments || 0,
     };
 
-    return <PopupUserCard user={userCardInfo} buttonContent={buttonContent} openAsModal={openAsModal} />;
+    return (
+        <PopupUserCard
+            visible={visible || false}
+            user={userCardInfo}
+            buttonContent={buttonContent}
+            openAsModal={openAsModal}
+        />
+    );
+}
+
+export function UserCardModule(props: IProps) {
+    const { userID, buttonContent, openAsModal } = props;
+    const [ready, setReady] = useState(false);
+
+    return ready ? (
+        <UserCard visible={ready} userID={userID} buttonContent={buttonContent} openAsModal={openAsModal} />
+    ) : (
+        <PopupUserCard onClick={() => setReady(true)} buttonContent={buttonContent} openAsModal={openAsModal} />
+    );
 }

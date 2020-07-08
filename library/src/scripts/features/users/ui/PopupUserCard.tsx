@@ -37,10 +37,11 @@ export interface IUserCardInfo {
 }
 
 interface IProps {
-    user: IUserCardInfo;
+    user?: IUserCardInfo;
     visible?: boolean;
     buttonContent?: ReactNode | string;
     openAsModal?: boolean;
+    onClick?: () => void;
 }
 
 interface IContainerProps {
@@ -159,87 +160,107 @@ function Header(props: IHeaderProps) {
 
 export default function PopupUserCard(props: IProps) {
     const classes = userCardClasses();
-    const { user, visible, buttonContent, openAsModal } = props;
+    const { user, visible, buttonContent, openAsModal, onClick } = props;
     const [open, toggleOpen] = useState(visible || false);
     const device = useDevice();
 
     const isCompact = device === Devices.MOBILE || device === Devices.XS;
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
 
-    const userInfo: IUserFragment = {
-        userID: user.userID,
-        name: user.name,
-        photoUrl: user.photoUrl,
-        dateLastActive: user.dateLastActive || null,
-        label: user.label || null,
-    };
+    if (user) {
+        const userInfo: IUserFragment = {
+            userID: user.userID,
+            name: user.name,
+            photoUrl: user.photoUrl,
+            dateLastActive: user.dateLastActive || null,
+            label: user.label || null,
+        };
+
+        return (
+            <DropDown
+                buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
+                buttonContents={buttonContent || user.name}
+                selfPadded={true}
+                flyoutType={FlyoutType.FRAME}
+                isVisible={open}
+                onVisibilityChange={isVisible => toggleOpen(isVisible)}
+                openAsModal={openAsModal}
+            >
+                <Header onClick={() => toggleOpen(!open)} />
+
+                <Container>
+                    <UserPhoto userInfo={userInfo} size={photoSize} />
+                </Container>
+
+                <Container>
+                    <Name name={user.name} />
+                </Container>
+
+                {/* We don't  want this section to show at all if there's no label */}
+                {user.label && (
+                    <Container>
+                        <Label label={user.label} />
+                    </Container>
+                )}
+
+                <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
+                    <Container>
+                        <a className={classes.email} href={`mailto:${user.email}`}>
+                            {user.email}
+                        </a>
+                    </Container>
+                </Permission>
+
+                <Container>
+                    <ButtonContainer>
+                        <LinkAsButton
+                            to={makeProfileUrl(user.name)}
+                            baseClass={ButtonTypes.STANDARD_ROUND}
+                            className={classes.button}
+                        >
+                            {t("View Profile")}
+                        </LinkAsButton>
+                    </ButtonContainer>
+
+                    <ButtonContainer>
+                        <LinkAsButton
+                            to={`/messages/add/${user.name}`}
+                            baseClass={ButtonTypes.STANDARD_ROUND}
+                            className={classes.button}
+                        >
+                            {t("Message")}
+                        </LinkAsButton>
+                    </ButtonContainer>
+                </Container>
+
+                <Container borderTop={true}>
+                    <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />
+                    <Stat count={user.countComments} text={t("Comments")} position={"right"} />
+                </Container>
+
+                <Container borderTop={true}>
+                    <Date text={t("Joined")} date={user.dateJoined} />
+                    <Date text={t("Last Active")} date={user.dateLastActive} />
+                </Container>
+            </DropDown>
+        );
+    }
 
     return (
         <DropDown
             buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
-            buttonContents={buttonContent || user.name}
+            buttonContents={buttonContent || null}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
-            isVisible={open}
-            onVisibilityChange={isVisible => toggleOpen(isVisible)}
+            isVisible={false}
+            onVisibilityChange={isVisible => {
+                if (onClick) {
+                    onClick();
+                }
+            }}
             openAsModal={openAsModal}
         >
-            <Header onClick={() => toggleOpen(!open)} />
-
-            <Container>
-                <UserPhoto userInfo={userInfo} size={photoSize} />
-            </Container>
-
-            <Container>
-                <Name name={user.name} />
-            </Container>
-
-            {/* We don't  want this section to show at all if there's no label */}
-            {user.label && (
-                <Container>
-                    <Label label={user.label} />
-                </Container>
-            )}
-
-            <Permission permission={"email.view"} mode={PermissionMode.GLOBAL}>
-                <Container>
-                    <a className={classes.email} href={`mailto:${user.email}`}>
-                        {user.email}
-                    </a>
-                </Container>
-            </Permission>
-
-            <Container>
-                <ButtonContainer>
-                    <LinkAsButton
-                        to={makeProfileUrl(user.name)}
-                        baseClass={ButtonTypes.STANDARD_ROUND}
-                        className={classes.button}
-                    >
-                        {t("View Profile")}
-                    </LinkAsButton>
-                </ButtonContainer>
-
-                <ButtonContainer>
-                    <LinkAsButton
-                        to={`/messages/add/${user.name}`}
-                        baseClass={ButtonTypes.STANDARD_ROUND}
-                        className={classes.button}
-                    >
-                        {t("Message")}
-                    </LinkAsButton>
-                </ButtonContainer>
-            </Container>
-
-            <Container borderTop={true}>
-                <Stat count={user.countDiscussions} text={t("Discussions")} position={"left"} />
-                <Stat count={user.countComments} text={t("Comments")} position={"right"} />
-            </Container>
-
-            <Container borderTop={true}>
-                <Date text={t("Joined")} date={user.dateJoined} />
-                <Date text={t("Last Active")} date={user.dateLastActive} />
-            </Container>
+            {null}
         </DropDown>
     );
 }
