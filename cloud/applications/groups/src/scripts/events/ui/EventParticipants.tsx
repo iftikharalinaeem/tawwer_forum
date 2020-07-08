@@ -12,7 +12,6 @@ import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsSty
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import ProfileLink from "@library/navigation/ProfileLink";
-import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 
 interface IProps {
     participants: IEventParticipant[];
@@ -25,14 +24,8 @@ function Participant({ user }) {
 
     const participantsClasses = eventParticipantsClasses();
     return (
-        <ProfileLink username={user.name} className={participantsClasses.item}>
-            <UserCardModuleLazyLoad
-                userID={user.userID}
-                buttonContent={
-                    <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
-                }
-                openAsModal={true}
-            />
+        <ProfileLink username={user.name} userID={user.userID} cardAsModal={true} className={participantsClasses.item}>
+            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
             <span className={participantsClasses.name}>{user.name}</span>
         </ProfileLink>
     );

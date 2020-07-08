@@ -7,21 +7,37 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
-import { UserCardModule } from "@library/features/users/modules/UserCardModule";
+import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 
 interface IProps {
     username: string;
+    userID: number;
     className?: string;
     children?: React.ReactNode;
+    isUserCard?: boolean;
+    cardAsModal?: boolean;
 }
 
 /**
  * Class representing a link to a users profile. This will do a full page refresh.
  */
-export default class ProfileLink extends React.Component<IProps> {
-    public render() {
-        const { username } = this.props;
-        const children = this.props.children || username;
-        return <span className={classNames(this.props.className)}>{children}</span>;
+export default function ProfileLink(props: IProps) {
+    const { username, isUserCard = true, cardAsModal } = props;
+    const children = props.children || username;
+
+    if (isUserCard) {
+        return (
+            <UserCardModuleLazyLoad
+                buttonContent={<span className={classNames(props.className)}>{children}</span>}
+                openAsModal={cardAsModal}
+                userID={props.userID}
+            />
+        );
+    } else {
+        return (
+            <a href={makeProfileUrl(username)} className={classNames(props.className)}>
+                {children}
+            </a>
+        );
     }
 }

@@ -30,9 +30,11 @@ export default function InsertUpdateMetas(props: IProps) {
                     source="Published <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateInserted} />}
                     c1={
-                        <ProfileLink className={classesMetas.metaStyle} username={props.insertUser.name}>
-                            <UserCardModuleLazyLoad userID={props.insertUser.userID} />
-                        </ProfileLink>
+                        <ProfileLink
+                            className={classesMetas.metaStyle}
+                            username={props.insertUser.name}
+                            userID={props.insertUser.userID}
+                        />
                     }
                 />
             </DropDownItemMeta>
@@ -41,9 +43,11 @@ export default function InsertUpdateMetas(props: IProps) {
                     source="Updated <0/> by <1/>"
                     c0={<DateTime timestamp={props.dateUpdated} />}
                     c1={
-                        <ProfileLink className={classesMetas.metaStyle} username={props.updateUser.name}>
-                            <UserCardModuleLazyLoad userID={props.insertUser.userID} />
-                        </ProfileLink>
+                        <ProfileLink
+                            className={classesMetas.metaStyle}
+                            username={props.updateUser.name}
+                            userID={props.updateUser.userID}
+                        />
                     }
                 />
             </DropDownItemMeta>

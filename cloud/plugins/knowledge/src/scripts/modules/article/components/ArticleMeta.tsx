@@ -31,9 +31,11 @@ export class ArticleMeta extends React.Component<IProps> {
                     <Translate
                         source="By <0/>"
                         c0={
-                            <ProfileLink className={classesMetas.meta} username={updateUser.name}>
-                                <UserCardModuleLazyLoad userID={updateUser.userID} buttonContent={updateUser.name} />
-                            </ProfileLink>
+                            <ProfileLink
+                                className={classesMetas.meta}
+                                username={updateUser.name}
+                                userID={updateUser.userID}
+                            />
                         }
                     />
                 </span>
