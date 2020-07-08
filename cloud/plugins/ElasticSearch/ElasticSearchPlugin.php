@@ -10,12 +10,11 @@ namespace Vanilla\Cloud\ElasticSearch;
 use Garden\Container\Container;
 use Garden\Web\Data;
 use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
-use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpConfig;
 use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpClient;
-use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpConfig;
 use Vanilla\Dashboard\Controllers\API\ResourcesApiController;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
+use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
 
 /**
  * Plugin for elastic search.

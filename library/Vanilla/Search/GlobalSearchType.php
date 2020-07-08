@@ -82,6 +82,9 @@ class GlobalSearchType extends AbstractSearchType {
 
         /** @var $endDate \DateTimeImmutable|null */
         $endDate = $dateInserted['date'][1] ?? null;
+        if ($startDate && $endDate) {
+            $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());
+        }
 
 
         $sort = $query->getQueryParameter('sort', 'relevance');
@@ -104,9 +107,7 @@ class GlobalSearchType extends AbstractSearchType {
 
         /** @psalm-suppress UndefinedClass */
         if ($query instanceof SphinxSearchQuery) {
-            if ($startDate && $endDate) {
-                $query->setFilterRange('dateInserted', $startDate->getTimestamp(), $endDate->getTimestamp());
-            }
+
 
             // Sorts
             $sortField = ltrim($sort, '-');

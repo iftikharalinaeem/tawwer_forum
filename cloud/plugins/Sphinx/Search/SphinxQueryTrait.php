@@ -88,6 +88,10 @@ trait SphinxQueryTrait {
         bool $exclude = false,
         string $filterOp = SphinxSearchQuery::FILTER_OP_OR
     ) {
+        if ($attribute === 'type') {
+            // this case handled by SphinxSearchDriver itself with method applyDtypes()
+            return $this;
+        }
         $allNumbers = true;
         foreach ($values as $value) {
             if (is_numeric($value)) {
