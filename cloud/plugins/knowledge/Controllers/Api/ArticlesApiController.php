@@ -258,9 +258,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]);
 
         $query = $in->validate($query);
-        $article = $this->articleHelper->articleByID($id, true, false, true);
+        $articles = $this->articleHelper->articleByID($id, true, false, true);
 
-        $result =  $this->articleHelper->getArticleTranslationData($article);
+        $result =  $this->articleHelper->getArticleTranslationData($articles);
         $result = $out->validate($result);
 
         return $result;

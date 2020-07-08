@@ -265,6 +265,7 @@ trait ArticlesApiSchemes {
         if ($this->articleSchema === null) {
             $this->articleSchema = Schema::parse([
                 "articleID",
+                "articleRevisionID",
                 "knowledgeCategoryID",
                 "breadcrumbs?",
                 "knowledgeBaseID",
