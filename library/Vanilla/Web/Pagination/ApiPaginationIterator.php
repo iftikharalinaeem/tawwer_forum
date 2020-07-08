@@ -44,7 +44,7 @@ class ApiPaginationIterator implements \IteratorAggregate {
      *
      * @return \Generator
      */
-    private function internalGenerator(): \Generator {
+    protected function internalGenerator(): \Generator {
         if ($this->currentUrl === null) {
             $this->currentUrl = $this->initialUrl;
         }
