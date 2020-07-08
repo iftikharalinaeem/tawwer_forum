@@ -413,7 +413,6 @@ class PagerModule extends Gdn_Module {
         if ($currentPage == 1) {
             $pager .= '<span class="Previous Pager-nav" aria-disabled="true">'.$previousText.'</span>';
         } else {
-            //$pager .= anchor($previousText, $this->pageUrl($currentPage - 1), 'Previous Pager-nav', ['rel' => 'prev', 'tabindex' => "0"]);
             $attr = ['title' => t('Previous'), 'aria-label' => t('Previous')];
             $pager .= $this->previousLink($currentPage, $previousText, $attr);
         }
