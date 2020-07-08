@@ -974,11 +974,7 @@ export const titleBarClasses = useThemeCache(() => {
         marginRight: negativeUnit(globalVars.buttonIcon.offset + 3),
     });
 
-    const titleBarContainer = style("titleBarContainer", {
-        ...paddings({
-            horizontal: globalVars.gutter.half,
-        }),
-    });
+    const titleBarContainer = style("titleBarContainer", {});
 
     return {
         root,
