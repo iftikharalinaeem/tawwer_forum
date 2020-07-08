@@ -480,6 +480,11 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         ...margins({ bottom: globalVars.gutter.half }),
     });
 
+    const itemWrapper = style("itemWrapper", {
+        display: "flex",
+        flexWrap: "nowrap",
+    });
+
     return {
         root,
         item,
@@ -520,5 +525,6 @@ export const eventsClasses = useThemeCache((props: { compact?: boolean } = {}) =
         description,
         organizer,
         panelHeading,
+        itemWrapper,
     };
 });
