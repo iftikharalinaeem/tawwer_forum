@@ -16,8 +16,6 @@ export const containerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
     const makeThemeVars = variableFactory("containerVariables");
 
-    console.log("--- vars: ", vars);
-
     let spacing = makeThemeVars("spacing", {
         padding: globalVars.constants.fullGutter / 2,
         mobile: {

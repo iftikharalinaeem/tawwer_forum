@@ -425,9 +425,6 @@ export const generatePanelLayoutClasses = (props: {
         }),
     });
 
-    console.log("two vars.panel.paddedWidth: ", vars.panel.paddedWidth);
-    console.log("two vars: ", vars);
-
     const mainColumnMaxWidth = style("mainColumnMaxWidth", {
         $nest: {
             "&.hasAdjacentPanel": {
