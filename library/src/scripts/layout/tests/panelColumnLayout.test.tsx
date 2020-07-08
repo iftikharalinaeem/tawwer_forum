@@ -27,23 +27,53 @@ const DummyPanel = (props: { bg?: string; children?: React.ReactNode }) => {
     );
 };
 
-// For Three column layout:
+// == THREE COLUMN LAYOUT ==
+
+// -- Widths --
+// gutter       : 20
 // left panel   : 216
 // gutter       : 40
 // middle column: 672
 // gutter       : 40
 // right panel  : 216
-// total        : 1184
+// gutter       : 20
+// total        : 1224
 
-// For Two column layout:
+// -- Padded Widths --
+// left panel    : 20 + 216 + 20 = 256
+// middle column : 20 + 672 + 20 = 712
+// right panel   : 20 + 216 + 20 = 256
+// total         : 1172
+
+// == TWO COLUMN LAYOUT ==
+
+// -- Widths --
+// gutter       : 20
 // right panel  : 343
 // gutter       : 40
-// main column  : 1184 - 343 - 40
+// main column  : 1172 - 20 - 343 - 40 - 20 = 749
+// gutter       : 20
+// total        : 1172
 
-// For Legacy
+// -- Padded Widths --
+// right panel    : 20 + 343 + 20 = 383
+// middle column : 20 + 749 + 20 = 789
+// total         : 1172
+
+// == LEGACY LAYOUT ==
+
+// -- Widths --
+// gutter       : 20
 // right panel  : 244
-// gutter       : 52 (special)
-// main column  : 1184 - 244 - 52
+// gutter       : 52 (different than other layouts)
+// main column  : 1172 - 20 - 244 - 52 - 20 = 836
+// gutter       : 20
+// total        : 1172
+
+// -- Padded Widths --
+// right panel    : 20 + 244 + (52/2) = 290
+// middle column : 20 + 836 + (52/2) = 882
+// total         : 1172
 
 describe.only("TwoColumnLayout", () => {
     it("Check desktop widths", () => {

@@ -173,7 +173,7 @@ export const bannerVariables = useThemeCache((forcedVars?: IThemeVariables, altN
         padding: {
             ...EMPTY_SPACING,
             vertical: globalVars.gutter.size,
-            horizontal: containerVariables().spacing.paddingFull.horizontal,
+            horizontal: containerVariables().spacing.padding * 2,
         },
     });
 
@@ -606,8 +606,7 @@ export const bannerClasses = useThemeCache(
                 },
                 media(
                     {
-                        maxWidth:
-                            vars.contentContainer.minWidth + containerVariables().spacing.paddingFull.horizontal * 2,
+                        maxWidth: vars.contentContainer.minWidth + containerVariables().spacing.padding * 2 * 2,
                     },
                     {
                         right: "initial",
@@ -779,7 +778,7 @@ export const bannerClasses = useThemeCache(
                 alignSelf: "stretch",
                 maxWidth: makeImageMinWidth(
                     layoutVariables().contentWidth,
-                    containerVariables().spacing.paddingFull.horizontal * 2,
+                    containerVariables().spacing.padding * 2 * 2,
                 ),
                 flexGrow: 1,
                 position: "relative",
@@ -788,13 +787,13 @@ export const bannerClasses = useThemeCache(
             media(
                 { maxWidth: layoutVariables().contentWidth },
                 {
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFull.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.padding * 2),
                 },
             ),
             layoutVariables()
                 .mediaQueries()
                 .oneColumnDown({
-                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.paddingFullMobile.horizontal),
+                    minWidth: makeImageMinWidth("100vw", containerVariables().spacing.mobile.padding * 2),
                 }),
             media(
                 { maxWidth: 500 },

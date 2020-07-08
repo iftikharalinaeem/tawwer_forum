@@ -71,8 +71,7 @@ export const layoutVariables = useThemeCache(
             paddedWidth: foundationalWidths.middleColumnWidth + fullPadding,
         });
 
-        // @Deprecated - Use LayoutContext to get variables
-        const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2 + fullPadding;
+        const contentWidth = middleColumn.paddedWidth + panel.paddedWidth * 2;
 
         // @Deprecated - Needs to be split into separate layouts
         const contentSizes = makeThemeVars("content", {
@@ -474,7 +473,7 @@ export const generatePanelLayoutClasses = (props: {
     });
 
     const breadcrumbsContainer = style("breadcrumbs", {
-        paddingBottom: unit(10),
+        paddingBottom: unit(6),
     });
 
     const layoutSpecificStyles = style => {

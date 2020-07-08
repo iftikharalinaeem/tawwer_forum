@@ -10,21 +10,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { paddings } from "@library/styles/styleHelpers";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
-export const panelWidgetVariables = useThemeCache(() => {
-    const makeThemeVars = variableFactory("panelWidget");
-
-    // @Deprecated - Use globalVariables().widget.padding directly
-    const spacing = makeThemeVars("spacing", {
-        padding: globalVariables().widget.padding,
-    });
-
-    return { spacing };
-});
-
 export const panelWidgetClasses = useThemeCache(mediaQueries => {
     const globalVars = globalVariables();
     const style = styleFactory("panelWidget");
-    const vars = panelWidgetVariables();
 
     const root = style({
         display: "flex",
@@ -32,7 +20,7 @@ export const panelWidgetClasses = useThemeCache(mediaQueries => {
         position: "relative",
         width: percent(100),
         ...paddings({
-            all: globalVars.gutter.half,
+            all: globalVars.widget.padding,
         }),
         $nest: {
             "&.hasNoVerticalPadding": {
@@ -48,14 +36,14 @@ export const panelWidgetClasses = useThemeCache(mediaQueries => {
                 [LayoutTypes.TWO_COLUMNS]: {
                     oneColumnDown: {
                         ...paddings({
-                            all: vars.spacing.padding,
+                            all: globalVars.widget.padding,
                         }),
                     },
                 },
                 [LayoutTypes.THREE_COLUMNS]: {
                     oneColumnDown: {
                         ...paddings({
-                            all: vars.spacing.padding,
+                            all: globalVars.widget.padding,
                         }),
                     },
                 },

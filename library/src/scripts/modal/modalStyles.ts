@@ -14,7 +14,6 @@ import { calc, percent, translate, translateX, viewHeight } from "csx";
 import { NestedCSSProperties } from "typestyle/lib/types";
 import { cssRule } from "typestyle";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { panelWidgetVariables } from "@library/layout/panelWidgetStyles";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
