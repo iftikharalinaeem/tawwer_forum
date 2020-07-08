@@ -7,7 +7,9 @@
 import React from "react";
 import { makeProfileUrl } from "../utility/appUtils";
 import classNames from "classnames";
+import { UserCardModule } from "@library/features/users/modules/UserCardModule";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 interface IProps {
     username: string;
@@ -16,6 +18,7 @@ interface IProps {
     children?: React.ReactNode;
     isUserCard?: boolean;
     cardAsModal?: boolean;
+    buttonType?: ButtonTypes;
 }
 
 /**
@@ -28,9 +31,11 @@ export default function ProfileLink(props: IProps) {
     if (isUserCard) {
         return (
             <UserCardModuleLazyLoad
-                buttonContent={<span className={classNames(props.className)}>{children}</span>}
+                buttonType={props.buttonType}
+                buttonContent={children}
                 openAsModal={cardAsModal}
                 userID={props.userID}
+                buttonClass={props.className}
             />
         );
     } else {

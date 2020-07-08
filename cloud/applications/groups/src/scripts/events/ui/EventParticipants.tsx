@@ -12,6 +12,7 @@ import { eventParticipantsClasses } from "@groups/events/ui/eventParticipantsSty
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import Button from "@vanilla/library/src/scripts/forms/Button";
 import ProfileLink from "@library/navigation/ProfileLink";
+import { ButtonTypes } from "@vanilla/library/src/scripts/forms/buttonTypes";
 
 interface IProps {
     participants: IEventParticipant[];
@@ -30,6 +31,7 @@ function Participant({ user }) {
                 userID={user.userID}
                 cardAsModal={true}
                 className={participantsClasses.item}
+                buttonType={ButtonTypes.RESET}
             >
                 <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
                 <span className={participantsClasses.name}>{user.name}</span>

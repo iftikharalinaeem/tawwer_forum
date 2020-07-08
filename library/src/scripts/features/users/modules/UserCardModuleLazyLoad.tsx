@@ -9,6 +9,7 @@ import Button from "@library/forms/Button";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import classNames from "classnames";
 import { IUserCardModule, UserCardModule } from "@library/features/users/modules/UserCardModule";
+import { t } from "@vanilla/i18n";
 
 export interface IProps extends Omit<IUserCardModule, "fallbackButton" | "ready"> {}
 
@@ -21,11 +22,11 @@ export function UserCardModuleLazyLoad(props: IProps) {
             onClick={() => {
                 setReady(true);
             }}
-            baseClass={ButtonTypes.TEXT}
-            className={classNames(userCardClasses().link, {
+            baseClass={props.buttonType ?? ButtonTypes.TEXT}
+            className={classNames(userCardClasses().link, props.buttonClass, {
                 isLoading: ready,
             })}
-            disabled={ready}
+            ariaLabel={t(`Load user information.`)}
         >
             {buttonContent}
         </Button>

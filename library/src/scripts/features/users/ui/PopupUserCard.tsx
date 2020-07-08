@@ -39,6 +39,8 @@ interface IProps {
     visible?: boolean;
     buttonContent?: ReactNode | string;
     openAsModal?: boolean;
+    buttonType?: ButtonTypes;
+    buttonClass?: string;
 }
 
 interface IContainerProps {
@@ -168,8 +170,8 @@ export default function PopupUserCard(props: IProps) {
         <DropDown
             tag={"span"}
             buttonContents={buttonContent || user.name}
-            buttonBaseClass={ButtonTypes.TEXT}
-            buttonClassName={classes.link}
+            buttonBaseClass={props.buttonType ?? ButtonTypes.TEXT}
+            buttonClassName={classNames(classes.link, props.buttonClass)}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
