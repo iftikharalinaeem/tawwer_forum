@@ -12,13 +12,18 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
 import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
+import { hasPermission } from "@vanilla/library/src/scripts/features/users/Permission";
 
 export function applyCompatibilityUserCards(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
         return;
     }
+
+    if (!hasPermission("profiles.view")) {
+        // We don't do user cards if the user's don't have
+        return;
+    }
     const userCards = scope.querySelectorAll(".js-userCard");
-    // const userCards = [];
     userCards.forEach(userLink => {
         const { userid } = (userLink as HTMLAnchorElement).dataset;
         if (userid && isNumeric(userid) && userLink instanceof HTMLAnchorElement) {

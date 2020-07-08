@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { UserCardModule } from "@library/features/users/modules/UserCardModule";
 import { UserCardModuleLazyLoad } from "@library/features/users/modules/UserCardModuleLazyLoad";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { hasPermission } from "@library/features/users/Permission";
 
 interface IProps {
     username: string;
@@ -27,8 +28,7 @@ interface IProps {
 export default function ProfileLink(props: IProps) {
     const { username, isUserCard = true, cardAsModal } = props;
     const children = props.children || username;
-
-    if (isUserCard) {
+    if (isUserCard && hasPermission("profiles.view")) {
         return (
             <UserCardModuleLazyLoad
                 buttonType={props.buttonType}
