@@ -10,7 +10,6 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 import { paddings, unit, colorOut } from "@library/styles/styleHelpers";
-import { NestedCSSProperties } from "typestyle/lib/types";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export const panelAreaClasses = useThemeCache(mediaQueries => {
@@ -18,47 +17,45 @@ export const panelAreaClasses = useThemeCache(mediaQueries => {
     const style = styleFactory("panelArea");
     const classesPanelWidget = panelWidgetClasses(mediaQueries);
 
-    const root = style(
-        {
-            width: percent(100),
-            ...paddings({
-                all: globalVars.gutter.half,
-            }),
-            $nest: {
-                "& .heading": {
-                    $nest: lineHeightAdjustment(),
-                },
-                [`&.inheritHeight > .${classesPanelWidget.root}`]: {
-                    flexGrow: 1,
-                },
-                "&.hasNoVerticalPadding": {
-                    ...paddings({ vertical: 0 }),
-                },
-                "&.hasNoHorizontalPadding": {
-                    ...paddings({ horizontal: 0 }),
-                },
-                "&.isSelfPadded": {
-                    ...paddings({ all: 0 }),
-                },
-            },
-        } as NestedCSSProperties,
-        mediaQueries({
-            [LayoutTypes.TWO_COLUMNS]: {
-                oneColumnDown: {
-                    ...paddings({
-                        horizontal: 0,
-                    }),
-                },
-            },
-            [LayoutTypes.THREE_COLUMNS]: {
-                oneColumnDown: {
-                    ...paddings({
-                        horizontal: 0,
-                    }),
-                },
-            },
+    const root = style({
+        width: percent(100),
+        ...paddings({
+            all: globalVariables().widget.padding,
         }),
-    );
+        $nest: {
+            "& .heading": {
+                $nest: lineHeightAdjustment(),
+            },
+            [`&.inheritHeight > .${classesPanelWidget.root}`]: {
+                flexGrow: 1,
+            },
+            "&.hasNoVerticalPadding": {
+                ...paddings({ vertical: 0 }),
+            },
+            "&.hasNoHorizontalPadding": {
+                ...paddings({ horizontal: 0 }),
+            },
+            "&.isSelfPadded": {
+                ...paddings({ all: 0 }),
+            },
+            ...mediaQueries({
+                [LayoutTypes.TWO_COLUMNS]: {
+                    oneColumnDown: {
+                        ...paddings({
+                            horizontal: 0,
+                        }),
+                    },
+                },
+                [LayoutTypes.THREE_COLUMNS]: {
+                    oneColumnDown: {
+                        ...paddings({
+                            horizontal: 0,
+                        }),
+                    },
+                },
+            }).$nest,
+        },
+    });
 
     const overflowFull = useThemeCache((offset: number) =>
         style("overflowFull", {

@@ -7,10 +7,11 @@ import { NestedCSSProperties } from "typestyle/lib/types";
 import { media } from "typestyle";
 import { px } from "csx";
 import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
-import { doNothingWithMediaQueries, generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
+import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { ITwoColumnLayoutMediaQueries, twoColumnLayoutDevices } from "@library/layout/types/interface.twoColumns";
 import { IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 
 export const twoColumnLayoutVariables = useThemeCache(
     (): IPanelLayoutVariables => {
@@ -174,6 +175,6 @@ export const twoColumnLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: twoColumnLayoutVariables(),
         name: "twoColumnLayout",
-        mediaQueries: twoColumnLayoutVariables().mediaQueries,
+        mediaQueries: mediaQueryFactory(twoColumnLayoutVariables().mediaQueries, LayoutTypes.TWO_COLUMNS),
     });
 };

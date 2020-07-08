@@ -1,6 +1,14 @@
 import { NestedCSSProperties } from "typestyle/lib/types";
-import { IThreeColumnLayoutMediaQueries } from "@library/layout/types/interface.threeColumns";
-import { ITwoColumnLayoutMediaQueries } from "@library/layout/types/interface.twoColumns";
+import {
+    IThreeColumnLayoutMediaQueries,
+    IThreeColumnLayoutMediaQueryStyles,
+} from "@library/layout/types/interface.threeColumns";
+import {
+    ITwoColumnLayoutMediaQueries,
+    ITwoColumnLayoutMediaQueryStyles,
+    twoColumnLayoutDevices,
+} from "@library/layout/types/interface.twoColumns";
+import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 
 export enum fallbackLayoutVariables {
     XS = "xs",
@@ -51,3 +59,16 @@ export interface IPanelLayoutVariables {
     calculateDevice: () => string;
     rightPanelCondition?: (currentDevice, shouldRenderLeftPanel) => boolean;
 }
+
+export interface IAllLayoutMediaQueries {
+    [LayoutTypes.TWO_COLUMNS]?: ITwoColumnLayoutMediaQueryStyles;
+    [LayoutTypes.THREE_COLUMNS]?: IThreeColumnLayoutMediaQueryStyles;
+}
+
+export type ILayoutMediaQueryFunction = (styles: IAllLayoutMediaQueries) => NestedCSSProperties;
+
+export type IAllLayoutDevices = twoColumnLayoutDevices | fallbackLayoutVariables;
+
+export type IAllMediaQueriesForLayouts = ITwoColumnLayoutMediaQueries | IThreeColumnLayoutMediaQueries | {};
+
+export type IMediaQueryFunction = (mediaQueriesForAllLayouts: IAllLayoutMediaQueries) => NestedCSSProperties;

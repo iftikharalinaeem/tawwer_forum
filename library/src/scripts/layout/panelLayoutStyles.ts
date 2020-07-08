@@ -14,7 +14,11 @@ import { margins, paddings } from "@library/styles/styleHelpersSpacing";
 import { sticky, unit } from "@library/styles/styleHelpers";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
-import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import {
+    fallbackLayoutVariables,
+    IMediaQueryFunction,
+    IPanelLayoutVariables,
+} from "@library/layout/types/interface.panelLayout";
 import { logError } from "@vanilla/utils";
 
 interface IProps extends IPanelLayoutVariables {
@@ -277,6 +281,7 @@ export interface IPanelLayoutClasses {
     isSticky: string;
     breadcrumbs: string;
     breadcrumbsContainer: string;
+    layoutSpecificStyles?: any;
 }
 
 export const doNothingWithMediaQueries = (styles: any) => {
@@ -284,10 +289,19 @@ export const doNothingWithMediaQueries = (styles: any) => {
     return {};
 };
 
-export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables; name: string; mediaQueries }) => {
+export const generatePanelLayoutClasses = (props: {
+    vars: IPanelLayoutVariables;
+    name: string;
+    mediaQueries: IMediaQueryFunction;
+}): IPanelLayoutClasses => {
     const { vars, name, mediaQueries } = props;
     const globalVars = globalVariables();
     const style = styleFactory(name);
+
+    if (typeof mediaQueries !== "function") {
+        logError("mediaQueries needs to be a function of type IMediaQueryFunction: ", mediaQueries);
+        return {} as IPanelLayoutClasses;
+    }
 
     const main = style("main", {
         minHeight: viewHeight(20),
@@ -451,7 +465,7 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
                     bottom: "auto",
                 },
             },
-        }),
+        }).$nest,
     });
 
     // To remove when we have overlay styles converted
@@ -534,13 +548,4 @@ export const generatePanelLayoutClasses = (props: { vars: IPanelLayoutVariables;
         breadcrumbsContainer,
         layoutSpecificStyles,
     };
-};
-
-//@Deprecated use specific layout instead (i.e. three or two column layouts)
-export const panelLayoutClasses = (mediaQueries = doNothingWithMediaQueries) => {
-    return generatePanelLayoutClasses({
-        vars: layoutVariables(),
-        name: "panelLayout",
-        mediaQueries,
-    });
 };

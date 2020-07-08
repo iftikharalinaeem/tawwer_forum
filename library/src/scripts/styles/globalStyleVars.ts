@@ -33,7 +33,6 @@ export enum GlobalPreset {
 
 export const FULL_GUTTER = 40;
 
-
 export const defaultFontFamily = "Open Sans";
 
 export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
@@ -250,7 +249,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     });
 
     const widgetInit = makeThemeVars("widget", {
-        padding: 8,
+        padding: 10,
     });
 
     const widget = makeThemeVars("widget", {

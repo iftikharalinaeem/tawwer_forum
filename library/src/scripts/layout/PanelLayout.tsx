@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { panelLayoutClasses } from "@library/layout/panelLayoutStyles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
@@ -83,7 +82,7 @@ function PanelLayout(props: IPanelLayoutProps) {
     const { offsetClass, topOffset } = useScrollOffset();
     const { bannerRect } = useBannerContext();
     const {
-        classes = props.classes ?? panelLayoutClasses(mediaQueries),
+        classes = props.classes,
         currentDevice,
         isCompact,
         isFullWidth,

@@ -7,6 +7,7 @@ import { useThemeCache, variableFactory } from "@library/styles/styleUtils";
 import { generatePanelLayoutClasses, layoutVariables } from "../panelLayoutStyles";
 import { LayoutTypes } from "@library/layout/types/interface.layoutTypes";
 import { fallbackLayoutVariables, IPanelLayoutVariables } from "@library/layout/types/interface.panelLayout";
+import { mediaQueryFactory } from "@library/layout/types/mediaQueryFactory";
 
 interface IProps extends IPanelLayoutVariables {
     contentSizes: object;
@@ -118,6 +119,6 @@ export const threeColumnLayoutClasses = () => {
     return generatePanelLayoutClasses({
         vars: threeColumnLayoutVariables(),
         name: "threeColumnLayout",
-        mediaQueries: threeColumnLayoutVariables().mediaQueries,
+        mediaQueries: mediaQueryFactory(threeColumnLayoutVariables().mediaQueries, LayoutTypes.THREE_COLUMNS),
     });
 };
