@@ -31,7 +31,9 @@ export function UserCardModule(props: IUserCardModule) {
     }
 
     if (!user.data || user.error) {
-        logError("failed to fetch data for UserCardModule", user);
+        if (user.error) {
+            logError("failed to fetch data for UserCardModule", user);
+        }
         return (
             <>
                 {/* Fallback to the original link, unchanged */}
