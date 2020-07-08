@@ -165,6 +165,7 @@ export default function PopupUserCard(props: IProps) {
 
     return (
         <DropDown
+            tag={"span"}
             buttonContents={buttonContent || user.name}
             buttonBaseClass={ButtonTypes.TEXT}
             buttonClassName={classes.link}
