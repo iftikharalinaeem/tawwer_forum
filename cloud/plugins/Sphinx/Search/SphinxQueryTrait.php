@@ -106,7 +106,12 @@ trait SphinxQueryTrait {
                 $sphinxMethod = 'setFilterString';
             } else {
                 $countString = count($values) === 0 ? 'none' : 'multiple';
-                throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
+                if ($attribute === 'type') {
+                    // this case handled by SphinxSearchDriver itself with method applyDtypes()
+                    return $this;
+                } else {
+                    throw new SphinxSearchException("Sphinx string filters may only filter exactly 1 value, $countString were passed.");
+                }
             }
         }
 
