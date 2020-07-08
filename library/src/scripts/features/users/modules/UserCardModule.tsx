@@ -17,16 +17,15 @@ export interface IUserCardModule {
     children?: React.ReactNode; // First fallback
     fallbackButton: React.ReactNode;
     visible?: boolean;
-    ready?: boolean;
 }
 
 // Does not lazy load, will load user data right away
 export function UserCardModule(props: IUserCardModule) {
-    const { userID, buttonContent, openAsModal, children, fallbackButton, visible, ready = false } = props;
+    const { userID, buttonContent, openAsModal, children, fallbackButton, visible } = props;
     const user = useUser({ userID });
 
     // Fallback to the original link, unchanged
-    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status) && !user.data && !ready) {
+    if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(user.status)) {
         return <>{fallbackButton}</>;
     }
 

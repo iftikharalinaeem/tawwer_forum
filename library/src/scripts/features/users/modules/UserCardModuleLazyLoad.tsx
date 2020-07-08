@@ -34,6 +34,6 @@ export function UserCardModuleLazyLoad(props: IProps) {
     if (!ready) {
         return <>{fallbackButton}</>;
     } else {
-        return <UserCardModule {...props} fallbackButton={fallbackButton} visible={true} ready={ready} />;
+        return <UserCardModule {...props} fallbackButton={fallbackButton} visible={true} />;
     }
 }
