@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+ORIG_PWD=$(pwd)
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+CLOUD_ROOT=$(dirname "$DIR")
+VANILLA_ROOT=$(dirname "$CLOUD_ROOT")
+
+echo "Creating symlinks:"
+
+set -euxo pipefail
+
+cd "$VANILLA_ROOT/plugins"
+sudo ln -sf ../cloud/plugins/* .
+
+cd "$VANILLA_ROOT/applications"
+sudo ln -sf ../cloud/applications/* .
+
+cd $ORIG_PWD
+
+
+

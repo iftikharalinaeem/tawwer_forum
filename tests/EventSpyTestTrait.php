@@ -26,6 +26,13 @@ trait EventSpyTestTrait {
      * Setup.
      */
     public function setUpEventSpyTestTrait() {
+        $this->clearDispatchedEvents();
+    }
+
+    /**
+     * Clear the dispatched events.
+     */
+    protected function clearDispatchedEvents() {
         $this->getEventManager()->clearDispatchedEvents();
     }
 
@@ -41,8 +48,20 @@ trait EventSpyTestTrait {
      *
      * @param ResourceEvent[] $events
      * @param array|string[] $matchPayloadFields
+     * @param bool $strictCount If set to true we are asserting these are the only events dispatched.
      */
-    public function assertEventsDispatched(array $events, array $matchPayloadFields = ["*"]) {
+    public function assertEventsDispatched(array $events, array $matchPayloadFields = ["*"], bool $strictCount = false) {
+        if ($strictCount) {
+            $expectedCount = count($events);
+            $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
+            $actualCount = count($dispatchedEvents);
+            $this->assertEquals(
+                $expectedCount,
+                $actualCount,
+                "Expected {$expectedCount} events to be dispatched, but $actualCount events were dispatched. Dispatched Events:\n".
+                json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+            );
+        }
         foreach ($events as $event) {
             $this->assertEventDispatched($event, $matchPayloadFields);
         }

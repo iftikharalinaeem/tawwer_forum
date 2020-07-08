@@ -7,6 +7,7 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\EventManager;
+use Garden\Events\ResourceEvent;
 use Garden\Http\HttpClient;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
@@ -20,6 +21,7 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Knowledge\Events\ArticleEvent;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
@@ -179,44 +181,6 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     }
 
     /**
-     * Get an article by its numeric ID.
-     *
-     * @param int $id Article ID.
-     * @param bool $includeRevision
-     * @param bool $includeDeleted Include articles which belongs to knowledge base "deleted"
-     * @param bool $includeTranslations Whether to include translated article revisions.
-     *
-     * @return array
-     * @throws NotFoundException If the article could not be found.
-     * @throws ValidationException If the result fails schema validation.
-     */
-    private function articleByID(int $id, bool $includeRevision = false, bool $includeDeleted = false, bool $includeTranslations = false): array {
-        try {
-            if ($includeRevision) {
-                $article = $this->articleModel->getIDWithRevision($id, $includeTranslations);
-                if ($includeTranslations) {
-                    $knowledgeCategoryID = array_unique(array_column($article, "knowledgeCategoryID"));
-                } else {
-                    $knowledgeCategoryID = $article["knowledgeCategoryID"];
-                }
-                if (empty($article)) {
-                    throw new NoResultsException("No rows matched the provided criteria.");
-                }
-            } else {
-                $article = $this->articleModel->selectSingle(["articleID" => $id]);
-                $knowledgeCategoryID = $article['knowledgeCategoryID'];
-            }
-            if (!$includeDeleted) {
-                $knowledgeCategory = $this->knowledgeCategoryModel->selectSingle(['knowledgeCategoryID' => $knowledgeCategoryID]);
-                $this->knowledgeBaseModel->checkKnowledgeBasePublished($knowledgeCategory['knowledgeBaseID']);
-            }
-        } catch (NoResultsException $e) {
-            throw new NotFoundException("Article");
-        }
-        return $article;
-    }
-
-    /**
      * Handle GET requests to the root of the endpoint.
      *
      * @param int $id
@@ -294,9 +258,9 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]);
 
         $query = $in->validate($query);
-        $article = $this->articleByID($id, true, false, true);
+        $articles = $this->articleHelper->articleByID($id, true, false, true);
 
-        $result =  $this->articleHelper->getArticleTranslationData($article);
+        $result =  $this->articleHelper->getArticleTranslationData($articles);
         $result = $out->validate($result);
 
         return $result;
@@ -517,7 +481,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             ])->add($this->fullRevisionSchema()),
         ], "out");
 
-        $article = $this->articleByID($id);
+        $article = $this->articleHelper->articleByID($id);
         $where = ["articleID" => $article["articleID"]];
 
         if (!empty($query['locale'])) {
@@ -633,17 +597,19 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ], "in")->setDescription("Set the status of an article.");
         $out = $this->articleSchema("out");
         $body = $in->validate($body);
-        $article = $this->articleByID($id);
+        $article = $this->articleHelper->articleByID($id);
         if ($article['status'] !== $body['status']) {
             $this->articleModel->update(
                 ['status' => $body['status']],
                 ["articleID" => $id]
             );
+
+            $this->articleHelper->dispatchUpdateForAllLocales($id);
             $this->knowledgeCategoryModel->updateCounts($article['knowledgeCategoryID']);
             $this->articleHelper->updateDefaultArticleID($article["knowledgeCategoryID"]);
         }
 
-        $row = $this->articleByID($id, true);
+        $row = $this->articleHelper->articleByID($id, true);
         $row = $this->articleHelper->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['breadcrumbs'] = $crumbs;
@@ -687,7 +653,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $body = $in->validate($body);
 
         // This is just check if article exists and knowledge base has status "published"
-        $row = $this->articleByID($id, true);
+        $row = $this->articleHelper->articleByID($id, true);
         $validReaction = true;
 
 
@@ -731,7 +697,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
 
             $reactionCounts = $this->articleReactionModel->updateReactionCount($id);
 
-            $row = $this->articleByID($id, true);
+            $row = $this->articleHelper->articleByID($id, true);
 
             $newReactionValue = $this->articleReactionModel->getUserReaction(
                 ArticleReactionModel::TYPE_HELPFUL,
@@ -812,7 +778,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         [$body, $rehostResponseHeaders] = $this->articleHelper->rehostArticleImages($body);
 
         $articleID = $this->articleHelper->save($body);
-        $row = $this->articleByID($articleID, true);
+        $row = $this->articleHelper->articleByID($articleID, true);
         $this->eventManager->fire("afterArticleCreate", $row);
         $row = $this->articleHelper->normalizeOutput($row);
         $crumbs = $this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
@@ -869,11 +835,13 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         ]), "in");
 
         // Check that the article exists.
-        $this->articleByID($id);
+        $this->articleHelper->articleByID($id);
 
         $body = $in->validate($body);
 
         $this->articleFeaturedModel->update(['featured' => ($body['featured'] ? 1 : 0)], ['articleID' => $id]);
+        $this->articleHelper->dispatchUpdateForAllLocales($id);
+
         $this->knowledgeBaseModel->resetSphinxCounters();
         return $this->get($id);
     }
@@ -902,7 +870,7 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
         $query = $in->validate($query);
 
         $minimumArticles = $query['minimumArticles'] ?? null;
-        $article = $this->articleByID($id, true);
+        $article = $this->articleHelper->articleByID($id, true);
         $knowledgeBaseID = $article["knowledgeBaseID"] ?? '';
         $knowledgeBase =  $this->knowledgeBaseModel->get(["knowledgeBaseID" => $knowledgeBaseID]);
         $knowledgeBase = reset($knowledgeBase);

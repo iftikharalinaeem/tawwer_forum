@@ -373,13 +373,13 @@ MESSAGE
     public function selectFragmentForCategoryID(int $categoryID, string $locale = null) {
         $rows = $this->sql()
             ->select(
-                'kb.knowledgeBaseID, 
-                kb.rootCategoryID, 
-                kb.name, 
-                kb.urlCode, 
-                kb.viewType, 
-                kb.status, 
-                kb.sourceLocale, 
+                'kb.knowledgeBaseID,
+                kb.rootCategoryID,
+                kb.name,
+                kb.urlCode,
+                kb.viewType,
+                kb.status,
+                kb.sourceLocale,
                 kb.siteSectionGroup'
             )
             ->from('knowledgeCategory kc')
@@ -557,20 +557,24 @@ MESSAGE
      * @return bool
      */
     public function resetSphinxCounters() {
-        /** @var \Gdn_MySQLDriver $sql */
-        $sql = $this->sql();
-        $query = $sql->getUpdate(
-            $sql->mapAliases('SphinxCounter'),
-            ['MaxID' => 1],
-            [
-                'CounterID in ('.implode(',', [
-                    self::SPHINX_ARTICLES_COUNTER_ID,
-                    self::SPHINX_ARTICLES_DELETED_COUNTER_ID
-                ]).')',
-            ]
-        );
-        $sql->query($query, 'update');
-        $this->reindexSphinx();
+        try {
+            /** @var \Gdn_MySQLDriver $sql */
+            $sql = $this->sql();
+            $query = $sql->getUpdate(
+                $sql->mapAliases('SphinxCounter'),
+                ['MaxID' => 1],
+                [
+                    'CounterID in ('.implode(',', [
+                        self::SPHINX_ARTICLES_COUNTER_ID,
+                        self::SPHINX_ARTICLES_DELETED_COUNTER_ID
+                    ]).')',
+                ]
+            );
+            $sql->query($query, 'update');
+            $this->reindexSphinx();
+        } catch (\Exception $e) {
+            // Sphinx may not be enabled.
+        }
     }
 
     /**

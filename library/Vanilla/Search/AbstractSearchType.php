@@ -114,7 +114,7 @@ abstract class AbstractSearchType {
             'expandBody:b?' => [
                 'default' => true,
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs']),
+            'expand?' => ApiUtils::getExpandDefinition(['insertUser', 'breadcrumbs', 'image', 'excerpt']),
         ]));
     }
 
