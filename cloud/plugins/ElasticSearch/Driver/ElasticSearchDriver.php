@@ -45,7 +45,7 @@ class ElasticSearchDriver extends AbstractSearchDriver {
     ) {
         $this->searchTypeRecordProvider = $searchRecordProvider;
         $this->config = $config;
-        $this->elastic  = $elastic;
+        $this->elastic = $elastic;
     }
 
     /**
