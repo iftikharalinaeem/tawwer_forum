@@ -996,6 +996,7 @@ class UsersApiController extends AbstractApiController {
                 'dateLastActive:dt',
                 'countDiscussions?',
                 'countComments?',
-            ])->add($this->fullSchema()), 'ViewProfile');
+                'label:s?'
+        ])->add($this->fullSchema()), 'ViewProfile');
     }
 }

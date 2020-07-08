@@ -78,7 +78,8 @@ function Name(props: INameProps) {
 function Label(props: ILabelProps) {
     const classes = userCardClasses();
     const { label } = props;
-    return label ? <div className={classes.label}>{label}</div> : null;
+    // HTML here is sanitized server side.
+    return label ? <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} /> : null;
 }
 
 function Container(props: IContainerProps) {
