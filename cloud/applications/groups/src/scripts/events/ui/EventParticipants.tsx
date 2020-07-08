@@ -24,10 +24,17 @@ function Participant({ user }) {
 
     const participantsClasses = eventParticipantsClasses();
     return (
-        <ProfileLink username={user.name} userID={user.userID} cardAsModal={true} className={participantsClasses.item}>
-            <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
-            <span className={participantsClasses.name}>{user.name}</span>
-        </ProfileLink>
+        <li>
+            <ProfileLink
+                username={user.name}
+                userID={user.userID}
+                cardAsModal={true}
+                className={participantsClasses.item}
+            >
+                <UserPhoto className={classes.attendeePhoto} size={UserPhotoSize.MEDIUM} userInfo={user} />
+                <span className={participantsClasses.name}>{user.name}</span>
+            </ProfileLink>
+        </li>
     );
 }
 
