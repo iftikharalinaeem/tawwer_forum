@@ -54,6 +54,7 @@ import { suggestedTextStyleHelper } from "@library/features/search/suggestedText
 import { dropDownVariables } from "@vanilla/library/src/scripts/flyouts/dropDownStyles";
 import { logDebugConditionnal } from "@vanilla/utils";
 import { forumVariables } from "@library/forums/forumStyleVars";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 
 // To use compatibility styles, set '$staticVariables : true;' in custom.scss
 // $Configuration['Feature']['DeferredLegacyScripts']['Enabled'] = true;
@@ -322,7 +323,7 @@ compatibilityStyles = useThemeCache(() => {
         borderTopColor: colorOut(vars.border.color),
     });
 
-    cssOut(`.Author a:not(.PhotoWrap)`, {
+    cssOut(`.Author a:not(.PhotoWrap), .Author .${userCardClasses().link}`, {
         fontWeight: vars.fonts.weights.bold,
     });
 

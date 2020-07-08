@@ -12,17 +12,20 @@ import InputTextBlock from "@library/forms/InputTextBlock";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
 import { cssOut } from "@dashboard/compatibilityStyles/index";
+import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles";
 
 export function applyCompatibilityUserCards(scope: HTMLElement | Document | undefined = document) {
     if (scope === undefined) {
         return;
     }
     const userCards = scope.querySelectorAll(".js-userCard");
+    // const userCards = [];
     userCards.forEach(userLink => {
         const { userid } = (userLink as HTMLAnchorElement).dataset;
         if (userid && isNumeric(userid) && userLink instanceof HTMLAnchorElement) {
             const linkClasses = userLink.classList;
             linkClasses.remove("js-userCard"); // do not target more than once
+
             if (userLink.parentElement) {
                 const placeholderElement = document.createElement("span");
                 placeholderElement.classList.add("userCardWrapper");
@@ -34,7 +37,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
                             title={userLink.title}
                             rel={userLink.rel}
                             target={userLink.target}
-                            className={classNames(linkClasses.value)}
+                            className={classNames(linkClasses.value, userCardClasses().link)}
                         >
                             {userLink.innerText}
                         </SmartLink>

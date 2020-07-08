@@ -162,13 +162,13 @@ export default function PopupUserCard(props: IProps) {
 
     return (
         <DropDown
-            buttonBaseClass={ButtonTypes.TEXT_PRIMARY}
+            buttonBaseClass={ButtonTypes.TEXT}
             buttonContents={user.name}
+            buttonClassName={classes.link}
             selfPadded={true}
             flyoutType={FlyoutType.FRAME}
             isVisible={open}
             onVisibilityChange={isVisible => toggleOpen(isVisible)}
-            openDirection={DropDownOpenDirection.ABOVE_TOP}
         >
             <Header onClick={() => toggleOpen(!open)} />
 

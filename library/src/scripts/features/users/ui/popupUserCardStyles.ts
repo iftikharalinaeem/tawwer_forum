@@ -247,19 +247,21 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         height: unit(vars.header.height),
     });
 
-    const section = style("section", {
-        // paddingTop: vars.container.margin * 0.5,
-    });
+    const section = style("section", {});
 
     const email = style("email", {
-        ...fonts({
-            color: globalVars.mainColors.fg,
-            size: globalVars.fonts.size.small,
-            align: "center",
-        }),
-        marginTop: unit(vars.container.spacing * 1.8),
-        width: percent(100),
-        $nest: linkColors.$nest,
+        $nest: {
+            "&&&": {
+                ...fonts({
+                    color: globalVars.mainColors.fg,
+                    size: globalVars.fonts.size.small,
+                    align: "center",
+                }),
+                marginTop: unit(vars.container.spacing * 1.8),
+                width: percent(100),
+            },
+            ...linkColors.$nest,
+        },
     });
 
     const date = style("date", {
@@ -286,6 +288,11 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         display: "block",
     });
 
+    const link = style("link", {
+        color: "inherit",
+        fontSize: "inherit",
+    });
+
     return {
         container,
         containerWithBorder,
@@ -305,5 +312,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean } = {})
         close,
         userPhoto,
         actionContainer,
+        link,
     };
 });
