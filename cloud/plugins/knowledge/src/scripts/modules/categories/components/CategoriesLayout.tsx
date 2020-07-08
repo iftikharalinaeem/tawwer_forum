@@ -12,24 +12,24 @@ import { EditorRoute } from "@knowledge/routes/pageRoutes";
 import { searchBarClasses } from "@library/features/search/searchBarStyles";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import PanelLayout from "@library/layout/PanelLayout";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import * as React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ComposeIcon } from "@library/icons/common";
 import { typographyClasses } from "@library/styles/typographyStyles";
-import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import KbErrorMessages, { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
 import { KbPermission } from "@knowledge/knowledge-bases/KbPermission";
+import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@vanilla/library/src/scripts/layout/ThreeColumnLayout";
 
 interface IProps {
     category: IKbCategory;
@@ -45,8 +45,8 @@ export default function CategoriesLayout(props: IProps) {
         recordType: KbRecordType.CATEGORY,
         recordID: category.knowledgeCategoryID,
     };
-    const device = useDevice();
-    const isFullWidth = [Devices.DESKTOP, Devices.NO_BLEED].includes(device); // This compoment doesn't care about the no bleed, it's the same as desktop
+    const { isCompact, isFullWidth } = useLayout();
+
     const classesSearchBar = searchBarClasses();
     const crumbs = category.breadcrumbs;
     const lastCrumb = crumbs && crumbs.length > 1 ? crumbs.slice(t.length - 1) : crumbs;
@@ -78,9 +78,9 @@ export default function CategoriesLayout(props: IProps) {
                 }
                 useMobileBackButton={true}
             />
-            <PanelLayout
+            <ThreeColumnLayout
                 breadcrumbs={
-                    (device === Devices.XS || device === Devices.MOBILE) && category.breadcrumbs
+                    isCompact && category.breadcrumbs
                         ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
                         : category.breadcrumbs && <Breadcrumbs forceDisplay={false}>{category.breadcrumbs}</Breadcrumbs>
                 }
@@ -108,7 +108,7 @@ export default function CategoriesLayout(props: IProps) {
                                     </LinkAsButton>
                                 </KbPermission>
                             }
-                            includeBackLink={device !== Devices.MOBILE && device !== Devices.XS && props.useBackButton}
+                            includeBackLink={!isCompact && props.useBackButton}
                         >
                             <label className={classNames("searchBar-label", classesSearchBar.label)}>
                                 {category.name}

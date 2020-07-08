@@ -9,13 +9,11 @@ import ArticleActions, { IArticleActionsProps } from "@knowledge/modules/article
 import ArticleMenuModel, { IArticleMenuState } from "@knowledge/modules/article/ArticleMenuModel";
 import { EditorRoute, RevisionsRoute } from "@knowledge/routes/pageRoutes";
 import { LoadStatus, PublishStatus } from "@library/@types/api/core";
-import Permission, { PermissionMode } from "@library/features/users/Permission";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
-import { Devices } from "@library/layout/DeviceContext";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import InsertUpdateMetas from "@library/result/InsertUpdateMetas";
 import { t } from "@library/utility/appUtils";
@@ -28,7 +26,6 @@ interface IProps extends IArticleMenuState, IArticleActionsProps {
     article: IArticle;
     knowledgeBase?: IKnowledgeBase;
     buttonClassName?: string;
-    device?: Devices;
 }
 
 interface IState {
@@ -50,7 +47,6 @@ export class ArticleMenu extends React.PureComponent<IProps, IState> {
 
         const deleteButton = <DropDownItemButton name={t("Delete")} onClick={this.openDeleteDialogue} />;
         const restoreButton = <DropDownItemButton name={t("Restore")} onClick={this.openRestoreDialogue} />;
-        const isMobile = this.props.device === Devices.MOBILE || this.props.device === Devices.XS;
 
         const { insertUser, updateUser, dateInserted, dateUpdated } = article;
 

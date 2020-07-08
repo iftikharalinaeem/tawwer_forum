@@ -7,12 +7,13 @@
 import * as React from "react";
 import Container from "@library/layout/components/Container";
 import { withDevice, Devices } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
 import { t } from "@library/utility/appUtils";
 import DraftList from "@knowledge/modules/drafts/components/DraftList";
 import DraftHeader from "@knowledge/modules/drafts/components/DraftHeader";
 import { IResponseArticleDraft } from "@knowledge/@types/api/article";
 import PageTitle from "@knowledge/modules/common/PageTitle";
+import PanelLayout from "@vanilla/library/src/scripts/layout/PanelLayout";
+import ThreeColumnLayout from "@vanilla/library/src/scripts/layout/ThreeColumnLayout";
 
 interface IProps {
     device: Devices;
@@ -32,7 +33,7 @@ class DraftsLayout extends React.Component<IProps> {
             <React.Fragment>
                 <DraftHeader mobileDropDownTitle={isMobile ? t("Drafts") : undefined} />
                 <Container>
-                    <PanelLayout
+                    <ThreeColumnLayout
                         className="hasLargePadding"
                         leftTop={isFullWidth && <React.Fragment />}
                         middleTop={!isMobile && <PageTitle includeBackLink={false} title={t("Drafts")} />}

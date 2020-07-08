@@ -8,26 +8,27 @@ import { EventDetails } from "@groups/events/ui/EventDetails";
 import { EventsOptionsDropDown } from "@groups/events/ui/EventsOptionsDropDown";
 import { LoadStatus } from "@library/@types/api/core";
 import Container from "@library/layout/components/Container";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { panelBackgroundVariables } from "@library/layout/panelBackgroundStyles";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import PanelLayout from "@library/layout/PanelLayout";
 import Loader from "@library/loaders/Loader";
 import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
 import { ErrorPage } from "@vanilla/library/src/scripts/errorPages/ErrorComponent";
 import TitleBar from "@vanilla/library/src/scripts/headers/TitleBar";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router";
 import { PageHeading } from "@library/layout/PageHeading";
+import { useLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@library/layout/ThreeColumnLayout";
 
 export default function EventPage() {
     let eventID = useParams<{
         id: string;
     }>().id;
 
-    const device = useDevice();
-    const renderPanelBackground =
-        device !== Devices.MOBILE && device !== Devices.XS && panelBackgroundVariables().config.render;
+    const { isCompact } = useLayout();
+    const renderPanelBackground = !isCompact && panelBackgroundVariables().config.render;
 
     const eventWithParticipants = useEvent(Number.parseInt(eventID, 10));
     const { setEventAttendance, setEventAttendanceLoadable } = useEventAttendance(Number.parseInt(eventID, 10));
@@ -62,11 +63,11 @@ export default function EventPage() {
     return (
         <Container>
             <TitleBar />
-            <PanelLayout
+            <ThreeColumnLayout
                 renderLeftPanelBackground={renderPanelBackground}
                 leftBottom={<></>}
                 breadcrumbs={
-                    (device === Devices.XS || device === Devices.MOBILE) && crumbs
+                    isCompact && crumbs
                         ? lastCrumb && <Breadcrumbs forceDisplay={false}>{lastCrumb}</Breadcrumbs>
                         : crumbs && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
                 }

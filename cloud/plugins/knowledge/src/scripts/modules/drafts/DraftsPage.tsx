@@ -9,7 +9,6 @@ import DraftsPageActions from "@knowledge/modules/drafts/DraftsPageActions";
 import DraftsPageModel, { IInjectableDraftsPageProps } from "@knowledge/modules/drafts/DraftsPageModel";
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import apiv2 from "@library/apiv2";
-import { IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DocumentTitle from "@library/routing/DocumentTitle";
@@ -21,13 +20,14 @@ import { connect } from "react-redux";
 import { RouteComponentProps } from "react-router-dom";
 import { FallbackBackUrlSetter } from "@library/routing/links/BackRoutingProvider";
 import { HomeRoute } from "@knowledge/routes/pageRoutes";
+import { ILayoutProps, withLayout } from "@library/layout/LayoutContext";
 
 interface IOwnProps
     extends RouteComponentProps<{
         id?: string;
     }> {}
 
-interface IProps extends IOwnProps, IInjectableDraftsPageProps, IDeviceProps {
+interface IProps extends IOwnProps, IInjectableDraftsPageProps, ILayoutProps {
     actions: DraftsPageActions;
 }
 
@@ -86,4 +86,4 @@ function mapDispatchToProps(dispatch) {
 
 const withRedux = connect(DraftsPageModel.mapStateToProps, mapDispatchToProps);
 
-export default withRedux(withDevice(DraftsPage));
+export default withRedux(withLayout(DraftsPage));

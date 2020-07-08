@@ -8,7 +8,7 @@ import PageTitle from "@knowledge/modules/common/PageTitle";
 import TitleBar from "@library/headers/TitleBar";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import PanelLayout, { PanelWidget } from "@library/layout/PanelLayout";
+import PanelLayout from "@library/layout/PanelLayout";
 import SimplePager from "@library/navigation/SimplePager";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { IResult } from "@library/result/Result";
@@ -19,6 +19,8 @@ import * as React from "react";
 import { typographyClasses } from "@library/styles/typographyStyles";
 import { KbErrorPage } from "@knowledge/pages/KbErrorPage";
 import { DefaultKbError } from "@knowledge/modules/common/KbErrorMessages";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@vanilla/library/src/scripts/layout/ThreeColumnLayout";
 
 interface IProps {
     title: string;
@@ -45,7 +47,7 @@ export default function FeaturedArticleLayout(props: IProps) {
     return (
         <Container>
             <TitleBar />
-            <PanelLayout
+            <ThreeColumnLayout
                 leftTop={<React.Fragment />}
                 middleTop={
                     <PanelWidget>

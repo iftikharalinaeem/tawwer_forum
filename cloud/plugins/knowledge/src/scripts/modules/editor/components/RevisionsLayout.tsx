@@ -6,17 +6,19 @@
 
 import EditorHeader from "@knowledge/modules/editor/components/EditorHeader";
 import Container from "@library/layout/components/Container";
-import { Devices, IDeviceProps, withDevice } from "@library/layout/DeviceContext";
 import Heading from "@library/layout/Heading";
-import PanelLayout, { PanelWidget, PanelWidgetVerticalPadding } from "@library/layout/PanelLayout";
+import PanelLayout from "@library/layout/PanelLayout";
 import SmartAlign from "@library/layout/SmartAlign";
 import Breadcrumbs, { ICrumb } from "@library/navigation/Breadcrumbs";
 import { t } from "@library/utility/appUtils";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { mobileDropDownClasses } from "@library/headers/pieces/mobileDropDownStyles";
+import { ILayoutProps, useLayout, withLayout } from "@library/layout/LayoutContext";
+import PanelWidget from "@vanilla/library/src/scripts/layout/components/PanelWidget";
+import ThreeColumnLayout from "@vanilla/library/src/scripts/layout/ThreeColumnLayout";
 
-interface IProps extends IDeviceProps, RouteComponentProps<{}> {
+interface IProps extends ILayoutProps, RouteComponentProps<{}> {
     bodyHeading: React.ReactNode;
     bodyContent: React.ReactNode;
     draftList: React.ReactNode;
@@ -31,9 +33,8 @@ interface IProps extends IDeviceProps, RouteComponentProps<{}> {
  */
 export class RevisionsLayout extends React.Component<IProps> {
     public render() {
-        const { device, mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
-        const isDesktop = device === Devices.DESKTOP || device === Devices.NO_BLEED;
-        const isMobile = device === Devices.MOBILE || device === Devices.XS;
+        const { mobileDropDownTitle, bodyHeading, bodyContent, crumbs } = this.props;
+        const { isCompact, isFullWidth } = useLayout();
         const mobileTitle = mobileDropDownTitle ? mobileDropDownTitle : t("History");
 
         const classesMobileDropdown = mobileDropDownClasses();
@@ -68,17 +69,14 @@ export class RevisionsLayout extends React.Component<IProps> {
                     mobileDropDownContent={mobileDropDownContent}
                 />
                 <Container className="richEditorRevisionsForm-body">
-                    <PanelLayout
-                        topPadding={this.props.device !== Devices.MOBILE && this.props.device !== Devices.XS}
-                        breadcrumbs={
-                            this.props.device !== Devices.MOBILE &&
-                            this.props.device !== Devices.XS && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>
-                        }
-                        leftTop={isDesktop && <></>}
+                    <ThreeColumnLayout
+                        topPadding={!isCompact}
+                        breadcrumbs={!isCompact && <Breadcrumbs forceDisplay={false}>{crumbs}</Breadcrumbs>}
+                        leftTop={isFullWidth && <></>}
                         middleTop={<PanelWidget>{bodyHeading}</PanelWidget>}
                         middleBottom={<PanelWidget>{bodyContent}</PanelWidget>}
-                        rightTop={!isMobile && this.props.draftList}
-                        rightBottom={!isMobile && this.props.revisionList}
+                        rightTop={!isCompact && this.props.draftList}
+                        rightBottom={!isCompact && this.props.revisionList}
                     />
                 </Container>
             </>
@@ -86,4 +84,4 @@ export class RevisionsLayout extends React.Component<IProps> {
     }
 }
 
-export default withRouter(withDevice(RevisionsLayout));
+export default withRouter(withLayout(RevisionsLayout));

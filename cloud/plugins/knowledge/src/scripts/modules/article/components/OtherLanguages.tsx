@@ -18,6 +18,7 @@ import { WarningIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { useKnowledgeBase } from "@knowledge/knowledge-bases/knowledgeBaseHooks";
+import { useLayout } from "@library/layout/LayoutContext";
 
 export interface IOtherLanguagesProps {
     articleLocaleData: IArticleLocale[];
@@ -32,7 +33,7 @@ export default function OtherLanguages(props: IOtherLanguagesProps) {
     const titleID = useUniqueID("articleOtherLanguages");
     const { currentLocale } = useLocaleInfo();
     const kb = useKnowledgeBase(props.knowledgeBaseID);
-    const classesPanelList = panelListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
     const showPicker = props.articleLocaleData && props.articleLocaleData.length > 1;
     if (!showPicker || !currentLocale) {

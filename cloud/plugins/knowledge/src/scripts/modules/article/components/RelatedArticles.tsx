@@ -13,6 +13,7 @@ import { relatedArticlesClasses } from "@knowledge/modules/article/components/re
 import Heading from "@library/layout/Heading";
 import { panelListClasses } from "@library/layout/panelListStyles";
 import classNames from "classnames";
+import { useLayout } from "@library/layout/LayoutContext";
 
 interface IProps {
     articles: IRelatedArticle[];
@@ -24,7 +25,7 @@ interface IProps {
 export default function RelatedArticles(props: IProps) {
     const { articles } = props;
     const classes = relatedArticlesClasses();
-    const panelClasses = panelListClasses();
+    const panelClasses = panelListClasses(useLayout().mediaQueries);
     const content =
         articles.length === 0 ? (
             <></>

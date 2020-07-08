@@ -13,7 +13,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import MobileDropDown from "@library/headers/pieces/MobileDropDown";
 import Container from "@library/layout/components/Container";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
-import { PanelArea, PanelWidgetHorizontalPadding } from "@library/layout/PanelLayout";
+
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { modalClasses } from "@library/modal/modalStyles";
 import BackLink from "@library/routing/links/BackLink";
@@ -25,8 +25,8 @@ import { editorHeaderClasses } from "@knowledge/modules/editor/components/editor
 import { unit } from "@library/styles/styleHelpers";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useMeasure } from "@vanilla/react-utils";
-import { ArticleRoute, HomeRoute } from "@knowledge/routes/pageRoutes";
-import { article } from "@knowledge/navigation/navigationManagerIcons";
+import PanelArea from "@vanilla/library/src/scripts/layout/components/PanelArea";
+import PanelWidgetHorizontalPadding from "@vanilla/library/src/scripts/layout/components/PanelWidgetHorizontalPadding";
 
 interface IProps {
     callToAction?: string;
