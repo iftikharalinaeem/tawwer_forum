@@ -64,7 +64,7 @@ trait ArticlesApiMigration {
         $body = $in->validate($body);
 
         // This is just check if article exists and knowledge base has status "published"
-        $article = $this->articleByID($id);
+        $article = $this->articleHelper->articleByID($id);
 
         $aliases = array_unique($body['aliases']);
 
@@ -92,7 +92,7 @@ trait ArticlesApiMigration {
         }
 
 
-        $row = $this->articleByID($id, true);
+        $row = $this->articleHelper->articleByID($id, true);
 
         $row['breadcrumbs'] =$this->breadcrumbModel->getForRecord(new KbCategoryRecordType($row['knowledgeCategoryID']));
         $row['aliases']  = $this->pageRouteAliasModel->getAliases(
@@ -120,7 +120,7 @@ trait ArticlesApiMigration {
         $in = $this->schema([], "in")->setDescription("Get article aliases.");
         $out = $this->articleAliasesSchema("out");
 
-        $row = $this->articleByID($id, true);
+        $row = $this->articleHelper->articleByID($id, true);
 
         $row['aliases']  = $this->pageRouteAliasModel->getAliases(
             ArticleModel::RECORD_TYPE,

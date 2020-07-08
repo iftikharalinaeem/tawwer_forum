@@ -37,7 +37,7 @@ trait ArticlesApiDrafts {
         $body["recordType"] = "article";
         if ($body['recordID'] ?? false) {
             //check if article exists and knowledge base is "published"
-            $this->articleByID($body['recordID']);
+            $this->articleHelper->articleByID($body['recordID']);
         }
 
         $body = (new ArticleDraft($this->formatService))->prepareDraftFields($body);
@@ -96,7 +96,7 @@ trait ArticlesApiDrafts {
             ]);
             if (!$includeDeleted && ($draft['recordID'] ?? false)) {
                 //check if article exists and knowledge base is "published"
-                $this->articleByID($draft['recordID']);
+                $this->articleHelper->articleByID($draft['recordID']);
             }
         } catch (NoResultsException $e) {
             throw new NotFoundException("Draft");
@@ -169,7 +169,7 @@ trait ArticlesApiDrafts {
         $query = $in->validate($query);
         if ($query['articleID'] ?? false) {
             //check if article exists and knowledge base is "published"
-            $this->articleByID($query['articleID']);
+            $this->articleHelper->articleByID($query['articleID']);
         }
 
         $where = ["recordType" => "article"] + \Vanilla\ApiUtils::queryToFilters($in, $query);
