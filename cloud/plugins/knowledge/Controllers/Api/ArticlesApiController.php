@@ -15,6 +15,7 @@ use Garden\Web\Exception\HttpException;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
 use UserModel;
+use Vanilla\ApiUtils;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
@@ -43,6 +44,7 @@ use Garden\Web\Data;
 use Vanilla\Knowledge\Models\PageRouteAliasModel;
 use Vanilla\Knowledge\Models\DefaultArticleModel;
 use Vanilla\ReCaptchaVerification;
+use Vanilla\Utility\SchemaUtils;
 
 /**
  * API controller for managing the articles resource.
@@ -321,33 +323,46 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
     public function index(array $query = []) {
         $this->checkPermission(KnowledgeBaseModel::VIEW_PERMISSION);
         $in = $this->schema([
-            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
-            "knowledgeCategoryID" => [
+            // Filter by specific articles.
+            'articleID?' => \Vanilla\Schema\RangeExpression::createSchema([':int'])->setField('x-filter', ['field' => 'a.articleID']),
+            // Filter by a category.
+            "knowledgeCategoryID?" => [
                 "type" => "integer",
                 "minimum" => 1,
             ],
             "includeSubcategories:b?",
-            "limit" => [
-                "default" => ArticleModel::LIMIT_DEFAULT,
-                "minimum" => 1,
-                "maximum" => 100,
-                "type" => "integer",
+
+            "locale:s?" => [
+                "description" => "Filter revisions by locale.",
             ],
+
+            'sort:s?' => [
+                'enum' => ApiUtils::sortEnum('sort', 'dateInserted', 'dateUpdated', 'dateFeatured', 'score', 'articleID'),
+            ],
+
             "page:i?" => [
                 "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                 "default" => 1,
                 "minimum" => 1,
                 "maximum" => 100,
             ],
-            "locale:s?" => [
-                "description" => "Filter revisions by locale.",
+            "limit" => [
+                "default" => ArticleModel::LIMIT_DEFAULT,
+                "minimum" => 1,
+                "maximum" => 100,
+                "type" => "integer",
             ],
             "only-translated?" => [
                 "description" => "If transalted revisions does not exist don not return related article.",
                 "type" => "boolean",
                 "default" => false
             ],
-        ], "in")->setDescription("List published articles in a given knowledge category.");
+            "expand?" => \Vanilla\ApiUtils::getExpandDefinition(["excerpt"]),
+        ], "in")
+            ->requireOneOf(['articleID', 'knowledgeCategoryID'])
+            ->addValidator('', SchemaUtils::onlyOneOf(['articleID', 'knowledgeCategoryID']))
+            ->setDescription("List published articles in a given knowledge category.");
+
         $out = $this->schema([":a" => $this->articleSimpleSchema()], "out");
 
         $query = $in->validate($query);
@@ -361,48 +376,43 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             "offset" => $offset,
         ];
 
-        $includeSubcategories = $query['includeSubcategories'] ?? false;
-        $knowledgeCategory = $this->articleHelper->knowledgeCategoryByID($query["knowledgeCategoryID"]);
-        $paging = \Vanilla\ApiUtils::numberedPagerInfo(
-            $includeSubcategories ? $knowledgeCategory['articleCountRecursive'] : $knowledgeCategory["articleCount"],
-            "/api/v2/articles",
-            $query,
-            $in
-        );
-
-        // A page beyond our bounds is expected to return a not-found (404) response.
-        if ($query["page"] > 1 && $query["page"] > $paging["pageCount"]) {
-            throw new NotFoundException();
-        }
-
-        $kb = $this->knowledgeBaseModel->get(
-            $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']]),
-            ['selects' => 'sortArticles']
-        );
-        $knowledgeBase = array_pop($kb);
-        $sortRule = KnowledgeBaseModel::SORT_CONFIGS[$knowledgeBase['sortArticles']];
-        $options["orderFields"] = $sortRule[0];
-        $options["orderDirection"] = $sortRule[1];
-
-        $locale = $query["locale"] ?? $knowledgeBase["sourceLocale"];
-
-        $categoryIDs = [$query['knowledgeCategoryID']];
-        if ($includeSubcategories) {
-            $collection = $this->knowledgeCategoryModel->getCollectionForKB($knowledgeBase['knowledgeBaseID']);
-            $includedCategories = $collection->getWithChildren($query['knowledgeCategoryID']);
-            $categoryIDs = array_column($includedCategories, 'knowledgeCategoryID');
-        }
-
         $where = [
-            "a.knowledgeCategoryID" => $categoryIDs,
-            "ar.locale" => $locale,
             "a.status" => ArticleModel::STATUS_PUBLISHED,
         ];
 
-        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
+        // Do the basic top-level filtering.
+        if (!empty($query['knowledgeCategoryID'])) {
+            $includeSubcategories = $query['includeSubcategories'] ?? false;
+            $knowledgeCategory = $this->articleHelper->knowledgeCategoryByID($query["knowledgeCategoryID"]);
+            $knowledgeBase = $this->knowledgeBaseModel->selectSingle(
+                $this->knowledgeBaseModel->updateKnowledgeIDsWithCustomPermission(['knowledgeBaseID' => $knowledgeCategory['knowledgeBaseID']]),
+                ['selects' => 'sortArticles']
+            );
 
+            $categoryIDs = [$query['knowledgeCategoryID']];
+            if ($includeSubcategories) {
+                $collection = $this->knowledgeCategoryModel->getCollectionForKB($knowledgeBase['knowledgeBaseID']);
+                $includedCategories = $collection->getWithChildren($query['knowledgeCategoryID']);
+                $categoryIDs = array_column($includedCategories, 'knowledgeCategoryID');
+            }
+
+            $where["a.knowledgeCategoryID"] = $categoryIDs;
+        } elseif (!empty($query['articleID'])) {
+            $where['a.articleID'] = $query['articleID'];
+        }
+
+        // Filter the translation.
+        $options['only-translated'] = (isset($query['only-translated'])) ? $query['only-translated'] : false;
         if ($options['only-translated']) {
-            $where['ar.locale'] = $query['locale'] ?? $knowledgeBase['sourceLocale'];
+            if (!empty($query['locale'])) {
+                $where['ar.locale'] = $query['locale'];
+            } elseif (isset($knowledgeBase)) {
+                $where['ar.locale'] = $knowledgeBase['sourceLocale'];
+            }
+        } elseif (!empty($query['articleID']) || !isset($knowledgeBase)) {
+            if (!empty($query['locale'])) {
+                $where['ar.locale'] = $query['locale'];
+            }
         } else {
             $where['ar.locale'] = $knowledgeBase['sourceLocale'];
             if (!empty($query['locale']) && $query['locale'] !== $where['ar.locale']) {
@@ -410,11 +420,21 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             }
         }
 
+        if (!empty($query['sort'])) {
+            $options['orderFields'] = [$query['sort']];
+        } elseif (isset($knowledgeBase)) {
+            $sortRule = KnowledgeBaseModel::SORT_CONFIGS[$knowledgeBase['sortArticles']];
+            [$options["orderFields"], $options["orderDirection"]] = $sortRule;
+        } else {
+            $options['orderFields'] = ['articleID'];
+        }
+
         $rows = $this->articleModel->getWithRevision(
             $where,
             $options
         );
 
+        $locale = $query["locale"] ?? ($knowledgeBase["sourceLocale"] ?? '');
         foreach ($rows as &$row) {
             if (isset($query["locale"])) {
                 $row["queryLocale"] = $locale;
@@ -428,6 +448,27 @@ class ArticlesApiController extends AbstractKnowledgeApiController {
             $rows,
             ["insertUserID", "updateUserID"]
         );
+
+        if (isset($knowledgeCategory)) {
+            $paging = \Vanilla\ApiUtils::numberedPagerInfo(
+                $includeSubcategories ? $knowledgeCategory['articleCountRecursive'] : $knowledgeCategory["articleCount"],
+                "/api/v2/articles",
+                $query,
+                $in
+            );
+
+            // A page beyond our bounds is expected to return a not-found (404) response.
+            if ($query["page"] > 1 && $query["page"] > $paging["pageCount"]) {
+                throw new NotFoundException();
+            }
+        } else {
+            $paging = ApiUtils::morePagerInfo(
+                $rows,
+                '/api/v2/articles',
+                $query,
+                $in
+            );
+        }
 
         $result = $out->validate($rows);
         return new Data($result, ["paging" => $paging]);

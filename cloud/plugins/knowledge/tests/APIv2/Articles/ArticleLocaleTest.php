@@ -9,6 +9,7 @@ namespace VanillaTests\Knowledge\APIv2\Articles;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Web\Pagination\FlatApiPaginationIterator;
 use VanillaTests\Knowledge\Utils\KbApiTestCase;
 
 /**
@@ -269,5 +270,67 @@ class ArticleLocaleTest extends KbApiTestCase {
         $this->assertEquals("up-to-date", $translationStatuses["en"]);
         $this->assertEquals("out-of-date", $translationStatuses["es"]);
         $this->assertEquals("out-of-date", $translationStatuses["ru"]);
+    }
+
+    /**
+     * Generate two test articles in three locales each.
+     *
+     * @return array
+     */
+    protected function generateTestArticles(): array {
+        $kb = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-1']);
+        $articles[] = $this->createArticle(['name' => __FUNCTION__.' 1'], ['es', 'ru']);
+        $articles[] = $this->createArticle(['name' => __FUNCTION__.' 2'], ['es']);
+
+        return $articles;
+    }
+
+    /**
+     * Article translations should be selectable via API.
+     */
+    public function testIndexMultiLocale(): void {
+        $articles = $this->generateTestArticles();
+
+        $url = '/articles?'.http_build_query([
+            'articleID' => implode(',', array_column($articles, 'articleID')),
+            'limit' => 4
+        ]);
+
+        $actual = iterator_to_array(new FlatApiPaginationIterator($this->api(), $url), false);
+        $this->assertCount(5, $actual);
+
+        $counts = ['en' => 2, 'ru' => 1, 'es' => 2, $articles[0]['articleID'] =>  3, $articles[1]['articleID'] =>  2];
+        foreach ($actual as $article) {
+            $counts[$article['locale']]--;
+            $counts[$article['articleID']]--;
+        }
+        $this->assertEmpty(array_filter($counts, function ($v) {
+            return $v !== 0;
+        }));
+    }
+
+    /**
+     * I should still be able to filter articles by locale.
+     */
+    public function testIndexLocaleFilter(): void {
+        $articles = $this->generateTestArticles();
+        $actual = $this->api()->get('/articles', ['locale' => 'es', 'articleID' => implode(',', array_column($articles, 'articleID'))]);
+
+        $this->assertCount(2, array_filter($actual->getBody(), function ($row) {
+            return $row['locale'] === 'es';
+        }));
+    }
+
+    /**
+     * If I specify a knowledge category and no locale then only articles of the default locale should be returned.
+     *
+     * This is the default behavior.
+     */
+    public function testIndexDefaultLocale(): void {
+        $articles = $this->generateTestArticles();
+        $actual = $this->api()->get('/articles', ['knowledgeCategoryID' => $articles[0]['knowledgeCategoryID']])->getBody();
+        $this->assertSame(count($actual), count(array_filter($actual, function ($row) {
+            return $row['locale'] === 'en';
+        })));
     }
 }

@@ -10,14 +10,18 @@ use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Gdn_Session;
+use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Database\Operation;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
+use Vanilla\Models\PrimaryKeyCrawlInfoTrait;
 
 /**
  * A model for managing articles.
  */
-class ArticleModel extends \Vanilla\Models\PipelineModel {
+class ArticleModel extends \Vanilla\Models\PipelineModel implements CrawlableInterface {
+    use PrimaryKeyCrawlInfoTrait;
+
     /**
      * Record type is the key we can use as a foreign reference
      * to differentiate records of other types: article, discussion, category, etc
@@ -444,7 +448,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
                     // Stick it up into the root.
                     $row['knowledgeCategoryID'] = $depth1Category;
                 }
-                
+
                 if (array_key_exists('queryLocale', $options) && isset($options['queryLocale'])) {
                     $row['queryLocale'] = $options['queryLocale'];
                 }
@@ -512,5 +516,17 @@ class ArticleModel extends \Vanilla\Models\PipelineModel {
      */
     public function delete(array $where = [], $options = []): bool {
         throw new Exception('Delete article action is not permitted');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCrawlInfo(): array {
+        $r = $this->getCrawlInfoFromPrimaryKey(
+            '/api/v2/articles?sort=-articleID',
+            'articleID'
+        );
+
+        return $r;
     }
 }

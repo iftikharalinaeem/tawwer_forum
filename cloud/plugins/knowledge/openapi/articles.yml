@@ -17,9 +17,13 @@ paths:
                           type: string
                       type: array
                   style: form
+                - name: articleID
+                  description: Filter by one or more article IDs.
+                  in: query
+                  schema:
+                    $ref: '#/components/schemas/RangeExpression'
                 - in: query
                   name: knowledgeCategoryID
-                  required: true
                   schema:
                       minimum: 1
                       type: integer
@@ -43,6 +47,24 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
+                - name: sort
+                  description: Sort the output.
+                  in: query
+                  schema:
+                    type: string
+                    enum:
+                      - sort
+                      - dateInserted
+                      - dateUpdated
+                      - dateFeatured
+                      - score
+                      - articleID
+                      - -sort
+                      - -dateInserted
+                      - -dateUpdated
+                      - -dateFeatured
+                      - -score
+                      - -articleID
                 - description: |
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
                   in: query

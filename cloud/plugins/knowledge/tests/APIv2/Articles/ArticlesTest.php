@@ -18,14 +18,15 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Models\ReactionModel;
 use Vanilla\ReCaptchaVerification;
 use VanillaTests\APIv2\AbstractResourceTest;
+use VanillaTests\APIv2\TestCrawlTrait;
+use VanillaTests\APIv2\TestSortingTrait;
 use VanillaTests\Knowledge\Utils\KbApiTestTrait;
 
 /**
  * Test the /api/v2/articles endpoint.
  */
 class ArticlesTest extends AbstractResourceTest {
-
-    use KbApiTestTrait;
+    use KbApiTestTrait, TestSortingTrait, TestCrawlTrait;
 
     /** @var int */
     private static $knowledgeBaseID;
@@ -35,6 +36,11 @@ class ArticlesTest extends AbstractResourceTest {
 
     /** @var string The resource route. */
     protected $baseUrl = "/articles";
+
+    /**
+     * @var string
+     */
+    protected $resourceName = 'article';
 
     /** @var array Fields to be checked with get/<id>/edit */
     protected $editFields = [
@@ -56,6 +62,14 @@ class ArticlesTest extends AbstractResourceTest {
     protected $singular = "article";
 
     private $defaultKB = [];
+
+    /**
+     * {@inheritDoc}
+     */
+    public function __construct($name = null, array $data = [], $dataName = '') {
+        parent::__construct($name, $data, $dataName);
+        $this->sortFields = ['sort', 'dateInserted', 'dateUpdated', 'score', 'articleID'];
+    }
 
     /**
      * This method is called before the first test of this test class is run.
@@ -81,6 +95,13 @@ class ArticlesTest extends AbstractResourceTest {
             "parentID" => -1,
             "knowledgeBaseID" => self::$knowledgeBaseID,
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function sortUrl(): string {
+        return $this->baseUrl.'?articleID=1..';
     }
 
     /**
