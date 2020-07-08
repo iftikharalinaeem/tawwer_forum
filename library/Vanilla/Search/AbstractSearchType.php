@@ -45,7 +45,7 @@ abstract class AbstractSearchType {
      * @return string
      */
     public function getIndex(): string {
-        return $this->getType();
+        return $this->getSearchGroup();
     }
 
     /**

@@ -119,31 +119,25 @@ class DiscussionSearchType extends AbstractSearchType {
      */
     protected function skipType(SearchQuery $query): ?array {
         $types = $query->getQueryParameter('types');
-        if ($types !== null && ((count($types) > 0) && !in_array($this->getSearchGroup(), $types))) {
+        $type = $this->getType();
+        if ($types !== null && ((count($types) > 0) && !in_array($type, $types))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
             return null;
         }
 
-        $types = $query->getQueryParameter('recordTypes');
-        if ($types !== null && ((count($types) > 0) && !in_array($this->getType(), $types))) {
+        $recordTypes = $query->getQueryParameter('recordTypes');
+        if ($recordTypes !== null && ((count($recordTypes) > 0) && !in_array($this->getSearchGroup(), $recordTypes))) {
             // discussions are not the part of this search query request
             // we don't need to do anything
             return null;
         }
 
         $categoryIDs = $this->getCategoryIDs($query);
-        if ($categoryIDs === []) {
-            return null;
-        }
-
-        $userIDs = $this->getUserIDs($query->getQueryParameter('insertUserNames', []));
-        if ($userIDs === []) {
-            return null;
-        }
 
         return [
-            'users' => $userIDs,
+            'types' => $types,
+            'recordTypes' => $recordTypes,
             'categories' => $categoryIDs
         ];
     }
@@ -168,6 +162,11 @@ class DiscussionSearchType extends AbstractSearchType {
             $categoryIDs = $preparedIDs['categories'];
             if (!empty($categoryIDs)) {
                 $query->setFilter('CategoryID', $categoryIDs);
+            }
+
+            $types = $preparedIDs['types'];
+            if (!empty($types)) {
+                $query->setFilter('type', $types);
             }
 
             // tags
