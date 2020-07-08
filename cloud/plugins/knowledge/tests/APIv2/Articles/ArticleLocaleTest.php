@@ -280,7 +280,7 @@ class ArticleLocaleTest extends KbApiTestCase {
     protected function generateTestArticles(): array {
         $kb = $this->createKnowledgeBase(['siteSectionGroup' => 'mockSiteSectionGroup-1']);
         $articles[] = $this->createArticle(['name' => __FUNCTION__.' 1'], ['es', 'ru']);
-        $articles[] = $this->createArticle(['name' => __FUNCTION__.' 2'], ['es', 'ru']);
+        $articles[] = $this->createArticle(['name' => __FUNCTION__.' 2'], ['es']);
 
         return $articles;
     }
@@ -297,20 +297,16 @@ class ArticleLocaleTest extends KbApiTestCase {
         ]);
 
         $actual = iterator_to_array(new FlatApiPaginationIterator($this->api(), $url), false);
-        $this->assertCount(6, $actual);
+        $this->assertCount(5, $actual);
 
-        $counts = ['en' => 0, 'ru' => 0, 'es' => 0, $articles[0]['articleID'] =>  0, $articles[1]['articleID'] =>  0];
+        $counts = ['en' => 2, 'ru' => 1, 'es' => 2, $articles[0]['articleID'] =>  3, $articles[1]['articleID'] =>  2];
         foreach ($actual as $article) {
-            $counts[$article['locale']]++;
-            $counts[$article['articleID']]++;
+            $counts[$article['locale']]--;
+            $counts[$article['articleID']]--;
         }
-        foreach ($counts as $k => $count) {
-            if (is_numeric($k)) {
-                $this->assertSame(3, $count);
-            } else {
-                $this->assertSame(2, $count);
-            }
-        }
+        $this->assertEmpty(array_filter($counts, function ($v) {
+            return $v !== 0;
+        }));
     }
 
     /**
