@@ -681,6 +681,7 @@ class PagerModule extends Gdn_Module {
      *
      * @param int $currentPage
      * @param string $linkLabel
+     * @param array $extraAttributes
      * @return string
      */
     private function previousLink($currentPage, $linkLabel, $extraAttributes = []): string {
