@@ -10,10 +10,10 @@ import { userCardClasses } from "@library/features/users/ui/popupUserCardStyles"
 import classNames from "classnames";
 import { IUserCardModule, UserCardModule } from "@library/features/users/modules/UserCardModule";
 
-export interface IProps extends Omit<IUserCardModule, "fallbackButton"> {}
+export interface IProps extends Omit<IUserCardModule, "fallbackButton" | "ready"> {}
 
 export function UserCardModuleLazyLoad(props: IProps) {
-    const { buttonContent, children } = props;
+    const { buttonContent } = props;
     const [ready, setReady] = useState(false);
 
     const fallbackButton = (
@@ -27,13 +27,13 @@ export function UserCardModuleLazyLoad(props: IProps) {
             })}
             disabled={ready}
         >
-            {children || buttonContent}
+            {buttonContent}
         </Button>
     );
 
     if (!ready) {
         return <>{fallbackButton}</>;
     } else {
-        return <UserCardModule {...props} fallbackButton={fallbackButton} visible={true} />;
+        return <UserCardModule {...props} fallbackButton={fallbackButton} visible={true} ready={ready} />;
     }
 }
