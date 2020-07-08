@@ -12,4 +12,5 @@ use Garden\Events\ResourceEvent;
 /**
  * Resource event for an article.
  */
-class ArticleEvent extends ResourceEvent {}
+class ArticleEvent extends ResourceEvent {
+}
