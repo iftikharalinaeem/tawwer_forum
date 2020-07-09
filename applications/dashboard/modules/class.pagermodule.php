@@ -485,17 +485,11 @@ class PagerModule extends Gdn_Module {
         if ($currentPage == $pageCount) {
             $pager .= '<span class="Next Pager-nav" aria-disabled="true">'.$nextText.'</span>';
         } else {
-            $pager .= anchor(
-                $nextText,
-                $this->pageUrl($currentPage + 1),
-                'Next Pager-nav',
-                [
-                    'rel' => 'next',
-                    'tabindex' => "0",
-                    'title' => t('Next Page'),
-                    'aria-label' => t('Next Page')
-                ]
-            ); // extra sprintf parameter in case old url style is set
+            $nextAttr = [
+                'title' => t('Next Page'),
+                'aria-label' => t('Next Page')
+            ];
+            $pager .= $this->nextLink($currentPage, $nextText, $nextAttr);
         }
         if ($pageCount <= 1) {
             $pager = '';
@@ -559,7 +553,7 @@ class PagerModule extends Gdn_Module {
 
         if ($hasNext) {
             $pageParam = 'p'.($currentPage + 1);
-            $pager = concatSep(' ', $pager, anchor(t('Next'), $this->pageUrl($currentPage + 1), 'Next', ['rel' => 'next']));
+            $pager = concatSep(' ', $pager, $this->nextLink($currentPage, t('Next')));
         }
 
         $clientID = $this->ClientID;
@@ -677,7 +671,30 @@ class PagerModule extends Gdn_Module {
     }
 
     /**
-     * Generate the previous page link.
+     * Returns next page link.
+     *
+     * @param int $currentPage
+     * @param string $linkLabel
+     * @param array $extraAttributes
+     * @return string
+     */
+    private function nextLink($currentPage, $linkLabel, $extraAttributes = []): string {
+        $attr = [
+            'rel' => 'next',
+            'tabindex' => "0"
+        ];
+        $attr = array_merge($attr, $extraAttributes);
+
+        return anchor(
+            $linkLabel,
+            $this->pageUrl($currentPage + 1),
+            'Next',
+            $attr
+        );
+    }
+
+    /**
+     * Returns previous page link.
      *
      * @param int $currentPage
      * @param string $linkLabel
