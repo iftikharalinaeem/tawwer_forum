@@ -17,8 +17,5 @@
             "name": "Francis Caisse",
             "email": "francis.c@vanillaforums.com"
         }
-    ],
-    "require": {
-        "hosted-job": ">=1.0"
-    }
+    ]
 }
