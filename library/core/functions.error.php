@@ -723,7 +723,7 @@ function setHandlers() {
 /**
  * Create a new not found exception. This is a convenience function that will create an exception with a standard message.
  *
- * @param string $Code The translation code of the type of object that wasn't found.
+ * @param string $recordType The translation code of the type of object that wasn't found.
  * @return Exception
  */
 function notFoundException($recordType = 'Page') {
