@@ -492,7 +492,7 @@ class PagerModule extends Gdn_Module {
                 [
                     'rel' => 'next',
                     'tabindex' => "0",
-                    'title' => t('Next'),
+                    'title' => t('Next Page'),
                     'aria-label' => t('Next Page')
                 ]
             ); // extra sprintf parameter in case old url style is set
