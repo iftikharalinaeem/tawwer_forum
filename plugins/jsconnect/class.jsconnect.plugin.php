@@ -1125,7 +1125,7 @@ class JsConnectPlugin extends SSOAddon {
      * @return string
      */
     private function getCSRFCookieName(): string {
-        return c('Garden.Cookie.Name', 'Vanilla') . '-ssostatetoken';
+        return '-ssostatetoken';
     }
 
     /**
