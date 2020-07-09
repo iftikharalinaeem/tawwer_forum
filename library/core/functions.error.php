@@ -736,7 +736,7 @@ function notFoundException($recordType = 'Page') {
                 t('The page you were looking for could not be found.')
             )
         );
-    return new Gdn_UserException(t(sprintf('%s not found.', $recordType), t('Page Not Found')), 404);
+    return new Gdn_UserException(t(sprintf('%s Not Found', $recordType), t('Page Not Found')), 404);
 }
 
 /**
