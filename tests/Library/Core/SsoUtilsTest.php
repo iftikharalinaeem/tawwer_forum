@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Core;
 
-use Garden\Web\Cookie;
 use PHPUnit\Framework\TestCase;
 use VanillaTests\SiteTestTrait;
 
