@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use \Exception;
 use \Throwable;
+use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Local job for handling deleting of records from elasticsearch.
@@ -86,7 +87,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
             $msg = "Couldn't get resources, received a {$responseCode} response code.";
             throw new Exception($this, $msg);
         }
-        return json_decode($response, true);
+        return $response->getBody();
     }
 
     /**
@@ -105,7 +106,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
             throw new Exception($this, $msg);
         }
 
-        return json_decode($response, true);
+        return $response->getBody();
     }
 
     /**
@@ -130,14 +131,13 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
         $url = "{$url}{$separator}{$parameter}={$min}..{$max}&page=1&limit=".self::API_LIMIT;
 
         while ($continue) {
-            error_log($url);
             $response = $this->vanillaClient->get($url);
             $responseCode = $response->getStatusCode();
             if ($responseCode !== 200) {
                 $msg = "Couldn't get records, received a {$responseCode} response code.";
                 throw new Exception($this, $msg);
             }
-            $records = json_decode($response, true);
+            $records = $response->getBody();
 
             // There is currently a problem where the <Link> response header of vanilla sometimes contains a "next" page even though there is no more records to be shown
             if (empty($records)) {
@@ -207,7 +207,8 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
             throw new Exception($this, "Missing `Link` response header");
         }
 
-        $result = $this->parseLinkHeader($linkHeader);
+        $result = WebLinking::parseLinkHeaders($linkHeader);
+
         return $result['next'] ?? '';
     }
 
