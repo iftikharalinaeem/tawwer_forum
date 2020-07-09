@@ -2941,7 +2941,7 @@ class UserModel extends Gdn_Model implements UserProviderInterface, EventFromRow
         } elseif (preg_match('/^\d+$/', $keywords)) {
             $numericQuery = $keywords;
             $keywords = '';
-        } elseif (!empty($roleID) && !empty($keywords)) {
+        } elseif (empty($roleID) && !empty($keywords)) {
             // Check to see if the search exactly matches a role name.
             $roleID = $this->SQL->getWhere('Role', ['Name' => $keywords])->value('RoleID');
         }
