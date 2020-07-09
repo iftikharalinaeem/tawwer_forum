@@ -729,8 +729,14 @@ function setHandlers() {
 function notFoundException($recordType = 'Page') {
     Gdn::dispatcher()
         ->passData('RecordType', $recordType)
-        ->passData('Description', sprintf(t('The %s you were looking for could not be found.'), t(strtolower($recordType))));
-    return new Gdn_UserException(sprintf(t('%s not found.'), t($recordType)), 404);
+        ->passData(
+            'Description',
+            t(
+                sprintf('The %s you were looking for could not be found.', strtolower($recordType)),
+                t('The page you were looking for could not be found.')
+            )
+        );
+    return new Gdn_UserException(t(sprintf('%s not found.', $recordType), 404), t('Page Not Found'));
 }
 
 /**
