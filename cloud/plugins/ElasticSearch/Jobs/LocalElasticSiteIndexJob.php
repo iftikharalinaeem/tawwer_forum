@@ -34,13 +34,6 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
     protected const API_LIMIT = 100;
 
     /**
-     * LocalElasticSiteIndexJob constructor.
-     */
-    public function __construct() {
-
-    }
-
-    /**
      * @return JobExecutionStatus
      */
     public function run(): JobExecutionStatus {
@@ -76,9 +69,9 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
     /**
      * Get resources from the api based on the received URL
      *
-     * @param $url
+     * @param string $url
      * @return array
-     * @throws Exception
+     * @throws Exception If we can't get the resources from vanilla.
      */
     protected function getResources(string $url): array {
         $response = $this->vanillaClient->get($url);
@@ -95,7 +88,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
      *
      * @param array $resource
      * @return array
-     * @throws Exception
+     * @throws Exception If we can't get the resource from vanilla.
      */
     protected function getResource(array $resource): array {
         $response = $this->vanillaClient->get("{$resource['url']}?expand=crawl");
@@ -113,7 +106,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
      * Crawl the expanded resource and index it
      *
      * @param array $expandedResource
-     * @throws Exception
+     * @throws Exception If we can't get the records from Vanilla's API.
      */
     protected function indexResource(array $expandedResource) {
         // resource info
@@ -180,7 +173,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
      * Calls the microservice to index the records
      *
      * @param array $records
-     * @throws Exception
+     * @throws Exception If we the request to the MS failed.
      */
     protected function indexRecords(array $records) {
         $response = $this->elasticClient->bulkIndexDocuments($records);
@@ -199,7 +192,7 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
      *
      * @param HttpResponse $response
      * @return string
-     * @throws Exception
+     * @throws Exception If the response didn't include a Link header.
      */
     protected function subsequentRequest(HttpResponse $response): string {
         $linkHeader = $response->getHeader('Link');

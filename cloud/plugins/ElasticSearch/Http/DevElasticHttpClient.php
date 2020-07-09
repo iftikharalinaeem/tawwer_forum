@@ -73,7 +73,7 @@ class DevElasticHttpClient extends AbstractElasticHttpClient {
      * Bulk index records into ES
      * Records need to be pre formatted to the format the microservice expects
      *
-     * @param $records
+     * @param array $records
      * @return HttpResponse
      */
     public function bulkIndexDocuments(array $records): HttpResponse {
