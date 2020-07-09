@@ -18,11 +18,6 @@ class SsoUtilsTest extends TestCase {
     use SiteTestTrait;
 
     /**
-     * @var Cookie
-     */
-    private $cookie;
-
-    /**
      * @var \SsoUtils
      */
     private $ssoUtils;
@@ -34,11 +29,9 @@ class SsoUtilsTest extends TestCase {
         parent::setUp();
         $this->setupSiteTestTrait();
         $this->container()->call(function (
-            \SsoUtils $ssoUtils,
-            Cookie $cookie
+            \SsoUtils $ssoUtils
         ) {
             $this->ssoUtils = $ssoUtils;
-            $this->cookie = $cookie;
         });
     }
 
