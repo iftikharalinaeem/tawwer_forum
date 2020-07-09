@@ -211,24 +211,4 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
 
         return $result['next'] ?? '';
     }
-
-    /**
-     * Parse the <Link> response header vanilla sends us
-     * i.e. Link: <http://vanilla.localhost/dev/api/v2/discussions?page=1&limit=1>; rel="first", <http://vanilla.localhost/dev/api/v2/discussions?page=2&limit=1>; rel="next"
-     *
-     * @param $link
-     * @return array|null
-     */
-    protected function parseLinkHeader($link)
-    {
-        if (preg_match_all('`<([^>]+)>;\s*rel="([^"]+)"`', $link, $matches, PREG_SET_ORDER)) {
-            $result = [];
-            foreach ($matches as $match) {
-                $result[$match[2]] = $match[1];
-            }
-            return $result;
-        } else {
-            return null;
-        }
-    }
 }
