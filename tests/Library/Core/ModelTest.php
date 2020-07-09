@@ -48,13 +48,12 @@ class ModelTest extends TestCase {
     /**
      * Test `Gdn_Model::delete()` with an option of `reset = false`.
      */
-    public function testDeleteNoReset(): void {
+    public function testDelete(): void {
         $id = $this->model->insert(['name' => 'toDelete']);
         $this->assertNotFalse($id);
+        $this->assertNotFalse($this->model->getID($id));
 
-        $r = $this->model->delete(['modelID' => $id], ['reset' => false]);
-        $this->assertSame(1, $this->model->SQL->whereCount());
-        $this->model->SQL->reset();
+        $r = $this->model->delete(['modelID' => $id]);
         $this->assertFalse($this->model->getID($id));
     }
 }

@@ -77,14 +77,6 @@ abstract class Gdn_SQLDriver {
      */
     protected $_NamedParameters = [];
 
-    /**
-     * @var int Whether or not to reset the properties when a query is executed.
-     *   0 = The object will reset after query execution.
-     *   1 = The object will not reset after the <b>NEXT</b> query execution.
-     *   2 = The object will not reset after <b>ALL</b> query executions.
-     */
-    protected $_NoReset = false;
-
     /** @var int The offset from which data should be returned. FALSE by default. */
     protected $_Offset;
 
@@ -1424,18 +1416,6 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Allows a query to be called without resetting the object.
-     *
-     * @param boolean $noReset Whether or not to reset this object when the next query executes.
-     * @param boolean $oneTime Whether or not this will apply for only the next query or for all subsequent queries.
-     * @return $this
-     */
-    public function noReset($noReset = true, $oneTime = true) {
-        $this->_NoReset = $noReset ? ($oneTime ? 1 : 2) : 0;
-        return $this;
-    }
-
-    /**
      * Sets the offset for the query.
      *
      * @param int $offset The offset where the query results should begin.
@@ -1905,14 +1885,6 @@ abstract class Gdn_SQLDriver {
      * @return $this
      */
     public function reset() {
-        // Check the _NoReset flag.
-        switch ($this->_NoReset) {
-            case 1:
-                $this->_NoReset = 0;
-                return $this;
-            case 2:
-                return $this;
-        }
         $this->_Selects = [];
         $this->_Froms = [];
         $this->_Joins = [];
