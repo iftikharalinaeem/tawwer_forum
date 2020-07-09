@@ -53,7 +53,9 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
      *
      * @param ResourcesApiController $resourcesApi
      * @param \Gdn_Request $request
+     *
      * @return Data
+     * 
      * @throws \Garden\Web\Exception\HttpException
      * @throws \Vanilla\Exception\PermissionException
      */
