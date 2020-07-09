@@ -76,7 +76,7 @@ class DevElasticHttpClient extends AbstractElasticHttpClient {
      * @param $records
      * @return HttpResponse
      */
-    public function bulkIndexDocuments($records) {
+    public function bulkIndexDocuments(array $records): HttpResponse {
         return $this->post('/documents', $records, ["Content-Type: application/json"]);
     }
 }
