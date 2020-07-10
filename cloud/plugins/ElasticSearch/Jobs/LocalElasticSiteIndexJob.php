@@ -12,6 +12,7 @@ use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use \Exception;
 use \Throwable;
+use Vanilla\Web\Pagination\ApiPaginationIterator;
 use Vanilla\Web\Pagination\WebLinking;
 
 /**
@@ -113,75 +114,26 @@ class LocalElasticSiteIndexJob extends AbstractLocalElasticJob {
         $type = $expandedResource['recordType'];
         $url = $expandedResource['crawl']['url'];
         $parameter = $expandedResource['crawl']['parameter'];
-        $count = $expandedResource['crawl']['count'];
         $min = $expandedResource['crawl']['min'];
         $max = $expandedResource['crawl']['max'];
-
-        $continue = true;
 
         // Add pagination and limit to original request
         $separator = strpos($url, '?') === false ? '?' : '&';
         $url = "{$url}{$separator}{$parameter}={$min}..{$max}&page=1&limit=".self::API_LIMIT;
 
-        while ($continue) {
-            $response = $this->vanillaClient->get($url);
-            $responseCode = $response->getStatusCode();
-            if ($responseCode !== 200) {
-                $msg = "Couldn't get records, received a {$responseCode} response code.";
-                throw new Exception($this, $msg);
-            }
-            $records = $response->getBody();
+        $emptyPageCount = 0;
 
-            // There is currently a problem where the <Link> response header of vanilla sometimes contains a "next" page even though there is no more records to be shown
+        $iterator = new ApiPaginationIterator($this->vanillaClient, $url);
+        foreach ($iterator as $records) {
             if (empty($records)) {
-                break;
+                if ($emptyPageCount > 5) {
+                    trigger_error("Local elastic indexer encounter 5+ empty pages in a row. This may indicate a bug", E_USER_WARNING);
+                }
+                $emptyPageCount++;
+                continue;
             }
 
-            $records = $this->prepareRecordsForMS($type, $parameter, $records);
-            $this->indexRecords($records);
-
-            // Check the response header we got from vanilla and see if we need to make a subsequent call
-            $url = $this->subsequentRequest($response);
-
-            if (empty($url)) {
-                $continue = false;
-            }
-        }
-    }
-
-    /**
-     * Takes an array of records of the same type and adds what the microservice is expecting to properly index the records
-     *
-     * @param string $type
-     * @param string $field
-     * @param array $records
-     * @return array
-     */
-    protected function prepareRecordsForMS(string $type, string $field, array $records): array {
-
-        // Resource type prepended by {{idx: and appended with }}
-        $formattedRecords['indexAlias'] = "{{idx:$type}}";
-        // Record unique identifier
-        $formattedRecords['documentIdField'] = $field;
-        // Array of the records we are indexing
-        $formattedRecords['documents'] = $records;
-
-        return $formattedRecords;
-    }
-
-    /**
-     * Calls the microservice to index the records
-     *
-     * @param array $records
-     * @throws Exception If we the request to the MS failed.
-     */
-    protected function indexRecords(array $records) {
-        $response = $this->elasticClient->bulkIndexDocuments($records);
-
-        $responseCode = $response->getStatusCode();
-        if ($responseCode !== 201) {
-            $msg = "Error indexing records through the microservice, received a {$responseCode} response code.";
-            throw new Exception($this, $msg);
+            $this->elasticClient->indexDocuments($type, $parameter, $records);
         }
     }
 

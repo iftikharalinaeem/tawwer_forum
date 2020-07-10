@@ -9,6 +9,7 @@ namespace Vanilla\Knowledge\Models;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ServerException;
 use Gdn_Session;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Database\Operation;
@@ -253,8 +254,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel implements CrawlableInt
                 }
             }
             $sql->from($this->getTable() . " as a")
-                ->join("articleRevision ar", "a.articleID = ar.articleID and ar.status = \"" . self::STATUS_PUBLISHED . "\"", "left")
-                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "left");
+                ->join("articleRevision ar", "a.articleID = ar.articleID", "inner")
+                ->join("knowledgeCategory c", "a.knowledgeCategoryID = c.knowledgeCategoryID", "inner");
             if (!empty($where["kb.status"])) {
                 $sql->leftJoin('knowledgeBase kb', "c.knowledgeBaseID = kb.knowledgeBaseID");
             }
@@ -273,6 +274,7 @@ class ArticleModel extends \Vanilla\Models\PipelineModel implements CrawlableInt
             if ($orderFields) {
                 $sql->orderBy($orderFields, $orderDirection);
             }
+            $sql->where('ar.status', self::STATUS_PUBLISHED);
             if ($where) {
                 $sql->where($where);
             }
@@ -467,12 +469,9 @@ class ArticleModel extends \Vanilla\Models\PipelineModel implements CrawlableInt
      * @throws Exception If the row does not contain a valid ID or name.
      */
     public function url(array $article, bool $withDomain = true): string {
-        $name = $article["name"] ?? null;
+        $name = $article["name"] ?? 'unknown';
         $articleID = $article["articleID"] ?? null;
 
-        if (!$name || !$articleID) {
-            throw new Exception('Invalid article row.');
-        }
         if (array_key_exists("queryLocale", $article) && isset($article["queryLocale"])) {
             $article["locale"] = ($article["queryLocale"] === $article["locale"]) ? $article["locale"] : $article["queryLocale"];
         }
@@ -491,12 +490,8 @@ class ArticleModel extends \Vanilla\Models\PipelineModel implements CrawlableInt
      * @throws Exception If the row does not contain a valid ID or name.
      */
     public function getSlug(array $article): string {
-        $name = $article["name"] ?? null;
+        $name = $article["name"] ?? 'unknown';
         $articleID = $article["articleID"] ?? null;
-
-        if (!$name || !$articleID) {
-            throw new Exception('Invalid article row.');
-        }
 
         $slug = \Gdn_Format::url("{$articleID}-{$name}");
         return $slug;

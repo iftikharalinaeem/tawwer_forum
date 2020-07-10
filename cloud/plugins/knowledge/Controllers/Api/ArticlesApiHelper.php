@@ -576,24 +576,19 @@ class ArticlesApiHelper {
         $isUpdate = false;
         if (!empty($revisionUpdate)) {
             // Grab the current published revisions from each locale, if available, to load as initial defaults.
-            $articles = $this->articleModel->getIDWithRevision($articleID, true);
-
-            $currentRevision =[];
-            foreach ($articles as $articleUpdate) {
-                // find the unique published revision in the give locale.
-                if ($articleUpdate["locale"] === $locale) {
-                    $currentRevision = array_intersect_key($articleUpdate, $revisionFields);
-                    break;
-                }
-            }
+            $currentRevision = $this->articleModel->getWithRevision(['a.articleID' => $articleID, 'ar.locale' => $locale ]);
 
             if (!empty($currentRevision)) {
+                $currentRevision = $currentRevision[0] ?? $currentRevision;
+                $currentRevision = array_intersect_key($currentRevision, $revisionFields);
+                $revisionUpdate = array_merge($currentRevision, $revisionUpdate);
                 // We have an existing revision for this locale. This means it's an update.
                 // This means it's an update.
                 $isUpdate = true;
+            } else {
+                $currentRevision = null;
             }
 
-            $revisionUpdate = array_merge($currentRevision, $revisionUpdate);
             $revisionUpdate["articleID"] = $articleID;
             $revisionUpdate["locale"] = $locale;
 

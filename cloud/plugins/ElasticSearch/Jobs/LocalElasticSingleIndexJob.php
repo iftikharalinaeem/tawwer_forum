@@ -9,6 +9,7 @@ namespace Vanilla\Cloud\ElasticSearch;
 
 use Garden\Schema\Schema;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Local job for handling updating individual records in elasticsearch.
@@ -28,15 +29,19 @@ class LocalElasticSingleIndexJob extends AbstractLocalElasticJob {
      * @return JobExecutionStatus
      */
     public function run(): JobExecutionStatus {
+        $recordResponse = $this->vanillaClient->get($this->apiUrl, $this->apiParams);
+        $recordBody = $recordResponse->getBody();
+
+        $documents = $recordBody;
+        if (ArrayUtils::isAssociative($documents)) {
+            $documents = [$documents];
+        }
         try {
             // Insert the record body into elasticsearch.
             $response = $this->elasticClient->indexDocuments(
                 $this->indexName,
                 "{$this->indexName}ID",
-                [
-                    'apiUrl' => $this->apiUrl,
-                    'apiParams' => $this->apiParams,
-                ]
+                $documents
             );
         } catch (\Exception $e) {
             logException($e);
