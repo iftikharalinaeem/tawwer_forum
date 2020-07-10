@@ -327,7 +327,7 @@ class SearchApiController extends AbstractApiController {
 
         $data = [];
         $usePagerNumberInfo = true;
-        if ($this->searchModel instanceof SphinxSearchModel) {
+        if (false) {
             $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
             $searchResults = $data['SearchResults'] ?? [];
             if (!$searchResults) {
@@ -379,7 +379,7 @@ class SearchApiController extends AbstractApiController {
                 'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in),
             ] :
             [
-                'paging' => ApiUtils::morePagerInfo($recordCount, '/api/v2/search', $query, $in),
+                'paging' => ApiUtils::morePagerInfo($result, '/api/v2/search', $query, $in),
             ];
 
         return new Data(
