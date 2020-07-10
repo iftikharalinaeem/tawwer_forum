@@ -1401,12 +1401,13 @@ if (!function_exists('userAnchor')) {
 
         $px = val('Px', $options, '');
         $name = val($px.'Name', $user, t('Unknown'));
+        $userID = $user->UserID ?? $user['UserID'] ?? $user[$px.'UserID'];
         $text = val('Text', $options, htmlspecialchars($name)); // Allow anchor text to be overridden.
 
         $attributes = [
             'class' => trim(($cssClass ?? "") . " js-userCard"),
             'rel' => val('Rel', $options),
-            'data-userid' => $user->UserID ?? $user['UserID'],
+            'data-userid' => $userID,
         ];
         if (isset($options['title'])) {
             $attributes['title'] = $options['title'];
@@ -1481,7 +1482,7 @@ if (!function_exists('userPhoto')) {
             $user = (object)$user;
         }
 
-        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap');
+        $linkClass = concatSep(' ', val('LinkClass', $options, ''), 'PhotoWrap', 'js-userCard');
         $imgClass = val('ImageClass', $options, 'ProfilePhoto');
 
         $size = val('Size', $options);
@@ -1503,7 +1504,6 @@ if (!function_exists('userPhoto')) {
         $photo = val('Photo', $fullUser, val('PhotoUrl', $user));
         $name = val('Name', $fullUser);
         $title = htmlspecialchars(val('Title', $options, $name));
-
         if ($fullUser && $fullUser['Banned']) {
             $photo = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
             $title .= ' ('.t('Banned').')';
@@ -1523,7 +1523,7 @@ if (!function_exists('userPhoto')) {
 
         $accessibleLabel = HtmlUtils::accessibleLabel('User: "%s"', [is_array($fullUser) ? $fullUser["Name"] : $fullUser->Name]);
 
-        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '">'
+        return '<a title="'.$title.'"'.$href.$linkClass.' aria-label="' . $accessibleLabel . '" data-userid="'.(json_decode($user)->UserID).'">'
                 .img($photoUrl, ['alt' => $name, 'class' => $imgClass])
             .'</a>';
     }

@@ -198,7 +198,7 @@ export default function PopupUserCard(props: IProps) {
                 <ButtonContainer>
                     <LinkAsButton
                         to={makeProfileUrl(user.name)}
-                        baseClass={ButtonTypes.STANDARD_ROUND}
+                        baseClass={ButtonTypes.STANDARD}
                         className={classes.button}
                     >
                         {t("View Profile")}
@@ -208,7 +208,7 @@ export default function PopupUserCard(props: IProps) {
                 <ButtonContainer>
                     <LinkAsButton
                         to={`/messages/add/${user.name}`}
-                        baseClass={ButtonTypes.STANDARD_ROUND}
+                        baseClass={ButtonTypes.STANDARD}
                         className={classes.button}
                     >
                         {t("Message")}

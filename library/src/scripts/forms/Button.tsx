@@ -44,8 +44,6 @@ export const getButtonStyleFromBaseClass = (type: ButtonTypes | undefined) => {
         switch (type) {
             case ButtonTypes.STANDARD:
                 return classes.standard;
-            case ButtonTypes.STANDARD_ROUND:
-                return classes.standardRound;
             case ButtonTypes.TEXT:
                 return classes.text;
             case ButtonTypes.TEXT_PRIMARY:

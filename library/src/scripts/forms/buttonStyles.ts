@@ -159,25 +159,6 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
         },
     });
 
-    const standardRound = makeThemeVars("standardRound", {
-        name: ButtonTypes.STANDARD_ROUND,
-        preset: standard.preset,
-        colors: {
-            ...standard.colors,
-        },
-        borders: {
-            ...standard.borders,
-            radius: formElementsVariables().sizing.height / 2,
-        },
-        state: {
-            ...standard.state,
-            borders: {
-                ...standard.state?.borders,
-                radius: formElementsVariables().sizing.height / 2,
-            },
-        },
-    });
-
     const primaryPresetInit = makeThemeVars("primary", {
         preset: {
             style: ButtonPreset.SOLID,
@@ -353,7 +334,6 @@ export const buttonVariables = useThemeCache((forcedVars?: IThemeVariables) => {
 
     return {
         standard,
-        standardRound,
         primary,
         transparent,
         translucid,
@@ -437,7 +417,6 @@ export const buttonClasses = useThemeCache(() => {
     return {
         primary: generateButtonClass(vars.primary),
         standard: generateButtonClass(vars.standard),
-        standardRound: generateButtonClass(vars.standardRound),
         transparent: generateButtonClass(vars.transparent),
         translucid: generateButtonClass(vars.translucid),
         icon: buttonUtilityClasses().buttonIcon,
