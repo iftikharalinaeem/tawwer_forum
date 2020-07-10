@@ -327,7 +327,7 @@ class SearchApiController extends AbstractApiController {
 
         $data = [];
         $usePagerNumberInfo = true;
-        if (false) {
+        if ($this->searchModel instanceof SphinxSearchModel) {
             $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
             $searchResults = $data['SearchResults'] ?? [];
             if (!$searchResults) {
