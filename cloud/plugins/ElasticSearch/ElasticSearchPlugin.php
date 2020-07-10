@@ -12,9 +12,7 @@ use Garden\Web\Data;
 use Vanilla\Cloud\ElasticSearch\Http\AbstractElasticHttpClient;
 use Vanilla\Cloud\ElasticSearch\Http\DevElasticHttpClient;
 use Vanilla\Dashboard\Controllers\API\ResourcesApiController;
-use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\SchedulerInterface;
-use Vanilla\Cloud\ElasticSearch\Http\ElasticHttpClient;
 
 /**
  * Plugin for elastic search.
@@ -51,27 +49,17 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
      * Trigger a full crawl of the site contents.
      *
      * @param ResourcesApiController $resourcesApi
-     * @param \Gdn_Request $request
      *
      * @return Data
-     *
-     * @throws \Garden\Web\Exception\HttpException If the http request fails.
-     * @throws \Vanilla\Exception\PermissionException If we don't have the necessary permissions to reach this endpoint.
      */
-    public function resourcesApiController_post_indexElastic(
-        ResourcesApiController $resourcesApi,
-        \Gdn_Request $request
-    ): Data {
+    public function resourcesApiController_post_indexElastic(ResourcesApiController $resourcesApi): Data {
         $resourcesApi->permission('Garden.Settings.Manage');
 
-        $slip = $this->scheduler->addJob(
-            LocalElasticSiteIndexJob::class,
-            ['resourceApiUrl' => $request->getSimpleUrl('/api/v2/resources')."?crawlable=true"],
-            JobPriority::low(),
-            0
-        );
+        // Defer loading of the client.
+        /** @var AbstractElasticHttpClient $elasticClient */
+        $elasticClient = \Gdn::getContainer()->get(AbstractElasticHttpClient::class);
+        $response = $elasticClient->triggerFullSiteIndex();
 
-        $slipID = $slip->getId();
-        return new Data(['slipID' => $slipID, 'extendedStatus' => $slip->getExtendedStatus()]);
+        return new Data($response->getBody());
     }
 }

@@ -7,10 +7,14 @@
 
 namespace Vanilla\Cloud\ElasticSearch\Http;
 
+use Aws\CloudFront\Exception\Exception;
 use Garden\Http\HttpResponse;
+use Vanilla\Cloud\ElasticSearch\LocalElasticSiteIndexJob;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Utility\ArrayUtils;
+use Vanilla\Scheduler\Job\JobPriority;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Http\InternalClient;
+use VanillaTests\Fixtures\Scheduler\InstantScheduler;
 
 /**
  * Dev implementation of the elastic http client.
@@ -22,31 +26,37 @@ class DevElasticHttpClient extends AbstractElasticHttpClient {
     /** @var InternalClient */
     private $vanillaClient;
 
+    /** @var \Gdn_Request */
+    private $request;
+
+    /** @var SchedulerInterface */
+    private $scheduler;
+
     /**
      * @inheritdoc
      */
-    public function __construct(DevElasticHttpConfig $elasticConfig, InternalClient $vanillaClient, ConfigurationInterface $config) {
+    public function __construct(
+        DevElasticHttpConfig $elasticConfig,
+        InternalClient $vanillaClient,
+        ConfigurationInterface $config,
+        \Gdn_Request $request,
+        SchedulerInterface $scheduler
+    ) {
         parent::__construct($elasticConfig);
         // Make an internal http client.
         $vanillaClient->setBaseUrl('');
         $vanillaClient->setUserID($config->get('Garden.SystemUserID'));
         $vanillaClient->setThrowExceptions(true);
         $this->vanillaClient = $vanillaClient;
+        $this->request = $request;
+        $this->scheduler = $scheduler;
     }
 
     /**
-     * Implementation that resolves pointeres immediately, rather than on in a deferred job.
-     *
      * @inheritdoc
      */
-    public function indexDocuments(string $indexName, string $documentIdField, array $apiPointer): HttpResponse {
-        $recordResponse = $this->vanillaClient->get($apiPointer['apiUrl'], $apiPointer['apiParams']);
-        $recordBody = $recordResponse->getBody();
+    public function indexDocuments(string $indexName, string $documentIdField, array $documents): HttpResponse {
 
-        $documents = $recordBody;
-        if (ArrayUtils::isAssociative($documents)) {
-            $documents = [$documents];
-        }
 
         $body = [
             'indexAlias' => $this->convertIndexNameToAlias($indexName),
@@ -70,13 +80,29 @@ class DevElasticHttpClient extends AbstractElasticHttpClient {
     }
 
     /**
-     * Bulk index records into ES
-     * Records need to be pre formatted to the format the microservice expects
-     *
-     * @param array $records
      * @return HttpResponse
      */
-    public function bulkIndexDocuments(array $records): HttpResponse {
-        return $this->post('/documents', $records, ["Content-Type: application/json"]);
+    public function triggerFullSiteIndex(): HttpResponse {
+        $slip = $this->scheduler->addJob(
+            LocalElasticSiteIndexJob::class,
+            ['resourceApiUrl' => $this->request->getSimpleUrl('/api/v2/resources')."?crawlable=true"],
+            JobPriority::low(),
+            0
+        );
+
+        $slipID = $slip->getId();
+
+        return new HttpResponse(
+            202,
+            ['Content-Type' => 'application/json'],
+            json_encode(['slipID' => $slipID, 'extendedStatus' => $slip->getExtendedStatus()])
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function documentsFieldMassUpdate(string $indexName, array $searchPayload, array $updates): HttpResponse {
+        throw new Exception('Not implemented yet');
     }
 }

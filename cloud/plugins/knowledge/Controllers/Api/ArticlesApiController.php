@@ -7,8 +7,6 @@
 namespace Vanilla\Knowledge\Controllers\Api;
 
 use Garden\EventManager;
-use Garden\Events\ResourceEvent;
-use Garden\Http\HttpClient;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
@@ -21,15 +19,12 @@ use Vanilla\Database\Operation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\ExtendedContentFormatService;
 use Vanilla\Formatting\FormatCompatTrait;
-use Vanilla\Formatting\FormatService;
-use Vanilla\Knowledge\Events\ArticleEvent;
 use Vanilla\Knowledge\Models\ArticleFeaturedModel;
 use Vanilla\Knowledge\Models\KbCategoryRecordType;
 use Vanilla\Knowledge\Models\ArticleReactionModel;
 use Vanilla\Knowledge\Models\KnowledgeBaseModel;
 use Vanilla\Knowledge\Models\KnowledgeNavigationModel;
 use Vanilla\Models\DraftModel;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Knowledge\Models\ArticleModel;
 use Vanilla\Knowledge\Models\ArticleRevisionModel;
 use Vanilla\Formatting\Quill\Parser;

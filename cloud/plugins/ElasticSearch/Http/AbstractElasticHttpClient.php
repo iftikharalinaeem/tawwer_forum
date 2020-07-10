@@ -63,18 +63,31 @@ abstract class AbstractElasticHttpClient extends HttpClient {
      *
      * @param string $indexName The index to index into.
      * @param string $documentIdField The field in the document to use as elastics `_id`.
-     * @param array $apiPointer A pointer to an API endpoint to fetch the documents from.
-     * @example
-     * [
-     *      'apiUrl' => 'https://site.com/api/v2/discussions/5'
-     *      'apiParams' => [ 'expand' => ['crawl'] ] // The query parameters.
-     * ]
+     * @param array $documents An array of documents to index in elasticsearch.
      *
      * @return HttpResponse Http response (contains ES result).
      *
      * @throws HttpException When something goes wrong.
      */
-    abstract public function indexDocuments(string $indexName, string $documentIdField, array $apiPointer): HttpResponse;
+    abstract public function indexDocuments(string $indexName, string $documentIdField, array $documents): HttpResponse;
+
+    /**
+     * Trigger a full-site index.
+     *
+     * @return HttpResponse
+     */
+    abstract public function triggerFullSiteIndex(): HttpResponse;
+
+    /**
+     * Update multiple documents with some specific fields based on the an elasticsearch query.
+     *
+     * @param string $indexName The name of the index.
+     * @param array $searchPayload An elastic search payload.
+     * @param array $updates Array of [$field => $value].
+     *
+     * @return HttpResponse
+     */
+    abstract public function documentsFieldMassUpdate(string $indexName, array $searchPayload, array $updates): HttpResponse;
 
     /**
      * Delete documents from elasticsearch.
@@ -123,7 +136,7 @@ abstract class AbstractElasticHttpClient extends HttpClient {
      * @param array $options An array of additional options for the request.
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
-    protected function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []) {
+    protected function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []): HttpResponse {
         return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
     }
 
