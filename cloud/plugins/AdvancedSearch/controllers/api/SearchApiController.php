@@ -326,6 +326,7 @@ class SearchApiController extends AbstractApiController {
 
 
         $data = [];
+        $usePagerNumberInfo = true;
         if ($this->searchModel instanceof SphinxSearchModel) {
             $data = $this->searchModel->advancedSearch($search, $offset, $limit, 'api') ?? [];
             $searchResults = $data['SearchResults'] ?? [];
@@ -336,6 +337,7 @@ class SearchApiController extends AbstractApiController {
                 }
             }
         } else {
+            $usePagerNumberInfo = false;
             if ($query['dateInserted'] ?? false) {
                 $search['date-filters'] = ApiUtils::queryToFilters($in, ['dateInserted' => $query['dateInserted']]);
             }
@@ -372,12 +374,17 @@ class SearchApiController extends AbstractApiController {
 
         $result = $out->validate($searchResults);
         $recordCount = $data['RecordCount'] ?? 0;
+        $paging = $usePagerNumberInfo ?
+            [
+                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in),
+            ] :
+            [
+                'paging' => ApiUtils::morePagerInfo($result, '/api/v2/search', $query, $in),
+            ];
 
         return new Data(
             $result,
-            [
-                'paging' => ApiUtils::numberedPagerInfo($recordCount, '/api/v2/search', $query, $in),
-            ]
+            $paging
         );
     }
 
