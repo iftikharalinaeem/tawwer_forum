@@ -10,6 +10,7 @@ import { eventsClasses } from "@groups/events/ui/eventStyles";
 import Heading from "@library/layout/Heading";
 import { EventList, IEventList } from "@groups/events/ui/EventList";
 import { IEvent } from "@groups/events/state/eventsTypes";
+import { getMeta } from "@vanilla/library/src/scripts/utility/appUtils";
 
 export interface IProps {
     events: IEvent[];
@@ -34,13 +35,17 @@ export function EventsPanel(props: IProps) {
         return null;
     }
     const classes = eventsClasses();
+    const hasThemeFeature = getMeta("themeFeatures.NewEventsPage");
     return (
         <>
             <Heading className={classes.panelHeading}>{title}</Heading>
             <EventList events={events} compact={true} headingLevel={(headingLevel + 1) as 3 | 4} />
-            <SmartLink to={viewMoreLink} className={classes.viewMore}>
-                {viewMoreText}
-            </SmartLink>
+            {/* We don't actually have a functioning view more page unless the theme feature is enabled. */}
+            {hasThemeFeature && (
+                <SmartLink to={viewMoreLink} className={classes.viewMore}>
+                    {viewMoreText}
+                </SmartLink>
+            )}
         </>
     );
 }
