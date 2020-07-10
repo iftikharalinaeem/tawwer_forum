@@ -54,6 +54,9 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
      * @param \Gdn_Request $request
      *
      * @return Data
+     *
+     * @throws \Garden\Web\Exception\HttpException If the http request fails.
+     * @throws \Vanilla\Exception\PermissionException If we don't have the necessary permissions to reach this endpoint.
      */
     public function resourcesApiController_post_indexElastic(
         ResourcesApiController $resourcesApi,
@@ -61,10 +64,12 @@ class ElasticSearchPlugin extends \Gdn_Plugin {
     ): Data {
         $resourcesApi->permission('Garden.Settings.Manage');
 
-        $slip = $this->scheduler->addJob(ResourceHandlerJob::class, [
-            'url' => $request->getSimpleUrl('/api/v2/resources'),
-            'devMode' => true
-        ], JobPriority::low(), 0);
+        $slip = $this->scheduler->addJob(
+            LocalElasticSiteIndexJob::class,
+            ['resourceApiUrl' => $request->getSimpleUrl('/api/v2/resources')."?crawlable=true"],
+            JobPriority::low(),
+            0
+        );
 
         $slipID = $slip->getId();
         return new Data(['slipID' => $slipID, 'extendedStatus' => $slip->getExtendedStatus()]);

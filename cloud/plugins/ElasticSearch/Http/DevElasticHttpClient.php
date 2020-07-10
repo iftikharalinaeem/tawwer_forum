@@ -68,4 +68,15 @@ class DevElasticHttpClient extends AbstractElasticHttpClient {
         ];
         return $this->deleteWithBody('/documents', $body);
     }
+
+    /**
+     * Bulk index records into ES
+     * Records need to be pre formatted to the format the microservice expects
+     *
+     * @param array $records
+     * @return HttpResponse
+     */
+    public function bulkIndexDocuments(array $records): HttpResponse {
+        return $this->post('/documents', $records, ["Content-Type: application/json"]);
+    }
 }
