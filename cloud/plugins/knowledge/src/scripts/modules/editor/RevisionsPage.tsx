@@ -121,15 +121,13 @@ export class RevisionsPage extends React.Component<IProps, IState> {
     private renderDrafts(): React.ReactNode {
         const { drafts } = this.props;
 
-        const { isCompact } = useLayout();
-
         if (drafts.status !== LoadStatus.SUCCESS || (Array.isArray(drafts.data) && drafts.data.length === 0)) {
             return null;
         }
 
         return (
             drafts.data && (
-                <DraftsList hideTitle={isCompact}>
+                <DraftsList hideTitle={this.props.isCompact}>
                     {drafts.data.slice().map(item => {
                         return (
                             <DraftsListItem
@@ -149,11 +147,10 @@ export class RevisionsPage extends React.Component<IProps, IState> {
      */
     private renderRevisions(): React.ReactNode {
         const { revisions, selectedRevisionID, pagination } = this.props;
-        const { isCompact } = useLayout();
         return (
             revisions.data && (
                 <>
-                    <RevisionsList hideTitle={isCompact}>
+                    <RevisionsList hideTitle={this.props.isCompact}>
                         {revisions.data.slice().map(item => {
                             const preload = () => this.props.preloadRevision(item.articleRevisionID);
                             return (
@@ -334,4 +331,4 @@ function LoadMoreButton(props: { nextPage?: number; onClick: () => void }) {
     );
 }
 
-export default withRedux(withDevice(RevisionsPage));
+export default withRedux(withLayout(RevisionsPage));

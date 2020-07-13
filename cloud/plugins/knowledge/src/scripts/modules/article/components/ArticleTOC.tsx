@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import * as React from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { t } from "@library/utility/appUtils";
 import Heading from "@library/layout/Heading";
 import classNames from "classnames";
@@ -13,7 +13,6 @@ import { panelListClasses } from "@library/layout/panelListStyles";
 import { articleTOCClasses } from "@knowledge/modules/article/components/articleTOCStyles";
 import { useUniqueID } from "@library/utility/idUtils";
 import { useLayout } from "@library/layout/LayoutContext";
-import { useEffect, useState } from "react";
 
 interface IProps {
     items: IOutlineItem[];
@@ -28,9 +27,9 @@ export default function ArticleTOC(props: IProps) {
     const { mediaQueries } = useLayout();
     const titleID = useUniqueID("articleTOC");
 
-    const handleHashChange = () => {
+    const handleHashChange = useCallback(() => {
         setRerender(!rerender);
-    };
+    }, [setRerender, rerender]);
 
     useEffect(() => {
         window.addEventListener("hashchange", handleHashChange);

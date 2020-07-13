@@ -20,23 +20,19 @@ interface IProps {
 /**
  * Implements the Article Revision History component
  */
-export default class RevisionsList extends React.Component<IProps> {
-    public render() {
-        const classes = mobileDropDownClasses();
-        const classesPanelList = panelListClasses(useLayout().mediaQueries);
-        return (
-            <div className="revisionsList related">
-                {!this.props.hideTitle && (
-                    <Heading
-                        className={classNames(classesPanelList.title, "panelList-title", "itemList-title")}
-                        title={t("Revisions")}
-                        depth={2}
-                    />
-                )}
-                <ul className={classNames("itemList-items", "panelList-items", classes.listContainer)}>
-                    {this.props.children}
-                </ul>
-            </div>
-        );
-    }
+export default function RevisionsList(props: IProps) {
+    const classes = mobileDropDownClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
+    return (
+        <div className="revisionsList related">
+            {!props.hideTitle && (
+                <Heading
+                    className={classNames(classesPanelList.title, "panelList-title", "itemList-title")}
+                    title={t("Revisions")}
+                    depth={2}
+                />
+            )}
+            <ul className={classNames("itemList-items", "panelList-items", classes.listContainer)}>{props.children}</ul>
+        </div>
+    );
 }
