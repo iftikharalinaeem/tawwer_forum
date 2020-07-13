@@ -22,45 +22,43 @@ interface IProps extends IResponseArticleDraft {
 /**
  * Implements the drafts list item component.
  */
-export default class DraftsListItem extends React.Component<IProps> {
-    public render() {
-        const { dateInserted, insertUser, url } = this.props;
-        const classesMetas = metasClasses();
-        const classes = itemListClasses();
-        const classesPanelList = panelListClasses(useLayout().mediaQueries);
+export default function DraftsListItem(props: IProps) {
+    const { dateInserted, insertUser, url } = props;
+    const classesMetas = metasClasses();
+    const classes = itemListClasses();
+    const classesPanelList = panelListClasses(useLayout().mediaQueries);
 
-        let name = "(" + t("Unknown User") + ")";
-        let photoUrl: string | undefined;
+    let name = "(" + t("Unknown User") + ")";
+    let photoUrl: string | undefined;
 
-        if (insertUser) {
-            name = insertUser.name;
-            photoUrl = insertUser.photoUrl;
-        }
-
-        return (
-            <li className={classNames("itemList-item", classes.item)}>
-                <SmartLink
-                    to={url}
-                    className={classNames("itemList-link", classes.link, "panelList-link", classesPanelList.link)}
-                    tabIndex={-1}
-                >
-                    {photoUrl && photoUrl !== "" && (
-                        <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
-                            <img
-                                src={photoUrl}
-                                className={classNames("itemList-photo", classes.photo)}
-                                alt={`${t("User") + ": "}${name}`}
-                            />
-                        </div>
-                    )}
-                    <div className={classNames("itemList-content", classes.content)}>
-                        <div className={classNames("itemList-userName", classes.userName)}>{name}</div>
-                        <div className={classNames("itemList-dateTime", classes.dateTime)}>
-                            <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
-                        </div>
-                    </div>
-                </SmartLink>
-            </li>
-        );
+    if (insertUser) {
+        name = insertUser.name;
+        photoUrl = insertUser.photoUrl;
     }
+
+    return (
+        <li className={classNames("itemList-item", classes.item)}>
+            <SmartLink
+                to={url}
+                className={classNames("itemList-link", classes.link, "panelList-link", classesPanelList.link)}
+                tabIndex={-1}
+            >
+                {photoUrl && photoUrl !== "" && (
+                    <div className={classNames("itemList-photoFrame", classes.photoFrame)}>
+                        <img
+                            src={photoUrl}
+                            className={classNames("itemList-photo", classes.photo)}
+                            alt={`${t("User") + ": "}${name}`}
+                        />
+                    </div>
+                )}
+                <div className={classNames("itemList-content", classes.content)}>
+                    <div className={classNames("itemList-userName", classes.userName)}>{name}</div>
+                    <div className={classNames("itemList-dateTime", classes.dateTime)}>
+                        <DateTime timestamp={dateInserted} className={classesMetas.metaStyle} />
+                    </div>
+                </div>
+            </SmartLink>
+        </li>
+    );
 }
