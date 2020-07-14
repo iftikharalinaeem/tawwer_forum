@@ -583,44 +583,42 @@ class Gdn_Memcached extends Gdn_Cache {
                 return $default;
             }
 
-            if ($multi) {
-                $storeData = [];
-                foreach ($data as $localKey => &$localValue) {
-                    // Is this a sharded key manifest?
-                    if (is_object($localValue) && $localValue instanceof MemcachedShard) {
-                        $manifest = $localValue;
+            $storeData = [];
+            foreach ($data as $localKey => &$localValue) {
+                // Is this a sharded key manifest?
+                if (is_object($localValue) && $localValue instanceof MemcachedShard) {
+                    $manifest = $localValue;
 
-                        // MultiGet sub-keys
-                        $shardKeys = [];
-                        foreach ($manifest->keys as $serverKey => $keys) {
-                            $serverKeys = $this->memcache->getMultiByKey($serverKey, $keys);
-                            $shardKeys = array_merge($shardKeys, $serverKeys);
-                        }
-                        ksort($shardKeys, SORT_NATURAL);
+                    // MultiGet sub-keys
+                    $shardKeys = [];
+                    foreach ($manifest->keys as $serverKey => $keys) {
+                        $serverKeys = $this->memcache->getMultiByKey($serverKey, $keys);
+                        $shardKeys = array_merge($shardKeys, $serverKeys);
+                    }
+                    ksort($shardKeys, SORT_NATURAL);
 
-                        // Check subkeys for validity
-                        $shardData = implode('', array_values($shardKeys));
-                        unset($shardKeys);
-                        $dataHash = md5($shardData);
-                        if ($dataHash != $manifest->hash) {
-                            continue;
-                        }
-
-                        $localValue = unserialize($shardData);
+                    // Check subkeys for validity
+                    $shardData = implode('', array_values($shardKeys));
+                    unset($shardKeys);
+                    $dataHash = md5($shardData);
+                    if ($dataHash != $manifest->hash) {
+                        continue;
                     }
 
-                    if ($localValue !== false) {
-                        $storeData[$localKey] = $localValue;
-                    }
-
+                    $localValue = unserialize($shardData);
                 }
-                $data = $storeData;
-                unset($storeData);
 
-                // Cache in process memory
-                if ($useLocal && sizeof($data)) {
-                    $this->localSet($data);
+                if ($localValue !== false) {
+                    $storeData[$localKey] = $localValue;
                 }
+
+            }
+            $data = $storeData;
+            unset($storeData);
+
+            // Cache in process memory
+            if ($useLocal && sizeof($data)) {
+                $this->localSet($data);
             }
         }
 
