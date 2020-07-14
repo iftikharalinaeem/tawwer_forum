@@ -36,9 +36,13 @@ if (!window.onVanillaReady) {
             console.error("Cannot register a vanilla ready handler that is not a function.");
             return;
         }
-        document.addEventListener("X-DOMContentReady", function (e) {
-            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__, e);
+        document.addEventListener("X-DOMContentReady", function () {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
         })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
     }
 }
 {%- endautoescape -%}

@@ -39,9 +39,9 @@ window.gdn.apiv2 = apiv2;
 window.onPageView = onPageView;
 
 // Named this way to discourage direct usage.
+window.__VANILLA_INTERNAL_IS_READY__ = false;
 window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__ = {
     apiv2,
-    onPageView,
     translate,
     getCurrentUser: () => {
         return getStore().getState().users.current.data;
@@ -66,8 +66,6 @@ onPageView((params: { history: History }) => {
     }, 50);
 });
 
-// Expose some globals for use in customer scripts.
-
 logDebug("Bootstrapping");
 _executeReady()
     .then(() => {
@@ -81,6 +79,7 @@ _executeReady()
 
         const contentEvent = new CustomEvent("X-DOMContentReady", { bubbles: true, cancelable: false });
         document.dispatchEvent(contentEvent);
+        window.__VANILLA_INTERNAL_IS_READY__ = true;
     })
     .catch(error => {
         logError(error);
