@@ -210,9 +210,6 @@ export function onReady(callback: PromiseOrNormalCallback) {
     _readyHandlers.push(callback);
 }
 
-// Export to the window for use in the application.
-window.onVanillaReady = onReady;
-
 /**
  * Execute all of the registered events in order.
  *
