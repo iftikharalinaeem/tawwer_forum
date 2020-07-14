@@ -86,6 +86,10 @@ class ThemeFeatures implements \JsonSerializable {
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
         }
 
+        if (FeatureFlagHelper::featureEnabled('NewEventsPage')) {
+            $themeValues['NewEventsPage'] = true;
+        }
+
         if (FeatureFlagHelper::featureEnabled(SearchRootController::ENABLE_FLAG)) {
             $themeValues[SearchRootController::ENABLE_FLAG] = true;
         }
