@@ -30,7 +30,7 @@
         "csx": "9.0.0",
         "emojibase-data": "3.2.1",
         "formik": "^2.1.4",
-        "highlight.js": "9.15.6",
+        "highlight.js": "10.1.2",
         "immer": "^2.0.0",
         "karma-viewport": "^1.0.6",
         "lodash": "^4.17.11",
